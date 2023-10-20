@@ -48,34 +48,21 @@ public class TaskCoordinatorMessageBrokerConfiguration {
     @Bean
     MessageBrokerConfigurer<?> taskCoordinatorMessageBrokerConfigurer() {
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            TaskCoordinator coordinator = applicationContext.getBean(TaskCoordinator.class);
-
+            TaskCoordinator taskCoordinator = applicationContext.getBean(TaskCoordinator.class);
             TaskCoordinatorSubscriptions subscriptions = taskCoordinatorProperties.getSubscriptions();
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                TaskMessageRoute.TASKS_COMPLETIONS,
-                subscriptions.getCompletions(),
-                coordinator,
-                "complete");
+                listenerEndpointRegistrar, TaskMessageRoute.TASKS_COMPLETE, subscriptions.getTasksComplete(),
+                taskCoordinator, "handleTasksComplete");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                TaskMessageRoute.TASKS_JOBS,
-                subscriptions.getJobs(),
-                coordinator,
-                "start");
+                listenerEndpointRegistrar, TaskMessageRoute.JOBS_START, subscriptions.getJobsStart(), taskCoordinator,
+                "handleJobsStart");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                TaskMessageRoute.TASKS_RESTARTS,
-                subscriptions.getRestarts(),
-                coordinator,
-                "resume");
+                listenerEndpointRegistrar, TaskMessageRoute.JOBS_RESUME, subscriptions.getJobsResume(),
+                taskCoordinator, "handleJobsResume");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar,
-                TaskMessageRoute.TASKS_STOPS,
-                subscriptions.getStops(),
-                coordinator,
-                "stop");
+                listenerEndpointRegistrar, TaskMessageRoute.JOBS_STOP, subscriptions.getJobsStop(),
+                taskCoordinator, "handleJobsStop");
         };
     }
 }

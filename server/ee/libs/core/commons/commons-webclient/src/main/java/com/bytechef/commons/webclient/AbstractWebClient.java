@@ -57,45 +57,45 @@ public class AbstractWebClient {
     }
 
     @Retryable
-    public <T> T get(Function<UriBuilder, URI> uriFunction, Class<T> elementClass) {
+    public <T> T get(Function<UriBuilder, URI> uriFunction, Class<T> responseClass) {
         return webClientBuilder
             .build()
             .get()
             .uri(uriFunction)
             .retrieve()
-            .bodyToMono(elementClass)
+            .bodyToMono(responseClass)
             .block();
     }
 
     @Retryable
-    public <T> T get(Function<UriBuilder, URI> uriFunction, ParameterizedTypeReference<T> elementTypeRef) {
+    public <T> T get(Function<UriBuilder, URI> uriFunction, ParameterizedTypeReference<T> responseTypeRef) {
         return webClientBuilder
             .build()
             .get()
             .uri(uriFunction)
             .retrieve()
-            .bodyToMono(elementTypeRef)
+            .bodyToMono(responseTypeRef)
             .block();
     }
 
     @Retryable
-    public <T> Mono<T> getMono(Function<UriBuilder, URI> uriFunction, Class<T> elementClass) {
+    public <T> Mono<T> getMono(Function<UriBuilder, URI> uriFunction, Class<T> responseClass) {
         return webClientBuilder
             .build()
             .get()
             .uri(uriFunction)
             .retrieve()
-            .bodyToMono(elementClass);
+            .bodyToMono(responseClass);
     }
 
     @Retryable
-    public <T> Mono<T> getMono(Function<UriBuilder, URI> uriFunction, ParameterizedTypeReference<T> elementTypeRef) {
+    public <T> Mono<T> getMono(Function<UriBuilder, URI> uriFunction, ParameterizedTypeReference<T> responseTypeRef) {
         return webClientBuilder
             .build()
             .get()
             .uri(uriFunction)
             .retrieve()
-            .bodyToMono(elementTypeRef);
+            .bodyToMono(responseTypeRef);
     }
 
     @Retryable
@@ -115,7 +115,7 @@ public class AbstractWebClient {
     }
 
     @Retryable
-    public <T> T post(Function<UriBuilder, URI> uriFunction, Object bodyValue, Class<T> elementClass) {
+    public <T> T post(Function<UriBuilder, URI> uriFunction, Object bodyValue, Class<T> responseClass) {
         WebClient.RequestBodySpec requestBodySpec = webClientBuilder
             .build()
             .post()
@@ -126,13 +126,13 @@ public class AbstractWebClient {
         }
 
         return requestBodySpec.retrieve()
-            .bodyToMono(elementClass)
+            .bodyToMono(responseClass)
             .block();
     }
 
     @Retryable
     public <T> T post(
-        Function<UriBuilder, URI> uriFunction, Object bodyValue, ParameterizedTypeReference<T> elementTypeRef) {
+        Function<UriBuilder, URI> uriFunction, Object bodyValue, ParameterizedTypeReference<T> responseTypeRef) {
 
         WebClient.RequestBodySpec requestBodySpec = webClientBuilder
             .build()
@@ -144,7 +144,7 @@ public class AbstractWebClient {
         }
 
         return requestBodySpec.retrieve()
-            .bodyToMono(elementTypeRef)
+            .bodyToMono(responseTypeRef)
             .block();
     }
 
@@ -165,7 +165,7 @@ public class AbstractWebClient {
     }
 
     @Retryable
-    public <T> T put(Function<UriBuilder, URI> uriFunction, Object bodyValue, Class<T> elementClass) {
+    public <T> T put(Function<UriBuilder, URI> uriFunction, Object bodyValue, Class<T> responseClass) {
         WebClient.RequestBodySpec requestBodySpec = webClientBuilder
             .build()
             .put()
@@ -176,13 +176,13 @@ public class AbstractWebClient {
         }
 
         return requestBodySpec.retrieve()
-            .bodyToMono(elementClass)
+            .bodyToMono(responseClass)
             .block();
     }
 
     @Retryable
     public <T> T put(
-        Function<UriBuilder, URI> uriFunction, Object bodyValue, ParameterizedTypeReference<T> elementTypeRef) {
+        Function<UriBuilder, URI> uriFunction, Object bodyValue, ParameterizedTypeReference<T> responseTypeRef) {
 
         WebClient.RequestBodySpec requestBodySpec = webClientBuilder
             .build()
@@ -194,7 +194,7 @@ public class AbstractWebClient {
         }
 
         return requestBodySpec.retrieve()
-            .bodyToMono(elementTypeRef)
+            .bodyToMono(responseTypeRef)
             .block();
     }
 }

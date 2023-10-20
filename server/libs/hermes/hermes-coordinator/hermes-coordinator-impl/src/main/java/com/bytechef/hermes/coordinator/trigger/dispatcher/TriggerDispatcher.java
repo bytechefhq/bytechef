@@ -20,6 +20,7 @@ package com.bytechef.hermes.coordinator.trigger.dispatcher;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -37,19 +38,16 @@ public class TriggerDispatcher {
     private final MessageBroker messageBroker;
     private final List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors;
 
+    @SuppressFBWarnings("EI")
     public TriggerDispatcher(
         MessageBroker messageBroker, List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors) {
 
         this.messageBroker = messageBroker;
-        this.triggerDispatcherPreSendProcessors = triggerDispatcherPreSendProcessors == null
-            ? List.of()
-            : triggerDispatcherPreSendProcessors;
+        this.triggerDispatcherPreSendProcessors = triggerDispatcherPreSendProcessors;
     }
 
     public void dispatch(TriggerExecution triggerExecution) {
-        for (TriggerDispatcherPreSendProcessor triggerDispatcherPreSendProcessor : triggerDispatcherPreSendProcessors) {
-            triggerExecution = triggerDispatcherPreSendProcessor.process(triggerExecution);
-        }
+        triggerExecution = preProcess(triggerExecution);
 
         if (logger.isDebugEnabled()) {
             logger.debug(
@@ -58,5 +56,13 @@ public class TriggerDispatcher {
         }
 
         messageBroker.send(TriggerMessageRoute.TRIGGERS, triggerExecution);
+    }
+
+    private TriggerExecution preProcess(TriggerExecution triggerExecution) {
+        for (TriggerDispatcherPreSendProcessor triggerDispatcherPreSendProcessor : triggerDispatcherPreSendProcessors) {
+            triggerExecution = triggerDispatcherPreSendProcessor.process(triggerExecution);
+        }
+
+        return triggerExecution;
     }
 }

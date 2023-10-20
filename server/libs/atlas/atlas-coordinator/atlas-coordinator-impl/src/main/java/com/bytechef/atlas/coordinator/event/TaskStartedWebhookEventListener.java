@@ -21,9 +21,9 @@ package com.bytechef.atlas.coordinator.event;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.event.TaskStartedWorkflowEvent;
+import com.bytechef.atlas.execution.event.TaskStartedEvent;
 import com.bytechef.event.listener.EventListener;
-import com.bytechef.event.WorkflowEvent;
+import com.bytechef.event.Event;
 import com.bytechef.atlas.execution.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -51,13 +51,13 @@ public class TaskStartedWebhookEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (TaskStartedWorkflowEvent.TASK_STARTED.equals(workflowEvent.getType())) {
-            handleEvent((TaskStartedWorkflowEvent) workflowEvent);
+    public void onApplicationEvent(Event event) {
+        if (TaskStartedEvent.TASK_STARTED.equals(event.getType())) {
+            handleEvent((TaskStartedEvent) event);
         }
     }
 
-    private void handleEvent(TaskStartedWorkflowEvent workflowEvent) {
+    private void handleEvent(TaskStartedEvent workflowEvent) {
         Long jobId = workflowEvent.getJobId();
 
         Job job = jobService.getJob(jobId);
@@ -69,7 +69,7 @@ public class TaskStartedWebhookEventListener implements EventListener {
         }
 
         for (Job.Webhook webhook : job.getWebhooks()) {
-            if (TaskStartedWorkflowEvent.TASK_STARTED.equals(webhook.type())) {
+            if (TaskStartedEvent.TASK_STARTED.equals(webhook.type())) {
                 Map<String, Object> webhookEvent = webhook.toMap();
 
                 webhookEvent.put(WorkflowConstants.EVENT, workflowEvent);

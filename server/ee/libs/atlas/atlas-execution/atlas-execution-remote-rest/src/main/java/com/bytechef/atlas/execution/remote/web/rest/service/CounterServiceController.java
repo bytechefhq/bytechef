@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/counter-service")
 public class CounterServiceController {
 
     private final CounterService counterService;
@@ -43,7 +43,7 @@ public class CounterServiceController {
 
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/counter-service/delete/{id}")
+        value = "/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id) {
         counterService.delete(id);
 
@@ -53,7 +53,7 @@ public class CounterServiceController {
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/counter-service/decrement/{id}")
+        value = "/decrement/{id}")
     public ResponseEntity<Void> decrement(@PathVariable long id) {
         counterService.decrement(id);
 
@@ -63,7 +63,7 @@ public class CounterServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/counter-service/set/{id}/{value}")
+        value = "/set/{id}/{value}")
     public ResponseEntity<Void> set(@PathVariable long id, @PathVariable long value) {
         counterService.set(id, value);
 

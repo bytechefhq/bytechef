@@ -27,15 +27,7 @@ import java.util.Optional;
  */
 public interface AuthorizationContextConnection extends Context.Connection {
 
-    /**
-     *
-     * @return
-     */
     ApplyResponse applyAuthorization();
 
-    /**
-     *
-     * @return
-     */
     Optional<String> fetchBaseUri();
 }

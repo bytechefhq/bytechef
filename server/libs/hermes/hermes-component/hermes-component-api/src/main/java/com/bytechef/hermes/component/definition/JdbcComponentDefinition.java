@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableJdbcComponentDefinition;
 import com.bytechef.hermes.definition.Resources;
 
 import java.util.Optional;
@@ -25,7 +24,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public sealed interface JdbcComponentDefinition permits ModifiableJdbcComponentDefinition {
+public interface JdbcComponentDefinition {
 
     /**
      *
@@ -49,7 +48,7 @@ public sealed interface JdbcComponentDefinition permits ModifiableJdbcComponentD
      *
      * @return
      */
-    String getIcon();
+    Optional<String> getIcon();
 
     /**
      * TODO
@@ -68,7 +67,7 @@ public sealed interface JdbcComponentDefinition permits ModifiableJdbcComponentD
      *
      * @return
      */
-    String getTitle();
+    Optional<String> getTitle();
 
     /**
      * TODO

@@ -54,7 +54,8 @@ public class TaskWorkerMessageBrokerConfiguration {
             Map<String, Object> subscriptions = taskWorkerProperties.getSubscriptions();
 
             subscriptions.forEach((routeName, concurrency) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TaskMessageRoute.ofRoute(routeName), Integer.parseInt((String) concurrency),
+                listenerEndpointRegistrar, TaskMessageRoute.ofWorkerRoute(routeName),
+                Integer.parseInt((String) concurrency),
                 taskWorker, "handle"));
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(

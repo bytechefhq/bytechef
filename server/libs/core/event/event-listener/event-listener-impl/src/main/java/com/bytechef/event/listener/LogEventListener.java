@@ -19,7 +19,7 @@
 
 package com.bytechef.event.listener;
 
-import com.bytechef.event.WorkflowEvent;
+import com.bytechef.event.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class LogEventListener implements EventListener {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        logger.debug("{}", workflowEvent);
+    public void onApplicationEvent(Event event) {
+        logger.debug("{}", event);
     }
 }

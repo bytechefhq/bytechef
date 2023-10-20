@@ -27,10 +27,13 @@ import com.bytechef.component.petstore.PetstoreComponentHandler;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.context.factory.ContextConnectionFactory;
+import com.bytechef.hermes.component.context.factory.ContextConnectionFactoryImpl;
 import com.bytechef.hermes.component.context.factory.ContextFactoryImpl;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.hermes.component.util.OpenApiClientUtils;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistryImpl;
 import com.bytechef.hermes.component.oas.handler.OpenApiComponentActionTaskHandler;
 import com.bytechef.hermes.component.util.HttpClientUtils;
@@ -41,6 +44,10 @@ import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.component.context.factory.ContextFactory;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionServiceImpl;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionServiceImpl;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionServiceImpl;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
@@ -80,7 +87,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
 import static com.github.tomakehurst.wiremock.client.WireMock.binaryEqualTo;
@@ -111,6 +117,15 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
             return connectionDefinition;
         }
+
+        @Override
+        public ModifiableActionDefinition modifyAction(ModifiableActionDefinition actionDefinition) {
+            return actionDefinition.perform(
+                (inputParameters, context) -> OpenApiClientUtils.execute(
+                    inputParameters, OptionalUtils.orElse(actionDefinition.getProperties(), List.of()),
+                    OptionalUtils.orElse(actionDefinition.getOutputSchema(), null),
+                    OptionalUtils.get(actionDefinition.getMetadata())));
+        }
     };
 
     @Autowired
@@ -119,7 +134,7 @@ public class OpenApiComponentActionTaskHandlerIntTest {
     private Connection connection;
 
     @Autowired
-    private ContextFactory contextFactory;
+    private ActionDefinitionService actionDefinitionService;
 
     @BeforeEach
     public void beforeEach() {
@@ -800,23 +815,12 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
     private OpenApiComponentActionTaskHandler createOpenApiComponentHandler(String actionName) {
         return new OpenApiComponentActionTaskHandler(
-            getActionDefinition(actionName), contextFactory, PETSTORE_COMPONENT_HANDLER);
-    }
-
-    private ActionDefinition getActionDefinition(String actionName) {
-        ComponentDefinition componentDefinition = PETSTORE_COMPONENT_HANDLER.getDefinition();
-
-        for (ActionDefinition actionDefinition : OptionalUtils.get(componentDefinition.getActions())) {
-            if (Objects.equals(actionDefinition.getName(), actionName)) {
-                return actionDefinition;
-            }
-        }
-
-        throw new IllegalArgumentException("Action name does not exist");
+            actionName, actionDefinitionService, PETSTORE_COMPONENT_HANDLER);
     }
 
     private TaskExecution getTaskExecution(Map<String, Object> parameters) {
         return TaskExecution.builder()
+            .id(1L)
             .metadata(
                 connection.getId() == null
                     ? Map.of()
@@ -845,9 +849,37 @@ public class OpenApiComponentActionTaskHandlerIntTest {
         MessageBroker messageBroker;
 
         @Bean
-        ConnectionDefinitionService connectionDefinitionService() {
-            return new ConnectionDefinitionServiceImpl(
-                new ComponentDefinitionRegistryImpl(List.of(PETSTORE_COMPONENT_HANDLER)));
+        ActionDefinitionService actionDefinitionService(
+            ComponentDefinitionRegistry componentDefinitionRegistry, ContextConnectionFactory contextConnectionFactory,
+            ContextFactory contextFactory) {
+
+            return new ActionDefinitionServiceImpl(
+                componentDefinitionRegistry, contextConnectionFactory, contextFactory);
+        }
+
+        @Bean
+        ComponentDefinitionRegistry componentDefinitionRegistry() {
+            return new ComponentDefinitionRegistryImpl(List.of(PETSTORE_COMPONENT_HANDLER));
+        }
+
+        @Bean
+        ComponentDefinitionService componentDefinitionService(ComponentDefinitionRegistry componentDefinitionRegistry) {
+            return new ComponentDefinitionServiceImpl(componentDefinitionRegistry);
+        }
+
+        @Bean
+        ContextConnectionFactory contextConnectionFactory(
+            ComponentDefinitionService componentDefinitionService,
+            ConnectionDefinitionService connectionDefinitionService) {
+
+            return new ContextConnectionFactoryImpl(componentDefinitionService, connectionDefinitionService);
+        }
+
+        @Bean
+        ConnectionDefinitionService connectionDefinitionService(
+            ComponentDefinitionRegistry componentDefinitionRegistry) {
+
+            return new ConnectionDefinitionServiceImpl(componentDefinitionRegistry);
         }
 
         @Bean

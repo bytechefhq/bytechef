@@ -36,7 +36,7 @@ import java.util.Map;
  */
 @Hidden
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path:}/internal/context-service")
 public class ContextServiceController {
 
     private final ContextService contextService;
@@ -48,7 +48,7 @@ public class ContextServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/context-service/peek/{stackId}/{classname}",
+        value = "/peek/{stackId}/{classname}",
         produces = {
             "application/json"
         })
@@ -58,7 +58,7 @@ public class ContextServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/context-service/peek/{stackId}/{subStackId}/{classname}",
+        value = "/peek/{stackId}/{subStackId}/{classname}",
         produces = {
             "application/json"
         })
@@ -70,7 +70,7 @@ public class ContextServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/context-service/push/{stackId}/{classname}",
+        value = "/push/{stackId}/{classname}",
         consumes = {
             "application/json"
         })
@@ -86,7 +86,7 @@ public class ContextServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/context-service/push/{stackId}/{subStackId}/{classname}",
+        value = "/push/{stackId}/{subStackId}/{classname}",
         consumes = {
             "application/json"
         })

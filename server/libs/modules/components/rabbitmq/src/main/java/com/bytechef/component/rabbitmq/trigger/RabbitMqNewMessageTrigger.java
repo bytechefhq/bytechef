@@ -20,11 +20,11 @@ package com.bytechef.component.rabbitmq.trigger;
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.hermes.component.util.ListenerTriggerUtils;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.JsonUtils;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DeliverCallback;
 
@@ -63,29 +63,29 @@ public class RabbitMqNewMessageTrigger {
         .listenerDisable(RabbitMqNewMessageTrigger::listenerDisable);
 
     protected static void listenerEnable(
-        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
+        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId,
+        ListenerEmitter listenerEmitter) {
 
         try {
             com.rabbitmq.client.Connection rabbitMqConnection = RabbitMqUtils.getConnection(
-                MapValueUtils.getString(connection.getParameters(), HOSTNAME),
-                MapValueUtils.getInteger(connection.getParameters(), PORT, 5672),
-                MapValueUtils.getString(connection.getParameters(), USERNAME),
-                MapValueUtils.getString(connection.getParameters(), PASSWORD));
+                MapUtils.getString(connection.getParameters(), HOSTNAME),
+                MapUtils.getInteger(connection.getParameters(), PORT, 5672),
+                MapUtils.getString(connection.getParameters(), USERNAME),
+                MapUtils.getString(connection.getParameters(), PASSWORD));
 
             CONNECTION_MAP.put(workflowExecutionId, rabbitMqConnection);
 
             Channel channel = rabbitMqConnection.createChannel();
 
-            channel.queueDeclare(MapValueUtils.getRequiredString(inputParameters, QUEUE), true, false, false, null);
+            channel.queueDeclare(MapUtils.getRequiredString(inputParameters, QUEUE), true, false, false, null);
 
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                 String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
 
-                ListenerTriggerUtils.emit(workflowExecutionId, JsonUtils.read(message));
+                listenerEmitter.emit(JsonUtils.read(message));
             };
 
-            channel.basicConsume(
-                MapValueUtils.getString(inputParameters, QUEUE), true, deliverCallback, consumerTag -> {});
+            channel.basicConsume(MapUtils.getString(inputParameters, QUEUE), true, deliverCallback, consumerTag -> {});
         } catch (Exception e) {
             throw new ComponentExecutionException(e.getMessage(), e);
         }

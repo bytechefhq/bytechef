@@ -17,11 +17,8 @@
 
 package com.bytechef.hermes.definition.registry.facade;
 
-import com.bytechef.hermes.component.ActionContext;
-import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.component.context.factory.ContextFactory;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
@@ -37,16 +34,13 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     private final ActionDefinitionService actionDefinitionService;
     private final ConnectionService connectionService;
-    private final ContextFactory contextFactory;
 
     @SuppressFBWarnings("EI")
     public ActionDefinitionFacadeImpl(
-        ActionDefinitionService actionDefinitionService, ConnectionService connectionService,
-        ContextFactory contextFactory) {
+        ActionDefinitionService actionDefinitionService, ConnectionService connectionService) {
 
         this.actionDefinitionService = actionDefinitionService;
         this.connectionService = connectionService;
-        this.contextFactory = contextFactory;
     }
 
     @Override
@@ -54,16 +48,12 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, Long connectionId) {
 
-        return ComponentContextSupplier.get(
-            getActionContext(componentName, connectionId),
-            () -> {
-                Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
+        Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
-                return actionDefinitionService.executeDynamicProperties(
-                    componentVersion, componentName, actionName, propertyName, actionParameters,
-                    connection == null ? null : connection.getAuthorizationName(),
-                    connection == null ? null : connection.getParameters());
-            });
+        return actionDefinitionService.executeDynamicProperties(
+            componentName, componentVersion, actionName, propertyName, actionParameters, connectionId,
+            connection == null ? null : connection.getParameters(),
+            connection == null ? null : connection.getAuthorizationName());
     }
 
     @Override
@@ -71,16 +61,12 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         Long connectionId) {
 
-        return ComponentContextSupplier.get(
-            getActionContext(componentName, connectionId),
-            () -> {
-                Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
+        Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
-                return actionDefinitionService.executeEditorDescription(
-                    componentName, componentVersion, actionName, actionParameters,
-                    connection == null ? null : connection.getAuthorizationName(),
-                    connection == null ? null : connection.getParameters());
-            });
+        return actionDefinitionService.executeEditorDescription(
+            componentName, componentVersion, actionName, actionParameters, connectionId,
+            connection == null ? null : connection.getParameters(),
+            connection == null ? null : connection.getAuthorizationName());
     }
 
     @Override
@@ -88,16 +74,13 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, Long connectionId, String searchText) {
 
-        return ComponentContextSupplier.get(
-            getActionContext(componentName, connectionId),
-            () -> {
-                Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
+        Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
-                return actionDefinitionService.executeOptions(
-                    componentName, componentVersion, actionName, propertyName, actionParameters,
-                    connection == null ? null : connection.getAuthorizationName(),
-                    connection == null ? null : connection.getParameters(), searchText);
-            });
+        return actionDefinitionService.executeOptions(
+            componentName, componentVersion, actionName, propertyName, actionParameters,
+            searchText, connectionId,
+            connection == null ? null : connection.getParameters(),
+            connection == null ? null : connection.getAuthorizationName());
     }
 
     @Override
@@ -105,16 +88,12 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         Long connectionId) {
 
-        return ComponentContextSupplier.get(
-            getActionContext(componentName, connectionId),
-            () -> {
-                Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
+        Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
-                return actionDefinitionService.executeOutputSchema(
-                    componentName, componentVersion, actionName, actionParameters,
-                    connection == null ? null : connection.getAuthorizationName(),
-                    connection == null ? null : connection.getParameters());
-            });
+        return actionDefinitionService.executeOutputSchema(
+            componentName, componentVersion, actionName, actionParameters, connectionId,
+            connection == null ? null : connection.getParameters(),
+            connection == null ? null : connection.getAuthorizationName());
     }
 
     @Override
@@ -122,20 +101,11 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         Long connectionId) {
 
-        return ComponentContextSupplier.get(
-            getActionContext(componentName, connectionId),
-            () -> {
-                Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
+        Connection connection = connectionId == null ? null : connectionService.getConnection(connectionId);
 
-                return actionDefinitionService.executeSampleOutput(
-                    componentName, componentVersion, actionName, actionParameters,
-                    connection == null ? null : connection.getAuthorizationName(),
-                    connection == null ? null : connection.getParameters());
-            });
-    }
-
-    private ActionContext getActionContext(String componentName, Long connectionId) {
-        return contextFactory.createActionContext(
-            connectionId == null ? Map.of() : Map.of(componentName, connectionId));
+        return actionDefinitionService.executeSampleOutput(
+            componentName, componentVersion, actionName, actionParameters, connectionId,
+            connection == null ? null : connection.getParameters(),
+            connection == null ? null : connection.getAuthorizationName());
     }
 }

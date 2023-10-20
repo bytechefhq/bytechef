@@ -17,9 +17,11 @@
 
 package com.bytechef.server.config;
 
-import com.bytechef.atlas.execution.facade.JobFactoryFacade;
+import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.helios.configuration.facade.ProjectFacadeImpl;
@@ -30,6 +32,7 @@ import com.bytechef.helios.execution.facade.WorkflowExecutionFacadeImpl;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
+import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.tag.service.TagService;
 import org.springframework.context.annotation.Bean;
@@ -43,13 +46,13 @@ public class ProjectConfiguration {
 
     @Bean
     ProjectInstanceFacade projectInstanceFacade(
-        JobFactoryFacade jobFactoryFacade, ProjectInstanceService projectInstanceService,
+        JobFacade jobFacade, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
         TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade,
         WorkflowService workflowService) {
 
         return new ProjectInstanceFacadeImpl(
-            jobFactoryFacade, projectInstanceService, projectInstanceWorkflowService, projectService, tagService,
+            jobFacade, projectInstanceService, projectInstanceWorkflowService, projectService, tagService,
             triggerLifecycleFacade, workflowService);
     }
 
@@ -64,10 +67,12 @@ public class ProjectConfiguration {
 
     @Bean
     WorkflowExecutionFacade projectWorkflowExecutionFacade(
-        com.bytechef.hermes.execution.facade.JobFacade jobFacade, JobService jobService,
-        ProjectInstanceService projectInstanceService, ProjectService projectService, WorkflowService workflowService) {
+        ComponentDefinitionService componentDefinitionService, ContextService contextService, JobService jobService,
+        ProjectInstanceService projectInstanceService, ProjectService projectService,
+        TaskExecutionService taskExecutionService, WorkflowService workflowService) {
 
         return new WorkflowExecutionFacadeImpl(
-            jobFacade, jobService, projectInstanceService, projectService, workflowService);
+            componentDefinitionService, contextService, jobService, projectInstanceService, projectService,
+            taskExecutionService, workflowService);
     }
 }

@@ -20,9 +20,9 @@
 package com.bytechef.atlas.coordinator.event;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.event.TaskProgressedWorkflowEvent;
+import com.bytechef.atlas.execution.event.TaskProgressedEvent;
 import com.bytechef.event.listener.EventListener;
-import com.bytechef.event.WorkflowEvent;
+import com.bytechef.event.Event;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -40,9 +40,9 @@ public class TaskProgressedEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (TaskProgressedWorkflowEvent.TASK_PROGRESSED.equals(workflowEvent.getType())) {
-            TaskProgressedWorkflowEvent taskProgressedWorkflowEvent = (TaskProgressedWorkflowEvent) workflowEvent;
+    public void onApplicationEvent(Event event) {
+        if (TaskProgressedEvent.TASK_PROGRESSED.equals(event.getType())) {
+            TaskProgressedEvent taskProgressedWorkflowEvent = (TaskProgressedEvent) event;
 
             TaskExecution taskExecution = taskExecutionService.getTaskExecution(
                 taskProgressedWorkflowEvent.getTaskExecutionId());

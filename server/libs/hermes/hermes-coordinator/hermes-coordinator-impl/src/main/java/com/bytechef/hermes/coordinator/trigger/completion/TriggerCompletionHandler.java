@@ -18,10 +18,10 @@
 package com.bytechef.hermes.coordinator.trigger.completion;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.JobFactoryFacade;
-import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManagerRegistry;
+import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
+import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
@@ -39,17 +39,17 @@ import java.util.Map;
 @Component
 public class TriggerCompletionHandler {
 
-    private final InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry;
-    private final JobFactoryFacade jobFactoryFacade;
+    private final InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry;
+    private final JobFacade jobFacade;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerStateService triggerStateService;
 
     public TriggerCompletionHandler(
-        InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry, JobFactoryFacade jobFactoryFacade,
+        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, JobFacade jobFacade,
         TriggerExecutionService triggerExecutionService, TriggerStateService triggerStateService) {
 
-        this.instanceWorkflowManagerRegistry = instanceWorkflowManagerRegistry;
-        this.jobFactoryFacade = jobFactoryFacade;
+        this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
+        this.jobFacade = jobFacade;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerStateService = triggerStateService;
     }
@@ -58,9 +58,6 @@ public class TriggerCompletionHandler {
     @SuppressWarnings("unchecked")
     public void handle(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
-
-        InstanceWorkflowManager instanceWorkflowManager = instanceWorkflowManagerRegistry.getInstanceFacade(
-            workflowExecutionId.getInstanceType());
 
         triggerExecution.setStatus(Status.COMPLETED);
 
@@ -74,23 +71,26 @@ public class TriggerCompletionHandler {
             triggerStateService.save(workflowExecutionId, triggerExecution.getState());
         }
 
-        Map<String, Object> inputs = (Map<String, Object>) instanceWorkflowManager.getInputs(
+        InstanceWorkflowAccessor instanceWorkflowAccessor =
+            instanceWorkflowAccessorRegistry.getInstanceWorkflowAccessor(
+                workflowExecutionId.getInstanceType());
+
+        Map<String, Object> inputs = (Map<String, Object>) instanceWorkflowAccessor.getInputs(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
 
         if (!triggerExecution.isBatch() && triggerExecution.getOutput() instanceof Collection<?> collectionOutput) {
             for (Object outputItem : collectionOutput) {
                 createJob(
-                    workflowExecutionId,
-                    CollectionUtils.concat(inputs, Map.of(triggerExecution.getName(), outputItem)));
+                    workflowExecutionId, MapUtils.concat(inputs, Map.of(triggerExecution.getName(), outputItem)));
             }
         } else {
             createJob(
                 workflowExecutionId,
-                CollectionUtils.concat(inputs, Map.of(triggerExecution.getName(), triggerExecution.getOutput())));
+                MapUtils.concat(inputs, Map.of(triggerExecution.getName(), triggerExecution.getOutput())));
         }
     }
 
     private void createJob(WorkflowExecutionId workflowExecutionId, Map<String, ?> inputs) {
-        jobFactoryFacade.createJob(new JobParameters(workflowExecutionId.getWorkflowId(), inputs));
+        jobFacade.createJob(new JobParameters(workflowExecutionId.getWorkflowId(), inputs));
     }
 }

@@ -22,9 +22,9 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookHeaders;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookValidateContext;
+import com.bytechef.hermes.component.util.MapUtils;
 
 import java.util.Map;
 import java.util.Objects;
@@ -51,6 +51,7 @@ public class WebhookValidateAndRespondTrigger {
         .description(
             "Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook trigger responds to the sender with an appropriate HTTP status code.")
         .type(TriggerDefinition.TriggerType.STATIC_WEBHOOK)
+        .workflowSyncValidation(true)
         .properties(
             string(CSRF_TOKEN)
                 .label("CSRF Token")
@@ -65,17 +66,16 @@ public class WebhookValidateAndRespondTrigger {
 
         return WebhookOutput.map(
             Map.of(
-                BODY, webhookBody.getContent(),
+                BODY, webhookBody.content(),
                 METHOD, context.method(),
                 HEADERS, context.headers(),
                 PARAMETERS, context.parameters()));
     }
 
     protected static boolean webhookValidate(WebhookValidateContext context) {
-        WebhookHeaders webhookHeaders = context.headers();
-        Map<String, ?> inputParameters = context.inputParameters();
-
-        return Objects.equals(webhookHeaders.getValue(X_CRSF_TOKEN), inputParameters.get(CSRF_TOKEN));
+        return Objects.equals(
+            MapUtils.getArray(context.headers(), X_CRSF_TOKEN, String.class)[0],
+            MapUtils.getString(context.inputParameters(), CSRF_TOKEN));
     }
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {

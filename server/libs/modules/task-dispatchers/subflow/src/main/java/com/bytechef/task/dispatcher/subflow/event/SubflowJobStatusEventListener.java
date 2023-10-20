@@ -24,8 +24,8 @@ import com.bytechef.event.listener.EventListener;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.atlas.execution.event.JobStatusWorkflowEvent;
-import com.bytechef.event.WorkflowEvent;
+import com.bytechef.atlas.execution.event.JobStatusEvent;
+import com.bytechef.event.Event;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.atlas.execution.service.JobService;
@@ -59,9 +59,9 @@ public class SubflowJobStatusEventListener implements EventListener {
     }
 
     @Override
-    public void onApplicationEvent(WorkflowEvent workflowEvent) {
-        if (JobStatusWorkflowEvent.JOB_STATUS.equals(workflowEvent.getType())) {
-            JobStatusWorkflowEvent jobStatusWorkflowEvent = (JobStatusWorkflowEvent) workflowEvent;
+    public void onApplicationEvent(Event event) {
+        if (JobStatusEvent.JOB_STATUS.equals(event.getType())) {
+            JobStatusEvent jobStatusWorkflowEvent = (JobStatusEvent) event;
 
             Job.Status status = jobStatusWorkflowEvent.getStatus();
             Job job = jobService.getJob(jobStatusWorkflowEvent.getJobId());
@@ -78,7 +78,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                     TaskExecution subflowTaskExecution = taskExecutionService.getTaskExecution(
                         job.getParentTaskExecutionId());
 
-                    messageBroker.send(TaskMessageRoute.TASKS_STOPS, subflowTaskExecution.getJobId());
+                    messageBroker.send(TaskMessageRoute.JOBS_STOP, subflowTaskExecution.getJobId());
 
                     break;
                 }
@@ -105,7 +105,7 @@ public class SubflowJobStatusEventListener implements EventListener {
                         completionTaskExecution.evaluate(Map.of("execution", Map.of("output", output)));
                     }
 
-                    messageBroker.send(TaskMessageRoute.TASKS_COMPLETIONS, completionTaskExecution);
+                    messageBroker.send(TaskMessageRoute.TASKS_COMPLETE, completionTaskExecution);
 
                     break;
                 }

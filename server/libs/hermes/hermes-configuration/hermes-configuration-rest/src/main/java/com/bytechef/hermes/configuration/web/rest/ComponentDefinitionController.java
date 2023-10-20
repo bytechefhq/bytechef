@@ -68,7 +68,8 @@ public class ComponentDefinitionController implements ComponentDefinitionsApi {
         ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
         ConnectionDefinitionService connectionDefinitionService, ConversionService conversionService,
         ComponentDefinitionFacade componentDefinitionFacade, ComponentDefinitionService componentDefinitionService,
-        TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService) {
+        TriggerDefinitionFacade triggerDefinitionFacade,
+        TriggerDefinitionService triggerDefinitionService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.actionDefinitionService = actionDefinitionService;

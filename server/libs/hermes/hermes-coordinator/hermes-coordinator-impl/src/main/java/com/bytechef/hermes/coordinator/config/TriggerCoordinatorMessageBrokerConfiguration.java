@@ -19,6 +19,7 @@ package com.bytechef.hermes.coordinator.config;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.hermes.coordinator.TriggerCoordinator;
+import com.bytechef.hermes.coordinator.config.TriggerCoordinatorProperties.TriggerCoordinatorSubscriptions;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.hermes.execution.message.broker.TriggerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,24 +35,37 @@ import org.springframework.context.annotation.Configuration;
 public class TriggerCoordinatorMessageBrokerConfiguration {
 
     private final ApplicationContext applicationContext;
+    private final TriggerCoordinatorProperties triggerCoordinatorProperties;
 
     @SuppressFBWarnings("EI")
-    public TriggerCoordinatorMessageBrokerConfiguration(ApplicationContext applicationContext) {
+    public TriggerCoordinatorMessageBrokerConfiguration(
+        ApplicationContext applicationContext, TriggerCoordinatorProperties triggerCoordinatorProperties) {
+
         this.applicationContext = applicationContext;
+        this.triggerCoordinatorProperties = triggerCoordinatorProperties;
     }
 
     @Bean
     MessageBrokerConfigurer<?> triggerCoordinatorMessageBrokerConfigurer() {
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             TriggerCoordinator triggerCoordinator = applicationContext.getBean(TriggerCoordinator.class);
+            TriggerCoordinatorSubscriptions subscriptions = triggerCoordinatorProperties.getSubscriptions();
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TriggerMessageRoute.TRIGGERS_COMPLETIONS, 1, triggerCoordinator,
-                "complete");
+                listenerEndpointRegistrar, TriggerMessageRoute.LISTENERS, subscriptions.getListeners(),
+                triggerCoordinator, "handleListeners");
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TriggerMessageRoute.TRIGGERS_POLLS, 1, triggerCoordinator,
-                "poll");
+                listenerEndpointRegistrar, TriggerMessageRoute.POLLS, subscriptions.getPolls(),
+                triggerCoordinator, "handlePolls");
+
+            messageBrokerListenerRegistrar.registerListenerEndpoint(
+                listenerEndpointRegistrar, TriggerMessageRoute.TRIGGERS_COMPLETE,
+                subscriptions.getTriggersComplete(), triggerCoordinator, "handleTriggersComplete");
+
+            messageBrokerListenerRegistrar.registerListenerEndpoint(
+                listenerEndpointRegistrar, TriggerMessageRoute.WEBHOOKS, subscriptions.getWebhooks(),
+                triggerCoordinator, "handleWebhooks");
         };
     }
 }

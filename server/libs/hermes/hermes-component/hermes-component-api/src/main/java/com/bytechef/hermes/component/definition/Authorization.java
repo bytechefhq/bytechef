@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableAuthorization;
 import com.bytechef.hermes.definition.Property.InputProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -29,7 +28,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public sealed interface Authorization permits ModifiableAuthorization {
+public interface Authorization {
 
     String ACCESS_TOKEN = "access_token";
     String ADD_TO = "addTo";

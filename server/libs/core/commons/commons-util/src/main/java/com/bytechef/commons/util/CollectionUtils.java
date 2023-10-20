@@ -19,12 +19,9 @@ package com.bytechef.commons.util;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -58,14 +55,6 @@ public final class CollectionUtils {
 
         return Stream.concat(stream1, stream2)
             .toList();
-    }
-
-    public static <K, V> Map<K, V> concat(Map<K, V> map1, Map<K, V> map2) {
-        Objects.requireNonNull(map1, "'map1' must not be null");
-        Objects.requireNonNull(map2, "'map2' must not be null");
-
-        return Stream.concat(stream(map1), stream(map2))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v2));
     }
 
     public static <T> List<T> concatDistinct(List<T> list1, List<T> list2) {
@@ -134,20 +123,6 @@ public final class CollectionUtils {
                 .findFirst());
     }
 
-    public static <T, U> U getFirstFlat(
-        Collection<T> list, Function<? super T, ? extends Stream<? extends U>> mapper, Predicate<? super U> filter) {
-
-        Objects.requireNonNull(list, "'list' must not be null");
-        Objects.requireNonNull(mapper, "'mapper' must not be null");
-        Objects.requireNonNull(filter, "'filter' must not be null");
-
-        return OptionalUtils.get(
-            list.stream()
-                .flatMap(mapper)
-                .filter(filter)
-                .findFirst());
-    }
-
     public static <T, R> List<R> map(List<T> list, Function<? super T, R> mapper) {
         Objects.requireNonNull(list, "'list' must not be null");
         Objects.requireNonNull(mapper, "'mapper' must not be null");
@@ -171,14 +146,6 @@ public final class CollectionUtils {
 
     public static <T> Stream<T> stream(Iterable<T> iterable) {
         return StreamSupport.stream(iterable.spliterator(), false);
-    }
-
-    public static <K, V> Stream<Map.Entry<K, V>> stream(Map<K, V> map) {
-        Objects.requireNonNull(map, "'map' must not be null");
-
-        Set<Map.Entry<K, V>> entry = map.entrySet();
-
-        return entry.stream();
     }
 
     public static <T> List<T> toList(Iterable<T> iterable) {

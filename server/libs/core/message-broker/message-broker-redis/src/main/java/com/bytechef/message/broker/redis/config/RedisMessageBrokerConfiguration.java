@@ -139,14 +139,7 @@ public class RedisMessageBrokerConfiguration implements SmartInitializingSinglet
         RedisListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
         Object delegate, String methodName) {
 
-        MessageRoute.Exchange exchange = MessageRoute.Exchange.MESSAGE;
-
-        if (messageRoute.isControlExchange()) {
-            exchange = MessageRoute.Exchange.CONTROL;
-            messageRoute = SystemMessageRoute.CONTROL;
-        }
-
-        listenerEndpointRegistrar.registerListenerEndpoint(messageRoute.toString(), delegate, methodName, exchange);
+        listenerEndpointRegistrar.registerListenerEndpoint(messageRoute, delegate, methodName);
     }
 
     private static int getTimeout(Duration timeout) {

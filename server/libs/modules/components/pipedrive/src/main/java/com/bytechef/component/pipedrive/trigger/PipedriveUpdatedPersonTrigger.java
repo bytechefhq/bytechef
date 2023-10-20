@@ -22,9 +22,11 @@ import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableContext;
+import com.bytechef.hermes.component.definition.TriggerDefinition.EnableDynamicWebhookContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
+import com.bytechef.hermes.component.util.MapUtils;
 
 import java.util.Map;
 
@@ -222,13 +224,10 @@ public class PipedriveUpdatedPersonTrigger {
         .dynamicWebhookRequest(PipedriveUpdatedPersonTrigger::dynamicWebhookRequest);
 
     @SuppressWarnings("unchecked")
-    private static WebhookOutput
-        dynamicWebhookRequest(TriggerDefinition.DynamicWebhookRequestContext context) {
-        TriggerDefinition.WebhookBody body = context.body();
+    private static WebhookOutput dynamicWebhookRequest(TriggerDefinition.DynamicWebhookRequestContext context) {
+        WebhookBody body = context.body();
 
-        Map<String, Object> content = (Map<String, Object>) body.getContent();
-
-        return WebhookOutput.map((Map<String, Object>) content.get("current"));
+        return WebhookOutput.map(MapUtils.getMap((Map<String, ?>) body.content(), "current"));
     }
 
     private static void dynamicWebhookDisable(DynamicWebhookDisableContext context) {
@@ -237,7 +236,7 @@ public class PipedriveUpdatedPersonTrigger {
         PipedriveUtils.unsubscribeWebhook((String) enableOutput.getParameter("id"));
     }
 
-    private static DynamicWebhookEnableOutput dynamicWebhookEnable(DynamicWebhookEnableContext context) {
+    private static DynamicWebhookEnableOutput dynamicWebhookEnable(EnableDynamicWebhookContext context) {
         return new DynamicWebhookEnableOutput(
             Map.of("id", PipedriveUtils.subscribeWebhook("person", "updated", context.webhookUrl())), null);
     }

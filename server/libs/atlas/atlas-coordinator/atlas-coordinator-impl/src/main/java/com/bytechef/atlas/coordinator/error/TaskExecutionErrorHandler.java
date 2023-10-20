@@ -24,7 +24,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ErrorHandler;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.event.EventPublisher;
-import com.bytechef.atlas.execution.event.JobStatusWorkflowEvent;
+import com.bytechef.atlas.execution.event.JobStatusEvent;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
@@ -107,7 +107,7 @@ public class TaskExecutionErrorHandler implements ErrorHandler<TaskExecution> {
 
             jobService.update(job);
 
-            eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
+            eventPublisher.publishEvent(new JobStatusEvent(job.getId(), job.getStatus()));
         }
     }
 }

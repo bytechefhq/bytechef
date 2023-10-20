@@ -36,8 +36,7 @@ public class TaskDispatcherAdapterTaskHandlerResolver implements TaskHandlerReso
             .collect(
                 Collectors.toMap(
                     TaskDispatcherAdapterFactory::getName,
-                    taskDispatcherAdapterFactory -> taskDispatcherAdapterFactory.create(
-                        taskHandlerResolver)));
+                    taskDispatcherAdapterFactory -> taskDispatcherAdapterFactory.create(taskHandlerResolver)));
     }
 
     @Override

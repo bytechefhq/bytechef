@@ -20,15 +20,13 @@
 package com.bytechef.helios.execution.web.rest;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.JobFactoryFacade;
-import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.execution.web.rest.model.CreateJob200ResponseModel;
 import com.bytechef.helios.execution.web.rest.model.JobBasicModel;
 import com.bytechef.helios.execution.web.rest.model.JobModel;
 import com.bytechef.helios.execution.web.rest.model.JobParametersModel;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.execution.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
@@ -47,26 +45,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectJobController implements JobsApi {
 
     private final ConversionService conversionService;
-    private final JobFactoryFacade jobFactoryFacade;
+    private final JobFacade jobFacade;
     private final JobService jobService;
-    private final MessageBroker messageBroker;
 
     @SuppressFBWarnings("EI2")
     public ProjectJobController(
-        ConversionService conversionService, JobFactoryFacade jobFactoryFacade, JobService jobService,
-        MessageBroker messageBroker) {
+        ConversionService conversionService, JobFacade jobFacade, JobService jobService) {
 
         this.conversionService = conversionService;
-        this.jobFactoryFacade = jobFactoryFacade;
+        this.jobFacade = jobFacade;
         this.jobService = jobService;
-        this.messageBroker = messageBroker;
     }
 
     @Override
     public ResponseEntity<CreateJob200ResponseModel> createJob(JobParametersModel jobParametersModel) {
         return ResponseEntity.ok(
             new CreateJob200ResponseModel()
-                .jobId(jobFactoryFacade.createJob(conversionService.convert(jobParametersModel, JobParameters.class))));
+                .jobId(jobFacade.createJob(conversionService.convert(jobParametersModel, JobParameters.class))));
     }
 
     @Override
@@ -92,7 +87,7 @@ public class ProjectJobController implements JobsApi {
 
     @Override
     public ResponseEntity<Void> restartJob(Long id) {
-        messageBroker.send(TaskMessageRoute.TASKS_RESTARTS, id);
+        jobFacade.restartJob(id);
 
         return ResponseEntity.noContent()
             .build();
@@ -100,7 +95,7 @@ public class ProjectJobController implements JobsApi {
 
     @Override
     public ResponseEntity<Void> stopJob(Long id) {
-        messageBroker.send(TaskMessageRoute.TASKS_STOPS, id);
+        jobFacade.stopJob(id);
 
         return ResponseEntity.noContent()
             .build();

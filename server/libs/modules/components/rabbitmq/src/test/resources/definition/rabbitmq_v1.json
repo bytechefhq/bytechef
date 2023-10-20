@@ -195,9 +195,10 @@
     "staticWebhookRequest": null,
     "title": "New Message",
     "type": "LISTENER",
-    "webhookBodyRaw": null,
+    "webhookRawBody": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
+    "workflowSyncValidation": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,

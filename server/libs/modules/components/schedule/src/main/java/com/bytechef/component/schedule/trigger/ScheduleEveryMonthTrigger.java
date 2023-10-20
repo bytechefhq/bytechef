@@ -21,7 +21,8 @@ import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.util.MapValueUtils;
+import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
+import com.bytechef.hermes.component.util.MapUtils;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 
 import java.util.Map;
@@ -80,8 +81,8 @@ public class ScheduleEveryMonthTrigger {
                     integer(MINUTE),
                     integer(DAY_OF_MONTH),
                     string(TIMEZONE)))
-        .listenerEnable(this::listenerEnable)
-        .listenerDisable(this::listenerDisable);
+        .listenerDisable(this::listenerDisable)
+        .listenerEnable(this::listenerEnable);
 
     private final TriggerScheduler triggerScheduler;
 
@@ -89,24 +90,25 @@ public class ScheduleEveryMonthTrigger {
         this.triggerScheduler = triggerScheduler;
     }
 
-    protected void listenerEnable(
-        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
-
-        triggerScheduler.scheduleScheduleTrigger(
-            "0 %s %s %s * ?".formatted(
-                MapValueUtils.getInteger(inputParameters, MINUTE), MapValueUtils.getInteger(inputParameters, HOUR),
-                MapValueUtils.getInteger(inputParameters, DAY_OF_MONTH)),
-            MapValueUtils.getString(inputParameters, TIMEZONE), Map.of(
-                HOUR, MapValueUtils.getInteger(inputParameters, HOUR),
-                MINUTE, MapValueUtils.getInteger(inputParameters, MINUTE),
-                DAY_OF_MONTH, MapValueUtils.getInteger(inputParameters, DAY_OF_MONTH),
-                TIMEZONE, MapValueUtils.getString(inputParameters, TIMEZONE)),
-            workflowExecutionId);
-    }
-
     protected void listenerDisable(
         Connection connection, Map<String, ?> inputParameters, String workflowExecutionId) {
 
         triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
+    }
+
+    protected void listenerEnable(
+        Connection connection, Map<String, ?> inputParameters, String workflowExecutionId,
+        ListenerEmitter listenerEmitter) {
+
+        triggerScheduler.scheduleScheduleTrigger(
+            "0 %s %s %s * ?".formatted(
+                MapUtils.getInteger(inputParameters, MINUTE), MapUtils.getInteger(inputParameters, HOUR),
+                MapUtils.getInteger(inputParameters, DAY_OF_MONTH)),
+            MapUtils.getString(inputParameters, TIMEZONE), Map.of(
+                HOUR, MapUtils.getInteger(inputParameters, HOUR),
+                MINUTE, MapUtils.getInteger(inputParameters, MINUTE),
+                DAY_OF_MONTH, MapUtils.getInteger(inputParameters, DAY_OF_MONTH),
+                TIMEZONE, MapUtils.getString(inputParameters, TIMEZONE)),
+            workflowExecutionId);
     }
 }

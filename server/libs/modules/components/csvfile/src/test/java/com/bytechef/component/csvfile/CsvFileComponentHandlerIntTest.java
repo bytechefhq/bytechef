@@ -22,7 +22,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.hermes.component.test.workflow.ComponentWorkflowTestSupport;
+import com.bytechef.hermes.component.test.JobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.File;
@@ -46,13 +46,13 @@ public class CsvFileComponentHandlerIntTest {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private ComponentWorkflowTestSupport componentWorkflowTestSupport;
+    private JobTestExecutor jobTestExecutor;
 
     @Test
     public void testRead() throws JSONException {
         File sampleFile = getFile("sample_header.csv");
 
-        Job job = componentWorkflowTestSupport.execute(
+        Job job = jobTestExecutor.execute(
             Base64.getEncoder()
                 .encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
@@ -75,7 +75,7 @@ public class CsvFileComponentHandlerIntTest {
 
     @Test
     public void testWrite() throws JSONException {
-        Job job = componentWorkflowTestSupport.execute(
+        Job job = jobTestExecutor.execute(
             Base64.getEncoder()
                 .encodeToString("csvfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
@@ -91,7 +91,7 @@ public class CsvFileComponentHandlerIntTest {
 
         File sampleFile = getFile("sample_header.csv");
 
-        job = componentWorkflowTestSupport.execute(
+        job = jobTestExecutor.execute(
             Base64.getEncoder()
                 .encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(

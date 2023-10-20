@@ -20,7 +20,7 @@ package com.bytechef.helios.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.JobFactoryFacade;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
@@ -33,7 +33,6 @@ import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
@@ -52,7 +51,7 @@ import java.util.Objects;
 @Transactional
 public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
-    private final JobFactoryFacade jobFactoryFacade;
+    private final JobFacade jobFacade;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
@@ -62,12 +61,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
-        JobFactoryFacade jobFactoryFacade, ProjectInstanceService projectInstanceService,
+        JobFacade jobFacade, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
         TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade,
         WorkflowService workflowService) {
 
-        this.jobFactoryFacade = jobFactoryFacade;
+        this.jobFacade = jobFacade;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectService = projectService;
@@ -103,7 +102,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
             id, workflowId);
 
-        jobFactoryFacade.createJob(new JobParameters(workflowId, projectInstanceWorkflow.getInputs()));
+        jobFacade.createJob(new JobParameters(workflowId, projectInstanceWorkflow.getInputs()));
     }
 
     @Override
@@ -293,10 +292,9 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             triggerLifecycleFacade.executeTriggerDisable(
-                WorkflowExecutionId.of(
-                    workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT,
-                    workflowTrigger),
-                workflowTrigger.getParameters(), getConnectionId(workflowTrigger));
+                workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT,
+                workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
+                getConnectionId(workflowTrigger));
         }
     }
 
@@ -307,10 +305,9 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             triggerLifecycleFacade.executeTriggerEnable(
-                WorkflowExecutionId.of(
-                    workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT,
-                    workflowTrigger),
-                workflowTrigger.getParameters(), getConnectionId(workflowTrigger));
+                workflow.getId(), projectInstanceWorkflow.getProjectInstanceId(), ProjectConstants.PROJECT,
+                workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
+                getConnectionId(workflowTrigger));
         }
     }
 

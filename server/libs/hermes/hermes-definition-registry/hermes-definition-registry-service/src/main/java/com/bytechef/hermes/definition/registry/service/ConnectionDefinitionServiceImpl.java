@@ -17,39 +17,27 @@
 
 package com.bytechef.hermes.definition.registry.service;
 
-import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.Authorization.ApplyFunction;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import com.bytechef.hermes.component.definition.Authorization.ClientSecretFunction;
-import com.bytechef.hermes.component.definition.Authorization.TokenUrlFunction;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition.BaseUriFunction;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.util.HttpClientUtils;
-import com.bytechef.hermes.component.util.HttpClientUtils.Body;
-import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
-import com.bytechef.hermes.component.util.HttpClientUtils.Response;
-import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.component.definition.Authorization.ApplyFunction;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackFunction;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationUrlFunction;
 import com.bytechef.hermes.component.definition.Authorization.ClientIdFunction;
+import com.bytechef.hermes.component.definition.Authorization.PkceFunction;
 import com.bytechef.hermes.component.definition.Authorization.ScopesFunction;
+import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
+import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegistry;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
 import com.bytechef.hermes.definition.registry.util.AuthorizationUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import static com.bytechef.hermes.component.util.HttpClientUtils.responseType;
 
 /**
  * @author Ivica Cardic
@@ -74,11 +62,11 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public ApplyResponse executeAuthorizationApply(
+    public Authorization.ApplyResponse executeAuthorizationApply(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            authorizationName, componentName, connectionVersion);
+            componentName, connectionVersion, authorizationName);
 
         ApplyFunction applyFunction = OptionalUtils.orElse(
             authorization.getApply(), AuthorizationUtils.getDefaultApply(authorization.getType()));
@@ -87,27 +75,17 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public AuthorizationCallbackResponse executeAuthorizationCallback(
+    public Authorization.AuthorizationCallbackResponse executeAuthorizationCallback(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
         String redirectUri) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            authorizationName, componentName, connectionVersion);
-
-        AuthorizationCallbackFunction authorizationCallbackFunction =
-            OptionalUtils.orElse(
-                authorization.getAuthorizationCallback(),
-                getDefaultAuthorizationCallback(
-                    OptionalUtils.orElse(authorization.getClientId(), AuthorizationUtils::getDefaultClientId),
-                    OptionalUtils.orElse(authorization.getClientSecret(), AuthorizationUtils::getDefaultClientSecret),
-                    OptionalUtils.orElse(authorization.getTokenUrl(), AuthorizationUtils::getDefaultTokenUrl)));
-
-        Authorization.PkceFunction pkceFunction = OptionalUtils.orElse(
-            authorization.getPkce(), AuthorizationUtils.getDefaultPkce());
-
+            componentName, connectionVersion, authorizationName);
         String verifier = null;
 
         if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
+            PkceFunction pkceFunction = OptionalUtils.orElse(
+                authorization.getPkce(), AuthorizationUtils.getDefaultPkce());
 
             // TODO pkce
             Authorization.Pkce pkce = pkceFunction.apply(null, null, "SHA256");
@@ -115,19 +93,26 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             verifier = pkce.verifier();
         }
 
+        AuthorizationCallbackFunction authorizationCallbackFunction = OptionalUtils.orElse(
+            authorization.getAuthorizationCallback(),
+            AuthorizationUtils.getDefaultAuthorizationCallbackFunction(
+                OptionalUtils.orElse(authorization.getClientId(), AuthorizationUtils::getDefaultClientId),
+                OptionalUtils.orElse(authorization.getClientSecret(), AuthorizationUtils::getDefaultClientSecret),
+                OptionalUtils.orElse(authorization.getTokenUrl(), AuthorizationUtils::getDefaultTokenUrl)));
+
         return authorizationCallbackFunction.apply(
-            connectionParameters, MapValueUtils.getString(connectionParameters, Authorization.CODE), redirectUri,
+            connectionParameters, MapUtils.getString(connectionParameters, Authorization.CODE), redirectUri,
             verifier);
     }
 
     @Override
-    public Optional<String> fetchBaseUri(
+    public Optional<String> executeFetchBaseUri(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters) {
 
         ConnectionDefinition connectionDefinition = componentDefinitionRegistry.getComponentConnectionDefinition(
             componentName, connectionVersion);
 
-        BaseUriFunction baseUriFunction =
+        ConnectionDefinition.BaseUriFunction baseUriFunction =
             OptionalUtils.orElse(connectionDefinition.getBaseUri(), AuthorizationUtils::getDefaultBaseUri);
 
         return Optional.ofNullable(baseUriFunction.apply(connectionParameters));
@@ -138,7 +123,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String authorizationName, String componentName, int connectionVersion) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            authorizationName, componentName, connectionVersion);
+            componentName, connectionVersion, authorizationName);
 
         return authorization.getType();
     }
@@ -169,7 +154,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            authorizationName, componentName, connectionVersion);
+            componentName, connectionVersion, authorizationName);
 
         AuthorizationUrlFunction authorizationUrlFunction = OptionalUtils.orElse(
             authorization.getAuthorizationUrl(), AuthorizationUtils::getDefaultAuthorizationUrl);
@@ -190,45 +175,6 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             .stream()
             .map(this::toConnectionDefinitionDTO)
             .toList();
-    }
-
-    private AuthorizationCallbackFunction getDefaultAuthorizationCallback(
-        ClientIdFunction clientIdFunction, ClientSecretFunction clientSecretFunction,
-        TokenUrlFunction tokenUrlFunction) {
-
-        return (connectionParameters, code, redirectUri, codeVerifier) -> {
-            Map<String, Object> payload = new HashMap<>() {
-                {
-                    put("client_id", clientIdFunction.apply(connectionParameters));
-                    put("client_secret", clientSecretFunction.apply(connectionParameters));
-                    put("code", code);
-                    put("grant_type", "authorization_code");
-                    put("redirect_uri", redirectUri);
-                }
-            };
-
-            if (codeVerifier != null) {
-                payload.put("code_verifier", codeVerifier);
-            }
-
-            Response response = HttpClientUtils.post(tokenUrlFunction.apply(connectionParameters))
-                .body(Body.of(payload, BodyContentType.FORM_URL_ENCODED))
-                .configuration(responseType(HttpClientUtils.ResponseType.JSON))
-                .execute();
-
-            if (response.statusCode() != 200) {
-                throw new ComponentExecutionException("Invalid claim");
-            }
-
-            if (response.body() == null) {
-                throw new ComponentExecutionException("Invalid claim");
-            }
-
-            Map<?, ?> body = (Map<?, ?>) response.body();
-
-            return new AuthorizationCallbackResponse(
-                (String) body.get(Authorization.ACCESS_TOKEN), (String) body.get(Authorization.REFRESH_TOKEN));
-        };
     }
 
     private ConnectionDefinitionDTO toConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {

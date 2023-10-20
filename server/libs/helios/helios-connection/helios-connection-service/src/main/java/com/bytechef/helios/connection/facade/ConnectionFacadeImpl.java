@@ -143,7 +143,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         for (ConnectionDefinitionDTO connectionDefinitionDTO : connectionDefinitionDTOs) {
             connections.addAll(connectionService.getConnections(
-                connectionDefinitionDTO.componentName(), connectionDefinitionDTO.version()));
+                connectionDefinitionDTO.getComponentName(), connectionDefinitionDTO.getVersion()));
         }
 
         return getConnectionDTOs(connections);

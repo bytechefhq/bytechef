@@ -18,54 +18,49 @@
 package com.bytechef.hermes.component.oas.handler;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.hermes.component.ActionContext;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.oas.OpenApiClient;
-import com.bytechef.hermes.definition.registry.component.util.ComponentContextSupplier;
+import com.bytechef.hermes.component.util.HttpClientUtils.Response;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.hermes.component.context.factory.ContextFactory;
+import com.bytechef.hermes.definition.registry.service.ActionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
 public class OpenApiComponentActionTaskHandler implements TaskHandler<Object> {
 
-    private static final OpenApiClient OPEN_API_CLIENT = new OpenApiClient();
-
-    private final ActionDefinition actionDefinition;
-    private final ContextFactory contextFactory;
+    private final String actionName;
+    private final ActionDefinitionService actionDefinitionService;
     private final OpenApiComponentHandler openApiComponentHandler;
 
     @SuppressFBWarnings("EI2")
     public OpenApiComponentActionTaskHandler(
-        ActionDefinition actionDefinition, ContextFactory contextFactory,
+        String actionName, ActionDefinitionService actionDefinitionService,
         OpenApiComponentHandler openApiComponentHandler) {
 
-        this.actionDefinition = actionDefinition;
-        this.contextFactory = contextFactory;
+        this.actionName = actionName;
+        this.actionDefinitionService = actionDefinitionService;
         this.openApiComponentHandler = openApiComponentHandler;
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
-        ActionContext context = contextFactory.createActionContext(
-            MapValueUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class),
-            taskExecution.getId());
+        try {
 
-        return ComponentContextSupplier.get(
-            context,
-            () -> {
-                try {
-                    return openApiComponentHandler.postExecute(
-                        actionDefinition, OPEN_API_CLIENT.execute(actionDefinition, taskExecution));
-                } catch (Exception e) {
-                    throw new TaskExecutionException(e.getMessage(), e);
-                }
-            });
+            return openApiComponentHandler.postExecute(
+                actionName,
+                (Response) actionDefinitionService.executePerform(
+                    openApiComponentHandler.getName(), openApiComponentHandler.getVersion(), actionName,
+                    Objects.requireNonNull(taskExecution.getId()), taskExecution.getParameters(),
+                    MapUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class)));
+        } catch (Exception e) {
+            throw new TaskExecutionException(e.getMessage(), e);
+        }
     }
 }

@@ -73,7 +73,8 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
 
     @Override
     public ActionDefinition getActionDefinition(
-        String actionName, String componentName, int componentVersion) {
+        String componentName, int componentVersion, String actionName) {
+
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getActions()
@@ -96,9 +97,9 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
 
     @Override
     public Property getActionProperty(
-        String propertyName, String actionName, String componentName, int componentVersion) {
+        String componentName, int componentVersion, String actionName, String propertyName) {
 
-        ActionDefinition actionDefinition = getActionDefinition(actionName, componentName, componentVersion);
+        ActionDefinition actionDefinition = getActionDefinition(componentName, componentVersion, actionName);
 
         return actionDefinition.getProperties()
             .orElseThrow(IllegalStateException::new)
@@ -109,7 +110,7 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
     }
 
     @Override
-    public Authorization getAuthorization(String authorizationName, String componentName, int connectionVersion) {
+    public Authorization getAuthorization(String componentName, int connectionVersion, String authorizationName) {
         ConnectionDefinition connectionDefinition = getComponentConnectionDefinition(componentName, connectionVersion);
 
         return connectionDefinition.getAuthorization(authorizationName);
@@ -171,7 +172,7 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
     }
 
     @Override
-    public TriggerDefinition getTriggerDefinition(String triggerName, String componentName, int componentVersion) {
+    public TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getTriggers()
@@ -194,9 +195,9 @@ public class ComponentDefinitionRegistryImpl implements ComponentDefinitionRegis
 
     @Override
     public Property getTriggerProperty(
-        String propertyName, String actionName, String componentName, int componentVersion) {
+        String componentName, int componentVersion, String triggerName, String propertyName) {
 
-        TriggerDefinition triggerDefinition = getTriggerDefinition(actionName, componentName, componentVersion);
+        TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return triggerDefinition.getProperties()
             .orElseThrow(IllegalStateException::new)

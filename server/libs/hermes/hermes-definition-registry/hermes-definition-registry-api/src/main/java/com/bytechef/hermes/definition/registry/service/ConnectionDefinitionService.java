@@ -41,7 +41,7 @@ public interface ConnectionDefinitionService {
         String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
         String redirectUri);
 
-    Optional<String> fetchBaseUri(
+    Optional<String> executeFetchBaseUri(
         String componentName, int connectionVersion, Map<String, ?> connectionParameters);
 
     AuthorizationType getAuthorizationType(String authorizationName, String componentName, int connectionVersion);

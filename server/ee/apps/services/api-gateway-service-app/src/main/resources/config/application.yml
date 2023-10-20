@@ -24,7 +24,7 @@ management:
         liveness:
           include: livenessState
         readiness:
-          include: readinessState,db
+          include: readinessState
   info:
     git:
       mode: full

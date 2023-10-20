@@ -23,8 +23,8 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManager;
-import com.bytechef.hermes.coordinator.instance.InstanceWorkflowManagerRegistry;
+import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessor;
+import com.bytechef.hermes.coordinator.instance.InstanceWorkflowAccessorRegistry;
 import com.bytechef.hermes.coordinator.trigger.completion.TriggerCompletionHandler;
 import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcher;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
@@ -32,6 +32,7 @@ import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
+import com.bytechef.hermes.definition.registry.component.trigger.WebhookRequest;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -50,7 +52,7 @@ public class TriggerCoordinator {
 
     private static final Logger logger = LoggerFactory.getLogger(TriggerCoordinator.class);
 
-    private final InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry;
+    private final InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry;
     private final MessageBroker messageBroker;
     private final TriggerCompletionHandler triggerCompletionHandler;
     private final TriggerDispatcher triggerDispatcher;
@@ -60,12 +62,12 @@ public class TriggerCoordinator {
 
     @SuppressFBWarnings("EI")
     public TriggerCoordinator(
-        InstanceWorkflowManagerRegistry instanceWorkflowManagerRegistry, MessageBroker messageBroker,
+        InstanceWorkflowAccessorRegistry instanceWorkflowAccessorRegistry, MessageBroker messageBroker,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
         TriggerExecutionService triggerExecutionService, TriggerStateService triggerStateService,
         WorkflowService workflowService) {
 
-        this.instanceWorkflowManagerRegistry = instanceWorkflowManagerRegistry;
+        this.instanceWorkflowAccessorRegistry = instanceWorkflowAccessorRegistry;
         this.messageBroker = messageBroker;
         this.triggerCompletionHandler = triggerCompletionHandler;
         this.triggerDispatcher = triggerDispatcher;
@@ -79,7 +81,7 @@ public class TriggerCoordinator {
      *
      * @param triggerExecution The trigger to complete.
      */
-    public void complete(TriggerExecution triggerExecution) {
+    public void handleTriggersComplete(TriggerExecution triggerExecution) {
         try {
             triggerCompletionHandler.handle(triggerExecution);
         } catch (Exception e) {
@@ -90,24 +92,63 @@ public class TriggerCoordinator {
         }
     }
 
+    public void handleListeners(ListenerParameters listenerParameters) {
+        TriggerExecution triggerExecution = TriggerExecution.builder()
+            .output(listenerParameters.output)
+            .workflowExecutionId(listenerParameters.workflowExecutionId)
+            .build();
+
+        handleTriggersComplete(triggerExecution);
+    }
+
     /**
      * Invoked every poll interval (5 mins by default) for a given workflow execution to dispatch request for trigger's
      * handler execution.
      *
      * @param workflowExecutionId The workflowExecutionId.
      */
-    public void poll(WorkflowExecutionId workflowExecutionId) {
+    public void handlePolls(WorkflowExecutionId workflowExecutionId) {
         TriggerExecution triggerExecution = TriggerExecution.builder()
             .workflowExecutionId(workflowExecutionId)
             .workflowTrigger(getWorkflowTrigger(workflowExecutionId))
             .build();
 
-        InstanceWorkflowManager instanceWorkflowManager = instanceWorkflowManagerRegistry.getInstanceFacade(
-            workflowExecutionId.getInstanceType());
+        dispatch(triggerExecution);
+
+        logger.debug(
+            "Handling poll trigger id={}, type='{}', name='{}', workflowExecutionId='{}' executed",
+            triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
+            triggerExecution.getWorkflowExecutionId());
+    }
+
+    /**
+     *
+     * @param webhookParameters
+     */
+    public void handleWebhooks(WebhookParameters webhookParameters) {
+        TriggerExecution triggerExecution = TriggerExecution.builder()
+            .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, webhookParameters.webhookRequest))
+            .workflowExecutionId(webhookParameters.workflowExecutionId)
+            .workflowTrigger(getWorkflowTrigger(webhookParameters.workflowExecutionId))
+            .build();
+
+        dispatch(triggerExecution);
+
+        logger.debug(
+            "Handling webhook trigger id={}, type='{}', name='{}', workflowExecutionId='{}' executed",
+            triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
+            triggerExecution.getWorkflowExecutionId());
+    }
+
+    private void dispatch(TriggerExecution triggerExecution) {
+        WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
+
+        InstanceWorkflowAccessor instanceWorkflowAccessor = instanceWorkflowAccessorRegistry
+            .getInstanceWorkflowAccessor(workflowExecutionId.getInstanceType());
 
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(
-                instanceWorkflowManager.getInputs(
+                instanceWorkflowAccessor.getInputs(
                     workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId())));
 
         triggerExecution.setState(OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null));
@@ -120,10 +161,6 @@ public class TriggerCoordinator {
 
             messageBroker.send(SystemMessageRoute.ERRORS, triggerExecution);
         }
-
-        logger.debug(
-            "Poll interval for trigger id={}, type='{}', name='{}' executed",
-            triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName());
     }
 
     private WorkflowTrigger getWorkflowTrigger(WorkflowExecutionId workflowExecutionId) {
@@ -132,5 +169,11 @@ public class TriggerCoordinator {
         return CollectionUtils.getFirst(
             WorkflowTrigger.of(workflow),
             workflowTrigger -> Objects.equals(workflowTrigger.getName(), workflowExecutionId.getWorkflowTriggerName()));
+    }
+
+    public record ListenerParameters(WorkflowExecutionId workflowExecutionId, Object output) {
+    }
+
+    public record WebhookParameters(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
     }
 }

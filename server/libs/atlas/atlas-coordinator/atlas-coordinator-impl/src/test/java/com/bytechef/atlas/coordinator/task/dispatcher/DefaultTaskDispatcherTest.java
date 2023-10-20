@@ -58,7 +58,7 @@ public class DefaultTaskDispatcherTest {
                 .build();
 
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
-            (k, m) -> Assertions.assertEquals(TaskMessageRoute.ofRoute("encoder"), k), List.of());
+            (k, m) -> Assertions.assertEquals(TaskMessageRoute.ofWorkerRoute("encoder"), k), List.of());
 
         defaultTaskDispatcher.dispatch(taskExecution);
     }
@@ -74,7 +74,7 @@ public class DefaultTaskDispatcherTest {
                 .build();
 
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
-            (k, m) -> Assertions.assertEquals(TaskMessageRoute.ofRoute("encoder.xlarge"), k), List.of());
+            (k, m) -> Assertions.assertEquals(TaskMessageRoute.ofWorkerRoute("encoder.xlarge"), k), List.of());
 
         defaultTaskDispatcher.dispatch(taskExecution);
     }

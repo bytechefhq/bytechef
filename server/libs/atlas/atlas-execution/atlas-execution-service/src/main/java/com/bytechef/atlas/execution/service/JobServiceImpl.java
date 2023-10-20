@@ -113,7 +113,7 @@ public class JobServiceImpl implements JobService {
 
         Assert.notNull(job, String.format("Unknown job %s", id));
         Assert.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
-        Assert.isTrue(isRestartable(job), "can't restart job " + id + " as it is " + job.getStatus());
+        Assert.isTrue(isRestartable(job), "can't resume job " + id + " as it is " + job.getStatus());
 
         job.setStatus(Job.Status.STARTED);
 
