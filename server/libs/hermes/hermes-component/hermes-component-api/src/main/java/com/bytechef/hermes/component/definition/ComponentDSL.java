@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.HttpClientUtils;
+import com.bytechef.hermes.component.util.HttpClientUtils.Response;
 import com.bytechef.hermes.component.util.HttpClientUtils.ResponseFormat;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.Property;
@@ -242,12 +243,6 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        @JsonIgnore
-        public String getComponentName() {
-            return componentName;
-        }
-
-        @Override
         public String getDescription() {
             return Objects.requireNonNullElseGet(description, () -> componentName + ": " + name);
 
@@ -345,7 +340,7 @@ public final class ComponentDSL extends DefinitionDSL {
                 payload.put("code_verifier", codeVerifier);
             }
 
-            HttpClientUtils.Response response = HttpClientUtils.post(tokenUrlFunction.apply(connectionParameters))
+            Response response = HttpClientUtils.post(tokenUrlFunction.apply(connectionParameters))
                 .body(
                     HttpClientUtils.Body.of(payload, HttpClientUtils.BodyContentType.FORM_URL_ENCODED))
                 .configuration(responseFormat(ResponseFormat.JSON))
@@ -362,8 +357,7 @@ public final class ComponentDSL extends DefinitionDSL {
             Map<?, ?> body = (Map<?, ?>) response.getBody();
 
             return new AuthorizationCallbackResponse(
-                (String) body.get(Authorization.ACCESS_TOKEN),
-                (String) body.get(Authorization.REFRESH_TOKEN), Map.of());
+                (String) body.get(Authorization.ACCESS_TOKEN), (String) body.get(Authorization.REFRESH_TOKEN));
         };
 
         @JsonIgnore

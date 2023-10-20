@@ -34,8 +34,6 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
 
     Optional<Boolean> getBatch();
 
-    String getComponentName();
-
     String getDescription();
 
     Optional<Object> getExampleOutput();
