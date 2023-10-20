@@ -11,7 +11,7 @@ export default function Settings() {
             <SidebarContentLayout
                 title={'Settings'}
                 subTitle={'Display'}
-                sidebarContent={
+                sidebar={
                     <>
                         {navigation.map((item) => (
                             <a

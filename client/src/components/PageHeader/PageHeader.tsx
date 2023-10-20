@@ -1,17 +1,23 @@
-import Button from 'components/Button/Button';
-import React from 'react';
+import React, {ReactNode} from 'react';
 
 const PageHeader: React.FC<{
-    subTitle: string;
-    buttonLabel: string;
-}> = ({subTitle, buttonLabel}) => (
+    title: string;
+    right?: ReactNode;
+    bold?: boolean;
+}> = ({title, right, bold = false}) => (
     <div className="mb-6 flex justify-center py-4">
         <div className="flex w-full items-center justify-between">
-            <h2 className="text-2xl tracking-tight text-gray-900 dark:text-gray-200">
-                {subTitle}
-            </h2>
+            {bold ? (
+                <h1 className="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-200">
+                    {title}
+                </h1>
+            ) : (
+                <h2 className="text-2xl tracking-tight text-gray-900 dark:text-gray-200">
+                    {title}
+                </h2>
+            )}
 
-            <Button label={buttonLabel} />
+            <div>{right}</div>
         </div>
     </div>
 );
