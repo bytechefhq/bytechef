@@ -76,8 +76,8 @@ public class ContextImpl implements ActionContext, TriggerContext {
     }
 
     @Override
-    public Optional<Connection> fetchConnection(String workflowConnectionKey) {
-        return fetchConnection(connectionIdMap.get(workflowConnectionKey)).map(this::toContextConnection);
+    public Optional<Connection> fetchConnection(String taskConnectionKey) {
+        return fetchConnection(connectionIdMap.get(taskConnectionKey)).map(this::toContextConnection);
     }
 
     @Override
@@ -99,8 +99,8 @@ public class ContextImpl implements ActionContext, TriggerContext {
     }
 
     @Override
-    public Connection getConnection(String workflowConnectionKey) {
-        return toContextConnection(connectionService.getConnection(connectionIdMap.get(workflowConnectionKey)));
+    public Connection getConnection(String taskConnectionKey) {
+        return toContextConnection(connectionService.getConnection(connectionIdMap.get(taskConnectionKey)));
     }
 
     @Override
