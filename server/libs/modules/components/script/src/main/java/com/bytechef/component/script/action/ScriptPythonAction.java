@@ -49,7 +49,7 @@ public class ScriptPythonAction {
                 .label("Python code")
                 .description("Add your Python custom logic here.")
                 .controlType(Property.ControlType.CODE))
-        .output(oneOf())
+        .outputSchema(oneOf())
         .perform(ScriptPythonAction::performPython);
 
     public static Object performPython(Context context, Parameters parameters) {

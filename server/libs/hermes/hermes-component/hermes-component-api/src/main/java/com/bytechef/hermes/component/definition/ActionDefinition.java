@@ -42,7 +42,7 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
 
     String getName();
 
-    List<Property<? extends Property<?>>> getOutput();
+    List<Property<? extends Property<?>>> getOutputSchema();
 
     List<Property<?>> getProperties();
 

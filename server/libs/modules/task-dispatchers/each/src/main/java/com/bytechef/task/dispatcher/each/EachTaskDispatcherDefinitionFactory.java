@@ -59,7 +59,7 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .label("Item Index")
                 .description("The name of the index variable.")
                 .defaultValue(ITEM_INDEX))
-        .output(oneOf("item"), integer("itemIndex"))
+        .outputSchema(oneOf("item"), integer("itemIndex"))
         .taskProperties(task(ITERATEE));
 
     @Override

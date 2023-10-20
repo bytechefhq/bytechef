@@ -111,7 +111,7 @@ public class AddPersonAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .output(object(null).properties(integer("related_closed_deals_count").label("Related_closed_deals_count")
+        .outputSchema(object(null).properties(integer("related_closed_deals_count").label("Related_closed_deals_count")
             .description("The count of related closed deals related with the item")
             .required(false),
             integer("email_messages_count").label("Email_messages_count")

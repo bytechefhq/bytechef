@@ -6,7 +6,7 @@
         "label": "Convert from XML string"
       },
       "name": "parse",
-      "output": [
+      "outputSchema": [
         {
           "type": "OBJECT"
         }
@@ -27,7 +27,7 @@
         "label": "Convert to XML string"
       },
       "name": "stringify",
-      "output": [
+      "outputSchema": [
         {
           "type": "STRING"
         }

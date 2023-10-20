@@ -46,7 +46,7 @@ public class FilesystemReadFileAction {
             .description("The path of the file to read.")
             .placeholder("/data/your_file.pdf")
             .required(true))
-        .output(ComponentDSL.fileEntry())
+        .outputSchema(ComponentDSL.fileEntry())
         .perform(FilesystemReadFileAction::performReadFile);
 
     public static FileEntry performReadFile(Context context, Parameters parameters) {

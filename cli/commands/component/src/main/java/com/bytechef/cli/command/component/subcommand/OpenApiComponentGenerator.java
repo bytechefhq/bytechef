@@ -402,7 +402,7 @@ public class OpenApiComponentGenerator {
         CodeBlock codeBlock = outputEntry == null ? null : outputEntry.outputCodeBlock();
 
         if (codeBlock != null && !codeBlock.isEmpty()) {
-            builder.add(".output($L)", codeBlock);
+            builder.add(".outputSchema($L)", codeBlock);
         }
 
         Object example = outputEntry == null ? null : outputEntry.example();

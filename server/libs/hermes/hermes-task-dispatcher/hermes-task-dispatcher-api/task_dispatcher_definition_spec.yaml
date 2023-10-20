@@ -12,7 +12,7 @@ schemas:
       name:
         description: The task dispatcher name..
         type: string
-      output:
+      outputSchema:
         description: The output schema of a task dispatching result.
         type: array
         items:

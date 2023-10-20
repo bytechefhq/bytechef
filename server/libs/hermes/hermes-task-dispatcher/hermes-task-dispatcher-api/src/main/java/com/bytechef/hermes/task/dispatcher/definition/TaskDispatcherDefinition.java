@@ -37,7 +37,7 @@ public sealed interface TaskDispatcherDefinition permits TaskDispatcherDSL.Modif
 
     String getName();
 
-    List<Property<? extends Property<?>>> getOutput();
+    List<Property<? extends Property<?>>> getOutputSchema();
 
     List<Property<?>> getProperties();
 

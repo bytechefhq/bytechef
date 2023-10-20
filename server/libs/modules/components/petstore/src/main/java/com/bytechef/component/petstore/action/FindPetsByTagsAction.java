@@ -54,7 +54,7 @@ public class FindPetsByTagsAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)))
-        .output(array("array").items(object(null).properties(PetProperties.PROPERTIES))
+        .outputSchema(array("array").items(object(null).properties(PetProperties.PROPERTIES))
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

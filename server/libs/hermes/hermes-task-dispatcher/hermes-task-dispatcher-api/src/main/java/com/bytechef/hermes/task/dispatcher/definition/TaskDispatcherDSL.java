@@ -47,7 +47,7 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
 
         private Display display;
         private String name;
-        private List<Property<? extends Property<?>>> output;
+        private List<Property<? extends Property<?>>> outputSchema;
         private List<Property<?>> properties;
         private Resources resources;
         private int version = VERSION_1;
@@ -72,9 +72,9 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             return this;
         }
 
-        public <P extends Property<?>> ModifiableTaskDispatcherDefinition output(P... output) {
-            if (output != null) {
-                this.output = List.of(output);
+        public <P extends Property<?>> ModifiableTaskDispatcherDefinition outputSchema(P... outputSchema) {
+            if (outputSchema != null) {
+                this.outputSchema = List.of(outputSchema);
             }
 
             return this;
@@ -111,8 +111,8 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<Property<? extends Property<?>>> getOutput() {
-            return output;
+        public List<Property<? extends Property<?>>> getOutputSchema() {
+            return outputSchema;
         }
 
         @Override

@@ -42,7 +42,7 @@ public class AwsS3GetUrlAction {
             .label("URI")
             .description("The AWS S3 uri.")
             .required(true))
-        .output(string())
+        .outputSchema(string())
         .perform(AwsS3GetUrlAction::performGetUrl);
 
     public static String performGetUrl(Context context, Parameters parameters) {

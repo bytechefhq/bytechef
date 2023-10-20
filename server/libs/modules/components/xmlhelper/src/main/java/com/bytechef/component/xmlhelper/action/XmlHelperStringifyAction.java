@@ -44,7 +44,7 @@ public class XmlHelperStringifyAction {
             .description("The data to convert to XML string.")
             .required(true)
             .types(array(), object()))
-        .output(string())
+        .outputSchema(string())
         .perform(XmlHelperStringifyAction::performStringify);
 
     public static String performStringify(Context context, Parameters parameters) {

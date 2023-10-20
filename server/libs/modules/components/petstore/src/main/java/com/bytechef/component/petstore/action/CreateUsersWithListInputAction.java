@@ -50,7 +50,7 @@ public class CreateUsersWithListInputAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))
-        .output(array("array").items(object(null).properties(UserProperties.PROPERTIES))
+        .outputSchema(array("array").items(object(null).properties(UserProperties.PROPERTIES))
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)));

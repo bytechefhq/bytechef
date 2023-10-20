@@ -62,7 +62,7 @@ public class HttpClientPostAction {
                 //
 
                 HttpClientActionUtils.options(true)))
-        .output(
+        .outputSchema(
             oneOf().types(array(), object())
                 .displayOption(show(
                     RESPONSE_FORMAT,

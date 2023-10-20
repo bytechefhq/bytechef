@@ -6,7 +6,7 @@
         "label": "Convert from JSON string"
       },
       "name": "parse",
-      "output": [
+      "outputSchema": [
         {
           "type": "ONE_OF",
           "types": [
@@ -53,7 +53,7 @@
         "label": "Convert to JSON string"
       },
       "name": "stringify",
-      "output": [
+      "outputSchema": [
         {
           "type": "STRING"
         }

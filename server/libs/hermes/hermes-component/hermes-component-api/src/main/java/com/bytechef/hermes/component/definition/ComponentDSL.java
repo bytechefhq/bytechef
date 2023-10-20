@@ -92,7 +92,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private Object exampleOutput;
         private Map<String, Object> metadata;
         private String name;
-        private List<Property<? extends Property<?>>> output;
+        private List<Property<? extends Property<?>>> outputSchema;
         private List<Property<?>> properties;
 
         @JsonIgnore
@@ -134,9 +134,9 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public <P extends Property<?>> ModifiableActionDefinition output(P... output) {
-            if (output != null) {
-                this.output = List.of(output);
+        public <P extends Property<?>> ModifiableActionDefinition outputSchema(P... outputSchema) {
+            if (outputSchema != null) {
+                this.outputSchema = List.of(outputSchema);
             }
 
             return this;
@@ -174,8 +174,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public List<Property<? extends Property<?>>> getOutput() {
-            return output;
+        public List<Property<? extends Property<?>>> getOutputSchema() {
+            return outputSchema;
         }
 
         @Override

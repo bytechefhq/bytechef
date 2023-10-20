@@ -1,23 +1,16 @@
 package com.bytechef.hermes.definition.registry.web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.definition.registry.web.rest.model.DisplayModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.PropertyModel;
-import com.bytechef.hermes.definition.registry.web.rest.model.ResourcesModel;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.List;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
+
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -35,9 +28,9 @@ public class TaskDispatcherDefinitionModel {
   @JsonProperty("name")
   private String name;
 
-  @JsonProperty("output")
+  @JsonProperty("outputSchema")
   @Valid
-  private List<PropertyModel> output = null;
+  private List<PropertyModel> outputSchema = null;
 
   @JsonProperty("properties")
   @Valid
@@ -62,7 +55,7 @@ public class TaskDispatcherDefinitionModel {
    * Get display
    * @return display
   */
-  @Valid 
+  @Valid
   @Schema(name = "display", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public DisplayModel getDisplay() {
     return display;
@@ -81,7 +74,7 @@ public class TaskDispatcherDefinitionModel {
    * The task dispatcher name..
    * @return name
   */
-  
+
   @Schema(name = "name", description = "The task dispatcher name..", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getName() {
     return name;
@@ -91,16 +84,16 @@ public class TaskDispatcherDefinitionModel {
     this.name = name;
   }
 
-  public TaskDispatcherDefinitionModel output(List<PropertyModel> output) {
-    this.output = output;
+  public TaskDispatcherDefinitionModel outputSchema(List<PropertyModel> outputSchema) {
+    this.outputSchema = outputSchema;
     return this;
   }
 
-  public TaskDispatcherDefinitionModel addOutputItem(PropertyModel outputItem) {
-    if (this.output == null) {
-      this.output = new ArrayList<>();
+  public TaskDispatcherDefinitionModel addOutputSchemaItem(PropertyModel outputISchemaItem) {
+    if (this.outputSchema == null) {
+      this.outputSchema = new ArrayList<>();
     }
-    this.output.add(outputItem);
+    this.outputSchema.add(outputISchemaItem);
     return this;
   }
 
@@ -108,14 +101,14 @@ public class TaskDispatcherDefinitionModel {
    * The output schema of a task dispatching result.
    * @return output
   */
-  @Valid 
-  @Schema(name = "output", description = "The output schema of a task dispatching result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public List<PropertyModel> getOutput() {
-    return output;
+  @Valid
+  @Schema(name = "outputSchema", description = "The output schema of a task dispatching result.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  public List<PropertyModel> getOutputSchema() {
+    return outputSchema;
   }
 
-  public void setOutput(List<PropertyModel> output) {
-    this.output = output;
+  public void setOutputSchema(List<PropertyModel> outputSchema) {
+    this.outputSchema = outputSchema;
   }
 
   public TaskDispatcherDefinitionModel properties(List<PropertyModel> properties) {
@@ -135,7 +128,7 @@ public class TaskDispatcherDefinitionModel {
    * The list of task dispatcher properties.
    * @return properties
   */
-  @Valid 
+  @Valid
   @Schema(name = "properties", description = "The list of task dispatcher properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<PropertyModel> getProperties() {
     return properties;
@@ -154,7 +147,7 @@ public class TaskDispatcherDefinitionModel {
    * Get resources
    * @return resources
   */
-  @Valid 
+  @Valid
   @Schema(name = "resources", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public ResourcesModel getResources() {
     return resources;
@@ -173,7 +166,7 @@ public class TaskDispatcherDefinitionModel {
    * Get version
    * @return version
   */
-  
+
   @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
@@ -200,7 +193,7 @@ public class TaskDispatcherDefinitionModel {
    * Properties used to define tasks to be dispatched.
    * @return taskProperties
   */
-  @Valid 
+  @Valid
   @Schema(name = "taskProperties", description = "Properties used to define tasks to be dispatched.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<PropertyModel> getTaskProperties() {
     return taskProperties;
@@ -221,7 +214,7 @@ public class TaskDispatcherDefinitionModel {
     TaskDispatcherDefinitionModel taskDispatcherDefinition = (TaskDispatcherDefinitionModel) o;
     return Objects.equals(this.display, taskDispatcherDefinition.display) &&
         Objects.equals(this.name, taskDispatcherDefinition.name) &&
-        Objects.equals(this.output, taskDispatcherDefinition.output) &&
+        Objects.equals(this.outputSchema, taskDispatcherDefinition.outputSchema) &&
         Objects.equals(this.properties, taskDispatcherDefinition.properties) &&
         Objects.equals(this.resources, taskDispatcherDefinition.resources) &&
         Objects.equals(this.version, taskDispatcherDefinition.version) &&
@@ -230,7 +223,7 @@ public class TaskDispatcherDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(display, name, output, properties, resources, version, taskProperties);
+    return Objects.hash(display, name, outputSchema, properties, resources, version, taskProperties);
   }
 
   @Override
@@ -239,7 +232,7 @@ public class TaskDispatcherDefinitionModel {
     sb.append("class TaskDispatcherDefinitionModel {\n");
     sb.append("    display: ").append(toIndentedString(display)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    output: ").append(toIndentedString(output)).append("\n");
+    sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");

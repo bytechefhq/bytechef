@@ -10,7 +10,7 @@
         "label": "Read from file"
       },
       "name": "readFile",
-      "output": [
+      "outputSchema": [
         {
           "type": "OBJECT",
           "objectType": "FILE_ENTRY",
@@ -54,7 +54,7 @@
         "label": "Write to file"
       },
       "name": "writeFile",
-      "output": [
+      "outputSchema": [
         {
           "type": "OBJECT",
           "properties": [
@@ -120,7 +120,7 @@
       },
       "exampleOutput": "/data",
       "name": "getFilePath",
-      "output": [
+      "outputSchema": [
         {
           "type": "STRING"
         }

@@ -53,7 +53,7 @@ public class GetPersonAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)))
-        .output(object(null).properties(
+        .outputSchema(object(null).properties(
             object("additional_data").properties(string("dropbox_email").label("Dropbox_email")
                 .description("Dropbox email for the person")
                 .required(false))

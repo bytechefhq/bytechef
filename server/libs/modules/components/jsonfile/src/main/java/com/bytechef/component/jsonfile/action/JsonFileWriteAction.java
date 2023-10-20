@@ -75,7 +75,7 @@ public class JsonFileWriteAction {
                 .required(true)
                 .defaultValue("file.json")
                 .advancedOption(true))
-        .output(fileEntry())
+        .outputSchema(fileEntry())
         .perform(JsonFileWriteAction::performWrite);
 
     @SuppressWarnings("unchecked")

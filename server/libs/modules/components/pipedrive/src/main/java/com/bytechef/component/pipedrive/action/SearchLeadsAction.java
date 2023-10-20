@@ -106,7 +106,7 @@ public class SearchLeadsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)))
-        .output(object(null)
+        .outputSchema(object(null)
             .properties(
                 object("data")
                     .properties(array("items")

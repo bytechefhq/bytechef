@@ -11,7 +11,7 @@
         "requestMethod": "GET"
       },
       "name": "getDeals",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -1045,7 +1045,7 @@
         "bodyContentType": "JSON"
       },
       "name": "addDeal",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -2061,7 +2061,7 @@
         "requestMethod": "GET"
       },
       "name": "searchDeals",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -2468,7 +2468,7 @@
         "requestMethod": "DELETE"
       },
       "name": "deleteDeal",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -2524,7 +2524,7 @@
         "requestMethod": "GET"
       },
       "name": "getDeal",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -3590,7 +3590,7 @@
         "requestMethod": "GET"
       },
       "name": "getLeads",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -3962,7 +3962,7 @@
         "bodyContentType": "JSON"
       },
       "name": "addLead",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -4278,7 +4278,7 @@
         "requestMethod": "DELETE"
       },
       "name": "deleteLead",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -4332,7 +4332,7 @@
         "requestMethod": "GET"
       },
       "name": "getLead",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -4538,7 +4538,7 @@
         "requestMethod": "GET"
       },
       "name": "searchLeads",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -4923,7 +4923,7 @@
         "requestMethod": "GET"
       },
       "name": "getOrganizations",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -5699,7 +5699,7 @@
         "bodyContentType": "JSON"
       },
       "name": "addOrganization",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -6413,7 +6413,7 @@
         "requestMethod": "GET"
       },
       "name": "searchOrganization",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -6684,7 +6684,7 @@
         "requestMethod": "DELETE"
       },
       "name": "deleteOrganization",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -6740,7 +6740,7 @@
         "requestMethod": "GET"
       },
       "name": "getOrganization",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -7483,7 +7483,7 @@
         "requestMethod": "GET"
       },
       "name": "getPersons",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -8326,7 +8326,7 @@
         "bodyContentType": "JSON"
       },
       "name": "addPerson",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -9076,7 +9076,7 @@
         "requestMethod": "GET"
       },
       "name": "searchPersons",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -9420,7 +9420,7 @@
         "requestMethod": "DELETE"
       },
       "name": "deletePerson",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"
@@ -9476,7 +9476,7 @@
         "requestMethod": "GET"
       },
       "name": "getPerson",
-      "output": [
+      "outputSchema": [
         {
           "metadata": {
             "responseFormat": "JSON"

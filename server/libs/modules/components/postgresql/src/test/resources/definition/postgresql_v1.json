@@ -6,7 +6,7 @@
         "label": "Query"
       },
       "name": "query",
-      "output": [
+      "outputSchema": [
         {
           "type": "ARRAY",
           "items": [
@@ -58,7 +58,7 @@
         "label": "Insert"
       },
       "name": "insert",
-      "output": [
+      "outputSchema": [
         {
           "type": "OBJECT",
           "properties": [
@@ -145,7 +145,7 @@
         "label": "Update"
       },
       "name": "update",
-      "output": [
+      "outputSchema": [
         {
           "type": "OBJECT",
           "properties": [
@@ -239,7 +239,7 @@
         "label": "Delete"
       },
       "name": "delete",
-      "output": [
+      "outputSchema": [
         {
           "type": "OBJECT",
           "properties": [
@@ -322,7 +322,7 @@
         "label": "Execute"
       },
       "name": "execute",
-      "output": [
+      "outputSchema": [
         {
           "type": "OBJECT",
           "properties": [

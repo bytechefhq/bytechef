@@ -11,7 +11,7 @@
         "label": "Read from file"
       },
       "name": "read",
-      "output": [
+      "outputSchema": [
         {
           "type": "STRING"
         }
@@ -55,7 +55,7 @@
         "label": "Write to file"
       },
       "name": "write",
-      "output": [
+      "outputSchema": [
         {
           "type": "OBJECT",
           "objectType": "FILE_ENTRY",
@@ -106,7 +106,7 @@
         "label": "Download file"
       },
       "name": "download",
-      "output": [
+      "outputSchema": [
         {
           "type": "OBJECT",
           "objectType": "FILE_ENTRY",

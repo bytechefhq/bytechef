@@ -60,7 +60,7 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .label("Loop Forever")
                 .description("Should loop iterate until condition set by \'Loop Break\' statement is met.")
                 .defaultValue(false))
-        .output(oneOf("item"), integer("itemIndex"))
+        .outputSchema(oneOf("item"), integer("itemIndex"))
         .taskProperties(task(ITERATEE));
 
     @Override

@@ -147,7 +147,7 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
                             .description(
                                 "The list of properties which should be used as query parameters.")
                             .properties(bool(), dateTime(), number(), string()))
-                    .output(array().items(object().properties(integer())))
+                    .outputSchema(array().items(object().properties(integer())))
                     .perform(this::performQuery),
                 action(INSERT)
                     .display(display("Insert").description("Insert rows in database."))
@@ -170,7 +170,7 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
                             .label("Rows")
                             .description("List of rows.")
                             .items(object().additionalProperties(oneOf())))
-                    .output(object().properties(integer()))
+                    .outputSchema(object().properties(integer()))
                     .perform(this::performInsert),
                 action(UPDATE)
                     .display(display("Update").description("Update rows in database."))
@@ -198,7 +198,7 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
                             .label("Rows")
                             .description("List of rows.")
                             .items(object().additionalProperties(oneOf())))
-                    .output(object().properties(integer()))
+                    .outputSchema(object().properties(integer()))
                     .perform(this::performUpdate),
                 action(DELETE)
                     .display(display("Delete").description("Delete rows from database."))
@@ -221,7 +221,7 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
                             .label("Rows")
                             .description("List of rows.")
                             .items(object().additionalProperties(oneOf())))
-                    .output(object().properties(integer()))
+                    .outputSchema(object().properties(integer()))
                     .perform(this::performDelete),
                 action(EXECUTE)
                     .display(display("Execute").description("Execute an SQL DML or DML statement."))
@@ -242,7 +242,7 @@ public class JdbcComponentTaskHandler implements ComponentHandler {
                             .description(
                                 "The list of properties which should be used as parameters.")
                             .properties(bool(), dateTime(), number(), string()))
-                    .output(object().properties(integer()))
+                    .outputSchema(object().properties(integer()))
                     .perform(this::performExecute));
     }
 }

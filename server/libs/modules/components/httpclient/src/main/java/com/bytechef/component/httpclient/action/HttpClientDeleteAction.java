@@ -47,7 +47,7 @@ public class HttpClientDeleteAction {
                 //
 
                 HttpClientActionUtils.options(false)))
-        .output(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
+        .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
         .perform(HttpClientDeleteAction::performDelete);
 
     public static Object performDelete(Context context, Parameters parameters) {

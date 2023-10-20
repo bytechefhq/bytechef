@@ -11,7 +11,7 @@
         "label": "Execute"
       },
       "name": "execute",
-      "output": [
+      "outputSchema": [
         {
           "type": "STRING"
         }

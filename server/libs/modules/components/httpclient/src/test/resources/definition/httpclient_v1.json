@@ -6,7 +6,7 @@
         "label": "GET"
       },
       "name": "get",
-      "output": [
+      "outputSchema": [
         {
           "displayOption": {
             "show": {
@@ -161,7 +161,7 @@
         "label": "POST"
       },
       "name": "post",
-      "output": [
+      "outputSchema": [
         {
           "displayOption": {
             "show": {
@@ -625,7 +625,7 @@
         "label": "PUT"
       },
       "name": "put",
-      "output": [
+      "outputSchema": [
         {
           "displayOption": {
             "show": {
@@ -1211,7 +1211,7 @@
         "label": "PATCH"
       },
       "name": "patch",
-      "output": [
+      "outputSchema": [
         {
           "displayOption": {
             "show": {
@@ -1797,7 +1797,7 @@
         "label": "DELETE"
       },
       "name": "delete",
-      "output": [
+      "outputSchema": [
         {
           "displayOption": {
             "show": {
@@ -2124,7 +2124,7 @@
         "label": "HEAD"
       },
       "name": "head",
-      "output": [
+      "outputSchema": [
         {
           "displayOption": {
             "show": {
