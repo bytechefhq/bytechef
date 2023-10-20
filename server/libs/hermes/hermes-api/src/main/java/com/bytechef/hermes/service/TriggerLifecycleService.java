@@ -15,21 +15,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.data.storage.service;
+package com.bytechef.hermes.service;
 
-import com.bytechef.hermes.data.storage.domain.DataStorage;
-import com.bytechef.hermes.data.storage.domain.DataStorage.Scope;
+import com.bytechef.hermes.domain.TriggerLifecycle;
 
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public interface DataStorageService {
+public interface TriggerLifecycleService {
 
-    <T> Optional<T> fetchValue(Scope scope, long scopeId, String key);
+    <T> Optional<T> fetchValue(long instanceId, String workflowExecutionId);
 
-    DataStorage getDataStorage(long id);
+    TriggerLifecycle getTriggerLifecycle(long id);
 
-    void save(Scope scope, long scopeId, String key, Object value);
+    void save(long instanceId, String workflowExecutionId, Object value);
 }

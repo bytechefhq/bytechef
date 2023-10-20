@@ -15,21 +15,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.data.storage.service;
+package com.bytechef.hermes.repository;
 
-import com.bytechef.hermes.data.storage.domain.DataStorage;
-import com.bytechef.hermes.data.storage.domain.DataStorage.Scope;
-
-import java.util.Optional;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public interface DataStorageService {
+public class TriggerLifecycleRepositoryTest {
 
-    <T> Optional<T> fetchValue(Scope scope, long scopeId, String key);
-
-    DataStorage getDataStorage(long id);
-
-    void save(Scope scope, long scopeId, String key, Object value);
+    @Disabled
+    @Test
+    public void test() {
+        // TODO
+    }
 }

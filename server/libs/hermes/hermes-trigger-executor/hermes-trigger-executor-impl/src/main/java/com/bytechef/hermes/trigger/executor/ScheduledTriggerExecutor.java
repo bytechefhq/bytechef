@@ -19,12 +19,11 @@ package com.bytechef.hermes.trigger.executor;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.data.storage.domain.DataStorage;
-import com.bytechef.hermes.data.storage.service.DataStorageService;
 import com.bytechef.hermes.definition.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.message.broker.TriggerMessageRoute;
 import com.bytechef.hermes.service.TriggerExecutionService;
+import com.bytechef.hermes.service.TriggerLifecycleService;
 import com.bytechef.hermes.trigger.WorkflowTrigger;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import com.bytechef.message.broker.MessageBroker;
@@ -39,19 +38,19 @@ import java.util.Map;
 @Service
 public class ScheduledTriggerExecutor {
 
-    private final DataStorageService dataStorageService;
     private final MessageBroker messageBroker;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
+    private final TriggerLifecycleService triggerLifecycleService;
 
     public ScheduledTriggerExecutor(
-        DataStorageService dataStorageService, MessageBroker messageBroker,
-        TriggerExecutionService triggerExecutionService, TriggerDefinitionFacade triggerDefinitionFacade) {
+        MessageBroker messageBroker, TriggerExecutionService triggerExecutionService,
+        TriggerDefinitionFacade triggerDefinitionFacade, TriggerLifecycleService triggerLifecycleService) {
 
-        this.dataStorageService = dataStorageService;
         this.messageBroker = messageBroker;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
+        this.triggerLifecycleService = triggerLifecycleService;
     }
 
     public LocalDateTime executeTriggerDynamicWebhookRefresh(
@@ -60,9 +59,7 @@ public class ScheduledTriggerExecutor {
         LocalDateTime webhookExpirationDate = null;
 
         TriggerDefinition.DynamicWebhookEnableOutput output = OptionalUtils.get(
-            dataStorageService.fetchValue(
-                DataStorage.Scope.WORKFLOW_INSTANCE, workflowExecutionId.getInstanceId(),
-                workflowExecutionId.toString()));
+            triggerLifecycleService.fetchValue(workflowExecutionId.getInstanceId(), workflowExecutionId.toString()));
 
         output = triggerDefinitionFacade.executeDynamicWebhookRefresh(
             workflowTrigger.getTriggerName(), workflowTrigger.getComponentName(), workflowTrigger.getComponentVersion(),
