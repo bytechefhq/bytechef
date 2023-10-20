@@ -142,8 +142,8 @@ public class DefinitionRegistryConfiguration {
     }
 
     /**
-     * Compound ConnectionDefinitionService impl that supports the use case where a component (for example, HttpClient)
-     * uses a compatible connection from a different component that can be in a different worker instance.
+     * Compound ConnectionDefinitionService impl that supports the use case where a component (for example, HttpClient
+     * or Script) uses a compatible connection from a different component that can be in a different worker instance.
      */
     private static class WorkerConnectionDefinitionService implements ConnectionDefinitionService {
 
