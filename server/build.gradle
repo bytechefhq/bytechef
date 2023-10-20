@@ -33,7 +33,7 @@ subprojects {
 
     checkstyle {
         toolVersion "${checkstyleVersion}"
-        configFile file("checkstyle.xml")
+        configFile file("${rootDir}/checkstyle.xml")
         checkstyleTest.enabled = false
     }
 
