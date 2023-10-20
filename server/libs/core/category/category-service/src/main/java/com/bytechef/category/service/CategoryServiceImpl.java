@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.StreamSupport;
 
 /**
  * @author Ivica Cardic
@@ -62,8 +61,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public List<Category> getCategories() {
-        return StreamSupport.stream(categoryRepository.findAll(Sort.by("name"))
-            .spliterator(), false)
+        return categoryRepository.findAll(Sort.by("name"))
+            .stream()
             .sorted(Comparator.comparing(Category::getName))
             .toList();
     }
@@ -83,9 +82,8 @@ public class CategoryServiceImpl implements CategoryService {
             return Collections.emptyList();
         } else {
 
-            return StreamSupport.stream(categoryRepository.findAllById(ids)
-                .spliterator(),
-                false)
+            return categoryRepository.findAllById(ids)
+                .stream()
                 .sorted(Comparator.comparing(Category::getName))
                 .toList();
         }

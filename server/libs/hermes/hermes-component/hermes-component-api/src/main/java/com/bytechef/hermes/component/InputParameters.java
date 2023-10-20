@@ -33,7 +33,7 @@ public interface InputParameters {
     /**
      * Determined if the given task contains the given key.
      *
-     * @param key The key to check for existance.
+     * @param key The key to check for existence.
      * @return <code>true</code> if the key exists.<code>false</code> otherwise.
      */
     boolean containsKey(String key);

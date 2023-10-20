@@ -21,6 +21,7 @@ import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
@@ -91,9 +92,9 @@ public abstract class AbstractComponentTaskHandlerBeanDefinitionLoader<T extends
 
         BeanDefinition beanDefinition = null;
 
-        TriggerDefinition.TriggerType triggerType = triggerDefinition.getType();
+        TriggerType triggerType = triggerDefinition.getType();
 
-        if (triggerType != TriggerDefinition.TriggerType.LISTENER) {
+        if (triggerType != TriggerType.LISTENER) {
             beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DefaultComponentTriggerTaskHandler.class)
                 .addConstructorArgValue(componentDefinitionFactory)
                 .addConstructorArgReference("connectionDefinitionService")
