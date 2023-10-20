@@ -182,7 +182,6 @@ include("server:libs:modules:task-dispatchers:subflow")
 include("server:libs:test:test-support")
 include("server:libs:test:test-int-support")
 
-include("server:ee:apps:server-app")
 include("server:ee:apps:services:api-gateway-app")
 include("server:ee:apps:services:config-server-app")
 include("server:ee:apps:services:configuration-app")

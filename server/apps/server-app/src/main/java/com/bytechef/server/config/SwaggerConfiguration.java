@@ -36,4 +36,9 @@ public class SwaggerConfiguration {
     public GroupedOpenApi coreOpenApi() {
         return SwaggerUtils.CORE_GROUP_API;
     }
+
+    @Bean
+    public GroupedOpenApi embeddedOpenApi() {
+        return com.bytechef.dione.swagger.util.SwaggerUtils.EMBEDDED_GROUP_API;
+    }
 }
