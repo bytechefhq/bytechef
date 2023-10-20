@@ -6,7 +6,6 @@ import {
     AccordionTrigger,
 } from '@radix-ui/react-accordion';
 import {TaskExecutionModel} from 'middleware/automation/project';
-import React from 'react';
 import InlineSVG from 'react-inlinesvg';
 import ReactJson from 'react-json-view';
 import {twMerge} from 'tailwind-merge';
