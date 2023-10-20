@@ -25,15 +25,21 @@ type SelectProps = {
     defaultValue?: string | undefined;
     options: ISelectOption[];
     onValueChange?(value: string): void;
+    value: string;
 };
 
 const Select = ({
     defaultValue,
     options,
     onValueChange,
+    value,
 }: SelectProps): JSX.Element => {
     return (
-        <Root defaultValue={defaultValue} onValueChange={onValueChange}>
+        <Root
+            defaultValue={defaultValue}
+            onValueChange={onValueChange}
+            value={value}
+        >
             <Trigger asChild aria-label="Select">
                 <Button displayType="light">
                     <Value />
