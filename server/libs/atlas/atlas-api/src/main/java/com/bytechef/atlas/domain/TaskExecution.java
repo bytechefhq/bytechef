@@ -19,6 +19,7 @@
 
 package com.bytechef.atlas.domain;
 
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.error.Errorable;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.Prioritizable;
@@ -30,7 +31,6 @@ import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -70,7 +70,7 @@ import org.springframework.util.Assert;
 @Table
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public final class TaskExecution
-    implements Errorable, Persistable<Long>, Prioritizable, Progressable, Retryable, Task {
+    implements Errorable, Cloneable, Persistable<Long>, Prioritizable, Progressable, Retryable, Task {
 
     private static final int DEFAULT_TASK_NUMBER = -1;
 
@@ -168,25 +168,29 @@ public final class TaskExecution
     public TaskExecution() {
     }
 
-    public TaskExecution(long id) {
-        this.id = id;
-    }
-
-    public TaskExecution(@NonNull WorkflowTask workflowTask) {
-        Assert.notNull(workflowTask, "'workflowTask' must not be null");
-
-        this.workflowTask = workflowTask;
-    }
-
-    public TaskExecution(long id, @NonNull WorkflowTask workflowTask) {
-        Assert.notNull(workflowTask, "'workflowTask' must not be null");
-
-        this.id = id;
-        this.workflowTask = workflowTask;
-    }
-
     public static Builder builder() {
         return new Builder();
+    }
+
+    /**
+     * Evaluate the {@link WorkflowTask}
+     *
+     * @param context The context value to evaluate the task against
+     * @return the evaluated {@link TaskExecution} instance.
+     */
+    public TaskExecution evaluate(Map<String, Object> context) {
+        WorkflowTask workflowTask = getWorkflowTask();
+
+        Map<String, Object> map = Evaluator.evaluate(workflowTask.toMap(), context);
+
+        setWorkflowTask(new WorkflowTask(map));
+
+        return this;
+    }
+
+    @Override
+    public TaskExecution clone() throws CloneNotSupportedException {
+        return (TaskExecution) super.clone();
     }
 
     @Override
@@ -256,6 +260,7 @@ public final class TaskExecution
      *
      * @return String the id of the task execution.
      */
+    @Override
     public Long getId() {
         return this.id;
     }
@@ -413,6 +418,7 @@ public final class TaskExecution
     }
 
     @Override
+    @JsonIgnore
     public String getType() {
         Assert.notNull(workflowTask.getType(), "Type must not be null");
 
@@ -424,8 +430,10 @@ public final class TaskExecution
         return id == null;
     }
 
-    public void putMetadata(String key, Object value) {
+    public TaskExecution putMetadata(String key, Object value) {
         metadata.put(key, value);
+
+        return this;
     }
 
     public void setEndDate(LocalDateTime endDate) {
@@ -637,8 +645,8 @@ public final class TaskExecution
         }
 
         public TaskExecution build() {
-
             TaskExecution taskExecution = new TaskExecution();
+
             taskExecution.setEndDate(endDate);
             taskExecution.setError(error);
             taskExecution.setId(id);

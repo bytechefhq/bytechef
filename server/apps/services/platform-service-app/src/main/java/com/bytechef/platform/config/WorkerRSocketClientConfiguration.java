@@ -20,6 +20,9 @@ package com.bytechef.platform.config;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
 import com.bytechef.hermes.worker.rsocket.client.task.handler.TaskHandlerRSocketClient;
+import com.bytechef.hermes.worker.rsocket.client.task.handler.TriggerHandlerRSocketClient;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerAccessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,13 +33,22 @@ import org.springframework.context.annotation.Configuration;
 public class WorkerRSocketClientConfiguration {
 
     private final TaskHandlerRSocketClient taskHandlerRSocketClient;
+    private final TriggerHandlerRSocketClient triggerHandlerRSocketClient;
 
-    public WorkerRSocketClientConfiguration(TaskHandlerRSocketClient taskHandlerRSocketClient) {
+    public WorkerRSocketClientConfiguration(
+        TaskHandlerRSocketClient taskHandlerRSocketClient, TriggerHandlerRSocketClient triggerHandlerRSocketClient) {
+
         this.taskHandlerRSocketClient = taskHandlerRSocketClient;
+        this.triggerHandlerRSocketClient = triggerHandlerRSocketClient;
     }
 
     @Bean
     TaskHandlerAccessor taskHandlerAccessor() {
         return type -> (TaskHandler<Object>) taskExecution -> taskHandlerRSocketClient.handle(type, taskExecution);
+    }
+
+    @Bean
+    TriggerHandlerAccessor triggerHandlerAccessor() {
+        return type -> (TriggerHandler) triggerExecution -> triggerHandlerRSocketClient.handle(type, triggerExecution);
     }
 }

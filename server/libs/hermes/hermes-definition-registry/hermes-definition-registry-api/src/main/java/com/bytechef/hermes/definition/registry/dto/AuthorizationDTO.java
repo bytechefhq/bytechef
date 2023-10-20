@@ -17,8 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
-import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.definition.Display;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.definition.Property;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -29,5 +28,5 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record AuthorizationDTO(
-    Display display, String name, List<? extends Property<?>> properties, Authorization.AuthorizationType type) {
+    String description, String name, List<? extends Property<?>> properties, String title, AuthorizationType type) {
 }

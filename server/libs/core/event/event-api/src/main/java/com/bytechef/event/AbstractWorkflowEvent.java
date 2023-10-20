@@ -29,8 +29,11 @@ import java.util.Objects;
  */
 public abstract class AbstractWorkflowEvent implements WorkflowEvent {
 
-    protected final LocalDateTime createdDate;
-    protected final String type;
+    protected LocalDateTime createdDate;
+    protected String type;
+
+    protected AbstractWorkflowEvent() {
+    }
 
     protected AbstractWorkflowEvent(String type) {
         Objects.requireNonNull(type, "'type' must not be null");

@@ -18,7 +18,6 @@
 package com.bytechef.atlas.event;
 
 import com.bytechef.event.AbstractWorkflowEvent;
-import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
@@ -28,17 +27,14 @@ public class TaskProgressedWorkflowEvent extends AbstractWorkflowEvent {
     public static final String TASK_PROGRESSED = "task.progressed";
 
     private int progress;
-    private Long taskExecutionId;
+    private long taskExecutionId;
 
     private TaskProgressedWorkflowEvent() {
-        super(TASK_PROGRESSED);
+        super();
     }
 
-    public TaskProgressedWorkflowEvent(Long taskExecutionId, int progress) {
+    public TaskProgressedWorkflowEvent(long taskExecutionId, int progress) {
         super(TASK_PROGRESSED);
-
-        Assert.notNull(taskExecutionId, "'taskExecutionId' must not be null");
-        Assert.notNull(progress, "'progress' must not be null");
 
         this.progress = progress;
         this.taskExecutionId = taskExecutionId;
@@ -48,7 +44,7 @@ public class TaskProgressedWorkflowEvent extends AbstractWorkflowEvent {
         return progress;
     }
 
-    public Long getTaskExecutionId() {
+    public long getTaskExecutionId() {
         return taskExecutionId;
     }
 

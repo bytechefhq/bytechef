@@ -20,7 +20,7 @@ package com.bytechef.hermes.workflow.test.executor;
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.dto.TaskExecutionDTO;
-import com.bytechef.atlas.job.JobParameters;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;

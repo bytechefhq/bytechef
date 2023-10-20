@@ -55,7 +55,15 @@ public final class OptionalUtils {
     }
 
     public static <T, U> U map(Optional<T> optional, Function<? super T, ? extends U> mapper) {
-        return optional.map(mapper)
+        return optional
+            .map(mapper)
             .orElseThrow(IllegalArgumentException::new);
+    }
+
+    public static <T, U> U mapOrElse(Optional<T> optional, Function<? super T, ? extends U> mapper, U other) {
+        return optional
+            .map(mapper)
+            .map(u -> (U) u)
+            .orElse(other);
     }
 }

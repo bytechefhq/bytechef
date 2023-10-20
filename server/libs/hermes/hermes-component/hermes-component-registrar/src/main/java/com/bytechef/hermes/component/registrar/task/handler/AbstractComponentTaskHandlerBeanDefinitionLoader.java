@@ -23,7 +23,6 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,30 +48,33 @@ public abstract class AbstractComponentTaskHandlerBeanDefinitionLoader<T extends
 
             List<TaskHandlerBeanDefinitionEntry> taskHandlerBeanDefinitionEntries = new ArrayList<>();
 
-            if (!CollectionUtils.isEmpty(componentDefinition.getActions())) {
-                taskHandlerBeanDefinitionEntries.addAll(
-                    com.bytechef.commons.util.CollectionUtils.map(
-                        componentDefinition.getActions(),
-                        actionDefinition -> new TaskHandlerBeanDefinitionEntry(
-                            actionDefinition.getName(),
-                            getComponentActionTaskHandlerBeanDefinition(
-                                actionDefinition, componentDefinitionFactory))));
-            }
+            componentDefinition
+                .getActions()
+                .ifPresent(
+                    actionDefinitions -> taskHandlerBeanDefinitionEntries.addAll(
+                        com.bytechef.commons.util.CollectionUtils.map(
+                            actionDefinitions,
+                            actionDefinition -> new TaskHandlerBeanDefinitionEntry(
+                                actionDefinition.getName(),
+                                getComponentActionTaskHandlerBeanDefinition(
+                                    actionDefinition, componentDefinitionFactory)))));
 
-            if (!CollectionUtils.isEmpty(componentDefinition.getTriggers())) {
-                for (TriggerDefinition triggerDefinition : componentDefinition.getTriggers()) {
-                    BeanDefinition triggeBeanDefinition = getComponentTriggerTaskHandlerBeanDefinition(
-                        triggerDefinition, componentDefinitionFactory);
+            componentDefinition
+                .getTriggers()
+                .ifPresent(triggerDefinitions -> {
+                    for (TriggerDefinition triggerDefinition : triggerDefinitions) {
+                        BeanDefinition triggeBeanDefinition = getComponentTriggerTaskHandlerBeanDefinition(
+                            triggerDefinition, componentDefinitionFactory);
 
-                    if (triggeBeanDefinition != null) {
-                        taskHandlerBeanDefinitionEntries.add(
-                            new TaskHandlerBeanDefinitionEntry(
-                                triggerDefinition.getName(),
-                                getComponentTriggerTaskHandlerBeanDefinition(
-                                    triggerDefinition, componentDefinitionFactory)));
+                        if (triggeBeanDefinition != null) {
+                            taskHandlerBeanDefinitionEntries.add(
+                                new TaskHandlerBeanDefinitionEntry(
+                                    triggerDefinition.getName(),
+                                    getComponentTriggerTaskHandlerBeanDefinition(
+                                        triggerDefinition, componentDefinitionFactory)));
+                        }
                     }
-                }
-            }
+                });
 
             componentTaskHandlerFactories.add(
                 new ComponentTaskHandlerBeanDefinition(componentDefinition, taskHandlerBeanDefinitionEntries));

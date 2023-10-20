@@ -19,7 +19,7 @@ package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.Workflow;
-import com.bytechef.atlas.job.JobParameters;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.atlas.repository.JobRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;

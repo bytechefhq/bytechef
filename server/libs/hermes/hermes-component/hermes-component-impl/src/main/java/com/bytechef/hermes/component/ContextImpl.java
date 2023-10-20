@@ -36,6 +36,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.bytechef.hermes.component.definition.ConnectionDefinition.CONNECTION_ID;
 
@@ -252,6 +253,11 @@ public class ContextImpl implements ActionContext, TriggerContext {
         }
 
         @Override
+        public Set<String> getKeys() {
+            return inputParameters.getKeys();
+        }
+
+        @Override
         public <T> List<T> getList(String key, Class<T> elementType) {
             return inputParameters.getList(key, elementType);
         }
@@ -294,11 +300,6 @@ public class ContextImpl implements ActionContext, TriggerContext {
         @Override
         public long getLong(String key, long defaultValue) {
             return inputParameters.getLong(key, defaultValue);
-        }
-
-        @Override
-        public Map<String, Object> getMap() {
-            return inputParameters.getMap();
         }
 
         @Override

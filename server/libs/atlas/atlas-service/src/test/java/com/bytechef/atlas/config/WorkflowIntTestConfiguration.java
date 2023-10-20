@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.service.config;
+package com.bytechef.atlas.config;
 
-import com.bytechef.atlas.config.WorkflowConfiguration;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;

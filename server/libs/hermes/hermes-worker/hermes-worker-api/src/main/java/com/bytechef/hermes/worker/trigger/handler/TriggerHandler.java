@@ -20,7 +20,7 @@
 package com.bytechef.hermes.worker.trigger.handler;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.trigger.TriggerExecution;
+import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 
 /**

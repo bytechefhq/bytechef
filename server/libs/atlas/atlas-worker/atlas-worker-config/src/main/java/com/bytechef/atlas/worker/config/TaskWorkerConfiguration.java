@@ -21,7 +21,6 @@ package com.bytechef.atlas.worker.config;
 
 import com.bytechef.event.EventPublisher;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
@@ -53,9 +52,6 @@ public class TaskWorkerConfiguration {
     @Autowired(required = false)
     private List<TaskDispatcherAdapterFactory> taskDispatcherAdapterTaskHandlerFactories = Collections.emptyList();
 
-    @Autowired
-    private TaskEvaluator taskEvaluator;
-
     @Bean
     TaskHandlerAccessor taskHandlerAccessor(Map<String, TaskHandler<?>> taskHandlerMap) {
         return taskHandlerMap::get;
@@ -69,7 +65,7 @@ public class TaskWorkerConfiguration {
     @Bean
     TaskHandlerResolver taskDispatcherAdapterTaskHandlerResolver(TaskHandlerResolver taskHandlerResolver) {
         return new TaskDispatcherAdapterTaskHandlerResolver(
-            taskDispatcherAdapterTaskHandlerFactories, taskHandlerResolver, taskEvaluator);
+            taskDispatcherAdapterTaskHandlerFactories, taskHandlerResolver);
     }
 
     @Bean
@@ -93,7 +89,6 @@ public class TaskWorkerConfiguration {
             .taskHandlerResolver(taskHandlerResolver)
             .messageBroker(messageBroker)
             .eventPublisher(eventPublisher)
-            .taskEvaluator(taskEvaluator)
             .build();
     }
 }

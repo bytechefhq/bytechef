@@ -78,14 +78,15 @@ public class JmsMessageBrokerConfiguration
     @Override
     public void registerListenerEndpoint(
         JmsListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
-        Object delegate,
-        String methodName) {
+        Object delegate, String methodName) {
 
         if (messageRoute.isControlExchange()) {
             messageRoute = SystemMessageRoute.CONTROL;
         }
 
-        logger.info("Registering JMS Listener: {} -> {}:{}", messageRoute, delegate.getClass(), methodName);
+        Class<?> delegateClass = delegate.getClass();
+
+        logger.info("Registering JMS Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
 
         MessageListenerAdapter messageListenerAdapter = new NoReplyMessageListenerAdapter(delegate);
 
@@ -94,7 +95,7 @@ public class JmsMessageBrokerConfiguration
 
         SimpleJmsListenerEndpoint simpleJmsListenerEndpoint = new SimpleJmsListenerEndpoint();
 
-        simpleJmsListenerEndpoint.setId(messageRoute + "Endpoint");
+        simpleJmsListenerEndpoint.setId(messageRoute + delegateClass.getSimpleName() + "Endpoint");
         simpleJmsListenerEndpoint.setDestination(messageRoute.toString());
         simpleJmsListenerEndpoint.setMessageListener(messageListenerAdapter);
 

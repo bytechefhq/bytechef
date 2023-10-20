@@ -68,7 +68,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
-    public ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId) {
+    public ProjectInstanceWorkflow getProjectInstanceWorkflow(String workflowId, long projectInstanceId) {
         return projectInstanceWorkflowRepository.findByProjectInstanceIdAndWorkflowId(projectInstanceId, workflowId);
     }
 
@@ -95,7 +95,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
 
             curProjectInstanceWorkflow.setConnectionIds(projectInstanceWorkflow.getConnectionIds());
             curProjectInstanceWorkflow.setEnabled(projectInstanceWorkflow.isEnabled());
-            curProjectInstanceWorkflow.setInputParameters(projectInstanceWorkflow.getInputParameters());
+            curProjectInstanceWorkflow.setInputs(projectInstanceWorkflow.getInputs());
             curProjectInstanceWorkflow.setVersion(projectInstanceWorkflow.getVersion());
 
             updatedProjectInstanceWorkflows.add(projectInstanceWorkflowRepository.save(curProjectInstanceWorkflow));

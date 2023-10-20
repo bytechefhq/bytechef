@@ -17,13 +17,11 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
-import com.bytechef.hermes.definition.Display;
-import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ConnectionDefinitionBasicDTO(Display display, String name, Resources resources, int version) {
+public record ConnectionDefinitionBasicDTO(String description, String name, String title, int version) {
 }

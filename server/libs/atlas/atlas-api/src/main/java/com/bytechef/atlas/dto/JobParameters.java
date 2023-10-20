@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.job;
+package com.bytechef.atlas.dto;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.message.Prioritizable;

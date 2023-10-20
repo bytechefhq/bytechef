@@ -19,7 +19,7 @@ package com.bytechef.atlas.service;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
-import com.bytechef.atlas.service.config.WorkflowIntTestConfiguration;
+import com.bytechef.atlas.config.WorkflowIntTestConfiguration;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.test.annotation.EmbeddedSql;

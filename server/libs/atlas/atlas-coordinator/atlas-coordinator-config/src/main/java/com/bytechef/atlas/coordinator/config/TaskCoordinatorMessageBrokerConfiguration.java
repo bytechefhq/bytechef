@@ -67,13 +67,13 @@ public class TaskCoordinatorMessageBrokerConfiguration {
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
                 TaskMessageRoute.TASKS_RESTARTS,
-                subscriptions.getJobs(),
+                subscriptions.getRestarts(),
                 coordinator,
                 "resume");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
                 TaskMessageRoute.TASKS_STOPS,
-                subscriptions.getJobs(),
+                subscriptions.getStops(),
                 coordinator,
                 "stop");
         };

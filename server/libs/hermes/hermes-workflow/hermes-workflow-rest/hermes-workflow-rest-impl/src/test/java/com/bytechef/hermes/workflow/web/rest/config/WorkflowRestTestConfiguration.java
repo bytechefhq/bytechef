@@ -18,7 +18,7 @@
 package com.bytechef.hermes.workflow.web.rest.config;
 
 import com.bytechef.atlas.facade.TaskExecutionFacade;
-import com.bytechef.atlas.job.JobFactory;
+import com.bytechef.atlas.facade.JobFacade;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.JobService;
 import com.bytechef.atlas.service.TaskExecutionService;
@@ -33,7 +33,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class WorkflowRestTestConfiguration {
 
     @MockBean
-    private JobFactory jobFactory;
+    private JobFacade jobFacade;
 
     @MockBean
     private JobService jobService;

@@ -17,7 +17,6 @@
 
 package com.bytechef.hermes.definition.registry.dto;
 
-import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,10 +28,10 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record TaskDispatcherDefinitionDTO(
-    Display display, String name, List<Property<? extends Property<?>>> outputSchema, List<Property<?>> properties,
-    Resources resources, List<Property<?>> taskProperties, int version) {
+    String description, String icon, String name, List<Property<? extends Property<?>>> outputSchema,
+    List<Property<?>> properties, Resources resources, List<Property<?>> taskProperties, String title, int version) {
 
     public TaskDispatcherDefinitionDTO(String name) {
-        this(null, name, null, null, null, null, 0);
+        this(null, null, name, null, null, null, null, null, 0);
     }
 }

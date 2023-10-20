@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2016-2018 the original author or authors.
+ * Copyright 2021 <your company/name>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,34 +13,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.bytechef.atlas.task;
+package com.bytechef.atlas.facade;
+
+import com.bytechef.atlas.dto.JobParameters;
 
 /**
- * @author Arik Cohen
  * @author Ivica Cardic
- * @since Apr 11, 2017
  */
-public abstract class AbstractControlTask implements ControlTask {
+public interface JobFacade {
 
-    private String type;
-
-    public AbstractControlTask() {
-    }
-
-    public AbstractControlTask(String type) {
-        this.type = type;
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
+    long create(JobParameters jobParameters);
 }

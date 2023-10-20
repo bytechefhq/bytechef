@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.registrar.oas;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
 import com.bytechef.hermes.component.definition.ActionDefinition;
@@ -30,6 +31,7 @@ import com.bytechef.hermes.definition.Property;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,19 +51,28 @@ public class OpenApiClient {
         Map<String, Object> metadata = actionDefinition.getMetadata();
 
         return exchange(
-            createUri(metadata, taskExecution.getParameters(), actionDefinition.getProperties()),
+            createUri(
+                metadata, taskExecution.getParameters(),
+                OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList())),
             MapValueUtils.get(metadata, "method", RequestMethod.class))
                 .configuration(
                     HttpClientUtils.responseFormat(getResponseFormat(actionDefinition)))
                 .headers(
-                    getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.HEADER))
+                    getValuesMap(
+                        taskExecution.getParameters(),
+                        OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
+                        PropertyType.HEADER))
                 .body(
                     getBody(
                         MapValueUtils.get(metadata, "bodyContentType", BodyContentType.class),
                         MapValueUtils.getString(metadata, "mimeType"),
-                        taskExecution.getParameters(), actionDefinition.getProperties()))
+                        taskExecution.getParameters(),
+                        OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList())))
                 .queryParameters(
-                    getValuesMap(taskExecution.getParameters(), actionDefinition.getProperties(), PropertyType.QUERY))
+                    getValuesMap(
+                        taskExecution.getParameters(),
+                        OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
+                        PropertyType.QUERY))
                 .execute();
     }
 
@@ -124,9 +135,10 @@ public class OpenApiClient {
 
     private ResponseFormat getResponseFormat(ActionDefinition actionDefinition) {
         ResponseFormat responseFormat = null;
-        List<? extends Property<?>> outputProperties = actionDefinition.getOutputSchema();
+        List<? extends Property<?>> outputProperties = OptionalUtils.orElse(
+            actionDefinition.getOutputSchema(), Collections.emptyList());
 
-        if (outputProperties != null && !outputProperties.isEmpty()) {
+        if (!outputProperties.isEmpty()) {
             Property<?> property = outputProperties.get(0);
 
             responseFormat = MapValueUtils.get(property.getMetadata(), "responseFormat", ResponseFormat.class);

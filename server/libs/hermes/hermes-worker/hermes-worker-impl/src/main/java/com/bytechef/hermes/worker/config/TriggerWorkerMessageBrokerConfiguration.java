@@ -18,6 +18,7 @@
 package com.bytechef.hermes.worker.config;
 
 import com.bytechef.hermes.worker.TriggerWorker;
+import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import com.bytechef.hermes.message.broker.TriggerMessageRoute;
@@ -43,10 +44,13 @@ public class TriggerWorkerMessageBrokerConfiguration {
     @Bean
     MessageBrokerConfigurer<?> triggerWorkerMessageBrokerConfigurer() {
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-            TriggerWorker worker = applicationContext.getBean(TriggerWorker.class);
+            TriggerWorker triggerWorker = applicationContext.getBean(TriggerWorker.class);
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, TriggerMessageRoute.TRIGGERS, 1, worker, "handle");
+                listenerEndpointRegistrar, TriggerMessageRoute.TRIGGERS, 1, triggerWorker, "handle");
+
+            messageBrokerListenerRegistrar.registerListenerEndpoint(
+                listenerEndpointRegistrar, SystemMessageRoute.CONTROL, 1, triggerWorker, "handle");
         };
     }
 }

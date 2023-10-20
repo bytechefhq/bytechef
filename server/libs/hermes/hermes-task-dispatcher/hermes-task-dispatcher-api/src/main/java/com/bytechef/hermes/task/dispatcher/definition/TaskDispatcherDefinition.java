@@ -17,12 +17,12 @@
 
 package com.bytechef.hermes.task.dispatcher.definition;
 
-import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.definition.Resources;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Used for specifying a task dispatcher description.
@@ -33,7 +33,9 @@ import java.util.List;
 @JsonDeserialize(as = TaskDispatcherDSL.ModifiableTaskDispatcherDefinition.class)
 public sealed interface TaskDispatcherDefinition permits TaskDispatcherDSL.ModifiableTaskDispatcherDefinition {
 
-    Display getDisplay();
+    Optional<String> getDescription();
+
+    String getIcon();
 
     String getName();
 
@@ -42,6 +44,8 @@ public sealed interface TaskDispatcherDefinition permits TaskDispatcherDSL.Modif
     List<Property<?>> getProperties();
 
     Resources getResources();
+
+    String getTitle();
 
     int getVersion();
 

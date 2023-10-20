@@ -159,9 +159,11 @@ public final class Workflow implements Errorable, Persistable<String> {
 
     @PersistenceCreator
     public Workflow(String definition, String id, int format) throws Exception {
-        this(definition, Format.valueOf(format), id, WorkflowReader.readWorkflowMap(
-            new WorkflowResource(
-                id, new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)), Format.valueOf(format))));
+        this(
+            definition, Format.valueOf(format), id,
+            WorkflowReader.readWorkflowMap(
+                new WorkflowResource(
+                    id, new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)), Format.valueOf(format))));
     }
 
     public Workflow(String definition, Format format, String id, Map<String, Object> source) {
@@ -191,7 +193,7 @@ public final class Workflow implements Errorable, Persistable<String> {
         this.maxRetries = MapValueUtils.getInteger(source, WorkflowConstants.MAX_RETRIES, 0);
         this.tasks = CollectionUtils.map(
             MapValueUtils.getList(source, WorkflowConstants.TASKS, Map.class, Collections.emptyList()),
-            WorkflowTask::of);
+            WorkflowTask::new);
     }
 
     public Workflow(String definition, Format format) {

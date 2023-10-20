@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.job;
+package com.bytechef.atlas.facade;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.Job;
+import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.message.broker.TaskMessageRoute;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.event.JobStatusWorkflowEvent;
@@ -26,9 +27,13 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.atlas.service.ContextService;
 import com.bytechef.atlas.service.JobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-public class JobFactoryImpl implements JobFactory {
+public class JobFacadeImpl implements JobFacade {
+
+    private static final Logger log = LoggerFactory.getLogger(JobFacadeImpl.class);
 
     private final ContextService contextService;
     private final EventPublisher eventPublisher;
@@ -36,7 +41,7 @@ public class JobFactoryImpl implements JobFactory {
     private final MessageBroker messageBroker;
 
     @SuppressFBWarnings("EI2")
-    public JobFactoryImpl(
+    public JobFacadeImpl(
         ContextService contextService, EventPublisher eventPublisher, JobService jobService,
         MessageBroker messageBroker) {
 
@@ -58,6 +63,8 @@ public class JobFactoryImpl implements JobFactory {
         eventPublisher.publishEvent(new JobStatusWorkflowEvent(job.getId(), job.getStatus()));
 
         messageBroker.send(TaskMessageRoute.TASKS_JOBS, job.getId());
+
+        log.debug("Job id={}, label='{}' created", job.getId(), job.getLabel());
 
         return job.getId();
     }

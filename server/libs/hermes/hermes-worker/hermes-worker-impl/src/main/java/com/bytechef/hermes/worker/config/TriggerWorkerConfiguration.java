@@ -20,10 +20,14 @@ package com.bytechef.hermes.worker.config;
 import com.bytechef.autoconfigure.annotation.ConditionalOnWorker;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.worker.TriggerWorker;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerAccessor;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
 import com.bytechef.message.broker.MessageBroker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Map;
 import java.util.concurrent.Executors;
 
 /**
@@ -34,7 +38,20 @@ import java.util.concurrent.Executors;
 public class TriggerWorkerConfiguration {
 
     @Bean
-    TriggerWorker triggerWorker(EventPublisher eventPublisher, MessageBroker messageBroker) {
-        return new TriggerWorker(eventPublisher, Executors.newCachedThreadPool(), messageBroker);
+    TriggerHandlerAccessor triggerHandlerAccessor(Map<String, TriggerHandler> triggerHandlerMap) {
+        return triggerHandlerMap::get;
+    }
+
+    @Bean
+    TriggerHandlerResolver triggerHandlerResolver(TriggerHandlerAccessor triggerHandlerAccessor) {
+        return new TriggerHandlerResolver(triggerHandlerAccessor);
+    }
+
+    @Bean
+    TriggerWorker triggerWorker(
+        EventPublisher eventPublisher, MessageBroker messageBroker, TriggerHandlerResolver triggerHandlerResolver) {
+
+        return new TriggerWorker(
+            eventPublisher, Executors.newCachedThreadPool(), messageBroker, triggerHandlerResolver);
     }
 }

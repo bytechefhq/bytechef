@@ -32,7 +32,7 @@ public interface ProjectInstanceWorkflowService {
 
     ProjectInstanceWorkflow getProjectInstanceWorkflow(long id);
 
-    ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId);
+    ProjectInstanceWorkflow getProjectInstanceWorkflow(String workflowId, long projectInstanceId);
 
     List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(long projectInstanceId);
 

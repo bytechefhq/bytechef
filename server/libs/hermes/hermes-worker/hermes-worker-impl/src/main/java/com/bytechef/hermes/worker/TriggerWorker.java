@@ -18,20 +18,25 @@
 package com.bytechef.hermes.worker;
 
 import com.bytechef.event.EventPublisher;
+import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerOutput;
 import com.bytechef.hermes.event.TriggerStartedWorkflowEvent;
+import com.bytechef.hermes.trigger.CancelControlTrigger;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
+import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerResolver;
+import com.bytechef.message.Controllable;
 import com.bytechef.message.broker.SystemMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.message.broker.TriggerMessageRoute;
-import com.bytechef.hermes.trigger.ControlTrigger;
-import com.bytechef.hermes.trigger.TriggerExecution;
+import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -57,11 +62,16 @@ public class TriggerWorker {
     private final ExecutorService executorService;
     private final MessageBroker messageBroker;
     private final Map<WorkflowExecutionId, TriggerExecutionFuture<?>> triggerExecutions = new ConcurrentHashMap<>();
+    private final TriggerHandlerResolver triggerHandlerResolver;
 
-    public TriggerWorker(EventPublisher eventPublisher, ExecutorService executorService, MessageBroker messageBroker) {
+    public TriggerWorker(
+        EventPublisher eventPublisher, ExecutorService executorService, MessageBroker messageBroker,
+        TriggerHandlerResolver triggerHandlerResolver) {
+
         this.eventPublisher = eventPublisher;
         this.executorService = executorService;
         this.messageBroker = messageBroker;
+        this.triggerHandlerResolver = triggerHandlerResolver;
     }
 
     @SuppressFBWarnings("NP")
@@ -72,9 +82,9 @@ public class TriggerWorker {
 
         Future<?> future = executorService.submit(() -> {
             try {
-                eventPublisher.publishEvent(new TriggerStartedWorkflowEvent(triggerExecution.getWorkflowExecutionId()));
+                eventPublisher.publishEvent(new TriggerStartedWorkflowEvent(triggerExecution.getId()));
 
-                TriggerExecution completedTriggerExecution = doExecuteTask(triggerExecution);
+                TriggerExecution completedTriggerExecution = doExecuteTrigger(triggerExecution);
 
                 messageBroker.send(TriggerMessageRoute.TRIGGERS_COMPLETIONS, completedTriggerExecution);
             } catch (InterruptedException e) {
@@ -91,8 +101,8 @@ public class TriggerWorker {
             }
         });
 
-        triggerExecutions.put(triggerExecution.getWorkflowExecutionId(), new TriggerExecutionFuture<>(
-            triggerExecution, future));
+        triggerExecutions.put(
+            triggerExecution.getWorkflowExecutionId(), new TriggerExecutionFuture<>(triggerExecution, future));
 
         try {
             future.get(calculateTimeout(triggerExecution), TimeUnit.MILLISECONDS);
@@ -111,17 +121,39 @@ public class TriggerWorker {
         }
     }
 
-    public void handle(ControlTrigger controlTrigger) {
-        logger.debug("Received control trigger: {}", controlTrigger);
+    public void handle(Controllable controllable) {
+        if (controllable instanceof CancelControlTrigger controlTrigger) {
+            logger.debug("Received control trigger: {}", controlTrigger);
 
-        // TODO
+            long id = controlTrigger.getTriggerExecutionId();
+
+            for (TriggerExecutionFuture<?> triggerExecutionFuture : triggerExecutions.values()) {
+                if (Objects.equals(triggerExecutionFuture.triggerExecution.getId(), id)) {
+                    logger.info(
+                        "Cancelling trigger id ={}", triggerExecutionFuture.triggerExecution.getId());
+
+                    triggerExecutionFuture.cancel(true);
+                }
+            }
+        }
     }
 
-    private TriggerExecution doExecuteTask(TriggerExecution triggerExecution) throws Exception {
-        // TODO
-        System.out.println(triggerExecution);
+    private TriggerExecution doExecuteTrigger(TriggerExecution triggerExecution) throws Exception {
+        long startTime = System.currentTimeMillis();
 
-        return null;
+        TriggerHandler triggerHandler = triggerHandlerResolver.resolve(triggerExecution);
+
+        TriggerOutput output = triggerHandler.handle(triggerExecution.clone());
+
+        if (output != null) {
+            triggerExecution.setOutput(output.getValue());
+        }
+
+        triggerExecution.setEndDate(LocalDateTime.now());
+        triggerExecution.setExecutionTime(System.currentTimeMillis() - startTime);
+        triggerExecution.setStatus(TriggerExecution.Status.COMPLETED);
+
+        return triggerExecution;
     }
 
     private long calculateTimeout(TriggerExecution triggerExecution) {

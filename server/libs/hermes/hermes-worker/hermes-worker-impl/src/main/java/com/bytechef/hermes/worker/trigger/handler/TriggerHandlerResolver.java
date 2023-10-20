@@ -15,12 +15,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.job;
+package com.bytechef.hermes.worker.trigger.handler;
+
+import com.bytechef.hermes.trigger.Trigger;
 
 /**
  * @author Ivica Cardic
  */
-public interface JobFactory {
+public class TriggerHandlerResolver {
 
-    long create(JobParameters jobParameters);
+    private final TriggerHandlerAccessor triggerHandlerAccessor;
+
+    public TriggerHandlerResolver(TriggerHandlerAccessor triggerHandlerAccessor) {
+        this.triggerHandlerAccessor = triggerHandlerAccessor;
+    }
+
+    public TriggerHandler resolve(Trigger trigger) {
+        return triggerHandlerAccessor.getTriggerHandler(trigger.getType());
+    }
 }

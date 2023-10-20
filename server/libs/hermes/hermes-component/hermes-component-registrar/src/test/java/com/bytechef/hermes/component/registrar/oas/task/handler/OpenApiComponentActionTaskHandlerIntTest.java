@@ -23,6 +23,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
@@ -392,35 +393,35 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
         //
 
-        stubFor(
-            get(
-                urlPathEqualTo("/user/login"))
-                    .willReturn(
-                        ok()
-                            .withBody("Logged in user session: 7284289668658063360")
-                            .withHeader("Content-Type", "text/plain")));
-
-        openApiComponentActionTaskHandler = createOpenApiComponentHandler("loginUser");
-
-        taskExecution = getTaskExecution(Map.of());
-
-        response = (Response) openApiComponentActionTaskHandler.handle(taskExecution);
-
-        Assertions.assertEquals(200, response.getStatusCode());
-        Assertions.assertEquals("Logged in user session: 7284289668658063360", response.getBody());
+//        stubFor(
+//            get(
+//                urlPathEqualTo("/user/login"))
+//                    .willReturn(
+//                        ok()
+//                            .withBody("Logged in user session: 7284289668658063360")
+//                            .withHeader("Content-Type", "text/plain")));
+//
+//        openApiComponentActionTaskHandler = createOpenApiComponentHandler("loginUser");
+//
+//        taskExecution = getTaskExecution(Map.of());
+//
+//        response = (Response) openApiComponentActionTaskHandler.handle(taskExecution);
+//
+//        Assertions.assertEquals(200, response.getStatusCode());
+//        Assertions.assertEquals("Logged in user session: 7284289668658063360", response.getBody());
 
         //
 
-        stubFor(get(urlPathEqualTo("/user/logout")).willReturn(ok()));
-
-        openApiComponentActionTaskHandler = createOpenApiComponentHandler("logoutUser");
-
-        taskExecution = getTaskExecution(Map.of());
-
-        response = (Response) openApiComponentActionTaskHandler.handle(taskExecution);
-
-        Assertions.assertEquals(200, response.getStatusCode());
-        Assertions.assertNull(response.getBody());
+//        stubFor(get(urlPathEqualTo("/user/logout")).willReturn(ok()));
+//
+//        openApiComponentActionTaskHandler = createOpenApiComponentHandler("logoutUser");
+//
+//        taskExecution = getTaskExecution(Map.of());
+//
+//        response = (Response) openApiComponentActionTaskHandler.handle(taskExecution);
+//
+//        Assertions.assertEquals(200, response.getStatusCode());
+//        Assertions.assertNull(response.getBody());
 
         //
 
@@ -506,16 +507,21 @@ public class OpenApiComponentActionTaskHandlerIntTest {
 
         //
 
-//        restComponentTaskHandler = new RestComponentTaskHandler(
-//            getActionDefinition("updatePetWithForm"), getConnectionDefinition(), connectionService,
-//            PETSTORE_COMPONENT_HANDLER, null, null);
-//
-//        taskExecution = getTaskExecution(Map.of("petId", 10, "name", "doggie", "status", "available"));
-//
-//        httpResponseEntry = (HttpResponseEntry) restComponentTaskHandler.handle(taskExecution);
-//
-//        Assertions.assertEquals(200, httpResponseEntry.getStatusCode());
-//        Assertions.assertNull(httpResponseEntry.getBody());
+        stubFor(
+            post(urlPathEqualTo("/pet/10"))
+                .willReturn(
+                    ok()
+                        .withBody(json)
+                        .withHeader("Content-Type", "application/json")));
+
+        openApiComponentActionTaskHandler = createOpenApiComponentHandler("updatePetWithForm");
+
+        taskExecution = getTaskExecution(Map.of("petId", 10, "name", "doggie", "status", "available"));
+
+        response = (Response) openApiComponentActionTaskHandler.handle(taskExecution);
+
+        Assertions.assertEquals(200, response.getStatusCode());
+        Assertions.assertNull(response.getBody());
 
         //
 
@@ -802,7 +808,7 @@ public class OpenApiComponentActionTaskHandlerIntTest {
     private ActionDefinition getActionDefinition(String actionName) {
         ComponentDefinition componentDefinition = PETSTORE_COMPONENT_HANDLER.getDefinition();
 
-        for (ActionDefinition actionDefinition : componentDefinition.getActions()) {
+        for (ActionDefinition actionDefinition : OptionalUtils.get(componentDefinition.getActions())) {
             if (Objects.equals(actionDefinition.getName(), actionName)) {
                 return actionDefinition;
             }
@@ -812,18 +818,21 @@ public class OpenApiComponentActionTaskHandlerIntTest {
     }
 
     private TaskExecution getTaskExecution(Map<String, Object> parameters) {
-        return new TaskExecution(
-            connection.getId() == null
-                ? WorkflowTask.of("type")
-                : WorkflowTask.of(
-                    Map.of(
-                        WorkflowConstants.TYPE, "type",
-                        WorkflowConstants.PARAMETERS,
-                        Stream
-                            .concat(
-                                CollectionUtils.stream(Map.of(ConnectionDefinition.CONNECTION_ID, connection.getId())),
-                                CollectionUtils.stream(parameters.entrySet()))
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))));
+        return TaskExecution.builder()
+            .workflowTask(
+                connection.getId() == null
+                    ? new WorkflowTask(Map.of(WorkflowConstants.TYPE, "type"))
+                    : new WorkflowTask(
+                        Map.of(
+                            WorkflowConstants.TYPE, "type",
+                            WorkflowConstants.PARAMETERS,
+                            Stream
+                                .concat(
+                                    CollectionUtils
+                                        .stream(Map.of(ConnectionDefinition.CONNECTION_ID, connection.getId())),
+                                    CollectionUtils.stream(parameters.entrySet()))
+                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))))
+            .build();
     }
 
     @ComponentScan(

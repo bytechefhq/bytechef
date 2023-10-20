@@ -28,24 +28,22 @@ public class JobStatusWorkflowEvent extends AbstractWorkflowEvent {
 
     public static final String JOB_STATUS = "job.status";
 
-    private Long jobId;
+    private long jobId;
     private Status status;
 
     private JobStatusWorkflowEvent() {
-        super(JOB_STATUS);
     }
 
-    public JobStatusWorkflowEvent(Long jobId, Status status) {
+    public JobStatusWorkflowEvent(long jobId, Status status) {
         super(JOB_STATUS);
 
-        Assert.notNull(jobId, "'jobId' must not be null");
         Assert.notNull(status, "'status' must not be null");
 
         this.jobId = jobId;
         this.status = status;
     }
 
-    public Long getJobId() {
+    public long getJobId() {
         return jobId;
     }
 

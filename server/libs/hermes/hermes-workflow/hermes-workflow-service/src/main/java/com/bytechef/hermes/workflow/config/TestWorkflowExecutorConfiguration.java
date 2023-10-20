@@ -17,6 +17,8 @@
 
 package com.bytechef.hermes.workflow.config;
 
+import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.facade.JobFacadeImpl;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -39,7 +41,6 @@ import com.bytechef.atlas.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.service.WorkflowServiceImpl;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerAccessor;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
@@ -81,11 +82,9 @@ import java.util.List;
 @Configuration
 public class TestWorkflowExecutorConfiguration {
 
-    private static final TaskEvaluator TASK_EVALUATOR = TaskEvaluator.create();
-
     @Bean
     WorkflowExecutor testWorkflowExecutor(
-        ObjectMapper objectMapper, TaskEvaluator taskEvaluator, TaskHandlerAccessor taskHandlerAccessor,
+        ObjectMapper objectMapper, TaskHandlerAccessor taskHandlerAccessor,
         List<WorkflowRepository> workflowRepositories) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
@@ -104,21 +103,23 @@ public class TestWorkflowExecutorConfiguration {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
+        EventPublisher eventPublisher = getEventPublisher(jobService, syncMessageBroker, taskExecutionService);
+
+        JobFacade jobFacade = new JobFacadeImpl(contextService, eventPublisher, jobService, syncMessageBroker);
+
         return new TestWorkflowExecutor(
             contextService,
             JobSyncExecutor.builder()
                 .contextService(contextService)
-                .eventPublisher(getEventPublisher(jobService, syncMessageBroker, taskExecutionService))
+                .eventPublisher(eventPublisher)
                 .jobService(jobService)
                 .syncMessageBroker(syncMessageBroker)
                 .taskCompletionHandlerFactories(
-                    getTaskCompletionHandlerFactories(
-                        contextService, counterService, taskEvaluator, taskExecutionService))
+                    getTaskCompletionHandlerFactories(contextService, counterService, taskExecutionService))
                 .taskDispatcherAdapterFactories(getTaskDispatcherAdapterFactories())
                 .taskDispatcherResolverFactories(
                     getTaskDispatcherResolverFactories(
-                        contextService, counterService, syncMessageBroker, taskEvaluator, taskExecutionService))
-                .taskEvaluator(taskEvaluator)
+                        contextService, counterService, jobFacade, syncMessageBroker, taskExecutionService))
                 .taskExecutionService(taskExecutionService)
                 .taskHandlerAccessor(taskHandlerAccessor)
                 .workflowService(workflowService)
@@ -130,8 +131,7 @@ public class TestWorkflowExecutorConfiguration {
         JobService jobService, MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
 
         List<EventListener> eventListeners = List.of(
-            new SubflowJobStatusEventListener(
-                jobService, messageBroker, taskExecutionService, TASK_EVALUATOR));
+            new SubflowJobStatusEventListener(jobService, messageBroker, taskExecutionService));
 
         return workflowEvent -> {
             for (EventListener eventListener : eventListeners) {
@@ -141,27 +141,25 @@ public class TestWorkflowExecutorConfiguration {
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        ContextService contextService, CounterService counterService, TaskEvaluator taskEvaluator,
-        TaskExecutionService taskExecutionService) {
+        ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new BranchTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(
                 taskExecutionService, taskCompletionHandler, counterService),
             (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
-                taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService,
-                taskEvaluator),
+                taskExecutionService, taskCompletionHandler, counterService, taskDispatcher, contextService),
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService),
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new MapTaskCompletionHandler(taskExecutionService,
                 taskCompletionHandler, counterService),
             (taskCompletionHandler, taskDispatcher) -> new ParallelTaskCompletionHandler(counterService,
                 taskCompletionHandler, taskExecutionService),
             (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(
-                contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
+                contextService, taskCompletionHandler, taskDispatcher, taskExecutionService));
     }
 
     private List<TaskDispatcherAdapterFactory> getTaskDispatcherAdapterFactories() {
@@ -169,8 +167,8 @@ public class TestWorkflowExecutorConfiguration {
             new TaskDispatcherAdapterFactory() {
 
                 @Override
-                public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver, TaskEvaluator taskEvaluator) {
-                    return new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver, taskEvaluator);
+                public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver) {
+                    return new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver);
                 }
 
                 @Override
@@ -181,33 +179,32 @@ public class TestWorkflowExecutorConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService, MessageBroker messageBroker,
-        TaskEvaluator taskEvaluator, TaskExecutionService taskExecutionService) {
+        ContextService contextService, CounterService counterService, JobFacade jobFacade,
+        MessageBroker messageBroker, TaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskDispatcher) -> new BranchTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
+                contextService, messageBroker, taskDispatcher, taskExecutionService),
             (taskDispatcher) -> new ConditionTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
+                contextService, messageBroker, taskDispatcher, taskExecutionService),
             (taskDispatcher) -> new EachTaskDispatcher(
-                taskDispatcher, taskExecutionService, messageBroker, contextService, counterService, taskEvaluator),
+                taskDispatcher, taskExecutionService, messageBroker, contextService, counterService),
             (taskDispatcher) -> new ForkJoinTaskDispatcher(
-                contextService, counterService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
+                contextService, counterService, messageBroker, taskDispatcher, taskExecutionService),
             (taskDispatcher) -> new LoopBreakTaskDispatcher(messageBroker, taskExecutionService),
             (taskDispatcher) -> new LoopTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
+                contextService, messageBroker, taskDispatcher, taskExecutionService),
             (taskDispatcher) -> MapTaskDispatcher.builder()
                 .taskDispatcher(taskDispatcher)
                 .taskExecutionService(taskExecutionService)
                 .messageBroker(messageBroker)
                 .contextService(contextService)
                 .counterService(counterService)
-                .taskEvaluator(taskEvaluator)
                 .build(),
             (taskDispatcher) -> new ParallelTaskDispatcher(
                 contextService, counterService, messageBroker, taskDispatcher, taskExecutionService),
             (taskDispatcher) -> new SequenceTaskDispatcher(
-                contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService),
-            (taskDispatcher) -> new SubflowTaskDispatcher(messageBroker));
+                contextService, messageBroker, taskDispatcher, taskExecutionService),
+            (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade));
     }
 }

@@ -25,8 +25,6 @@ import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.WorkflowEvent;
 import com.bytechef.atlas.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Arik Cohen
@@ -35,8 +33,6 @@ import org.slf4j.LoggerFactory;
 public class TaskProgressedEventListener implements EventListener {
 
     private final TaskExecutionService taskExecutionService;
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @SuppressFBWarnings("EI2")
     public TaskProgressedEventListener(TaskExecutionService taskExecutionService) {
@@ -48,16 +44,12 @@ public class TaskProgressedEventListener implements EventListener {
         if (TaskProgressedWorkflowEvent.TASK_PROGRESSED.equals(workflowEvent.getType())) {
             TaskProgressedWorkflowEvent taskProgressedWorkflowEvent = (TaskProgressedWorkflowEvent) workflowEvent;
 
-            TaskExecution taskExecution = taskExecutionService
-                .getTaskExecution(taskProgressedWorkflowEvent.getTaskExecutionId());
+            TaskExecution taskExecution = taskExecutionService.getTaskExecution(
+                taskProgressedWorkflowEvent.getTaskExecutionId());
 
-            if (taskExecution == null) {
-                logger.error("Unknown task: {}", taskProgressedWorkflowEvent.getTaskExecutionId());
-            } else {
-                taskExecution.setProgress(taskProgressedWorkflowEvent.getProgress());
+            taskExecution.setProgress(taskProgressedWorkflowEvent.getProgress());
 
-                taskExecutionService.update(taskExecution);
-            }
+            taskExecutionService.update(taskExecution);
         }
     }
 }

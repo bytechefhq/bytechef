@@ -66,12 +66,6 @@ public class JobStatusWebhookEventListener implements EventListener {
 
         Job job = jobService.getJob(jobId);
 
-        if (job == null) {
-            logger.warn("Unknown job: {}", jobId);
-
-            return;
-        }
-
         for (Job.Webhook webhook : job.getWebhooks()) {
             if (JobStatusWorkflowEvent.JOB_STATUS.equals(webhook.type())) {
 
@@ -108,32 +102,43 @@ public class JobStatusWebhookEventListener implements EventListener {
 
         ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
 
-        backOffPolicy.setInitialInterval(
-            (retry.initialInterval() == null
-                ? Duration.of(2, ChronoUnit.SECONDS)
-                : Duration.of(retry.initialInterval(), ChronoUnit.SECONDS))
-                    .toMillis());
-        backOffPolicy.setMaxInterval(
-            (retry.maxInterval() == null
-                ? Duration.of(2, ChronoUnit.SECONDS)
-                : Duration.of(retry.maxInterval(), ChronoUnit.SECONDS))
-                    .toMillis());
-        backOffPolicy.setMultiplier(
-            retry.multiplier() == null
-                ? 2.0
-                : retry.multiplier());
+        backOffPolicy.setInitialInterval(getInitialInterval(retry));
+        backOffPolicy.setMaxInterval(getMaxInterval(retry));
+        backOffPolicy.setMultiplier(getMultiplier(retry));
 
         retryTemplate.setBackOffPolicy(backOffPolicy);
 
         SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
 
-        retryPolicy.setMaxAttempts(
-            retry.maxAttempts() == null
-                ? 5
-                : retry.maxAttempts());
-
+        retryPolicy.setMaxAttempts(getMaxAttempts(retry));
         retryTemplate.setRetryPolicy(retryPolicy);
 
         return retryTemplate;
+    }
+
+    private static int getMaxAttempts(Job.Retry retry) {
+        return retry.maxAttempts() == null
+            ? 5
+            : retry.maxAttempts();
+    }
+
+    private static double getMultiplier(Job.Retry retry) {
+        return retry.multiplier() == null
+            ? 2.0
+            : retry.multiplier();
+    }
+
+    private static long getMaxInterval(Job.Retry retry) {
+        return (retry.maxInterval() == null
+            ? Duration.of(2, ChronoUnit.SECONDS)
+            : Duration.of(retry.maxInterval(), ChronoUnit.SECONDS))
+                .toMillis();
+    }
+
+    private static long getInitialInterval(Job.Retry retry) {
+        return (retry.initialInterval() == null
+            ? Duration.of(2, ChronoUnit.SECONDS)
+            : Duration.of(retry.initialInterval(), ChronoUnit.SECONDS))
+                .toMillis();
     }
 }

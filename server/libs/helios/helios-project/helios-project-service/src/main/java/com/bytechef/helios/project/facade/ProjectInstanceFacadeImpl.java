@@ -17,13 +17,12 @@
 
 package com.bytechef.helios.project.facade;
 
-import com.bytechef.atlas.job.JobParameters;
-import com.bytechef.atlas.job.JobFactory;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.helios.project.domain.Project;
 import com.bytechef.helios.project.domain.ProjectInstance;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.project.dto.ProjectInstanceDTO;
+import com.bytechef.helios.project.job.ProjectInstanceJobFactory;
 import com.bytechef.helios.project.service.ProjectInstanceService;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.project.service.ProjectService;
@@ -45,7 +44,7 @@ import java.util.Objects;
 @Transactional
 public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
-    private final JobFactory jobFactory;
+    private final ProjectInstanceJobFactory projectInstanceJobFactory;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
@@ -53,11 +52,11 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
-        JobFactory jobFactory, ProjectInstanceService projectInstanceService,
-        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TagService tagService) {
+        ProjectInstanceJobFactory projectInstanceJobFactory, ProjectInstanceService projectInstanceService,
+        ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        ProjectService projectService, TagService tagService) {
 
-        this.jobFactory = jobFactory;
+        this.projectInstanceJobFactory = projectInstanceJobFactory;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectService = projectService;
@@ -87,17 +86,13 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
+    // Propagation.NEVER is set because of sending job messages via queue in monolith mode, where it can happen
+    // the case where a job is finished and completion task executed, but the transaction is not yet committed and
+    // the job id is missing.
     @Transactional(propagation = Propagation.NEVER)
     @SuppressFBWarnings("NP")
-    public long createProjectInstanceJob(long projectInstanceId, String workflowId) {
-        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
-            projectInstanceId, workflowId);
-
-        long jobId = jobFactory.create(new JobParameters(projectInstanceWorkflow.getInputParameters(), workflowId));
-
-        projectInstanceWorkflowService.addJob(projectInstanceWorkflow.getId(), jobId);
-
-        return jobId;
+    public long createProjectInstanceJob(String workflowId, long projectInstanceId) {
+        return projectInstanceJobFactory.createJob(workflowId, projectInstanceId);
     }
 
     @Override

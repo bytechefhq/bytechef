@@ -24,9 +24,7 @@ import com.bytechef.hermes.component.ContextImpl;
 import com.bytechef.hermes.component.InputParametersImpl;
 import com.bytechef.hermes.component.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition.PollContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerOutput;
@@ -35,7 +33,7 @@ import com.bytechef.hermes.component.util.ComponentContextSupplier;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
-import com.bytechef.hermes.trigger.TriggerExecution;
+import com.bytechef.hermes.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -82,28 +80,34 @@ public class DefaultComponentTriggerTaskHandler implements TriggerHandler {
         TriggerType triggerType = triggerDefinition.getType();
 
         try {
-            if (triggerType == TriggerType.DYNAMIC_WEBHOOK) {
+            if (TriggerType.DYNAMIC_WEBHOOK == triggerType) {
                 DynamicWebhookRequestFunction dynamicWebhookRequestFunction = OptionalUtils.get(
                     triggerDefinition.getDynamicWebhookRequest());
 
+                // TODO
+
                 return dynamicWebhookRequestFunction.apply(
-                    new DynamicWebhookRequestContext(
-                        triggerContext,
-                        new InputParametersImpl(triggerExecution.getParameters()), null, null, null, null, null,
-                        null));
-            } else if (triggerType == TriggerType.STATIC_WEBHOOK) {
+                    new DynamicWebhookRequestFunction.Context(
+                        triggerContext, new InputParametersImpl(triggerExecution.getParameters()), null, null, null,
+                        null, null, null));
+            } else if (TriggerType.STATIC_WEBHOOK == triggerType) {
                 StaticWebhookRequestFunction staticWebhookRequestFunction = OptionalUtils.get(
                     triggerDefinition.getStaticWebhookRequest());
 
+                // TODO
+
                 return staticWebhookRequestFunction.apply(
-                    new TriggerDefinition.StaticWebhookRequestContext(
+                    new StaticWebhookRequestFunction.Context(
                         triggerContext,
                         new InputParametersImpl(triggerExecution.getParameters()), null, null, null, null, null));
-            } else if (triggerType == TriggerType.POLLING || triggerType == TriggerType.HYBRID) {
+            } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
                 PollFunction pollFunction = OptionalUtils.get(triggerDefinition.getPoll());
 
+                // TODO
+
                 return pollFunction.apply(
-                    new PollContext(triggerContext, new InputParametersImpl(triggerExecution.getParameters()), null));
+                    new PollFunction.Context(triggerContext, new InputParametersImpl(triggerExecution.getParameters()),
+                        null));
             } else {
                 throw new TriggerExecutionException("Unknown trigger type: " + triggerType);
             }

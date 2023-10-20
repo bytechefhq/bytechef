@@ -17,14 +17,12 @@
 
 package com.bytechef.atlas.worker.task.handler;
 
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
-
 /**
  * @author Ivica Cardic
  */
 public interface TaskDispatcherAdapterFactory {
 
-    TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver, TaskEvaluator taskEvaluator);
+    TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver);
 
     String getName();
 }

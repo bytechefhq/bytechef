@@ -18,6 +18,7 @@
 package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.ConnectionDefinition;
@@ -29,12 +30,12 @@ import com.bytechef.hermes.definition.registry.dto.TriggerDefinitionBasicDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -42,7 +43,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
 public class ComponentDefinitionServiceImpl implements ComponentDefinitionService {
 
     private static final ComponentDefinition MANUAL_COMPONENT_DEFINITION = component("manual")
-        .display(display("Manual"))
+        .title("Manual")
         .triggers(trigger("trigger"));
 
     private final List<ComponentDefinition> componentDefinitions;
@@ -90,36 +91,39 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     private ComponentDefinitionDTO toComponentDefinitionDTO(ComponentDefinition componentDefinition) {
         return new ComponentDefinitionDTO(
-            componentDefinition.getActions() == null
-                ? null
-                : CollectionUtils.map(componentDefinition.getActions(), this::toActionDefinitionBasicDTO),
-            toConnectionDefinitionDTO(componentDefinition.getConnection()),
-            componentDefinition.getDisplay(), componentDefinition.getName(), componentDefinition.getResources(),
-            componentDefinition.getTriggers() == null
-                ? null
-                : CollectionUtils.map(componentDefinition.getTriggers(), this::toTriggerDefinitionBasicDTO),
-            componentDefinition.getVersion());
+            OptionalUtils.mapOrElse(
+                componentDefinition.getActions(),
+                actionDefinitions -> CollectionUtils.map(actionDefinitions, this::toActionDefinitionBasicDTO),
+                Collections.emptyList()),
+            OptionalUtils.orElse(componentDefinition.getCategory(), null),
+            OptionalUtils.mapOrElse(componentDefinition.getConnection(), this::toConnectionDefinitionDTO, null),
+            OptionalUtils.orElse(componentDefinition.getDescription(), null), componentDefinition.getIcon(),
+            componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getResources(), null),
+            OptionalUtils.orElse(componentDefinition.getTags(), null),
+            OptionalUtils.mapOrElse(
+                componentDefinition.getTriggers(),
+                triggerDefinitions -> CollectionUtils.map(triggerDefinitions, this::toTriggerDefinitionBasicDTO),
+                Collections.emptyList()),
+            componentDefinition.getTitle(), componentDefinition.getVersion());
     }
 
     private ActionDefinitionBasicDTO toActionDefinitionBasicDTO(ActionDefinition actionDefinition) {
         return new ActionDefinitionBasicDTO(
-            actionDefinition.getBatch(), actionDefinition.getDisplay(), actionDefinition.getName(),
-            actionDefinition.getResources());
+            OptionalUtils.orElse(actionDefinition.getBatch(), false), actionDefinition.getDescription(),
+            OptionalUtils.orElse(actionDefinition.getHelp(), null), actionDefinition.getName(),
+            actionDefinition.getTitle());
     }
 
     private ConnectionDefinitionBasicDTO toConnectionDefinitionDTO(ConnectionDefinition connectionDefinition) {
-        if (connectionDefinition == null) {
-            return null;
-        }
-
         return new ConnectionDefinitionBasicDTO(
-            connectionDefinition.getDisplay(), connectionDefinition.getName(), connectionDefinition.getResources(),
-            connectionDefinition.getVersion());
+            OptionalUtils.orElse(connectionDefinition.getDescription(), null),
+            connectionDefinition.getName(), connectionDefinition.getTitle(), connectionDefinition.getVersion());
     }
 
     private TriggerDefinitionBasicDTO toTriggerDefinitionBasicDTO(TriggerDefinition triggerDefinition) {
         return new TriggerDefinitionBasicDTO(
-            triggerDefinition.isBatch(), triggerDefinition.getDisplay(), triggerDefinition.getName(),
-            triggerDefinition.getResources(), triggerDefinition.getType());
+            OptionalUtils.orElse(triggerDefinition.getBatch(), false), triggerDefinition.getDescription(),
+            OptionalUtils.orElse(triggerDefinition.getHelp(), null), triggerDefinition.getName(),
+            triggerDefinition.getTitle(), triggerDefinition.getType());
     }
 }
