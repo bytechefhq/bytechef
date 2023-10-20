@@ -33,6 +33,8 @@ public interface ProjectService {
 
     void delete(long id);
 
+    Optional<Project> fetchJobProject(long jobId);
+
     Optional<Project> fetchProject(String name);
 
     Project getProject(long id);

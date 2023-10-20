@@ -39,6 +39,8 @@ public interface ProjectFacade {
 
     ProjectInstanceDTO createProjectInstance(ProjectInstanceDTO projectInstance);
 
+    long createProjectInstanceJob(long id, String workflowId);
+
     void deleteProject(Long id);
 
     void deleteProjectInstance(Long projectInstanceId);

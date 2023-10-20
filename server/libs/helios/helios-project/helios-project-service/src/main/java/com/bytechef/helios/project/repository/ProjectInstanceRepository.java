@@ -25,6 +25,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -53,4 +54,11 @@ public interface ProjectInstanceRepository
             WHERE project_instance_tag.tag_id in (:tagIds)
         """)
     List<ProjectInstance> findAllByTagIdInOrderByName(@Param("tagIds") List<Long> tagIds);
+
+    @Query("""
+            SELECT project_instance.* FROM project_instance
+            JOIN project_instance_job ON project_instance.id = project_instance_job.project_instance_id
+            WHERE project_instance_job.job_id = :jobId
+        """)
+    Optional<ProjectInstance> findByJobId(@Param("jobId") long jobId);
 }

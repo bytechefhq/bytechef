@@ -18,6 +18,8 @@
 package com.bytechef.helios.project.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.helios.project.domain.ProjectInstanceJob;
+import com.bytechef.helios.project.repository.ProjectInstanceJobRepository;
 import com.bytechef.helios.project.repository.ProjectInstanceRepository;
 import com.bytechef.helios.project.domain.ProjectInstance;
 import org.springframework.data.domain.Sort;
@@ -27,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -34,10 +37,22 @@ import java.util.Map;
 @Service
 public class ProjectInstanceServiceImpl implements ProjectInstanceService {
 
+    private final ProjectInstanceJobRepository projectInstanceJobRepository;
     private final ProjectInstanceRepository projectInstanceRepository;
 
-    public ProjectInstanceServiceImpl(ProjectInstanceRepository projectInstanceRepository) {
+    public ProjectInstanceServiceImpl(
+        ProjectInstanceJobRepository projectInstanceJobRepository,
+        ProjectInstanceRepository projectInstanceRepository) {
+
+        this.projectInstanceJobRepository = projectInstanceJobRepository;
         this.projectInstanceRepository = projectInstanceRepository;
+    }
+
+    @Override
+    public void addJob(long projectInstanceId, long jobId) {
+        ProjectInstanceJob projectInstanceJob = new ProjectInstanceJob(projectInstanceId, jobId);
+
+        projectInstanceJobRepository.save(projectInstanceJob);
     }
 
     @Override
@@ -56,6 +71,11 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     @Override
     public void delete(long id) {
         projectInstanceRepository.delete(getProjectInstance(id));
+    }
+
+    @Override
+    public Optional<ProjectInstance> fetchJobProjectInstance(long jobId) {
+        return projectInstanceRepository.findByJobId(jobId);
     }
 
     @Override

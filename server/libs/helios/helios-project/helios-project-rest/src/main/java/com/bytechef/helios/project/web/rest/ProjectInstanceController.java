@@ -20,6 +20,8 @@ package com.bytechef.helios.project.web.rest;
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.helios.project.dto.ProjectInstanceDTO;
 import com.bytechef.helios.project.facade.ProjectFacade;
+import com.bytechef.helios.project.web.rest.model.CreateProjectInstanceJob200ResponseModel;
+import com.bytechef.helios.project.web.rest.model.JobParametersModel;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceModel;
 import com.bytechef.helios.project.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;
@@ -59,8 +61,19 @@ public class ProjectInstanceController implements ProjectInstancesApi {
 
         return projectInstanceModelMono.map(projectInstanceModel -> conversionService.convert(
             projectFacade.createProjectInstance(
-                conversionService.convert(projectInstanceModel, ProjectInstanceDTO.class)),
+                conversionService.convert(
+                    projectInstanceModel, ProjectInstanceDTO.class)),
             ProjectInstanceModel.class))
+            .map(ResponseEntity::ok);
+    }
+
+    @Override
+    public Mono<ResponseEntity<CreateProjectInstanceJob200ResponseModel>> createProjectInstanceJob(
+        Long id, Mono<JobParametersModel> jobParametersModelMono, ServerWebExchange exchange) {
+
+        return jobParametersModelMono
+            .map(jobParametersModel -> new CreateProjectInstanceJob200ResponseModel()
+                .jobId(projectFacade.createProjectInstanceJob(id, jobParametersModel.getWorkflowId())))
             .map(ResponseEntity::ok);
     }
 
@@ -100,7 +113,9 @@ public class ProjectInstanceController implements ProjectInstancesApi {
         Long id, Mono<ProjectInstanceModel> projectInstanceModelMono, ServerWebExchange exchange) {
 
         return projectInstanceModelMono.map(projectInstanceModel -> conversionService.convert(
-            projectFacade.update(conversionService.convert(projectInstanceModel.id(id), ProjectInstanceDTO.class)),
+            projectFacade.update(
+                conversionService.convert(
+                    projectInstanceModel.id(id), ProjectInstanceDTO.class)),
             ProjectInstanceModel.class))
             .map(ResponseEntity::ok);
     }

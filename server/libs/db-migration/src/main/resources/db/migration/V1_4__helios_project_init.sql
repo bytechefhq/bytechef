@@ -34,6 +34,12 @@ CREATE TABLE IF NOT EXISTS project_instance_connection (
     connection_id                   BIGSERIAL    NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS project_instance_job (
+    id                       BIGSERIAL    NOT NULL PRIMARY KEY,
+    project_instance_id      BIGSERIAL    NOT NULL,
+    job_id                   BIGSERIAL    NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS project_instance_tag (
    id                       BIGSERIAL    NOT NULL PRIMARY KEY,
    project_instance_id      BIGSERIAL    NOT NULL,
@@ -58,6 +64,8 @@ ALTER TABLE project ADD CONSTRAINT fk_project_category FOREIGN KEY (category_id)
 ALTER TABLE project_instance ADD CONSTRAINT fk_project_instance_project FOREIGN KEY (project_id) REFERENCES project (id);
 ALTER TABLE project_instance_connection ADD CONSTRAINT fk_project_instance_connection_project_instance FOREIGN KEY (project_instance_id) REFERENCES project_instance (id);
 ALTER TABLE project_instance_connection ADD CONSTRAINT fk_project_instance_connection_connection FOREIGN KEY (connection_id) REFERENCES connection (id);
+ALTER TABLE project_instance_job ADD CONSTRAINT fk_project_instance_job_project_instance FOREIGN KEY (project_instance_id) REFERENCES project_instance (id);
+ALTER TABLE project_instance_job ADD CONSTRAINT fk_project_instance_job_job FOREIGN KEY (job_id) REFERENCES job (id);
 ALTER TABLE project_instance_tag ADD CONSTRAINT fk_project_instance_tag_project_instance FOREIGN KEY (project_instance_id) REFERENCES project_instance (id);
 ALTER TABLE project_instance_tag ADD CONSTRAINT fk_project_instance_tag_tag FOREIGN KEY (tag_id) REFERENCES tag (id);
 ALTER TABLE project_tag ADD CONSTRAINT fk_project_tag_project FOREIGN KEY (project_id) REFERENCES project (id);
