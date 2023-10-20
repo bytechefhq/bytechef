@@ -114,7 +114,7 @@ public class HttpClientUtilsTest {
         FormBodyPublisher formBodyPublisher = (FormBodyPublisher) httpClient.createBodyPublisher(
             context,
             HttpClientUtils.Payload.of(
-                Map.of("key1", "value1", "key2", "value2"), HttpClientUtils.BodyContentType.FORM_URLENCODED));
+                Map.of("key1", "value1", "key2", "value2"), HttpClientUtils.BodyContentType.FORM_URL_ENCODED));
 
         Assertions.assertEquals(MediaType.APPLICATION_FORM_URLENCODED, formBodyPublisher.mediaType());
 

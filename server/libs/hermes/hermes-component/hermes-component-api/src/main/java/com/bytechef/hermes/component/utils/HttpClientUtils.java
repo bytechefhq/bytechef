@@ -65,7 +65,7 @@ public class HttpClientUtils {
     public enum BodyContentType {
         BINARY,
         FORM_DATA,
-        FORM_URLENCODED,
+        FORM_URL_ENCODED,
         JSON,
         RAW,
         XML
@@ -155,7 +155,7 @@ public class HttpClientUtils {
                 }
 
                 bodyPublisher = builder.build();
-            } else if (payload.bodyContentType == BodyContentType.FORM_URLENCODED) {
+            } else if (payload.bodyContentType == BodyContentType.FORM_URL_ENCODED) {
                 Map<?, ?> bodyParameters = (Map<?, ?>) payload.value;
 
                 FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();

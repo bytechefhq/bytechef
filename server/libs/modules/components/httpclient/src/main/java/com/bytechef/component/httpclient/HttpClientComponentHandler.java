@@ -18,11 +18,9 @@
 package com.bytechef.component.httpclient;
 
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.ALLOW_UNAUTHORIZED_CERTS;
-import static com.bytechef.component.httpclient.constants.HttpClientConstants.BODY;
+import static com.bytechef.component.httpclient.constants.HttpClientConstants.BODY_CONTENT;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.BODY_CONTENT_TYPE;
-import static com.bytechef.component.httpclient.constants.HttpClientConstants.BODY_PARAMETERS;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.DELETE;
-import static com.bytechef.component.httpclient.constants.HttpClientConstants.FILE_ENTRY;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.FOLLOW_ALL_REDIRECTS;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.FOLLOW_REDIRECT;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.FULL_RESPONSE;
@@ -31,7 +29,7 @@ import static com.bytechef.component.httpclient.constants.HttpClientConstants.HE
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.HEADER_PARAMETERS;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.HTTP_CLIENT;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.IGNORE_RESPONSE_CODE;
-import static com.bytechef.component.httpclient.constants.HttpClientConstants.RAW_CONTENT_MIME_TYPE;
+import static com.bytechef.component.httpclient.constants.HttpClientConstants.BODY_CONTENT_RAW_MIME_TYPE;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.PATCH;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.POST;
 import static com.bytechef.component.httpclient.constants.HttpClientConstants.PROXY;
@@ -152,36 +150,36 @@ public class HttpClientComponentHandler implements ComponentHandler {
     };
 
     private static final Property<?>[] BODY_CONTENT_PROPERTIES = new Property[] {
-        object(BODY_PARAMETERS)
-            .label("Body Parameters")
+        object(BODY_CONTENT)
+            .label("JSON")
             .description("Body Parameters to send.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
             .additionalProperties(oneOf())
             .placeholder("Add Parameter"),
-        object(BODY_PARAMETERS)
+        object(BODY_CONTENT)
             .label("XML")
             .description("XML content to send.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.XML.name()))
             .additionalProperties(oneOf())
             .placeholder("Add Parameter"),
-        object(BODY_PARAMETERS)
-            .label("Body Parameters")
+        object(BODY_CONTENT)
+            .label("Form Data")
             .description("Body parameters to send.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
             .placeholder("Add Parameter")
             .additionalProperties(oneOf().types(string(), fileEntry())),
-        object(BODY_PARAMETERS)
-            .label("Body Parameters")
+        object(BODY_CONTENT)
+            .label("Form URL-Encoded")
             .description("Body parameters to send.")
-            .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.FORM_URLENCODED.name()))
+            .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.FORM_URL_ENCODED.name()))
             .placeholder("Add Parameter")
             .additionalProperties(string()),
-        string(BODY)
-            .label("Body")
+        string(BODY_CONTENT)
+            .label("Raw")
             .description("The raw text to send.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.RAW.name())),
-        fileEntry(FILE_ENTRY)
-            .label("File")
+        fileEntry(BODY_CONTENT)
+            .label("Binary")
             .description("The object property which contains a reference to the file to upload.")
             .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))
     };
@@ -430,7 +428,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
                     option("None", ""),
                     option("JSON", BodyContentType.JSON.name()),
                     option("Form-Data", BodyContentType.FORM_DATA.name()),
-                    option("Form-Urlencoded", BodyContentType.FORM_URLENCODED.name()),
+                    option("Form-Urlencoded", BodyContentType.FORM_URL_ENCODED.name()),
                     option("Raw", BodyContentType.RAW.name()),
                     option("Binary", BodyContentType.BINARY.name()))
                 .defaultValue("NONE")
@@ -438,7 +436,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
         }
 
         if (includeBodyContentProperties) {
-            properties.add(string(RAW_CONTENT_MIME_TYPE)
+            properties.add(string(BODY_CONTENT_RAW_MIME_TYPE)
                 .label("Content Type")
                 .description("Mime-Type to use when sending raw body content.")
                 .displayOption(show(BODY_CONTENT_TYPE, BodyContentType.RAW.name()))
@@ -522,20 +520,26 @@ public class HttpClientComponentHandler implements ComponentHandler {
             ? BodyContentType.valueOf(StringUtils.upperCase(executionParameters.getString(BODY_CONTENT_TYPE)))
             : null;
 
-        if (executionParameters.containsKey(BODY_PARAMETERS)) {
-            if (bodyContentType == BodyContentType.FORM_DATA) {
+        if (executionParameters.containsKey(BODY_CONTENT)) {
+            if (bodyContentType == BodyContentType.BINARY) {
+                payload = HttpClientUtils.Payload.of(executionParameters.get(BODY_CONTENT, FileEntry.class));
+            } else if (bodyContentType == BodyContentType.FORM_DATA) {
                 payload = HttpClientUtils.Payload.of(
-                    executionParameters.getMap(BODY_PARAMETERS, List.of(FileEntry.class), Map.of()), bodyContentType);
+                    executionParameters.getMap(BODY_CONTENT, List.of(FileEntry.class), Map.of()), bodyContentType);
+            } else if (bodyContentType == BodyContentType.FORM_URL_ENCODED) {
+                payload = HttpClientUtils.Payload.of(
+                    executionParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+            } else if (bodyContentType == BodyContentType.JSON) {
+                payload = HttpClientUtils.Payload.of(
+                    executionParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+            } else if (bodyContentType == BodyContentType.RAW) {
+                payload = HttpClientUtils.Payload.of(
+                    executionParameters.getString(BODY_CONTENT),
+                    executionParameters.getString(BODY_CONTENT_RAW_MIME_TYPE, "text/plain"));
             } else {
                 payload = HttpClientUtils.Payload.of(
-                    executionParameters.getMap(BODY_PARAMETERS, Map.of()), bodyContentType);
+                    executionParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             }
-        } else if (executionParameters.containsKey(BODY)) {
-            payload = HttpClientUtils.Payload.of(
-                executionParameters.getString(BODY),
-                executionParameters.getString(RAW_CONTENT_MIME_TYPE, "text/plain"));
-        } else if (executionParameters.containsKey(FILE_ENTRY)) {
-            payload = HttpClientUtils.Payload.of(executionParameters.get(FILE_ENTRY, FileEntry.class));
         }
 
         return HttpClientUtils.executor()
