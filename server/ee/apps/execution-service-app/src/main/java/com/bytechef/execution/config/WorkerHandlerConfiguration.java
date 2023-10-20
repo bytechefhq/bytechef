@@ -20,13 +20,9 @@ package com.bytechef.execution.config;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
-import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
-import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
-import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
+import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -39,13 +35,9 @@ import java.util.Objects;
 public class WorkerHandlerConfiguration {
 
     private final ActionDefinitionService actionDefinitionService;
-    private final TriggerDefinitionService triggerDefinitionService;
 
-    public WorkerHandlerConfiguration(
-        ActionDefinitionService actionDefinitionService, TriggerDefinitionService triggerDefinitionService) {
-
+    public WorkerHandlerConfiguration(ActionDefinitionService actionDefinitionService) {
         this.actionDefinitionService = actionDefinitionService;
-        this.triggerDefinitionService = triggerDefinitionService;
     }
 
     @Bean
@@ -58,20 +50,6 @@ public class WorkerHandlerConfiguration {
                 componentOperation.operationName(), Objects.requireNonNull(taskExecution.getId()),
                 taskExecution.getParameters(),
                 MapUtils.getMap(taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
-        };
-    }
-
-    @Bean
-    TriggerHandlerRegistry triggerHandlerRegistry() {
-        return type -> (TriggerHandler) triggerExecution -> {
-            ComponentOperation componentOperation = ComponentOperation.ofType(type);
-
-            return triggerDefinitionService.executeTrigger(
-                componentOperation.componentName(), componentOperation.componentVersion(),
-                componentOperation.operationName(), triggerExecution.getParameters(), triggerExecution.getState(),
-                MapUtils.getRequired(
-                    triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
-                MapUtils.getMap(triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class));
         };
     }
 }
