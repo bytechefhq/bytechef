@@ -16,67 +16,67 @@ import { exists, mapValues } from '../runtime';
 /**
  * The blueprint that describe the execution of a job.
  * @export
- * @interface WorkflowModel
+ * @interface WorkflowBasicModel
  */
-export interface WorkflowModel {
+export interface WorkflowBasicModel {
     /**
      * The created by.
      * @type {string}
-     * @memberof WorkflowModel
+     * @memberof WorkflowBasicModel
      */
     readonly createdBy?: string;
     /**
      * The created date.
      * @type {Date}
-     * @memberof WorkflowModel
+     * @memberof WorkflowBasicModel
      */
     readonly createdDate?: Date;
     /**
      * The description of a workflow.
      * @type {string}
-     * @memberof WorkflowModel
+     * @memberof WorkflowBasicModel
      */
     description?: string;
     /**
      * The id of the workflow.
      * @type {string}
-     * @memberof WorkflowModel
+     * @memberof WorkflowBasicModel
      */
     readonly id?: string;
     /**
      * The descriptive name for the workflow
      * @type {string}
-     * @memberof WorkflowModel
+     * @memberof WorkflowBasicModel
      */
     readonly label?: string;
     /**
      * The last modified by.
      * @type {string}
-     * @memberof WorkflowModel
+     * @memberof WorkflowBasicModel
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
      * @type {Date}
-     * @memberof WorkflowModel
+     * @memberof WorkflowBasicModel
      */
     readonly lastModifiedDate?: Date;
 }
 
 /**
- * Check if a given object implements the WorkflowModel interface.
+ * Check if a given object implements the WorkflowBasicModel interface.
  */
-export function instanceOfWorkflowModel(value: object): boolean {
+export function instanceOfWorkflowBasicModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function WorkflowModelFromJSON(json: any): WorkflowModel {
-    return WorkflowModelFromJSONTyped(json, false);
+export function WorkflowBasicModelFromJSON(json: any): WorkflowBasicModel {
+    return WorkflowBasicModelFromJSONTyped(json, false);
 }
 
-export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowModel {
+export function WorkflowBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): WorkflowBasicModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -92,7 +92,7 @@ export function WorkflowModelFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function WorkflowModelToJSON(value?: WorkflowModel | null): any {
+export function WorkflowBasicModelToJSON(value?: WorkflowBasicModel | null): any {
     if (value === undefined) {
         return undefined;
     }

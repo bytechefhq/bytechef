@@ -19,12 +19,6 @@ import {
     JobConnectionModelFromJSONTyped,
     JobConnectionModelToJSON,
 } from './JobConnectionModel';
-import type { WebhookModel } from './WebhookModel';
-import {
-    WebhookModelFromJSON,
-    WebhookModelFromJSONTyped,
-    WebhookModelToJSON,
-} from './WebhookModel';
 
 /**
  * Defines parameters used to execute a job.
@@ -51,29 +45,11 @@ export interface JobParametersModel {
      */
     label?: string;
     /**
-     * The id of the parent task that created this job. Used for sub-flows.
-     * @type {string}
-     * @memberof JobParametersModel
-     */
-    parentTaskExecutionId?: string;
-    /**
-     * The priority value used during execution of individual tasks.
-     * @type {number}
-     * @memberof JobParametersModel
-     */
-    priority?: number;
-    /**
      * Id of the workflow to execute.
      * @type {string}
      * @memberof JobParametersModel
      */
     workflowId: string;
-    /**
-     * The list of webhooks to register to receive notifications for certain events.
-     * @type {Array<WebhookModel>}
-     * @memberof JobParametersModel
-     */
-    webhooks?: Array<WebhookModel>;
 }
 
 /**
@@ -99,10 +75,7 @@ export function JobParametersModelFromJSONTyped(json: any, ignoreDiscriminator: 
         'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(JobConnectionModelFromJSON)),
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
         'label': !exists(json, 'label') ? undefined : json['label'],
-        'parentTaskExecutionId': !exists(json, 'parentTaskExecutionId') ? undefined : json['parentTaskExecutionId'],
-        'priority': !exists(json, 'priority') ? undefined : json['priority'],
         'workflowId': json['workflowId'],
-        'webhooks': !exists(json, 'webhooks') ? undefined : ((json['webhooks'] as Array<any>).map(WebhookModelFromJSON)),
     };
 }
 
@@ -118,10 +91,7 @@ export function JobParametersModelToJSON(value?: JobParametersModel | null): any
         'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(JobConnectionModelToJSON)),
         'inputs': value.inputs,
         'label': value.label,
-        'parentTaskExecutionId': value.parentTaskExecutionId,
-        'priority': value.priority,
         'workflowId': value.workflowId,
-        'webhooks': value.webhooks === undefined ? undefined : ((value.webhooks as Array<any>).map(WebhookModelToJSON)),
     };
 }
 

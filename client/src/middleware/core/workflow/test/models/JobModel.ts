@@ -25,15 +25,9 @@ import {
     TaskExecutionModelFromJSONTyped,
     TaskExecutionModelToJSON,
 } from './TaskExecutionModel';
-import type { WebhookModel } from './WebhookModel';
-import {
-    WebhookModelFromJSON,
-    WebhookModelFromJSONTyped,
-    WebhookModelToJSON,
-} from './WebhookModel';
 
 /**
- * 
+ * Represents an execution of a workflow.
  * @export
  * @interface JobModel
  */
@@ -105,12 +99,6 @@ export interface JobModel {
      */
     readonly outputs?: { [key: string]: object; };
     /**
-     * The id of the parent task that created this job. Required for sub-flows.
-     * @type {number}
-     * @memberof JobModel
-     */
-    readonly parentTaskExecutionId?: number;
-    /**
      * The priority value.
      * @type {number}
      * @memberof JobModel
@@ -128,18 +116,6 @@ export interface JobModel {
      * @memberof JobModel
      */
     readonly status: JobModelStatusEnum;
-    /**
-     * The list of the webhooks configured.
-     * @type {Array<WebhookModel>}
-     * @memberof JobModel
-     */
-    readonly webhooks?: Array<WebhookModel>;
-    /**
-     * 
-     * @type {string}
-     * @memberof JobModel
-     */
-    readonly workflowId?: string;
     /**
      * 
      * @type {Array<TaskExecutionModel>}
@@ -195,12 +171,9 @@ export function JobModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'outputs': !exists(json, 'outputs') ? undefined : json['outputs'],
-        'parentTaskExecutionId': !exists(json, 'parentTaskExecutionId') ? undefined : json['parentTaskExecutionId'],
         'priority': json['priority'],
         'startDate': (new Date(json['startDate'])),
         'status': json['status'],
-        'webhooks': !exists(json, 'webhooks') ? undefined : ((json['webhooks'] as Array<any>).map(WebhookModelFromJSON)),
-        'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
         'taskExecutions': !exists(json, 'taskExecutions') ? undefined : ((json['taskExecutions'] as Array<any>).map(TaskExecutionModelFromJSON)),
     };
 }

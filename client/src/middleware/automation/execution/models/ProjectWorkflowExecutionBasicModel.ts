@@ -31,12 +31,12 @@ import {
     ProjectInstanceBasicModelFromJSONTyped,
     ProjectInstanceBasicModelToJSON,
 } from './ProjectInstanceBasicModel';
-import type { WorkflowModel } from './WorkflowModel';
+import type { WorkflowBasicModel } from './WorkflowBasicModel';
 import {
-    WorkflowModelFromJSON,
-    WorkflowModelFromJSONTyped,
-    WorkflowModelToJSON,
-} from './WorkflowModel';
+    WorkflowBasicModelFromJSON,
+    WorkflowBasicModelFromJSONTyped,
+    WorkflowBasicModelToJSON,
+} from './WorkflowBasicModel';
 
 /**
  * Contains information about execution of one of project workflows.
@@ -70,10 +70,10 @@ export interface ProjectWorkflowExecutionBasicModel {
     project?: ProjectBasicModel;
     /**
      * 
-     * @type {WorkflowModel}
+     * @type {WorkflowBasicModel}
      * @memberof ProjectWorkflowExecutionBasicModel
      */
-    workflow?: WorkflowModel;
+    workflow?: WorkflowBasicModel;
 }
 
 /**
@@ -99,7 +99,7 @@ export function ProjectWorkflowExecutionBasicModelFromJSONTyped(json: any, ignor
         'instance': !exists(json, 'instance') ? undefined : ProjectInstanceBasicModelFromJSON(json['instance']),
         'job': !exists(json, 'job') ? undefined : JobBasicModelFromJSON(json['job']),
         'project': !exists(json, 'project') ? undefined : ProjectBasicModelFromJSON(json['project']),
-        'workflow': !exists(json, 'workflow') ? undefined : WorkflowModelFromJSON(json['workflow']),
+        'workflow': !exists(json, 'workflow') ? undefined : WorkflowBasicModelFromJSON(json['workflow']),
     };
 }
 
@@ -115,7 +115,7 @@ export function ProjectWorkflowExecutionBasicModelToJSON(value?: ProjectWorkflow
         'instance': ProjectInstanceBasicModelToJSON(value.instance),
         'job': JobBasicModelToJSON(value.job),
         'project': ProjectBasicModelToJSON(value.project),
-        'workflow': WorkflowModelToJSON(value.workflow),
+        'workflow': WorkflowBasicModelToJSON(value.workflow),
     };
 }
 
