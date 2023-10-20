@@ -311,7 +311,7 @@ public class HttpClientExecutor implements HttpClientUtils.HttpClientExecutor {
         FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
 
         for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
-            Object value = parameter.getValue();
+            Object value = Objects.requireNonNull(parameter.getValue());
 
             builder.query((String) parameter.getKey(), value.toString());
         }

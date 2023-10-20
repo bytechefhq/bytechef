@@ -45,6 +45,7 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     public TaskExecution create(TaskExecution taskExecution) {
         Assert.notNull(taskExecution, "'taskExecution' must not be null");
         Assert.isNull(taskExecution.getId(), "'taskExecution.id' must be null");
+        Assert.notNull(taskExecution.getWorkflowTask(), "'taskExecution.workflowTask' must not be null");
 
         return taskExecutionRepository.save(taskExecution);
     }
