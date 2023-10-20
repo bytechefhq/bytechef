@@ -12,7 +12,7 @@ paths:
   /tags/{id}:
     get:
       description: "Get a tag by id."
-      summary: "Get a tag by id."
+      summary: "Get a tag by id"
       tags:
       - "tags"
       operationId: "getTag"
@@ -33,7 +33,7 @@ paths:
                 $ref: "#/components/schemas/Tag"
     put:
       description: "Update an existing tag."
-      summary: "Update an existing tag."
+      summary: "Update an existing tag"
       tags:
       - "tags"
       operationId: "updateTag"

@@ -16,7 +16,7 @@ paths:
   /integration-categories:
     get:
       description: "Get categories."
-      summary: "Get categories."
+      summary: "Get categories"
       tags:
       - "integration-categories"
       operationId: "getIntegrationCategories"
@@ -33,7 +33,7 @@ paths:
   /integration-tags:
     get:
       description: "Get integration tags."
-      summary: "Get integration tags."
+      summary: "Get integration tags"
       tags:
       - "integration-tags"
       operationId: "getIntegrationTags"
@@ -50,7 +50,7 @@ paths:
   /integrations:
     get:
       description: "Get integrations."
-      summary: "Get integrations."
+      summary: "Get integrations"
       tags:
       - "integrations"
       operationId: "getIntegrations"
@@ -84,7 +84,7 @@ paths:
                   $ref: "#/components/schemas/Integration"
     post:
       description: "Create a new integration."
-      summary: "Create a new integration."
+      summary: "Create a new integration"
       tags:
       - "integrations"
       operationId: "createIntegration"
@@ -104,7 +104,7 @@ paths:
   /integrations/{id}:
     delete:
       description: "Delete an integration."
-      summary: "Delete an integration."
+      summary: "Delete an integration"
       tags:
       - "integrations"
       operationId: "deleteIntegration"
@@ -121,7 +121,7 @@ paths:
           description: "Successful operation."
     get:
       description: "Get an integration by id."
-      summary: "Get an integration by id."
+      summary: "Get an integration by id"
       tags:
       - "integrations"
       operationId: "getIntegration"
@@ -142,7 +142,7 @@ paths:
                 $ref: "#/components/schemas/Integration"
     put:
       description: "Update an existing integration."
-      summary: "Update an existing integration."
+      summary: "Update an existing integration"
       tags:
       - "integrations"
       operationId: "updateIntegration"
@@ -170,7 +170,7 @@ paths:
   /integrations/{id}/workflows:
     get:
       description: "Get workflows for particular integration."
-      summary: "Get workflows for particular integration."
+      summary: "Get workflows for particular integration"
       tags:
       - "integrations"
       operationId: "getIntegrationWorkflows"
@@ -193,7 +193,7 @@ paths:
                   $ref: "../../../../../libs/hermes/hermes-workflow/hermes-workflow-rest/hermes-workflow-rest-impl/openapi.yaml#/components/schemas/Workflow"
     post:
       description: "Create new workflow and adds it to an existing integration."
-      summary: "Create new workflow and adds it to an existing integration."
+      summary: "Create new workflow and adds it to an existing integration"
       tags:
       - "integrations"
       operationId: "createIntegrationWorkflow"
@@ -233,7 +233,7 @@ paths:
   /integrations/{id}/tags:
     put:
       description: "Updates tags of an existing integration."
-      summary: "Updates tags of an existing integration."
+      summary: "Updates tags of an existing integration"
       tags:
       - "integrations"
       operationId: "updateIntegrationTags"

@@ -12,7 +12,7 @@ paths:
   /connection-tags:
     get:
       description: "Get connection tags."
-      summary: "Get connection tags."
+      summary: "Get connection tags"
       tags:
       - "connection-tags"
       operationId: "getConnectionTags"
@@ -29,7 +29,7 @@ paths:
   /connections:
     get:
       description: "Get connections."
-      summary: "Get connections."
+      summary: "Get connections"
       tags:
       - "connections"
       operationId: "getConnections"
@@ -62,7 +62,7 @@ paths:
                   $ref: "#/components/schemas/Connection"
     post:
       description: "Create a new connection."
-      summary: "Create a new connection."
+      summary: "Create a new connection"
       tags:
       - "connections"
       operationId: "createConnection"
@@ -82,7 +82,7 @@ paths:
   /connections/{id}:
     delete:
       description: "Delete a connection."
-      summary: "Delete a connection."
+      summary: "Delete a connection"
       tags:
       - "connections"
       operationId: "deleteConnection"
@@ -99,7 +99,7 @@ paths:
           description: "Successful operation."
     get:
       description: "Get a connection by id."
-      summary: "Get a connection by id."
+      summary: "Get a connection by id"
       tags:
       - "connections"
       operationId: "getConnection"
@@ -120,7 +120,7 @@ paths:
                 $ref: "#/components/schemas/Connection"
     put:
       description: "Update an existing connection."
-      summary: "Update an existing connection."
+      summary: "Update an existing connection"
       tags:
       - "connections"
       operationId: "updateConnection"
@@ -148,7 +148,7 @@ paths:
   /connections/{id}/tags:
     put:
       description: "Updates tags of an existing connection."
-      summary: "Updates tags of an existing connection."
+      summary: "Updates tags of an existing connection"
       tags:
       - "connections"
       operationId: "updateConnectionTags"
