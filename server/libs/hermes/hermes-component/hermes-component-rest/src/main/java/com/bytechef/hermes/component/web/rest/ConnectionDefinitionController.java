@@ -17,13 +17,20 @@
 package com.bytechef.hermes.component.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
-import com.bytechef.hermes.component.web.rest.model.ConnectionDefinitionModel;
-import com.bytechef.hermes.component.web.rest.model.ConnectionsModel;
+import com.bytechef.hermes.component.ComponentFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.HashMap;
 import java.util.List;
-import org.springframework.core.convert.ConversionService;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
@@ -34,30 +41,52 @@ import reactor.core.publisher.Mono;
  */
 @RestController
 @ConditionalOnApi
+@RequestMapping("${openapi.openAPIDefinition.base-path:}")
 @SuppressFBWarnings("EI")
-public class ConnectionDefinitionController implements ConnectionDefinitionControllerApi {
+@Tag(name = "connection-definitions")
+public class ConnectionDefinitionController {
 
-    private final ConversionService conversionService;
-    private final List<ComponentDefinitionFactory> componentDefinitionFactories;
+    private final List<ComponentFactory> componentDefinitionFactories;
 
-    public ConnectionDefinitionController(
-            ConversionService conversionService, List<ComponentDefinitionFactory> componentDefinitionFactories) {
-        this.conversionService = conversionService;
+    public ConnectionDefinitionController(List<ComponentFactory> componentDefinitionFactories) {
         this.componentDefinitionFactories = componentDefinitionFactories;
     }
 
-    @Override
-    public Mono<ResponseEntity<Flux<ConnectionsModel>>> getConnectionDefinitions(ServerWebExchange exchange) {
+    /**
+     * GET /definitions/connections
+     * Returns all connection definitions
+     *
+     * @return OK (status code 200)
+     */
+    @Operation(
+            description = "Returns all connection definitions.",
+            operationId = "getConnectionDefinitions",
+            summary = "Returns all connection definitions.",
+            tags = {"connection-definitions"},
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "OK",
+                        content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))
+                        })
+            })
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/definitions/connections",
+            produces = {"application/json"})
+    public Mono<ResponseEntity<Flux<Map<String, Object>>>> getConnectionDefinitions(
+            @Parameter(hidden = true) final ServerWebExchange exchange) {
         return Mono.just(ResponseEntity.ok(Flux.fromIterable(componentDefinitionFactories.stream()
-                .map(ComponentDefinitionFactory::getDefinition)
+                .map(ComponentFactory::getDefinition)
                 .filter(componentDefinition -> componentDefinition.getConnections() != null)
-                .map(componentDefinition -> new ConnectionsModel()
-                        .connections(componentDefinition.getConnections().stream()
-                                .map(connectionDefinition -> conversionService.convert(
-                                        connectionDefinition, ConnectionDefinitionModel.class))
-                                .toList())
-                        .name(componentDefinition.getName())
-                        .version(componentDefinition.getVersion()))
+                .map(componentDefinition -> new HashMap<String, Object>() {
+                    {
+                        put("connections", componentDefinition.getConnections());
+                        put("name", componentDefinition.getName());
+                        put("version", componentDefinition.getVersion());
+                    }
+                })
                 .toList())));
     }
 }

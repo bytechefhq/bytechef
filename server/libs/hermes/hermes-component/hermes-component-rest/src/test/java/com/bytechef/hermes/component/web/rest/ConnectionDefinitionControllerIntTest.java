@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.web.rest.mapper.config;
+package com.bytechef.hermes.component.web.rest;
 
-import com.bytechef.hermes.component.web.rest.adapter.ComponentDefinitionConversionServiceAdapter;
-import org.mapstruct.MapperConfig;
-import org.mapstruct.extensions.spring.SpringMapperConfig;
+import com.bytechef.hermes.component.web.rest.config.ComponentDefinitionRestTestConfiguration;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = ComponentDefinitionConversionServiceAdapter.class)
-@SpringMapperConfig(
-        conversionServiceAdapterPackage = "com.bytechef.hermes.component.web.rest.adapter",
-        conversionServiceAdapterClassName = "ComponentDefinitionConversionServiceAdapter")
-public interface ComponentDefinitionMapperSpringConfig {}
+@ContextConfiguration(classes = ComponentDefinitionRestTestConfiguration.class)
+@WebFluxTest(ConnectionDefinitionController.class)
+public class ConnectionDefinitionControllerIntTest {
+
+    @Disabled
+    @Test
+    public void testGetConnectionDefinitions() {
+        // TODO
+    }
+}

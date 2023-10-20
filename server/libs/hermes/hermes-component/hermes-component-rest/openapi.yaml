@@ -7,8 +7,9 @@ servers:
 paths:
   /definitions/components:
     get:
+      description: Returns all component definitions.
       tags:
-        - ComponentDefinitionController
+        - component-definitions
       operationId: getComponentDefinitions
       responses:
         "200":
@@ -21,8 +22,9 @@ paths:
                   $ref: '#/components/schemas/ComponentDefinition'
   /definitions/connections:
     get:
+      description: Returns all connection definitions.
       tags:
-        - ConnectionDefinitionController
+        - connection-definitions
       operationId: getConnectionDefinitions
       responses:
         "200":
@@ -35,52 +37,20 @@ paths:
                   $ref: '#/components/schemas/Connections'
 components:
   schemas:
-    AnyProperty:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/AnyProperty'
-    ArrayProperty:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ArrayProperty'
-    BooleanProperty:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/BooleanProperty'
     ComponentDefinition:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ComponentDefinition'
-    ComponentDisplay:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ComponentDisplay'
-    ComponentAction:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ComponentAction'
-    ConnectionDefinition:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ConnectionDefinition'
+      $ref: '../hermes-component-api/component_definition_spec.yaml#/schemas/ComponentDefinition'
     Connections:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/Connections'
-    DateTimeProperty:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/DateTimeProperty'
-    Display:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/Display'
-    DisplayOption:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/DisplayOption'
-    DisplayOptionEntryValue:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/DisplayOptionEntryValue'
-    EditorType:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/EditorType'
-    IntegerProperty:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/IntegerProperty'
-    NumberProperty:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/NumberProperty'
-    ObjectProperty:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ObjectProperty'
-    OptionProperty:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/OptionProperty'
-    PrimitiveValueProperty:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/PrimitiveValueProperty'
-    Property:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/Property'
-    PropertyOption:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/PropertyOption'
-    PropertyType:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/PropertyType'
-    StringProperty:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/StringProperty'
-    TypeProperty:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/TypeProperty'
-    ValueProperty:
-      $ref: '../hermes-component-api/component_specification.yaml#/components/schemas/ValueProperty'
-
+      type: object
+      description: TODO
+      properties:
+        connections:
+          description: TODO
+          type: array
+          items:
+            $ref: '../hermes-component-api/component_definition_spec.yaml#/schemas/ConnectionDefinition'
+        name:
+          description: TODO
+          type: string
+        version:
+          type: integer
+          format: int32
