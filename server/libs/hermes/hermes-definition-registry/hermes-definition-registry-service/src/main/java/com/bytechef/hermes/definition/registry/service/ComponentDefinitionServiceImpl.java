@@ -51,9 +51,14 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     @SuppressFBWarnings("EI2")
     public ComponentDefinitionServiceImpl(List<ComponentDefinition> componentDefinitions) {
-        this.componentDefinitions = CollectionUtils.concat(
-            componentDefinitions,
-            MANUAL_COMPONENT_DEFINITION);
+        this.componentDefinitions = CollectionUtils.concat(componentDefinitions, MANUAL_COMPONENT_DEFINITION)
+            .stream()
+            .sorted((o1, o2) -> {
+                String o1Name = o1.getName();
+
+                return o1Name.compareTo(o2.getName());
+            })
+            .toList();
     }
 
     @Override

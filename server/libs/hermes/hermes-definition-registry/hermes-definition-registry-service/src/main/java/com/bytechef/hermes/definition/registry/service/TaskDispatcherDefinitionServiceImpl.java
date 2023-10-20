@@ -37,7 +37,13 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
 
     @SuppressFBWarnings("EI2")
     public TaskDispatcherDefinitionServiceImpl(List<TaskDispatcherDefinition> taskDispatcherDefinitions) {
-        this.taskDispatcherDefinitions = taskDispatcherDefinitions;
+        this.taskDispatcherDefinitions = taskDispatcherDefinitions.stream()
+            .sorted((o1, o2) -> {
+                String o1Name = o1.getName();
+
+                return o1Name.compareTo(o2.getName());
+            })
+            .toList();
     }
 
     @Override
