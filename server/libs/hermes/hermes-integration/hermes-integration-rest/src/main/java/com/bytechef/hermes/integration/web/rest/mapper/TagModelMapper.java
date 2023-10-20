@@ -20,27 +20,14 @@ package com.bytechef.hermes.integration.web.rest.mapper;
 import com.bytechef.hermes.integration.web.rest.mapper.config.IntegrationMapperSpringConfig;
 import com.bytechef.hermes.integration.web.rest.model.TagModel;
 import com.bytechef.tag.domain.Tag;
-import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
-
-import java.util.Random;
 
 /**
  * @author Ivica Cardic
  */
 @Mapper(config = IntegrationMapperSpringConfig.class)
-public abstract class TagModelMapper implements Converter<TagModel, Tag> {
+public interface TagModelMapper extends Converter<TagModel, Tag> {
 
-    private static final Random RANDOM = new Random();
-
-    public abstract Tag convert(TagModel tagModel);
-
-    @AfterMapping
-    public void afterMapping(@MappingTarget Tag tag) {
-        if (tag.getId() == null) {
-            tag.setId(-Math.abs(RANDOM.nextLong(Long.MAX_VALUE)));
-        }
-    }
+    Tag convert(TagModel tagModel);
 }

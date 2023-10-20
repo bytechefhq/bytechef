@@ -21,7 +21,6 @@ import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.tag.domain.Tag;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Ivica Cardic
@@ -38,7 +37,7 @@ public interface IntegrationService {
 
     List<Integration> getIntegrations();
 
-    Integration update(Long id, Set<Tag> tags);
+    Integration update(Long id, List<Tag> tags);
 
     Integration update(Integration integration);
 }

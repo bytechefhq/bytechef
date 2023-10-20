@@ -35,7 +35,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -86,7 +86,7 @@ public class IntegrationFacadeIntTest {
 
         integration = integrationFacade.addWorkflow(integration.getId(), "Workflow 1", "Description", null);
 
-        Set<String> workflowIds = integration.getWorkflowIds();
+        List<String> workflowIds = integration.getWorkflowIds();
 
         Workflow workflow = workflowRepository.findById(workflowIds.iterator()
             .next())
@@ -103,7 +103,7 @@ public class IntegrationFacadeIntTest {
         integration.setName("name");
         integration.setDescription("description");
         integration.setCategory(category);
-        integration.setTags(Set.of(new Tag("tag1")));
+        integration.setTags(List.of(new Tag("tag1")));
 
         integration = integrationFacade.create(integration);
 
@@ -117,7 +117,7 @@ public class IntegrationFacadeIntTest {
         integration = new Integration();
 
         integration.setName("name");
-        integration.setWorkflowIds(Set.of("workflow2"));
+        integration.setWorkflowIds(List.of("workflow2"));
 
         integration = integrationFacade.create(integration);
 
@@ -130,14 +130,14 @@ public class IntegrationFacadeIntTest {
         Integration integration1 = new Integration();
 
         integration1.setName("name");
-        integration1.setTags(Set.of(new Tag("tag1")));
+        integration1.setTags(List.of(new Tag("tag1")));
 
         integration1 = integrationFacade.create(integration1);
 
         Integration integration2 = new Integration();
 
         integration2.setName("name");
-        integration2.setTags(Set.of(new Tag("tag1")));
+        integration2.setTags(List.of(new Tag("tag1")));
 
         integration2 = integrationFacade.create(integration2);
 
@@ -162,7 +162,7 @@ public class IntegrationFacadeIntTest {
         Tag tag1 = tagRepository.save(new Tag("tag1"));
 
         integration.setName("name");
-        integration.setTags(Set.of(tag1, tagRepository.save(new Tag("tag2"))));
+        integration.setTags(List.of(tag1, tagRepository.save(new Tag("tag2"))));
 
         integrationFacade.create(integration);
 
@@ -178,7 +178,7 @@ public class IntegrationFacadeIntTest {
         tag1 = tagRepository.findById(tag1.getId())
             .orElseThrow();
 
-        integration.setTags(Set.of(tag1, tagRepository.save(new Tag("tag3"))));
+        integration.setTags(List.of(tag1, tagRepository.save(new Tag("tag3"))));
 
         integrationFacade.create(integration);
 
@@ -203,14 +203,14 @@ public class IntegrationFacadeIntTest {
 
         Tag tag1 = new Tag("tag1");
 
-        integration.setTags(Set.of(tag1, tagRepository.save(new Tag("tag2"))));
+        integration.setTags(List.of(tag1, tagRepository.save(new Tag("tag2"))));
 
         integration = integrationFacade.create(integration);
 
         assertThat(integration.getTagIds()).hasSize(2);
         assertThat(integration.getWorkflowIds()).hasSize(1);
 
-        integration.setTags(Set.of(tag1));
+        integration.setTags(List.of(tag1));
 
         integrationFacade.create(integration);
 

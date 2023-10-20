@@ -33,8 +33,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -72,6 +70,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public Integration create(Integration integration) {
         if (integration.getCategory() != null) {
             Category category = integration.getCategory();
@@ -82,7 +81,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         if (CollectionUtils.isEmpty(integration.getWorkflowIds())) {
             Workflow workflow = workflowService.create(null, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
-            integration.setWorkflowIds(Set.of(workflow.getId()));
+            integration.setWorkflowIds(List.of(workflow.getId()));
         }
 
         if (!CollectionUtils.isEmpty(integration.getTags())) {
@@ -105,19 +104,19 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public Set<Tag> getIntegrationTags() {
+    public List<Tag> getIntegrationTags() {
         List<Integration> integrations = integrationService.getIntegrations();
 
-        Set<Long> tagIds = integrations.stream()
+        List<Long> tagIds = integrations.stream()
             .map(Integration::getTagIds)
             .flatMap(Collection::stream)
-            .collect(Collectors.toSet());
+            .toList();
 
         return tagService.getTags(tagIds);
     }
 
     @Override
-    public Integration update(Long id, Set<Tag> tags) {
+    public Integration update(Long id, List<Tag> tags) {
         tags = CollectionUtils.isEmpty(tags) ? null : tagService.save(tags);
 
         return integrationService.update(id, tags);
