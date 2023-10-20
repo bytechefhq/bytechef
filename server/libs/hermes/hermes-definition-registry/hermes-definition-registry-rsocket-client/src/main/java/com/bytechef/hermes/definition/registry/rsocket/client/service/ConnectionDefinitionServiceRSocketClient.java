@@ -124,9 +124,7 @@ public class ConnectionDefinitionServiceRSocketClient extends AbstractRSocketCli
     }
 
     @Override
-    public List<ConnectionDefinitionDTO> getConnectionDefinitions(
-        String componentName, int componentVersion) {
-
+    public List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, int componentVersion) {
         return MonoUtils.get(
             Mono.zip(
                 DiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP))

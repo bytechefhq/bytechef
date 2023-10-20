@@ -51,7 +51,7 @@ public interface ConnectionDefinitionService {
 
     ConnectionDefinitionDTO getConnectionDefinition(String componentName, int componentVersion);
 
-    List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, int version);
+    List<ConnectionDefinitionDTO> getConnectionDefinitions(String componentName, int componentVersion);
 
     List<ConnectionDefinitionDTO> getConnectionDefinitions();
 
