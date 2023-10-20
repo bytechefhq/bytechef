@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.json.converter;
+package com.integri.atlas.task.handler.object_.helpers;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskDefinition;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -27,7 +28,7 @@ import org.skyscreamer.jsonassert.JSONParser;
 /**
  * @author Ivica Cardic
  */
-public class JSONConverterTaskDefinitionTest {
+public class ObjectHelpersTaskDefinitionTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper() {
         {
@@ -41,11 +42,11 @@ public class JSONConverterTaskDefinitionTest {
             """
             {
                 "description":"Converts between JSON string and object/array.",
-                "displayName":"JSON Converter",
-                "name":"jsonConverter",
+                "displayName":"Object Helpers",
+                "name":"objectHelpers",
                 "properties":[
                     {
-                        "defaultValue":"FROM_JSON",
+                        "defaultValue":"JSON_PARSE",
                         "description":"The operation to perform.",
                         "displayName":"Operation",
                         "name":"operation",
@@ -54,37 +55,37 @@ public class JSONConverterTaskDefinitionTest {
                         "options":[
                             {
                                 "name":"Convert from JSON string",
-                                "value":"FROM_JSON",
+                                "value":"JSON_PARSE",
                                 "description": "Converts the JSON string to object/array."
                             },
                             {
                                 "name":"Convert to JSON string",
-                                "value":"TO_JSON",
+                                "value":"JSON_STRINGIFY",
                                  "description": "Writes the object/array to a JSON string."
                             }
                         ]
                     },
                     {
-                        "description":"JSON string to convert to the data.",
-                        "displayName":"Input",
+                        "description":"The JSON string to convert to the data.",
+                        "displayName":"Source",
                         "displayOption":{
                             "show":{
-                                "operation":["FROM_JSON"]
+                                "operation":["JSON_PARSE"]
                             }
                         },
-                        "name":"input",
+                        "name":"source",
                         "required":true,
                         "type":"STRING"
                     },
                         {
                         "description":"The data to convert to JSON string.",
-                        "displayName":"Input",
+                        "displayName":"Source",
                         "displayOption":{
                             "show":{
-                                "operation":["TO_JSON"]
+                                "operation":["JSON_STRINGIFY"]
                             }
                         },
-                        "name":"input",
+                        "name":"source",
                         "required":true,
                         "type":"JSON"
                     },
@@ -93,7 +94,7 @@ public class JSONConverterTaskDefinitionTest {
             }
             """,
             (JSONObject) JSONParser.parseJSON(
-                objectMapper.writeValueAsString(JSONConverterTaskDefinition.TASK_SPECIFICATION)
+                objectMapper.writeValueAsString(ObjectHelpersTaskDefinition.TASK_SPECIFICATION)
             ),
             true
         );

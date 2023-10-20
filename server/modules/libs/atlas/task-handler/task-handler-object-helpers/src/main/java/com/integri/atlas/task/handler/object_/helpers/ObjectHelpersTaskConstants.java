@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.json.converter;
+package com.integri.atlas.task.handler.object_.helpers;
 
 /**
  * @author Ivica Cardic
  */
-public class JSONConverterTaskConstants {
+public class ObjectHelpersTaskConstants {
 
     public static final String PROPERTY_OPERATION = "operation";
-    public static final String PROPERTY_INPUT = "input";
-    static final String TASK_JSON_CONVERTER = "jsonConverter";
+    public static final String PROPERTY_SOURCE = "source";
+    static final String TASK_OBJECT_HELPERS = "objectHelpers";
 
     public enum Operation {
-        FROM_JSON,
-        TO_JSON,
+        JSON_PARSE,
+        JSON_STRINGIFY,
     }
 }

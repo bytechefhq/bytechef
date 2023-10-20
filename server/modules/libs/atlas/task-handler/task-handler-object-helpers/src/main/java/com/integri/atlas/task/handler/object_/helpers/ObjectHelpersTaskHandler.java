@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.json.converter;
+package com.integri.atlas.task.handler.object_.helpers;
 
-import static com.integri.atlas.task.handler.json.converter.JSONConverterTaskConstants.TASK_JSON_CONVERTER;
+import static com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.TASK_OBJECT_HELPERS;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.task.handler.json.converter.JSONConverterTaskConstants.Operation;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
+import com.integri.atlas.task.handler.object_.helpers.ObjectHelpersTaskConstants.Operation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-@Component(TASK_JSON_CONVERTER)
-public class JSONConverterTaskHandler implements TaskHandler<Object> {
+@Component(TASK_OBJECT_HELPERS)
+public class ObjectHelpersTaskHandler implements TaskHandler<Object> {
 
     private final JSONHelper jsonHelper;
 
-    public JSONConverterTaskHandler(JSONHelper jsonHelper) {
+    public ObjectHelpersTaskHandler(JSONHelper jsonHelper) {
         this.jsonHelper = jsonHelper;
     }
 
@@ -43,7 +43,7 @@ public class JSONConverterTaskHandler implements TaskHandler<Object> {
         Operation operation = Operation.valueOf(StringUtils.upperCase(taskExecution.getRequired("operation")));
         Object input = taskExecution.getRequired("input");
 
-        if (operation == Operation.FROM_JSON) {
+        if (operation == Operation.JSON_PARSE) {
             return jsonHelper.read((String) input, new TypeReference<>() {});
         } else {
             return jsonHelper.write(input);

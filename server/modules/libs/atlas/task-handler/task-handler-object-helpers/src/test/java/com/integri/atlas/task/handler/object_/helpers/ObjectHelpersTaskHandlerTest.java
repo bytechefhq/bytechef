@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.json.converter;
+package com.integri.atlas.task.handler.object_.helpers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class JSONConverterTaskHandlerTest {
+public class ObjectHelpersTaskHandlerTest {
 
     private static final JSONHelper jsonHelper = new JSONHelper(new ObjectMapper());
-    private static final JSONConverterTaskHandler jsonConverterTaskHandler = new JSONConverterTaskHandler(jsonHelper);
+    private static final ObjectHelpersTaskHandler objectHelpersTaskHandler = new ObjectHelpersTaskHandler(jsonHelper);
 
     @Test
     public void testJSONToObject() {
@@ -44,9 +44,9 @@ public class JSONConverterTaskHandlerTest {
             """;
 
         taskExecution.put("input", input);
-        taskExecution.put("operation", "FROM_JSON");
+        taskExecution.put("operation", "JSON_PARSE");
 
-        assertThat(jsonConverterTaskHandler.handle(taskExecution)).isEqualTo(Map.of("key", 3));
+        assertThat(objectHelpersTaskHandler.handle(taskExecution)).isEqualTo(Map.of("key", 3));
 
         input =
             """
@@ -58,9 +58,9 @@ public class JSONConverterTaskHandlerTest {
             """;
 
         taskExecution.put("input", input);
-        taskExecution.put("operation", "FROM_JSON");
+        taskExecution.put("operation", "JSON_PARSE");
 
-        assertThat(jsonConverterTaskHandler.handle(taskExecution)).isEqualTo(List.of(Map.of("key", 3)));
+        assertThat(objectHelpersTaskHandler.handle(taskExecution)).isEqualTo(List.of(Map.of("key", 3)));
     }
 
     @Test
@@ -70,8 +70,8 @@ public class JSONConverterTaskHandlerTest {
         Map<String, Integer> input = Map.of("key", 3);
 
         taskExecution.put("input", input);
-        taskExecution.put("operation", "TO_JSON");
+        taskExecution.put("operation", "JSON_STRINGIFY");
 
-        assertThat(jsonConverterTaskHandler.handle(taskExecution)).isEqualTo(jsonHelper.write(input));
+        assertThat(objectHelpersTaskHandler.handle(taskExecution)).isEqualTo(jsonHelper.write(input));
     }
 }
