@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.jsonfile;
+package com.bytechef.component.json.file.constants;
 
 /**
  * @author Ivica Cardic
@@ -28,7 +28,6 @@ public class JsonFileTaskConstants {
     public static final String PAGE_NUMBER = "pageNumber";
     public static final String SOURCE = "source";
     public static final String JSON_FILE = "jsonFile";
-    public static final float VERSION_1_0 = 1.0f;
     public static final String READ = "read";
     public static final String WRITE = "write";
 
