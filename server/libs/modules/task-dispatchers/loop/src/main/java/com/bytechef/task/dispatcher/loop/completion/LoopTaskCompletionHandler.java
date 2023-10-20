@@ -17,14 +17,14 @@
 
 package com.bytechef.task.dispatcher.loop.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM_INDEX;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITEM_VAR;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.ITERATEE;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LIST;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LOOP;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LOOP_FOREVER;
+import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_INDEX;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_VAR;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITERATEE;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LIST;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_FOREVER;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.domain.Context;
@@ -36,7 +36,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.MapValueUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;

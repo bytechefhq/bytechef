@@ -19,8 +19,8 @@
 
 package com.bytechef.task.dispatcher.map.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
-import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.MAP;
+import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.MAP;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.domain.TaskExecution;

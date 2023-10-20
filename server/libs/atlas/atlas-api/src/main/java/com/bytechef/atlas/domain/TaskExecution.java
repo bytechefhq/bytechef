@@ -28,7 +28,7 @@ import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
-import com.bytechef.commons.utils.LocalDateTimeUtils;
+import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.NonNull;

@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.impl;
 
-import com.bytechef.commons.utils.MapValueUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.Connection;
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;

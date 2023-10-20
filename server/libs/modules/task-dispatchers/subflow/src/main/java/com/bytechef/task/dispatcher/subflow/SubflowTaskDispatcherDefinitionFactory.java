@@ -21,10 +21,10 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.d
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 
-import com.bytechef.atlas.constants.WorkflowConstants;
+import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
-import com.bytechef.task.dispatcher.subflow.constants.SubflowTaskDispatcherConstants;
+import com.bytechef.task.dispatcher.subflow.constant.SubflowTaskDispatcherConstants;
 import org.springframework.stereotype.Component;
 
 /**

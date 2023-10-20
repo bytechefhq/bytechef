@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.jdbc;
 
 import com.bytechef.hermes.component.Connection;
-import com.bytechef.hermes.component.jdbc.constants.JdbcConstants;
+import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;

@@ -19,7 +19,7 @@ package com.bytechef.task.dispatcher.loop;
 
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
-import static com.bytechef.task.dispatcher.loop.constants.LoopTaskConstants.LOOP_BREAK;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_BREAK;
 
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;

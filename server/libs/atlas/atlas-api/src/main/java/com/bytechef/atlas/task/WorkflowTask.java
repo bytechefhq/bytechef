@@ -19,9 +19,9 @@
 
 package com.bytechef.atlas.task;
 
-import com.bytechef.atlas.constants.WorkflowConstants;
-import com.bytechef.commons.utils.CollectionUtils;
-import com.bytechef.commons.utils.MapValueUtils;
+import com.bytechef.atlas.constant.WorkflowConstants;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;

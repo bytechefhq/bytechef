@@ -20,7 +20,7 @@ package com.bytechef.hermes.component.jdbc.operation;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.jdbc.JdbcExecutor;
-import com.bytechef.hermes.component.jdbc.constants.JdbcConstants;
+import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.HashMap;

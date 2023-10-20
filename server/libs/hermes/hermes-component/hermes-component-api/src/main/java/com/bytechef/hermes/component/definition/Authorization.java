@@ -17,15 +17,15 @@
 
 package com.bytechef.hermes.component.definition;
 
-import static com.bytechef.hermes.component.constants.ComponentConstants.ACCESS_TOKEN;
-import static com.bytechef.hermes.component.constants.ComponentConstants.ADD_TO;
-import static com.bytechef.hermes.component.constants.ComponentConstants.API_TOKEN;
-import static com.bytechef.hermes.component.constants.ComponentConstants.HEADER_PREFIX;
-import static com.bytechef.hermes.component.constants.ComponentConstants.KEY;
-import static com.bytechef.hermes.component.constants.ComponentConstants.PASSWORD;
-import static com.bytechef.hermes.component.constants.ComponentConstants.TOKEN;
-import static com.bytechef.hermes.component.constants.ComponentConstants.USERNAME;
-import static com.bytechef.hermes.component.constants.ComponentConstants.VALUE;
+import static com.bytechef.hermes.component.constant.ComponentConstants.ACCESS_TOKEN;
+import static com.bytechef.hermes.component.constant.ComponentConstants.ADD_TO;
+import static com.bytechef.hermes.component.constant.ComponentConstants.API_TOKEN;
+import static com.bytechef.hermes.component.constant.ComponentConstants.HEADER_PREFIX;
+import static com.bytechef.hermes.component.constant.ComponentConstants.KEY;
+import static com.bytechef.hermes.component.constant.ComponentConstants.PASSWORD;
+import static com.bytechef.hermes.component.constant.ComponentConstants.TOKEN;
+import static com.bytechef.hermes.component.constant.ComponentConstants.USERNAME;
+import static com.bytechef.hermes.component.constant.ComponentConstants.VALUE;
 
 import com.bytechef.hermes.component.AuthorizationContext;
 import com.bytechef.hermes.component.Connection;

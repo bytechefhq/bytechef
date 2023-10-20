@@ -21,8 +21,8 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.a
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
-import static com.bytechef.task.dispatcher.forkjoin.constants.ForkJoinTaskDispatcherConstants.BRANCHES;
-import static com.bytechef.task.dispatcher.forkjoin.constants.ForkJoinTaskDispatcherConstants.FORK_JOIN;
+import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.BRANCHES;
+import static com.bytechef.task.dispatcher.forkjoin.constant.ForkJoinTaskDispatcherConstants.FORK_JOIN;
 
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;

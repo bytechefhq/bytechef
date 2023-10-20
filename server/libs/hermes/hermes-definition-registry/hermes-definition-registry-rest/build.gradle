@@ -48,7 +48,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation libs.swagger.annotations
     implementation project(":server:libs:core:autoconfigure-annotations")
-    implementation project(":server:libs:core:commons:commons-utils")
+    implementation project(":server:libs:core:commons:commons-util")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
 
     testImplementation "org.springframework.boot:spring-boot-starter-webflux"

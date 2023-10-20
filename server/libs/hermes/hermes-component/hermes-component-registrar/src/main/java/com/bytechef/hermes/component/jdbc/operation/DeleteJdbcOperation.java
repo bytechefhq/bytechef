@@ -17,10 +17,10 @@
 
 package com.bytechef.hermes.component.jdbc.operation;
 
-import static com.bytechef.hermes.component.jdbc.constants.JdbcConstants.DELETE_KEY;
-import static com.bytechef.hermes.component.jdbc.constants.JdbcConstants.ROWS;
-import static com.bytechef.hermes.component.jdbc.constants.JdbcConstants.SCHEMA;
-import static com.bytechef.hermes.component.jdbc.constants.JdbcConstants.TABLE;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.DELETE_KEY;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.ROWS;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;

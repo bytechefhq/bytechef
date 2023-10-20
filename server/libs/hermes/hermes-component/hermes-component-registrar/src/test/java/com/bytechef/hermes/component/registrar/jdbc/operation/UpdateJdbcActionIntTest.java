@@ -17,11 +17,11 @@
 
 package com.bytechef.hermes.component.registrar.jdbc.operation;
 
-import static com.bytechef.hermes.component.jdbc.constants.JdbcConstants.COLUMNS;
-import static com.bytechef.hermes.component.jdbc.constants.JdbcConstants.ROWS;
-import static com.bytechef.hermes.component.jdbc.constants.JdbcConstants.SCHEMA;
-import static com.bytechef.hermes.component.jdbc.constants.JdbcConstants.TABLE;
-import static com.bytechef.hermes.component.jdbc.constants.JdbcConstants.UPDATE_KEY;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.COLUMNS;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.ROWS;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.UPDATE_KEY;
 
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;

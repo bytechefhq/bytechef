@@ -54,7 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.bytechef.commons.utils.CollectionUtils;
+import com.bytechef.commons.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

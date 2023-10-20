@@ -24,7 +24,7 @@ import com.bytechef.hermes.definition.Resources;
 
 import java.util.List;
 
-import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
+import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
 
 /**
  * @author Ivica Cardic

@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.rest;
 
 import com.bytechef.atlas.domain.TaskExecution;
-import com.bytechef.commons.utils.MapValueUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;
 import com.bytechef.hermes.component.RestComponentHandler.PropertyType;

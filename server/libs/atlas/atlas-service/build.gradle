@@ -9,7 +9,7 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-event:atlas-event-api")
     implementation project(":server:libs:atlas:atlas-message-broker:atlas-message-broker-api")
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-api")
-    implementation project(":server:libs:core:commons:commons-utils")
+    implementation project(":server:libs:core:commons:commons-util")
 
     testImplementation project(":server:libs:atlas:atlas-config")
     testImplementation project(":server:libs:atlas:atlas-repository:atlas-repository-impl")

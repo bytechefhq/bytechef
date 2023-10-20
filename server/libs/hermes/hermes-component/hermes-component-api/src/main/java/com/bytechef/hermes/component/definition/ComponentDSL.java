@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.AuthorizationContext;
 import com.bytechef.hermes.component.Connection;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
-import com.bytechef.hermes.component.constants.ComponentConstants;
+import com.bytechef.hermes.component.constant.ComponentConstants;
 import com.bytechef.hermes.definition.DefinitionDSL;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
@@ -43,7 +43,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.bytechef.hermes.component.constants.ComponentConstants.BASE_URI;
+import static com.bytechef.hermes.component.constant.ComponentConstants.BASE_URI;
 
 /**
  * @author Ivica Cardic
@@ -422,6 +422,14 @@ public final class ComponentDSL extends DefinitionDSL {
             this.name = Objects.requireNonNull(name);
         }
 
+        public ModifiableComponentDefinition actions(ActionDefinition... actionDefinitions) {
+            if (actionDefinitions != null) {
+                this.actions = List.of(actionDefinitions);
+            }
+
+            return this;
+        }
+
         public ModifiableComponentDefinition actions(ModifiableActionDefinition... actionDefinitions) {
             if (actionDefinitions != null) {
                 this.actions = List.of(actionDefinitions);
@@ -437,6 +445,14 @@ public final class ComponentDSL extends DefinitionDSL {
                     .flatMap(Collection::stream)
                     .toList();
             }
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition connection(ConnectionDefinition connectionDefinition) {
+            this.connection = ((ModifiableConnectionDefinition) connectionDefinition)
+                .componentName(name)
+                .display(display);
 
             return this;
         }

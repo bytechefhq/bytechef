@@ -14,5 +14,5 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-repository:atlas-repository-memory")
     implementation project(":server:libs:atlas:atlas-service")
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-impl")
-    implementation project(":server:libs:core:commons:commons-utils")
+    implementation project(":server:libs:core:commons:commons-util")
 }

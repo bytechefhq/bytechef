@@ -17,7 +17,7 @@
 
 package com.bytechef.atlas.service.impl;
 
-import com.bytechef.atlas.constants.WorkflowConstants;
+import com.bytechef.atlas.constant.WorkflowConstants;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.dto.JobParameters;
@@ -25,7 +25,7 @@ import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.repository.JobRepository;
 import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.service.JobService;
-import com.bytechef.commons.utils.MapValueUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Date;
 import java.util.List;

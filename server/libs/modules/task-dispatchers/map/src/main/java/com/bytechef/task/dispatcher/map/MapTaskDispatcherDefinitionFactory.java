@@ -22,12 +22,12 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.d
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
-import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM;
-import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM_INDEX;
-import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITEM_VAR;
-import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.ITERATEE;
-import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.LIST;
-import static com.bytechef.task.dispatcher.map.constants.MapTaskDispatcherConstants.MAP;
+import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM_INDEX;
+import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM_VAR;
+import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITERATEE;
+import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.LIST;
+import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.MAP;
 
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;

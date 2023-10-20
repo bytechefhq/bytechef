@@ -17,6 +17,7 @@
 
 package com.bytechef.rest.error;
 
+import com.bytechef.rest.error.constant.ErrorConstants;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;

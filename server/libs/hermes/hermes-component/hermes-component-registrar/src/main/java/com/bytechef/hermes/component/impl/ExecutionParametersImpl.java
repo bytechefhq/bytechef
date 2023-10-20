@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.impl;
 
-import com.bytechef.commons.utils.MapValueUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.hermes.component.ExecutionParameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;

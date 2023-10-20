@@ -19,12 +19,12 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
-import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM;
-import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM_INDEX;
-import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITEM_VAR;
-import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.ITERATEE;
-import static com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants.LIST;
+import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM_INDEX;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM_VAR;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITERATEE;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.LIST;
 
 import com.bytechef.atlas.domain.Context;
 import com.bytechef.atlas.domain.TaskExecution;
@@ -39,8 +39,8 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.MapValueUtils;
-import com.bytechef.task.dispatcher.each.constants.EachTaskDispatcherConstants;
+import com.bytechef.commons.util.MapValueUtils;
+import com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.time.LocalDateTime;

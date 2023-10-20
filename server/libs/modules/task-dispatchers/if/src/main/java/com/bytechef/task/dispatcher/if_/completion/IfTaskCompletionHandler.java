@@ -17,10 +17,10 @@
 
 package com.bytechef.task.dispatcher.if_.completion;
 
-import static com.bytechef.hermes.task.dispatcher.constants.TaskDispatcherConstants.Versions.VERSION_1;
-import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CASE_FALSE;
-import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CASE_TRUE;
-import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.IF;
+import static com.bytechef.hermes.task.dispatcher.constant.TaskDispatcherConstants.Versions.VERSION_1;
+import static com.bytechef.task.dispatcher.if_.constant.IfTaskDispatcherConstants.CASE_FALSE;
+import static com.bytechef.task.dispatcher.if_.constant.IfTaskDispatcherConstants.CASE_TRUE;
+import static com.bytechef.task.dispatcher.if_.constant.IfTaskDispatcherConstants.IF;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.domain.Context;
@@ -32,7 +32,7 @@ import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
-import com.bytechef.commons.utils.MapValueUtils;
+import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.task.dispatcher.if_.util.IfTaskUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 

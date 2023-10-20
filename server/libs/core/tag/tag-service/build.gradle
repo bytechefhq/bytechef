@@ -4,7 +4,7 @@ dependencies {
     implementation "org.springframework:spring-context"
     implementation "org.springframework:spring-tx"
     implementation "org.springframework.data:spring-data-jdbc"
-    implementation project(":server:libs:core:commons:commons-utils")
+    implementation project(":server:libs:core:commons:commons-util")
 
     testImplementation project(":server:libs::db-migration")
     testImplementation project(":server:libs:test:test-int-support")
