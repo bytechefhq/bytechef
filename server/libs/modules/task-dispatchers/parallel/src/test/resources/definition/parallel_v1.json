@@ -1,0 +1,8 @@
+{
+  "display": {
+    "description": "Run collection of tasks in parallel, without waiting until the previous function has completed.",
+    "label": "Parallel"
+  },
+  "name": "parallel",
+  "version": 1
+}

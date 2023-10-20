@@ -18,9 +18,9 @@ package com.bytechef.task.dispatcher.parallel.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.counter.CounterService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.CounterService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
@@ -48,29 +48,13 @@ public class ParallelTaskDispatcherConfiguration {
 
     @Bean
     TaskCompletionHandlerFactory parallelTaskCompletionHandlerFactory() {
-        return (taskCompletionHandler, taskDispatcher) -> {
-            ParallelTaskCompletionHandler dispatcher = new ParallelTaskCompletionHandler();
-
-            dispatcher.setCounterService(counterService);
-            dispatcher.setTaskCompletionHandler(taskCompletionHandler);
-            dispatcher.setTaskExecutionService(taskExecutionService);
-
-            return dispatcher;
-        };
+        return (taskCompletionHandler, taskDispatcher) ->
+                new ParallelTaskCompletionHandler(counterService, taskCompletionHandler, taskExecutionService);
     }
 
     @Bean
     TaskDispatcherResolverFactory parallelTaskDispatcherFactory() {
-        return (taskDispatcher) -> {
-            ParallelTaskDispatcher dispatcher = new ParallelTaskDispatcher();
-
-            dispatcher.setContextService(contextService);
-            dispatcher.setCounterService(counterService);
-            dispatcher.setMessageBroker(messageBroker);
-            dispatcher.setTaskDispatcher(taskDispatcher);
-            dispatcher.setTaskExecutionService(taskExecutionService);
-
-            return dispatcher;
-        };
+        return (taskDispatcher) -> new ParallelTaskDispatcher(
+                contextService, counterService, messageBroker, taskDispatcher, taskExecutionService);
     }
 }
