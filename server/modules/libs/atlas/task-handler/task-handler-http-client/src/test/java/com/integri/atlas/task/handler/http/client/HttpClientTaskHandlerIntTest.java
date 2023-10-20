@@ -20,6 +20,7 @@ import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.core.context.Context;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
+import com.integri.atlas.task.handler.http.client.body.HttpBodyFactory;
 import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
 import com.integri.atlas.task.handler.http.client.params.QueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
@@ -75,11 +76,11 @@ public class HttpClientTaskHandlerIntTest extends BaseTaskIntTest {
         return Map.of(
             "httpClient",
             new HttpClientTaskHandler(
+                new HttpBodyFactory(jsonHelper),
                 new HttpAuthenticationFactory(),
                 new HttpHeadersFactory(jsonHelper),
                 new HttpResponseHandler(fileStorageService, jsonHelper),
-                new QueryParamsFactory(jsonHelper),
-                jsonHelper
+                new QueryParamsFactory(jsonHelper)
             )
         );
     }
