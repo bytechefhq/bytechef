@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Category", description = "An integration category.")
 @JsonTypeName("Category")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-08T13:23:46.808411+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-16T08:29:28.643031+01:00[Europe/Zagreb]")
 public class CategoryModel {
 
   @JsonProperty("createdBy")
@@ -59,7 +59,7 @@ public class CategoryModel {
    * @return createdBy
   */
   
-  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", required = false)
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getCreatedBy() {
     return createdBy;
   }
@@ -78,7 +78,7 @@ public class CategoryModel {
    * @return createdDate
   */
   @Valid 
-  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", required = false)
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getCreatedDate() {
     return createdDate;
   }
@@ -97,7 +97,7 @@ public class CategoryModel {
    * @return id
   */
   
-  @Schema(name = "id", description = "The id of the category.", required = false)
+  @Schema(name = "id", description = "The id of the category.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getId() {
     return id;
   }
@@ -116,7 +116,7 @@ public class CategoryModel {
    * @return name
   */
   @NotNull 
-  @Schema(name = "name", description = "The name of the category.", required = true)
+  @Schema(name = "name", description = "The name of the category.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
   }
@@ -135,7 +135,7 @@ public class CategoryModel {
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -154,7 +154,7 @@ public class CategoryModel {
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -173,7 +173,7 @@ public class CategoryModel {
    * @return version
   */
   
-  @Schema(name = "version", required = false)
+  @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
   }

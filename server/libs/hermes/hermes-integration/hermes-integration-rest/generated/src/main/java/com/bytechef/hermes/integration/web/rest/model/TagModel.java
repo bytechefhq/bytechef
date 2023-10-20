@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Tag", description = "An integration tag.")
 @JsonTypeName("Tag")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-08T13:23:46.808411+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-16T08:29:28.643031+01:00[Europe/Zagreb]")
 public class TagModel {
 
   @JsonProperty("id")
@@ -52,7 +52,7 @@ public class TagModel {
    * @return id
   */
   
-  @Schema(name = "id", description = "The id of the tag.", required = false)
+  @Schema(name = "id", description = "The id of the tag.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Long getId() {
     return id;
   }
@@ -71,7 +71,7 @@ public class TagModel {
    * @return lastModifiedBy
   */
   
-  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", required = false)
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getLastModifiedBy() {
     return lastModifiedBy;
   }
@@ -90,7 +90,7 @@ public class TagModel {
    * @return lastModifiedDate
   */
   @Valid 
-  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", required = false)
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public LocalDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
@@ -109,7 +109,7 @@ public class TagModel {
    * @return name
   */
   @NotNull 
-  @Schema(name = "name", description = "The name of the tag.", required = true)
+  @Schema(name = "name", description = "The name of the tag.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
   }
@@ -128,7 +128,7 @@ public class TagModel {
    * @return version
   */
   
-  @Schema(name = "version", required = false)
+  @Schema(name = "version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public Integer getVersion() {
     return version;
   }

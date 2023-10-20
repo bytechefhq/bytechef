@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("postIntegrationWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-08T13:23:46.808411+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-16T08:29:28.643031+01:00[Europe/Zagreb]")
 public class PostIntegrationWorkflowRequestModel {
 
   @JsonProperty("name")
@@ -42,7 +42,7 @@ public class PostIntegrationWorkflowRequestModel {
    * @return name
   */
   @NotNull 
-  @Schema(name = "name", description = "The workflow name.", required = true)
+  @Schema(name = "name", description = "The workflow name.", requiredMode = Schema.RequiredMode.REQUIRED)
   public String getName() {
     return name;
   }
@@ -61,7 +61,7 @@ public class PostIntegrationWorkflowRequestModel {
    * @return description
   */
   
-  @Schema(name = "description", description = "The workflow description.", required = false)
+  @Schema(name = "description", description = "The workflow description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDescription() {
     return description;
   }
@@ -80,7 +80,7 @@ public class PostIntegrationWorkflowRequestModel {
    * @return definition
   */
   
-  @Schema(name = "definition", description = "The workflow definition.", required = false)
+  @Schema(name = "definition", description = "The workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getDefinition() {
     return definition;
   }
