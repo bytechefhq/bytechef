@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/TagsApi.ts
 apis/index.ts
 index.ts

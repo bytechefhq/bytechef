@@ -25,6 +25,7 @@ models/DynamicPropertiesPropertyAllOfModel.ts
 models/DynamicPropertiesPropertyModel.ts
 models/IntegerPropertyAllOfModel.ts
 models/IntegerPropertyModel.ts
+models/NullPropertyModel.ts
 models/NumberPropertyAllOfModel.ts
 models/NumberPropertyModel.ts
 models/ObjectPropertyAllOfModel.ts
@@ -40,6 +41,8 @@ models/ResourcesModel.ts
 models/StringPropertyModel.ts
 models/TaskDispatcherDefinitionBasicModel.ts
 models/TaskDispatcherDefinitionModel.ts
+models/TimePropertyAllOfModel.ts
+models/TimePropertyModel.ts
 models/TriggerDefinitionBasicModel.ts
 models/TriggerDefinitionModel.ts
 models/TriggerTypeModel.ts
