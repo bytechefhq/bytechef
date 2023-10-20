@@ -91,9 +91,7 @@ public class TestConfiguration {
     }
 
     @Bean
-    JSONHelper jsonMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-
+    JSONHelper jsonMapper(ObjectMapper objectMapper) {
         return new DefaultJSONHelper(objectMapper);
     }
 
