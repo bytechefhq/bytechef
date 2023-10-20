@@ -25,7 +25,7 @@ import static com.integri.atlas.task.definition.dsl.TaskProperty.SELECT_PROPERTY
 import static com.integri.atlas.task.definition.dsl.TaskProperty.STRING_PROPERTY;
 import static com.integri.atlas.task.definition.dsl.TaskProperty.show;
 import static com.integri.atlas.task.definition.dsl.TaskPropertyOption.option;
-import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.*;
+import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.*;
 
 import com.integri.atlas.task.definition.TaskDefinition;
 import com.integri.atlas.task.definition.dsl.TaskSpecification;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class XMLFileTaskDefinition implements TaskDefinition {
+public class XmlFileTaskDefinition implements TaskDefinition {
 
     public static final TaskSpecification TASK_SPECIFICATION = TaskSpecification
         .create(TASK_XML_FILE)

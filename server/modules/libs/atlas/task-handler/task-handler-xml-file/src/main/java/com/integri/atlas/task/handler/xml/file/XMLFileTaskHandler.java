@@ -16,14 +16,14 @@
 
 package com.integri.atlas.task.handler.xml.file;
 
-import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_FILE_ENTRY;
-import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_FILE_NAME;
-import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_IS_ARRAY;
-import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_OPERATION;
-import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_PAGE_NUMBER;
-import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_PAGE_SIZE;
-import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.PROPERTY_SOURCE;
-import static com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.TASK_XML_FILE;
+import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_FILE_ENTRY;
+import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_FILE_NAME;
+import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_IS_ARRAY;
+import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_OPERATION;
+import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_PAGE_NUMBER;
+import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_PAGE_SIZE;
+import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.PROPERTY_SOURCE;
+import static com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.TASK_XML_FILE;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.integri.atlas.engine.core.task.TaskExecution;
@@ -31,8 +31,8 @@ import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
 import com.integri.atlas.task.handler.json.helper.JSONHelper;
-import com.integri.atlas.task.handler.xml.file.XMLFileTaskConstants.Operation;
-import com.integri.atlas.task.handler.xml.helper.XMLHelper;
+import com.integri.atlas.task.handler.xml.file.XmlFileTaskConstants.Operation;
+import com.integri.atlas.task.handler.xml.helper.XmlHelper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -47,12 +47,12 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component(TASK_XML_FILE)
-public class XMLFileTaskHandler implements TaskHandler<Object> {
+public class XmlFileTaskHandler implements TaskHandler<Object> {
 
     private final JSONHelper jsonHelper;
-    private final XMLHelper xmlHelper;
+    private final XmlHelper xmlHelper;
 
-    public XMLFileTaskHandler(JSONHelper jsonHelper, FileStorageService fileStorageService, XMLHelper xmlHelper) {
+    public XmlFileTaskHandler(JSONHelper jsonHelper, FileStorageService fileStorageService, XmlHelper xmlHelper) {
         this.jsonHelper = jsonHelper;
         this.fileStorageService = fileStorageService;
         this.xmlHelper = xmlHelper;
@@ -71,7 +71,7 @@ public class XMLFileTaskHandler implements TaskHandler<Object> {
             FileEntry fileEntry = taskExecution.getRequired(PROPERTY_FILE_ENTRY, FileEntry.class);
 
             if (isArray) {
-                String path = taskExecution.get(XMLFileTaskConstants.PROPERTY_PATH);
+                String path = taskExecution.get(XmlFileTaskConstants.PROPERTY_PATH);
                 InputStream inputStream = fileStorageService.getFileContentStream(fileEntry.getUrl());
                 List<Map<String, ?>> items;
 
