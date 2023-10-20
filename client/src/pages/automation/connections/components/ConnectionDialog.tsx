@@ -30,16 +30,19 @@ import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionsQuery,
 } from 'queries/componentDefinitions.queries';
-import {useGetConnectionDefinitionQuery} from 'queries/connectionDefinitions.queries';
+import {
+    useGetConnectionDefinitionQuery,
+    useGetConnectionDefinitionsQuery,
+} from 'queries/connectionDefinitions.queries';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
     useGetOAuth2AuthorizationParametersQuery,
 } from 'queries/connections.queries';
 import {useGetOAuth2PropertiesQuery} from 'queries/oauth2Properties.queries';
-import React, {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
-import {OnChangeValue} from 'react-select';
+import {SingleValue} from 'react-select';
 
 import {AuthTokenPayload} from '../oauth2/useOAuth2';
 import OAuth2Button from './OAuth2Button';
@@ -69,13 +72,13 @@ const ConnectionDialog = ({
     const [componentDefinition, setComponentDefinition] =
         useState<ComponentDefinitionBasicModel>();
 
+    const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
+
     useEffect(() => {
         if (component) {
             setComponentDefinition(component);
         }
     }, [component]);
-
-    const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
     const {
         control,
@@ -115,6 +118,14 @@ const ConnectionDialog = ({
                   componentVersion: 1,
               }
             : undefined
+    );
+
+    const {data: connectionDefinitions} = useGetConnectionDefinitionsQuery(
+        {
+            componentName: componentDefinition?.name as string,
+            componentVersion: 1,
+        },
+        !!componentDefinition?.name
     );
 
     const {
@@ -376,6 +387,27 @@ const ConnectionDialog = ({
         }
     }
 
+    const handleComponentNameChange = (
+        value: SingleValue<{
+            componentDefinition?: ComponentDefinitionBasicModel;
+            icon?: string;
+            label: string;
+            value: string;
+        }>
+    ) => {
+        if (value) {
+            setValue('componentName', value);
+
+            setAuthorizationName(undefined);
+
+            setComponentDefinition(value.componentDefinition);
+
+            setUsePredefinedOAuthApp(true);
+
+            setWizardStep('configuration_step');
+        }
+    };
+
     return (
         <Dialog
             description="Create your connection to connect to the chosen service"
@@ -401,77 +433,87 @@ const ConnectionDialog = ({
                     {(wizardStep === 'configuration_step' ||
                         oAuth2AuthorizationParametersLoading) && (
                         <>
-                            {!connection?.id && !component && (
+                            {!connection?.id && (
                                 <Controller
                                     control={control}
                                     name="componentName"
                                     rules={{required: true}}
-                                    render={({field, fieldState: {error}}) => (
-                                        <FilterableSelect
-                                            error={!!error}
-                                            field={field}
-                                            label="Component"
-                                            options={componentDefinitions!.map(
-                                                (
-                                                    componentDefinition: ComponentDefinitionBasicModel
-                                                ) => {
-                                                    const {name} =
-                                                        componentDefinition;
+                                    render={({field, fieldState: {error}}) => {
+                                        if (
+                                            !component &&
+                                            componentDefinitions
+                                        ) {
+                                            return (
+                                                <FilterableSelect
+                                                    error={!!error}
+                                                    field={field}
+                                                    label="Component"
+                                                    options={componentDefinitions.map(
+                                                        (
+                                                            componentDefinition
+                                                        ) => {
+                                                            const {icon, name} =
+                                                                componentDefinition;
 
-                                                    const capitalizedName = `${name
-                                                        .charAt(0)
-                                                        .toUpperCase()}${name.slice(
-                                                        1
-                                                    )}`;
+                                                            const capitalizedName = `${name
+                                                                .charAt(0)
+                                                                .toUpperCase()}${name.slice(
+                                                                1
+                                                            )}`;
 
-                                                    return {
-                                                        componentDefinition,
-                                                        icon: componentDefinition.icon,
-                                                        label: capitalizedName,
-                                                        value: name,
-                                                    };
-                                                }
-                                            )}
-                                            onChange={(
-                                                value: OnChangeValue<
-                                                    ISelectOption,
-                                                    false
-                                                >
-                                            ) => {
-                                                if (value) {
-                                                    setValue(
-                                                        'componentName',
-                                                        value
-                                                    );
-
-                                                    setAuthorizationName(
-                                                        undefined
-                                                    );
-
-                                                    setComponentDefinition(
-                                                        value.componentDefinition
-                                                    );
-
-                                                    setUsePredefinedOAuthApp(
-                                                        true
-                                                    );
-
-                                                    setWizardStep(
-                                                        'configuration_step'
-                                                    );
-                                                }
-                                            }}
-                                        />
-                                    )}
-                                />
-                            )}
-
-                            {component && (
-                                <Input
-                                    label="Component"
-                                    defaultValue={component.title}
-                                    disabled
-                                    name="defaultComponentName"
+                                                            return {
+                                                                componentDefinition,
+                                                                icon,
+                                                                label: capitalizedName,
+                                                                value: name,
+                                                            };
+                                                        }
+                                                    )}
+                                                    onChange={(value) =>
+                                                        handleComponentNameChange(
+                                                            value
+                                                        )
+                                                    }
+                                                />
+                                            );
+                                        } else if (
+                                            connectionDefinitions &&
+                                            connectionDefinitions?.length > 1
+                                        ) {
+                                            return (
+                                                <FilterableSelect
+                                                    error={!!error}
+                                                    field={field}
+                                                    label="Component"
+                                                    options={connectionDefinitions.map(
+                                                        (
+                                                            connectionDefinition
+                                                        ) => ({
+                                                            componentDefinition,
+                                                            label: connectionDefinition.componentTitle!,
+                                                            value: connectionDefinition.componentName,
+                                                        })
+                                                    )}
+                                                    onChange={(value) =>
+                                                        handleComponentNameChange(
+                                                            value
+                                                        )
+                                                    }
+                                                />
+                                            );
+                                        } else {
+                                            return (
+                                                <Input
+                                                    label="Component"
+                                                    defaultValue={
+                                                        component?.title
+                                                    }
+                                                    disabled
+                                                    name="defaultComponentName"
+                                                />
+                                            );
+                                        }
+                                    }}
                                 />
                             )}
 
@@ -572,6 +614,7 @@ const ConnectionDialog = ({
                                     render={({field}) => (
                                         <CreatableSelect
                                             field={field}
+                                            fieldsetClassName="mt-3 mb-0"
                                             isMulti={true}
                                             label="Tags"
                                             options={remainingTags!.map(
@@ -634,7 +677,7 @@ const ConnectionDialog = ({
                             </div>
                         )}
 
-                    <div className="mt-8 flex justify-end space-x-1">
+                    <footer className="mt-8 flex justify-end space-x-1">
                         {wizardStep === 'oauth_step' && (
                             <Button
                                 displayType="lightBorder"
@@ -721,7 +764,7 @@ const ConnectionDialog = ({
                                 onClick={handleSubmit(saveConnection)}
                             />
                         )}
-                    </div>
+                    </footer>
                 </div>
             )}
         </Dialog>

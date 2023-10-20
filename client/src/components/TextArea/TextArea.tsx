@@ -1,11 +1,15 @@
 import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
+import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import Tooltip from 'components/Tooltip/Tooltip';
 import {forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 type TextAreaProps = {
-    label: string;
+    label?: string;
     name: string;
+    description?: string;
     error?: string | undefined;
+    fieldsetClassName?: string;
     labelClassName?: string;
 } & React.DetailedHTMLProps<
     React.TextareaHTMLAttributes<HTMLTextAreaElement>,
@@ -13,17 +17,42 @@ type TextAreaProps = {
 >;
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-    ({error, label, labelClassName, name, ...props}, ref) => (
-        <fieldset className="mb-3">
-            <label
-                htmlFor={name}
-                className={twMerge(
-                    'block text-sm font-medium text-gray-700 dark:text-gray-400',
-                    labelClassName
-                )}
-            >
-                {label}
-            </label>
+    (
+        {
+            description,
+            error,
+            fieldsetClassName,
+            label,
+            labelClassName,
+            name,
+            required,
+            ...props
+        },
+        ref
+    ) => (
+        <fieldset className={twMerge('mb-3', fieldsetClassName)}>
+            {label && (
+                <div className="flex items-center">
+                    <label
+                        htmlFor={name}
+                        className={twMerge(
+                            'block text-sm font-medium capitalize text-gray-700 dark:text-gray-400',
+                            description && 'mr-1',
+                            labelClassName
+                        )}
+                    >
+                        {label}
+                    </label>
+
+                    {required && <span className="pr-1 text-red-500">*</span>}
+
+                    {description && (
+                        <Tooltip text={description}>
+                            <QuestionMarkCircledIcon />
+                        </Tooltip>
+                    )}
+                </div>
+            )}
 
             <div className={twMerge([label && 'mt-1'])}>
                 <textarea
