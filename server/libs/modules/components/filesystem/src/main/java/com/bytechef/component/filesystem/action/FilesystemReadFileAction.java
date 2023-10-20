@@ -18,7 +18,7 @@
 package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -46,15 +46,15 @@ public class FilesystemReadFileAction {
             .placeholder("/data/your_file.pdf")
             .required(true))
         .outputSchema(ComponentDSL.fileEntry())
-        .perform(FilesystemReadFileAction::performReadFile);
+        .execute(FilesystemReadFileAction::executeReadFile);
 
-    public static Context.FileEntry performReadFile(Context context, Parameters parameters) {
-        String filename = parameters.getRequiredString(FILENAME);
+    public static Context.FileEntry executeReadFile(Context context, InputParameters inputParameters) {
+        String filename = inputParameters.getRequiredString(FILENAME);
 
         try (InputStream inputStream = new FileInputStream(filename)) {
             return context.storeFileContent(filename, inputStream);
         } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to open file " + parameters, ioException);
+            throw new ComponentExecutionException("Unable to open file " + inputParameters, ioException);
         }
     }
 }

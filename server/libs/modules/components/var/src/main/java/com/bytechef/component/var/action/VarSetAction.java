@@ -19,7 +19,7 @@ package com.bytechef.component.var.action;
 
 import com.bytechef.component.var.constant.VarConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
@@ -36,9 +36,9 @@ public class VarSetAction {
             .label("Value")
             .description("Value of any type to set.")
             .required(true))
-        .perform(VarSetAction::performSetValue);
+        .execute(VarSetAction::executeSetValue);
 
-    public static Object performSetValue(Context context, Parameters parameters) {
-        return parameters.get(VarConstants.VALUE);
+    public static Object executeSetValue(Context context, InputParameters inputParameters) {
+        return inputParameters.get(VarConstants.VALUE);
     }
 }

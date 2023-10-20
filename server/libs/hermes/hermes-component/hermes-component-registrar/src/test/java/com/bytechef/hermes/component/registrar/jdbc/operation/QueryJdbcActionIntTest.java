@@ -18,7 +18,7 @@
 package com.bytechef.hermes.component.registrar.jdbc.operation;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.jdbc.JdbcExecutor;
 import com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstants;
@@ -80,14 +80,14 @@ public class QueryJdbcActionIntTest {
         Mockito.when(context.fetchConnection())
             .thenReturn(Optional.of(Mockito.mock(Context.Connection.class)));
 
-        Parameters parameters = Mockito.mock(Parameters.class);
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
-        Mockito.when(parameters.getMap(JdbcConstants.PARAMETERS, Map.of()))
+        Mockito.when(inputParameters.getMap(JdbcConstants.PARAMETERS, Map.of()))
             .thenReturn(Map.of("id", "id2"));
-        Mockito.when(parameters.getRequiredString(JdbcConstants.QUERY))
+        Mockito.when(inputParameters.getRequiredString(JdbcConstants.QUERY))
             .thenReturn("SELECT count(*) FROM test where id=:id");
 
-        List<Map<String, Object>> result = queryJdbcOperation.execute(context, parameters);
+        List<Map<String, Object>> result = queryJdbcOperation.execute(context, inputParameters);
 
         Assertions.assertEquals(1, result.size());
     }

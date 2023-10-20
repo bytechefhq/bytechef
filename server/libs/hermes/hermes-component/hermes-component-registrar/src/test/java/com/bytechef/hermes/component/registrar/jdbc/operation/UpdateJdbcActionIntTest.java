@@ -24,7 +24,7 @@ import static com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstant
 import static com.bytechef.hermes.component.registrar.jdbc.constant.JdbcConstants.UPDATE_KEY;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.registrar.jdbc.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.jdbc.JdbcExecutor;
 import com.bytechef.hermes.component.registrar.jdbc.operation.config.JdbcActionIntTestConfiguration;
@@ -85,20 +85,20 @@ public class UpdateJdbcActionIntTest {
         Mockito.when(context.fetchConnection())
             .thenReturn(Optional.of(Mockito.mock(Context.Connection.class)));
 
-        Parameters parameters = Mockito.mock(Parameters.class);
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
-        Mockito.when(parameters.getList(COLUMNS, String.class, List.of()))
+        Mockito.when(inputParameters.getList(COLUMNS, String.class, List.of()))
             .thenReturn(List.of("name"));
-        Mockito.when(parameters.getList(ROWS, Map.class, List.of()))
+        Mockito.when(inputParameters.getList(ROWS, Map.class, List.of()))
             .thenReturn(List.of(Map.of("id", "id2", "name", "name3")));
-        Mockito.when(parameters.getString(SCHEMA, "public"))
+        Mockito.when(inputParameters.getString(SCHEMA, "public"))
             .thenReturn("public");
-        Mockito.when(parameters.getRequiredString(TABLE))
+        Mockito.when(inputParameters.getRequiredString(TABLE))
             .thenReturn("test");
-        Mockito.when(parameters.getString(UPDATE_KEY, "id"))
+        Mockito.when(inputParameters.getString(UPDATE_KEY, "id"))
             .thenReturn("id");
 
-        Map<String, Integer> result = updateJdbcOperation.execute(context, parameters);
+        Map<String, Integer> result = updateJdbcOperation.execute(context, inputParameters);
 
         Assertions.assertEquals(1, result.get("rows"));
 

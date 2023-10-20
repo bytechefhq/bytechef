@@ -18,7 +18,7 @@
 package com.bytechef.component.httpclient.util;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.BodyContentType;
 import com.bytechef.hermes.component.util.HttpClientUtils.Payload;
@@ -129,24 +129,24 @@ public class HttpClientActionUtils {
     }
 
     public static Object execute(
-        Context context, Parameters parameters, RequestMethod requestMethod) {
+        Context context, InputParameters inputParameters, RequestMethod requestMethod) {
 
         HttpClientUtils.Response response = exchange(
-            parameters.getRequiredString(URI), requestMethod)
+            inputParameters.getRequiredString(URI), requestMethod)
             .configuration(
-                allowUnauthorizedCerts(parameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
-                    .filename(parameters.getString(RESPONSE_FILENAME))
-                    .followAllRedirects(parameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
-                    .followRedirect(parameters.getBoolean(FOLLOW_REDIRECT, false))
-                    .proxy(parameters.getString(PROXY))
-                    .responseFormat(getResponseFormat(parameters))
-                    .timeout(Duration.ofMillis(parameters.getInteger(TIMEOUT, 10000))))
-            .headers(parameters.getMap(HEADER_PARAMETERS))
-            .queryParameters(parameters.getMap(QUERY_PARAMETERS))
-            .payload(getPayload(parameters, getBodyContentType(parameters)))
+                allowUnauthorizedCerts(inputParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
+                    .filename(inputParameters.getString(RESPONSE_FILENAME))
+                    .followAllRedirects(inputParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
+                    .followRedirect(inputParameters.getBoolean(FOLLOW_REDIRECT, false))
+                    .proxy(inputParameters.getString(PROXY))
+                    .responseFormat(getResponseFormat(inputParameters))
+                    .timeout(Duration.ofMillis(inputParameters.getInteger(TIMEOUT, 10000))))
+            .headers(inputParameters.getMap(HEADER_PARAMETERS))
+            .queryParameters(inputParameters.getMap(QUERY_PARAMETERS))
+            .payload(getPayload(inputParameters, getBodyContentType(inputParameters)))
             .execute();
 
-        if (parameters.getBoolean(FULL_RESPONSE, false)) {
+        if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
             return response;
         } else {
             return response.body();
@@ -163,45 +163,45 @@ public class HttpClientActionUtils {
         return allProperties.toArray(size -> new Property<?>[size]);
     }
 
-    private static BodyContentType getBodyContentType(Parameters parameters) {
-        String bodyContentTypeParameter = parameters.getString(BODY_CONTENT_TYPE);
+    private static BodyContentType getBodyContentType(InputParameters inputParameters) {
+        String bodyContentTypeParameter = inputParameters.getString(BODY_CONTENT_TYPE);
 
         return bodyContentTypeParameter == null
             ? null
             : BodyContentType.valueOf(bodyContentTypeParameter.toUpperCase());
     }
 
-    private static Payload getPayload(Parameters parameters, BodyContentType bodyContentType) {
+    private static Payload getPayload(InputParameters inputParameters, BodyContentType bodyContentType) {
         Payload payload = null;
 
-        if (parameters.containsKey(BODY_CONTENT)) {
+        if (inputParameters.containsKey(BODY_CONTENT)) {
             if (bodyContentType == BodyContentType.BINARY) {
                 payload = Payload.of(
-                    parameters.get(BODY_CONTENT, Context.FileEntry.class),
-                    parameters.getString(BODY_CONTENT_MIME_TYPE));
+                    inputParameters.get(BODY_CONTENT, Context.FileEntry.class),
+                    inputParameters.getString(BODY_CONTENT_MIME_TYPE));
             } else if (bodyContentType == BodyContentType.FORM_DATA) {
                 payload = Payload.of(
-                    parameters.getMap(BODY_CONTENT, List.of(Context.FileEntry.class), Map.of()), bodyContentType);
+                    inputParameters.getMap(BODY_CONTENT, List.of(Context.FileEntry.class), Map.of()), bodyContentType);
             } else if (bodyContentType == BodyContentType.FORM_URL_ENCODED) {
-                payload = Payload.of(parameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+                payload = Payload.of(inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             } else if (bodyContentType == BodyContentType.JSON) {
                 payload = Payload.of(
-                    parameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+                    inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             } else if (bodyContentType == BodyContentType.RAW) {
                 payload = Payload.of(
-                    parameters.getString(BODY_CONTENT),
-                    parameters.getString(BODY_CONTENT_MIME_TYPE, "text/plain"));
+                    inputParameters.getString(BODY_CONTENT),
+                    inputParameters.getString(BODY_CONTENT_MIME_TYPE, "text/plain"));
             } else {
-                payload = Payload.of(parameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+                payload = Payload.of(inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
             }
         }
 
         return payload;
     }
 
-    private static ResponseFormat getResponseFormat(Parameters parameters) {
-        return parameters.containsKey(RESPONSE_FORMAT)
-            ? ResponseFormat.valueOf(parameters.getString(RESPONSE_FORMAT))
+    private static ResponseFormat getResponseFormat(InputParameters inputParameters) {
+        return inputParameters.containsKey(RESPONSE_FORMAT)
+            ? ResponseFormat.valueOf(inputParameters.getString(RESPONSE_FORMAT))
             : null;
     }
 }

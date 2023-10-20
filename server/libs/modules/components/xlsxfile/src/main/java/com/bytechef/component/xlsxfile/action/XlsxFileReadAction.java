@@ -19,7 +19,7 @@ package com.bytechef.component.xlsxfile.action;
 
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.ObjectUtils;
@@ -102,16 +102,16 @@ public class XlsxFileReadAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(array())
-        .perform(XlsxFileReadAction::performRead);
+        .execute(XlsxFileReadAction::executeRead);
 
-    public static List<Map<String, ?>> performRead(Context context, Parameters parameters) {
-        Context.FileEntry fileEntry = parameters.get(FILE_ENTRY, Context.FileEntry.class);
-        boolean headerRow = parameters.getBoolean(HEADER_ROW, true);
-        boolean includeEmptyCells = parameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
-        Integer pageSize = parameters.getInteger(PAGE_SIZE);
-        Integer pageNumber = parameters.getInteger(PAGE_NUMBER);
-        boolean readAsString = parameters.getBoolean(READ_AS_STRING, false);
-        String sheetName = parameters.getString(SHEET_NAME);
+    public static List<Map<String, ?>> executeRead(Context context, InputParameters inputParameters) {
+        Context.FileEntry fileEntry = inputParameters.get(FILE_ENTRY, Context.FileEntry.class);
+        boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
+        boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
+        Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
+        Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
+        boolean readAsString = inputParameters.getBoolean(READ_AS_STRING, false);
+        String sheetName = inputParameters.getString(SHEET_NAME);
 
         try (InputStream inputStream = context.getFileStream(fileEntry)) {
             String extension = fileEntry.getExtension();
@@ -138,7 +138,7 @@ public class XlsxFileReadAction {
                     readAsString,
                     sheetName));
         } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to handle action " + parameters, ioException);
+            throw new ComponentExecutionException("Unable to handle action " + inputParameters, ioException);
         }
     }
 

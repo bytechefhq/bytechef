@@ -32,7 +32,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 import com.bytechef.hermes.component.registrar.jdbc.DataSourceFactory;
@@ -84,24 +84,24 @@ public class JdbcComponentHandler implements ComponentHandler {
         this.updateJdbcOperation = new UpdateJdbcOperation(jdbcExecutor);
     }
 
-    protected Map<String, Integer> performDelete(Context context, Parameters parameters) {
-        return deleteJdbcOperation.execute(context, parameters);
+    protected Map<String, Integer> performDelete(Context context, InputParameters inputParameters) {
+        return deleteJdbcOperation.execute(context, inputParameters);
     }
 
-    protected Map<String, Integer> performExecute(Context context, Parameters parameters) {
-        return executeJdbcOperation.execute(context, parameters);
+    protected Map<String, Integer> performExecute(Context context, InputParameters inputParameters) {
+        return executeJdbcOperation.execute(context, inputParameters);
     }
 
-    protected Map<String, Integer> performInsert(Context context, Parameters parameters) {
-        return insertJdbcOperation.execute(context, parameters);
+    protected Map<String, Integer> performInsert(Context context, InputParameters inputParameters) {
+        return insertJdbcOperation.execute(context, inputParameters);
     }
 
-    protected List<Map<String, Object>> performQuery(Context context, Parameters parameters) {
-        return queryJdbcOperation.execute(context, parameters);
+    protected List<Map<String, Object>> performQuery(Context context, InputParameters inputParameters) {
+        return queryJdbcOperation.execute(context, inputParameters);
     }
 
-    protected Map<String, Integer> performUpdate(Context context, Parameters parameters) {
-        return updateJdbcOperation.execute(context, parameters);
+    protected Map<String, Integer> performUpdate(Context context, InputParameters inputParameters) {
+        return updateJdbcOperation.execute(context, inputParameters);
     }
 
     private ComponentDefinition getComponentDefinition(String name, Display display) {
@@ -142,7 +142,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                                 "The list of properties which should be used as query parameters.")
                             .properties(bool(), dateTime(), number(), string()))
                     .outputSchema(array().items(object().properties(integer())))
-                    .perform(this::performQuery),
+                    .execute(this::performQuery),
                 action(JdbcConstants.INSERT)
                     .display(display("Insert").description("Insert rows in database."))
                     .properties(
@@ -165,7 +165,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .description("List of rows.")
                             .items(object().additionalProperties(oneOf())))
                     .outputSchema(object().properties(integer()))
-                    .perform(this::performInsert),
+                    .execute(this::performInsert),
                 action(JdbcConstants.UPDATE)
                     .display(display("Update").description("Update rows in database."))
                     .properties(
@@ -193,7 +193,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .description("List of rows.")
                             .items(object().additionalProperties(oneOf())))
                     .outputSchema(object().properties(integer()))
-                    .perform(this::performUpdate),
+                    .execute(this::performUpdate),
                 action(JdbcConstants.DELETE)
                     .display(display("Delete").description("Delete rows from database."))
                     .properties(
@@ -216,7 +216,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .description("List of rows.")
                             .items(object().additionalProperties(oneOf())))
                     .outputSchema(object().properties(integer()))
-                    .perform(this::performDelete),
+                    .execute(this::performDelete),
                 action(JdbcConstants.EXECUTE)
                     .display(display("Execute").description("Execute an SQL DML or DML statement."))
                     .properties(
@@ -237,6 +237,6 @@ public class JdbcComponentHandler implements ComponentHandler {
                                 "The list of properties which should be used as parameters.")
                             .properties(bool(), dateTime(), number(), string()))
                     .outputSchema(object().properties(integer()))
-                    .perform(this::performExecute));
+                    .execute(this::performExecute));
     }
 }

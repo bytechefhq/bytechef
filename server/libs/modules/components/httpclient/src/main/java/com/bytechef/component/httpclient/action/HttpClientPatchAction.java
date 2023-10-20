@@ -20,7 +20,7 @@ package com.bytechef.component.httpclient.action;
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.PATCH;
@@ -53,9 +53,9 @@ public class HttpClientPatchAction {
 
                 HttpClientActionUtils.options(true)))
         .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
-        .perform(HttpClientPatchAction::performPatch);
+        .execute(HttpClientPatchAction::executePatch);
 
-    public static Object performPatch(Context context, Parameters parameters) {
-        return HttpClientActionUtils.execute(context, parameters, RequestMethod.PATCH);
+    public static Object executePatch(Context context, InputParameters inputParameters) {
+        return HttpClientActionUtils.execute(context, inputParameters, RequestMethod.PATCH);
     }
 }

@@ -119,7 +119,7 @@ public class FileEntry {
     }
 
     public Context.FileEntry toContextFileEntry() {
-        return new FileEntryImpl(this);
+        return new ContextFileEntry(this);
     }
 
     public Map<String, String> toMap() {
@@ -139,21 +139,21 @@ public class FileEntry {
             + url + '\'' + '}';
     }
 
-    private static class FileEntryImpl implements Context.FileEntry {
+    private static class ContextFileEntry implements Context.FileEntry {
 
         private final String extension;
         private final String mimeType;
         private final String name;
         private final String url;
 
-        public FileEntryImpl(String extension, String mimeType, String name, String url) {
+        public ContextFileEntry(String extension, String mimeType, String name, String url) {
             this.extension = extension;
             this.mimeType = mimeType;
             this.name = name;
             this.url = url;
         }
 
-        public FileEntryImpl(FileEntry fileEntry) {
+        public ContextFileEntry(com.bytechef.hermes.file.storage.domain.FileEntry fileEntry) {
             this(fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
         }
 
@@ -179,7 +179,7 @@ public class FileEntry {
 
         @Override
         public String toString() {
-            return "FileEntryImpl{" +
+            return "ContextFileEntry{" +
                 "extension='" + extension + '\'' +
                 ", mimeType='" + mimeType + '\'' +
                 ", name='" + name + '\'' +
@@ -192,7 +192,7 @@ public class FileEntry {
 
         @Override
         public Context.FileEntry convert(Map<?, ?> source) {
-            return new FileEntryImpl(
+            return new ContextFileEntry(
                 (String) source.get("extension"),
                 (String) source.get("mimeType"),
                 (String) source.get("name"),

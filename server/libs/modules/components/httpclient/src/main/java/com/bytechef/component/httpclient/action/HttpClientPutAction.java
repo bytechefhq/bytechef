@@ -20,7 +20,7 @@ package com.bytechef.component.httpclient.action;
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.PUT;
@@ -53,9 +53,9 @@ public class HttpClientPutAction {
 
                 HttpClientActionUtils.options(true)))
         .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
-        .perform(HttpClientPutAction::performPut);
+        .execute(HttpClientPutAction::executePut);
 
-    public static Object performPut(Context context, Parameters parameters) {
-        return HttpClientActionUtils.execute(context, parameters, RequestMethod.PUT);
+    public static Object executePut(Context context, InputParameters inputParameters) {
+        return HttpClientActionUtils.execute(context, inputParameters, RequestMethod.PUT);
     }
 }

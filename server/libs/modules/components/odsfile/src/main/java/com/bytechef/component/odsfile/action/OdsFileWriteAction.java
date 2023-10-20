@@ -18,7 +18,7 @@
 package com.bytechef.component.odsfile.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.github.miachm.sods.Range;
@@ -72,20 +72,20 @@ public class OdsFileWriteAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .perform(OdsFileWriteAction::performWrite);
+        .execute(OdsFileWriteAction::executeWrite);
 
-    public static Context.FileEntry performWrite(Context context, Parameters parameters) {
-        String fileName = parameters.getString(FILENAME, "file.ods");
+    public static Context.FileEntry executeWrite(Context context, InputParameters inputParameters) {
+        String fileName = inputParameters.getString(FILENAME, "file.ods");
         @SuppressWarnings("unchecked")
-        List<Map<String, ?>> rows = (List) parameters.getList(ROWS, Map.class, List.of());
+        List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, Map.class, List.of());
 
-        String sheetName = parameters.getString(SHEET_NAME, "Sheet");
+        String sheetName = inputParameters.getString(SHEET_NAME, "Sheet");
 
         try {
             return context.storeFileContent(
                 fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))));
         } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to handle action " + parameters, ioException);
+            throw new ComponentExecutionException("Unable to handle action " + inputParameters, ioException);
         }
     }
 

@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.component.xmlhelper.action.XmlHelperParseAction;
 import com.bytechef.component.xmlhelper.action.XmlHelperStringifyAction;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.util.XmlUtils;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.util.List;
@@ -44,10 +44,10 @@ public class XmlHelperComponentHandlerTest {
     }
 
     @Test
-    public void testPerformParse() {
-        Parameters parameters = Mockito.mock(Parameters.class);
+    public void testExecuteParse() {
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
-        Mockito.when(parameters.getRequiredString(SOURCE))
+        Mockito.when(inputParameters.getRequiredString(SOURCE))
             .thenReturn(
                 """
                     <Flower id="45">
@@ -55,10 +55,10 @@ public class XmlHelperComponentHandlerTest {
                     </Flower>
                     """);
 
-        assertThat((Map<String, ?>) XmlHelperParseAction.performParse(context, parameters))
+        assertThat((Map<String, ?>) XmlHelperParseAction.executeParse(context, inputParameters))
             .isEqualTo(Map.of("id", "45", "name", "Poppy"));
 
-        Mockito.when(parameters.getRequiredString(SOURCE))
+        Mockito.when(inputParameters.getRequiredString(SOURCE))
             .thenReturn(
                 """
                     <Flowers>
@@ -71,21 +71,21 @@ public class XmlHelperComponentHandlerTest {
                     </Flowers>
                     """);
 
-        assertThat(XmlHelperParseAction.performParse(context, parameters))
+        assertThat(XmlHelperParseAction.executeParse(context, inputParameters))
             .isEqualTo(Map.of(
                 "Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
     }
 
     @Test
-    public void testPerformStringify() {
-        Parameters parameters = Mockito.mock(Parameters.class);
+    public void testExecuteStringify() {
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
         Map<String, ?> source = Map.of("id", 45, "name", "Poppy");
 
-        Mockito.when(parameters.getRequired(SOURCE))
+        Mockito.when(inputParameters.getRequired(SOURCE))
             .thenReturn(source);
 
-        assertThat(XmlHelperStringifyAction.performStringify(context, parameters))
+        assertThat(XmlHelperStringifyAction.executeStringify(context, inputParameters))
             .isEqualTo(XmlUtils.write(source));
     }
 }

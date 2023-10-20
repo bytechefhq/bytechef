@@ -19,7 +19,7 @@ package com.bytechef.component.aws.s3.action;
 
 import com.bytechef.component.aws.s3.util.AmazonS3Uri;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -60,16 +60,16 @@ public class AwsS3PutObjectAction {
             string(ACL).label("ACL")
                 .description("The canned ACL to apply to the object."))
         .outputSchema(string())
-        .perform(AwsS3PutObjectAction::performPutObject);
+        .execute(AwsS3PutObjectAction::performPutObject);
 
-    public static Object performPutObject(Context context, Parameters parameters) {
-        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(parameters.getRequiredString(URI));
+    public static Object performPutObject(Context context, InputParameters inputParameters) {
+        AmazonS3Uri amazonS3Uri = new AmazonS3Uri(inputParameters.getRequiredString(URI));
 
         String bucketName = amazonS3Uri.getBucket();
         String key = amazonS3Uri.getKey();
 
         S3ClientBuilder builder = S3Client.builder();
-        Context.FileEntry fileEntry = parameters.get(FILE_ENTRY, Context.FileEntry.class);
+        Context.FileEntry fileEntry = inputParameters.get(FILE_ENTRY, Context.FileEntry.class);
 
         try (S3Client s3Client = builder.build()) {
             Path tempFilePath = Files.createTempFile("", ".tmp");
@@ -81,8 +81,8 @@ public class AwsS3PutObjectAction {
                     .bucket(bucketName)
                     .key(key)
                     .acl(
-                        parameters.getString(ACL) != null
-                            ? ObjectCannedACL.fromValue(parameters.getString(ACL))
+                        inputParameters.getString(ACL) != null
+                            ? ObjectCannedACL.fromValue(inputParameters.getString(ACL))
                             : null)
                     .build(),
                 tempFilePath);

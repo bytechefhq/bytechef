@@ -19,7 +19,7 @@ package com.bytechef.component.filestorage.action;
 
 import com.bytechef.component.filestorage.constant.FileStorageConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
@@ -60,14 +60,14 @@ public class FileStorageDownloadAction {
                     "Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
         .outputSchema(fileEntry())
-        .perform(FileStorageDownloadAction::performDownload);
+        .execute(FileStorageDownloadAction::executeDownload);
 
     /**
-     * Performs the download of a file (given its URL).
+     * executes the download of a file (given its URL).
      */
-    public static Context.FileEntry performDownload(Context context, Parameters parameters) {
+    public static Context.FileEntry executeDownload(Context context, InputParameters inputParameters) {
         try {
-            URL url = new URL(parameters.getRequiredString(FileStorageConstants.URL));
+            URL url = new URL(inputParameters.getRequiredString(FileStorageConstants.URL));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             connection.connect();
@@ -83,7 +83,7 @@ public class FileStorageDownloadAction {
                 }
 
                 try (FileInputStream fileInputStream = new FileInputStream(downloadedFile)) {
-                    return context.storeFileContent(parameters.getRequiredString(FILENAME), fileInputStream);
+                    return context.storeFileContent(inputParameters.getRequiredString(FILENAME), fileInputStream);
                 }
             }
 

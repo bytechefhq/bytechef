@@ -18,7 +18,7 @@
 package com.bytechef.component.aws.s3.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -59,21 +59,21 @@ public class AwsS3ListObjectsAction {
                 .description("The prefix of an AWS S3 objects.")
                 .required(true))
         .outputSchema(array().items(object().properties(string("key"), string("suffix"), string("uri"))))
-        .perform(AwsS3ListObjectsAction::performListObjects);
+        .execute(AwsS3ListObjectsAction::executeListObjects);
 
-    public static List<S3ObjectDescription> performListObjects(
-        Context context, Parameters parameters) {
+    public static List<S3ObjectDescription> executeListObjects(
+        Context context, InputParameters inputParameters) {
         S3ClientBuilder builder = S3Client.builder();
 
         try (S3Client s3Client = builder.build()) {
             ListObjectsResponse response = s3Client.listObjects(ListObjectsRequest.builder()
-                .bucket(parameters.getRequiredString(BUCKET))
-                .prefix(parameters.getRequiredString(PREFIX))
+                .bucket(inputParameters.getRequiredString(BUCKET))
+                .prefix(inputParameters.getRequiredString(PREFIX))
                 .build());
 
             return response.contents()
                 .stream()
-                .map(o -> new S3ObjectDescription(parameters.getRequiredString(BUCKET), o))
+                .map(o -> new S3ObjectDescription(inputParameters.getRequiredString(BUCKET), o))
                 .collect(Collectors.toList());
         }
     }

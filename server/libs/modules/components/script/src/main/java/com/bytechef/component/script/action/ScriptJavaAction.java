@@ -19,7 +19,7 @@ package com.bytechef.component.script.action;
 
 import com.bytechef.component.script.constant.ScriptConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.definition.Property;
 
@@ -50,9 +50,9 @@ public class ScriptJavaAction {
                 .description("Add your Java custom logic here.")
                 .controlType(Property.ControlType.CODE_EDITOR))
         .outputSchema(oneOf())
-        .perform(ScriptJavaAction::performJava);
+        .execute(ScriptJavaAction::executeJava);
 
-    public static Object performJava(Context context, Parameters parameters) {
-        return ScriptConstants.POLYGLOT_ENGINE.execute("java", parameters);
+    public static Object executeJava(Context context, InputParameters inputParameters) {
+        return ScriptConstants.POLYGLOT_ENGINE.execute("java", inputParameters);
     }
 }

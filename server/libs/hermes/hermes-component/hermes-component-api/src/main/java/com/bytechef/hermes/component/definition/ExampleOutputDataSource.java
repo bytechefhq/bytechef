@@ -18,10 +18,8 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import java.util.function.BiFunction;
 
 /**
  * @author Ivica Cardic
@@ -34,5 +32,20 @@ public sealed interface ExampleOutputDataSource permits ComponentDSL.ModifiableE
      *
      * @return The function implementation
      */
-    BiFunction<Context.Connection, Parameters, Object> getExampleOutputFunction();
+    ExampleOutputFunction getExampleOutput();
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ExampleOutputFunction {
+
+        /**
+         *
+         * @param connection
+         * @param inputParameters
+         * @return
+         */
+        Object apply(Context.Connection connection, InputParameters inputParameters);
+    }
 }

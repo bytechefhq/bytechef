@@ -49,7 +49,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
             HttpClientDeleteAction.ACTION_DEFINITION,
             HttpClientHeadAction.ACTION_DEFINITION)
         .connection(HttpClientConnection.CONNECTION_DEFINITION)
-        .filterCompatibleConnectionDefinitionsFunction(
+        .filterCompatibleConnectionDefinitions(
             (componentDefinition, connectionDefinitions) -> connectionDefinitions.stream()
                 .filter(ConnectionDefinition::containsAuthorizations)
                 .toList());

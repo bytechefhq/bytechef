@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -29,9 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * @author Ivica Cardic
@@ -58,7 +55,7 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
     String VALUE = "value";
 
     enum AuthorizationType {
-        API_KEY((AuthorizationContext authorizationContext, Context.Connection connection) -> {
+        API_KEY((AuthorizationContext authorizationContext, Connection connection) -> {
             String addTo = connection.getParameter(ADD_TO, ApiTokenLocation.HEADER.name());
 
             if (ApiTokenLocation.valueOf(addTo.toUpperCase()) == ApiTokenLocation.HEADER) {
@@ -69,42 +66,42 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
                     Map.of(connection.getParameter(KEY, API_TOKEN), List.of(connection.getParameter(VALUE, ""))));
             }
         }),
-        BASIC_AUTH((AuthorizationContext authorizationContext, Context.Connection connection) -> authorizationContext
+        BASIC_AUTH((AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
             .setHeaders(
                 getBasicAuthorizationHeader(connection.getParameter(USERNAME), connection.getParameter(PASSWORD)))),
         BEARER_TOKEN(
-            (AuthorizationContext authorizationContext, Context.Connection connection) -> authorizationContext
+            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
                 .setHeaders(
                     Map.of(Constants.AUTHORIZATION, List.of(Constants.BEARER + " " + connection.getParameter(TOKEN))))),
         CUSTOM(null),
-        DIGEST_AUTH((AuthorizationContext authorizationContext, Context.Connection connection) -> authorizationContext
+        DIGEST_AUTH((AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
             .setHeaders(
                 getBasicAuthorizationHeader(connection.getParameter(USERNAME), connection.getParameter(PASSWORD)))),
         OAUTH2_AUTHORIZATION_CODE(
-            (AuthorizationContext authorizationContext, Context.Connection connection) -> authorizationContext
+            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
                 .setHeaders(getOAuth2Headers(connection))),
         OAUTH2_AUTHORIZATION_CODE_PKCE(
-            (AuthorizationContext authorizationContext, Context.Connection connection) -> authorizationContext
+            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
                 .setHeaders(getOAuth2Headers(connection))),
         OAUTH2_CLIENT_CREDENTIALS(
-            (AuthorizationContext authorizationContext, Context.Connection connection) -> authorizationContext
+            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
                 .setHeaders(getOAuth2Headers(connection))),
         OAUTH2_IMPLICIT_CODE(
-            (AuthorizationContext authorizationContext, Context.Connection connection) -> authorizationContext
+            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
                 .setHeaders(getOAuth2Headers(connection))),
         OAUTH2_RESOURCE_OWNER_PASSWORD(
-            (AuthorizationContext authorizationContext, Context.Connection connection) -> authorizationContext
+            (AuthorizationContext authorizationContext, Connection connection) -> authorizationContext
                 .setHeaders(getOAuth2Headers(connection)));
 
         private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
-        private final BiConsumer<AuthorizationContext, Context.Connection> defaultApplyConsumer;
+        private final ApplyConsumer defaultApplyConsumer;
 
-        AuthorizationType(BiConsumer<AuthorizationContext, Context.Connection> defaultApplyConsumer) {
+        AuthorizationType(ApplyConsumer defaultApplyConsumer) {
             this.defaultApplyConsumer = defaultApplyConsumer;
         }
 
-        public BiConsumer<AuthorizationContext, Context.Connection> getDefaultApplyConsumer() {
+        public ApplyConsumer getDefaultApply() {
             return defaultApplyConsumer;
         }
 
@@ -121,7 +118,7 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
                 List.of("Basic " + ENCODER.encodeToString(valueToEncode.getBytes(StandardCharsets.UTF_8))));
         }
 
-        private static Map<String, List<String>> getOAuth2Headers(Context.Connection connection) {
+        private static Map<String, List<String>> getOAuth2Headers(Connection connection) {
             return Map.of(
                 Constants.AUTHORIZATION,
                 List.of(
@@ -135,17 +132,17 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
         QUERY_PARAMETERS,
     }
 
-    Optional<Function<Context.Connection, String>> getAcquireFunction();
+    Optional<AcquireFunction> getAcquire();
 
-    BiConsumer<AuthorizationContext, Context.Connection> getApplyConsumer();
+    ApplyConsumer getApply();
 
-    QuadFunction<Context.Connection, String, String, String, AuthorizationCallbackResponse> getAuthorizationCallbackFunction();
+    AuthorizationCallbackFunction getAuthorizationCallback();
 
-    Function<Context.Connection, String> getAuthorizationUrlFunction();
+    AuthorizationUrlFunction getAuthorizationUrl();
 
-    Function<Context.Connection, String> getClientIdFunction();
+    ClientIdFunction getClientId();
 
-    Function<Context.Connection, String> getClientSecretFunction();
+    ClientSecretFunction getClientSecret();
 
     List<Object> getDetectOn();
 
@@ -153,22 +150,185 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
 
     String getName();
 
+    PkceFunction getPkce();
+
+    List<? extends Property<?>> getProperties();
+
+    Optional<RefreshFunction> getRefresh();
+
     List<Object> getRefreshOn();
 
-    BiFunction<String, String, Pkce> getPkceFunction();
+    RefreshUrlFunction getRefreshUrl();
 
-    List<Property<?>> getProperties();
+    ScopesFunction getScopes();
 
-    Optional<Function<Context.Connection, String>> getRefreshFunction();
-
-    Function<Context.Connection, String> getRefreshUrlFunction();
-
-    Function<Context.Connection, List<String>> getScopesFunction();
-
-    Function<Context.Connection, String> getTokenUrlFunction();
+    TokenUrlFunction getTokenUrl();
 
     AuthorizationType getType();
 
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface AcquireFunction {
+
+        /**
+         *
+         * @param connection
+         * @return
+         */
+        String apply(Connection connection);
+    }
+
+    @FunctionalInterface
+    interface ApplyConsumer {
+
+        /**
+         *
+         * @param authorizationContext
+         * @param connection
+         */
+        void accept(AuthorizationContext authorizationContext, Connection connection);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface AuthorizationCallbackFunction {
+
+        /**
+         *
+         * @param connection
+         * @param code
+         * @param redirectUri
+         * @param codeVerifier
+         * @return
+         */
+        AuthorizationCallbackResponse apply(
+            Connection connection, String code, String redirectUri, String codeVerifier);
+    }
+
+    interface AuthorizationContext {
+
+        void setHeaders(Map<String, List<String>> headers);
+
+        void setQueryParameters(Map<String, List<String>> queryParameters);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface AuthorizationUrlFunction {
+
+        /**
+         *
+         * @param connection
+         * @return
+         */
+        String apply(Connection connection);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ClientIdFunction {
+
+        /**
+         *
+         * @param connection
+         * @return
+         */
+        String apply(Connection connection);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ClientSecretFunction {
+
+        /**
+         *
+         * @param connection
+         * @return
+         */
+        String apply(Connection connection);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface PkceFunction {
+
+        Pkce apply(String verifier, String challenge);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface RefreshFunction {
+
+        /**
+         *
+         * @param connection
+         * @return
+         */
+        String apply(Connection connection);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface RefreshUrlFunction {
+
+        /**
+         *
+         * @param connection
+         * @return
+         */
+        String apply(Connection connection);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ScopesFunction {
+
+        /**
+         *
+         * @param connection
+         * @return
+         */
+        List<String> apply(Connection connection);
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface TokenUrlFunction {
+
+        /**
+         *
+         * @param connection
+         * @return
+         */
+        String apply(Connection connection);
+    }
+
+    /**
+     *
+     * @param accessToken
+     * @param refreshToken
+     * @param additionalParameters
+     */
     @SuppressFBWarnings("EI")
     record AuthorizationCallbackResponse(
         String accessToken, String refreshToken, Map<String, Object> additionalParameters) {
@@ -185,19 +345,6 @@ public sealed interface Authorization permits ComponentDSL.ModifiableAuthorizati
         }
     }
 
-    interface AuthorizationContext {
-
-        void setHeaders(Map<String, List<String>> headers);
-
-        void setQueryParameters(Map<String, List<String>> queryParameters);
-    }
-
     record Pkce(String verifier, String challenge, String challengeMethod) {
-    }
-
-    @FunctionalInterface
-    interface QuadFunction<T, U, V, Z, R> {
-
-        R apply(T t, U u, V v, Z z);
     }
 }

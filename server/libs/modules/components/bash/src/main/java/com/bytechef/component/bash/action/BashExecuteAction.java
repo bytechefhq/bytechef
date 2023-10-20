@@ -18,7 +18,7 @@
 package com.bytechef.component.bash.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -52,13 +52,13 @@ public class BashExecuteAction {
             .description("Script written in bash.")
             .required(true))
         .outputSchema(string())
-        .perform(BashExecuteAction::performExecute);
+        .execute(BashExecuteAction::execute);
 
-    public static String performExecute(Context context, Parameters parameters) {
+    public static String execute(Context context, InputParameters inputParameters) {
         try {
             File scriptFile = File.createTempFile("_script", ".sh");
 
-            writeStringToFile(scriptFile, parameters.getRequiredString(SCRIPT));
+            writeStringToFile(scriptFile, inputParameters.getRequiredString(SCRIPT));
 
             try {
                 Runtime runtime = Runtime.getRuntime();
@@ -79,7 +79,7 @@ public class BashExecuteAction {
                 deleteRecursively(scriptFile.toPath());
             }
         } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to handle action " + parameters, exception);
+            throw new ComponentExecutionException("Unable to handle action " + inputParameters, exception);
         }
     }
 

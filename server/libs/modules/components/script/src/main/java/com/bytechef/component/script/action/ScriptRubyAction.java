@@ -19,7 +19,7 @@ package com.bytechef.component.script.action;
 
 import com.bytechef.component.script.constant.ScriptConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.definition.Property;
 
@@ -49,9 +49,9 @@ public class ScriptRubyAction {
                 .description("Add your Ruby custom logic here.")
                 .controlType(Property.ControlType.CODE_EDITOR))
         .outputSchema(oneOf())
-        .perform(ScriptRubyAction::performRuby);
+        .execute(ScriptRubyAction::executeRuby);
 
-    public static Object performRuby(Context context, Parameters parameters) {
-        return ScriptConstants.POLYGLOT_ENGINE.execute("ruby", parameters);
+    public static Object executeRuby(Context context, InputParameters inputParameters) {
+        return ScriptConstants.POLYGLOT_ENGINE.execute("ruby", inputParameters);
     }
 }

@@ -18,7 +18,7 @@
 package com.bytechef.component.csvfile.action;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -69,11 +69,11 @@ public class CsvFileWriteAction {
                 .defaultValue("file.csv")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .perform(CsvFileWriteAction::performWrite);
+        .execute(CsvFileWriteAction::executeWrite);
 
-    public static Context.FileEntry performWrite(Context context, Parameters parameters) {
+    public static Context.FileEntry executeWrite(Context context, InputParameters inputParameters) {
         @SuppressWarnings("unchecked")
-        List<Map<String, ?>> rows = (List) parameters.getList(ROWS, Map.class, List.of());
+        List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, Map.class, List.of());
 
         try (InputStream inputStream = new ByteArrayInputStream(write(rows))) {
             return context.storeFileContent("file.csv", inputStream);

@@ -20,7 +20,7 @@ package com.bytechef.component.csvfile.action;
 import com.bytechef.component.csvfile.CsvFileComponentHandler;
 import com.bytechef.component.csvfile.constant.CsvFileConstants;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.ValueUtils;
@@ -102,17 +102,18 @@ public class CsvFileReadAction {
                 .defaultValue(false)
                 .advancedOption(true))
         .outputSchema(array())
-        .perform(CsvFileReadAction::performRead);
+        .execute(CsvFileReadAction::executeRead);
 
-    public static List<Map<String, Object>> performRead(Context context, Parameters parameters) {
-        String delimiter = parameters.getString(DELIMITER, ",");
-        boolean headerRow = parameters.getBoolean(HEADER_ROW, true);
-        boolean includeEmptyCells = parameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
-        Integer pageSize = parameters.getInteger(PAGE_SIZE);
-        Integer pageNumber = parameters.getInteger(PAGE_NUMBER);
-        boolean readAsString = parameters.getBoolean(READ_AS_STRING, false);
+    public static List<Map<String, Object>> executeRead(Context context, InputParameters inputParameters) {
+        String delimiter = inputParameters.getString(DELIMITER, ",");
+        boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
+        boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
+        Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
+        Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
+        boolean readAsString = inputParameters.getBoolean(READ_AS_STRING, false);
 
-        try (InputStream inputStream = context.getFileStream(parameters.get(FILE_ENTRY, Context.FileEntry.class))) {
+        try (
+            InputStream inputStream = context.getFileStream(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))) {
             Integer rangeStartRow = null;
             Integer rangeEndRow = null;
 

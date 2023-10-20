@@ -17,13 +17,12 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.Context.Connection;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.definition.Option;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.List;
-import java.util.function.BiFunction;
 
 /**
  * @author Ivica Cardic
@@ -37,5 +36,20 @@ public sealed interface ComponentOptionsDataSource
      *
      * @return The function implementation
      */
-    BiFunction<Context.Connection, Parameters, List<Option>> getOptionsFunction();
+    OptionsFunction getOptions();
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface OptionsFunction {
+
+        /**
+         *
+         * @param connection
+         * @param inputParameters
+         * @return
+         */
+        List<Option> apply(Connection connection, InputParameters inputParameters);
+    }
 }

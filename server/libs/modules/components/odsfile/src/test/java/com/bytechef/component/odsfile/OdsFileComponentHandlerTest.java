@@ -31,7 +31,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.bytechef.component.odsfile.action.OdsFileReadAction;
 import com.bytechef.component.odsfile.action.OdsFileWriteAction;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.Parameters;
+import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -65,12 +65,12 @@ public class OdsFileComponentHandlerTest {
     }
 
     @Test
-    public void testPerformReadODS() throws IOException, JSONException {
+    public void testExecuteReadODS() throws IOException, JSONException {
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
-            new JSONArray((List) OdsFileReadAction.performRead(
+            new JSONArray((List) OdsFileReadAction.executeRead(
                 context, getReadParameters(true, false, null, null, false, getFile("sample_header.ods")))),
             true);
 
@@ -78,7 +78,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(true, false)),
-            new JSONArray((List) OdsFileReadAction.performRead(
+            new JSONArray((List) OdsFileReadAction.executeRead(
                 context, getReadParameters(true, true, null, null, false, getFile("sample_header.ods")))),
             true);
 
@@ -86,7 +86,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, true)),
-            new JSONArray((List) OdsFileReadAction.performRead(
+            new JSONArray((List) OdsFileReadAction.executeRead(
                 context, getReadParameters(true, false, null, null, true, getFile("sample_header.ods")))),
             true);
 
@@ -94,7 +94,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(true, true)),
-            new JSONArray((List) OdsFileReadAction.performRead(
+            new JSONArray((List) OdsFileReadAction.executeRead(
                 context, getReadParameters(true, true, null, null, true, getFile("sample_header.ods")))),
             true);
 
@@ -102,7 +102,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(false, false)),
-            new JSONArray((List) OdsFileReadAction.performRead(
+            new JSONArray((List) OdsFileReadAction.executeRead(
                 context, getReadParameters(false, false, null, null, false, getFile("sample_no_header.ods")))),
             true);
 
@@ -110,7 +110,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(false, true)),
-            new JSONArray((List) OdsFileReadAction.performRead(
+            new JSONArray((List) OdsFileReadAction.executeRead(
                 context, getReadParameters(false, false, null, null, true, getFile("sample_no_header.ods")))),
             true);
 
@@ -118,7 +118,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(true, false)),
-            new JSONArray((List) OdsFileReadAction.performRead(
+            new JSONArray((List) OdsFileReadAction.executeRead(
                 context, getReadParameters(false, true, null, null, false, getFile("sample_no_header.ods")))),
             true);
 
@@ -126,7 +126,7 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(true, true)),
-            new JSONArray((List) OdsFileReadAction.performRead(
+            new JSONArray((List) OdsFileReadAction.executeRead(
                 context, getReadParameters(false, true, null, null, true, getFile("sample_no_header.ods")))),
             true);
 
@@ -134,18 +134,18 @@ public class OdsFileComponentHandlerTest {
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
-            new JSONArray((List) OdsFileReadAction.performRead(
+            new JSONArray((List) OdsFileReadAction.executeRead(
                 context, getReadParameters(true, false, 1, 3, false, getFile("sample_header.ods")))),
             true);
     }
 
     @Test
-    public void testPerformWriteODS() throws JSONException, IOException {
+    public void testExecuteWriteODS() throws JSONException, IOException {
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
-        Parameters parameters = getWriteParameters(new JSONArray(jsonContent).toList());
+        InputParameters inputParameters = getWriteParameters(new JSONArray(jsonContent).toList());
 
-        OdsFileWriteAction.performWrite(context, parameters);
+        OdsFileWriteAction.executeWrite(context, inputParameters);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -314,7 +314,7 @@ public class OdsFileComponentHandlerTest {
             .getFile());
     }
 
-    private Parameters getReadParameters(
+    private InputParameters getReadParameters(
         boolean headerRow,
         boolean includeEmptyCells,
         Integer pageNumber,
@@ -322,19 +322,19 @@ public class OdsFileComponentHandlerTest {
         boolean readAsString,
         File file)
         throws FileNotFoundException {
-        Parameters parameters = Mockito.mock(Parameters.class);
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
-        Mockito.when(parameters.get(FILE_ENTRY, Context.FileEntry.class))
+        Mockito.when(inputParameters.get(FILE_ENTRY, Context.FileEntry.class))
             .thenReturn(Mockito.mock(Context.FileEntry.class));
-        Mockito.when(parameters.getBoolean(HEADER_ROW, true))
+        Mockito.when(inputParameters.getBoolean(HEADER_ROW, true))
             .thenReturn(headerRow);
-        Mockito.when(parameters.getBoolean(INCLUDE_EMPTY_CELLS, false))
+        Mockito.when(inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false))
             .thenReturn(includeEmptyCells);
-        Mockito.when(parameters.getInteger(PAGE_NUMBER))
+        Mockito.when(inputParameters.getInteger(PAGE_NUMBER))
             .thenReturn(pageNumber);
-        Mockito.when(parameters.getInteger(PAGE_SIZE))
+        Mockito.when(inputParameters.getInteger(PAGE_SIZE))
             .thenReturn(pageSize);
-        Mockito.when(parameters.getBoolean(READ_AS_STRING, false))
+        Mockito.when(inputParameters.getBoolean(READ_AS_STRING, false))
             .thenReturn(readAsString);
 
         if (file != null) {
@@ -342,21 +342,21 @@ public class OdsFileComponentHandlerTest {
                 .thenReturn(new FileInputStream(file));
         }
 
-        return parameters;
+        return inputParameters;
     }
 
     @SuppressWarnings("unchecked")
-    private Parameters getWriteParameters(List items) {
-        Parameters parameters = Mockito.mock(Parameters.class);
+    private InputParameters getWriteParameters(List items) {
+        InputParameters inputParameters = Mockito.mock(InputParameters.class);
 
-        Mockito.when(parameters.getString(FILENAME, "file.ods"))
+        Mockito.when(inputParameters.getString(FILENAME, "file.ods"))
             .thenReturn("file.ods");
-        Mockito.when(parameters.getList(ROWS, Map.class, List.of()))
+        Mockito.when(inputParameters.getList(ROWS, Map.class, List.of()))
             .thenReturn(items);
-        Mockito.when(parameters.getString(SHEET_NAME, "Sheet"))
+        Mockito.when(inputParameters.getString(SHEET_NAME, "Sheet"))
             .thenReturn("Sheet");
 
-        return parameters;
+        return inputParameters;
     }
 
     private static List<Map<String, ?>> read(InputStream inputStream) throws IOException {
