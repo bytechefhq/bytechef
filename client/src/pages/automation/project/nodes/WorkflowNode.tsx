@@ -12,7 +12,7 @@ import {twMerge} from 'tailwind-merge';
 
 import EditNodeDialog from '../components/EditNodeDialog';
 import useNodeClickHandler from '../hooks/useNodeClick';
-import useNodeDetailsDialogStore from '../stores/useNodeDetailsDialogStore';
+import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import styles from './NodeTypes.module.css';
 
 const WorkflowNode = ({id, data}: NodeProps) => {

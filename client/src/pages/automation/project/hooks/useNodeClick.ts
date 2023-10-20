@@ -1,7 +1,7 @@
 import {useCallback} from 'react';
 import {NodeProps, useReactFlow} from 'reactflow';
 
-import useNodeDetailsDialogStore from '../stores/useNodeDetailsDialogStore';
+import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 
 export default function useNodeClick(
     data: NodeProps['data'],
