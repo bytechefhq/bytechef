@@ -18,7 +18,7 @@
 package com.bytechef.hermes.definition.registry.remote.web.rest.service;
 
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.definition.registry.dto.ConnectionDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OAuth2AuthorizationParametersDTO;
@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,16 +59,13 @@ public class ConnectionDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Map<String, Map<String, List<String>>>> executeAuthorizationApply(
+    public ResponseEntity<ApplyResponse> executeAuthorizationApply(
         @Valid @RequestBody Connection connection) {
-        Map<String, List<String>> headers = new HashMap<>();
-        Map<String, List<String>> queryParameters = new HashMap<>();
 
-        connectionDefinitionService.executeAuthorizationApply(
-            connection.componentName, connection.connectionVersion, connection.parameters, connection.authorizationName,
-            new AuthorizationContextImpl(headers, queryParameters));
-
-        return ResponseEntity.ok(Map.of("headers", headers, "queryParameters", queryParameters));
+        return ResponseEntity.ok(
+            connectionDefinitionService.executeAuthorizationApply(
+                connection.componentName, connection.connectionVersion, connection.parameters,
+                connection.authorizationName));
     }
 
     @RequestMapping(
@@ -169,20 +165,6 @@ public class ConnectionDefinitionServiceController {
         return ResponseEntity.ok(connectionDefinitionService.getOAuth2Parameters(
             connection.componentName, connection.connectionVersion, connection.parameters,
             connection.authorizationName));
-    }
-
-    record AuthorizationContextImpl(Map<String, List<String>> headers, Map<String, List<String>> queryParameters)
-        implements AuthorizationContext {
-
-        @Override
-        public void setHeaders(Map<String, List<String>> headers) {
-            this.headers.putAll(headers);
-        }
-
-        @Override
-        public void setQueryParameters(Map<String, List<String>> queryParameters) {
-            this.queryParameters.putAll(queryParameters);
-        }
     }
 
     private record AuthorizationCallbackRequest(Connection connection, String redirectUri) {

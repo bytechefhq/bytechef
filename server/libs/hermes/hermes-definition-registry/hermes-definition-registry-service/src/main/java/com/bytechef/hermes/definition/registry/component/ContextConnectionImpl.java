@@ -18,7 +18,7 @@
 package com.bytechef.hermes.definition.registry.component;
 
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.definition.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -50,9 +50,9 @@ public class ContextConnectionImpl implements Context.Connection {
     }
 
     @Override
-    public void applyAuthorization(AuthorizationContext authorizationContext) {
-        connectionDefinitionService.executeAuthorizationApply(
-            componentName, connectionVersion, parameters, authorizationName, authorizationContext);
+    public ApplyResponse applyAuthorization() {
+        return connectionDefinitionService.executeAuthorizationApply(
+            componentName, connectionVersion, parameters, authorizationName);
     }
 
     @Override

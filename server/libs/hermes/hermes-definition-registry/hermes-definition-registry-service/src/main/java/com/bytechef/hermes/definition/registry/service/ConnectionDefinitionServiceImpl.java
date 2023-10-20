@@ -19,7 +19,7 @@ package com.bytechef.hermes.definition.registry.service;
 
 import com.bytechef.commons.util.MapValueUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.Authorization.ApplyConsumer;
+import com.bytechef.hermes.component.definition.Authorization.ApplyFunction;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.Authorization.ClientSecretFunction;
 import com.bytechef.hermes.component.definition.Authorization.TokenUrlFunction;
@@ -34,7 +34,7 @@ import com.bytechef.hermes.definition.registry.component.ComponentDefinitionRegi
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackFunction;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationContext;
+import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationUrlFunction;
 import com.bytechef.hermes.component.definition.Authorization.ClientIdFunction;
 import com.bytechef.hermes.component.definition.Authorization.ScopesFunction;
@@ -76,17 +76,16 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public void executeAuthorizationApply(
-        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName,
-        AuthorizationContext authorizationContext) {
+    public ApplyResponse executeAuthorizationApply(
+        String componentName, int connectionVersion, Map<String, ?> connectionParameters, String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationName);
 
-        ApplyConsumer applyConsumer = OptionalUtils.orElse(
+        ApplyFunction applyFunction = OptionalUtils.orElse(
             authorization.getApply(), AuthorizationUtils.getDefaultApply(authorization.getType()));
 
-        applyConsumer.accept(connectionParameters, authorizationContext);
+        return applyFunction.apply(connectionParameters);
     }
 
     @Override
