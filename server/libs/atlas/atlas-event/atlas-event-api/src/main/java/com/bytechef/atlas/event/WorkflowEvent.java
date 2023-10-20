@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
  */
 public abstract class WorkflowEvent {
 
-    private final LocalDateTime createdDate;
+    protected final LocalDateTime createdDate;
     protected String type;
 
     protected WorkflowEvent() {
@@ -41,10 +41,5 @@ public abstract class WorkflowEvent {
 
     public String getType() {
         return type;
-    }
-
-    @Override
-    public String toString() {
-        return "WorkflowEvent{" + "createTime=" + createdDate + ", type='" + type + '\'' + '}';
     }
 }
