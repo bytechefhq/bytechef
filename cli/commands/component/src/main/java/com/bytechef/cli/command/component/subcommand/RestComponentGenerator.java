@@ -549,7 +549,7 @@ public class RestComponentGenerator {
                 """,
             AUTHORIZATION_CLASS_NAME,
             AUTHORIZATION_CLASS_NAME,
-            "OAuth2 Authorization code",
+            "Authorization Code",
             "Client Id",
             true,
             "Client Secret",
@@ -602,6 +602,84 @@ public class RestComponentGenerator {
         return builder.build();
     }
 
+    private CodeBlock getAuthorizationOAuth2ImplicitCodeBlock(OAuthFlow oAuthFlow) {
+        CodeBlock.Builder builder = CodeBlock.builder();
+
+        builder.add(
+            """
+                authorization(
+                    $T.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name().toLowerCase(),
+                    $T.AuthorizationType.OAUTH2_AUTHORIZATION_CODE
+                )
+                .display(
+                    display($S)
+                )
+                .properties(
+                    string(CLIENT_ID)
+                        .label($S)
+                        .required($L),
+                    string(CLIENT_SECRET)
+                        .label($S)
+                        .required($L)
+                )
+                .authorizationUrl(connection -> $S)
+                .refreshUrl(connection -> $S)
+                .scopes(connection -> $T.of($L))
+                """,
+            AUTHORIZATION_CLASS_NAME,
+            AUTHORIZATION_CLASS_NAME,
+            "Implicit",
+            "Client Id",
+            true,
+            "Client Secret",
+            true,
+            oAuthFlow.getAuthorizationUrl(),
+            oAuthFlow.getRefreshUrl(),
+            List.class,
+            getOAUth2Scopes(oAuthFlow.getScopes()));
+
+        return builder.build();
+    }
+
+    private CodeBlock getAuthorizationOAuth2PasswordCodeBlock(OAuthFlow oAuthFlow) {
+        CodeBlock.Builder builder = CodeBlock.builder();
+
+        builder.add(
+            """
+                authorization(
+                    $T.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS.name().toLowerCase(),
+                    $T.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS
+                )
+                .display(
+                    display($S)
+                )
+                .properties(
+                    string(CLIENT_ID)
+                        .label($S)
+                        .required($L),
+                    string(CLIENT_SECRET)
+                        .label($S)
+                        .required($L)
+                )
+                .refreshUrl(connection -> $S)
+                .scopes(connection -> $T.of($L))
+                .tokenUrl(connection -> $S)
+                """,
+            AUTHORIZATION_CLASS_NAME,
+            AUTHORIZATION_CLASS_NAME,
+            "Resource Owner Password",
+            "Client Id",
+            true,
+            "Client Secret",
+            true,
+            List.class,
+            oAuthFlow.getRefreshUrl(),
+            getOAUth2Scopes(oAuthFlow.getScopes()),
+            oAuthFlow.getTokenUrl());
+
+        return builder.build();
+    }
+
     private CodeBlock getAuthorizationsCodeBlock(Map<String, SecurityScheme> securitySchemeMap) {
         List<CodeBlock> codeBlocks = new ArrayList<>();
 
@@ -640,15 +718,15 @@ public class RestComponentGenerator {
 
                     oAuthFlow = flows.getImplicit();
 
-                    // if (oAuthFlow != null) {
-                    // // TODO
-                    // }
+                    if (oAuthFlow != null) {
+                        codeBlocks.add(getAuthorizationOAuth2ImplicitCodeBlock(oAuthFlow));
+                    }
 
                     oAuthFlow = flows.getPassword();
 
-                    // if (oAuthFlow != null) {
-                    // // TODO
-                    // }
+                    if (oAuthFlow != null) {
+                        codeBlocks.add(getAuthorizationOAuth2PasswordCodeBlock(oAuthFlow));
+                    }
                 } else {
                     throw new IllegalStateException(
                         "Security scheme type %s not supported: ".formatted(securityScheme.getType()));
@@ -1057,7 +1135,7 @@ public class RestComponentGenerator {
                 propertyName,
                 schema.getAdditionalProperties());
         } else {
-            Schema additionalPropertiesSchema = (Schema) schema.getAdditionalProperties();
+            Schema<?> additionalPropertiesSchema = (Schema<?>) schema.getAdditionalProperties();
 
             if (additionalPropertiesSchema.get$ref() == null) {
                 builder.add(
