@@ -19,8 +19,10 @@ package com.bytechef.hermes.integration.facade.impl;
 
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
+import com.bytechef.hermes.integration.domain.Category;
 import com.bytechef.hermes.integration.domain.Integration;
 import com.bytechef.hermes.integration.facade.IntegrationFacade;
+import com.bytechef.hermes.integration.service.CategoryService;
 import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
@@ -30,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,48 +43,53 @@ import java.util.stream.Collectors;
 @Transactional
 public class IntegrationFacadeImpl implements IntegrationFacade {
 
+    private final CategoryService categoryService;
     private final IntegrationService integrationService;
     private final TagService tagService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
-    public IntegrationFacadeImpl(IntegrationService integrationService, TagService tagService,
+    public IntegrationFacadeImpl(
+        CategoryService categoryService, IntegrationService integrationService, TagService tagService,
         WorkflowService workflowService) {
+
+        this.categoryService = categoryService;
         this.integrationService = integrationService;
         this.tagService = tagService;
         this.workflowService = workflowService;
     }
 
     @Override
-    public Integration addWorkflow(long id, String workflowName, String workflowDescription) {
-        Integration integration = integrationService.getIntegration(id);
+    public Integration addWorkflow(long id, String name, String description, String definition) {
+        if (definition == null) {
+            definition = "{\"label\": \"%s\", \"description\": \"%s\", \"tasks\": []}"
+                .formatted(name, description);
+        }
 
-        Workflow workflow = workflowService.create(
-            "{\"label\": \"%s\", \"description\": \"%s\", \"tasks\": []}".formatted(workflowName, workflowDescription),
-            Workflow.Format.JSON, Workflow.SourceType.JDBC);
+        Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
-        integration.addWorkflow(workflow.getId());
-
-        return integrationService.update(integration);
+        return integrationService.addWorkflow(id, workflow.getId());
     }
 
     @Override
-    public Integration create(
-        String name, String description, String category, List<String> workflowIds, List<String> tagNames) {
+    public Integration create(Integration integration) {
+        if (integration.getCategory() != null) {
+            Category category = integration.getCategory();
 
-        if (CollectionUtils.isEmpty(workflowIds)) {
+            integration.setCategory(categoryService.save(category));
+        }
+
+        if (CollectionUtils.isEmpty(integration.getWorkflowIds())) {
             Workflow workflow = workflowService.create(null, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
-            workflowIds = List.of(workflow.getId());
+            integration.setWorkflowIds(Set.of(workflow.getId()));
         }
 
-        Set<Tag> tags = null;
-
-        if (!CollectionUtils.isEmpty(tagNames)) {
-            tags = tagService.create(new HashSet<>(tagNames));
+        if (!CollectionUtils.isEmpty(integration.getTags())) {
+            integration.setTags(tagService.save(integration.getTags()));
         }
 
-        return integrationService.create(name, description, category, new HashSet<>(workflowIds), tags);
+        return integrationService.create(integration);
     }
 
     @Override
@@ -99,7 +105,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public Set<String> getIntegrationTags() {
+    public Set<Tag> getIntegrationTags() {
         List<Integration> integrations = integrationService.getIntegrations();
 
         Set<Long> tagIds = integrations.stream()
@@ -107,19 +113,23 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
             .flatMap(Collection::stream)
             .collect(Collectors.toSet());
 
-        return tagService.getTags(tagIds)
-            .stream()
-            .map(Tag::getName)
-            .collect(Collectors.toSet());
+        return tagService.getTags(tagIds);
     }
 
     @Override
-    public Integration update(
-        Long id, String name, String description, String category, List<String> workflowIds, List<String> tagNames) {
+    public Integration update(Long id, Set<Tag> tags) {
+        tags = CollectionUtils.isEmpty(tags) ? null : tagService.save(tags);
 
-        Set<Tag> tags = CollectionUtils.isEmpty(tagNames) ? null : tagService.create(new HashSet<>(tagNames));
-        Set<String> workflowIdSet = CollectionUtils.isEmpty(workflowIds) ? null : new HashSet<>(workflowIds);
+        return integrationService.update(id, tags);
+    }
 
-        return integrationService.update(id, name, description, category, workflowIdSet, tags);
+    @Override
+    public Integration update(Integration integration) {
+        integration
+            .setCategory(integration.getCategory() == null ? null : categoryService.save(integration.getCategory()));
+        integration
+            .setTags(CollectionUtils.isEmpty(integration.getTags()) ? null : tagService.save(integration.getTags()));
+
+        return integrationService.update(integration);
     }
 }

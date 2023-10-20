@@ -24,10 +24,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.Set;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Ivica Cardic
@@ -39,46 +41,44 @@ public class IntegrationRepositoryIntTest {
     @Autowired
     private IntegrationRepository integrationRepository;
 
+    @BeforeEach
+    public void beforeEach() {
+        integrationRepository.deleteAll();
+    }
+
     @Test
     @SuppressFBWarnings("NP")
     public void testCreate() {
         Integration integration = integrationRepository.save(getIntegration(Collections.emptySet()));
 
-        Assertions.assertEquals(
-            integration, integrationRepository.findById(integration.getId())
-                .get());
+        assertThat(integration).isEqualTo(integrationRepository.findById(integration.getId())
+            .get());
     }
 
     @Test
     @SuppressFBWarnings("NP")
     public void testDelete() {
-        Integration integration = getIntegration(Collections.emptySet());
-
-        integration = integrationRepository.save(integration);
+        Integration integration = integrationRepository.save(getIntegration(Collections.emptySet()));
 
         Integration resultIntegration = integrationRepository.findById(integration.getId())
             .orElseThrow();
 
-        Assertions.assertEquals(resultIntegration, integration);
+        assertThat(resultIntegration).isEqualTo(integration);
 
         integrationRepository.deleteById(resultIntegration.getId());
 
-        Assertions.assertFalse(
-            integrationRepository.findById(integration.getId())
-                .isPresent());
+        assertThat(integrationRepository.findById(integration.getId())).isEmpty();
     }
 
     @Test
     @SuppressFBWarnings("NP")
     public void testFindById() {
-        Integration integration = getIntegration(Collections.emptySet());
-
-        integration = integrationRepository.save(integration);
+        Integration integration = integrationRepository.save(getIntegration(Collections.emptySet()));
 
         Integration resultIntegration = integrationRepository.findById(integration.getId())
             .orElseThrow();
 
-        Assertions.assertEquals(resultIntegration, integration);
+        assertThat(resultIntegration).isEqualTo(integration);
 
         integration = getIntegration(Set.of("workflowId"));
 
@@ -87,7 +87,7 @@ public class IntegrationRepositoryIntTest {
         resultIntegration = integrationRepository.findById(integration.getId())
             .orElseThrow();
 
-        Assertions.assertEquals(resultIntegration.getWorkflowIds(), integration.getWorkflowIds());
+        assertThat(resultIntegration.getWorkflowIds()).isEqualTo(integration.getWorkflowIds());
 
         resultIntegration.removeWorkflow("workflowId");
 
@@ -96,8 +96,7 @@ public class IntegrationRepositoryIntTest {
         resultIntegration = integrationRepository.findById(integration.getId())
             .orElseThrow();
 
-        Assertions.assertEquals(0, resultIntegration.getWorkflowIds()
-            .size());
+        assertThat(resultIntegration.getWorkflowIds()).isEmpty();
     }
 
     @Test
@@ -110,12 +109,7 @@ public class IntegrationRepositoryIntTest {
 
         integrationRepository.save(integration);
 
-        Integration updatedIntegration = integrationRepository.findById(integration.getId())
-            .get();
-
-        Assertions.assertEquals("name2", updatedIntegration.getName());
-        Assertions.assertEquals(2, updatedIntegration.getWorkflowIds()
-            .size());
+        assertThat(integrationRepository.findById(integration.getId())).hasValue(integration);
     }
 
     private static Integration getIntegration(Set<String> workflowIds) {

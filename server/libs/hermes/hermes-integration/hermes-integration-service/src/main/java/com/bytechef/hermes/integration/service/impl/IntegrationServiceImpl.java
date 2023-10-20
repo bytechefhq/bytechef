@@ -26,11 +26,8 @@ import java.util.stream.StreamSupport;
 
 import com.bytechef.hermes.integration.service.IntegrationService;
 import com.bytechef.tag.domain.Tag;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -45,18 +42,17 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public Integration create(
-        @NonNull String name, String description, String category, @NonNull Set<String> workflowIds, Set<Tag> tags) {
-        Assert.isTrue(StringUtils.hasText(name), "'name' must not be empty.");
-        Assert.notEmpty(workflowIds, "'workflowIds' must not be empty.");
+    public Integration addWorkflow(Long id, String workflowId) {
+        Integration integration = getIntegration(id);
 
-        Integration integration = new Integration();
+        integration.addWorkflow(workflowId);
 
-        integration.setCategory(category);
-        integration.setDescription(description);
-        integration.setName(name);
-        integration.setTags(tags);
-        integration.setWorkflowIds(workflowIds);
+        return integrationRepository.save(integration);
+    }
+
+    @Override
+    public Integration create(Integration integration) {
+        Assert.notNull(integration, "'integration' must not be null.");
 
         return integrationRepository.save(integration);
     }
@@ -80,35 +76,18 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public Integration update(Integration integration) {
+    public Integration update(Long id, Set<Tag> tags) {
+        Integration integration = getIntegration(id);
+
+        integration.setTags(tags);
+
         return integrationRepository.save(integration);
     }
 
     @Override
-    public Integration update(
-        long id, String name, String description, String category, Set<String> workflowIds, Set<Tag> tags) {
-
-        Integration integration = getIntegration(id);
-
-        if (name != null) {
-            integration.setName(name);
-        }
-
-        if (category != null) {
-            integration.setCategory(category);
-        }
-
-        if (description != null) {
-            integration.setDescription(description);
-        }
-
-        if (tags != null) {
-            integration.setTags(tags);
-        }
-
-        if (!CollectionUtils.isEmpty(workflowIds)) {
-            integration.setWorkflowIds(workflowIds);
-        }
+    public Integration update(Integration integration) {
+        Assert.notNull(integration, "'integration' must not be null.");
+        Assert.notEmpty(integration.getWorkflowIds(), "'workflowIds' must not be empty.");
 
         return integrationRepository.save(integration);
     }
