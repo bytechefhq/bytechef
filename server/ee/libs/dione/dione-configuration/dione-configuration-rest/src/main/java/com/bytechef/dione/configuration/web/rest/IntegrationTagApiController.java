@@ -33,7 +33,7 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}")
 public class IntegrationTagApiController implements IntegrationTagApi {
 
     private final IntegrationFacade integrationFacade;

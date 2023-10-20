@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.dione.configuration.web.rest;
+package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.dione.configuration.facade.IntegrationFacade;
-import com.bytechef.dione.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.autoconfigure.annotation.ConditionalOnEnabled;
+import com.bytechef.helios.configuration.facade.ProjectFacade;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -33,21 +34,21 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-@RestController
+@RestController("com.bytechef.helios.configuration.web.rest.workflowApiController")
+@RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
+@ConditionalOnEnabled("coordinator")
+public class WorkflowApiController implements WorkflowApi {
 
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
-public class IntegrationWorkflowApiController implements IntegrationWorkflowApi {
-
-    private final IntegrationFacade integrationFacade;
     private final ConversionService conversionService;
+    private final ProjectFacade projectFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
-    public IntegrationWorkflowApiController(
-        IntegrationFacade integrationFacade, ConversionService conversionService, WorkflowService workflowService) {
-        this.integrationFacade = integrationFacade;
+    public WorkflowApiController(
+        ConversionService conversionService, ProjectFacade projectFacade, WorkflowService workflowService) {
 
         this.conversionService = conversionService;
+        this.projectFacade = projectFacade;
         this.workflowService = workflowService;
     }
 
@@ -61,9 +62,9 @@ public class IntegrationWorkflowApiController implements IntegrationWorkflowApi 
     }
 
     @Override
-    public ResponseEntity<List<WorkflowModel>> getIntegrationWorkflows(Long id) {
+    public ResponseEntity<List<WorkflowModel>> getProjectWorkflows(Long id) {
         return ResponseEntity.ok(
-            integrationFacade.getIntegrationWorkflows(id)
+            projectFacade.getProjectWorkflows(id)
                 .stream()
                 .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
                 .toList());
@@ -72,8 +73,7 @@ public class IntegrationWorkflowApiController implements IntegrationWorkflowApi 
     @Override
     @SuppressFBWarnings("NP")
     public ResponseEntity<WorkflowModel> getWorkflow(String id) {
-        return ResponseEntity.ok(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class)
-            .definition(null));
+        return ResponseEntity.ok(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class));
     }
 
     @Override
@@ -82,9 +82,7 @@ public class IntegrationWorkflowApiController implements IntegrationWorkflowApi 
         List<WorkflowModel> workflowModels = new ArrayList<>();
 
         for (Workflow workflow : workflowService.getWorkflows()) {
-            workflowModels.add(
-                conversionService.convert(workflow, WorkflowModel.class)
-                    .definition(null));
+            workflowModels.add(conversionService.convert(workflow, WorkflowModel.class));
         }
 
         return ResponseEntity.ok(workflowModels);

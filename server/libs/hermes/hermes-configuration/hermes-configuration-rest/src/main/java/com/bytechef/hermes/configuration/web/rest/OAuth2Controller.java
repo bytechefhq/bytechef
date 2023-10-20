@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RequestMapping("${openapi.openAPIDefinition.base-path.core:}")
 @ConditionalOnEnabled("coordinator")
 public class OAuth2Controller implements Oauth2Api {
 

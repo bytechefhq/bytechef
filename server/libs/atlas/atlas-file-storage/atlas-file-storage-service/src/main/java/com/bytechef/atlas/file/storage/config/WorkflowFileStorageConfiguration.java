@@ -25,6 +25,7 @@ import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService
 import com.bytechef.file.storage.service.FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,6 +36,7 @@ import org.springframework.context.annotation.Configuration;
 public class WorkflowFileStorageConfiguration {
 
     @Bean
+    @ConditionalOnProperty("bytechef.workflow.async.output-storage.provider")
     WorkflowFileStorageFacade workflowAsyncFileStorageFacade(
         FileStorageProperties fileStorageProperties, ObjectMapper objectMapper,
         @Value("${bytechef.workflow.async.output-storage.provider}") String workflowAsyncOutputStorageProvider) {
@@ -44,6 +46,7 @@ public class WorkflowFileStorageConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty("bytechef.workflow.sync.output-storage.provider")
     WorkflowFileStorageFacade workflowSyncFileStorageFacade(
         FileStorageProperties fileStorageProperties, ObjectMapper objectMapper,
         @Value("${bytechef.workflow.sync.output-storage.provider}") String workflowAsyncOutputStorageProvider) {

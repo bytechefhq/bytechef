@@ -31,16 +31,16 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-@RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path:}")
+@RestController("com.bytechef.helios.configuration.web.rest.categoryApiController")
+@RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEnabled("coordinator")
-public class ProjectCategoryApiController implements ProjectCategoryApi {
+public class CategoryApiController implements CategoryApi {
 
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
 
     @SuppressFBWarnings("EI")
-    public ProjectCategoryApiController(ConversionService conversionService, ProjectFacade projectFacade) {
+    public CategoryApiController(ConversionService conversionService, ProjectFacade projectFacade) {
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
     }
