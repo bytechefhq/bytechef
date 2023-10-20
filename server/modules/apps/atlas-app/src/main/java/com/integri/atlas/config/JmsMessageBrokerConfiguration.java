@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 <your company/name>.
+ * Copyright 2016-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2021 <your company/name>
  */
 
 package com.integri.atlas.config;
@@ -49,6 +51,9 @@ import org.springframework.jms.support.converter.MappingJackson2MessageConverter
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 
+/**
+ * @author Arik Cohen
+ */
 @Configuration
 @EnableConfigurationProperties(AtlasProperties.class)
 @ConditionalOnProperty(name = "atlas.message-broker.provider", havingValue = "jms")
