@@ -13,18 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ProjectInstanceBasicModel } from './ProjectInstanceBasicModel';
-import {
-    ProjectInstanceBasicModelFromJSON,
-    ProjectInstanceBasicModelFromJSONTyped,
-    ProjectInstanceBasicModelToJSON,
-} from './ProjectInstanceBasicModel';
 import type { ProjectInstanceWorkflowConnectionModel } from './ProjectInstanceWorkflowConnectionModel';
 import {
     ProjectInstanceWorkflowConnectionModelFromJSON,
     ProjectInstanceWorkflowConnectionModelFromJSONTyped,
     ProjectInstanceWorkflowConnectionModelToJSON,
 } from './ProjectInstanceWorkflowConnectionModel';
+import type { ProjectInstanceWorkflowProjectInstanceModel } from './ProjectInstanceWorkflowProjectInstanceModel';
+import {
+    ProjectInstanceWorkflowProjectInstanceModelFromJSON,
+    ProjectInstanceWorkflowProjectInstanceModelFromJSONTyped,
+    ProjectInstanceWorkflowProjectInstanceModelToJSON,
+} from './ProjectInstanceWorkflowProjectInstanceModel';
 
 /**
  * Contains configuration and connections required for the execution of a particular project workflow.
@@ -88,10 +88,10 @@ export interface ProjectInstanceWorkflowModel {
     readonly lastModifiedDate?: Date;
     /**
      * 
-     * @type {ProjectInstanceBasicModel}
+     * @type {ProjectInstanceWorkflowProjectInstanceModel}
      * @memberof ProjectInstanceWorkflowModel
      */
-    projectInstance?: ProjectInstanceBasicModel;
+    projectInstance?: ProjectInstanceWorkflowProjectInstanceModel;
     /**
      * Th id of a project instance.
      * @type {number}
@@ -140,7 +140,7 @@ export function ProjectInstanceWorkflowModelFromJSONTyped(json: any, ignoreDiscr
         'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'projectInstance': !exists(json, 'projectInstance') ? undefined : ProjectInstanceBasicModelFromJSON(json['projectInstance']),
+        'projectInstance': !exists(json, 'projectInstance') ? undefined : ProjectInstanceWorkflowProjectInstanceModelFromJSON(json['projectInstance']),
         'projectInstanceId': !exists(json, 'projectInstanceId') ? undefined : json['projectInstanceId'],
         'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
         'version': !exists(json, '__version') ? undefined : json['__version'],
@@ -160,7 +160,7 @@ export function ProjectInstanceWorkflowModelToJSON(value?: ProjectInstanceWorkfl
         'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(ProjectInstanceWorkflowConnectionModelToJSON)),
         'enabled': value.enabled,
         'lastExecutionDate': value.lastExecutionDate === undefined ? undefined : (value.lastExecutionDate.toISOString()),
-        'projectInstance': ProjectInstanceBasicModelToJSON(value.projectInstance),
+        'projectInstance': ProjectInstanceWorkflowProjectInstanceModelToJSON(value.projectInstance),
         'projectInstanceId': value.projectInstanceId,
         'workflowId': value.workflowId,
         '__version': value.version,
