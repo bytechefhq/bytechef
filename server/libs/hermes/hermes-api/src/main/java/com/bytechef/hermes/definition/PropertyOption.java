@@ -16,11 +16,13 @@
 
 package com.bytechef.hermes.definition;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
+@Schema(name = "PropertyOption", description = "Defines valid property value.")
 public final class PropertyOption {
 
     private String description;
@@ -48,12 +50,13 @@ public final class PropertyOption {
         return this;
     }
 
-    public PropertyOption displayOption(DisplayOption.DisplayOptionEntry... displayOptionEntries) {
+    public PropertyOption displayOption(DisplayOption.DisplayOptionCondition... displayOptionEntries) {
         this.displayOption = DisplayOption.build(List.of(displayOptionEntries));
 
         return this;
     }
 
+    @Schema(name = "description", description = "Description of the option.")
     public String getDescription() {
         return description;
     }
@@ -62,10 +65,12 @@ public final class PropertyOption {
         return displayOption;
     }
 
+    @Schema(name = "name", description = "Name of the option.")
     public String getName() {
         return name;
     }
 
+    @Schema(name = "value", description = "Value of the option")
     public Object getValue() {
         return value;
     }
