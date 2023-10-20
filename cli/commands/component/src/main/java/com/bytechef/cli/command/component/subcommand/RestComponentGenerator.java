@@ -45,6 +45,7 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.Scopes;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
@@ -60,7 +61,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -70,7 +70,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -91,7 +90,7 @@ public class RestComponentGenerator {
     public static final ClassName COMPONENT_DSL_CLASS_NAME = ClassName
         .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDSL");
     private static final ClassName COMPONENT_CONSTANTS_CLASS_NAME = ClassName
-        .get("com.bytechef.hermes.component.constants", "ComponentConstants");
+        .get("com.bytechef.hermes.component.constant", "ComponentConstants");
     private static final ClassName HTTP_CLIENT_UTILS_CLASS = ClassName
         .get("com.bytechef.hermes.component.utils", "HttpClientUtils");
     private static final ClassName REST_COMPONENT_HANDLER_CLASS = ClassName
@@ -102,6 +101,9 @@ public class RestComponentGenerator {
             setSerializationInclusion(JsonInclude.Include.NON_NULL);
         }
     };
+    private static final String[] COMPONENT_DIR_NAMES = {
+        "action", "property"
+    };
 
     private final String basePackageName;
     private final String componentName;
@@ -111,6 +113,7 @@ public class RestComponentGenerator {
     private final Set<String> schemas = new HashSet<>();
     private final boolean internalComponent;
     private final int version;
+    private final Set<String> oAuth2Scopes = new HashSet<>();
 
     public RestComponentGenerator(
         String basePackageName, String componentName, int version, boolean internalComponent, String openApiPath,
@@ -185,6 +188,31 @@ public class RestComponentGenerator {
         }
     }
 
+    private void collectOAuthScopes(List<SecurityRequirement> securityRequirements) {
+        Components components = openAPI.getComponents();
+
+        if (components != null) {
+            Map<String, SecurityScheme> securitySchemeMap = components.getSecuritySchemes();
+            List<String> oauth2SecuritySchemeNames = new ArrayList<>();
+
+            for (Map.Entry<String, SecurityScheme> entry : securitySchemeMap.entrySet()) {
+                SecurityScheme securityScheme = entry.getValue();
+
+                if (securityScheme.getType() == SecurityScheme.Type.OAUTH2) {
+                    oauth2SecuritySchemeNames.add(entry.getKey());
+                }
+            }
+
+            for (SecurityRequirement securityRequirement : securityRequirements) {
+                for (Map.Entry<String, List<String>> entry : securityRequirement.entrySet()) {
+                    if (oauth2SecuritySchemeNames.contains(entry.getKey())) {
+                        oAuth2Scopes.addAll(entry.getValue());
+                    }
+                }
+            }
+        }
+    }
+
     private Path compileComponentHandlerSource(Path sourcePath, String simpleClassName) {
         JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
         List<String> javacOpts = new ArrayList<>();
@@ -194,9 +222,7 @@ public class RestComponentGenerator {
 
         Path parentPath = sourcePath.getParent();
 
-        for (String dirName : new String[] {
-            "action", "schema"
-        }) {
+        for (String dirName : COMPONENT_DIR_NAMES) {
             Path dirPath = parentPath.resolve(dirName);
 
             File dirFile = dirPath.toFile();
@@ -288,76 +314,69 @@ public class RestComponentGenerator {
         return outputPath + File.separator + componentName + File.separator + subPath;
     }
 
-    private CodeBlock getActionsCodeBlock(List<OperationItem> operationItems, OpenAPI openAPI) {
-        List<CodeBlock> codeBlocks = new ArrayList<>();
+    private CodeBlock getActionCodeBlock(OperationItem operationItem, OpenAPI openAPI) {
+        Operation operation = operationItem.operation();
+        String requestMethod = operationItem.requestMethod();
 
-        for (OperationItem operationItem : operationItems) {
-            Operation operation = operationItem.operation();
-            String requestMethod = operationItem.requestMethod();
+        OutputEntry outputEntry = getOutputEntry(operation, openAPI);
+        PropertiesEntry propertiesEntry = getPropertiesEntry(operation, openAPI);
 
-            OutputEntry outputEntry = getOutputEntry(operation, openAPI);
-            PropertiesEntry propertiesEntry = getPropertiesEntry(operation, openAPI);
+        CodeBlock.Builder builder = CodeBlock.builder();
 
-            CodeBlock.Builder builder = CodeBlock.builder();
+        CodeBlock.Builder metadataBuilder = CodeBlock.builder();
 
-            CodeBlock.Builder metadataBuilder = CodeBlock.builder();
+        metadataBuilder.add(
+            """
+                "requestMethod", $S,
+                "path", $S
+                """,
+            requestMethod,
+            operationItem.path);
 
+        if (propertiesEntry.bodyContentType != null) {
             metadataBuilder.add(
                 """
-                    "requestMethod", $S,
-                    "path", $S
+                    ,"bodyContentType", BodyContentType.$L
+                    ,"mimeType", $S
                     """,
-                requestMethod,
-                operationItem.path);
-
-            if (propertiesEntry.bodyContentType != null) {
-                metadataBuilder.add(
-                    """
-                        ,"bodyContentType", BodyContentType.$L
-                        ,"mimeType", $S
-                        """,
-                    propertiesEntry.bodyContentType,
-                    propertiesEntry.mimeType);
-            }
-
-            builder.add(
-                """
-                    action($S)
-                        .display(
-                            display($S)
-                                .description($S)
-                        )
-                        .metadata(
-                            $T.of(
-                                $L
-                            )
-                        )
-                        .properties($L)
-                    """,
-                operation.getOperationId(),
-                operation.getSummary(),
-                operation.getDescription(),
-                Map.class,
-                metadataBuilder.build(),
-                propertiesEntry.propertiesCodeBlock());
-
-            CodeBlock codeBlock = outputEntry == null ? null : outputEntry.outputCodeBlock();
-
-            if (codeBlock != null && !codeBlock.isEmpty()) {
-                builder.add(".output($L)", codeBlock);
-            }
-
-            Object example = outputEntry == null ? null : outputEntry.example();
-
-            if (example != null) {
-                builder.add(".exampleOutput($S)", example);
-            }
-
-            codeBlocks.add(builder.build());
+                propertiesEntry.bodyContentType,
+                propertiesEntry.mimeType);
         }
 
-        return codeBlocks.stream()
-            .collect(CodeBlock.joining(","));
+        builder.add(
+            """
+                action($S)
+                    .display(
+                        display($S)
+                            .description($S)
+                    )
+                    .metadata(
+                        $T.of(
+                            $L
+                        )
+                    )
+                    .properties($L)
+                """,
+            operation.getOperationId(),
+            operation.getSummary(),
+            operation.getDescription(),
+            Map.class,
+            metadataBuilder.build(),
+            propertiesEntry.propertiesCodeBlock());
+
+        CodeBlock codeBlock = outputEntry == null ? null : outputEntry.outputCodeBlock();
+
+        if (codeBlock != null && !codeBlock.isEmpty()) {
+            builder.add(".output($L)", codeBlock);
+        }
+
+        Object example = outputEntry == null ? null : outputEntry.example();
+
+        if (example != null) {
+            builder.add(".exampleOutput($S)", example);
+        }
+
+        return builder.build();
     }
 
     private CodeBlock getActionsCodeBlock(Path componentHandlerDirPath, OpenAPI openAPI) throws IOException {
@@ -367,22 +386,19 @@ public class RestComponentGenerator {
         List<CodeBlock> codeBlocks = new ArrayList<>();
 
         for (Map.Entry<String, List<OperationItem>> operationItemsEntry : operationsMap.entrySet()) {
-            CodeBlock actionsCodeBlock = getActionsCodeBlock(operationItemsEntry.getValue(), openAPI);
+            for (OperationItem operationItem : operationItemsEntry.getValue()) {
+                CodeBlock actionCodeBlock = getActionCodeBlock(operationItem, openAPI);
 
-            if (generatorConfig.openApi.useTags) {
-                String key = operationItemsEntry.getKey();
+                ClassName className = ClassName.get(
+                    getPackageName() + ".action", StringUtils.capitalize(operationItem.getOperationId()) + "Action");
 
-                String prefix = Arrays.stream(key.split(" "))
-                    .map(StringUtils::capitalize)
-                    .collect(Collectors.joining());
+                writeComponentActionSource(className, actionCodeBlock, componentHandlerDirPath);
 
-                ClassName className = ClassName.get(getPackageName() + ".action", prefix + "Actions");
+                codeBlocks.add(CodeBlock.of("$T.ACTION_DEFINITION", className));
 
-                writeComponentActionsSource(className, actionsCodeBlock, componentHandlerDirPath);
-
-                codeBlocks.add(CodeBlock.of("$T.ACTIONS", className));
-            } else {
-                codeBlocks.add(actionsCodeBlock);
+                if (generatorConfig.openApi.oAuth2Scopes.isEmpty() && operationItem.operation.getSecurity() != null) {
+                    collectOAuthScopes(operationItem.operation.getSecurity());
+                }
             }
         }
 
@@ -858,7 +874,11 @@ public class RestComponentGenerator {
         Collection<String> scopeNames;
 
         if (generatorConfig.openApi.oAuth2Scopes.isEmpty()) {
-            scopeNames = scopes.keySet();
+            if (oAuth2Scopes.isEmpty()) {
+                scopeNames = scopes.keySet();
+            } else {
+                scopeNames = oAuth2Scopes;
+            }
         } else {
             scopeNames = generatorConfig.openApi.oAuth2Scopes;
         }
@@ -1161,9 +1181,7 @@ public class RestComponentGenerator {
                 builder.add(
                     "object($S).additionalProperties(object().properties($L))",
                     propertyName,
-                    CodeBlock.of(
-                        "$T.COMPONENT_SCHEMA",
-                        ClassName.get(getPackageName() + ".schema", curSchemaName + "Schema")));
+                    CodeBlock.of("$T.PROPERTIES", getPropertiesClassName(curSchemaName)));
             }
         }
 
@@ -1218,6 +1236,10 @@ public class RestComponentGenerator {
         }
 
         return getPropertiesSchemaCodeBlock(allOfProperties, allOfRequired, openAPI);
+    }
+
+    private ClassName getPropertiesClassName(String schemaName) {
+        return ClassName.get(getPackageName() + ".property", schemaName + "Properties");
     }
 
     @SuppressWarnings({
@@ -1307,9 +1329,7 @@ public class RestComponentGenerator {
                         CodeBlock propertiesCodeBlock;
 
                         if (schemas.contains(schemaName)) {
-                            propertiesCodeBlock = CodeBlock.of(
-                                "$T.COMPONENT_SCHEMA",
-                                ClassName.get(getPackageName() + ".schema", schemaName + "Schema"));
+                            propertiesCodeBlock = CodeBlock.of("$T.PROPERTIES", getPropertiesClassName(schemaName));
                         } else {
                             propertiesCodeBlock = getObjectPropertiesCodeBlock(propertyName, schema, openAPI);
                         }
@@ -1516,7 +1536,7 @@ public class RestComponentGenerator {
         javaFile.writeToPath(testDirPath);
     }
 
-    private void writeComponentActionsSource(
+    private void writeComponentActionSource(
         ClassName className, CodeBlock actionsCodeBlock, Path componentHandlerDirPath) throws IOException {
 
         JavaFile javaFile = JavaFile.builder(
@@ -1529,15 +1549,13 @@ public class RestComponentGenerator {
                     """)
                 .addModifiers(Modifier.PUBLIC)
                 .addField(FieldSpec.builder(
-                    ParameterizedTypeName.get(
-                        ClassName.get("java.util", "List"),
-                        ClassName.get(
-                            "com.bytechef.hermes.component.definition",
-                            "ComponentDSL",
-                            "ModifiableActionDefinition")),
-                    "ACTIONS")
+                    ClassName.get(
+                        "com.bytechef.hermes.component.definition",
+                        "ComponentDSL",
+                        "ModifiableActionDefinition"),
+                    "ACTION_DEFINITION")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                    .initializer("$T.of($L)", List.class, actionsCodeBlock)
+                    .initializer(actionsCodeBlock)
                     .build())
                 .build())
             .addStaticImport(COMPONENT_CONSTANTS_CLASS_NAME, "ACCESS_TOKEN")
@@ -1678,7 +1696,7 @@ public class RestComponentGenerator {
                     ParameterizedTypeName.get(
                         ClassName.get("java.util", "List"),
                         ClassName.get("com.bytechef.hermes.definition", "Property")),
-                    "COMPONENT_SCHEMA")
+                    "PROPERTIES")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer("$T.of($L)", List.class, componentSchemaCodeBlock)
                     .build())
@@ -1731,7 +1749,7 @@ public class RestComponentGenerator {
                         continue;
                     }
 
-                    ClassName className = ClassName.get(getPackageName() + ".schema", entry.getKey() + "Schema");
+                    ClassName className = getPropertiesClassName(entry.getKey());
 
                     writeComponentSchemaSource(
                         className,
@@ -1769,9 +1787,6 @@ public class RestComponentGenerator {
 
             @JsonProperty
             private List<String> oAuth2Scopes = Collections.emptyList();
-
-            @JsonProperty
-            private boolean useTags = false;
         }
     }
 }
