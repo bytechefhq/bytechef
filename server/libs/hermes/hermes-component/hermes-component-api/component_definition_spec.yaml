@@ -8,7 +8,7 @@ schemas:
     type: object
     properties:
       display:
-        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Display'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       exampleOutput:
         description: The example of the action's output.
         type: object
@@ -17,8 +17,6 @@ schemas:
         type: object
         additionalProperties:
           type: object
-          items:
-            type: object
       name:
         description: The action name.
         type: string
@@ -26,32 +24,12 @@ schemas:
         description: The output schema of an execution result.
         type: array
         items:
-          oneOf:
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/AnyProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ArrayProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/BooleanProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateTimeProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/IntegerProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NullProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NumberProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ObjectProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/StringProperty'
+          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
       properties:
         description: The list of action properties.
         type: array
         items:
-          oneOf:
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/AnyProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ArrayProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/BooleanProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateTimeProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/IntegerProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NullProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NumberProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/StringProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ObjectProperty'
+          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Property'
       performFunction:
         description: Contains information required for a connection's authorization.
         type: object
@@ -60,7 +38,7 @@ schemas:
     type: object
     properties:
       display:
-        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Display'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       name:
         description: The authorization name.
         type: string
@@ -68,15 +46,7 @@ schemas:
         description: Properties of the connection.
         type: array
         items:
-          oneOf:
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ArrayProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/BooleanProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateTimeProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/IntegerProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NumberProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ObjectProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/StringProperty'
+          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/ValueProperty'
       type:
         $ref: '#/schemas/AuthorizationType'
   AuthorizationType:
@@ -102,40 +72,20 @@ schemas:
       connection:
         $ref: '#/schemas/ConnectionDefinition'
       display:
-        $ref: '#/schemas/ComponentDisplay'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       metadata:
         description: Additional data that can be used during processing.
         type: object
         additionalProperties:
           type: object
-          items:
-            type: object
       name:
         description: The connection name.
         type: string
       resources:
-        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Resources'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       version:
         type: number
         format: double
-  ComponentDisplay:
-    description: A display information about the component.
-    type: object
-    allOf:
-      - $ref: '../../hermes-api/definition_spec.yaml#/schemas/Display'
-      - type: object
-        properties:
-          category:
-            description: The category of the component.
-            type: string
-          subtitle:
-            description: Additional explanation.
-            type: string
-          tags:
-            description: Tags for the component.
-            type: array
-            items:
-              type: string
   ConnectionDefinition:
     description: A connection to an outside service.
     type: object
@@ -145,25 +95,20 @@ schemas:
         items:
           $ref: '#/schemas/Authorization'
       componentName:
-        description: The name of a connection this connection can be used for.
+        description: The name of a component this connection can be used for.
+        type: string
+      componentVersion:
+        description: The version of a component this connection can be used for.
         type: string
       display:
-        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Display'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       properties:
         description: Properties of the connection.
         type: array
         items:
-          oneOf:
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ArrayProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/BooleanProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/DateTimeProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/IntegerProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/NumberProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/ObjectProperty'
-            - $ref: '../../hermes-api/definition_spec.yaml#/schemas/StringProperty'
+          $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/ValueProperty'
       resources:
-        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Resources'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       subtitle:
         description: Additional explanation.
         type: string
@@ -181,12 +126,12 @@ schemas:
         description: Database type name used when defining a jdbc url.
         type: string
       display:
-        $ref: '#/schemas/ComponentDisplay'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Display'
       name:
         description: The connection name.
         type: string
       resources:
-        $ref: '../../hermes-api/definition_spec.yaml#/schemas/Resources'
+        $ref: '../../hermes-definition-api/definition_spec.yaml#/schemas/Resources'
       version:
         type: number
         format: double
