@@ -13,7 +13,7 @@ import PlaceholderNode from './nodes/PlaceholderNode';
 import WorkflowNode from './nodes/WorkflowNode';
 
 import './WorkflowEditor.css';
-import useLayoutHook from './hooks/useLayout.hook';
+import useLayout from './hooks/useLayout';
 import {PlayIcon} from '@heroicons/react/24/outline';
 
 const Workflow = (): JSX.Element => {
@@ -61,7 +61,7 @@ const Workflow = (): JSX.Element => {
         []
     );
 
-    useLayoutHook();
+    useLayout();
 
     return (
         <div className="flex h-full flex-1 flex-col">

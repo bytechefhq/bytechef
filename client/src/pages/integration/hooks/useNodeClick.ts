@@ -4,7 +4,7 @@ import useRightSlideOverStore from '../stores/rightSlideOver.store';
 
 // this hook implements the logic for clicking a workflow node
 // on workflow node click: create a new child node of the clicked node
-export default function useNodeClickHook(
+export default function useNodeClick(
     data: NodeProps['data'],
     id: NodeProps['id']
 ) {
