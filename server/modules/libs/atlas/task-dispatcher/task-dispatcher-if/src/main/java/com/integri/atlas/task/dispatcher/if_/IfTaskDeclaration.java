@@ -154,12 +154,6 @@ public class IfTaskDeclaration implements TaskDeclaration {
                             """
                 )
                 .defaultValue("ALL"),
-            COLLECTION_PROPERTY("caseTrue")
-                .description("List of tasks that will be executed when result of resolving all conditions is TRUE")
-                .displayName("Case TRUE"),
-            COLLECTION_PROPERTY("caseFalse")
-                .description("List of tasks that will be executed when result of resolving all conditions is FALSE")
-                .displayName("Case FALSE")
         );
 
     @Override

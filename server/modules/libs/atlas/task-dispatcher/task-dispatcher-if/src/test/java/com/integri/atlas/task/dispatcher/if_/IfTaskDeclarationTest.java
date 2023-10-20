@@ -293,18 +293,6 @@ public class IfTaskDeclarationTest {
                                 "description":"If any condition is met, the workflow goes into \\"true\\" branch."
                             }
                         ]
-                    },
-                    {
-                        "description":"List of tasks that will be executed when result of resolving all conditions is TRUE",
-                        "displayName":"Case TRUE",
-                        "name":"caseTrue",
-                        "type":"COLLECTION"
-                    },
-                    {
-                        "description":"List of tasks that will be executed when result of resolving all conditions is FALSE",
-                        "displayName":"Case FALSE",
-                        "name":"caseFalse",
-                        "type":"COLLECTION"
                     }
                 ],
                 "version":1.0
