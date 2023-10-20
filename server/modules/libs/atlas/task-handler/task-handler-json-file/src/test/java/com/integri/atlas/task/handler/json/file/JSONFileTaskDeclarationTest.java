@@ -45,6 +45,24 @@ public class JSONFileTaskDeclarationTest {
                 "name":"jsonFile",
                 "properties":[
                     {
+                        "defaultValue":"JSON",
+                        "description":"The file type to choose.",
+                        "displayName":"File Type",
+                        "name":"fileType",
+                        "required":true,
+                        "type":"SELECT",
+                        "options":[
+                            {
+                                "name":"JSON",
+                                "value":"JSON"
+                            },
+                            {
+                                "name":"JSON Line",
+                                "value":"JSONL"
+                            }
+                        ]
+                    },
+                    {
                         "defaultValue":"READ",
                         "description":"The operation to perform.",
                         "displayName":"Operation",

@@ -45,6 +45,10 @@ public class JSONArrayUtil {
         return new JSONArray(jsonArray);
     }
 
+    public static JSONArray ofLines(String jsonl) {
+        return new JSONArray("[" + jsonl.replace("\n", ",") + "]");
+    }
+
     public static List<Object> toList(String json) {
         JSONArray jsonArray = new JSONArray(json);
 

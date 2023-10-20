@@ -42,6 +42,12 @@ public class JSONFileTaskDeclaration implements TaskDeclaration {
         .displayName("JSON File")
         .description("Reads and writes data from a JSON file")
         .properties(
+            OPTION_PROPERTY("fileType")
+                .displayName("File Type")
+                .description("The file type to choose.")
+                .options(option("JSON", "JSON"), option("JSON Line", "JSONL"))
+                .defaultValue("JSON")
+                .required(true),
             OPTION_PROPERTY("operation")
                 .displayName("Operation")
                 .description("The operation to perform.")
