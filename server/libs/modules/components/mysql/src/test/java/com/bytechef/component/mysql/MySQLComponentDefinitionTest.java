@@ -16,8 +16,8 @@
 
 package com.bytechef.component.mysql;
 
-import com.bytechef.hermes.component.jdbc.JdbcComponentHandler;
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.hermes.component.registrar.jdbc.JdbcComponentTaskHandler;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,9 +27,9 @@ public class MySQLComponentDefinitionTest {
 
     @Test
     public void testGetComponentDefinition() {
-        DefinitionAssert.assertEquals(
+        AssertUtils.assertEquals(
                 "definition/mysql_v1.json",
-                new JdbcComponentHandler(null, new MySQLJdbcComponentDefinitionFactory().getJdbcComponentDefinition())
+                new JdbcComponentTaskHandler(null, new MySQLJdbcComponentFactory().getJdbcComponentDefinition())
                         .getDefinition());
     }
 }
