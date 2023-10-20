@@ -1,10 +1,5 @@
 import App from '@/App';
 import ErrorPage from '@/ErrorPage';
-import IntegrationConfiguration from '@/ee/pages/embedded/integration/IntegrationConfiguration';
-import IntegrationConnection from '@/ee/pages/embedded/integration/IntegrationConnection';
-import IntegrationUserMetadata from '@/ee/pages/embedded/integration/IntegrationUserMetadata';
-import IntegrationWorkflowEditor from '@/ee/pages/embedded/integration/IntegrationWorkflowEditor';
-import Integrations from '@/ee/pages/embedded/integrations/Integrations';
 import {ProjectApi} from '@/middleware/helios/configuration';
 import Connections from '@/pages/automation/connections/Connections';
 import OAuthPopup from '@/pages/automation/connections/oauth2/OAuthPopup';
@@ -85,40 +80,6 @@ export const router = createBrowserRouter([
                 ],
                 element: <Settings />,
                 path: 'settings',
-            },
-            {
-                children: [
-                    {
-                        element: <Integrations />,
-                        path: '',
-                    },
-                    {
-                        element: <Integrations />,
-                        path: 'integrations',
-                    },
-                    {
-                        children: [
-                            {
-                                element: <IntegrationConfiguration />,
-                                path: 'configuration',
-                            },
-                            {
-                                element: <IntegrationWorkflowEditor />,
-                                path: 'workflows',
-                            },
-                            {
-                                element: <IntegrationConnection />,
-                                path: 'connection',
-                            },
-                            {
-                                element: <IntegrationUserMetadata />,
-                                path: 'user-metadata',
-                            },
-                        ],
-                        path: 'integrations/:integrationId',
-                    },
-                ],
-                path: 'embedded',
             },
         ],
         element: <App />,
