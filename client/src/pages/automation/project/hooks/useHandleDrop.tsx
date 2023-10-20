@@ -46,6 +46,7 @@ export default function useHandleDrop(): [
                 ),
                 label: droppedNode.display?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
+                originNodeName: droppedNode.name,
             },
             type: 'workflow',
         };
@@ -126,6 +127,7 @@ export default function useHandleDrop(): [
                 ),
                 label: droppedNode.display?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
+                originNodeName: droppedNode.name,
             },
             id: getRandomId(),
             name: droppedNode.name,

@@ -28,6 +28,7 @@ import {ReactComponent as ObjectIcon} from '../../../../../assets/object.svg';
 import {ReactComponent as OneOfIcon} from '../../../../../assets/oneof.svg';
 import {ReactComponent as StringIcon} from '../../../../../assets/string.svg';
 import {ReactComponent as TimeIcon} from '../../../../../assets/time.svg';
+import {useNodeDetailsDialogStore} from '../../stores/useNodeDetailsDialogStore';
 
 const TYPE_ICONS = {
     ARRAY: <ArrayIcon className="h-5 w-5 text-gray-600" />,
@@ -57,69 +58,66 @@ type Property = ArrayPropertyModel &
     StringPropertyModel &
     TimePropertyModel;
 
-const SchemaProperties = ({properties}: {properties: Property[]}) => {
-    return (
-        <ul className="h-full">
-            {properties.map((property: Property, index: number) => {
-                return (
-                    <li
-                        className="flex flex-col"
-                        key={`${property.name}-${index}`}
-                    >
-                        <div className="inline-flex rounded-md p-2 text-sm hover:bg-gray-100">
-                            <span>
-                                {
-                                    TYPE_ICONS[
-                                        property.type as keyof typeof TYPE_ICONS
-                                    ]
-                                }
-                            </span>
+const PropertyField = ({data, label}: {data: Property; label: string}) => (
+    <div className="inline-flex rounded-md p-2 text-sm hover:bg-gray-100">
+        <span>{TYPE_ICONS[data.type as keyof typeof TYPE_ICONS]}</span>
 
-                            <span className="pl-2">{property.name}</span>
+        <span className="pl-2">{label}</span>
+    </div>
+);
+
+const SchemaProperties = ({properties}: {properties: Property[]}) => (
+    <ul className="h-full">
+        {properties.map((property: Property, index: number) => {
+            return (
+                <li className="flex flex-col" key={`${property.name}_${index}`}>
+                    <PropertyField data={property} label={property.name!} />
+
+                    {property.properties && !!property.properties.length && (
+                        <div
+                            key={property.name}
+                            className="ml-4 flex flex-col border-l border-gray-200 pl-1"
+                        >
+                            <SchemaProperties
+                                properties={property.properties}
+                            />
                         </div>
-
-                        {property.properties &&
-                            !!property.properties.length && (
-                                <div
-                                    key={property.name}
-                                    className="ml-4 flex flex-col border-l border-gray-200 pl-1"
-                                >
-                                    <SchemaProperties
-                                        properties={property.properties}
-                                    />
-                                </div>
-                            )}
-                    </li>
-                );
-            })}
-        </ul>
-    );
-};
+                    )}
+                </li>
+            );
+        })}
+    </ul>
+);
 
 const OutputTab = ({
     actionDefinition,
 }: {
     actionDefinition: ActionDefinitionModel;
 }) => {
+    const {currentNode} = useNodeDetailsDialogStore();
+
     return (
         <div className="max-h-full flex-[1_1_1px] overflow-auto">
+            <div className="mb-2 flex items-center">
+                <span>{TYPE_ICONS.OBJECT}</span>
+
+                <span className="ml-2 text-sm font-bold uppercase text-gray-800">
+                    {currentNode.name}
+                </span>
+            </div>
+
             {actionDefinition.outputSchema?.map((schema: Property, index) =>
                 schema.properties ? (
                     <SchemaProperties
-                        key={schema.name + '_' + index}
+                        key={`${schema.name}_${index}`}
                         properties={schema.properties}
                     />
                 ) : (
-                    <div
-                        className="inline-flex rounded-md p-2 text-sm hover:bg-gray-100"
-                        key={schema.name}
-                    >
-                        <span>
-                            {TYPE_ICONS[schema.type as keyof typeof TYPE_ICONS]}
-                        </span>
-
-                        <span className="pl-2">{schema.controlType}</span>
-                    </div>
+                    <PropertyField
+                        data={schema}
+                        key={`${schema.name}_${index}`}
+                        label={schema.controlType!}
+                    />
                 )
             )}
         </div>

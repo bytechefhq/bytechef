@@ -48,7 +48,7 @@ const NodeDetailsDialog = () => {
     });
 
     const {data: currentComponent} = useGetComponentDefinitionQuery({
-        componentName: currentNode.name,
+        componentName: currentNode.originNodeName || currentNode.name,
     });
 
     const componentDefinitionNames = componentDefinitions?.map(
@@ -70,6 +70,8 @@ const NodeDetailsDialog = () => {
         currentActionName,
         !!currentComponent
     );
+
+    console.log('currentAction: ', currentAction);
 
     return (
         <Dialog.Root
@@ -174,6 +176,11 @@ const NodeDetailsDialog = () => {
                                             )
                                         ) {
                                             return;
+                                        } else if (
+                                            tab.name === 'output' &&
+                                            !currentAction
+                                        ) {
+                                            return;
                                         } else {
                                             return (
                                                 <Button
@@ -208,11 +215,12 @@ const NodeDetailsDialog = () => {
                                         />
                                     )}
 
-                                    {activeTab === 'connection' && (
-                                        <ConnectionTab
-                                            component={currentComponent}
-                                        />
-                                    )}
+                                    {activeTab === 'connection' &&
+                                        currentComponent.connection && (
+                                            <ConnectionTab
+                                                component={currentComponent}
+                                            />
+                                        )}
 
                                     {activeTab === 'output' &&
                                         currentAction && (
