@@ -21,12 +21,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.jayway.jsonpath.TypeRef;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.lang3.ClassUtils;
 import org.springframework.stereotype.Component;
 
@@ -183,7 +187,23 @@ public class JSONHelper {
         }
     }
 
+    public <T> T read(InputStream inputStream, String path) {
+        DocumentContext documentContext = JsonPath.parse(inputStream);
 
+        return documentContext.read(path);
+    }
+
+    public <T> T read(String json, String path) {
+        DocumentContext documentContext = JsonPath.parse(json);
+
+        return documentContext.read(path);
+    }
+
+    public <T> T read(String json, String path, TypeRef<T> typeRef) {
+        DocumentContext documentContext = JsonPath.parse(json);
+
+        return documentContext.read(path, typeRef);
+    }
 
     public Stream<Map<String, ?>> stream(InputStream inputStream) {
         try {
