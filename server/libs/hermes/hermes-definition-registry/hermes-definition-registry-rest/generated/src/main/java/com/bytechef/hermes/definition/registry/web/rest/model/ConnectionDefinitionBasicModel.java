@@ -21,14 +21,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinitionBasic", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-25T15:46:35.328005+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-05-27T10:19:33.855801+02:00[Europe/Zagreb]")
 public class ConnectionDefinitionBasicModel {
 
-  private String description;
+  private String componentDescription;
 
-  private String name;
+  private String componentName;
 
-  private String title;
+  private String componentTitle;
 
   private Integer version;
 
@@ -44,69 +44,69 @@ public class ConnectionDefinitionBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public ConnectionDefinitionBasicModel(String name, Integer version) {
-    this.name = name;
+  public ConnectionDefinitionBasicModel(String componentName, Integer version) {
+    this.componentName = componentName;
     this.version = version;
   }
 
-  public ConnectionDefinitionBasicModel description(String description) {
-    this.description = description;
+  public ConnectionDefinitionBasicModel componentDescription(String componentDescription) {
+    this.componentDescription = componentDescription;
     return this;
   }
 
   /**
-   * The description.
-   * @return description
+   * The description used from the connection's component.
+   * @return componentDescription
   */
   
-  @Schema(name = "description", description = "The description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("description")
-  public String getDescription() {
-    return description;
+  @Schema(name = "componentDescription", description = "The description used from the connection's component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentDescription")
+  public String getComponentDescription() {
+    return componentDescription;
   }
 
-  public void setDescription(String description) {
-    this.description = description;
+  public void setComponentDescription(String componentDescription) {
+    this.componentDescription = componentDescription;
   }
 
-  public ConnectionDefinitionBasicModel name(String name) {
-    this.name = name;
+  public ConnectionDefinitionBasicModel componentName(String componentName) {
+    this.componentName = componentName;
     return this;
   }
 
   /**
-   * The connection name.
-   * @return name
+   * The connection name used from the connection's component.
+   * @return componentName
   */
   @NotNull 
-  @Schema(name = "name", description = "The connection name.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("name")
-  public String getName() {
-    return name;
+  @Schema(name = "componentName", description = "The connection name used from the connection's component.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("componentName")
+  public String getComponentName() {
+    return componentName;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setComponentName(String componentName) {
+    this.componentName = componentName;
   }
 
-  public ConnectionDefinitionBasicModel title(String title) {
-    this.title = title;
+  public ConnectionDefinitionBasicModel componentTitle(String componentTitle) {
+    this.componentTitle = componentTitle;
     return this;
   }
 
   /**
-   * The title
-   * @return title
+   * The title used from the connection's component
+   * @return componentTitle
   */
   
-  @Schema(name = "title", description = "The title", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("title")
-  public String getTitle() {
-    return title;
+  @Schema(name = "componentTitle", description = "The title used from the connection's component", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentTitle")
+  public String getComponentTitle() {
+    return componentTitle;
   }
 
-  public void setTitle(String title) {
-    this.title = title;
+  public void setComponentTitle(String componentTitle) {
+    this.componentTitle = componentTitle;
   }
 
   public ConnectionDefinitionBasicModel version(Integer version) {
@@ -138,24 +138,24 @@ public class ConnectionDefinitionBasicModel {
       return false;
     }
     ConnectionDefinitionBasicModel connectionDefinitionBasic = (ConnectionDefinitionBasicModel) o;
-    return Objects.equals(this.description, connectionDefinitionBasic.description) &&
-        Objects.equals(this.name, connectionDefinitionBasic.name) &&
-        Objects.equals(this.title, connectionDefinitionBasic.title) &&
+    return Objects.equals(this.componentDescription, connectionDefinitionBasic.componentDescription) &&
+        Objects.equals(this.componentName, connectionDefinitionBasic.componentName) &&
+        Objects.equals(this.componentTitle, connectionDefinitionBasic.componentTitle) &&
         Objects.equals(this.version, connectionDefinitionBasic.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, name, title, version);
+    return Objects.hash(componentDescription, componentName, componentTitle, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConnectionDefinitionBasicModel {\n");
-    sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    componentDescription: ").append(toIndentedString(componentDescription)).append("\n");
+    sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    componentTitle: ").append(toIndentedString(componentTitle)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
