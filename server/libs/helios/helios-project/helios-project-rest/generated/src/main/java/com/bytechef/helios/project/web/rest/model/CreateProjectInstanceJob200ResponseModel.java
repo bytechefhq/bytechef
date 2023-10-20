@@ -1,4 +1,4 @@
-package com.bytechef.atlas.web.rest.model;
+package com.bytechef.helios.project.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -16,17 +16,17 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * CreateJob200ResponseModel
+ * CreateProjectInstanceJob200ResponseModel
  */
 
-@JsonTypeName("createJob_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T20:58:15.589763+02:00[Europe/Zagreb]")
-public class CreateJob200ResponseModel {
+@JsonTypeName("createProjectInstanceJob_200_response")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T10:07:11.328260+02:00[Europe/Zagreb]")
+public class CreateProjectInstanceJob200ResponseModel {
 
   @JsonProperty("jobId")
   private Long jobId;
 
-  public CreateJob200ResponseModel jobId(Long jobId) {
+  public CreateProjectInstanceJob200ResponseModel jobId(Long jobId) {
     this.jobId = jobId;
     return this;
   }
@@ -53,8 +53,8 @@ public class CreateJob200ResponseModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateJob200ResponseModel createJob200Response = (CreateJob200ResponseModel) o;
-    return Objects.equals(this.jobId, createJob200Response.jobId);
+    CreateProjectInstanceJob200ResponseModel createProjectInstanceJob200Response = (CreateProjectInstanceJob200ResponseModel) o;
+    return Objects.equals(this.jobId, createProjectInstanceJob200Response.jobId);
   }
 
   @Override
@@ -65,7 +65,7 @@ public class CreateJob200ResponseModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateJob200ResponseModel {\n");
+    sb.append("class CreateProjectInstanceJob200ResponseModel {\n");
     sb.append("    jobId: ").append(toIndentedString(jobId)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -5,6 +5,8 @@
  */
 package com.bytechef.helios.project.web.rest;
 
+import com.bytechef.helios.project.web.rest.model.CreateProjectInstanceJob200ResponseModel;
+import com.bytechef.helios.project.web.rest.model.JobParametersModel;
 import com.bytechef.helios.project.web.rest.model.ProjectInstanceModel;
 import com.bytechef.helios.project.web.rest.model.UpdateTagsRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -36,7 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T14:04:57.997730+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-30T10:07:11.328260+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project-instances", description = "the project-instances API")
 public interface ProjectInstancesApi {
@@ -79,6 +81,50 @@ public interface ProjectInstancesApi {
             }
         }
         return result.then(projectInstanceModel).then(Mono.empty());
+
+    }
+
+
+    /**
+     * POST /project-instances/{id}/jobs : Create a request for running a new job.
+     * Create a request for running a new job.
+     *
+     * @param id The id of a project instance. (required)
+     * @param jobParametersModel Parameters required to run a job, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
+     * @return The id of a created job. (status code 200)
+     */
+    @Operation(
+        operationId = "createProjectInstanceJob",
+        summary = "Create a request for running a new job.",
+        description = "Create a request for running a new job.",
+        tags = { "project-instances" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The id of a created job.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CreateProjectInstanceJob200ResponseModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/project-instances/{id}/jobs",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<CreateProjectInstanceJob200ResponseModel>> createProjectInstanceJob(
+        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "JobParametersModel", description = "Parameters required to run a job, for example '{\"workflowId\":\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'", required = true) @Valid @RequestBody Mono<JobParametersModel> jobParametersModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "{ \"jobId\" : 0 }";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(jobParametersModel).then(Mono.empty());
 
     }
 

@@ -6,7 +6,6 @@
 package com.bytechef.atlas.web.rest;
 
 import com.bytechef.atlas.web.rest.model.WorkflowModel;
-import com.bytechef.atlas.web.rest.model.WorkflowParametersModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:44:25.432901+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T20:58:15.589763+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflows", description = "the workflows API")
 public interface WorkflowsApi {
@@ -190,43 +189,6 @@ public interface WorkflowsApi {
             }
         }
         return result.then(Mono.empty());
-
-    }
-
-
-    /**
-     * POST /workflows/{id}/test : Create a request for testing a workflow.
-     * Create a request for testing a workflow.
-     *
-     * @param id The id of the workflow to test. (required)
-     * @param workflowParametersModel Parameters required to run a workflow, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
-     * @return The output of the executed workflow, if any. (status code 200)
-     */
-    @Operation(
-        operationId = "testWorkflow",
-        summary = "Create a request for testing a workflow.",
-        description = "Create a request for testing a workflow.",
-        tags = { "workflows" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The output of the executed workflow, if any.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = Object.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/workflows/{id}/test",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    default Mono<ResponseEntity<Object>> testWorkflow(
-        @Parameter(name = "id", description = "The id of the workflow to test.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
-        @Parameter(name = "WorkflowParametersModel", description = "Parameters required to run a workflow, for example '{\"workflowId\":\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'", required = true) @Valid @RequestBody Mono<WorkflowParametersModel> workflowParametersModel,
-        @Parameter(hidden = true) final ServerWebExchange exchange
-    ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        return result.then(workflowParametersModel).then(Mono.empty());
 
     }
 

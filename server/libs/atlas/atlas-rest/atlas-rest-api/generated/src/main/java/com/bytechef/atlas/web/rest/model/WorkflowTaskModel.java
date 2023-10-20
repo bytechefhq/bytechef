@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of the task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T08:44:25.432901+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-29T20:58:15.589763+02:00[Europe/Zagreb]")
 public class WorkflowTaskModel {
 
   @JsonProperty("finalize")
@@ -73,11 +73,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * The (optional) list of tasks that are to be executed after execution of this task -- regardless of whether it had failed or not.
+   * The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.
    * @return finalize
   */
   @Valid 
-  @Schema(name = "finalize", description = "The (optional) list of tasks that are to be executed after execution of this task -- regardless of whether it had failed or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "finalize", description = "The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<WorkflowTaskModel> getFinalize() {
     return finalize;
   }
@@ -184,11 +184,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * The (optional) list of tasks that are to be executed after the succesful execution of this task.
+   * The (optional) list of tasks that are to be executed after the successful execution of a task.
    * @return post
   */
   @Valid 
-  @Schema(name = "post", description = "The (optional) list of tasks that are to be executed after the succesful execution of this task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "post", description = "The (optional) list of tasks that are to be executed after the successful execution of a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<WorkflowTaskModel> getPost() {
     return post;
   }
@@ -211,11 +211,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * The (optional) list of tasks that are to be executed prior to this task.
+   * The (optional) list of tasks that are to be executed prior to a task.
    * @return pre
   */
   @Valid 
-  @Schema(name = "pre", description = "The (optional) list of tasks that are to be executed prior to this task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "pre", description = "The (optional) list of tasks that are to be executed prior to a task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public List<WorkflowTaskModel> getPre() {
     return pre;
   }
@@ -230,11 +230,11 @@ public class WorkflowTaskModel {
   }
 
   /**
-   * The timeout expression which describes when this task should be deemed as timed-out.
+   * The timeout expression which describes when a task should be deemed as timed-out.
    * @return timeout
   */
   
-  @Schema(name = "timeout", description = "The timeout expression which describes when this task should be deemed as timed-out.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "timeout", description = "The timeout expression which describes when a task should be deemed as timed-out.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   public String getTimeout() {
     return timeout;
   }
