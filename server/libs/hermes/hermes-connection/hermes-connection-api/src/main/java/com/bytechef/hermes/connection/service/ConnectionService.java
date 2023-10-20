@@ -41,4 +41,6 @@ public interface ConnectionService {
     Connection update(long id, List<Long> tagIds);
 
     Connection update(long id, String name, List<Long> tagIds, int version);
+
+    Connection getConnection(String componentName, int connectionVersion);
 }

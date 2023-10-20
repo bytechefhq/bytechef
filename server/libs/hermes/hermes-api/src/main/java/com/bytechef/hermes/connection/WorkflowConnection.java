@@ -25,9 +25,11 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public record WorkflowConnection(String componentName, int connectionVersion, Long id) {
+public record WorkflowConnection(String componentName, int connectionVersion) {
 
     public static List<WorkflowConnection> of(Workflow workflow) {
+        // TODO trigger
+
         return workflow.getTasks()
             .stream()
             .map(workflowTask -> workflowTask.fetchExtension(WorkflowConnection.class))

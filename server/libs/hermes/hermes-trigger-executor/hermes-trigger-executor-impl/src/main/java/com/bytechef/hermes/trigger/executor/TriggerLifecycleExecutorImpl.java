@@ -68,8 +68,7 @@ public class TriggerLifecycleExecutorImpl implements TriggerLifecycleExecutor {
 
     @Override
     public void executeTriggerDisable(
-        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection,
-        Map<String, Object> context) {
+        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection) {
 
         DynamicWebhookEnableOutput output = OptionalUtils.orElse(
             dataStorageService.fetchValue(

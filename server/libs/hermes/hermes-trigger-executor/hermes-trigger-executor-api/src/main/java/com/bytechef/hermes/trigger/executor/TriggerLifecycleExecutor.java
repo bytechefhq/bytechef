@@ -26,8 +26,7 @@ import java.util.Map;
 public interface TriggerLifecycleExecutor {
 
     void executeTriggerDisable(
-        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection,
-        Map<String, Object> context);
+        WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection);
 
     void executeTriggerEnable(
         WorkflowTrigger workflowTrigger, WorkflowExecutionId workflowExecutionId, Connection connection,
