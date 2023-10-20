@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobParameters", description = "Defines parameters used to execute a job.")
 @JsonTypeName("JobParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T13:46:09.067916+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-28T19:25:30.758107+02:00[Europe/Zagreb]")
 public class JobParametersModel {
 
   @JsonProperty("inputs")
@@ -34,10 +34,6 @@ public class JobParametersModel {
 
   @JsonProperty("label")
   private String label;
-
-  @JsonProperty("outputs")
-  @Valid
-  private Map<String, Object> outputs = null;
 
   @JsonProperty("parentTaskExecutionId")
   private String parentTaskExecutionId;
@@ -96,33 +92,6 @@ public class JobParametersModel {
 
   public void setLabel(String label) {
     this.label = label;
-  }
-
-  public JobParametersModel outputs(Map<String, Object> outputs) {
-    this.outputs = outputs;
-    return this;
-  }
-
-  public JobParametersModel putOutputsItem(String key, Object outputsItem) {
-    if (this.outputs == null) {
-      this.outputs = new HashMap<>();
-    }
-    this.outputs.put(key, outputsItem);
-    return this;
-  }
-
-  /**
-   * The outputs expected by the workflow.
-   * @return outputs
-  */
-  
-  @Schema(name = "outputs", description = "The outputs expected by the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public Map<String, Object> getOutputs() {
-    return outputs;
-  }
-
-  public void setOutputs(Map<String, Object> outputs) {
-    this.outputs = outputs;
   }
 
   public JobParametersModel parentTaskExecutionId(String parentTaskExecutionId) {
@@ -220,7 +189,6 @@ public class JobParametersModel {
     JobParametersModel jobParameters = (JobParametersModel) o;
     return Objects.equals(this.inputs, jobParameters.inputs) &&
         Objects.equals(this.label, jobParameters.label) &&
-        Objects.equals(this.outputs, jobParameters.outputs) &&
         Objects.equals(this.parentTaskExecutionId, jobParameters.parentTaskExecutionId) &&
         Objects.equals(this.priority, jobParameters.priority) &&
         Objects.equals(this.workflowId, jobParameters.workflowId) &&
@@ -229,7 +197,7 @@ public class JobParametersModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(inputs, label, outputs, parentTaskExecutionId, priority, workflowId, webhooks);
+    return Objects.hash(inputs, label, parentTaskExecutionId, priority, workflowId, webhooks);
   }
 
   @Override
@@ -238,7 +206,6 @@ public class JobParametersModel {
     sb.append("class JobParametersModel {\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
-    sb.append("    outputs: ").append(toIndentedString(outputs)).append("\n");
     sb.append("    parentTaskExecutionId: ").append(toIndentedString(parentTaskExecutionId)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");

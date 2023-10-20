@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-27T13:46:09.067916+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-28T19:25:30.758107+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "task-executions", description = "the task-executions API")
 public interface TaskExecutionsApi {
