@@ -15,9 +15,9 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
 
     const {data: connections} = useGetConnectionsQuery(
         {
-            componentNames: [component.connection!.name!],
+            componentNames: [component.connection!.componentName!],
         },
-        !!component.connection?.name
+        !!component.connection?.componentName
     );
 
     const {setShowConnectionNote, showConnectionNote} =
