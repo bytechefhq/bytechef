@@ -9,21 +9,21 @@
         {
           "label": "Key",
           "name": "key",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": "api_token"
         },
         {
           "label": "Value",
           "name": "value",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "label": "Add to",
           "name": "addTo",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "options": [
             {
               "name": "Header",
@@ -47,8 +47,8 @@
         {
           "label": "Token",
           "name": "token",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         }
       ],
       "version": 1
@@ -62,14 +62,14 @@
         {
           "label": "Username",
           "name": "username",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "label": "Password",
           "name": "password",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         }
       ],
       "version": 1
@@ -83,14 +83,14 @@
         {
           "label": "Username",
           "name": "username",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "label": "Password",
           "name": "password",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         }
       ],
       "version": 1
@@ -104,14 +104,14 @@
         {
           "label": "Access Token",
           "name": "accessToken",
-          "type": "STRING",
-          "required": true
+          "required": true,
+          "type": "STRING"
         },
         {
           "label": "Header Prefix",
           "name": "headerPrefix",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": "Bearer"
         }
       ],
@@ -130,14 +130,81 @@
         "label": "GET"
       },
       "name": "get",
-      "inputs": [
+      "output": [
+        {
+          "displayOption": {
+            "showWhen": {
+              "responseFormat": [
+                "JSON",
+                "XML"
+              ]
+            }
+          },
+          "type": "ARRAY"
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "responseFormat": [
+                "JSON",
+                "XML"
+              ]
+            }
+          },
+          "type": "OBJECT"
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "responseFormat": [
+                "TEXT"
+              ]
+            }
+          },
+          "type": "STRING"
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "responseFormat": [
+                "FILE"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The URI to make the request to",
           "label": "URI",
           "name": "uri",
           "placeholder": "https://example.com/index.html",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": ""
         },
         {
@@ -180,11 +247,9 @@
           "description": "The name of the file if the response is returned as a file object.",
           "displayOption": {
             "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "FILE"
-                ]
-              }
+              "responseFormat": [
+                "FILE"
+              ]
             }
           },
           "label": "Response Filename",
@@ -203,7 +268,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -236,7 +300,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -254,75 +317,6 @@
                   "defaultValue": ""
                 }
               ]
-            }
-          ]
-        }
-      ],
-      "outputSchema": [
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "JSON",
-                  "XML"
-                ]
-              }
-            }
-          },
-          "type": "ANY",
-          "types": [
-            {
-              "type": "ARRAY"
-            },
-            {
-              "type": "OBJECT"
-            }
-          ]
-        },
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "TEXT"
-                ]
-              }
-            }
-          },
-          "type": "STRING"
-        },
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "FILE"
-                ]
-              }
-            }
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "mimeType",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "name",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "url",
-              "type": "STRING",
-              "required": true
             }
           ]
         }
@@ -334,14 +328,81 @@
         "label": "POST"
       },
       "name": "post",
-      "inputs": [
+      "output": [
+        {
+          "displayOption": {
+            "showWhen": {
+              "responseFormat": [
+                "JSON",
+                "XML"
+              ]
+            }
+          },
+          "type": "ARRAY"
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "responseFormat": [
+                "JSON",
+                "XML"
+              ]
+            }
+          },
+          "type": "OBJECT"
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "responseFormat": [
+                "TEXT"
+              ]
+            }
+          },
+          "type": "STRING"
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "responseFormat": [
+                "FILE"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The URI to make the request to",
           "label": "URI",
           "name": "uri",
           "placeholder": "https://example.com/index.html",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": ""
         },
         {
@@ -384,11 +445,9 @@
           "description": "The name of the file if the response is returned as a file object.",
           "displayOption": {
             "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "FILE"
-                ]
-              }
+              "responseFormat": [
+                "FILE"
+              ]
             }
           },
           "label": "Response Filename",
@@ -407,7 +466,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -440,7 +498,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -465,13 +522,11 @@
           "description": "Send file instead of body parameters.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "JSON",
-                  "RAW",
-                  "XML"
-                ]
-              }
+              "bodyContentType": [
+                "JSON",
+                "RAW",
+                "XML"
+              ]
             }
           },
           "label": "Send File",
@@ -483,28 +538,29 @@
           "description": "Body parameters to send.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "JSON"
-                ]
-              }
+              "bodyContentType": [
+                "JSON"
+              ]
             }
           },
           "label": "Body Parameters",
           "name": "bodyParameters",
           "placeholder": "Add Parameter",
           "type": "OBJECT",
-          "additionalProperties": true
+          "additionalProperties": true,
+          "properties": [
+            {
+              "type": "ANY"
+            }
+          ]
         },
         {
           "description": "Body parameters to send.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "FORM_DATA"
-                ]
-              }
+              "bodyContentType": [
+                "FORM_DATA"
+              ]
             }
           },
           "label": "Body Parameters",
@@ -517,7 +573,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -542,11 +597,9 @@
           "description": "Body parameters to send.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "FORM_URLENCODED"
-                ]
-              }
+              "bodyContentType": [
+                "FORM_URLENCODED"
+              ]
             }
           },
           "label": "Body Parameters",
@@ -559,7 +612,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -580,26 +632,27 @@
                     },
                     {
                       "type": "OBJECT",
+                      "objectType": "FILE_ENTRY",
                       "properties": [
                         {
                           "name": "extension",
-                          "type": "STRING",
-                          "required": true
+                          "required": true,
+                          "type": "STRING"
                         },
                         {
                           "name": "mimeType",
-                          "type": "STRING",
-                          "required": true
+                          "required": true,
+                          "type": "STRING"
                         },
                         {
                           "name": "name",
-                          "type": "STRING",
-                          "required": true
+                          "required": true,
+                          "type": "STRING"
                         },
                         {
                           "name": "url",
-                          "type": "STRING",
-                          "required": true
+                          "required": true,
+                          "type": "STRING"
                         }
                       ]
                     }
@@ -613,11 +666,9 @@
           "description": "The raw text to send.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "RAW"
-                ]
-              }
+              "bodyContentType": [
+                "RAW"
+              ]
             }
           },
           "label": "Raw",
@@ -628,217 +679,136 @@
           "description": "The object property which contains a reference to the file with data to upload.",
           "displayOption": {
             "hideWhen": {
-              "sendFile": {
-                "values": [
-                  false
-                ]
-              }
+              "sendFile": [
+                false
+              ]
             },
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "BINARY",
-                  "JSON",
-                  "RAW",
-                  "XML"
-                ]
-              }
+              "bodyContentType": [
+                "BINARY",
+                "JSON",
+                "RAW",
+                "XML"
+              ]
             }
           },
           "label": "File",
           "name": "fileEntry",
           "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
           "properties": [
             {
               "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "mimeType",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "name",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "url",
-              "type": "STRING",
-              "required": true
-            }
-          ]
-        },
-        {
-          "label": "Options",
-          "placeholder": "Add Option",
-          "type": "OPTION",
-          "options": [
-            {
-              "description": "Content-Type to use when sending body parameters.",
-              "label": "Body Content Type",
-              "name": "bodyContentType",
-              "type": "STRING",
-              "defaultValue": "JSON",
-              "options": [
-                {
-                  "name": "JSON",
-                  "value": "JSON"
-                },
-                {
-                  "name": "Raw",
-                  "value": "RAW"
-                },
-                {
-                  "name": "Form-Data",
-                  "value": "FORM_DATA"
-                },
-                {
-                  "name": "Form-Urlencoded",
-                  "value": "FORM_URLENCODED"
-                },
-                {
-                  "name": "Binary",
-                  "value": "BINARY"
-                },
-                {
-                  "name": "XML",
-                  "value": "XML"
-                }
-              ]
-            },
-            {
-              "description": "Mime-Type to use when sending raw body content.",
-              "displayOption": {
-                "showWhen": {
-                  "bodyContentType": {
-                    "values": [
-                      "RAW"
-                    ]
-                  }
-                }
-              },
-              "label": "Mime Type",
-              "name": "mimeType",
-              "placeholder": "text/xml",
+              "required": true,
               "type": "STRING"
             },
             {
-              "description": "Returns the full response data instead of only the body.",
-              "label": "Full Response",
-              "name": "fullResponse",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Follow non-GET HTTP 3xx redirects.",
-              "label": "Follow All Redirects",
-              "name": "followAllRedirects",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Follow GET HTTP 3xx redirects.",
-              "label": "Follow GET Redirect",
-              "name": "followRedirect",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Succeeds also when the status code is not 2xx.",
-              "label": "Ignore Response Code",
-              "name": "ignoreResponseCode",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "HTTP proxy to use.",
-              "label": "Proxy",
-              "name": "proxy",
-              "placeholder": "https://myproxy:3128",
-              "type": "STRING",
-              "defaultValue": ""
-            },
-            {
-              "description": "Time in ms to wait for the server to send a response before aborting the request.",
-              "label": "Timeout",
-              "name": "timeout",
-              "type": "INTEGER",
-              "defaultValue": 1000,
-              "minValue": 1
-            }
-          ]
-        }
-      ],
-      "outputSchema": [
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "JSON",
-                  "XML"
-                ]
-              }
-            }
-          },
-          "type": "ANY",
-          "types": [
-            {
-              "type": "ARRAY"
-            },
-            {
-              "type": "OBJECT"
-            }
-          ]
-        },
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "TEXT"
-                ]
-              }
-            }
-          },
-          "type": "STRING"
-        },
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "FILE"
-                ]
-              }
-            }
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
               "name": "mimeType",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "name",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "url",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             }
           ]
+        },
+        {
+          "description": "Content-Type to use when sending body parameters.",
+          "label": "Body Content Type",
+          "name": "bodyContentType",
+          "type": "STRING",
+          "defaultValue": "JSON",
+          "options": [
+            {
+              "name": "JSON",
+              "value": "JSON"
+            },
+            {
+              "name": "Raw",
+              "value": "RAW"
+            },
+            {
+              "name": "Form-Data",
+              "value": "FORM_DATA"
+            },
+            {
+              "name": "Form-Urlencoded",
+              "value": "FORM_URLENCODED"
+            },
+            {
+              "name": "Binary",
+              "value": "BINARY"
+            },
+            {
+              "name": "XML",
+              "value": "XML"
+            }
+          ]
+        },
+        {
+          "description": "Mime-Type to use when sending raw body content.",
+          "displayOption": {
+            "showWhen": {
+              "bodyContentType": [
+                "RAW"
+              ]
+            }
+          },
+          "label": "Mime Type",
+          "name": "mimeType",
+          "placeholder": "text/xml",
+          "type": "STRING"
+        },
+        {
+          "description": "Returns the full response data instead of only the body.",
+          "label": "Full Response",
+          "name": "fullResponse",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "Follow non-GET HTTP 3xx redirects.",
+          "label": "Follow All Redirects",
+          "name": "followAllRedirects",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "Follow GET HTTP 3xx redirects.",
+          "label": "Follow GET Redirect",
+          "name": "followRedirect",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "Succeeds also when the status code is not 2xx.",
+          "label": "Ignore Response Code",
+          "name": "ignoreResponseCode",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "HTTP proxy to use.",
+          "label": "Proxy",
+          "name": "proxy",
+          "placeholder": "https://myproxy:3128",
+          "type": "STRING",
+          "defaultValue": ""
+        },
+        {
+          "description": "Time in ms to wait for the server to send a response before aborting the request.",
+          "label": "Timeout",
+          "name": "timeout",
+          "type": "INTEGER",
+          "defaultValue": 1000,
+          "minValue": 1
         }
       ]
     },
@@ -848,14 +818,200 @@
         "label": "PUT"
       },
       "name": "put",
-      "inputs": [
+      "output": [
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                true
+              ],
+              "responseFormat": [
+                "JSON",
+                "XML"
+              ]
+            }
+          },
+          "type": "ANY",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "OBJECT"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                false
+              ],
+              "responseFormat": [
+                "JSON",
+                "XML"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "body",
+              "type": "ANY",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "OBJECT"
+                }
+              ]
+            },
+            {
+              "name": "headers",
+              "type": "OBJECT"
+            },
+            {
+              "name": "status",
+              "type": "INTEGER"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                true
+              ],
+              "responseFormat": [
+                "TEXT"
+              ]
+            }
+          },
+          "type": "STRING"
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                false
+              ],
+              "responseFormat": [
+                "TEXT"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "body",
+              "type": "STRING"
+            },
+            {
+              "name": "headers",
+              "type": "OBJECT"
+            },
+            {
+              "name": "status",
+              "type": "INTEGER"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                true
+              ],
+              "responseFormat": [
+                "FILE"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                false
+              ],
+              "responseFormat": [
+                "FILE"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "body",
+              "type": "OBJECT",
+              "objectType": "FILE_ENTRY",
+              "properties": [
+                {
+                  "name": "extension",
+                  "required": true,
+                  "type": "STRING"
+                },
+                {
+                  "name": "mimeType",
+                  "required": true,
+                  "type": "STRING"
+                },
+                {
+                  "name": "name",
+                  "required": true,
+                  "type": "STRING"
+                },
+                {
+                  "name": "url",
+                  "required": true,
+                  "type": "STRING"
+                }
+              ]
+            },
+            {
+              "name": "headers",
+              "type": "OBJECT"
+            },
+            {
+              "name": "status",
+              "type": "INTEGER"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The URI to make the request to",
           "label": "URI",
           "name": "uri",
           "placeholder": "https://example.com/index.html",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": ""
         },
         {
@@ -898,11 +1054,9 @@
           "description": "The name of the file if the response is returned as a file object.",
           "displayOption": {
             "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "FILE"
-                ]
-              }
+              "responseFormat": [
+                "FILE"
+              ]
             }
           },
           "label": "Response Filename",
@@ -921,7 +1075,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -954,7 +1107,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -979,13 +1131,11 @@
           "description": "Send file instead of body parameters.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "JSON",
-                  "RAW",
-                  "XML"
-                ]
-              }
+              "bodyContentType": [
+                "JSON",
+                "RAW",
+                "XML"
+              ]
             }
           },
           "label": "Send File",
@@ -997,28 +1147,29 @@
           "description": "Body parameters to send.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "JSON"
-                ]
-              }
+              "bodyContentType": [
+                "JSON"
+              ]
             }
           },
           "label": "Body Parameters",
           "name": "bodyParameters",
           "placeholder": "Add Parameter",
           "type": "OBJECT",
-          "additionalProperties": true
+          "additionalProperties": true,
+          "properties": [
+            {
+              "type": "ANY"
+            }
+          ]
         },
         {
           "description": "Body parameters to send.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "FORM_DATA"
-                ]
-              }
+              "bodyContentType": [
+                "FORM_DATA"
+              ]
             }
           },
           "label": "Body Parameters",
@@ -1031,7 +1182,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -1056,11 +1206,9 @@
           "description": "Body parameters to send.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "FORM_URLENCODED"
-                ]
-              }
+              "bodyContentType": [
+                "FORM_URLENCODED"
+              ]
             }
           },
           "label": "Body Parameters",
@@ -1073,7 +1221,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -1094,26 +1241,27 @@
                     },
                     {
                       "type": "OBJECT",
+                      "objectType": "FILE_ENTRY",
                       "properties": [
                         {
                           "name": "extension",
-                          "type": "STRING",
-                          "required": true
+                          "required": true,
+                          "type": "STRING"
                         },
                         {
                           "name": "mimeType",
-                          "type": "STRING",
-                          "required": true
+                          "required": true,
+                          "type": "STRING"
                         },
                         {
                           "name": "name",
-                          "type": "STRING",
-                          "required": true
+                          "required": true,
+                          "type": "STRING"
                         },
                         {
                           "name": "url",
-                          "type": "STRING",
-                          "required": true
+                          "required": true,
+                          "type": "STRING"
                         }
                       ]
                     }
@@ -1127,11 +1275,9 @@
           "description": "The raw text to send.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "RAW"
-                ]
-              }
+              "bodyContentType": [
+                "RAW"
+              ]
             }
           },
           "label": "Raw",
@@ -1142,217 +1288,136 @@
           "description": "The object property which contains a reference to the file with data to upload.",
           "displayOption": {
             "hideWhen": {
-              "sendFile": {
-                "values": [
-                  false
-                ]
-              }
+              "sendFile": [
+                false
+              ]
             },
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "BINARY",
-                  "JSON",
-                  "RAW",
-                  "XML"
-                ]
-              }
+              "bodyContentType": [
+                "BINARY",
+                "JSON",
+                "RAW",
+                "XML"
+              ]
             }
           },
           "label": "File",
           "name": "fileEntry",
           "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
           "properties": [
             {
               "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "mimeType",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "name",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "url",
-              "type": "STRING",
-              "required": true
-            }
-          ]
-        },
-        {
-          "label": "Options",
-          "placeholder": "Add Option",
-          "type": "OPTION",
-          "options": [
-            {
-              "description": "Content-Type to use when sending body parameters.",
-              "label": "Body Content Type",
-              "name": "bodyContentType",
-              "type": "STRING",
-              "defaultValue": "JSON",
-              "options": [
-                {
-                  "name": "JSON",
-                  "value": "JSON"
-                },
-                {
-                  "name": "Raw",
-                  "value": "RAW"
-                },
-                {
-                  "name": "Form-Data",
-                  "value": "FORM_DATA"
-                },
-                {
-                  "name": "Form-Urlencoded",
-                  "value": "FORM_URLENCODED"
-                },
-                {
-                  "name": "Binary",
-                  "value": "BINARY"
-                },
-                {
-                  "name": "XML",
-                  "value": "XML"
-                }
-              ]
-            },
-            {
-              "description": "Mime-Type to use when sending raw body content.",
-              "displayOption": {
-                "showWhen": {
-                  "bodyContentType": {
-                    "values": [
-                      "RAW"
-                    ]
-                  }
-                }
-              },
-              "label": "Mime Type",
-              "name": "mimeType",
-              "placeholder": "text/xml",
+              "required": true,
               "type": "STRING"
             },
             {
-              "description": "Returns the full response data instead of only the body.",
-              "label": "Full Response",
-              "name": "fullResponse",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Follow non-GET HTTP 3xx redirects.",
-              "label": "Follow All Redirects",
-              "name": "followAllRedirects",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Follow GET HTTP 3xx redirects.",
-              "label": "Follow GET Redirect",
-              "name": "followRedirect",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Succeeds also when the status code is not 2xx.",
-              "label": "Ignore Response Code",
-              "name": "ignoreResponseCode",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "HTTP proxy to use.",
-              "label": "Proxy",
-              "name": "proxy",
-              "placeholder": "https://myproxy:3128",
-              "type": "STRING",
-              "defaultValue": ""
-            },
-            {
-              "description": "Time in ms to wait for the server to send a response before aborting the request.",
-              "label": "Timeout",
-              "name": "timeout",
-              "type": "INTEGER",
-              "defaultValue": 1000,
-              "minValue": 1
-            }
-          ]
-        }
-      ],
-      "outputSchema": [
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "JSON",
-                  "XML"
-                ]
-              }
-            }
-          },
-          "type": "ANY",
-          "types": [
-            {
-              "type": "ARRAY"
-            },
-            {
-              "type": "OBJECT"
-            }
-          ]
-        },
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "TEXT"
-                ]
-              }
-            }
-          },
-          "type": "STRING"
-        },
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "FILE"
-                ]
-              }
-            }
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
               "name": "mimeType",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "name",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "url",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             }
           ]
+        },
+        {
+          "description": "Content-Type to use when sending body parameters.",
+          "label": "Body Content Type",
+          "name": "bodyContentType",
+          "type": "STRING",
+          "defaultValue": "JSON",
+          "options": [
+            {
+              "name": "JSON",
+              "value": "JSON"
+            },
+            {
+              "name": "Raw",
+              "value": "RAW"
+            },
+            {
+              "name": "Form-Data",
+              "value": "FORM_DATA"
+            },
+            {
+              "name": "Form-Urlencoded",
+              "value": "FORM_URLENCODED"
+            },
+            {
+              "name": "Binary",
+              "value": "BINARY"
+            },
+            {
+              "name": "XML",
+              "value": "XML"
+            }
+          ]
+        },
+        {
+          "description": "Mime-Type to use when sending raw body content.",
+          "displayOption": {
+            "showWhen": {
+              "bodyContentType": [
+                "RAW"
+              ]
+            }
+          },
+          "label": "Mime Type",
+          "name": "mimeType",
+          "placeholder": "text/xml",
+          "type": "STRING"
+        },
+        {
+          "description": "Returns the full response data instead of only the body.",
+          "label": "Full Response",
+          "name": "fullResponse",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "Follow non-GET HTTP 3xx redirects.",
+          "label": "Follow All Redirects",
+          "name": "followAllRedirects",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "Follow GET HTTP 3xx redirects.",
+          "label": "Follow GET Redirect",
+          "name": "followRedirect",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "Succeeds also when the status code is not 2xx.",
+          "label": "Ignore Response Code",
+          "name": "ignoreResponseCode",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "HTTP proxy to use.",
+          "label": "Proxy",
+          "name": "proxy",
+          "placeholder": "https://myproxy:3128",
+          "type": "STRING",
+          "defaultValue": ""
+        },
+        {
+          "description": "Time in ms to wait for the server to send a response before aborting the request.",
+          "label": "Timeout",
+          "name": "timeout",
+          "type": "INTEGER",
+          "defaultValue": 1000,
+          "minValue": 1
         }
       ]
     },
@@ -1362,14 +1427,200 @@
         "label": "PATCH"
       },
       "name": "patch",
-      "inputs": [
+      "output": [
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                true
+              ],
+              "responseFormat": [
+                "JSON",
+                "XML"
+              ]
+            }
+          },
+          "type": "ANY",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "OBJECT"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                false
+              ],
+              "responseFormat": [
+                "JSON",
+                "XML"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "body",
+              "type": "ANY",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "OBJECT"
+                }
+              ]
+            },
+            {
+              "name": "headers",
+              "type": "OBJECT"
+            },
+            {
+              "name": "status",
+              "type": "INTEGER"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                true
+              ],
+              "responseFormat": [
+                "TEXT"
+              ]
+            }
+          },
+          "type": "STRING"
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                false
+              ],
+              "responseFormat": [
+                "TEXT"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "body",
+              "type": "STRING"
+            },
+            {
+              "name": "headers",
+              "type": "OBJECT"
+            },
+            {
+              "name": "status",
+              "type": "INTEGER"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                true
+              ],
+              "responseFormat": [
+                "FILE"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                false
+              ],
+              "responseFormat": [
+                "FILE"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "body",
+              "type": "OBJECT",
+              "objectType": "FILE_ENTRY",
+              "properties": [
+                {
+                  "name": "extension",
+                  "required": true,
+                  "type": "STRING"
+                },
+                {
+                  "name": "mimeType",
+                  "required": true,
+                  "type": "STRING"
+                },
+                {
+                  "name": "name",
+                  "required": true,
+                  "type": "STRING"
+                },
+                {
+                  "name": "url",
+                  "required": true,
+                  "type": "STRING"
+                }
+              ]
+            },
+            {
+              "name": "headers",
+              "type": "OBJECT"
+            },
+            {
+              "name": "status",
+              "type": "INTEGER"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The URI to make the request to",
           "label": "URI",
           "name": "uri",
           "placeholder": "https://example.com/index.html",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": ""
         },
         {
@@ -1412,11 +1663,9 @@
           "description": "The name of the file if the response is returned as a file object.",
           "displayOption": {
             "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "FILE"
-                ]
-              }
+              "responseFormat": [
+                "FILE"
+              ]
             }
           },
           "label": "Response Filename",
@@ -1435,7 +1684,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -1468,7 +1716,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -1493,13 +1740,11 @@
           "description": "Send file instead of body parameters.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "JSON",
-                  "RAW",
-                  "XML"
-                ]
-              }
+              "bodyContentType": [
+                "JSON",
+                "RAW",
+                "XML"
+              ]
             }
           },
           "label": "Send File",
@@ -1511,28 +1756,29 @@
           "description": "Body parameters to send.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "JSON"
-                ]
-              }
+              "bodyContentType": [
+                "JSON"
+              ]
             }
           },
           "label": "Body Parameters",
           "name": "bodyParameters",
           "placeholder": "Add Parameter",
           "type": "OBJECT",
-          "additionalProperties": true
+          "additionalProperties": true,
+          "properties": [
+            {
+              "type": "ANY"
+            }
+          ]
         },
         {
           "description": "Body parameters to send.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "FORM_DATA"
-                ]
-              }
+              "bodyContentType": [
+                "FORM_DATA"
+              ]
             }
           },
           "label": "Body Parameters",
@@ -1545,7 +1791,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -1570,11 +1815,9 @@
           "description": "Body parameters to send.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "FORM_URLENCODED"
-                ]
-              }
+              "bodyContentType": [
+                "FORM_URLENCODED"
+              ]
             }
           },
           "label": "Body Parameters",
@@ -1587,7 +1830,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -1608,26 +1850,27 @@
                     },
                     {
                       "type": "OBJECT",
+                      "objectType": "FILE_ENTRY",
                       "properties": [
                         {
                           "name": "extension",
-                          "type": "STRING",
-                          "required": true
+                          "required": true,
+                          "type": "STRING"
                         },
                         {
                           "name": "mimeType",
-                          "type": "STRING",
-                          "required": true
+                          "required": true,
+                          "type": "STRING"
                         },
                         {
                           "name": "name",
-                          "type": "STRING",
-                          "required": true
+                          "required": true,
+                          "type": "STRING"
                         },
                         {
                           "name": "url",
-                          "type": "STRING",
-                          "required": true
+                          "required": true,
+                          "type": "STRING"
                         }
                       ]
                     }
@@ -1641,11 +1884,9 @@
           "description": "The raw text to send.",
           "displayOption": {
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "RAW"
-                ]
-              }
+              "bodyContentType": [
+                "RAW"
+              ]
             }
           },
           "label": "Raw",
@@ -1656,217 +1897,136 @@
           "description": "The object property which contains a reference to the file with data to upload.",
           "displayOption": {
             "hideWhen": {
-              "sendFile": {
-                "values": [
-                  false
-                ]
-              }
+              "sendFile": [
+                false
+              ]
             },
             "showWhen": {
-              "bodyContentType": {
-                "values": [
-                  "BINARY",
-                  "JSON",
-                  "RAW",
-                  "XML"
-                ]
-              }
+              "bodyContentType": [
+                "BINARY",
+                "JSON",
+                "RAW",
+                "XML"
+              ]
             }
           },
           "label": "File",
           "name": "fileEntry",
           "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
           "properties": [
             {
               "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "mimeType",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "name",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "url",
-              "type": "STRING",
-              "required": true
-            }
-          ]
-        },
-        {
-          "label": "Options",
-          "placeholder": "Add Option",
-          "type": "OPTION",
-          "options": [
-            {
-              "description": "Content-Type to use when sending body parameters.",
-              "label": "Body Content Type",
-              "name": "bodyContentType",
-              "type": "STRING",
-              "defaultValue": "JSON",
-              "options": [
-                {
-                  "name": "JSON",
-                  "value": "JSON"
-                },
-                {
-                  "name": "Raw",
-                  "value": "RAW"
-                },
-                {
-                  "name": "Form-Data",
-                  "value": "FORM_DATA"
-                },
-                {
-                  "name": "Form-Urlencoded",
-                  "value": "FORM_URLENCODED"
-                },
-                {
-                  "name": "Binary",
-                  "value": "BINARY"
-                },
-                {
-                  "name": "XML",
-                  "value": "XML"
-                }
-              ]
-            },
-            {
-              "description": "Mime-Type to use when sending raw body content.",
-              "displayOption": {
-                "showWhen": {
-                  "bodyContentType": {
-                    "values": [
-                      "RAW"
-                    ]
-                  }
-                }
-              },
-              "label": "Mime Type",
-              "name": "mimeType",
-              "placeholder": "text/xml",
+              "required": true,
               "type": "STRING"
             },
             {
-              "description": "Returns the full response data instead of only the body.",
-              "label": "Full Response",
-              "name": "fullResponse",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Follow non-GET HTTP 3xx redirects.",
-              "label": "Follow All Redirects",
-              "name": "followAllRedirects",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Follow GET HTTP 3xx redirects.",
-              "label": "Follow GET Redirect",
-              "name": "followRedirect",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Succeeds also when the status code is not 2xx.",
-              "label": "Ignore Response Code",
-              "name": "ignoreResponseCode",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "HTTP proxy to use.",
-              "label": "Proxy",
-              "name": "proxy",
-              "placeholder": "https://myproxy:3128",
-              "type": "STRING",
-              "defaultValue": ""
-            },
-            {
-              "description": "Time in ms to wait for the server to send a response before aborting the request.",
-              "label": "Timeout",
-              "name": "timeout",
-              "type": "INTEGER",
-              "defaultValue": 1000,
-              "minValue": 1
-            }
-          ]
-        }
-      ],
-      "outputSchema": [
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "JSON",
-                  "XML"
-                ]
-              }
-            }
-          },
-          "type": "ANY",
-          "types": [
-            {
-              "type": "ARRAY"
-            },
-            {
-              "type": "OBJECT"
-            }
-          ]
-        },
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "TEXT"
-                ]
-              }
-            }
-          },
-          "type": "STRING"
-        },
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "FILE"
-                ]
-              }
-            }
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
               "name": "mimeType",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "name",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             },
             {
               "name": "url",
-              "type": "STRING",
-              "required": true
+              "required": true,
+              "type": "STRING"
             }
           ]
+        },
+        {
+          "description": "Content-Type to use when sending body parameters.",
+          "label": "Body Content Type",
+          "name": "bodyContentType",
+          "type": "STRING",
+          "defaultValue": "JSON",
+          "options": [
+            {
+              "name": "JSON",
+              "value": "JSON"
+            },
+            {
+              "name": "Raw",
+              "value": "RAW"
+            },
+            {
+              "name": "Form-Data",
+              "value": "FORM_DATA"
+            },
+            {
+              "name": "Form-Urlencoded",
+              "value": "FORM_URLENCODED"
+            },
+            {
+              "name": "Binary",
+              "value": "BINARY"
+            },
+            {
+              "name": "XML",
+              "value": "XML"
+            }
+          ]
+        },
+        {
+          "description": "Mime-Type to use when sending raw body content.",
+          "displayOption": {
+            "showWhen": {
+              "bodyContentType": [
+                "RAW"
+              ]
+            }
+          },
+          "label": "Mime Type",
+          "name": "mimeType",
+          "placeholder": "text/xml",
+          "type": "STRING"
+        },
+        {
+          "description": "Returns the full response data instead of only the body.",
+          "label": "Full Response",
+          "name": "fullResponse",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "Follow non-GET HTTP 3xx redirects.",
+          "label": "Follow All Redirects",
+          "name": "followAllRedirects",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "Follow GET HTTP 3xx redirects.",
+          "label": "Follow GET Redirect",
+          "name": "followRedirect",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "Succeeds also when the status code is not 2xx.",
+          "label": "Ignore Response Code",
+          "name": "ignoreResponseCode",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "HTTP proxy to use.",
+          "label": "Proxy",
+          "name": "proxy",
+          "placeholder": "https://myproxy:3128",
+          "type": "STRING",
+          "defaultValue": ""
+        },
+        {
+          "description": "Time in ms to wait for the server to send a response before aborting the request.",
+          "label": "Timeout",
+          "name": "timeout",
+          "type": "INTEGER",
+          "defaultValue": 1000,
+          "minValue": 1
         }
       ]
     },
@@ -1876,14 +2036,200 @@
         "label": "DELETE"
       },
       "name": "delete",
-      "inputs": [
+      "output": [
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                true
+              ],
+              "responseFormat": [
+                "JSON",
+                "XML"
+              ]
+            }
+          },
+          "type": "ANY",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "OBJECT"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                false
+              ],
+              "responseFormat": [
+                "JSON",
+                "XML"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "body",
+              "type": "ANY",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "OBJECT"
+                }
+              ]
+            },
+            {
+              "name": "headers",
+              "type": "OBJECT"
+            },
+            {
+              "name": "status",
+              "type": "INTEGER"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                true
+              ],
+              "responseFormat": [
+                "TEXT"
+              ]
+            }
+          },
+          "type": "STRING"
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                false
+              ],
+              "responseFormat": [
+                "TEXT"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "body",
+              "type": "STRING"
+            },
+            {
+              "name": "headers",
+              "type": "OBJECT"
+            },
+            {
+              "name": "status",
+              "type": "INTEGER"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                true
+              ],
+              "responseFormat": [
+                "FILE"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                false
+              ],
+              "responseFormat": [
+                "FILE"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "body",
+              "type": "OBJECT",
+              "objectType": "FILE_ENTRY",
+              "properties": [
+                {
+                  "name": "extension",
+                  "required": true,
+                  "type": "STRING"
+                },
+                {
+                  "name": "mimeType",
+                  "required": true,
+                  "type": "STRING"
+                },
+                {
+                  "name": "name",
+                  "required": true,
+                  "type": "STRING"
+                },
+                {
+                  "name": "url",
+                  "required": true,
+                  "type": "STRING"
+                }
+              ]
+            },
+            {
+              "name": "headers",
+              "type": "OBJECT"
+            },
+            {
+              "name": "status",
+              "type": "INTEGER"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The URI to make the request to",
           "label": "URI",
           "name": "uri",
           "placeholder": "https://example.com/index.html",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": ""
         },
         {
@@ -1926,11 +2272,9 @@
           "description": "The name of the file if the response is returned as a file object.",
           "displayOption": {
             "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "FILE"
-                ]
-              }
+              "responseFormat": [
+                "FILE"
+              ]
             }
           },
           "label": "Response Filename",
@@ -1949,7 +2293,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -1982,7 +2325,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -2004,124 +2346,48 @@
           ]
         },
         {
-          "label": "Options",
-          "placeholder": "Add Option",
-          "type": "OPTION",
-          "options": [
-            {
-              "description": "Returns the full response data instead of only the body.",
-              "label": "Full Response",
-              "name": "fullResponse",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Follow non-GET HTTP 3xx redirects.",
-              "label": "Follow All Redirects",
-              "name": "followAllRedirects",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Follow GET HTTP 3xx redirects.",
-              "label": "Follow GET Redirect",
-              "name": "followRedirect",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Succeeds also when the status code is not 2xx.",
-              "label": "Ignore Response Code",
-              "name": "ignoreResponseCode",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "HTTP proxy to use.",
-              "label": "Proxy",
-              "name": "proxy",
-              "placeholder": "https://myproxy:3128",
-              "type": "STRING",
-              "defaultValue": ""
-            },
-            {
-              "description": "Time in ms to wait for the server to send a response before aborting the request.",
-              "label": "Timeout",
-              "name": "timeout",
-              "type": "INTEGER",
-              "defaultValue": 1000,
-              "minValue": 1
-            }
-          ]
-        }
-      ],
-      "outputSchema": [
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "JSON",
-                  "XML"
-                ]
-              }
-            }
-          },
-          "type": "ANY",
-          "types": [
-            {
-              "type": "ARRAY"
-            },
-            {
-              "type": "OBJECT"
-            }
-          ]
+          "description": "Returns the full response data instead of only the body.",
+          "label": "Full Response",
+          "name": "fullResponse",
+          "type": "BOOLEAN",
+          "defaultValue": false
         },
         {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "TEXT"
-                ]
-              }
-            }
-          },
-          "type": "STRING"
+          "description": "Follow non-GET HTTP 3xx redirects.",
+          "label": "Follow All Redirects",
+          "name": "followAllRedirects",
+          "type": "BOOLEAN",
+          "defaultValue": false
         },
         {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "FILE"
-                ]
-              }
-            }
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "mimeType",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "name",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "url",
-              "type": "STRING",
-              "required": true
-            }
-          ]
+          "description": "Follow GET HTTP 3xx redirects.",
+          "label": "Follow GET Redirect",
+          "name": "followRedirect",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "Succeeds also when the status code is not 2xx.",
+          "label": "Ignore Response Code",
+          "name": "ignoreResponseCode",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "HTTP proxy to use.",
+          "label": "Proxy",
+          "name": "proxy",
+          "placeholder": "https://myproxy:3128",
+          "type": "STRING",
+          "defaultValue": ""
+        },
+        {
+          "description": "Time in ms to wait for the server to send a response before aborting the request.",
+          "label": "Timeout",
+          "name": "timeout",
+          "type": "INTEGER",
+          "defaultValue": 1000,
+          "minValue": 1
         }
       ]
     },
@@ -2131,14 +2397,200 @@
         "label": "HEAD"
       },
       "name": "head",
-      "inputs": [
+      "output": [
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                true
+              ],
+              "responseFormat": [
+                "JSON",
+                "XML"
+              ]
+            }
+          },
+          "type": "ANY",
+          "types": [
+            {
+              "type": "ARRAY"
+            },
+            {
+              "type": "OBJECT"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                false
+              ],
+              "responseFormat": [
+                "JSON",
+                "XML"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "body",
+              "type": "ANY",
+              "types": [
+                {
+                  "type": "ARRAY"
+                },
+                {
+                  "type": "OBJECT"
+                }
+              ]
+            },
+            {
+              "name": "headers",
+              "type": "OBJECT"
+            },
+            {
+              "name": "status",
+              "type": "INTEGER"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                true
+              ],
+              "responseFormat": [
+                "TEXT"
+              ]
+            }
+          },
+          "type": "STRING"
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                false
+              ],
+              "responseFormat": [
+                "TEXT"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "body",
+              "type": "STRING"
+            },
+            {
+              "name": "headers",
+              "type": "OBJECT"
+            },
+            {
+              "name": "status",
+              "type": "INTEGER"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                true
+              ],
+              "responseFormat": [
+                "FILE"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "objectType": "FILE_ENTRY",
+          "properties": [
+            {
+              "name": "extension",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "mimeType",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "name",
+              "required": true,
+              "type": "STRING"
+            },
+            {
+              "name": "url",
+              "required": true,
+              "type": "STRING"
+            }
+          ]
+        },
+        {
+          "displayOption": {
+            "showWhen": {
+              "fullResponse": [
+                false
+              ],
+              "responseFormat": [
+                "FILE"
+              ]
+            }
+          },
+          "type": "OBJECT",
+          "properties": [
+            {
+              "name": "body",
+              "type": "OBJECT",
+              "objectType": "FILE_ENTRY",
+              "properties": [
+                {
+                  "name": "extension",
+                  "required": true,
+                  "type": "STRING"
+                },
+                {
+                  "name": "mimeType",
+                  "required": true,
+                  "type": "STRING"
+                },
+                {
+                  "name": "name",
+                  "required": true,
+                  "type": "STRING"
+                },
+                {
+                  "name": "url",
+                  "required": true,
+                  "type": "STRING"
+                }
+              ]
+            },
+            {
+              "name": "headers",
+              "type": "OBJECT"
+            },
+            {
+              "name": "status",
+              "type": "INTEGER"
+            }
+          ]
+        }
+      ],
+      "properties": [
         {
           "description": "The URI to make the request to",
           "label": "URI",
           "name": "uri",
           "placeholder": "https://example.com/index.html",
-          "type": "STRING",
           "required": true,
+          "type": "STRING",
           "defaultValue": ""
         },
         {
@@ -2181,11 +2633,9 @@
           "description": "The name of the file if the response is returned as a file object.",
           "displayOption": {
             "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "FILE"
-                ]
-              }
+              "responseFormat": [
+                "FILE"
+              ]
             }
           },
           "label": "Response Filename",
@@ -2204,7 +2654,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -2237,7 +2686,6 @@
           "items": [
             {
               "label": "Parameter",
-              "name": "parameter",
               "type": "OBJECT",
               "properties": [
                 {
@@ -2259,124 +2707,48 @@
           ]
         },
         {
-          "label": "Options",
-          "placeholder": "Add Option",
-          "type": "OPTION",
-          "options": [
-            {
-              "description": "Returns the full response data instead of only the body.",
-              "label": "Full Response",
-              "name": "fullResponse",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Follow non-GET HTTP 3xx redirects.",
-              "label": "Follow All Redirects",
-              "name": "followAllRedirects",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Follow GET HTTP 3xx redirects.",
-              "label": "Follow GET Redirect",
-              "name": "followRedirect",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "Succeeds also when the status code is not 2xx.",
-              "label": "Ignore Response Code",
-              "name": "ignoreResponseCode",
-              "type": "BOOLEAN",
-              "defaultValue": false
-            },
-            {
-              "description": "HTTP proxy to use.",
-              "label": "Proxy",
-              "name": "proxy",
-              "placeholder": "https://myproxy:3128",
-              "type": "STRING",
-              "defaultValue": ""
-            },
-            {
-              "description": "Time in ms to wait for the server to send a response before aborting the request.",
-              "label": "Timeout",
-              "name": "timeout",
-              "type": "INTEGER",
-              "defaultValue": 1000,
-              "minValue": 1
-            }
-          ]
-        }
-      ],
-      "outputSchema": [
-        {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "JSON",
-                  "XML"
-                ]
-              }
-            }
-          },
-          "type": "ANY",
-          "types": [
-            {
-              "type": "ARRAY"
-            },
-            {
-              "type": "OBJECT"
-            }
-          ]
+          "description": "Returns the full response data instead of only the body.",
+          "label": "Full Response",
+          "name": "fullResponse",
+          "type": "BOOLEAN",
+          "defaultValue": false
         },
         {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "TEXT"
-                ]
-              }
-            }
-          },
-          "type": "STRING"
+          "description": "Follow non-GET HTTP 3xx redirects.",
+          "label": "Follow All Redirects",
+          "name": "followAllRedirects",
+          "type": "BOOLEAN",
+          "defaultValue": false
         },
         {
-          "displayOption": {
-            "showWhen": {
-              "responseFormat": {
-                "values": [
-                  "FILE"
-                ]
-              }
-            }
-          },
-          "type": "OBJECT",
-          "properties": [
-            {
-              "name": "extension",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "mimeType",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "name",
-              "type": "STRING",
-              "required": true
-            },
-            {
-              "name": "url",
-              "type": "STRING",
-              "required": true
-            }
-          ]
+          "description": "Follow GET HTTP 3xx redirects.",
+          "label": "Follow GET Redirect",
+          "name": "followRedirect",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "Succeeds also when the status code is not 2xx.",
+          "label": "Ignore Response Code",
+          "name": "ignoreResponseCode",
+          "type": "BOOLEAN",
+          "defaultValue": false
+        },
+        {
+          "description": "HTTP proxy to use.",
+          "label": "Proxy",
+          "name": "proxy",
+          "placeholder": "https://myproxy:3128",
+          "type": "STRING",
+          "defaultValue": ""
+        },
+        {
+          "description": "Time in ms to wait for the server to send a response before aborting the request.",
+          "label": "Timeout",
+          "name": "timeout",
+          "type": "INTEGER",
+          "defaultValue": 1000,
+          "minValue": 1
         }
       ]
     }

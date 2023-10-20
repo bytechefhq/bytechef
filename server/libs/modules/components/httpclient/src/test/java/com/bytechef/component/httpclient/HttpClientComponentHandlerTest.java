@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.http.client;
+package com.bytechef.component.httpclient;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +27,7 @@ public class HttpClientComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        DefinitionAssert.assertEquals(
-                "definition/http-client_v1.json", new HttpClientComponentHandler().getDefinition());
+        AssertUtils.assertEquals("definition/httpclient_v1.json", new HttpClientComponentHandler().getDefinition());
     }
 
     @Disabled
