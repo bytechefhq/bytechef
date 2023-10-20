@@ -31,6 +31,8 @@ import com.bytechef.atlas.dto.JobParameters;
 import com.bytechef.atlas.error.ErrorHandler;
 import com.bytechef.atlas.error.ExecutionError;
 import com.bytechef.atlas.event.EventPublisher;
+import com.bytechef.atlas.facade.JobFacade;
+import com.bytechef.atlas.facade.impl.JobFacadeImpl;
 import com.bytechef.atlas.message.broker.MessageBroker;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
@@ -47,7 +49,6 @@ import com.bytechef.atlas.worker.Worker;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
-import com.bytechef.commons.utils.UUIDUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -68,13 +69,10 @@ public class WorkflowExecutor {
     private final WorkflowService workflowService;
 
     public WorkflowExecutor(
-        ContextService contextService,
-        CounterService counterService,
-        JobService jobService,
-        EventPublisher eventPublisher,
-        TaskExecutionService taskExecutionService,
-        Map<String, TaskHandler<?>> taskHandlerMap,
-        WorkflowService workflowService) {
+        ContextService contextService, CounterService counterService, JobService jobService,
+        EventPublisher eventPublisher, TaskExecutionService taskExecutionService,
+        Map<String, TaskHandler<?>> taskHandlerMap, WorkflowService workflowService) {
+
         this.contextService = contextService;
         this.counterService = counterService;
         this.jobService = jobService;
@@ -117,11 +115,9 @@ public class WorkflowExecutor {
         GetTaskCompletionHandlersFunction getTaskCompletionHandlersFunction,
         GetTaskDispatcherResolversFunction getTaskDispatcherResolversFunction,
         GetTaskHandlerMapSupplier getTaskHandlerMapSupplier) {
+
         return execute(
-            workflowId,
-            Map.of(),
-            getTaskCompletionHandlersFunction,
-            getTaskDispatcherResolversFunction,
+            workflowId, Map.of(), getTaskCompletionHandlersFunction, getTaskDispatcherResolversFunction,
             getTaskHandlerMapSupplier);
     }
 
@@ -170,11 +166,7 @@ public class WorkflowExecutor {
         taskDispatcherChain.setTaskDispatcherResolvers(Stream.concat(
             getTaskDispatcherResolversFunction
                 .apply(
-                    contextService,
-                    counterService,
-                    coordinatorMessageBroker,
-                    taskDispatcherChain,
-                    taskEvaluator,
+                    contextService, counterService, coordinatorMessageBroker, taskDispatcherChain, taskEvaluator,
                     taskExecutionService)
                 .stream(),
             Stream.of(new DefaultTaskDispatcher(coordinatorMessageBroker, List.of())))
@@ -184,54 +176,33 @@ public class WorkflowExecutor {
             contextService, taskDispatcherChain, taskExecutionService, taskEvaluator, workflowService);
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
-            contextService,
-            eventPublisher,
-            jobExecutor,
-            jobService,
-            taskEvaluator,
-            taskExecutionService,
-            workflowService);
+            contextService, e -> {
+            }, jobExecutor, jobService, taskEvaluator, taskExecutionService, workflowService);
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
 
         taskCompletionHandlerChain.setTaskCompletionHandlers(Stream.concat(
             getTaskCompletionHandlersFunction
                 .apply(
-                    counterService,
-                    taskCompletionHandlerChain,
-                    taskDispatcherChain,
-                    taskEvaluator,
+                    counterService, taskCompletionHandlerChain, taskDispatcherChain, taskEvaluator,
                     taskExecutionService)
                 .stream(),
             Stream.of(defaultTaskCompletionHandler))
             .toList());
 
+        JobFacade jobFacade = new JobFacadeImpl(contextService, eventPublisher, jobService, messageBroker);
+
         @SuppressWarnings({
             "rawtypes", "unchecked"
         })
         Coordinator coordinator = new Coordinator(
-            contextService,
-            (ErrorHandler) getTaskExecutionErrorHandler(taskDispatcherChain),
-            eventPublisher,
-            jobExecutor,
-            jobService,
-            messageBroker,
-            taskCompletionHandlerChain,
-            taskDispatcherChain,
-            taskExecutionService);
+            (ErrorHandler) getTaskExecutionErrorHandler(taskDispatcherChain), eventPublisher, jobExecutor, jobFacade,
+            jobService, taskCompletionHandlerChain, taskDispatcherChain, taskExecutionService);
 
         messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
-        messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((String) jobId));
+        messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
 
-        String jobId = UUIDUtils.generate();
-
-        JobParameters jobParameters = new JobParameters();
-
-        jobParameters.setInputs(inputs);
-        jobParameters.setJobId(jobId);
-        jobParameters.setWorkflowId(workflowId);
-
-        coordinator.create(jobParameters);
+        long jobId = jobFacade.create(new JobParameters(inputs, workflowId));
 
         return jobService.getJob(jobId);
     }
@@ -243,20 +214,15 @@ public class WorkflowExecutor {
 
     public interface GetTaskCompletionHandlersFunction {
         List<TaskCompletionHandler> apply(
-            CounterService counterService,
-            TaskCompletionHandler taskCompletionHandler,
-            TaskDispatcher<? super Task> taskDispatcher,
-            TaskEvaluator taskEvaluator,
+            CounterService counterService, TaskCompletionHandler taskCompletionHandler,
+            TaskDispatcher<? super Task> taskDispatcher, TaskEvaluator taskEvaluator,
             TaskExecutionService taskExecutionService);
     }
 
     public interface GetTaskDispatcherResolversFunction {
         List<TaskDispatcherResolver> apply(
-            ContextService contextService,
-            CounterService counterService,
-            MessageBroker messageBroker,
-            TaskDispatcher<? super Task> taskDispatcher,
-            TaskEvaluator taskEvaluator,
+            ContextService contextService, CounterService counterService, MessageBroker messageBroker,
+            TaskDispatcher<? super Task> taskDispatcher, TaskEvaluator taskEvaluator,
             TaskExecutionService taskExecutionService);
     }
 
