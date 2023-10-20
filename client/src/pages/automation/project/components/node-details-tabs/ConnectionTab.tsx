@@ -1,0 +1,68 @@
+import {PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
+import Button from 'components/Button/Button';
+import Select from 'components/Select/Select';
+import {ComponentDefinitionWithBasicActionsModel} from 'middleware/definition-registry';
+import {useGetConnectionsQuery} from 'queries/connections.queries';
+
+import {useConnectionNoteStore} from '../../stores/useNodeDetailsDialogStore';
+
+const ConnectionTab = ({
+    currentComponent,
+}: {
+    currentComponent: ComponentDefinitionWithBasicActionsModel;
+}) => {
+    const {data: connections} = useGetConnectionsQuery({
+        componentNames: [currentComponent.connection!.componentName!],
+    });
+
+    const {showConnectionNote, setShowConnectionNote} =
+        useConnectionNoteStore();
+
+    return (
+        <>
+            {connections && (
+                <div className="flex space-x-2">
+                    <Select
+                        contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
+                        label="Connections"
+                        options={connections.map((connection) => ({
+                            label: connection.name,
+                            value: connection.id!.toString(),
+                        }))}
+                        triggerClassName="w-full bg-gray-100"
+                    />
+
+                    <Button
+                        className="mt-auto bg-blue-500 p-2"
+                        icon={<PlusIcon className="h-5 w-5" />}
+                        onClick={() => console.log('add connection')}
+                        title="Create a new connection"
+                    />
+                </div>
+            )}
+
+            {showConnectionNote && (
+                <div className="mt-4 flex flex-col rounded-md border-2 border-amber-200 bg-amber-100 p-4 text-gray-800">
+                    <div className="flex pb-2">
+                        <span className="font-medium ">Note</span>
+
+                        <Button
+                            className="ml-auto p-0"
+                            displayType="icon"
+                            icon={<XMarkIcon className="ml-auto h-5 w-5" />}
+                            onClick={() => setShowConnectionNote(false)}
+                            title="Close the note"
+                        />
+                    </div>
+
+                    <p className="text-sm text-gray-800">
+                        The selected connection is used for testing purposes
+                        only.
+                    </p>
+                </div>
+            )}
+        </>
+    );
+};
+
+export default ConnectionTab;

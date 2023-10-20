@@ -44,7 +44,7 @@ const Select = ({
     triggerClassName,
     value,
 }: SelectProps): JSX.Element => (
-    <fieldset>
+    <fieldset className="w-full">
         {label && (
             <Label className="block px-2 text-sm font-medium leading-6 text-gray-900">
                 {label}
