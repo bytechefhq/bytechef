@@ -18,11 +18,11 @@ package com.bytechef.task.dispatcher.map.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.message.broker.MessageBroker;
-import com.bytechef.atlas.service.context.ContextService;
-import com.bytechef.atlas.service.counter.CounterService;
-import com.bytechef.atlas.service.task.execution.TaskExecutionService;
+import com.bytechef.atlas.service.ContextService;
+import com.bytechef.atlas.service.CounterService;
+import com.bytechef.atlas.service.TaskExecutionService;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.task.execution.evaluator.TaskEvaluator;
+import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +52,13 @@ public class MapTaskDispatcherConfiguration {
     @Autowired
     private TaskExecutionService taskExecutionService;
 
-    @Bean
+    @Bean("mapTaskCompletionHandlerFactory_v1")
     TaskCompletionHandlerFactory mapTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) ->
                 new MapTaskCompletionHandler(taskExecutionService, taskCompletionHandler, counterService);
     }
 
-    @Bean
+    @Bean("mapTaskDispatcherFactory_v1")
     TaskDispatcherResolverFactory mapTaskDispatcherFactory() {
         return (taskDispatcher) -> MapTaskDispatcher.builder()
                 .taskDispatcher(taskDispatcher)
