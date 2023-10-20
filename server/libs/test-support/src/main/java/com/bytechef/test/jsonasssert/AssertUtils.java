@@ -26,6 +26,9 @@ import org.json.JSONException;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.core.io.ClassPathResource;
 
+/**
+ * @author Ivica Cardic
+ */
 public class AssertUtils {
 
     private static final ObjectMapper objectMapper = new ObjectMapper() {
