@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "TODO")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-27T13:15:03.783538+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-29T13:13:26.694393+01:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   @JsonProperty("authorizationName")
@@ -48,7 +48,7 @@ public class ConnectionModel {
   private String name;
 
   @JsonProperty("id")
-  private String id;
+  private Long id;
 
   @JsonProperty("lastModifiedBy")
   private String lastModifiedBy;
@@ -175,7 +175,7 @@ public class ConnectionModel {
     this.name = name;
   }
 
-  public ConnectionModel id(String id) {
+  public ConnectionModel id(Long id) {
     this.id = id;
     return this;
   }
@@ -186,11 +186,11 @@ public class ConnectionModel {
   */
   
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
-  public String getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
