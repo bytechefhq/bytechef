@@ -54,7 +54,7 @@ class Framerate implements TaskHandler<Double> {
             String frameRateStr = response.getOutput();
             Assert.notNull(frameRateStr, "can not determine framerate");
             String[] frate = frameRateStr.replaceAll("[^0-9/\\.]", "").split("/");
-            return Double.valueOf(frate[0]) / Double.valueOf(frate[1]);
+            return Double.parseDouble(frate[0]) / Double.parseDouble(frate[1]);
         } catch (Exception exception) {
             throw new TaskExecutionException("Unable to handle task " + aTask, exception);
         }

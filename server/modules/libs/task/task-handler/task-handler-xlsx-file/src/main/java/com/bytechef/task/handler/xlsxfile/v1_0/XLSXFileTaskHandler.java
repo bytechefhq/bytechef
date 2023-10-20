@@ -116,14 +116,6 @@ public class XLSXFileTaskHandler {
             }
         }
 
-        private String getaDefaultFileName() {
-            return "file." + StringUtils.lowerCase(FileFormat.XLSX.name());
-        }
-
-        private Workbook getWorkbook() {
-            return new XSSFWorkbook();
-        }
-
         private Workbook getWorkbook(FileFormat fileFormat, InputStream inputStream) throws IOException {
             return fileFormat == FileFormat.XLS ? new HSSFWorkbook(inputStream) : new XSSFWorkbook(inputStream);
         }
@@ -318,9 +310,7 @@ public class XLSXFileTaskHandler {
                 int columnCount = 0;
                 Row row = sheet.createRow(i + 1);
 
-                for (String key : item.keySet()) {
-                    Object value = item.get(key);
-
+                for (Object value : item.values()) {
                     Cell cell = row.createCell(columnCount++);
 
                     if (value instanceof Boolean) {

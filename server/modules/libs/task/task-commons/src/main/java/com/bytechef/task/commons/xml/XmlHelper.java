@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilder;
@@ -35,6 +36,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -92,7 +94,10 @@ public class XmlHelper {
         return read(parse(path, (documentBuilder -> parse(xml, documentBuilder))), typeReference);
     }
 
-    public Stream<Map<String, ?>> stream(InputStream inputStream) {
+    @NonNull
+    public Stream<Map<String, ?>> stream(@NonNull InputStream inputStream) {
+        Objects.requireNonNull(inputStream, "Non null stream reference expected");
+
         try {
             return new XmlStreamReaderStream(inputStream, XML_MAPPER);
         } catch (Exception exception) {

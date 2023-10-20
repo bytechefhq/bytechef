@@ -21,13 +21,16 @@ package com.bytechef.task.handler.io;
 import com.bytechef.atlas.task.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
  * @author Arik Cohen
@@ -55,29 +58,39 @@ class Ls implements TaskHandler<List<Ls.FileInfo>> {
 
     public static class FileInfo {
 
+        @NonNull
         private final Path path;
+
+        @NonNull
         private final Path root;
+
         private final long size;
 
-        public FileInfo(Path aRoot, Path aPath) {
+        public FileInfo(@NonNull Path aRoot, @NonNull Path aPath) {
+            Assert.notNull(aRoot, "Root path is required");
+            Assert.notNull(aPath, "File path is required");
+
             root = aRoot;
             path = aPath;
-            size = aPath.toFile().length();
+
+            File file = aPath.toFile();
+
+            if ((file == null) || !file.exists() || !file.isFile()) {
+                throw new IllegalArgumentException("Path does not pint to valid file");
+            }
+
+            size = file.length();
         }
 
         public String getName() {
-            return path.getFileName().toString();
-        }
-
-        public String getFullPath() {
-            return path.toString();
+            return String.valueOf(path.getFileName());
         }
 
         public String getRelativePath() {
-            return root.relativize(path).toString();
+            return String.valueOf(root.relativize(path));
         }
 
-        public long getSize() throws IOException {
+        public long getSize() {
             return size;
         }
     }
