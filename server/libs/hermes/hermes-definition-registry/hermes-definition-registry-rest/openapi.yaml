@@ -23,7 +23,7 @@ paths:
       summary: "Get all component definitions"
       tags:
       - "component-definitions"
-      operationId: "getComponentDefinitions"
+      operationId: "searchComponentDefinitions"
       parameters:
       - name: "actionDefinitions"
         description: "Use for filtering components which define action definitions."
@@ -1342,8 +1342,9 @@ components:
           INTEGER: "#/components/schemas/IntegerProperty"
           "NULL": "#/components/schemas/NullProperty"
           NUMBER: "#/components/schemas/NumberProperty"
-          STRING: "#/components/schemas/StringProperty"
           OBJECT: "#/components/schemas/ObjectProperty"
+          STRING: "#/components/schemas/StringProperty"
+          TIME: "#/components/schemas/TimeProperty"
     PropertyType:
       description: "A type of property."
       type: "string"

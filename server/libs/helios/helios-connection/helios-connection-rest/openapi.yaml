@@ -8,6 +8,8 @@ servers:
 tags:
 - name: "connections"
   description: "The Automation Connections API"
+- name: "connection-tags"
+  description: "The Automation Connection Tags API"
 paths:
   /component-definitions/{componentName}/{componentVersion}/connections:
     get:
@@ -55,13 +57,13 @@ paths:
                 type: "array"
                 items:
                   $ref: "../../../core/tag/tag-rest/tag-rest-impl/openapi.yaml#/components/schemas/Tag"
-  /connections:
+  /connections/search:
     get:
-      description: "Get connections."
-      summary: "Get connections"
+      description: "Search connections."
+      summary: "Search connections"
       tags:
       - "connections"
-      operationId: "getConnections"
+      operationId: "searchConnections"
       parameters:
       - name: "componentNames"
         description: "The list of component names used for filtering connections."
