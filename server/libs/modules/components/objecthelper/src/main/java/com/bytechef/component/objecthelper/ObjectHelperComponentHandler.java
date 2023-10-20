@@ -20,15 +20,15 @@ import static com.bytechef.component.objecthelper.constants.ObjectHelperConstant
 import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.JSON_STRINGIFY;
 import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.OBJECT_HELPER;
 import static com.bytechef.component.objecthelper.constants.ObjectHelperConstants.SOURCE;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.any;
-import static com.bytechef.hermes.component.ComponentDSL.array;
-import static com.bytechef.hermes.component.ComponentDSL.bool;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.number;
-import static com.bytechef.hermes.component.ComponentDSL.object;
-import static com.bytechef.hermes.component.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.any;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.commons.json.JsonUtils;
 import com.bytechef.hermes.component.ComponentHandler;
@@ -41,7 +41,7 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
  */
 public class ObjectHelperComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = createComponent(OBJECT_HELPER)
+    private final ComponentDefinition componentDefinition = component(OBJECT_HELPER)
             .display(display("Object Helper")
                     .description("The Object Helper allows you to do various operations on objects."))
             .actions(
@@ -53,7 +53,7 @@ public class ObjectHelperComponentHandler implements ComponentHandler {
                                     .description("The JSON string to convert to the data.")
                                     .required(true))
                             .output(any())
-                            .performFunction(this::performParse),
+                            .perform(this::performParse),
                     action(JSON_STRINGIFY)
                             .display(display("Convert to JSON string")
                                     .description("Writes the object/array to a JSON string."))
@@ -63,7 +63,7 @@ public class ObjectHelperComponentHandler implements ComponentHandler {
                                     .types(array(), bool(), number(), object(), string())
                                     .required(true))
                             .output(string())
-                            .performFunction(this::performStringify));
+                            .perform(this::performStringify));
 
     @Override
     public ComponentDefinition getDefinition() {

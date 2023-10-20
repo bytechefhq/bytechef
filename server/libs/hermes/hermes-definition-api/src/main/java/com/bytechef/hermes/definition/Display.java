@@ -21,15 +21,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 /**
  * @author Ivica Cardic
  */
-@Schema(name = "Display", description = "Display information.")
-public class Display {
+@Schema(name = "Display", description = "A display information.")
+public sealed class Display permits DefinitionDSL.ModifiableDisplay {
 
+    protected String category;
     protected String description;
     protected String icon;
     protected String label;
+    protected String subtitle;
+    protected String[] tags;
 
     protected Display(String label) {
         this.label = label;
+    }
+
+    @Schema(name = "category", description = "The category of the component.")
+    public String getCategory() {
+        return category;
     }
 
     @Schema(name = "description", description = "The description.")
@@ -45,5 +53,15 @@ public class Display {
     @Schema(name = "label", description = "The label.")
     public String getLabel() {
         return label;
+    }
+
+    @Schema(name = "subtitle", description = "Additional explanation.")
+    public String getSubtitle() {
+        return subtitle;
+    }
+
+    @Schema(name = "tags", description = "Tags for the component.")
+    public String[] getTags() {
+        return tags;
     }
 }

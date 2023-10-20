@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.test.mock;
 import com.bytechef.hermes.component.ConnectionParameters;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.FileEntry;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import java.io.InputStream;
@@ -34,12 +35,17 @@ public class MockContext implements Context {
     public MockContext() {}
 
     @Override
-    public Optional<ConnectionParameters> fetchConnection() {
+    public Optional<ConnectionParameters> fetchConnectionParameters() {
         return Optional.empty();
     }
 
     @Override
-    public ConnectionParameters getConnection() {
+    public ConnectionDefinition getConnectionDefinition() {
+        return null;
+    }
+
+    @Override
+    public ConnectionParameters getConnectionParameters() {
         return null;
     }
 

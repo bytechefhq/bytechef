@@ -17,7 +17,7 @@
 package com.bytechef.hermes.component.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
-import com.bytechef.hermes.component.ComponentFactory;
+import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,10 +46,10 @@ import reactor.core.publisher.Mono;
 @Tag(name = "component-definitions")
 public class ComponentDefinitionController {
 
-    private final List<ComponentFactory> componentFactories;
+    private final List<ComponentDefinitionFactory> componentDefinitionFactories;
 
-    public ComponentDefinitionController(List<ComponentFactory> componentFactories) {
-        this.componentFactories = componentFactories;
+    public ComponentDefinitionController(List<ComponentDefinitionFactory> componentDefinitionFactories) {
+        this.componentDefinitionFactories = componentDefinitionFactories;
     }
 
     /**
@@ -79,7 +79,8 @@ public class ComponentDefinitionController {
             produces = {"application/json"})
     public Mono<ResponseEntity<Flux<ComponentDefinition>>> getComponentDefinitions(
             @Parameter(hidden = true) final ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(Flux.fromIterable(
-                componentFactories.stream().map(ComponentFactory::getDefinition).collect(Collectors.toList()))));
+        return Mono.just(ResponseEntity.ok(Flux.fromIterable(componentDefinitionFactories.stream()
+                .map(ComponentDefinitionFactory::getDefinition)
+                .collect(Collectors.toList()))));
     }
 }

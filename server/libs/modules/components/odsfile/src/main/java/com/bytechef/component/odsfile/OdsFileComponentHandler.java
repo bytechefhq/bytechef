@@ -26,19 +26,19 @@ import static com.bytechef.component.odsfile.constants.OdsFileConstants.READ_AS_
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.ROWS;
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.SHEET_NAME;
 import static com.bytechef.component.odsfile.constants.OdsFileConstants.WRITE;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.array;
-import static com.bytechef.hermes.component.ComponentDSL.bool;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.dateTime;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.ComponentDSL.integer;
-import static com.bytechef.hermes.component.ComponentDSL.number;
-import static com.bytechef.hermes.component.ComponentDSL.object;
-import static com.bytechef.hermes.component.ComponentDSL.string;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.hermes.component.ComponentHandler;
@@ -69,7 +69,7 @@ import org.apache.commons.lang3.ObjectUtils;
  */
 public class OdsFileComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = createComponent(ODS_FILE)
+    private final ComponentDefinition componentDefinition = component(ODS_FILE)
             .display(display("ODS File").description("Reads and writes data from a ODS file."))
             .actions(
                     action(READ)
@@ -104,7 +104,7 @@ public class OdsFileComponentHandler implements ComponentHandler {
                                                     "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
                                             .defaultValue("Sheet"))
                             .output(array())
-                            .performFunction(this::performRead),
+                            .perform(this::performRead),
                     action(WRITE)
                             .display(display("Write to file").description("Writes the data to a ODS file."))
                             .properties(
@@ -125,7 +125,7 @@ public class OdsFileComponentHandler implements ComponentHandler {
                                             .description("The name of the sheet to create in the spreadsheet.")
                                             .defaultValue("Sheet"))
                             .output(fileEntry())
-                            .performFunction(this::performWrite));
+                            .perform(this::performWrite));
 
     @Override
     public ComponentDefinition getDefinition() {

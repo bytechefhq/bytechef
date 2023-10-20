@@ -21,13 +21,13 @@ import static com.bytechef.component.filestorage.constants.FileStorageConstants.
 import static com.bytechef.component.filestorage.constants.FileStorageConstants.FILE_STORAGE;
 import static com.bytechef.component.filestorage.constants.FileStorageConstants.READ;
 import static com.bytechef.component.filestorage.constants.FileStorageConstants.WRITE;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.ComponentDSL.string;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static org.apache.commons.io.IOUtils.copy;
 
 import com.bytechef.component.filestorage.constants.FileStorageConstants;
@@ -52,7 +52,7 @@ import java.util.function.Consumer;
  */
 public class FileStorageComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = createComponent(FILE_STORAGE)
+    private final ComponentDefinition componentDefinition = component(FILE_STORAGE)
             .display(display("File Storage").description("Reads and writes data from a file"))
             .actions(
                     action(READ)
@@ -63,7 +63,7 @@ public class FileStorageComponentHandler implements ComponentHandler {
                                             "The object property which contains a reference to the file to read from.")
                                     .required(true))
                             .output(string())
-                            .performFunction(this::performRead),
+                            .perform(this::performRead),
                     action(WRITE)
                             .display(display("Write to file").description("Writes the data to the file."))
                             .properties(
@@ -77,7 +77,7 @@ public class FileStorageComponentHandler implements ComponentHandler {
                                                     "Filename to set for data. By default, \"file.txt\" will be used.")
                                             .defaultValue("file.txt"))
                             .output(fileEntry())
-                            .performFunction(this::performWrite),
+                            .perform(this::performWrite),
                     action(DOWNLOAD)
                             .display(display("Download file").description("Download thr file from the URL."))
                             .properties(
@@ -91,7 +91,7 @@ public class FileStorageComponentHandler implements ComponentHandler {
                                                     "Filename to set for data. By default, \"file.txt\" will be used.")
                                             .defaultValue("file.txt"))
                             .output(fileEntry())
-                            .performFunction(this::performDownload));
+                            .perform(this::performDownload));
 
     @Override
     public ComponentDefinition getDefinition() {

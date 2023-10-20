@@ -22,14 +22,14 @@ import static com.bytechef.component.logger.constants.LoggerConstants.INFO;
 import static com.bytechef.component.logger.constants.LoggerConstants.LOGGER;
 import static com.bytechef.component.logger.constants.LoggerConstants.TEXT;
 import static com.bytechef.component.logger.constants.LoggerConstants.WARN;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.any;
-import static com.bytechef.hermes.component.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.any;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
-import com.bytechef.hermes.component.ComponentDSL;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,19 +41,19 @@ public class LoggerComponentHandler implements ComponentHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerComponentHandler.class);
 
-    private final ComponentDefinition componentDefinition = ComponentDSL.createComponent(LOGGER)
+    private final ComponentDefinition componentDefinition = ComponentDSL.component(LOGGER)
             .display(display("Logger").description("Logs a value to the system log."))
             .actions(
                     action(DEBUG)
                             .display(display("Debug"))
                             .properties(any(TEXT))
-                            .performFunction(this::performDebug),
+                            .perform(this::performDebug),
                     action(ERROR)
                             .display(display("Error"))
                             .properties(any(TEXT))
-                            .performFunction(this::performError),
-                    action(INFO).display(display("Info")).properties(any(TEXT)).performFunction(this::performInfo),
-                    action(WARN).display(display("Warn")).properties(any(TEXT)).performFunction(this::performWarn));
+                            .perform(this::performError),
+                    action(INFO).display(display("Info")).properties(any(TEXT)).perform(this::performInfo),
+                    action(WARN).display(display("Warn")).properties(any(TEXT)).perform(this::performWarn));
 
     @Override
     public ComponentDefinition getDefinition() {

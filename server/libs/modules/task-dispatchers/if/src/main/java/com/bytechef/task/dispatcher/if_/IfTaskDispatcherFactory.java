@@ -16,18 +16,18 @@
 
 package com.bytechef.task.dispatcher.if_;
 
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.bool;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.create;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.dateTime;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.display;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.hideWhen;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.number;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.object;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.option;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.showWhen;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.string;
-import static com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.dateTime;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.display;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.hideWhen;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.number;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.object;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.option;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.showWhen;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.BOOLEAN;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CASE_FALSE;
 import static com.bytechef.task.dispatcher.if_.constants.IfTaskDispatcherConstants.CASE_TRUE;
@@ -54,7 +54,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class IfTaskDispatcherFactory implements TaskDispatcherFactory {
 
-    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = create(IF)
+    private static final TaskDispatcherDefinition TASK_DISPATCHER_DEFINITION = taskDispatcher(IF)
             .display(display("If").description("Directs a stream based on true/false results of comparisons."))
             .display(display("Boolean Condition"))
             .properties(

@@ -27,14 +27,14 @@ import static com.bytechef.component.aws.s3.constants.AwsS3Constants.PREFIX;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.PRESIGN_GET_OBJECT;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.PUT_OBJECT;
 import static com.bytechef.component.aws.s3.constants.AwsS3Constants.URI;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.array;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.ComponentDSL.object;
-import static com.bytechef.hermes.component.ComponentDSL.string;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
@@ -66,7 +66,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
  */
 public class AwsS3ComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = createComponent(AWS_S3)
+    private final ComponentDefinition componentDefinition = component(AWS_S3)
             .display(display("AWS S3")
                     .description("AWS S3 is a simple object storage service provided by Amazon Web Services."))
             .actions(
@@ -83,7 +83,7 @@ public class AwsS3ComponentHandler implements ComponentHandler {
                                             .required(true)
                                             .defaultValue("file.xml"))
                             .output(fileEntry())
-                            .performFunction(this::performGetObject),
+                            .perform(this::performGetObject),
                     action(GET_URL)
                             .display(display("Get URL").description("Get the url of an AWS S3 object."))
                             .properties(string(URI)
@@ -91,7 +91,7 @@ public class AwsS3ComponentHandler implements ComponentHandler {
                                     .description("The AWS S3 uri.")
                                     .required(true))
                             .output(string())
-                            .performFunction(this::performGetUrl),
+                            .perform(this::performGetUrl),
                     action(LIST_OBJECTS)
                             .display(display("List Objects").description("Get the list AWS S3 objects."))
                             .properties(
@@ -104,7 +104,7 @@ public class AwsS3ComponentHandler implements ComponentHandler {
                                             .description("The prefix of an AWS S3 objects.")
                                             .required(true))
                             .output(array().items(object().properties(string("key"), string("suffix"), string("uri"))))
-                            .performFunction(this::performListObjects),
+                            .perform(this::performListObjects),
                     action(PRESIGN_GET_OBJECT)
                             .display(display("Get Pre-signed Object")
                                     .description("Get the url of an pre-signed AWS S3 object."))
@@ -113,7 +113,7 @@ public class AwsS3ComponentHandler implements ComponentHandler {
                                     .description("The AWS S3 uri.")
                                     .required(true))
                             .output(string())
-                            .performFunction(this::performGetPresignedObject),
+                            .perform(this::performGetPresignedObject),
                     action(PUT_OBJECT)
                             .display(display("Put Object").description("Store an object to AWS S3."))
                             .properties(
@@ -128,7 +128,7 @@ public class AwsS3ComponentHandler implements ComponentHandler {
                                             .required(true),
                                     string(ACL).label("ACL").description("The canned ACL to apply to the object."))
                             .output(string())
-                            .performFunction(this::performPutObject));
+                            .perform(this::performPutObject));
 
     @Override
     public ComponentDefinition getDefinition() {

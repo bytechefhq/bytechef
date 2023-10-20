@@ -26,26 +26,26 @@ import static com.bytechef.component.csvfile.constants.CsvFileConstants.READ;
 import static com.bytechef.component.csvfile.constants.CsvFileConstants.READ_AS_STRING;
 import static com.bytechef.component.csvfile.constants.CsvFileConstants.ROWS;
 import static com.bytechef.component.csvfile.constants.CsvFileConstants.WRITE;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.array;
-import static com.bytechef.hermes.component.ComponentDSL.bool;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.dateTime;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.ComponentDSL.integer;
-import static com.bytechef.hermes.component.ComponentDSL.number;
-import static com.bytechef.hermes.component.ComponentDSL.string;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.commons.collection.MapUtils;
 import com.bytechef.commons.lang.ValueUtils;
-import com.bytechef.hermes.component.ComponentDSL;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import java.io.BufferedReader;
@@ -71,7 +71,7 @@ public class CsvFileComponentHandler implements ComponentHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(CsvFileComponentHandler.class);
 
-    public final ComponentDefinition componentDefinition = createComponent(CSV_FILE)
+    public final ComponentDefinition componentDefinition = component(CSV_FILE)
             .display(display("CSV File").description("Reads and writes data from a csv file."))
             .actions(
                     action(READ)
@@ -105,7 +105,7 @@ public class CsvFileComponentHandler implements ComponentHandler {
                                                     "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
                                             .defaultValue(false))
                             .output(array())
-                            .performFunction(this::performRead),
+                            .perform(this::performRead),
                     action(WRITE)
                             .display(display("Write to file").description("Writes the data to a csv file."))
                             .properties(
@@ -122,7 +122,7 @@ public class CsvFileComponentHandler implements ComponentHandler {
                                                     "Filename to set for binary data. By default, \"file.csv\" will be used.")
                                             .defaultValue(""))
                             .output(fileEntry())
-                            .performFunction(this::performWrite));
+                            .perform(this::performWrite));
 
     @Override
     public ComponentDefinition getDefinition() {

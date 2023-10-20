@@ -20,13 +20,13 @@ import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.SOUR
 import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.XML_HELPER;
 import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.XML_PARSE;
 import static com.bytechef.component.xmlhelper.constants.XmlHelperConstants.XML_STRINGIFY;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.any;
-import static com.bytechef.hermes.component.ComponentDSL.array;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.object;
-import static com.bytechef.hermes.component.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.any;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.commons.xml.XmlUtils;
 import com.bytechef.hermes.component.ComponentHandler;
@@ -40,7 +40,7 @@ import java.util.Map;
  */
 public class XmlHelperComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = createComponent(XML_HELPER)
+    private final ComponentDefinition componentDefinition = component(XML_HELPER)
             .display(display("XML Helper").description("Converts between XML string and object/array."))
             .actions(
                     action(XML_PARSE)
@@ -51,7 +51,7 @@ public class XmlHelperComponentHandler implements ComponentHandler {
                                     .description("The XML string to convert to the data.")
                                     .required(true))
                             .output(object())
-                            .performFunction(this::performParse),
+                            .perform(this::performParse),
                     action(XML_STRINGIFY)
                             .display(display("Convert to XML string")
                                     .description("Writes the object/array to a XML string."))
@@ -61,7 +61,7 @@ public class XmlHelperComponentHandler implements ComponentHandler {
                                     .required(true)
                                     .types(array(), object()))
                             .output(string())
-                            .performFunction(this::performStringify));
+                            .perform(this::performStringify));
 
     @Override
     public ComponentDefinition getDefinition() {

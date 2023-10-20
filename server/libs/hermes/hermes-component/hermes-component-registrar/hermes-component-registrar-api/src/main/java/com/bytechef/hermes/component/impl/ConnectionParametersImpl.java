@@ -25,12 +25,19 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 public class ConnectionParametersImpl implements ConnectionParameters {
+    private final String authorizationName;
     private final String name;
     private final Map<String, Object> parameters;
 
     public ConnectionParametersImpl(Connection connection) {
+        this.authorizationName = connection.getAuthorizationName();
         this.name = connection.getName();
         this.parameters = connection.getParameters();
+    }
+
+    @Override
+    public String getAuthorizationName() {
+        return authorizationName;
     }
 
     @Override

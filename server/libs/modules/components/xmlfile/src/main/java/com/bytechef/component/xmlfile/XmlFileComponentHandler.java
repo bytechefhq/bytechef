@@ -20,19 +20,19 @@ import static com.bytechef.component.xmlfile.constants.XmlFileConstants.IS_ARRAY
 import static com.bytechef.component.xmlfile.constants.XmlFileConstants.READ;
 import static com.bytechef.component.xmlfile.constants.XmlFileConstants.SOURCE;
 import static com.bytechef.component.xmlfile.constants.XmlFileConstants.WRITE;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.any;
-import static com.bytechef.hermes.component.ComponentDSL.array;
-import static com.bytechef.hermes.component.ComponentDSL.bool;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.ComponentDSL.integer;
-import static com.bytechef.hermes.component.ComponentDSL.object;
-import static com.bytechef.hermes.component.ComponentDSL.showWhen;
-import static com.bytechef.hermes.component.ComponentDSL.string;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.any;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.showWhen;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.commons.xml.XmlUtils;
 import com.bytechef.component.xmlfile.constants.XmlFileConstants;
@@ -58,7 +58,7 @@ import java.util.stream.Stream;
  */
 public class XmlFileComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = createComponent(XmlFileConstants.XML_FILE)
+    private final ComponentDefinition componentDefinition = component(XmlFileConstants.XML_FILE)
             .display(display("XML File").description("Reads and writes data from a XML file."))
             .actions(
                     action(READ)
@@ -86,12 +86,10 @@ public class XmlFileComponentHandler implements ComponentHandler {
                                             .label("Page Number")
                                             .description("The page number to get.")
                                             .displayOption(showWhen(IS_ARRAY).eq(true)))
-                            .output(any().types(
-                                            array().displayOption(
-                                                            showWhen(IS_ARRAY).eq(true)),
-                                            object().displayOption(
-                                                            showWhen(IS_ARRAY).eq(false))))
-                            .performFunction(this::performRead),
+                            .output(
+                                    array().displayOption(showWhen(IS_ARRAY).eq(true)),
+                                    object().displayOption(showWhen(IS_ARRAY).eq(false)))
+                            .perform(this::performRead),
                     action(WRITE)
                             .display(display("Write to file").description("Writes the data to a XML file."))
                             .properties(
@@ -107,7 +105,7 @@ public class XmlFileComponentHandler implements ComponentHandler {
                                             .required(true)
                                             .defaultValue("file.xml"))
                             .output(fileEntry())
-                            .performFunction(this::performWrite));
+                            .perform(this::performWrite));
 
     @Override
     public ComponentDefinition getDefinition() {

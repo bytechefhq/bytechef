@@ -24,21 +24,21 @@ import static com.bytechef.component.filesystem.constants.FilesystemConstants.MK
 import static com.bytechef.component.filesystem.constants.FilesystemConstants.READ_FILE;
 import static com.bytechef.component.filesystem.constants.FilesystemConstants.RM;
 import static com.bytechef.component.filesystem.constants.FilesystemConstants.WRITE_FILE;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.ComponentDSL.integer;
-import static com.bytechef.hermes.component.ComponentDSL.object;
-import static com.bytechef.hermes.component.ComponentDSL.string;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.ComponentDSL;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import java.io.File;
@@ -62,7 +62,7 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class FilesystemComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = createComponent(FILESYSTEM)
+    private final ComponentDefinition componentDefinition = component(FILESYSTEM)
             .display(display("Local File").description("Reads or writes a binary file from/to disk"))
             .actions(
                     action(READ_FILE)
@@ -73,7 +73,7 @@ public class FilesystemComponentHandler implements ComponentHandler {
                                     .placeholder("/data/your_file.pdf")
                                     .required(true))
                             .output(ComponentDSL.fileEntry())
-                            .performFunction(this::performReadFile),
+                            .perform(this::performReadFile),
                     action(WRITE_FILE)
                             .display(display("Write from file"))
                             .properties(
@@ -88,11 +88,11 @@ public class FilesystemComponentHandler implements ComponentHandler {
                                             .placeholder("/data/your_file.pdf")
                                             .required(true))
                             .output(object().properties(integer("bytes")))
-                            .performFunction(this::performWriteFile),
+                            .perform(this::performWriteFile),
                     action(CREATE_TEMP_DIR)
                             .display(display("Create Temp Directory")
                                     .description("Creates a temporary directory oon the filesystem."))
-                            .performFunction(this::performCreateTempDir),
+                            .perform(this::performCreateTempDir),
                     action(GET_FILE_PATH)
                             .display(
                                     display("File Path")
@@ -103,7 +103,7 @@ public class FilesystemComponentHandler implements ComponentHandler {
                                     .description("The path to full filename.")
                                     .placeholder("/data/your_file.pdf")
                                     .required(true))
-                            .performFunction(this::performGetFilePath)
+                            .perform(this::performGetFilePath)
                             .output(string())
                             .exampleOutput("/data"),
                     action(LS)
@@ -111,10 +111,10 @@ public class FilesystemComponentHandler implements ComponentHandler {
                                     .description("")),
                     action(MKDIR)
                             .display(display("Create").description("Creates a directory."))
-                            .performFunction(this::performCreateDir),
+                            .perform(this::performCreateDir),
                     action(RM)
                             .display(display("Remove").description("Removes the content of a directory."))
-                            .performFunction(this::performDelete));
+                            .perform(this::performDelete));
 
     @Override
     public ComponentDefinition getDefinition() {

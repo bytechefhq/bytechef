@@ -18,7 +18,7 @@ package com.bytechef.component.xmlfile;
 
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
-import static com.bytechef.hermes.component.definition.Action.ACTION;
+import static com.bytechef.hermes.component.definition.ActionDefinition.ACTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.commons.xml.XmlUtils;

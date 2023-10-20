@@ -17,14 +17,31 @@
 package com.bytechef.hermes.component.http.client;
 
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
+import static com.bytechef.hermes.component.constants.ComponentConstants.KEY;
+import static com.bytechef.hermes.component.constants.ComponentConstants.VALUE;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.ALLOW_UNAUTHORIZED_CERTS;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.BODY_CONTENT_TYPE;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.BODY_PARAMETERS;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.FOLLOW_ALL_REDIRECTS;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.FOLLOW_REDIRECT;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.FULL_RESPONSE;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.HEADER_PARAMETERS;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.MIME_TYPE;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.PROXY;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.QUERY_PARAMETERS;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.RESPONSE_FILENAME;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.RESPONSE_FORMAT;
+import static com.bytechef.hermes.component.http.client.constants.HttpClientConstants.TIMEOUT;
 
 import com.bytechef.commons.json.JsonUtils;
 import com.bytechef.commons.xml.XmlUtils;
+import com.bytechef.hermes.component.AuthorizationContext;
+import com.bytechef.hermes.component.ConnectionParameters;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
 import com.bytechef.hermes.component.FileEntry;
-import com.bytechef.hermes.component.http.client.auth.resolver.AuthResolver;
-import com.bytechef.hermes.component.http.client.auth.resolver.AuthResolverRegistry;
+import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.http.client.constants.HttpClientConstants;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
@@ -33,7 +50,9 @@ import com.github.mizosoft.methanol.MoreBodyPublishers;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
+import java.net.Authenticator;
 import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
 import java.net.ProxySelector;
 import java.net.Socket;
 import java.net.URI;
@@ -45,6 +64,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -60,14 +81,36 @@ import org.apache.tika.mime.MimeTypes;
  */
 public class HttpClient {
 
-    public Object execute(
-            Context context, ExecutionParameters executionParameters, HttpClientConstants.RequestMethod requestMethod)
-            throws Exception {
-        Map<String, List<String>> headers =
-                getNameValuesMap(executionParameters, HttpClientConstants.HEADER_PARAMETERS);
+    public enum BodyContentType {
+        BINARY,
+        FORM_DATA,
+        FORM_URLENCODED,
+        JSON,
+        RAW,
+        XML
+    }
 
-        Map<String, List<String>> queryParams =
-                getNameValuesMap(executionParameters, HttpClientConstants.QUERY_PARAMETERS);
+    public enum ResponseFormat {
+        FILE,
+        JSON,
+        TEXT,
+        XML,
+    }
+
+    public enum RequestMethod {
+        DELETE,
+        GET,
+        HEAD,
+        PATCH,
+        POST,
+        PUT,
+    }
+
+    public Object execute(Context context, ExecutionParameters executionParameters, RequestMethod requestMethod)
+            throws Exception {
+        Map<String, List<String>> headers = getNameValuesMap(executionParameters, HEADER_PARAMETERS);
+
+        Map<String, List<String>> queryParams = getNameValuesMap(executionParameters, QUERY_PARAMETERS);
 
         java.net.http.HttpClient httpClient = createHTTPClient(context, executionParameters, headers, queryParams);
 
@@ -81,11 +124,10 @@ public class HttpClient {
     protected HttpResponse.BodyHandler<?> createBodyHandler(ExecutionParameters executionParameters) {
         HttpResponse.BodyHandler<?> bodyHandler;
 
-        if (executionParameters.containsKey(HttpClientConstants.RESPONSE_FORMAT)) {
-            HttpClientConstants.ResponseFormat responseFormat = HttpClientConstants.ResponseFormat.valueOf(
-                    executionParameters.getString(HttpClientConstants.RESPONSE_FORMAT));
+        if (executionParameters.containsKey(RESPONSE_FORMAT)) {
+            ResponseFormat responseFormat = ResponseFormat.valueOf(executionParameters.getString(RESPONSE_FORMAT));
 
-            if (responseFormat == HttpClientConstants.ResponseFormat.FILE) {
+            if (responseFormat == ResponseFormat.FILE) {
                 bodyHandler = HttpResponse.BodyHandlers.ofInputStream();
             } else {
                 bodyHandler = HttpResponse.BodyHandlers.ofString();
@@ -101,79 +143,74 @@ public class HttpClient {
     protected HttpRequest.BodyPublisher createBodyPublisher(Context context, ExecutionParameters executionParameters) {
         HttpRequest.BodyPublisher bodyPublisher;
 
-        HttpClientConstants.BodyContentType bodyContentType = HttpClientConstants.BodyContentType.valueOf(
-                StringUtils.upperCase(executionParameters.getString(HttpClientConstants.BODY_CONTENT_TYPE, "JSON")));
+        BodyContentType bodyContentType = BodyContentType.valueOf(
+                StringUtils.upperCase(executionParameters.getString(BODY_CONTENT_TYPE, "JSON")));
 
-        if (executionParameters.containsKey(HttpClientConstants.BODY_PARAMETERS)) {
-            if (bodyContentType == HttpClientConstants.BodyContentType.FORM_DATA) {
-                List<Map<String, ?>> bodyParameters = executionParameters.getList(HttpClientConstants.BODY_PARAMETERS);
+        if (executionParameters.containsKey(BODY_PARAMETERS)) {
+            if (bodyContentType == BodyContentType.FORM_DATA) {
+                List<Map<String, ?>> bodyParameters = executionParameters.getList(BODY_PARAMETERS);
 
                 MultipartBodyPublisher.Builder builder = MultipartBodyPublisher.newBuilder();
 
                 for (Map<String, ?> parameter : bodyParameters) {
-                    if (parameter.get(HttpClientConstants.VALUE) instanceof Map
-                            && FileEntry.isFileEntry((Map<String, String>) parameter.get(HttpClientConstants.VALUE))) {
-                        FileEntry fileEntry = executionParameters.getFileEntry(parameter, HttpClientConstants.VALUE);
+                    if (parameter.get(VALUE) instanceof Map
+                            && FileEntry.isFileEntry((Map<String, String>) parameter.get(VALUE))) {
+                        FileEntry fileEntry = executionParameters.getFileEntry(parameter, VALUE);
 
                         builder.formPart(
-                                (String) parameter.get(HttpClientConstants.KEY),
+                                (String) parameter.get(KEY),
                                 fileEntry.getName(),
                                 MoreBodyPublishers.ofMediaType(
                                         HttpRequest.BodyPublishers.ofInputStream(
                                                 () -> context.getFileStream(fileEntry)),
                                         MediaType.parse(fileEntry.getMimeType())));
                     } else {
-                        builder.textPart(
-                                (String) parameter.get(HttpClientConstants.KEY),
-                                parameter.get(HttpClientConstants.VALUE));
+                        builder.textPart((String) parameter.get(KEY), parameter.get(VALUE));
                     }
                 }
 
                 bodyPublisher = builder.build();
-            } else if (bodyContentType == HttpClientConstants.BodyContentType.FORM_URLENCODED) {
-                List<Map<String, String>> bodyParameters =
-                        executionParameters.getList(HttpClientConstants.BODY_PARAMETERS);
+            } else if (bodyContentType == BodyContentType.FORM_URLENCODED) {
+                List<Map<String, String>> bodyParameters = executionParameters.getList(BODY_PARAMETERS);
 
                 FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
 
                 for (Map<String, String> parameter : bodyParameters) {
-                    builder.query(parameter.get(HttpClientConstants.KEY), parameter.get(HttpClientConstants.VALUE));
+                    builder.query(parameter.get(KEY), parameter.get(VALUE));
                 }
 
                 bodyPublisher = builder.build();
-            } else if (bodyContentType == HttpClientConstants.BodyContentType.JSON) {
+            } else if (bodyContentType == BodyContentType.JSON) {
                 bodyPublisher = MoreBodyPublishers.ofMediaType(
                         HttpRequest.BodyPublishers.ofString(
-                                JsonUtils.write(executionParameters.getMap(HttpClientConstants.BODY_PARAMETERS))),
+                                JsonUtils.write(executionParameters.getMap(BODY_PARAMETERS))),
                         MediaType.APPLICATION_JSON);
-            } else if (bodyContentType == HttpClientConstants.BodyContentType.XML) {
+            } else if (bodyContentType == BodyContentType.XML) {
                 bodyPublisher = MoreBodyPublishers.ofMediaType(
                         HttpRequest.BodyPublishers.ofString(
-                                XmlUtils.write(executionParameters.getMap(HttpClientConstants.BODY_PARAMETERS))),
+                                XmlUtils.write(executionParameters.getMap(BODY_PARAMETERS))),
                         MediaType.APPLICATION_XML);
             } else {
                 MediaType mediaType;
 
-                if (executionParameters.containsKey(HttpClientConstants.MIME_TYPE)) {
-                    mediaType = MediaType.parse(executionParameters.getString(HttpClientConstants.MIME_TYPE));
+                if (executionParameters.containsKey(MIME_TYPE)) {
+                    mediaType = MediaType.parse(executionParameters.getString(MIME_TYPE));
                 } else {
                     mediaType = MediaType.TEXT_PLAIN;
                 }
 
                 bodyPublisher = MoreBodyPublishers.ofMediaType(
-                        HttpRequest.BodyPublishers.ofString(
-                                executionParameters.getString(HttpClientConstants.BODY_PARAMETERS)),
-                        mediaType);
+                        HttpRequest.BodyPublishers.ofString(executionParameters.getString(BODY_PARAMETERS)), mediaType);
             }
         } else if (executionParameters.containsKey(FILE_ENTRY)) {
             FileEntry fileEntry = executionParameters.getFileEntry(FILE_ENTRY);
             MediaType mediaType;
 
-            if (bodyContentType == HttpClientConstants.BodyContentType.BINARY) {
+            if (bodyContentType == BodyContentType.BINARY) {
                 mediaType = MediaType.APPLICATION_OCTET_STREAM;
-            } else if (bodyContentType == HttpClientConstants.BodyContentType.JSON) {
+            } else if (bodyContentType == BodyContentType.JSON) {
                 mediaType = MediaType.APPLICATION_JSON;
-            } else if (bodyContentType == HttpClientConstants.BodyContentType.XML) {
+            } else if (bodyContentType == BodyContentType.XML) {
                 mediaType = MediaType.APPLICATION_XML;
             } else {
                 mediaType = MediaType.TEXT_PLAIN;
@@ -195,7 +232,7 @@ public class HttpClient {
             Map<String, List<String>> queryParams) {
         Methanol.Builder builder = Methanol.newBuilder().version(java.net.http.HttpClient.Version.HTTP_1_1);
 
-        if (executionParameters.getBoolean(HttpClientConstants.ALLOW_UNAUTHORIZED_CERTS, false)) {
+        if (executionParameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false)) {
             try {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
 
@@ -207,22 +244,35 @@ public class HttpClient {
             }
         }
 
-        context.fetchConnection().ifPresent(connectionParameters -> {
-            AuthResolver authResolver = AuthResolverRegistry.get(
-                    HttpClientConstants.AuthType.valueOf(StringUtils.upperCase(connectionParameters.getName())));
+        context.fetchConnectionParameters().ifPresent(connectionParameters -> {
+            ConnectionDefinition connectionDefinition = context.getConnectionDefinition();
 
-            authResolver.apply(builder, headers, queryParams, connectionParameters);
+            BiConsumer<AuthorizationContext, ConnectionParameters> applyConsumer = null;
+
+            if (connectionDefinition != null) {
+                for (Authorization authorization : connectionDefinition.getAuthorizations()) {
+                    if (Objects.equals(authorization.getName(), connectionParameters.getAuthorizationName())) {
+                        applyConsumer = authorization.getApplyConsumer();
+
+                        break;
+                    }
+                }
+            }
+
+            if (applyConsumer != null) {
+                applyConsumer.accept(new AuthorizationContextImpl(builder, headers, queryParams), connectionParameters);
+            }
         });
 
-        if (executionParameters.getBoolean(HttpClientConstants.FOLLOW_REDIRECT, false)) {
+        if (executionParameters.getBoolean(FOLLOW_REDIRECT, false)) {
             builder.followRedirects(java.net.http.HttpClient.Redirect.NORMAL);
         }
 
-        if (executionParameters.getBoolean(HttpClientConstants.FOLLOW_ALL_REDIRECTS, false)) {
+        if (executionParameters.getBoolean(FOLLOW_ALL_REDIRECTS, false)) {
             builder.followRedirects(java.net.http.HttpClient.Redirect.ALWAYS);
         }
 
-        String proxy = executionParameters.getString(HttpClientConstants.PROXY);
+        String proxy = executionParameters.getString(PROXY);
 
         if (proxy != null) {
             String[] proxyAddress = proxy.split(":");
@@ -230,7 +280,7 @@ public class HttpClient {
             builder.proxy(ProxySelector.of(new InetSocketAddress(proxyAddress[0], Integer.parseInt(proxyAddress[1]))));
         }
 
-        builder.connectTimeout(Duration.ofMillis(executionParameters.getInteger(HttpClientConstants.TIMEOUT, 10000)));
+        builder.connectTimeout(Duration.ofMillis(executionParameters.getInteger(TIMEOUT, 10000)));
 
         return builder.build();
     }
@@ -238,7 +288,7 @@ public class HttpClient {
     protected HttpRequest createHTTPRequest(
             Context context,
             ExecutionParameters executionParameters,
-            HttpClientConstants.RequestMethod requestMethod,
+            RequestMethod requestMethod,
             Map<String, List<String>> headers,
             Map<String, List<String>> queryParams) {
 
@@ -260,12 +310,11 @@ public class HttpClient {
             Context context, ExecutionParameters executionParameters, HttpResponse<?> httpResponse) throws Exception {
         Object body = null;
 
-        if (executionParameters.getString(HttpClientConstants.RESPONSE_FORMAT) != null) {
-            HttpClientConstants.ResponseFormat responseFormat = HttpClientConstants.ResponseFormat.valueOf(
-                    executionParameters.getString(HttpClientConstants.RESPONSE_FORMAT));
+        if (executionParameters.getString(RESPONSE_FORMAT) != null) {
+            ResponseFormat responseFormat = ResponseFormat.valueOf(executionParameters.getString(RESPONSE_FORMAT));
 
-            if (responseFormat == HttpClientConstants.ResponseFormat.FILE) {
-                String filename = executionParameters.getString(HttpClientConstants.RESPONSE_FILENAME);
+            if (responseFormat == ResponseFormat.FILE) {
+                String filename = executionParameters.getString(RESPONSE_FILENAME);
 
                 if (StringUtils.isEmpty(filename)) {
                     Map<String, List<String>> headersMap =
@@ -285,15 +334,15 @@ public class HttpClient {
                 }
 
                 body = context.storeFileContent(filename, (InputStream) httpResponse.body());
-            } else if (responseFormat == HttpClientConstants.ResponseFormat.JSON) {
+            } else if (responseFormat == ResponseFormat.JSON) {
                 body = JsonUtils.read(httpResponse.body().toString());
-            } else if (responseFormat == HttpClientConstants.ResponseFormat.TEXT) {
+            } else if (responseFormat == ResponseFormat.TEXT) {
                 body = httpResponse.body().toString();
             } else {
                 body = XmlUtils.read(httpResponse.body().toString());
             }
 
-            if (executionParameters.getBoolean(HttpClientConstants.FULL_RESPONSE, false)) {
+            if (executionParameters.getBoolean(FULL_RESPONSE, false)) {
                 body = new HttpResponseEntry(body, httpResponse.headers().map(), httpResponse.statusCode());
             }
         }
@@ -325,12 +374,12 @@ public class HttpClient {
             List<Map<String, String>> properties = executionParameters.getList(propertyKey);
 
             for (Map<String, String> property : properties) {
-                nameValuesMap.compute(property.get(HttpClientConstants.KEY), (key, values) -> {
+                nameValuesMap.compute(property.get(KEY), (key, values) -> {
                     if (values == null) {
                         values = new ArrayList<>();
                     }
 
-                    values.add(property.get(HttpClientConstants.VALUE));
+                    values.add(property.get(VALUE));
 
                     return values;
                 });
@@ -364,4 +413,39 @@ public class HttpClient {
 
     @SuppressFBWarnings({"EI", "EI2"})
     public record HttpResponseEntry(Object body, Map<String, List<String>> headers, int statusCode) {}
+
+    private static class AuthorizationContextImpl implements AuthorizationContext {
+
+        private Methanol.Builder builder;
+        private Map<String, List<String>> headers;
+        private Map<String, List<String>> queryParams;
+
+        public AuthorizationContextImpl(
+                Methanol.Builder builder, Map<String, List<String>> headers, Map<String, List<String>> queryParams) {
+            this.builder = builder;
+            this.headers = headers;
+            this.queryParams = queryParams;
+        }
+
+        @Override
+        public void setHeaders(Map<String, List<String>> headers) {
+            this.headers.putAll(headers);
+        }
+
+        @Override
+        public void setQueryParameters(Map<String, List<String>> queryParams) {
+            this.queryParams.putAll(queryParams);
+        }
+
+        @Override
+        public void setUsernamePassword(String username, String password) {
+            this.builder.authenticator(new Authenticator() {
+
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(username, password.toCharArray());
+                }
+            });
+        }
+    }
 }

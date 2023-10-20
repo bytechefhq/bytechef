@@ -37,8 +37,7 @@
           "required": true,
           "type": "STRING"
         }
-      ],
-      "version": 1
+      ]
     }
   ],
   "display": {

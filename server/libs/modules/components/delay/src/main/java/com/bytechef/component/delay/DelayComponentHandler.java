@@ -17,15 +17,15 @@
 package com.bytechef.component.delay;
 
 import static com.bytechef.component.delay.constants.DelayConstants.DELAY;
-import static com.bytechef.hermes.component.ComponentDSL.action;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 
 import com.bytechef.component.delay.constants.DelayConstants;
-import com.bytechef.hermes.component.ComponentDSL;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.exception.ActionExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class DelayComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = ComponentDSL.createComponent(DELAY)
+    private final ComponentDefinition componentDefinition = ComponentDSL.component(DELAY)
             .display(display("Delay").description("Sets a value which can then be referenced in other tasks."))
             .actions(action(DELAY)
                     .display(display("Delay"))
@@ -44,7 +44,7 @@ public class DelayComponentHandler implements ComponentHandler {
                             .description("Time in milliseconds.")
                             .required(true)
                             .defaultValue(1))
-                    .performFunction(this::sleep));
+                    .perform(this::sleep));
 
     @Override
     public ComponentDefinition getDefinition() {

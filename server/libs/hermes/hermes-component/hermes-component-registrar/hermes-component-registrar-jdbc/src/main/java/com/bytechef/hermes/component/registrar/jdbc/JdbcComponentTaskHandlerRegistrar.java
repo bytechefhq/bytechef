@@ -17,11 +17,11 @@
 package com.bytechef.hermes.component.registrar.jdbc;
 
 import com.bytechef.atlas.event.EventPublisher;
-import com.bytechef.hermes.component.JdbcComponentFactory;
+import com.bytechef.hermes.component.JdbcComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
+import com.bytechef.hermes.component.registrar.default_.DefaultComponentTaskHandlerRegistrar;
 import com.bytechef.hermes.component.registrar.jdbc.executor.DataSourceFactory;
 import com.bytechef.hermes.component.registrar.jdbc.executor.JdbcExecutor;
-import com.bytechef.hermes.component.registrar.standard.StandardComponentTaskHandlerRegistrar;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class JdbcComponentTaskHandlerRegistrar extends StandardComponentTaskHandlerRegistrar {
+public class JdbcComponentTaskHandlerRegistrar extends DefaultComponentTaskHandlerRegistrar {
 
     private final DataSourceFactory dataSourceFactory;
 
@@ -50,8 +50,10 @@ public class JdbcComponentTaskHandlerRegistrar extends StandardComponentTaskHand
 
     @Override
     public void registerTaskHandlers(ConfigurableListableBeanFactory beanFactory) {
-        for (JdbcComponentFactory jdbcComponentFactory : ServiceLoader.load(JdbcComponentFactory.class)) {
-            JdbcComponentDefinition jdbcComponentDefinition = jdbcComponentFactory.getJdbcComponentDefinition();
+        for (JdbcComponentDefinitionFactory jdbcComponentDefinitionFactory :
+                ServiceLoader.load(JdbcComponentDefinitionFactory.class)) {
+            JdbcComponentDefinition jdbcComponentDefinition =
+                    jdbcComponentDefinitionFactory.getJdbcComponentDefinition();
 
             JdbcExecutor jdbcExecutor = new JdbcExecutor(
                     jdbcComponentDefinition.getDatabaseJdbcName(),

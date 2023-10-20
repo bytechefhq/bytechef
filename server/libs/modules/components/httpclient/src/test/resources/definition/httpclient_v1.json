@@ -35,8 +35,7 @@
             }
           ]
         }
-      ],
-      "version": 1
+      ]
     },
     {
       "display": {
@@ -50,8 +49,7 @@
           "required": true,
           "type": "STRING"
         }
-      ],
-      "version": 1
+      ]
     },
     {
       "display": {
@@ -71,8 +69,7 @@
           "required": true,
           "type": "STRING"
         }
-      ],
-      "version": 1
+      ]
     },
     {
       "display": {
@@ -92,8 +89,7 @@
           "required": true,
           "type": "STRING"
         }
-      ],
-      "version": 1
+      ]
     },
     {
       "display": {
@@ -114,8 +110,7 @@
           "type": "STRING",
           "defaultValue": "Bearer"
         }
-      ],
-      "version": 1
+      ]
     }
   ],
   "display": {

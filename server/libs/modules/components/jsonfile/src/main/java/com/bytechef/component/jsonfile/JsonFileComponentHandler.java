@@ -25,23 +25,23 @@ import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.PA
 import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.READ;
 import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.SOURCE;
 import static com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.WRITE;
-import static com.bytechef.hermes.component.ComponentDSL.any;
-import static com.bytechef.hermes.component.ComponentDSL.array;
-import static com.bytechef.hermes.component.ComponentDSL.bool;
-import static com.bytechef.hermes.component.ComponentDSL.createComponent;
-import static com.bytechef.hermes.component.ComponentDSL.display;
-import static com.bytechef.hermes.component.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.ComponentDSL.integer;
-import static com.bytechef.hermes.component.ComponentDSL.object;
-import static com.bytechef.hermes.component.ComponentDSL.option;
-import static com.bytechef.hermes.component.ComponentDSL.showWhen;
-import static com.bytechef.hermes.component.ComponentDSL.string;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILENAME;
 import static com.bytechef.hermes.component.constants.ComponentConstants.FILE_ENTRY;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.any;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.hermes.component.definition.ComponentDSL.display;
+import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.showWhen;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.commons.json.JsonUtils;
 import com.bytechef.component.jsonfile.constants.JsonFileTaskConstants.FileType;
-import com.bytechef.hermes.component.ComponentDSL;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
@@ -67,10 +67,10 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class JsonFileComponentHandler implements ComponentHandler {
 
-    private final ComponentDefinition componentDefinition = createComponent(JSON_FILE)
+    private final ComponentDefinition componentDefinition = component(JSON_FILE)
             .display(display("JSON File").description("Reads and writes data from a JSON file."))
             .actions(
-                    ComponentDSL.action(READ)
+                    action(READ)
                             .display(display("Read from file").description("Reads data from a JSON file."))
                             .properties(
                                     string(FILE_TYPE)
@@ -103,13 +103,11 @@ public class JsonFileComponentHandler implements ComponentHandler {
                                             .label("Page Number")
                                             .description("The page number to get.")
                                             .displayOption(showWhen(IS_ARRAY).eq(true)))
-                            .output(any().types(
-                                            array().displayOption(
-                                                            showWhen(IS_ARRAY).eq(true)),
-                                            object().displayOption(
-                                                            showWhen(IS_ARRAY).eq(false))))
-                            .performFunction(this::performRead),
-                    ComponentDSL.action(WRITE)
+                            .output(
+                                    array().displayOption(showWhen(IS_ARRAY).eq(true)),
+                                    object().displayOption(showWhen(IS_ARRAY).eq(false)))
+                            .perform(this::performRead),
+                    action(WRITE)
                             .display(display("Write to file").description("Writes the data to a JSON file."))
                             .properties(
                                     string(FILE_TYPE)
@@ -132,7 +130,7 @@ public class JsonFileComponentHandler implements ComponentHandler {
                                             .required(true)
                                             .defaultValue("file.json"))
                             .output(fileEntry())
-                            .performFunction(this::performWrite));
+                            .perform(this::performWrite));
 
     @Override
     public ComponentDefinition getDefinition() {

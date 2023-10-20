@@ -18,11 +18,9 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.ExecutionParameters;
-import com.bytechef.hermes.definition.Definition;
 import com.bytechef.hermes.definition.Display;
 import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashMap;
 import java.util.List;
@@ -36,71 +34,22 @@ import java.util.function.BiFunction;
         name = "ActionDefinition",
         description =
                 "An action is a a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
-public final class ActionDefinition implements Definition {
+public sealed class ActionDefinition permits ComponentDSL.ModifiableActionDefinition {
 
     public static final String ACTION = "action";
-    private Display display;
-    private Object exampleOutput;
-    private Map<String, Object> metadata;
-    private String name;
-    private List<Property<? extends Property<?>>> output;
-    private List<Property<?>> properties;
+
+    protected Display display;
+    protected Object exampleOutput;
+    protected Map<String, Object> metadata;
+    protected String name;
+    protected List<Property<? extends Property<?>>> output;
+    protected List<Property<?>> properties;
 
     @JsonIgnore
-    private BiFunction<Context, ExecutionParameters, Object> performFunction;
+    protected BiFunction<Context, ExecutionParameters, Object> performFunction;
 
-    private ActionDefinition() {}
-
-    public ActionDefinition(String name) {
+    protected ActionDefinition(String name) {
         this.name = name;
-    }
-
-    public ActionDefinition display(Display display) {
-        this.display = display;
-
-        return this;
-    }
-
-    public ActionDefinition exampleOutput(Object exampleOutput) {
-        this.exampleOutput = exampleOutput;
-
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public ActionDefinition metadata(String key, String value) {
-        if (metadata == null) {
-            metadata = new HashMap<>();
-        }
-
-        this.metadata.put(key, value);
-
-        return this;
-    }
-
-    @SuppressFBWarnings("EI2")
-    public ActionDefinition metadata(Map<String, Object> metadata) {
-        this.metadata = metadata;
-
-        return this;
-    }
-
-    public ActionDefinition output(Property... output) {
-        this.output = List.of(output);
-
-        return this;
-    }
-
-    public ActionDefinition perform(BiFunction<Context, ExecutionParameters, Object> performFunction) {
-        this.performFunction = performFunction;
-
-        return this;
-    }
-
-    public ActionDefinition properties(Property... properties) {
-        this.properties = List.of(properties);
-
-        return this;
     }
 
     public Display getDisplay() {
