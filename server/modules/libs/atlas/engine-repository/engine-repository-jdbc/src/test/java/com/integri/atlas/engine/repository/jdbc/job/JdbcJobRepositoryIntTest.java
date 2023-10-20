@@ -29,7 +29,9 @@ import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
 import com.integri.atlas.engine.core.uuid.UUIDGenerator;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,6 +44,15 @@ public class JdbcJobRepositoryIntTest {
 
     @Autowired
     private JobRepository jobRepository;
+
+    @BeforeEach
+    public void beforeEach() {
+        List<Job> jobs = jobRepository.findAll();
+
+        for (Job job : jobs) {
+            jobRepository.delete(job.getId());
+        }
+    }
 
     @Test
     public void test1() {

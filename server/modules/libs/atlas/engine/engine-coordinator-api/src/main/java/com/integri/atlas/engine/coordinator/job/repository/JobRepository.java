@@ -21,27 +21,33 @@ package com.integri.atlas.engine.coordinator.job.repository;
 import com.integri.atlas.engine.coordinator.data.Page;
 import com.integri.atlas.engine.coordinator.job.Job;
 import com.integri.atlas.engine.coordinator.job.JobSummary;
+import java.util.List;
 import java.util.Optional;
 
 /**
  * @author Arik Cohen
+ * @author Ivica Cardic
  */
 public interface JobRepository {
+    int countCompletedJobsToday();
+
+    int countCompletedJobsYesterday();
+
+    int countRunningJobs();
+
+    void create(Job aJob);
+
+    void delete(String id);
+
+    List<Job> findAll();
+
     Page<JobSummary> getPage(int aPageNumber);
 
     Job getById(String aId);
 
     Optional<Job> getLatest();
 
-    void create(Job aJob);
-
-    Job merge(Job aJob);
-
     Job getByTaskId(String aTaskId);
 
-    int countRunningJobs();
-
-    int countCompletedJobsToday();
-
-    int countCompletedJobsYesterday();
+    Job merge(Job aJob);
 }

@@ -83,6 +83,16 @@ public class JdbcJobRepository implements JobRepository {
     }
 
     @Override
+    public void delete(String id) {
+        jdbc.update("delete from job where id = :id", Map.of("id", id));
+    }
+
+    @Override
+    public List<Job> findAll() {
+        return jdbc.query("select * from job", this::jobRowMappper);
+    }
+
+    @Override
     public Job getById(String aId) {
         List<Job> query = jdbc.query(
             "select * from job where id = :id",
