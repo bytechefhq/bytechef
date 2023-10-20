@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * @author Ivica Cardic
  */
@@ -50,5 +52,15 @@ public class WorkflowServiceController {
         })
     public ResponseEntity<Workflow> getWorkflow(@PathVariable String id) {
         return ResponseEntity.ok(workflowService.getWorkflow(id));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/workflow-service/get-workflows",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<List<Workflow>> getWorkflows() {
+        return ResponseEntity.ok(workflowService.getWorkflows());
     }
 }
