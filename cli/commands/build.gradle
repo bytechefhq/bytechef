@@ -1,0 +1,14 @@
+plugins {
+    id "com.bytechef.java-library-conventions"
+}
+
+subprojects {
+    dependencies {
+        annotationProcessor libs.picocli.codegen
+
+        implementation libs.logback.core
+        implementation libs.logback.classic
+        implementation libs.openapi.generator
+        implementation libs.picocli
+    }
+}

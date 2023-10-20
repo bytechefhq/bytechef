@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.cli.cmd.component;
+package com.bytechef.cli.command.component.subcomand;
 
 import static org.apache.commons.lang3.StringUtils.deleteWhitespace;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.replaceChars;
-import static picocli.CommandLine.Command;
-import static picocli.CommandLine.Model.CommandSpec;
-import static picocli.CommandLine.Option;
-import static picocli.CommandLine.Parameters;
-import static picocli.CommandLine.Spec;
 
+import com.bytechef.cli.command.component.ComponentCommand;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,53 +34,49 @@ import org.openapitools.codegen.api.TemplateDefinition;
 import org.openapitools.codegen.config.CodegenConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import picocli.CommandLine.ParameterException;
+import picocli.CommandLine;
 
-/**
- * @author Ivica Cardic
- */
-@Command(name = "component", description = "Generates project for a new component", mixinStandardHelpOptions = true)
-public class ComponentCommand implements Callable<Integer> {
-
+@CommandLine.Command(name = "init", description = "Generates project for a new component)")
+public class InitSubcommand implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ComponentCommand.class);
 
-    @Spec
-    private transient CommandSpec commandSpec;
+    @CommandLine.Spec
+    private transient CommandLine.Model.CommandSpec commandSpec;
 
-    @Option(
+    @CommandLine.Option(
             names = {"--base-package-name"},
             paramLabel = "base package name",
             description = "package for generated classes",
             defaultValue = "com.bytechef.task.handler")
     private transient String basePackageName;
 
-    @Option(
+    @CommandLine.Option(
             names = {"--component-version"},
             paramLabel = "component version",
             description = "component version",
             defaultValue = "1.0")
     private transient float componentVersion;
 
-    @Option(
+    @CommandLine.Option(
             names = {"--open-api-path"},
             description = "path to the OpenAPI specification")
     private transient String openAPIPath;
 
-    @Option(
+    @CommandLine.Option(
             names = {"-o", "--output"},
             paramLabel = "output directory",
             description = "where to write the generated files (current dir by default)",
             defaultValue = ".")
     private transient String output;
 
-    @Option(
+    @CommandLine.Option(
             names = {"--standard-component"},
             paramLabel = "standard component",
             description = "if a component is the standard one(ships with the platform) or the custom one",
             defaultValue = "true")
     private transient boolean standardComponent;
 
-    @Parameters(paramLabel = "COMPONENT", description = "component name")
+    @CommandLine.Parameters(paramLabel = "COMPONENT", description = "component name")
     private transient String componentName;
 
     @Override
@@ -134,7 +126,7 @@ public class ComponentCommand implements Callable<Integer> {
 
         private OpenAPIComponentGenerator() {
             if (!openAPIPath.matches("^http(s)?://.*") && !new File(openAPIPath).exists()) {
-                throw new ParameterException(
+                throw new CommandLine.ParameterException(
                         commandSpec.commandLine(), "The OpenAPI file is not found: " + openAPIPath);
             }
 
@@ -148,7 +140,7 @@ public class ComponentCommand implements Callable<Integer> {
             configurator.setModelPackage(getPackageName("model"));
             configurator.setOutputDir(output);
             configurator.setPackageName(getPackageName(null));
-            configurator.setTemplateDir("templates/component/rest");
+            configurator.setTemplateDir("templates/connector/rest");
 
             generator = new DefaultGenerator();
 

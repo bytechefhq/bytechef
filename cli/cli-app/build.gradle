@@ -1,0 +1,28 @@
+plugins {
+    id "com.bytechef.java-application-conventions"
+}
+
+version="1.0"
+
+jar {
+    archiveBaseName = "bytechef-${project.name}"
+}
+
+application {
+    mainClassName = "com.bytechef.cli.ByteChefCliApp"
+}
+
+compileJava {
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
+dependencies {
+    annotationProcessor libs.picocli.codegen
+
+    implementation libs.logback.core
+    implementation libs.logback.classic
+    implementation libs.openapi.generator
+    implementation libs.picocli
+
+    implementation project(":cli:commands:component")
+}
