@@ -110,6 +110,7 @@ const IntegrationModal = ({
 
     function closeModal() {
         reset();
+
         setIsOpen(false);
 
         if (onClose) {
@@ -119,6 +120,10 @@ const IntegrationModal = ({
 
     function createIntegration() {
         const formData = getValues();
+
+        if (!formData) {
+            return;
+        }
 
         const tagValues = formData.tags?.map((tag: TagModel) => {
             return {id: tag.id, name: tag.name, version: tag.version};
