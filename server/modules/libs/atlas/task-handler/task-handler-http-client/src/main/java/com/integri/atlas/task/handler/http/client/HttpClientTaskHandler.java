@@ -28,6 +28,7 @@ import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthenticationFactory;
 import com.integri.atlas.task.handler.http.client.body.HttpBodyFactory;
 import com.integri.atlas.task.handler.http.client.header.HttpHeadersFactory;
+import com.integri.atlas.task.handler.http.client.http.HttpClientHelper;
 import com.integri.atlas.task.handler.http.client.params.QueryParamsFactory;
 import com.integri.atlas.task.handler.http.client.response.HttpResponseHandler;
 import java.net.http.HttpResponse;
@@ -52,7 +53,7 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
 
     @Override
     public Object handle(TaskExecution taskExecution) throws Exception {
-        IntegriHttpClient integriHttpClient = new IntegriHttpClient(
+        HttpClientHelper httpClientHelper = new HttpClientHelper(
             httpAuthenticationFactory.create(
                 taskExecution.getRequiredString(PROPERTY_AUTHENTICATION_TYPE),
                 taskExecution.get("credentials", MapObject.class)
@@ -60,7 +61,7 @@ public class HttpClientTaskHandler implements TaskHandler<Object> {
             taskExecution.getLong(PROPERTY_TIMEOUT, 10000)
         );
 
-        HttpResponse httpResponse = integriHttpClient.send(
+        HttpResponse httpResponse = httpClientHelper.send(
             taskExecution.getRequiredString(PROPERTY_REQUEST_METHOD),
             resolveURI(
                 taskExecution.getRequiredString(PROPERTY_PROPERTY_URI),

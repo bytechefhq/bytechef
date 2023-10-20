@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.integri.atlas.task.handler.http.client;
+package com.integri.atlas.task.handler.http.client.http;
 
 import com.integri.atlas.task.handler.http.client.authentication.HttpAuthentication;
-import com.integri.atlas.task.handler.http.client.header.ContentType;
 import com.integri.atlas.task.handler.http.client.header.HttpHeader;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -25,16 +24,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.MultiValueMap;
 
 /**
  * @author Matija Petanjek
  */
-public class IntegriHttpClient {
+public class HttpClientHelper {
 
-    public IntegriHttpClient(HttpAuthentication httpAuthentication, long timeout) {
+    public HttpClientHelper(HttpAuthentication httpAuthentication, long timeout) {
         this.httpAuthentication = httpAuthentication;
 
         httpClient =
