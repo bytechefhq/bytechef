@@ -16,17 +16,17 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * PostJob200ResponseModel
+ * CreateJob200ResponseModel
  */
 
-@JsonTypeName("postJob_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T09:06:53.695754+01:00[Europe/Zagreb]")
-public class PostJob200ResponseModel {
+@JsonTypeName("createJob_200_response")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T19:53:04.302675+01:00[Europe/Zagreb]")
+public class CreateJob200ResponseModel {
 
   @JsonProperty("jobId")
   private Long jobId;
 
-  public PostJob200ResponseModel jobId(Long jobId) {
+  public CreateJob200ResponseModel jobId(Long jobId) {
     this.jobId = jobId;
     return this;
   }
@@ -53,8 +53,8 @@ public class PostJob200ResponseModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PostJob200ResponseModel postJob200Response = (PostJob200ResponseModel) o;
-    return Objects.equals(this.jobId, postJob200Response.jobId);
+    CreateJob200ResponseModel createJob200Response = (CreateJob200ResponseModel) o;
+    return Objects.equals(this.jobId, createJob200Response.jobId);
   }
 
   @Override
@@ -65,7 +65,7 @@ public class PostJob200ResponseModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PostJob200ResponseModel {\n");
+    sb.append("class CreateJob200ResponseModel {\n");
     sb.append("    jobId: ").append(toIndentedString(jobId)).append("\n");
     sb.append("}");
     return sb.toString();

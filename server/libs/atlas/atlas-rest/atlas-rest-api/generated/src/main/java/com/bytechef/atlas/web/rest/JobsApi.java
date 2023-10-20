@@ -5,9 +5,9 @@
  */
 package com.bytechef.atlas.web.rest;
 
+import com.bytechef.atlas.web.rest.model.CreateJob200ResponseModel;
 import com.bytechef.atlas.web.rest.model.JobModel;
 import com.bytechef.atlas.web.rest.model.JobParametersModel;
-import com.bytechef.atlas.web.rest.model.PostJob200ResponseModel;
 import com.bytechef.atlas.web.rest.model.TaskExecutionModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,10 +38,52 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T09:06:53.695754+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T19:53:04.302675+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "jobs", description = "the jobs API")
 public interface JobsApi {
+
+    /**
+     * POST /jobs : Create a request for running a new job.
+     * Create a request for running a new job.
+     *
+     * @param jobParametersModel Parameters required to run a job, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
+     * @return The id of the created job. (status code 200)
+     */
+    @Operation(
+        operationId = "createJob",
+        summary = "Create a request for running a new job.",
+        description = "Create a request for running a new job.",
+        tags = { "jobs" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The id of the created job.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CreateJob200ResponseModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/jobs",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default Mono<ResponseEntity<CreateJob200ResponseModel>> createJob(
+        @Parameter(name = "JobParametersModel", description = "Parameters required to run a job, for example '{\"workflowId\":\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'", required = true) @Valid @RequestBody Mono<JobParametersModel> jobParametersModel,
+        @Parameter(hidden = true) final ServerWebExchange exchange
+    ) {
+        Mono<Void> result = Mono.empty();
+        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
+        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
+            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                String exampleString = "{ \"jobId\" : 0 }";
+                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
+                break;
+            }
+        }
+        return result.then(jobParametersModel).then(Mono.empty());
+
+    }
+
 
     /**
      * GET /jobs/{id} : Get a job by id.
@@ -201,48 +243,6 @@ public interface JobsApi {
             }
         }
         return result.then(Mono.empty());
-
-    }
-
-
-    /**
-     * POST /jobs : Create a request for running a new job.
-     * Create a request for running a new job.
-     *
-     * @param jobParametersModel Parameters required to run a job, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
-     * @return The id of the created job. (status code 200)
-     */
-    @Operation(
-        operationId = "postJob",
-        summary = "Create a request for running a new job.",
-        description = "Create a request for running a new job.",
-        tags = { "jobs" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The id of the created job.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = PostJob200ResponseModel.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/jobs",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    default Mono<ResponseEntity<PostJob200ResponseModel>> postJob(
-        @Parameter(name = "JobParametersModel", description = "Parameters required to run a job, for example '{\"workflowId\":\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'", required = true) @Valid @RequestBody Mono<JobParametersModel> jobParametersModel,
-        @Parameter(hidden = true) final ServerWebExchange exchange
-    ) {
-        Mono<Void> result = Mono.empty();
-        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
-            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                String exampleString = "{ \"jobId\" : 0 }";
-                result = ApiUtil.getExampleResponse(exchange, mediaType, exampleString);
-                break;
-            }
-        }
-        return result.then(jobParametersModel).then(Mono.empty());
 
     }
 
