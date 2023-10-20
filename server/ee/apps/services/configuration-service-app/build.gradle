@@ -10,6 +10,7 @@ dependencies {
     implementation libs.org.springdoc.springdoc.openapi.starter.webmvc.ui
     implementation "org.springframework:spring-webflux"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-aop"
     implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "org.springframework.boot:spring-boot-starter-data-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"

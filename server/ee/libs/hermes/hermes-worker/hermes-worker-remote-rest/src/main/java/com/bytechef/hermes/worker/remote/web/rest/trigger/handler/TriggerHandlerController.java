@@ -18,7 +18,7 @@
 package com.bytechef.hermes.worker.remote.web.rest.trigger.handler;
 
 import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
+import com.bytechef.hermes.worker.trigger.exception.TriggerExecutionException;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandlerRegistry;
 import jakarta.validation.Valid;

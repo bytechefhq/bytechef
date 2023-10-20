@@ -17,6 +17,7 @@
 
 package com.bytechef.connection.config;
 
+import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.definition.registry.remote.client.service.ConnectionDefinitionServiceClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -31,8 +32,8 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     ConnectionDefinitionServiceClient connectionDefinitionServiceClient(
-        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new ConnectionDefinitionServiceClient(discoveryClient, objectMapper);
+        return new ConnectionDefinitionServiceClient(defaultWebClient, discoveryClient, objectMapper);
     }
 }

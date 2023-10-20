@@ -17,12 +17,11 @@
 
 package com.bytechef.hermes.execution.remote.client.facade;
 
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
 
@@ -32,11 +31,11 @@ import java.util.Map;
 @Component
 public class TriggerLifecycleFacadeClient implements TriggerLifecycleFacade {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
     @SuppressFBWarnings("EI")
-    public TriggerLifecycleFacadeClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    public TriggerLifecycleFacadeClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
@@ -58,17 +57,12 @@ public class TriggerLifecycleFacadeClient implements TriggerLifecycleFacade {
     }
 
     private void post(String path, TriggerRequest workflowExecutionId) {
-        loadBalancedWebClientBuilder
-            .build()
-            .post()
-            .uri(uriBuilder -> uriBuilder
+        loadBalancedWebClient.post(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path(path)
-                .build())
-            .bodyValue(workflowExecutionId)
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
-            .block();
+                .build(),
+            workflowExecutionId);
     }
 
     @SuppressFBWarnings("EI")

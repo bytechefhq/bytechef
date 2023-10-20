@@ -15,25 +15,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.scheduler.config;
+package com.bytechef.commons.webclient;
 
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
-import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author Ivica Cardic
  */
-@Configuration
-@LoadBalancerClients(@LoadBalancerClient("configuration-service-app"))
-public class WebClientConfiguration {
+@Component
+public class LoadBalancedWebClient extends AbstractWebClient {
 
-    @LoadBalanced
-    @Bean
-    WebClient.Builder loadBalancedWebClientBuilder() {
-        return WebClient.builder();
+    public LoadBalancedWebClient(WebClient.Builder loadBalancedWebClientBuilder) {
+        super(loadBalancedWebClientBuilder);
     }
 }

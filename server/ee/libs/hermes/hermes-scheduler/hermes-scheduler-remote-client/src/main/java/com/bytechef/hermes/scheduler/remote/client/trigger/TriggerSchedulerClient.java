@@ -17,11 +17,11 @@
 
 package com.bytechef.hermes.scheduler.remote.client.trigger;
 
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -32,55 +32,41 @@ import java.util.Map;
 @Component
 public class TriggerSchedulerClient implements TriggerScheduler {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
-    public TriggerSchedulerClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    @SuppressFBWarnings("EI")
+    public TriggerSchedulerClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
     public void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId) {
-        loadBalancedWebClientBuilder
-            .build()
-            .post()
-            .uri(uriBuilder -> uriBuilder
+        loadBalancedWebClient.post(
+            uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
                 .path("/trigger-scheduler/cancel-dynamic-webhook-trigger-refresh")
-                .build())
-            .bodyValue(workflowExecutionId)
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+                .build(),
+            workflowExecutionId);
     }
 
     @Override
     public void cancelPollingTrigger(String workflowExecutionId) {
-        loadBalancedWebClientBuilder
-            .build()
-            .post()
-            .uri(uriBuilder -> uriBuilder
+        loadBalancedWebClient.post(
+            uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
                 .path("/trigger-scheduler/cancel-polling-trigger")
-                .build())
-            .bodyValue(workflowExecutionId)
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+                .build(),
+            workflowExecutionId);
     }
 
     @Override
     public void cancelScheduleTrigger(String workflowExecutionId) {
-        loadBalancedWebClientBuilder
-            .build()
-            .post()
-            .uri(uriBuilder -> uriBuilder
+        loadBalancedWebClient.post(
+            uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
                 .path("/trigger-scheduler/cancel-schedule-trigger")
-                .build())
-            .bodyValue(workflowExecutionId)
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+                .build(),
+            workflowExecutionId);
     }
 
     @Override
@@ -88,50 +74,35 @@ public class TriggerSchedulerClient implements TriggerScheduler {
         LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
         WorkflowExecutionId workflowExecutionId) {
 
-        loadBalancedWebClientBuilder
-            .build()
-            .post()
-            .uri(uriBuilder -> uriBuilder
+        loadBalancedWebClient.post(
+            uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
                 .path("/trigger-scheduler/schedule-dynamic-webhook-trigger-refresh")
-                .build())
-            .bodyValue(new DynamicWebhookRefreshTaskRequest(
-                workflowExecutionId, webhookExpirationDate, componentName, componentVersion))
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+                .build(),
+            new DynamicWebhookRefreshTaskRequest(
+                workflowExecutionId, webhookExpirationDate, componentName, componentVersion));
     }
 
     @Override
     public void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId) {
-        loadBalancedWebClientBuilder
-            .build()
-            .post()
-            .uri(uriBuilder -> uriBuilder
+        loadBalancedWebClient.post(
+            uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
                 .path("/trigger-scheduler/schedule-polling-trigger")
-                .build())
-            .bodyValue(workflowExecutionId)
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+                .build(),
+            workflowExecutionId);
     }
 
     @Override
     public void scheduleScheduleTrigger(
         String pattern, String zoneId, Map<String, Object> output, String workflowExecutionId) {
 
-        loadBalancedWebClientBuilder
-            .build()
-            .post()
-            .uri(uriBuilder -> uriBuilder
+        loadBalancedWebClient.post(
+            uriBuilder -> uriBuilder
                 .host("scheduler-service-app")
                 .path("/trigger-scheduler/schedule-schedule-trigger")
-                .build())
-            .bodyValue(new TriggerWorkflowTaskRequest(workflowExecutionId, pattern, zoneId, output))
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+                .build(),
+            new TriggerWorkflowTaskRequest(workflowExecutionId, pattern, zoneId, output));
     }
 
     @SuppressFBWarnings("EI")

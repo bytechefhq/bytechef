@@ -18,6 +18,7 @@
 package com.bytechef.hermes.definition.registry.remote.client.service;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
+import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.definition.registry.service.ComponentDefinitionService;
@@ -36,20 +37,19 @@ import java.util.List;
 public class ComponentDefinitionServiceClient extends AbstractWorkerClient
     implements ComponentDefinitionService {
 
-    public ComponentDefinitionServiceClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
-        super(discoveryClient, objectMapper);
+    public ComponentDefinitionServiceClient(
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        super(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Override
     public ComponentDefinitionDTO getComponentDefinition(String name, Integer version) {
-        return WORKER_WEB_CLIENT
-            .get()
-            .uri(uriBuilder -> toUri(
+        return defaultWebClient.get(
+            uriBuilder -> toUri(
                 uriBuilder, name, "/component-definition-service/get-component-definition/{name}/{version}", name,
-                checkVersion(version)))
-            .retrieve()
-            .bodyToMono(ComponentDefinitionDTO.class)
-            .block();
+                checkVersion(version)),
+            ComponentDefinitionDTO.class);
     }
 
     @Override
@@ -57,12 +57,10 @@ public class ComponentDefinitionServiceClient extends AbstractWorkerClient
         return Mono.zip(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
-                .map(serviceInstance -> WORKER_WEB_CLIENT
-                    .get()
-                    .uri(uriBuilder -> toUri(uriBuilder, serviceInstance,
-                        "/component-definition-service/get-component-definitions"))
-                    .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                .map(serviceInstance -> defaultWebClient.getMono(
+                    uriBuilder -> toUri(uriBuilder, serviceInstance,
+                        "/component-definition-service/get-component-definitions"),
+                    new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
                 .toList(),
             this::toComponentDefinitions)
             .block();
@@ -73,12 +71,10 @@ public class ComponentDefinitionServiceClient extends AbstractWorkerClient
         return Mono.zip(
             WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_SERVICE_APP), objectMapper)
                 .stream()
-                .map(serviceInstance -> WORKER_WEB_CLIENT
-                    .get()
-                    .uri(uriBuilder -> toUri(uriBuilder, serviceInstance,
-                        "/component-definition-service/get-component-definitions/{name}", name))
-                    .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
+                .map(serviceInstance -> defaultWebClient.getMono(
+                    uriBuilder -> toUri(uriBuilder, serviceInstance,
+                        "/component-definition-service/get-component-definitions/{name}", name),
+                    new ParameterizedTypeReference<List<ComponentDefinitionDTO>>() {}))
                 .toList(),
             this::toComponentDefinitions)
             .block();

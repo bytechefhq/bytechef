@@ -19,10 +19,10 @@ package com.bytechef.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
@@ -32,40 +32,31 @@ import java.util.List;
 @Component
 public class TaskExecutionServiceClient implements TaskExecutionService {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
     @SuppressFBWarnings("EI")
-    public TaskExecutionServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    public TaskExecutionServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
     public TaskExecution create(TaskExecution taskExecution) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .post()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.post(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/task-execution-service/create")
-                .build())
-            .bodyValue(taskExecution)
-            .retrieve()
-            .bodyToMono(TaskExecution.class)
-            .block();
+                .build(),
+            taskExecution, TaskExecution.class);
     }
 
     @Override
     public TaskExecution getTaskExecution(long id) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/task-execution-service/get-task-execution/{id}")
-                .build(id))
-            .retrieve()
-            .bodyToMono(TaskExecution.class)
-            .block();
+                .build(id),
+            TaskExecution.class);
     }
 
     @Override
@@ -80,30 +71,21 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
 
     @Override
     public List<TaskExecution> getParentTaskExecutions(long parentId) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/task-execution-service/get-parent-task-executions/{parentId}")
-                .build(parentId))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<TaskExecution>>() {})
-            .block();
+                .build(parentId),
+            new ParameterizedTypeReference<List<TaskExecution>>() {});
     }
 
     @Override
     public TaskExecution update(TaskExecution taskExecution) {
-        return loadBalancedWebClientBuilder
-            .build()
-            .put()
-            .uri(uriBuilder -> uriBuilder
+        return loadBalancedWebClient.put(
+            uriBuilder -> uriBuilder
                 .host("execution-service-app")
                 .path("/api/internal/task-execution-service/update")
-                .build())
-            .bodyValue(taskExecution)
-            .retrieve()
-            .bodyToMono(TaskExecution.class)
-            .block();
+                .build(),
+            taskExecution, TaskExecution.class);
     }
 }

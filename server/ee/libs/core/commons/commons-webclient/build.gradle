@@ -1,0 +1,6 @@
+dependencies {
+    api "org.springframework:spring-webflux"
+    api "org.springframework.retry:spring-retry"
+
+    implementation "org.springframework:spring-context"
+}

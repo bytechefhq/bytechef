@@ -56,7 +56,7 @@ public interface ConnectionRepository
             AND connection_tag.tag_id = :tagId
             ORDER BY connection.name
         """)
-    Iterable<Connection> findAllByCN_CV_TI(
+    Iterable<Connection> findAllByCNCVTI(
         @Param("componentName") String componentName, @Param("connectionVersion") int connectionVersion,
         @Param("tagId") long tagId);
 

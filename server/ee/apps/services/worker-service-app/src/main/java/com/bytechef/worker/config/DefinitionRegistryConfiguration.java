@@ -17,6 +17,7 @@
 
 package com.bytechef.worker.config;
 
+import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.context.factory.ContextConnectionFactory;
@@ -105,9 +106,9 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     ConnectionDefinitionServiceClient connectionDefinitionServiceClient(
-        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new ConnectionDefinitionServiceClient(discoveryClient, objectMapper);
+        return new ConnectionDefinitionServiceClient(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Bean

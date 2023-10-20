@@ -17,11 +17,11 @@
 
 package com.bytechef.helios.configuration.remote.client.service;
 
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +32,11 @@ import java.util.Optional;
 @Component
 public class ProjectInstanceServiceClient implements ProjectInstanceService {
 
-    private final WebClient.Builder loadBalancedWebClientBuilder;
+    private final LoadBalancedWebClient loadBalancedWebClient;
 
     @SuppressFBWarnings("EI")
-    public ProjectInstanceServiceClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        this.loadBalancedWebClientBuilder = loadBalancedWebClientBuilder;
+    public ProjectInstanceServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
+        this.loadBalancedWebClient = loadBalancedWebClient;
     }
 
     @Override
@@ -52,16 +52,12 @@ public class ProjectInstanceServiceClient implements ProjectInstanceService {
     @Override
     public Optional<ProjectInstance> fetchJobProjectInstance(long jobId) {
         return Optional.ofNullable(
-            loadBalancedWebClientBuilder
-                .build()
-                .get()
-                .uri(uriBuilder -> uriBuilder
+            loadBalancedWebClient.get(
+                uriBuilder -> uriBuilder
                     .host("configuration-service-app")
                     .path("/api/internal/project-instance-service/fetch-project-instance/{jobId}")
-                    .build(jobId))
-                .retrieve()
-                .bodyToMono(ProjectInstance.class)
-                .block());
+                    .build(jobId),
+                ProjectInstance.class));
     }
 
     @Override
@@ -96,16 +92,11 @@ public class ProjectInstanceServiceClient implements ProjectInstanceService {
 
     @Override
     public void updateEnabled(long id, boolean enabled) {
-        loadBalancedWebClientBuilder
-            .build()
-            .get()
-            .uri(uriBuilder -> uriBuilder
+        loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
                 .host("configuration-service-app")
                 .path(
                     "/api/internal/project-instance-service/update-enabled/{id}/{enable}")
-                .build(id, enabled))
-            .retrieve()
-            .toBodilessEntity()
-            .block();
+                .build(id, enabled));
     }
 }

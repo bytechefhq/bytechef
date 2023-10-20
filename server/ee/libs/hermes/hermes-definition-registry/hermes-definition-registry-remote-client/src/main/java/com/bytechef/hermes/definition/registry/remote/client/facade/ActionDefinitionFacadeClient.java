@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.definition.registry.remote.client.facade;
 
+import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
 import com.bytechef.hermes.definition.registry.facade.ActionDefinitionFacade;
@@ -33,8 +34,10 @@ import java.util.Map;
  */
 public class ActionDefinitionFacadeClient extends AbstractWorkerClient implements ActionDefinitionFacade {
 
-    public ActionDefinitionFacadeClient(DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
-        super(discoveryClient, objectMapper);
+    public ActionDefinitionFacadeClient(
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+
+        super(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Override
@@ -42,16 +45,11 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         Long connectionId) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(
-                uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-editor-description"))
-            .bodyValue(
-                new EditorDescriptionRequest(
-                    actionName, actionParameters, componentName, componentVersion, connectionId))
-            .retrieve()
-            .bodyToMono(String.class)
-            .block();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-editor-description"),
+            new EditorDescriptionRequest(
+                actionName, actionParameters, componentName, componentVersion, connectionId),
+            String.class);
     }
 
     @Override
@@ -59,16 +57,12 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, Long connectionId, String searchText) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-options"))
-            .bodyValue(
-                new OptionsRequest(
-                    actionName, propertyName, actionParameters, componentName, componentVersion, connectionId,
-                    searchText))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<OptionDTO>>() {})
-            .block();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-options"),
+            new OptionsRequest(
+                actionName, propertyName, actionParameters, componentName, componentVersion, connectionId,
+                searchText),
+            new ParameterizedTypeReference<List<OptionDTO>>() {});
     }
 
     @Override
@@ -76,15 +70,11 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         String componentName, int componentVersion, String actionName, Map<String, Object> actionParameters,
         Long connectionId) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-output-schema"))
-            .bodyValue(
-                new OutputSchemaRequest(
-                    actionName, actionParameters, componentName, componentVersion, connectionId))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {})
-            .block();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-output-schema"),
+            new OutputSchemaRequest(
+                actionName, actionParameters, componentName, componentVersion, connectionId),
+            new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {});
     }
 
     @Override
@@ -92,15 +82,11 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, Object> actionParameters, Long connectionId) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-properties"))
-            .bodyValue(
-                new PropertiesRequest(
-                    actionName, actionParameters, componentName, componentVersion, connectionId, propertyName))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {})
-            .block();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-properties"),
+            new PropertiesRequest(
+                actionName, actionParameters, componentName, componentVersion, connectionId, propertyName),
+            new ParameterizedTypeReference<List<? extends ValuePropertyDTO<?>>>() {});
     }
 
     @Override
@@ -108,15 +94,10 @@ public class ActionDefinitionFacadeClient extends AbstractWorkerClient implement
         String actionName, String componentName, int componentVersion, Map<String, Object> actionParameters,
         Long connectionId) {
 
-        return WORKER_WEB_CLIENT
-            .post()
-            .uri(uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-sample-output"))
-            .bodyValue(
-                new SampleOutputRequest(
-                    actionName, actionParameters, componentName, componentVersion, connectionId))
-            .retrieve()
-            .bodyToMono(Object.class)
-            .block();
+        return defaultWebClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, "/action-definition-service/execute-sample-output"),
+            new SampleOutputRequest(actionName, actionParameters, componentName, componentVersion, connectionId),
+            Object.class);
     }
 
     private record EditorDescriptionRequest(

@@ -17,6 +17,8 @@
 
 package com.bytechef.configuration.config;
 
+import com.bytechef.commons.webclient.DefaultWebClient;
+import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.definition.registry.remote.client.facade.ActionDefinitionFacadeClient;
 import com.bytechef.hermes.definition.registry.remote.client.facade.ComponentDefinitionFacadeClient;
 import com.bytechef.hermes.definition.registry.remote.client.facade.TriggerDefinitionFacadeClient;
@@ -29,7 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * @author Ivica Cardic
@@ -39,57 +40,57 @@ public class DefinitionRegistryConfiguration {
 
     @Bean
     ActionDefinitionFacadeClient actionDefinitionFacadeClient(
-        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new ActionDefinitionFacadeClient(discoveryClient, objectMapper);
+        return new ActionDefinitionFacadeClient(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Bean
     ActionDefinitionServiceClient actionDefinitionServiceClient(
-        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new ActionDefinitionServiceClient(discoveryClient, objectMapper);
+        return new ActionDefinitionServiceClient(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Bean
     ComponentDefinitionFacadeClient componentDefinitionFacadeClient(
-        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new ComponentDefinitionFacadeClient(discoveryClient, objectMapper);
+        return new ComponentDefinitionFacadeClient(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Bean
     ComponentDefinitionServiceClient componentDefinitionServiceClient(
-        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new ComponentDefinitionServiceClient(discoveryClient, objectMapper);
+        return new ComponentDefinitionServiceClient(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Bean
     ConnectionDefinitionServiceClient connectionDefinitionServiceClient(
-        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new ConnectionDefinitionServiceClient(discoveryClient, objectMapper);
+        return new ConnectionDefinitionServiceClient(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Bean
     TaskDispatcherDefinitionServiceClient taskDispatcherDefinitionServiceClient(
-        WebClient.Builder loadBalancedWebClientBuilder) {
+        LoadBalancedWebClient loadBalancedWebClient) {
 
-        return new TaskDispatcherDefinitionServiceClient(loadBalancedWebClientBuilder);
+        return new TaskDispatcherDefinitionServiceClient(loadBalancedWebClient);
     }
 
     @Bean
     TriggerDefinitionFacadeClient triggerDefinitionFacadeClient(
-        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new TriggerDefinitionFacadeClient(discoveryClient, objectMapper);
+        return new TriggerDefinitionFacadeClient(defaultWebClient, discoveryClient, objectMapper);
     }
 
     @Bean
     TriggerDefinitionServiceClient triggerDefinitionServiceClient(
-        DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        return new TriggerDefinitionServiceClient(discoveryClient, objectMapper);
+        return new TriggerDefinitionServiceClient(defaultWebClient, discoveryClient, objectMapper);
     }
 }

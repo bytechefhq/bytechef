@@ -36,7 +36,7 @@ import com.bytechef.hermes.definition.registry.component.util.ComponentContextSu
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.component.context.factory.ContextFactory;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.worker.trigger.excepton.TriggerExecutionException;
+import com.bytechef.hermes.worker.trigger.exception.TriggerExecutionException;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
