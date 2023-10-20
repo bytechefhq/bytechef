@@ -1,7 +1,10 @@
 import React from 'react';
 import {Name} from './Name';
 import {Status} from './Status';
-import {Dropdown, DropDownMenuItem} from '../DropDown/Dropdown';
+import {
+    Dropdown,
+    DropDownMenuItem,
+} from '../../../components/DropDown/Dropdown';
 
 const menuItems: DropDownMenuItem[] = [
     {
@@ -32,7 +35,7 @@ const Header: React.FC<{
 }> = ({id, name, status, description = 'Description not available'}) => {
     return (
         <div className="relative mb-3 flex items-center justify-between">
-            <div className="">
+            <div>
                 <Status status={status} />
 
                 <Name name={name} description={description} />
