@@ -1,5 +1,5 @@
 import useOAuth2 from '../oauth2/useOAuth2';
-import Button from '../../../components/Button/Button';
+import Button from '../../../../components/Button/Button';
 import React from 'react';
 
 const LoadingIcon = (): JSX.Element => (

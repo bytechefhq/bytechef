@@ -1,12 +1,12 @@
-import LayoutContainer from '../../layouts/LayoutContainer/LayoutContainer';
-import PageHeader from '../../components/PageHeader/PageHeader';
+import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
+import PageHeader from '../../../components/PageHeader/PageHeader';
 import React, {useState} from 'react';
-import LeftSidebarMenu from '../../layouts/LeftSidebarMenu/LeftSidebarMenu';
+import LeftSidebarMenu from '../../../layouts/LeftSidebarMenu/LeftSidebarMenu';
 import {useSearchParams} from 'react-router-dom';
-import LeftSidebarMenuItem from '../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
+import LeftSidebarMenuItem from '../../../layouts/LeftSidebarMenu/LeftSidebarMenuItem';
 import {TagIcon} from '@heroicons/react/20/solid';
-import {useGetComponentDefinitionsQuery} from '../../queries/componentDefinitions';
-import {useGetConnectionTagsQuery} from '../../queries/connections';
+import {useGetComponentDefinitionsQuery} from '../../../queries/componentDefinitions';
+import {useGetConnectionTagsQuery} from '../../../queries/connections';
 import ConnectionDialog from './ConnectionDialog';
 import ConnectionList from './ConnectionList';
 

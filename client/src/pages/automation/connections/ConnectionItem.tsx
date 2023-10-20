@@ -1,17 +1,17 @@
 import React from 'react';
 import DropdownMenu, {
     IDropdownMenuItem,
-} from '../../components/DropdownMenu/DropdownMenu';
-import {ConnectionModel, TagModel} from '../../middleware/connection';
+} from '../../../components/DropdownMenu/DropdownMenu';
+import {ConnectionModel, TagModel} from '../../../middleware/connection';
 import {useQueryClient} from '@tanstack/react-query';
 import {Component1Icon} from '@radix-ui/react-icons';
-import {ConnectionKeys} from '../../queries/connections';
+import {ConnectionKeys} from '../../../queries/connections';
 import {
     useDeleteConnectionMutation,
     useUpdateConnectionTagsMutation,
-} from '../../mutations/connections.mutations';
-import {ComponentDefinitionKeys} from '../../queries/componentDefinitions';
-import TagList from '../../components/TagList/TagList';
+} from '../../../mutations/connections.mutations';
+import {ComponentDefinitionKeys} from '../../../queries/componentDefinitions';
+import TagList from '../../../components/TagList/TagList';
 
 interface ConnectionItemProps {
     connection: ConnectionModel;
