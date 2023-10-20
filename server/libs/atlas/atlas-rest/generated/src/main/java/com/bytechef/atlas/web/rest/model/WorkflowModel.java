@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-10T15:10:10.566850+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-18T08:53:27.088924+01:00[Europe/Zagreb]")
 public class WorkflowModel {
 
   @JsonProperty("createdBy")
@@ -38,6 +38,9 @@ public class WorkflowModel {
   @JsonProperty("createdDate")
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
+
+  @JsonProperty("definition")
+  private String definition;
 
   @JsonProperty("format")
   private WorkflowFormatModel format;
@@ -112,6 +115,9 @@ public class WorkflowModel {
   @Valid
   private List<WorkflowTaskModel> tasks = null;
 
+  @JsonProperty("version")
+  private Integer version;
+
   public WorkflowModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
@@ -148,6 +154,25 @@ public class WorkflowModel {
 
   public void setCreatedDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
+  }
+
+  public WorkflowModel definition(String definition) {
+    this.definition = definition;
+    return this;
+  }
+
+  /**
+   * Get definition
+   * @return definition
+  */
+  
+  @Schema(name = "definition", required = false)
+  public String getDefinition() {
+    return definition;
+  }
+
+  public void setDefinition(String definition) {
+    this.definition = definition;
   }
 
   public WorkflowModel format(WorkflowFormatModel format) {
@@ -309,7 +334,7 @@ public class WorkflowModel {
    * @return sourceType
   */
   
-  @Schema(name = "sourceType", accessMode = Schema.AccessMode.READ_ONLY, description = "The type of the source which stores the workflow definition.", required = false)
+  @Schema(name = "sourceType", description = "The type of the source which stores the workflow definition.", required = false)
   public SourceTypeEnum getSourceType() {
     return sourceType;
   }
@@ -364,6 +389,25 @@ public class WorkflowModel {
     this.tasks = tasks;
   }
 
+  public WorkflowModel version(Integer version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * Get version
+   * @return version
+  */
+  
+  @Schema(name = "version", required = false)
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -375,6 +419,7 @@ public class WorkflowModel {
     WorkflowModel workflow = (WorkflowModel) o;
     return Objects.equals(this.createdBy, workflow.createdBy) &&
         Objects.equals(this.createdDate, workflow.createdDate) &&
+        Objects.equals(this.definition, workflow.definition) &&
         Objects.equals(this.format, workflow.format) &&
         Objects.equals(this.id, workflow.id) &&
         Objects.equals(this.inputs, workflow.inputs) &&
@@ -384,12 +429,13 @@ public class WorkflowModel {
         Objects.equals(this.outputs, workflow.outputs) &&
         Objects.equals(this.sourceType, workflow.sourceType) &&
         Objects.equals(this.retry, workflow.retry) &&
-        Objects.equals(this.tasks, workflow.tasks);
+        Objects.equals(this.tasks, workflow.tasks) &&
+        Objects.equals(this.version, workflow.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, retry, tasks);
+    return Objects.hash(createdBy, createdDate, definition, format, id, inputs, label, lastModifiedBy, lastModifiedDate, outputs, sourceType, retry, tasks, version);
   }
 
   @Override
@@ -398,6 +444,7 @@ public class WorkflowModel {
     sb.append("class WorkflowModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
     sb.append("    format: ").append(toIndentedString(format)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
@@ -408,6 +455,7 @@ public class WorkflowModel {
     sb.append("    sourceType: ").append(toIndentedString(sourceType)).append("\n");
     sb.append("    retry: ").append(toIndentedString(retry)).append("\n");
     sb.append("    tasks: ").append(toIndentedString(tasks)).append("\n");
+    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }
