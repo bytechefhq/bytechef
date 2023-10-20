@@ -16,22 +16,29 @@
  * Modifications copyright (C) 2021 <your company/name>
  */
 
-package com.integri.atlas.config;
+package com.integri.atlas.engine.core.json;
 
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Arik Cohen
  * @author Ivica Cardic
  */
-@Configuration
-public class JSONConfiguration implements Jackson2ObjectMapperBuilderCustomizer {
+public class Json {
 
-    @Override
-    public void customize(Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder) {
-        //aJacksonObjectMapperBuilder.serializerByType(Throwable.class, new ExceptionSerializer());
-        //aJacksonObjectMapperBuilder.deserializerByType(JobTaskException.class, new JobTaskExceptionDeserializer());
+    public static <T> T deserialize(ObjectMapper aObjectMapper, String aValue, Class<T> aClass) {
+        try {
+            return aObjectMapper.readValue(aValue, aClass);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String serialize(ObjectMapper aObjectMapper, Object aValue) {
+        try {
+            return aObjectMapper.writeValueAsString(aValue);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -16,9 +16,9 @@
 
 package com.integri.atlas.task.handler.xml.converter;
 
-import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
+import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import com.integri.atlas.task.handler.xml.helper.XMLHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;

@@ -17,11 +17,11 @@
 package com.integri.atlas.task.handler.spreadsheet.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.worker.task.handler.TaskHandler;
 import com.integri.atlas.file.storage.FileEntry;
 import com.integri.atlas.file.storage.FileStorageService;
+import com.integri.atlas.task.handler.json.helper.JSONHelper;
 import com.integri.atlas.task.handler.spreadsheet.file.processor.CSVSpreadsheetProcessor;
 import com.integri.atlas.task.handler.spreadsheet.file.processor.ODSSpreadsheetProcessor;
 import com.integri.atlas.task.handler.spreadsheet.file.processor.SpreadsheetProcessor;
