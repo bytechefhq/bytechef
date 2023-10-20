@@ -36,6 +36,7 @@ const IntegrationModal: React.FC = () => {
         error: categoriesError,
         data: categories,
     } = useGetIntegrationCategoriesQuery();
+
     const {
         isLoading: tagsIsLoading,
         error: tagsError,

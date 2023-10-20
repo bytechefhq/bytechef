@@ -9,7 +9,7 @@ const IntegrationList: React.FC = () => {
     const {
         isLoading,
         error,
-        data: items,
+        data: integrations,
     } = useGetIntegrationsQuery({
         categoryId: searchParams.get('categoryId')
             ? +searchParams.get('categoryId')!
@@ -30,10 +30,10 @@ const IntegrationList: React.FC = () => {
 
                 {!isLoading &&
                     !error &&
-                    (items?.length === 0 ? (
+                    (integrations?.length === 0 ? (
                         <p>You do not have any Integration created yet.</p>
                     ) : (
-                        items.map((integration) => (
+                        integrations.map((integration) => (
                             <div key={integration.id}>
                                 <Link to={`/integrations/${integration.id}`}>
                                     <li className="my-3 overflow-hidden rounded-md bg-white p-3 hover:bg-gray-50">
