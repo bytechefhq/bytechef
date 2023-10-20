@@ -73,6 +73,7 @@ public class JobServiceImpl implements JobService {
 
         job.setInputs(jobParameters.getInputs());
         job.setLabel(jobParameters.getLabel() == null ? workflow.getLabel() : jobParameters.getLabel());
+        job.setMetadata(jobParameters.getMetadata());
         job.setParentTaskExecutionId(jobParameters.getParentTaskExecutionId());
         job.setPriority(jobParameters.getPriority());
         job.setStatus(Job.Status.CREATED);

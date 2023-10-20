@@ -17,7 +17,6 @@
 
 package com.bytechef.helios.project.dispatcher;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.connection.WorkflowConnection;
@@ -47,7 +46,7 @@ public abstract class AbstractDispatcherPreSendProcessor {
             .orElseGet(() -> {
                 ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
                     projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(
-                        workflowConnection.getKey(), OptionalUtils.get(workflowConnection.getTaskName()));
+                        workflowConnection.getKey(), workflowConnection.getTaskName());
 
                 return projectInstanceWorkflowConnection.getConnectionId();
             });

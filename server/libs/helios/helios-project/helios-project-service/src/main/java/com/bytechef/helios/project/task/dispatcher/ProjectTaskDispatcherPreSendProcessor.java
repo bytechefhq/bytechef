@@ -30,6 +30,7 @@ import com.bytechef.hermes.constant.MetadataConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -56,16 +57,26 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
     @Override
     @SuppressFBWarnings("NP")
     public TaskExecution process(TaskExecution taskExecution) {
-        taskExecution.putMetadata(
-            MetadataConstants.CONNECTION_IDS,
-            getConnectionIdMap(WorkflowConnection.of(taskExecution.getWorkflowTask())));
+        Job job = jobService.getJob(Objects.requireNonNull(taskExecution.getJobId()));
+
+        Map<String, Map<String, WorkflowConnection>> jobWorkflowConnectionMap = WorkflowConnection.of(job);
+
+        Map<String, WorkflowConnection> workflowConnectionMap;
+
+        if (jobWorkflowConnectionMap.containsKey(taskExecution.getName())) {
+            // directly coming from /core/jobs POST endpoint
+            workflowConnectionMap = jobWorkflowConnectionMap.get(taskExecution.getName());
+        } else {
+            // defined in the workflow definition
+            workflowConnectionMap = WorkflowConnection.of(taskExecution.getWorkflowTask());
+        }
+
+        taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, getConnectionIdMap(workflowConnectionMap));
 
         projectInstanceService.fetchJobProjectInstance(Objects.requireNonNull(taskExecution.getJobId()))
             .ifPresent(projectInstance -> taskExecution
                 .putMetadata(MetadataConstants.INSTANCE_ID, projectInstance.getId())
                 .putMetadata(MetadataConstants.INSTANCE_TYPE, ProjectConstants.PROJECT));
-
-        Job job = jobService.getJob(Objects.requireNonNull(taskExecution.getJobId()));
 
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 

@@ -116,6 +116,9 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
     private LocalDateTime lastModifiedDate;
 
     @Column
+    private MapWrapper metadata = new MapWrapper();
+
+    @Column
     private MapWrapper outputs = new MapWrapper();
 
     @Column("parent_task_execution_id")
@@ -256,6 +259,10 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
         return priority;
     }
 
+    public Map<String, Object> getMetadata() {
+        return Collections.unmodifiableMap(metadata.getMap());
+    }
+
     /**
      * Get the key-value map of outputs returned by the job.
      *
@@ -322,6 +329,10 @@ public final class Job implements Errorable, Persistable<Long>, Prioritizable {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public void setMetadata(Map<String, Object> metadata) {
+        this.metadata = new MapWrapper(metadata);
     }
 
     public void setOutputs(Map<String, Object> outputs) {

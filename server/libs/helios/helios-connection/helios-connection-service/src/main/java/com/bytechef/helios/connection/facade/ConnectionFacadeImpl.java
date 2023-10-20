@@ -20,7 +20,6 @@ package com.bytechef.helios.connection.facade;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.service.WorkflowService;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.project.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.project.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.component.definition.Authorization;
@@ -205,8 +204,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private boolean containsConnection(WorkflowConnection workflowConnection, long id) {
         return workflowConnection.getConnectionId()
             .map(connectionId -> id == connectionId)
-            .orElseGet(() -> getConnection(
-                workflowConnection.getKey(), OptionalUtils.get(workflowConnection.getTaskName())) != null);
+            .orElseGet(() -> getConnection(workflowConnection.getKey(), workflowConnection.getTaskName()) != null);
     }
 
     private boolean containsConnection(WorkflowTask workflowTask, long id) {

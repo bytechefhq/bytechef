@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.connection;
 
+import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.commons.util.MapValueUtils;
@@ -34,24 +35,34 @@ import java.util.stream.Collectors;
  */
 public class WorkflowConnection {
 
-    private static final String CONNECTIONS = "connections";
+    public static final String CONNECTIONS = "connections";
+    public static final String ID = "id";
 
     private final String componentName;
     private final Long connectionId;
-    private final Integer connectionVersion;
+    private final Integer componentVersion;
     private final String key;
     private final String name;
     private final String taskName;
 
     private WorkflowConnection(
-        String componentName, Long connectionId, Integer connectionVersion, String key, String name, String taskName) {
+        String componentName, Long connectionId, Integer componentVersion, String key, String name, String taskName) {
 
         this.componentName = componentName;
         this.connectionId = connectionId;
-        this.connectionVersion = connectionVersion;
+        this.componentVersion = componentVersion;
         this.key = key;
         this.name = name;
         this.taskName = taskName;
+    }
+
+    public static Map<String, Map<String, WorkflowConnection>> of(Job job) {
+        return MapValueUtils.get(
+            job.getMetadata(), CONNECTIONS,
+            new ParameterizedTypeReference<Map<String, Map<String, Map<String, Object>>>>() {}, Map.of())
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> toMap(entry.getValue(), entry.getKey())));
     }
 
     public static Map<String, WorkflowConnection> of(WorkflowTask workflowTask) {
@@ -90,8 +101,8 @@ public class WorkflowConnection {
         return Optional.ofNullable(connectionId);
     }
 
-    public Optional<Integer> getConnectionVersion() {
-        return Optional.ofNullable(connectionVersion);
+    public Optional<Integer> getComponentVersion() {
+        return Optional.ofNullable(componentVersion);
     }
 
     public String getKey() {
@@ -102,8 +113,8 @@ public class WorkflowConnection {
         return name;
     }
 
-    public Optional<String> getTaskName() {
-        return Optional.ofNullable(taskName);
+    public String getTaskName() {
+        return taskName;
     }
 
     private static Map<String, WorkflowConnection> toMap(Map<String, Map<String, Object>> source, String taskName) {
@@ -113,8 +124,8 @@ public class WorkflowConnection {
                 Map.Entry::getKey,
                 entry -> new WorkflowConnection(
                     MapValueUtils.getString(entry.getValue(), "componentName"),
-                    MapValueUtils.getLong(entry.getValue(), "id"),
-                    MapValueUtils.getInteger(entry.getValue(), "connectionVersion"),
+                    MapValueUtils.getLong(entry.getValue(), ID),
+                    MapValueUtils.getInteger(entry.getValue(), "componentVersion"),
                     entry.getKey(), MapValueUtils.getString(entry.getValue(), "name"), taskName)));
     }
 
@@ -123,7 +134,7 @@ public class WorkflowConnection {
         return "WorkflowConnection{" +
             "componentName='" + componentName + '\'' +
             ", connectionId=" + connectionId +
-            ", connectionVersion=" + connectionVersion +
+            ", connectionVersion=" + componentVersion +
             ", key='" + key + '\'' +
             ", name='" + name + '\'' +
             ", taskName='" + taskName + '\'' +
