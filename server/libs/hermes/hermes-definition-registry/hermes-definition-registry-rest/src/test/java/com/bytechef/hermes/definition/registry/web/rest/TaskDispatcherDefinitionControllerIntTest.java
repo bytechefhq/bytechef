@@ -29,7 +29,7 @@ import com.bytechef.hermes.definition.registry.web.rest.config.RegistryDefinitio
 import com.bytechef.hermes.definition.registry.service.TaskDispatcherDefinitionService;
 import java.util.List;
 
-import com.bytechef.oauth2.config.OAuth2Properties;
+import com.bytechef.hermes.connection.config.OAuth2Properties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
