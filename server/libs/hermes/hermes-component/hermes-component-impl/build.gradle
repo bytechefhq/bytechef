@@ -1,4 +1,5 @@
 dependencies {
+    api project(":server:libs:hermes:hermes-component:hermes-component-api")
 
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8"
@@ -6,13 +7,11 @@ dependencies {
     implementation libs.com.github.mizosoft.methanol
     implementation "com.jayway.jsonpath:json-path"
     implementation "org.slf4j:slf4j-api"
-    implementation libs.org.apache.tika.tika.core
     implementation "org.springframework:spring-jdbc"
     implementation "org.springframework.boot:spring-boot"
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
     implementation project(":server:libs:core:message-broker:message-broker-api")
     implementation project(":server:libs:core:commons:commons-util")
-    implementation project(":server:libs:hermes:hermes-component:hermes-component-api")
     implementation project(":server:libs:hermes:hermes-component:hermes-component-context:hermes-component-context-api")
     implementation project(":server:libs:hermes:hermes-definition-registry:hermes-definition-registry-api")
     implementation project(":server:libs:hermes:hermes-worker:hermes-worker-api")

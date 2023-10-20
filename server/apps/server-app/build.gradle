@@ -19,8 +19,6 @@ dependencies {
     implementation "org.springframework.kafka:spring-kafka"
     implementation libs.org.springdoc.springdoc.openapi.starter.webmvc.ui
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-    implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-rest")
-    implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-service")
     implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc")
     implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc-util")
     implementation project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git")
@@ -63,7 +61,9 @@ dependencies {
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-base64-service")
     implementation project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-filesystem-service")
     implementation project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-impl")
-    implementation project(":server:libs:hermes:hermes-test:hermes-test-service")
+    implementation project(":server:libs:hermes:hermes-test-executor:hermes-test-executor-impl")
+    implementation project(":server:libs:hermes:hermes-webhook:hermes-webhook-impl")
+    implementation project(":server:libs:hermes:hermes-webhook:hermes-webhook-rest")
     implementation project(":server:libs:hermes:hermes-worker:hermes-worker-impl")
 
     implementation project(":server:libs:modules:components:airtable")
@@ -107,6 +107,9 @@ dependencies {
     implementation project(":server:libs:modules:task-dispatchers:parallel")
     implementation project(":server:libs:modules:task-dispatchers:sequence")
     implementation project(":server:libs:modules:task-dispatchers:subflow")
+
+    implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-rest")
+    implementation project(":server:ee:libs:dione:dione-configuration:dione-configuration-service")
 
     runtimeOnly "com.h2database:h2"
 
