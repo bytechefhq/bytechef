@@ -54,6 +54,14 @@ public class WorkflowController implements WorkflowsApi {
     }
 
     @Override
+    public Mono<ResponseEntity<Void>> clearCache(ServerWebExchange exchange) {
+        workflowService.clearCache();
+
+        return Mono.just(ResponseEntity.ok()
+            .build());
+    }
+
+    @Override
     public Mono<ResponseEntity<Void>> deleteWorkflow(String id, ServerWebExchange exchange) {
         workflowService.delete(id);
 
