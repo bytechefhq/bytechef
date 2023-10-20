@@ -26,7 +26,6 @@ models/ProjectInstanceModel.ts
 models/ProjectInstanceProjectModel.ts
 models/ProjectInstanceWorkflowConnectionModel.ts
 models/ProjectInstanceWorkflowModel.ts
-models/ProjectInstanceWorkflowProjectInstanceModel.ts
 models/ProjectModel.ts
 models/TagModel.ts
 models/TaskExecutionModel.ts

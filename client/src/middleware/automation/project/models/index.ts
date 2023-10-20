@@ -20,7 +20,6 @@ export * from './ProjectInstanceModel';
 export * from './ProjectInstanceProjectModel';
 export * from './ProjectInstanceWorkflowConnectionModel';
 export * from './ProjectInstanceWorkflowModel';
-export * from './ProjectInstanceWorkflowProjectInstanceModel';
 export * from './ProjectModel';
 export * from './TagModel';
 export * from './TaskExecutionModel';

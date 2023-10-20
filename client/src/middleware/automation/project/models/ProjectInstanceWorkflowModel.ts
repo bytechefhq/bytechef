@@ -19,12 +19,6 @@ import {
     ProjectInstanceWorkflowConnectionModelFromJSONTyped,
     ProjectInstanceWorkflowConnectionModelToJSON,
 } from './ProjectInstanceWorkflowConnectionModel';
-import type { ProjectInstanceWorkflowProjectInstanceModel } from './ProjectInstanceWorkflowProjectInstanceModel';
-import {
-    ProjectInstanceWorkflowProjectInstanceModelFromJSON,
-    ProjectInstanceWorkflowProjectInstanceModelFromJSONTyped,
-    ProjectInstanceWorkflowProjectInstanceModelToJSON,
-} from './ProjectInstanceWorkflowProjectInstanceModel';
 
 /**
  * Contains configuration and connections required for the execution of a particular project workflow.
@@ -45,18 +39,6 @@ export interface ProjectInstanceWorkflowModel {
      */
     connections?: Array<ProjectInstanceWorkflowConnectionModel>;
     /**
-     * The created by.
-     * @type {string}
-     * @memberof ProjectInstanceWorkflowModel
-     */
-    readonly createdBy?: string;
-    /**
-     * The created date.
-     * @type {Date}
-     * @memberof ProjectInstanceWorkflowModel
-     */
-    readonly createdDate?: Date;
-    /**
      * If a workflow is enabled or not in the project instance.
      * @type {boolean}
      * @memberof ProjectInstanceWorkflowModel
@@ -75,41 +57,11 @@ export interface ProjectInstanceWorkflowModel {
      */
     lastExecutionDate?: Date;
     /**
-     * The last modified by.
-     * @type {string}
-     * @memberof ProjectInstanceWorkflowModel
-     */
-    readonly lastModifiedBy?: string;
-    /**
-     * The last modified date.
-     * @type {Date}
-     * @memberof ProjectInstanceWorkflowModel
-     */
-    readonly lastModifiedDate?: Date;
-    /**
-     * 
-     * @type {ProjectInstanceWorkflowProjectInstanceModel}
-     * @memberof ProjectInstanceWorkflowModel
-     */
-    projectInstance?: ProjectInstanceWorkflowProjectInstanceModel;
-    /**
-     * Th id of a project instance.
-     * @type {number}
-     * @memberof ProjectInstanceWorkflowModel
-     */
-    projectInstanceId?: number;
-    /**
      * The id of a workflow.
      * @type {number}
      * @memberof ProjectInstanceWorkflowModel
      */
     workflowId?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ProjectInstanceWorkflowModel
-     */
-    version?: number;
 }
 
 /**
@@ -133,17 +85,10 @@ export function ProjectInstanceWorkflowModelFromJSONTyped(json: any, ignoreDiscr
         
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
         'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(ProjectInstanceWorkflowConnectionModelFromJSON)),
-        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
-        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
         'id': !exists(json, 'id') ? undefined : json['id'],
         'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : (new Date(json['lastExecutionDate'])),
-        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
-        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'projectInstance': !exists(json, 'projectInstance') ? undefined : ProjectInstanceWorkflowProjectInstanceModelFromJSON(json['projectInstance']),
-        'projectInstanceId': !exists(json, 'projectInstanceId') ? undefined : json['projectInstanceId'],
         'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
-        'version': !exists(json, '__version') ? undefined : json['__version'],
     };
 }
 
@@ -160,10 +105,7 @@ export function ProjectInstanceWorkflowModelToJSON(value?: ProjectInstanceWorkfl
         'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(ProjectInstanceWorkflowConnectionModelToJSON)),
         'enabled': value.enabled,
         'lastExecutionDate': value.lastExecutionDate === undefined ? undefined : (value.lastExecutionDate.toISOString()),
-        'projectInstance': ProjectInstanceWorkflowProjectInstanceModelToJSON(value.projectInstance),
-        'projectInstanceId': value.projectInstanceId,
         'workflowId': value.workflowId,
-        '__version': value.version,
     };
 }
 
