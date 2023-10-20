@@ -214,7 +214,7 @@ const ProjectInstanceDialog = ({
                 </div>
 
                 <div className="flex w-2/3 flex-col">
-                    <header className="flex items-center border-b border-gray-200 p-4">
+                    <header className="flex items-center p-4">
                         <h2 className="font-semibold">
                             {projectInstanceDialogSteps[activeStepIndex].name}
                         </h2>
@@ -224,7 +224,7 @@ const ProjectInstanceDialog = ({
                         {projectInstanceDialogSteps[activeStepIndex].content}
                     </main>
 
-                    <footer className="flex w-full justify-end space-x-2 self-end border-t border-gray-200 p-4">
+                    <footer className="flex w-full justify-end space-x-2 self-end p-4">
                         {activeStepIndex === 0 && (
                             <>
                                 <Close asChild>
