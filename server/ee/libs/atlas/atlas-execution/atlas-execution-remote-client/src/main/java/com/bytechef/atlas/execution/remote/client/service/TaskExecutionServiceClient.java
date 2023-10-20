@@ -18,7 +18,7 @@
 package com.bytechef.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.ParameterizedTypeReference;
@@ -30,7 +30,10 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @Component
-public class TaskExecutionServiceClient implements TaskExecutionService {
+public class TaskExecutionServiceClient implements RemoteTaskExecutionService {
+
+    private static final String EXECUTION_SERVICE_APP = "execution-service-app";
+    private static final String TASK_EXECUTION_SERVICE = "/remote/task-execution-service";
 
     private final LoadBalancedWebClient loadBalancedWebClient;
 
@@ -43,48 +46,48 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
     public TaskExecution create(TaskExecution taskExecution) {
         return loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
-                .host("execution-service-app")
-                .path("/internal/task-execution-service/create")
+                .host(EXECUTION_SERVICE_APP)
+                .path(TASK_EXECUTION_SERVICE + "/create")
                 .build(),
             taskExecution, TaskExecution.class);
     }
 
     @Override
-    public TaskExecution getTaskExecution(long id) {
+    public List<TaskExecution> getJobTaskExecutions(long jobId) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host("execution-service-app")
-                .path("/internal/task-execution-service/get-task-execution/{id}")
-                .build(id),
-            TaskExecution.class);
-    }
-
-    @Override
-    public List<TaskExecution> getJobTaskExecutions(long jobId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<TaskExecution> getJobsTaskExecutions(List<Long> jobIds) {
-        throw new UnsupportedOperationException();
+                .host(EXECUTION_SERVICE_APP)
+                .path(TASK_EXECUTION_SERVICE + "/get-job-task-executions/{jobId}")
+                .build(jobId),
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override
     public List<TaskExecution> getParentTaskExecutions(long parentId) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
-                .host("execution-service-app")
-                .path("/internal/task-execution-service/get-parent-task-executions/{parentId}")
+                .host(EXECUTION_SERVICE_APP)
+                .path(TASK_EXECUTION_SERVICE + "/get-parent-task-executions/{parentId}")
                 .build(parentId),
-            new ParameterizedTypeReference<List<TaskExecution>>() {});
+            new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public TaskExecution getTaskExecution(long id) {
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_SERVICE_APP)
+                .path(TASK_EXECUTION_SERVICE + "/get-task-execution/{id}")
+                .build(id),
+            TaskExecution.class);
     }
 
     @Override
     public TaskExecution update(TaskExecution taskExecution) {
         return loadBalancedWebClient.put(
             uriBuilder -> uriBuilder
-                .host("execution-service-app")
-                .path("/internal/task-execution-service/update")
+                .host(EXECUTION_SERVICE_APP)
+                .path(TASK_EXECUTION_SERVICE + "/update")
                 .build(),
             taskExecution, TaskExecution.class);
     }

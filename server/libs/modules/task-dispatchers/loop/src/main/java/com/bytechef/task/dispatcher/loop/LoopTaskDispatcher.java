@@ -29,8 +29,8 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.message.broker.TaskMessageRoute;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -54,16 +54,16 @@ import java.util.Objects;
  */
 public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private final ContextService contextService;
+    private final RemoteContextService contextService;
     private final MessageBroker messageBroker;
     private final TaskDispatcher<? super Task> taskDispatcher;
-    private final TaskExecutionService taskExecutionService;
+    private final RemoteTaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @SuppressFBWarnings("EI")
     public LoopTaskDispatcher(
-        ContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
-        TaskExecutionService taskExecutionService,
+        RemoteContextService contextService, MessageBroker messageBroker, TaskDispatcher<? super Task> taskDispatcher,
+        RemoteTaskExecutionService taskExecutionService,
         @Qualifier("workflowAsyncFileStorageFacade") WorkflowFileStorageFacade workflowFileStorageFacade) {
 
         this.contextService = contextService;

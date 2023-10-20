@@ -20,7 +20,6 @@ package com.bytechef.hermes.connection.service;
 import com.bytechef.hermes.connection.domain.Connection;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -30,8 +29,6 @@ public interface ConnectionService {
     Connection create(Connection connection);
 
     void delete(long id);
-
-    Optional<Connection> fetchConnection(long id);
 
     Connection getConnection(long id);
 

@@ -78,7 +78,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Service("triggerDefinitionService")
-public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
+public class TriggerDefinitionServiceImpl implements TriggerDefinitionService, RemoteTriggerDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;

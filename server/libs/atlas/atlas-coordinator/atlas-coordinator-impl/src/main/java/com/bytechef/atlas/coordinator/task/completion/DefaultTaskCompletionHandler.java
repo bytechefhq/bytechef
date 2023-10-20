@@ -26,13 +26,13 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.domain.TaskExecution.Status;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.event.EventPublisher;
 import com.bytechef.atlas.execution.event.JobStatusEvent;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.evaluator.Evaluator;
 
@@ -57,19 +57,20 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultTaskCompletionHandler.class);
 
-    private final ContextService contextService;
+    private final RemoteContextService contextService;
     private final EventPublisher eventPublisher;
     private final JobExecutor jobExecutor;
-    private final JobService jobService;
-    private final TaskExecutionService taskExecutionService;
+    private final RemoteJobService jobService;
+    private final RemoteTaskExecutionService taskExecutionService;
     private final WorkflowFileStorageFacade workflowFileStorageFacade;
-    private final WorkflowService workflowService;
+    private final RemoteWorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public DefaultTaskCompletionHandler(
-        ContextService contextService, EventPublisher eventPublisher, JobExecutor jobExecutor, JobService jobService,
-        TaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade,
-        WorkflowService workflowService) {
+        RemoteContextService contextService, EventPublisher eventPublisher, JobExecutor jobExecutor,
+        RemoteJobService jobService,
+        RemoteTaskExecutionService taskExecutionService, WorkflowFileStorageFacade workflowFileStorageFacade,
+        RemoteWorkflowService workflowService) {
 
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;

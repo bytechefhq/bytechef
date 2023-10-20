@@ -23,7 +23,8 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallb
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.component.registry.remote.client.service.ConnectionDefinitionServiceClient;
+import com.bytechef.hermes.component.registry.service.RemoteConnectionDefinitionService;
+import com.bytechef.hermes.component.registry.remote.client.service.RemoteConnectionDefinitionServiceClient;
 import com.bytechef.hermes.connection.domain.Connection;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -40,9 +41,9 @@ public class DefinitionRegistryConfiguration {
 
     @Bean("workerConnectionDefinitionService")
     @Primary
-    ConnectionDefinitionService connectionDefinitionService(
+    RemoteConnectionDefinitionService connectionDefinitionService(
         @Qualifier("connectionDefinitionService") ConnectionDefinitionService connectionDefinitionService,
-        ConnectionDefinitionServiceClient connectionDefinitionServiceClient) {
+        RemoteConnectionDefinitionServiceClient connectionDefinitionServiceClient) {
 
         return new WorkerConnectionDefinitionService(connectionDefinitionService, connectionDefinitionServiceClient);
     }
@@ -51,22 +52,17 @@ public class DefinitionRegistryConfiguration {
      * Compound ConnectionDefinitionService impl that supports the use case where a component (for example, HttpClient
      * or Script) uses a compatible connection from a different component that can be in a different worker instance.
      */
-    private static class WorkerConnectionDefinitionService implements ConnectionDefinitionService {
+    private static class WorkerConnectionDefinitionService implements RemoteConnectionDefinitionService {
 
         private final ConnectionDefinitionService connectionDefinitionService;
-        private final ConnectionDefinitionServiceClient connectionDefinitionServiceClient;
+        private final RemoteConnectionDefinitionServiceClient connectionDefinitionServiceClient;
 
         public WorkerConnectionDefinitionService(
             ConnectionDefinitionService connectionDefinitionService,
-            ConnectionDefinitionServiceClient connectionDefinitionServiceClient) {
+            RemoteConnectionDefinitionServiceClient connectionDefinitionServiceClient) {
 
             this.connectionDefinitionService = connectionDefinitionService;
             this.connectionDefinitionServiceClient = connectionDefinitionServiceClient;
-        }
-
-        @Override
-        public boolean connectionExists(String componentName, int connectionVersion) {
-            return connectionDefinitionService.connectionExists(componentName, connectionVersion);
         }
 
         /**
@@ -96,7 +92,7 @@ public class DefinitionRegistryConfiguration {
         }
 
         /**
-         * Called from the Context.Connection instance.
+         * Called from the HttpClientExecutor instance.
          */
         @Override
         public Optional<String> executeBaseUri(@NonNull Connection connection) {

@@ -33,9 +33,9 @@ import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.RemoteCounterService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
@@ -52,12 +52,12 @@ import org.junit.jupiter.api.Test;
  */
 public class EachTaskDispatcherTest {
 
-    private final ContextService contextService = mock(ContextService.class);
-    private final CounterService counterService = mock(CounterService.class);
+    private final RemoteContextService contextService = mock(RemoteContextService.class);
+    private final RemoteCounterService counterService = mock(RemoteCounterService.class);
     private final MessageBroker messageBroker = mock(MessageBroker.class);
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
-    private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
+    private final RemoteTaskExecutionService taskExecutionService = mock(RemoteTaskExecutionService.class);
     private final WorkflowFileStorageFacade workflowFileStorageFacade = new WorkflowFileStorageFacadeImpl(
         new Base64FileStorageService(), new ObjectMapper());
 

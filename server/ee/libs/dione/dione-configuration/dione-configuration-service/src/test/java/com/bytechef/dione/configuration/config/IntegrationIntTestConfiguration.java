@@ -19,6 +19,7 @@ package com.bytechef.dione.configuration.config;
 
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 

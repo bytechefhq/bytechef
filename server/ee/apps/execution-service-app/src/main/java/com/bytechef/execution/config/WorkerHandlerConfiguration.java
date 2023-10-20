@@ -23,7 +23,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.registry.ComponentOperation;
-import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.hermes.component.registry.facade.RemoteActionDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,9 +37,9 @@ import java.util.Objects;
 @Configuration
 public class WorkerHandlerConfiguration {
 
-    private final ActionDefinitionFacade actionDefinitionFacade;
+    private final RemoteActionDefinitionFacade actionDefinitionFacade;
 
-    public WorkerHandlerConfiguration(ActionDefinitionFacade actionDefinitionService) {
+    public WorkerHandlerConfiguration(RemoteActionDefinitionFacade actionDefinitionService) {
         this.actionDefinitionFacade = actionDefinitionService;
     }
 

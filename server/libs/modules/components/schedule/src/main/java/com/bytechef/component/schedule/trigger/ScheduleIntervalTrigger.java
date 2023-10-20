@@ -25,7 +25,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.scheduler.TriggerScheduler;
+import com.bytechef.hermes.scheduler.RemoteTriggerScheduler;
 
 import java.time.ZoneId;
 import java.util.Map;
@@ -73,9 +73,9 @@ public class ScheduleIntervalTrigger {
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 
-    private final TriggerScheduler triggerScheduler;
+    private final RemoteTriggerScheduler triggerScheduler;
 
-    public ScheduleIntervalTrigger(TriggerScheduler triggerScheduler) {
+    public ScheduleIntervalTrigger(RemoteTriggerScheduler triggerScheduler) {
         this.triggerScheduler = triggerScheduler;
     }
 

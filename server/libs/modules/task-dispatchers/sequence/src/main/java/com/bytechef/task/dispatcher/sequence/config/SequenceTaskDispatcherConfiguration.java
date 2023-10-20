@@ -20,8 +20,8 @@ package com.bytechef.task.dispatcher.sequence.config;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
@@ -37,13 +37,13 @@ import org.springframework.context.annotation.Configuration;
 public class SequenceTaskDispatcherConfiguration {
 
     @Autowired
-    private ContextService contextService;
+    private RemoteContextService contextService;
 
     @Autowired
     private MessageBroker messageBroker;
 
     @Autowired
-    private TaskExecutionService taskExecutionService;
+    private RemoteTaskExecutionService taskExecutionService;
 
     @Autowired
     @Qualifier("workflowAsyncFileStorageFacade")

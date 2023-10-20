@@ -22,9 +22,9 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFact
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.message.broker.MessageBroker;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.RemoteCounterService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
@@ -49,10 +49,10 @@ public class ConditionTaskDispatcherIntTest {
     private TestVarTaskHandler<Object, Object> testVarTaskHandler;
 
     @Autowired
-    protected ContextService contextService;
+    protected RemoteContextService contextService;
 
     @Autowired
-    protected TaskExecutionService taskExecutionService;
+    protected RemoteTaskExecutionService taskExecutionService;
 
     @Autowired
     private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
@@ -138,7 +138,7 @@ public class ConditionTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
-        CounterService counterService, TaskExecutionService taskExecutionService) {
+        RemoteCounterService counterService, RemoteTaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskCompletionHandler, taskDispatcher) -> new ConditionTaskCompletionHandler(
@@ -148,8 +148,8 @@ public class ConditionTaskDispatcherIntTest {
 
     @SuppressWarnings("PMD")
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService, MessageBroker messageBroker,
-        TaskExecutionService taskExecutionService) {
+        RemoteContextService contextService, RemoteCounterService counterService, MessageBroker messageBroker,
+        RemoteTaskExecutionService taskExecutionService) {
 
         return List.of(
             (taskDispatcher) -> new ConditionTaskDispatcher(

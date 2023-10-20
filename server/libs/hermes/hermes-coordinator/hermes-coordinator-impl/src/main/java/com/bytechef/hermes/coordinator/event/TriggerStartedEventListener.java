@@ -22,7 +22,7 @@ import com.bytechef.event.listener.EventListener;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
 import com.bytechef.hermes.execution.event.TriggerStartedEvent;
-import com.bytechef.hermes.execution.service.TriggerExecutionService;
+import com.bytechef.hermes.execution.service.RemoteTriggerExecutionService;
 import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.SystemMessageRoute;
@@ -40,10 +40,12 @@ public class TriggerStartedEventListener implements EventListener {
     private static final Logger logger = LoggerFactory.getLogger(TriggerStartedEventListener.class);
 
     private final MessageBroker messageBroker;
-    private final TriggerExecutionService triggerExecutionService;
+    private final RemoteTriggerExecutionService triggerExecutionService;
 
     @SuppressFBWarnings("EI2")
-    public TriggerStartedEventListener(MessageBroker messageBroker, TriggerExecutionService triggerExecutionService) {
+    public TriggerStartedEventListener(
+        MessageBroker messageBroker, RemoteTriggerExecutionService triggerExecutionService) {
+
         this.messageBroker = messageBroker;
         this.triggerExecutionService = triggerExecutionService;
     }

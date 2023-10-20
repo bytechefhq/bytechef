@@ -17,13 +17,13 @@
 
 package com.bytechef.atlas.execution.facade;
 
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.service.RemoteWorkflowService;
 import com.bytechef.atlas.execution.config.WorkflowExecutionIntTestConfiguration;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.repository.JobRepository;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -68,7 +68,7 @@ public class JobFacadeIntTest {
         private ContextService contextService;
 
         @MockBean
-        private WorkflowService workflowService;
+        private RemoteWorkflowService workflowService;
 
         @MockBean
         private WorkflowFileStorageFacade workflowFileStorageFacade;

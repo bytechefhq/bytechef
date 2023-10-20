@@ -24,7 +24,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.event.JobStatusEvent;
 import com.bytechef.event.listener.EventListener;
 import com.bytechef.event.Event;
-import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.RemoteJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -46,11 +46,11 @@ public class JobStatusWebhookEventListener implements EventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(JobStatusWebhookEventListener.class);
 
-    private final JobService jobService;
+    private final RemoteJobService jobService;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @SuppressFBWarnings("EI2")
-    public JobStatusWebhookEventListener(JobService jobService) {
+    public JobStatusWebhookEventListener(RemoteJobService jobService) {
         this.jobService = jobService;
     }
 

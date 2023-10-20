@@ -18,8 +18,8 @@
 package com.bytechef.task.dispatcher.forkjoin;
 
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
-import com.bytechef.atlas.execution.service.ContextService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.execution.service.RemoteContextService;
+import com.bytechef.atlas.execution.service.RemoteTaskExecutionService;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
@@ -43,10 +43,10 @@ public class ForkJoinTaskDispatcherIntTest {
     private TestVarTaskHandler<Object, Object> testVarTaskHandler;
 
     @Autowired
-    protected ContextService contextService;
+    protected RemoteContextService contextService;
 
     @Autowired
-    protected TaskExecutionService taskExecutionService;
+    protected RemoteTaskExecutionService taskExecutionService;
 
     @Autowired
     private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;

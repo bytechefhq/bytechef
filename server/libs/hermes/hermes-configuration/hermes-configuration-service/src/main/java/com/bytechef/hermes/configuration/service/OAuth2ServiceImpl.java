@@ -17,6 +17,7 @@
 
 package com.bytechef.hermes.configuration.service;
 
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.configuration.config.OAuth2Properties;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -31,7 +32,7 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 @Service
-public class OAuth2ServiceImpl implements OAuth2Service {
+public class OAuth2ServiceImpl implements OAuth2Service, RemoteOAuth2Service {
 
     private final OAuth2Properties oAuth2Properties;
 
@@ -44,7 +45,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
     public Map<String, ?> checkPredefinedParameters(String componentName, Map<String, ?> parameters) {
         Map<String, Object> newParameters = new HashMap<>(parameters);
 
-        if (!StringUtils.hasText((String) parameters.get(AuthorizationConstants.CLIENT_ID))) {
+        if (!StringUtils.hasText(MapUtils.getString(parameters, AuthorizationConstants.CLIENT_ID))) {
             Map<String, OAuth2Properties.OAuth2App> oAuth2AppMap = oAuth2Properties.getPredefinedApps();
 
             if (oAuth2AppMap.containsKey(componentName)) {
