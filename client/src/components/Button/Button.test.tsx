@@ -7,7 +7,7 @@ describe('Button', async () => {
     it('should render the button', () => {
         const handleClick = vi.fn();
 
-        render(<Button onClick={handleClick}>New Integration</Button>);
+        render(<Button label="New Integration" onClick={handleClick}></Button>);
 
         expect(screen.getByText('New Integration')).toBeInTheDocument();
     });
