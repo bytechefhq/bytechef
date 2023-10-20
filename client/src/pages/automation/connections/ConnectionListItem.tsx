@@ -14,9 +14,10 @@ import {
     useDeleteConnectionMutation,
     useUpdateConnectionTagsMutation,
 } from '../../../mutations/connections.mutations';
-import {ComponentDefinitionKeys} from '../../../queries/componentDefinitions.queries';
+import { ComponentDefinitionKeys, useGetComponentDefinitionQuery } from "../../../queries/componentDefinitions.queries";
 import {ConnectionKeys} from '../../../queries/connections.queries';
 import ConnectionDialog from './components/ConnectionDialog';
+import InlineSVG from "react-inlinesvg";
 
 interface ConnectionListItemProps {
     connection: ConnectionModel;
@@ -29,6 +30,10 @@ const ConnectionListItem = ({
 }: ConnectionListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const {data: componentDefinition} = useGetComponentDefinitionQuery({
+        componentName: connection.componentName,
+    });
 
     const queryClient = useQueryClient();
 
@@ -72,7 +77,9 @@ const ConnectionListItem = ({
                 <div className="flex-1 pr-8">
                     <div className="flex items-center justify-between">
                         <div className="relative flex items-center">
-                            <Component1Icon className="mr-1 h-5 w-5 flex-none" />
+                            {componentDefinition?.icon && <InlineSVG className="mr-1 h-6 w-6 flex-none" src={componentDefinition.icon} />}
+
+                            {!componentDefinition?.icon && <Component1Icon className="mr-1 h-6 w-6 flex-none" />}
 
                             <span className="mr-2 text-base font-semibold text-gray-900">
                                 {connection.name}
