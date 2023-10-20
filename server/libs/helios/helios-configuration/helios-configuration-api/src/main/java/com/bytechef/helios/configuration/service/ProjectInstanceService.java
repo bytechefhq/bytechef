@@ -31,7 +31,7 @@ public interface ProjectInstanceService {
 
     void delete(long id);
 
-    Optional<ProjectInstance> fetchJobProjectInstance(long jobId);
+    Optional<ProjectInstance> fetchWorkflowProjectInstance(String workflowId);
 
     ProjectInstance getProjectInstance(long id);
 

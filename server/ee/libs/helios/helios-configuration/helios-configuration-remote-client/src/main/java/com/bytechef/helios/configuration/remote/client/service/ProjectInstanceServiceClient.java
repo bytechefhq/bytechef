@@ -50,13 +50,13 @@ public class ProjectInstanceServiceClient implements ProjectInstanceService {
     }
 
     @Override
-    public Optional<ProjectInstance> fetchJobProjectInstance(long jobId) {
+    public Optional<ProjectInstance> fetchWorkflowProjectInstance(String workflowId) {
         return Optional.ofNullable(
             loadBalancedWebClient.get(
                 uriBuilder -> uriBuilder
                     .host("configuration-service-app")
-                    .path("/api/internal/project-instance-service/fetch-project-instance/{jobId}")
-                    .build(jobId),
+                    .path("/api/internal/project-instance-service/fetch-workflow-project-instance/{workflowId}")
+                    .build(workflowId),
                 ProjectInstance.class));
     }
 

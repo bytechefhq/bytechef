@@ -62,8 +62,8 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
     }
 
     @Override
-    public Optional<ProjectInstance> fetchJobProjectInstance(long jobId) {
-        return projectInstanceRepository.findByJobId(jobId);
+    public Optional<ProjectInstance> fetchWorkflowProjectInstance(String workflowId) {
+        return projectInstanceRepository.findByWorkflowId(workflowId);
     }
 
     @Override
