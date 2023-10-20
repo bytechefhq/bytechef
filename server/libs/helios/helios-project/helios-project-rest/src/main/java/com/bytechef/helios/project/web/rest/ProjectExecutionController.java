@@ -19,6 +19,7 @@ package com.bytechef.helios.project.web.rest;
 
 import com.bytechef.autoconfigure.annotation.ConditionalOnApi;
 import com.bytechef.helios.project.facade.ProjectFacade;
+import com.bytechef.helios.project.web.rest.model.ProjectExecutionBasicModel;
 import com.bytechef.helios.project.web.rest.model.ProjectExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
@@ -49,15 +50,24 @@ public class ProjectExecutionController implements ProjectExecutionsApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
+    public Mono<ResponseEntity<ProjectExecutionModel>> getProjectExecution(Long id, ServerWebExchange exchange) {
+        return Mono.just(projectFacade.getProjectExecution(id))
+            .map(projectExecution -> conversionService.convert(projectExecution, ProjectExecutionModel.class))
+            .map(ResponseEntity::ok);
+    }
+
+    @Override
     public Mono<ResponseEntity<Page>> getProjectExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber, ServerWebExchange exchange) {
+
         return Mono.just(
             projectFacade
                 .searchProjectExecutions(
                     jobStatus, jobStartDate, jobEndDate, projectId, projectInstanceId, workflowId, pageNumber)
                 .map(
-                    projectExecution -> conversionService.convert(projectExecution, ProjectExecutionModel.class)))
+                    projectExecution -> conversionService.convert(projectExecution, ProjectExecutionBasicModel.class)))
             .map(ResponseEntity::ok);
     }
 }
