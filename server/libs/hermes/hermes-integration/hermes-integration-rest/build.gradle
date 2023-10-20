@@ -15,6 +15,11 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
     modelNameSuffix = "Model"
     modelPackage = "com.bytechef.hermes.integration.web.rest.model"
     outputDir = "$projectDir/generated".toString()
+    schemaMappings = [
+        Workflow: "com.bytechef.atlas.web.rest.model.WorkflowModel",
+        WorkflowFormat: "com.bytechef.atlas.web.rest.model.WorkflowFormatModel",
+        WorkflowTask: "com.bytechef.atlas.web.rest.model.WorkflowTaskModel"
+    ]
 }
 
 sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
@@ -37,6 +42,7 @@ dependencies {
     annotationProcessor libs.mapstruct.processor
     annotationProcessor libs.mapstruct.spring.extensions
 
+    api project(":server:libs:atlas:atlas-rest:atlas-rest-api")
     api project(":server:libs:hermes:hermes-integration:hermes-integration-api")
 
     implementation libs.jackson.databind.nullable

@@ -141,6 +141,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/Integration'
   /integrations/{id}/workflows:
+    get:
+      description: Get workflows for particular integration.
+      summary: Get workflows for particular integration.
+      tags:
+        - integrations
+      operationId: getIntegrationWorkflows
+      parameters:
+        - name: id
+          description: The id of the integration.
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: The updated integration object.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../../../atlas/atlas-rest/atlas-rest-impl/openapi.yaml#/components/schemas/Workflow'
     post:
       description: Creates new workflow and adds it to an existing integration.
       summary: Creates new workflow and adds it to an existing integration.
