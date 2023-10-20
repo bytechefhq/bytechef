@@ -50,6 +50,7 @@ import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import com.bytechef.commons.util.CollectionUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +68,7 @@ public class TaskDispatcherWorkflowTestSupport {
     private final TaskExecutionService taskExecutionService;
     private final WorkflowService workflowService;
 
+    @SuppressFBWarnings("EI")
     public TaskDispatcherWorkflowTestSupport(
         ContextService contextService, CounterService counterService, JobService jobService,
         EventPublisher eventPublisher, TaskExecutionService taskExecutionService, WorkflowService workflowService) {
@@ -89,6 +91,7 @@ public class TaskDispatcherWorkflowTestSupport {
             taskHandlerMapSupplier);
     }
 
+    // TODO Find a way to use WorkflowSyncExecutor to avoid copying logic
     public Job execute(
         String workflowId, Map<String, Object> inputs, TaskCompletionHandlersFunction taskCompletionHandlersFunction,
         TaskDispatcherResolversFunction taskDispatcherResolversFunction,
