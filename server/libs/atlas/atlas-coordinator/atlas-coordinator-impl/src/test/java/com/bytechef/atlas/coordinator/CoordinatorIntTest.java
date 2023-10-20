@@ -128,9 +128,10 @@ public class CoordinatorIntTest {
     @Test
     public void testRequiredParameters() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new Coordinator(null, null, null, jobService, null, null, taskExecutionService);
+            Coordinator coordinator = new Coordinator(
+                null, null, null, jobFacade, jobService, null, null, taskExecutionService);
 
-            jobFacade.create(new JobParametersDTO("aGVsbG8x"));
+            coordinator.create(new JobParametersDTO("aGVsbG8x"));
         });
     }
 
@@ -175,7 +176,7 @@ public class CoordinatorIntTest {
             "rawtypes", "unchecked"
         })
         Coordinator coordinator = new Coordinator(
-            e -> {}, e -> {}, jobExecutor, jobService, taskCompletionHandler,
+            e -> {}, e -> {}, jobExecutor, jobFacade, jobService, taskCompletionHandler,
             (TaskDispatcher) taskDispatcher, taskExecutionService);
 
         messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
