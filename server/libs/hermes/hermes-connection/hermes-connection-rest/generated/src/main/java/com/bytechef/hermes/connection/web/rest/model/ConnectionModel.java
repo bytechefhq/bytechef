@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "TODO")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-12-29T13:13:26.694393+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-01-17T19:55:44.393969+01:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   @JsonProperty("authorizationName")
@@ -61,6 +61,9 @@ public class ConnectionModel {
   @Valid
   private Map<String, Object> parameters = new HashMap<>();
 
+  @JsonProperty("version")
+  private Integer version;
+
   public ConnectionModel authorizationName(String authorizationName) {
     this.authorizationName = authorizationName;
     return this;
@@ -71,7 +74,7 @@ public class ConnectionModel {
    * @return authorizationName
   */
   
-  @Schema(name = "authorizationName", description = "TODO", required = false)
+  @Schema(name = "authorizationName", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = false)
   public String getAuthorizationName() {
     return authorizationName;
   }
@@ -89,8 +92,8 @@ public class ConnectionModel {
    * TODO
    * @return componentName
   */
-  @NotNull 
-  @Schema(name = "componentName", description = "TODO", required = true)
+  
+  @Schema(name = "componentName", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = true)
   public String getComponentName() {
     return componentName;
   }
@@ -108,8 +111,8 @@ public class ConnectionModel {
    * TODO
    * @return componentVersion
   */
-  @NotNull 
-  @Schema(name = "componentVersion", description = "TODO", required = true)
+  
+  @Schema(name = "componentVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = true)
   public Integer getComponentVersion() {
     return componentVersion;
   }
@@ -246,14 +249,33 @@ public class ConnectionModel {
    * TODO
    * @return parameters
   */
-  @NotNull 
-  @Schema(name = "parameters", description = "TODO", required = true)
+  
+  @Schema(name = "parameters", accessMode = Schema.AccessMode.READ_ONLY, description = "TODO", required = true)
   public Map<String, Object> getParameters() {
     return parameters;
   }
 
   public void setParameters(Map<String, Object> parameters) {
     this.parameters = parameters;
+  }
+
+  public ConnectionModel version(Integer version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * Get version
+   * @return version
+  */
+  
+  @Schema(name = "version", required = false)
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
   }
 
   @Override
@@ -274,12 +296,13 @@ public class ConnectionModel {
         Objects.equals(this.id, connection.id) &&
         Objects.equals(this.lastModifiedBy, connection.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, connection.lastModifiedDate) &&
-        Objects.equals(this.parameters, connection.parameters);
+        Objects.equals(this.parameters, connection.parameters) &&
+        Objects.equals(this.version, connection.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationName, componentName, componentVersion, createdBy, createdDate, name, id, lastModifiedBy, lastModifiedDate, parameters);
+    return Objects.hash(authorizationName, componentName, componentVersion, createdBy, createdDate, name, id, lastModifiedBy, lastModifiedDate, parameters, version);
   }
 
   @Override
@@ -296,6 +319,7 @@ public class ConnectionModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
+    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }
