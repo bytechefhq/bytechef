@@ -59,5 +59,5 @@ public class PipedriveDeletePersonAction {
             .metadata(
                 Map.of(
                     "responseFormat", ResponseFormat.JSON)))
-        .exampleOutput("{\"success\":true,\"data\":{\"id\":12}}");
+        .sampleOutput("{\"success\":true,\"data\":{\"id\":12}}");
 }

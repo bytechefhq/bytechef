@@ -126,7 +126,7 @@ public class PipedriveUpdatedPersonTrigger {
                     string("org_name"),
                     string("owner_name"),
                     string("cc_email")))
-        .exampleOutput(
+        .sampleOutput(
             """
                 {
                     "id": 1,

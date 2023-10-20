@@ -113,7 +113,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         return new ActionDefinitionDTO(
             OptionalUtils.orElse(actionDefinition.getBatch(), false), actionDefinition.getDescription(),
-            OptionalUtils.orElse(actionDefinition.getExampleOutput(), null),
+            OptionalUtils.orElse(actionDefinition.getSampleOutput(), null),
             OptionalUtils.orElse(actionDefinition.getHelp(), null), actionDefinition.getName(),
             outputSchema, OptionalUtils.orElse(actionDefinition.getProperties(), Collections.emptyList()),
             actionDefinition.getTitle());

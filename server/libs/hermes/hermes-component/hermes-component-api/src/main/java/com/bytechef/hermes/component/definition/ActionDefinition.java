@@ -54,13 +54,13 @@ public sealed interface ActionDefinition permits ComponentDSL.ModifiableActionDe
      *
      * @return
      */
-    Optional<String> getExampleOutput();
+    Optional<String> getSampleOutput();
 
     /**
      *
      * @return
      */
-    Optional<ExampleOutputDataSource> getExampleOutputDataSource();
+    Optional<SampleOutputDataSource> getExampleOutputDataSource();
 
     /**
      * The code that should be executed when an action runs as a task inside the workflow engine.

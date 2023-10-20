@@ -121,7 +121,7 @@ public class PipedriveNewActivityTrigger {
                         string("id"),
                         string("clean_name"),
                         string("url"))))
-        .exampleOutput("""
+        .sampleOutput("""
             {
                 "id": 8,
                 "company_id": 22122,

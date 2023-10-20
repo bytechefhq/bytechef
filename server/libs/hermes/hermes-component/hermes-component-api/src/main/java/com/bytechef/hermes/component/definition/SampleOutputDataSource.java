@@ -23,20 +23,20 @@ import com.bytechef.hermes.component.InputParameters;
 /**
  * @author Ivica Cardic
  */
-public sealed interface ExampleOutputDataSource permits ComponentDSL.ModifiableExampleOutputDataSource {
+public sealed interface SampleOutputDataSource permits ComponentDSL.ModifiableSampleOutputDataSource {
 
     /**
      * The function that returns an example output.
      *
      * @return The function implementation
      */
-    ExampleOutputFunction getExampleOutput();
+    SampleOutputFunction getSampleOutput();
 
     /**
      *
      */
     @FunctionalInterface
-    interface ExampleOutputFunction {
+    interface SampleOutputFunction {
 
         /**
          *

@@ -28,6 +28,6 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ActionDefinitionDTO(
-    Boolean batch, String description, String exampleOutput, Help help, String name,
+    Boolean batch, String description, String sampleOutput, Help help, String name,
     List<? extends Property<?>> outputSchema, List<? extends Property<?>> properties, String title) {
 }

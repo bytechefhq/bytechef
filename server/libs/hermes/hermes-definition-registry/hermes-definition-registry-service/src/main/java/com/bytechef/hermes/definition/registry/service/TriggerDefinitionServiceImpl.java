@@ -202,7 +202,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private TriggerDefinitionDTO toTriggerDefinitionDTO(TriggerDefinition triggerDefinition) {
         return new TriggerDefinitionDTO(
             OptionalUtils.orElse(triggerDefinition.getBatch(), false), triggerDefinition.getDescription(),
-            triggerDefinition.getExampleOutput(), OptionalUtils.orElse(triggerDefinition.getHelp(), null),
+            triggerDefinition.getSampleOutput(), OptionalUtils.orElse(triggerDefinition.getHelp(), null),
             triggerDefinition.getName(),
             OptionalUtils.orElse(triggerDefinition.getOutputSchema(), Collections.emptyList()),
             OptionalUtils.orElse(triggerDefinition.getProperties(), Collections.emptyList()),

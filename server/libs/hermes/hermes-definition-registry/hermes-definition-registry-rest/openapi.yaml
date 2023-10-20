@@ -415,8 +415,8 @@ components:
         description:
           description: "The description."
           type: "string"
-        exampleOutput:
-          description: "The example value of the action's output."
+        sampleOutput:
+          description: "The sample value of the action's output."
           type: "string"
         help:
           $ref: "#/components/schemas/Help"
@@ -1039,8 +1039,8 @@ components:
         description:
           description: "The description."
           type: "string"
-        exampleOutput:
-          description: "The example value of the action's output."
+        sampleOutput:
+          description: "The sample value of the action's output."
           type: "object"
         help:
           $ref: "#/components/schemas/Help"
