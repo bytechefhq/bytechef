@@ -7,7 +7,7 @@ import LeftSidebarMenuItem from '../../layouts/LeftSidebarMenu/LeftSidebarMenuIt
 import {TagIcon} from '@heroicons/react/20/solid';
 import {useGetComponentDefinitionsQuery} from '../../queries/componentDefinitions';
 import {useGetConnectionTagsQuery} from '../../queries/connections';
-import ConnectionModal from './ConnectionModal';
+import ConnectionDialog from './ConnectionDialog';
 import ConnectionList from './ConnectionList';
 
 export enum Type {
@@ -64,7 +64,7 @@ const Connections = () => {
             header={
                 <PageHeader
                     position="main"
-                    right={<ConnectionModal />}
+                    right={<ConnectionDialog />}
                     title={title}
                 />
             }
