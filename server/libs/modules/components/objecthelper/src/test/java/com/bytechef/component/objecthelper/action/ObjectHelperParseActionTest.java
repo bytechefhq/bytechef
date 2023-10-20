@@ -19,7 +19,10 @@ package com.bytechef.component.objecthelper.action;
 
 import com.bytechef.hermes.component.Context;
 
+import com.bytechef.hermes.component.util.JsonUtils;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.List;
@@ -37,26 +40,41 @@ public class ObjectHelperParseActionTest {
 
     @Test
     public void testExecuteParse() {
-        Map<String, ?> inputParameters = Map.of(
-            SOURCE, """
-                {
-                    "key": 3
-                }
-                """);
+        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
+            MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class)) {
 
-        assertThat(ObjectHelperParseAction.executeParse(context, inputParameters))
-            .isEqualTo(Map.of("key", 3));
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+                .thenReturn(
+                    """
+                        {
+                            "key": 3
+                        }
+                        """);
+            jsonUtilsMockedStatic.when(() -> JsonUtils.read(Mockito.anyString()))
+                .thenReturn(Map.of("key", 3));
 
-        inputParameters = Map.of(
-            SOURCE, """
-                [
-                    {
-                        "key": 3
-                    }
-                ]
-                """);
+            assertThat(ObjectHelperParseAction.executeParse(
+                context, Map.of()))
+                    .isEqualTo(Map.of("key", 3));
+        }
 
-        assertThat(ObjectHelperParseAction.executeParse(context, inputParameters))
-            .isEqualTo(List.of(Map.of("key", 3)));
+        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
+            MockedStatic<JsonUtils> jsonUtilsMockedStatic = Mockito.mockStatic(JsonUtils.class)) {
+
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+                .thenReturn(
+                    """
+                        [
+                            {
+                                "key": 3
+                            }
+                        ]
+                        """);
+            jsonUtilsMockedStatic.when(() -> JsonUtils.read(Mockito.anyString()))
+                .thenReturn(List.of(Map.of("key", 3)));
+
+            assertThat(ObjectHelperParseAction.executeParse(context, Map.of()))
+                .isEqualTo(List.of(Map.of("key", 3)));
+        }
     }
 }

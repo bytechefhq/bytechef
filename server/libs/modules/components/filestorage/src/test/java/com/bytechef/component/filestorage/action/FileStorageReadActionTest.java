@@ -18,8 +18,10 @@
 package com.bytechef.component.filestorage.action;
 
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.Map;
@@ -36,15 +38,22 @@ public class FileStorageReadActionTest {
 
     @Test
     public void testExecuteRead() {
-        Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
+        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+            Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
 
-        FileStorageReadAction.executeRead(context, Map.of(FILE_ENTRY, fileEntry));
+            mockedStatic.when(() -> MapValueUtils.getRequired(
+                Mockito.anyMap(), Mockito.eq(FILE_ENTRY), Mockito.eq(Context.FileEntry.class)))
+                .thenReturn(fileEntry);
 
-        ArgumentCaptor<Context.FileEntry> fileEntryArgumentCaptor = ArgumentCaptor.forClass(Context.FileEntry.class);
+            FileStorageReadAction.executeRead(context, Map.of());
 
-        Mockito.verify(context)
-            .readFileToString(fileEntryArgumentCaptor.capture());
+            ArgumentCaptor<Context.FileEntry> fileEntryArgumentCaptor =
+                ArgumentCaptor.forClass(Context.FileEntry.class);
 
-        assertThat(fileEntryArgumentCaptor.getValue()).isEqualTo(fileEntry);
+            Mockito.verify(context)
+                .readFileToString(fileEntryArgumentCaptor.capture());
+
+            assertThat(fileEntryArgumentCaptor.getValue()).isEqualTo(fileEntry);
+        }
     }
 }

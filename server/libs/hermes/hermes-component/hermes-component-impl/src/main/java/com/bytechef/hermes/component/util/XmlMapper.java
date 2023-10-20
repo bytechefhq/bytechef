@@ -35,7 +35,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -75,29 +74,9 @@ public final class XmlMapper implements XmlUtils.XmlMapper {
     public <T> T read(InputStream inputStream, String path) {
         try {
             return xmlMapper.readValue(
-                parse(path, documentBuilder -> parse(inputStream, documentBuilder)), new TypeReference<T>() {});
+                parse(path, documentBuilder -> parse(inputStream, documentBuilder)), new TypeReference<>() {});
         } catch (Exception exception) {
             throw new ComponentExecutionException("Unable to read xml", exception);
-        }
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> List<T> readList(InputStream inputStream) {
-        try {
-            return xmlMapper.readValue(inputStream, List.class);
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to read xml value", exception);
-        }
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> List<T> readList(String xml) {
-        try {
-            return xmlMapper.readValue(xml, List.class);
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to read xml value", exception);
         }
     }
 

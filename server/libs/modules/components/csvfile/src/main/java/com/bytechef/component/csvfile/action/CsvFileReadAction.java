@@ -110,8 +110,8 @@ public class CsvFileReadAction {
         String delimiter = MapValueUtils.getString(inputParameters, DELIMITER, ",");
         boolean headerRow = MapValueUtils.getBoolean(inputParameters, HEADER_ROW, true);
         boolean includeEmptyCells = MapValueUtils.getBoolean(inputParameters, INCLUDE_EMPTY_CELLS, false);
-        Integer pageSize = MapValueUtils.getInteger(inputParameters, PAGE_SIZE);
         Integer pageNumber = MapValueUtils.getInteger(inputParameters, PAGE_NUMBER);
+        Integer pageSize = MapValueUtils.getInteger(inputParameters, PAGE_SIZE);
         boolean readAsString = MapValueUtils.getBoolean(inputParameters, READ_AS_STRING, false);
 
         try (

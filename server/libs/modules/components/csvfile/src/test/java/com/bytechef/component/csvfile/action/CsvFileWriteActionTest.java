@@ -19,11 +19,13 @@ package com.bytechef.component.csvfile.action;
 
 import com.bytechef.component.csvfile.CsvFileComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Files;
 import org.json.JSONArray;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
@@ -46,37 +48,29 @@ public class CsvFileWriteActionTest {
 
     @Test
     @SuppressWarnings({
-        "raw", "unchecked"
+        "rawtypes", "unchecked"
     })
     public void testExecuteWriteCSV() throws IOException {
-        String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
+        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+            String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
-        CsvFileWriteAction.executeWrite(context, getWriteParameters((List) new JSONArray(jsonContent).toList()));
+            CsvFileWriteAction.executeWrite(
+                context, getWriteParameters((List) new JSONArray(jsonContent).toList(), mockedStatic));
 
-        ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
-            .forClass(ByteArrayInputStream.class);
-        ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
+                .forClass(ByteArrayInputStream.class);
+            ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-        Mockito.verify(context)
-            .storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
+            Mockito.verify(context)
+                .storeFileContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
 
-        assertEquals(
-            new JSONArray(jsonContent),
-            new JSONArray(read(inputStreamArgumentCaptor.getValue())),
-            true);
-        Assertions.assertThat(filenameArgumentCaptor.getValue())
-            .isEqualTo("file.csv");
-    }
-
-    @SuppressWarnings("raw")
-    private Map<String, Object> getWriteParameters(List<Map<?, ?>> items) {
-        return Map.of(ROWS, items);
-    }
-
-    private List<Map<String, Object>> read(InputStream inputStream) throws IOException {
-        return CsvFileReadAction.read(
-            inputStream,
-            new CsvFileReadAction.ReadConfiguration(",", true, true, 0, Integer.MAX_VALUE, false));
+            assertEquals(
+                new JSONArray(jsonContent),
+                new JSONArray(read(inputStreamArgumentCaptor.getValue())),
+                true);
+            Assertions.assertThat(filenameArgumentCaptor.getValue())
+                .isEqualTo("file.csv");
+        }
     }
 
     private File getFile(String fileName) {
@@ -84,5 +78,18 @@ public class CsvFileWriteActionTest {
             .getClassLoader()
             .getResource("dependencies/" + fileName)
             .getFile());
+    }
+
+    private Map<String, Object> getWriteParameters(List<Map<?, ?>> items, MockedStatic<MapValueUtils> mockedStatic) {
+        mockedStatic.when(() -> MapValueUtils.getList(Mockito.anyMap(), Mockito.eq(ROWS), Mockito.eq(List.of())))
+            .thenReturn(items);
+
+        return Map.of();
+    }
+
+    private List<Map<String, Object>> read(InputStream inputStream) throws IOException {
+        return CsvFileReadAction.read(
+            inputStream,
+            new CsvFileReadAction.ReadConfiguration(",", true, true, 0, Integer.MAX_VALUE, false));
     }
 }

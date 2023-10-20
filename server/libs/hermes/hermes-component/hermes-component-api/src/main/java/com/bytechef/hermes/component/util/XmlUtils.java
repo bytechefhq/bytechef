@@ -18,7 +18,6 @@
 package com.bytechef.hermes.component.util;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
@@ -34,7 +33,11 @@ public final class XmlUtils {
         ServiceLoader<XmlMapper> loader = ServiceLoader.load(XmlMapper.class);
 
         xmlMapper = loader.findFirst()
-            .orElseThrow(() -> new IllegalStateException("XmlMapper instance is not available"));
+            .orElse(null);
+
+        if (xmlMapper == null) {
+            System.err.println("XmlMapper instance is not available");
+        }
     }
 
     private XmlUtils() {
@@ -73,26 +76,6 @@ public final class XmlUtils {
      *
      * @param inputStream
      * @return
-     * @param <T>
-     */
-    public static <T> List<T> readList(InputStream inputStream) {
-        return xmlMapper.readList(inputStream);
-    }
-
-    /**
-     *
-     * @param xml
-     * @return
-     * @param <T>
-     */
-    public static <T> List<T> readList(String xml) {
-        return xmlMapper.readList(xml);
-    }
-
-    /**
-     *
-     * @param inputStream
-     * @return
      */
     public static Stream<Map<String, ?>> stream(InputStream inputStream) {
         return xmlMapper.stream(inputStream);
@@ -123,10 +106,6 @@ public final class XmlUtils {
         Map<String, ?> read(String xml);
 
         <T> T read(InputStream inputStream, String path);
-
-        <T> List<T> readList(InputStream inputStream);
-
-        <T> List<T> readList(String xml);
 
         Stream<Map<String, ?>> stream(InputStream inputStream);
 

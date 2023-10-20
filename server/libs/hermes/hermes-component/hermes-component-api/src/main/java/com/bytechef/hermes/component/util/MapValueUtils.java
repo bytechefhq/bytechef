@@ -34,7 +34,11 @@ public class MapValueUtils {
         ServiceLoader<MapValueReader> loader = ServiceLoader.load(MapValueReader.class);
 
         mapValueReader = loader.findFirst()
-            .orElseThrow(() -> new IllegalStateException("MapValueReader instance is not available"));
+            .orElse(null);
+
+        if (mapValueReader == null) {
+            System.err.println("MapValueReader instance is not available");
+        }
     }
 
     private MapValueUtils() {
@@ -718,7 +722,7 @@ public class MapValueUtils {
 
         Duration getDuration(Map<String, ?> map, String key);
 
-        Duration getDuration(Map<String, ?> map, String key, Duration defaultDuration);
+        Duration getDuration(Map<String, ?> map, String key, Duration defaultValue);
 
         Float getFloat(Map<String, ?> map, String key);
 

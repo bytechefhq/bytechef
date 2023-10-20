@@ -33,7 +33,11 @@ public final class JsonUtils {
         ServiceLoader<JsonMapper> loader = ServiceLoader.load(JsonMapper.class);
 
         jsonMapper = loader.findFirst()
-            .orElseThrow(() -> new IllegalStateException("JsonMapper instance is not available"));
+            .orElse(null);
+
+        if (jsonMapper == null) {
+            System.err.println("JsonMapper instance is not available");
+        }
     }
 
     private JsonUtils() {

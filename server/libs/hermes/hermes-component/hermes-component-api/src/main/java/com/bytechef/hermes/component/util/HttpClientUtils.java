@@ -74,7 +74,11 @@ public final class HttpClientUtils {
         ServiceLoader<HttpClientExecutor> loader = ServiceLoader.load(HttpClientExecutor.class);
 
         httpClientExecutor = loader.findFirst()
-            .orElseThrow(() -> new IllegalStateException("HttpClientExecutor instance is not available"));
+            .orElse(null);
+
+        if (httpClientExecutor == null) {
+            System.err.println("HttpClientExecutor instance is not available");
+        }
     }
 
     private HttpClientUtils() {

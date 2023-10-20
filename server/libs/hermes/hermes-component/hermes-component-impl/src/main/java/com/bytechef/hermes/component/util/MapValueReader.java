@@ -106,8 +106,8 @@ public final class MapValueReader implements MapValueUtils.MapValueReader {
     }
 
     @Override
-    public Duration getDuration(Map<String, ?> map, String key, Duration defaultDuration) {
-        return com.bytechef.commons.util.MapValueUtils.getDuration(map, key, defaultDuration);
+    public Duration getDuration(Map<String, ?> map, String key, Duration defaultValue) {
+        return com.bytechef.commons.util.MapValueUtils.getDuration(map, key, defaultValue);
     }
 
     @Override

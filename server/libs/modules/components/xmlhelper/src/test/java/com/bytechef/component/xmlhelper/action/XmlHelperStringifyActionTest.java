@@ -18,8 +18,10 @@
 package com.bytechef.component.xmlhelper.action;
 
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import com.bytechef.hermes.component.util.XmlUtils;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.Map;
@@ -34,9 +36,24 @@ public class XmlHelperStringifyActionTest {
 
     @Test
     public void testExecuteStringify() {
-        Map<String, Object> source = Map.of("id", 45, "name", "Poppy");
+        try (MockedStatic<MapValueUtils> mapValueUtilsMockedStatic = Mockito.mockStatic(MapValueUtils.class);
+            MockedStatic<XmlUtils> xmlUtilsMockedStatic = Mockito.mockStatic(XmlUtils.class)) {
 
-        assertThat(XmlHelperStringifyAction.executeStringify(Mockito.mock(Context.class), Map.of(SOURCE, source)))
-            .isEqualTo(XmlUtils.write(source));
+            mapValueUtilsMockedStatic.when(() -> MapValueUtils.getRequired(Mockito.anyMap(), Mockito.eq(SOURCE)))
+                .thenReturn(Map.of("id", 45, "name", "Poppy"));
+            xmlUtilsMockedStatic.when(() -> XmlUtils.write(Mockito.any()))
+                .thenReturn("""
+                    {
+                        "key": 3
+                    }
+                    """);
+
+            assertThat(XmlHelperStringifyAction.executeStringify(Mockito.mock(Context.class), Map.of()))
+                .isEqualTo("""
+                    {
+                        "key": 3
+                    }
+                    """);
+        }
     }
 }

@@ -19,8 +19,10 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import com.bytechef.hermes.component.Context;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.File;
@@ -37,20 +39,22 @@ public class FilesystemReadFileActionTest {
 
     @Test
     public void testExecuteReadFile() {
+        Context context = Mockito.mock(Context.class);
         File file = getSampleFile();
 
-        Map<String, ?> inputParameters = Map.of(FILENAME, file.getAbsolutePath());
+        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+            mockedStatic.when(() -> MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(FILENAME)))
+                .thenReturn(file.getAbsolutePath());
 
-        Context context = Mockito.mock(Context.class);
+            FilesystemReadFileAction.executeReadFile(context, Map.of());
 
-        FilesystemReadFileAction.executeReadFile(context, inputParameters);
+            ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
-        ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+            Mockito.verify(context)
+                .storeFileContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class));
 
-        Mockito.verify(context)
-            .storeFileContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class));
-
-        assertThat(filenameArgumentCaptor.getValue()).isEqualTo(file.getAbsolutePath());
+            assertThat(filenameArgumentCaptor.getValue()).isEqualTo(file.getAbsolutePath());
+        }
     }
 
     private File getSampleFile() {

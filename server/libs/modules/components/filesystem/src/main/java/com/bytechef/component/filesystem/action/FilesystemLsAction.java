@@ -61,12 +61,14 @@ public class FilesystemLsAction {
 
     protected static List<FileInfo> executeLs(Context context, Map<String, ?> inputParameters) {
         Path root = Paths.get(MapValueUtils.getRequiredString(inputParameters, PATH));
-
         boolean recursive = MapValueUtils.getBoolean(inputParameters, RECURSIVE, false);
 
         try (Stream<Path> stream = Files.walk(root)) {
-            return stream.filter(p -> recursive || p.getParent()
-                .equals(root))
+            return stream.filter(p -> {
+                Path parent = p.getParent();
+
+                return recursive || parent.equals(root);
+            })
                 .filter(Files::isRegularFile)
                 .map(p -> new FileInfo(root, p))
                 .collect(Collectors.toList());

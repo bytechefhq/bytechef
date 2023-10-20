@@ -19,13 +19,17 @@ package com.bytechef.component.filesystem.action;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.util.MapValueUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.util.Map;
 import java.util.UUID;
+
+import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 
 /**
  * @author Ivica Cardic
@@ -38,19 +42,25 @@ public class FilesystemMkdirActionTest {
             .toString()
             .replace("-", "");
 
-        Map<String, ?> inputParameters = Map.of("path", tempDir);
+        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+            mockedStatic.when(() -> MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH)))
+                .thenReturn(tempDir);
 
-        FilesystemMkdirAction.executeMkdir(Mockito.mock(Context.class), inputParameters);
+            FilesystemMkdirAction.executeMkdir(Mockito.mock(Context.class), Map.of());
 
-        Assertions.assertTrue(new File(tempDir).exists());
+            Assertions.assertTrue(new File(tempDir).exists());
+        }
     }
 
     @Test
     public void testCreateDir2() {
-        Assertions.assertThrows(ComponentExecutionException.class, () -> {
-            Map<String, ?> inputParameters = Map.of("path", "/no/such/thing");
+        try (MockedStatic<MapValueUtils> mockedStatic = Mockito.mockStatic(MapValueUtils.class)) {
+            Assertions.assertThrows(ComponentExecutionException.class, () -> {
+                mockedStatic.when(() -> MapValueUtils.getRequiredString(Mockito.anyMap(), Mockito.eq(PATH)))
+                    .thenReturn("/no/such/thing");
 
-            FilesystemMkdirAction.executeMkdir(Mockito.mock(Context.class), inputParameters);
-        });
+                FilesystemMkdirAction.executeMkdir(Mockito.mock(Context.class), Map.of());
+            });
+        }
     }
 }
