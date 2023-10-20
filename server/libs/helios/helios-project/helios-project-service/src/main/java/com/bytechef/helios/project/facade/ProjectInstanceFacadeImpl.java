@@ -93,13 +93,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         }
 
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService.create(
-            projectInstanceDTO.projectInstanceWorkflows());
+            projectInstanceDTO.projectInstanceWorkflows() == null
+                ? List.of()
+                : projectInstanceDTO.projectInstanceWorkflows());
 
         projectInstance = projectInstanceService.create(projectInstance);
 
         // TODO activate only enabled workflows
 
-        enableWorkflowTriggers(projectInstanceDTO.id(), projectInstanceWorkflows);
+        enableWorkflowTriggers(Objects.requireNonNull(projectInstance.getId()), projectInstanceWorkflows);
 
         return new ProjectInstanceDTO(
             getLastExecutionDate(Objects.requireNonNull(projectInstance.getId())), projectInstance,
@@ -118,7 +120,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @Override
     public void deleteProjectInstance(long projectInstanceId) {
-        projectService.delete(projectInstanceId);
+        projectInstanceService.delete(projectInstanceId);
 
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
             .getProjectInstanceWorkflows(projectInstanceId);

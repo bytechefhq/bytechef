@@ -59,7 +59,7 @@ public record ProjectInstanceDTO(
         projectInstance.setId(id);
         projectInstance.setName(name);
         projectInstance.setProjectId(projectId);
-        projectInstance.setStatus(status);
+        projectInstance.setStatus(status == null ? Status.DISABLED : status);
         projectInstance.setTags(tags);
         projectInstance.setVersion(version);
 

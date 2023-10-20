@@ -19,22 +19,22 @@ package com.bytechef.atlas.repository.git.config;
 
 import com.bytechef.atlas.repository.git.GitWorkflowRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "workflow-repository.git.enabled", havingValue = "true")
+@EnableConfigurationProperties(GitWorkflowRepositoryProperties.class)
 public class GitWorkflowRepositoryConfiguration {
 
     @Bean
     @Order(4)
     GitWorkflowRepository gitWorkflowRepository(GitWorkflowRepositoryProperties gitWorkflowRepositoryProperties) {
         return new GitWorkflowRepository(
-            gitWorkflowRepositoryProperties.getUrl(),
-            gitWorkflowRepositoryProperties.getBranch(),
-            gitWorkflowRepositoryProperties.getSearchPaths(),
-            gitWorkflowRepositoryProperties.getUsername(),
+            gitWorkflowRepositoryProperties.getUrl(), gitWorkflowRepositoryProperties.getBranch(),
+            gitWorkflowRepositoryProperties.getSearchPaths(), gitWorkflowRepositoryProperties.getUsername(),
             gitWorkflowRepositoryProperties.getPassword());
     }
 }

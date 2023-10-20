@@ -29,6 +29,7 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
@@ -196,6 +197,8 @@ public class ProjectInstance implements Persistable<Long> {
     }
 
     public void setStatus(Status status) {
+        Assert.notNull(status, "'status' must not be null");
+
         this.status = status.getId();
     }
 
