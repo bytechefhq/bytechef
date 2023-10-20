@@ -19,8 +19,6 @@ package com.bytechef.discovery.redis.client;
 
 import com.bytechef.discovery.redis.registry.RedisRegistration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;

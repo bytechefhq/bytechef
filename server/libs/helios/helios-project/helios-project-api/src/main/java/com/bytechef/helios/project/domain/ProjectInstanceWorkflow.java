@@ -33,7 +33,6 @@ import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
