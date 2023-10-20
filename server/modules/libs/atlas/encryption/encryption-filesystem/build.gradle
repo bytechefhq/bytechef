@@ -1,0 +1,5 @@
+dependencies {
+    api project(":modules:libs:atlas:encryption:encryption-api")
+
+    implementation "org.springframework:spring-context"
+}

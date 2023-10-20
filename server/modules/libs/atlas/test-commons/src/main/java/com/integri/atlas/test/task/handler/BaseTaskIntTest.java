@@ -146,7 +146,7 @@ public abstract class BaseTaskIntTest {
             Stream
                 .concat(
                     getTaskDispatcherResolvers(coordinatorMessageBroker, taskDispatcherChain).stream(),
-                    Stream.of(new DefaultTaskDispatcher(coordinatorMessageBroker))
+                    Stream.of(new DefaultTaskDispatcher(coordinatorMessageBroker, List.of()))
                 )
                 .toList()
         );

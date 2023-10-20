@@ -25,6 +25,8 @@ package com.integri.atlas.engine;
  */
 public class Constants {
 
+    public static final String AUTH = "auth";
+
     public static final String ID = "id";
 
     public static final String PARENT_ID = "parentId";
@@ -117,7 +119,11 @@ public class Constants {
 
     public static final String POST = "post";
 
+    public static final String PROPERTIES = "properties";
+
     public static final String FINALIZE = "finalize";
+
+    public static final String UPDATE_TIME = "updateTime";
 
     public static final String[] RESERVED_WORDS = new String[] {
         ID,

@@ -18,6 +18,7 @@ package com.integri.atlas.config;
 
 import com.integri.atlas.engine.MapObject;
 import com.integri.atlas.file.storage.converter.FileEntryConverter;
+import com.integri.atlas.task.auth.converter.TaskAuthConverter;
 import javax.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,5 +31,6 @@ public class MapObjectConfiguration {
     @PostConstruct
     void afterPropertiesSet() {
         MapObject.addConverter(new FileEntryConverter());
+        MapObject.addConverter(new TaskAuthConverter());
     }
 }

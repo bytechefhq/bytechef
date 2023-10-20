@@ -24,6 +24,7 @@ import com.integri.atlas.engine.task.Task;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcher;
 import com.integri.atlas.engine.task.dispatcher.TaskDispatcherResolver;
 import com.integri.atlas.engine.task.execution.TaskExecution;
+import java.util.List;
 import java.util.Objects;
 import org.springframework.util.Assert;
 
@@ -33,29 +34,42 @@ import org.springframework.util.Assert;
 public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
     private final MessageBroker messageBroker;
+    private final List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors;
 
     private static final String DEFAULT_QUEUE = Queues.TASKS;
 
-    public DefaultTaskDispatcher(MessageBroker aMessageBroker) {
-        messageBroker = Objects.requireNonNull(aMessageBroker);
+    public DefaultTaskDispatcher(
+        MessageBroker messageBroker,
+        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors
+    ) {
+        this.messageBroker = Objects.requireNonNull(messageBroker);
+        this.taskDispatcherPreSendProcessors =
+            taskDispatcherPreSendProcessors == null ? List.of() : taskDispatcherPreSendProcessors;
     }
 
     @Override
-    public void dispatch(TaskExecution aTask) {
+    public void dispatch(TaskExecution taskExecution) {
         Assert.notNull(messageBroker, "message broker not configured");
-        messageBroker.send(calculateRoutingKey(aTask), aTask);
+
+        for (TaskDispatcherPreSendProcessor taskDispatcherPreSendProcessor : taskDispatcherPreSendProcessors) {
+            taskExecution = taskDispatcherPreSendProcessor.process(taskExecution);
+        }
+
+        messageBroker.send(calculateRoutingKey(taskExecution), taskExecution);
     }
 
-    private String calculateRoutingKey(Task aTask) {
-        TaskExecution jtask = (TaskExecution) aTask;
-        return jtask.getNode() != null ? jtask.getNode() : DEFAULT_QUEUE;
+    private String calculateRoutingKey(Task task) {
+        TaskExecution taskExecution = (TaskExecution) task;
+
+        return taskExecution.getNode() != null ? taskExecution.getNode() : DEFAULT_QUEUE;
     }
 
     @Override
-    public TaskDispatcher<TaskExecution> resolve(Task aTask) {
-        if (aTask instanceof TaskExecution) {
+    public TaskDispatcher<TaskExecution> resolve(Task task) {
+        if (task instanceof TaskExecution) {
             return this;
         }
+
         return null;
     }
 }

@@ -47,6 +47,7 @@ import com.integri.atlas.task.handler.random.RandomInt;
 import com.integri.atlas.task.handler.time.Sleep;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -112,7 +113,7 @@ public class CoordinatorIntTest {
 
         syncMessageBroker.receive(Queues.TASKS, o -> worker.handle((TaskExecution) o));
 
-        DefaultTaskDispatcher taskDispatcher = new DefaultTaskDispatcher(syncMessageBroker);
+        DefaultTaskDispatcher taskDispatcher = new DefaultTaskDispatcher(syncMessageBroker, List.of());
 
         coordinator.setEventPublisher(e -> {});
         coordinator.setTaskDispatcher(taskDispatcher);

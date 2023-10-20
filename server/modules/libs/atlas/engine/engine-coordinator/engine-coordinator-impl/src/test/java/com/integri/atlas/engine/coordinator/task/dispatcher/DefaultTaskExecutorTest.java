@@ -20,6 +20,7 @@ package com.integri.atlas.engine.coordinator.task.dispatcher;
 
 import com.integri.atlas.engine.message.broker.Queues;
 import com.integri.atlas.engine.task.execution.SimpleTaskExecution;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,11 @@ public class DefaultTaskExecutorTest {
 
     @Test
     public void test1() {
-        DefaultTaskDispatcher executor = new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals(Queues.TASKS, k));
+        DefaultTaskDispatcher executor = new DefaultTaskDispatcher(
+            (k, m) -> Assertions.assertEquals(Queues.TASKS, k),
+            List.of()
+        );
+
         executor.dispatch(new SimpleTaskExecution());
     }
 
@@ -38,7 +43,11 @@ public class DefaultTaskExecutorTest {
     public void test2() {
         SimpleTaskExecution task = new SimpleTaskExecution();
         task.setNode("encoder");
-        DefaultTaskDispatcher executor = new DefaultTaskDispatcher((k, m) -> Assertions.assertEquals("encoder", k));
+        DefaultTaskDispatcher executor = new DefaultTaskDispatcher(
+            (k, m) -> Assertions.assertEquals("encoder", k),
+            List.of()
+        );
+
         executor.dispatch(task);
     }
 
@@ -46,9 +55,11 @@ public class DefaultTaskExecutorTest {
     public void test3() {
         SimpleTaskExecution task = new SimpleTaskExecution();
         task.setNode("encoder.xlarge");
-        DefaultTaskDispatcher executor = new DefaultTaskDispatcher((k, m) ->
-            Assertions.assertEquals("encoder.xlarge", k)
+        DefaultTaskDispatcher executor = new DefaultTaskDispatcher(
+            (k, m) -> Assertions.assertEquals("encoder.xlarge", k),
+            List.of()
         );
+
         executor.dispatch(task);
     }
 }
