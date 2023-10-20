@@ -17,8 +17,6 @@
 
 package com.bytechef.hermes.service;
 
-import com.bytechef.hermes.domain.TriggerLifecycle;
-
 import java.util.Optional;
 
 /**
@@ -27,8 +25,6 @@ import java.util.Optional;
 public interface TriggerLifecycleService {
 
     <T> Optional<T> fetchValue(long instanceId, String workflowExecutionId);
-
-    TriggerLifecycle getTriggerLifecycle(long id);
 
     void save(long instanceId, String workflowExecutionId, Object value);
 }
