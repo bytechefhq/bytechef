@@ -1,9 +1,4 @@
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import getRandomId from '@/pages/automation/project/utils/getRandomId';
 
 import 'quill-mention';

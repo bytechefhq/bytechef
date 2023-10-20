@@ -1,10 +1,5 @@
 import DropdownMenu from '@/components/DropdownMenu/DropdownMenu';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
 import {ProjectModel, WorkflowModel} from 'middleware/helios/configuration';

@@ -1,10 +1,5 @@
 import Avatar from '@/components/Avatar/Avatar';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Link} from 'react-router-dom';
 
 import reactLogo from '../assets/logo.svg';

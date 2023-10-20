@@ -1,11 +1,6 @@
 import DropdownMenu from '@/components/DropdownMenu/DropdownMenu';
 import {Switch} from '@/components/ui/switch';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     ProjectInstanceWorkflowModel,
     WorkflowModel,
