@@ -32,8 +32,5 @@ subprojects {
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-random")
         testImplementation project(":modules:libs:atlas:task-handler:task-handler-time")
         testImplementation project(":modules:libs:atlas:test-commons")
-
-        testRuntimeOnly "org.postgresql:postgresql"
-        testRuntimeOnly "org.testcontainers:postgresql"
     }
 }

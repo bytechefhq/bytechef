@@ -18,7 +18,4 @@ dependencies {
     testImplementation project(":modules:libs:atlas:engine:engine-message-broker:engine-message-broker-sync")
     testImplementation project(":modules:libs:atlas:test-commons")
     testImplementation project(":modules:libs:atlas:engine:engine-repository:engine-repository-resource")
-
-    testRuntimeOnly "org.postgresql:postgresql"
-    testRuntimeOnly "org.testcontainers:postgresql"
 }
