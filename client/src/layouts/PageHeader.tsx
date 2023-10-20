@@ -18,7 +18,7 @@ const PageHeader = ({
         <div className="flex w-full items-center justify-between">
             <div
                 className={twMerge(
-                    'flex h-[34px] items-center text-lg tracking-tight text-foreground',
+                    'flex h-[34px] items-center text-xl tracking-tight text-foreground',
                     position === 'sidebar' ? 'font-semibold' : ''
                 )}
             >
