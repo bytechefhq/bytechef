@@ -17,177 +17,58 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Stream;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 /**
  * @author Ivica Cardic
  */
 public final class XmlUtils {
 
-    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-    private static final XmlMapper XML_MAPPER = new XmlMapper();
-    private static final XPathFactory X_PATH_FACTORY = XPathFactory.newInstance();
-    private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
+    static XmlMapper xmlMapper;
+
+    public static Map<String, ?> read(InputStream inputStream) {
+        return xmlMapper.read(inputStream);
+    }
 
     public static Map<String, ?> read(String xml) {
-        try {
-            return XML_MAPPER.convertValue(XML_MAPPER.readTree(xml), new TypeReference<>() {});
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to convert xml value", exception);
-        }
-    }
-
-    public static <T> T read(InputStream inputStream, Class<T> clazz) {
-        try {
-            return XML_MAPPER.readValue(inputStream, clazz);
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to read xml value", exception);
-        }
-    }
-
-    public static <T> T read(String xml, Class<T> clazz) {
-        try {
-            return XML_MAPPER.readValue(xml, clazz);
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to read xml value", exception);
-        }
-    }
-
-    public static <T> T read(InputStream inputStream, TypeReference<T> typeReference) {
-        try {
-            return XML_MAPPER.readValue(inputStream, typeReference);
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to read xml", exception);
-        }
-    }
-
-    public static <T> T read(String xml, TypeReference<T> typeReference) {
-        try {
-            return XML_MAPPER.readValue(xml, typeReference);
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to read xml", exception);
-        }
-    }
-
-    public static <T> T read(InputStream inputStream, String path, Class<T> clazz) {
-        return read(parse(path, documentBuilder -> parse(inputStream, documentBuilder)), clazz);
+        return xmlMapper.read(xml);
     }
 
     public static <T> T read(InputStream inputStream, String path) {
-        return read(parse(path, documentBuilder -> parse(inputStream, documentBuilder)), new TypeReference<T>() {});
+        return xmlMapper.read(inputStream, path);
     }
 
-    public static <T> T read(InputStream inputStream, String path, TypeReference<T> typeReference) {
-        return read(parse(path, documentBuilder -> parse(inputStream, documentBuilder)), typeReference);
+    public static <T> List<T> readList(InputStream inputStream) {
+        return xmlMapper.readList(inputStream);
     }
 
-    public static <T> T read(String xml, String path, Class<T> clazz) {
-        return read(parse(path, documentBuilder -> parse(xml, documentBuilder)), clazz);
-    }
-
-    public static <T> T read(String xml, String path, TypeReference<T> typeReference) {
-        return read(parse(path, documentBuilder -> parse(xml, documentBuilder)), typeReference);
-    }
-
-    public static Stream<Map<String, ?>> stream(InputStream inputStream) {
-        Objects.requireNonNull(inputStream, "Non null stream reference expected");
-
-        try {
-            return new XmlStreamReaderStream(inputStream, XML_MAPPER);
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to stream xml", exception);
-        }
+    public static <T> List<T> readList(String xml) {
+        return xmlMapper.readList(xml);
     }
 
     public static String write(Object object) {
-        return write(object, "root");
+        return xmlMapper.write(object);
     }
 
     public static String write(Object object, String rootName) {
-        try {
-            return XML_MAPPER.writer()
-                .withRootName(rootName)
-                .writeValueAsString(object);
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to write xml", exception);
-        }
+        return xmlMapper.write(object, rootName);
     }
 
-    private static Document parse(InputStream inputStream, DocumentBuilder documentBuilder) {
-        try {
-            return documentBuilder.parse(inputStream);
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to parse xml", exception);
-        }
-    }
+    interface XmlMapper {
+        Map<String, ?> read(InputStream inputStream);
 
-    private static Document parse(String xml, DocumentBuilder documentBuilder) {
-        try {
-            return documentBuilder.parse(new InputSource(new StringReader(xml)));
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to parse xml", exception);
-        }
-    }
+        Map<String, ?> read(String xml);
 
-    private static String parse(String path, Function<DocumentBuilder, Document> parseFunction) {
-        StringBuffer sb = new StringBuffer();
-        try {
-            DocumentBuilder documentBuilder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
-            XPath xPath = X_PATH_FACTORY.newXPath();
+        <T> T read(InputStream inputStream, String path);
 
-            Document document = parseFunction.apply(documentBuilder);
+        <T> List<T> readList(InputStream inputStream);
 
-            NodeList nodeList = (NodeList) xPath.compile(path)
-                .evaluate(document, XPathConstants.NODESET);
+        <T> List<T> readList(String xml);
 
-            sb.append("<root>");
+        String write(Object object);
 
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                sb.append(nodeToString(nodeList.item(i)));
-            }
-
-            sb.append("</root>");
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to parse xml", exception);
-        }
-
-        return sb.toString();
-    }
-
-    private static String nodeToString(Node node) {
-        try {
-            StringWriter stringWriter = new StringWriter();
-            Transformer transformer = TRANSFORMER_FACTORY.newTransformer();
-
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.transform(new DOMSource(node), new StreamResult(stringWriter));
-
-            return stringWriter.toString();
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to transform xml node", exception);
-        }
+        String write(Object object, String rootName);
     }
 }

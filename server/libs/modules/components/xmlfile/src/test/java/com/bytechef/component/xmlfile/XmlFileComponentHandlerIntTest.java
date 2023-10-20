@@ -68,7 +68,7 @@ public class XmlFileComponentHandlerIntTest {
         Map<String, Object> outputs = job.getOutputs();
 
         Assertions.assertThat((List<?>) outputs.get("readXMLFile"))
-            .isEqualTo(XmlUtils.read(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8), List.class));
+            .isEqualTo(XmlUtils.readList(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8)));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class XmlFileComponentHandlerIntTest {
             ENCODER.encodeToString("xmlfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "source",
-                XmlUtils.read(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8), List.class)));
+                XmlUtils.readList(Files.contentOf(getFile("sample.xml"), StandardCharsets.UTF_8))));
 
         Assertions.assertThat(job.getStatus())
             .isEqualTo(Job.Status.COMPLETED);
@@ -101,7 +101,7 @@ public class XmlFileComponentHandlerIntTest {
         outputs = job.getOutputs();
 
         Assertions.assertThat((List<?>) outputs.get("readXMLFile"))
-            .isEqualTo(XmlUtils.read(Files.contentOf(sampleFile, StandardCharsets.UTF_8), List.class));
+            .isEqualTo(XmlUtils.readList(Files.contentOf(sampleFile, StandardCharsets.UTF_8)));
     }
 
     private File getFile(String filename) {

@@ -73,7 +73,7 @@ public class XmlFileReadActionTest {
             .thenReturn(false);
 
         Assertions.assertThat((Map<String, ?>) XmlFileReadAction.executeRead(context, inputParameters))
-            .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), Map.class));
+            .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8)));
     }
 
     @Test
@@ -96,7 +96,7 @@ public class XmlFileReadActionTest {
             .thenReturn(null);
 
         Assertions.assertThat((List<?>) XmlFileReadAction.executeRead(context, inputParameters))
-            .isEqualTo(XmlUtils.read(Files.contentOf(file, StandardCharsets.UTF_8), List.class));
+            .isEqualTo(XmlUtils.readList(Files.contentOf(file, StandardCharsets.UTF_8)));
 
         Mockito.when(context.getFileStream(Mockito.any(Context.FileEntry.class)))
             .thenReturn(new FileInputStream(file));

@@ -17,98 +17,45 @@
 
 package com.bytechef.hermes.component.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.TypeRef;
-import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
-import com.jayway.jsonpath.spi.json.JsonProvider;
-import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import java.io.InputStream;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
  */
 public final class JsonUtils {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper() {
-        {
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            registerModule(new JavaTimeModule());
-            registerModule(new Jdk8Module());
-        }
-    };
-
-    static {
-        Configuration.setDefaults(new Configuration.Defaults() {
-            private final JsonProvider jsonProvider = new JacksonJsonProvider();
-            private final MappingProvider mappingProvider = new JacksonMappingProvider();
-
-            @Override
-            public JsonProvider jsonProvider() {
-                return jsonProvider;
-            }
-
-            @Override
-            public MappingProvider mappingProvider() {
-                return mappingProvider;
-            }
-
-            @Override
-            public Set<Option> options() {
-                return EnumSet.noneOf(Option.class);
-            }
-        });
-    }
+    static JsonMapper jsonMapper;
 
     private JsonUtils() {
     }
 
     public static <T> T read(String json) {
-        try {
-            return objectMapper.readValue(json, new TypeReference<>() {});
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return jsonMapper.read(json);
     }
 
     public static <T> T read(InputStream inputStream, String path) {
-        DocumentContext documentContext = JsonPath.parse(inputStream);
-
-        return documentContext.read(path);
+        return jsonMapper.read(inputStream, path);
     }
 
     public static <T> T read(String json, String path) {
-        DocumentContext documentContext = JsonPath.parse(json);
-
-        return documentContext.read(path, new TypeRef<T>() {});
-    }
-
-    public static Stream<Map<String, ?>> stream(InputStream inputStream) {
-        try {
-            return new JsonParserStream(inputStream, objectMapper);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return jsonMapper.read(json, path);
     }
 
     public static String write(Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return jsonMapper.write(object);
+    }
+
+    /**
+     *
+     */
+    interface JsonMapper {
+
+        <T> T read(String json);
+
+        <T> T read(InputStream inputStream, String path);
+
+        <T> T read(String json, String path);
+
+        String write(Object object);
     }
 }

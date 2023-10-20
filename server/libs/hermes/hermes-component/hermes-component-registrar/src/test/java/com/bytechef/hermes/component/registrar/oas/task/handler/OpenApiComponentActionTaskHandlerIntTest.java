@@ -33,6 +33,7 @@ import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.registrar.oas.handler.OpenApiComponentActionTaskHandler;
 import com.bytechef.hermes.component.util.HttpClientUtils;
 import com.bytechef.hermes.component.util.HttpClientUtils.Response;
+import com.bytechef.hermes.component.util.JsonUtilsConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.connection.service.ConnectionService;
@@ -50,7 +51,10 @@ import com.bytechef.tag.service.TagService;
 import com.bytechef.test.annotation.EmbeddedSql;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.json.JSONArray;
@@ -841,8 +845,20 @@ public class OpenApiComponentActionTaskHandlerIntTest {
         DataStorageService dataStorageService;
 
         @Bean
+        JsonUtilsConfiguration jsonUtilsConfiguration(ObjectMapper objectMapper) {
+            return new JsonUtilsConfiguration(objectMapper);
+        }
+
+        @Bean
         ObjectMapper objectMapper() {
-            return new ObjectMapper();
+            return new ObjectMapper() {
+                {
+                    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+                    registerModule(new JavaTimeModule());
+                    registerModule(new Jdk8Module());
+                }
+            };
         }
 
         @Bean
