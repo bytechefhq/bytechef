@@ -27,7 +27,6 @@ dependencies {
     implementation(project(":server:libs:core:tag:tag-service"))
     implementation(project(":server:libs:helios:helios-configuration:helios-configuration-rest:helios-configuration-rest-impl"))
     implementation(project(":server:libs:helios:helios-configuration:helios-configuration-service"))
-    implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-converter"))
     implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-rest"))
     implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-service"))
 

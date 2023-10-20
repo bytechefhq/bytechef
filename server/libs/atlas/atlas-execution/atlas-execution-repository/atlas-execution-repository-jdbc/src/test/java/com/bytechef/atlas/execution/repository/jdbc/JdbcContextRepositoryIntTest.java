@@ -18,7 +18,7 @@
 package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.Context;
-import com.bytechef.atlas.file.storage.WorkflowFileStorage;
+import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
 import java.util.Map;
 
@@ -41,7 +41,7 @@ public class JdbcContextRepositoryIntTest {
     private JdbcContextRepository contextRepository;
 
     @Autowired
-    private WorkflowFileStorage workflowFileStorage;
+    private WorkflowFileStorageFacade workflowFileStorageFacade;
 
     @AfterEach
     public void afterEach() {
@@ -52,7 +52,7 @@ public class JdbcContextRepositoryIntTest {
     public void testFindByStackId() {
         Context context = new Context(
             1L, Context.Classname.TASK_EXECUTION,
-            workflowFileStorage.storeContextValue(1L, Context.Classname.TASK_EXECUTION, Map.of("key", "value")));
+            workflowFileStorageFacade.storeContextValue(1L, Context.Classname.TASK_EXECUTION, Map.of("key", "value")));
 
         context = contextRepository.save(context);
 
