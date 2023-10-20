@@ -834,7 +834,7 @@ components:
           description: "The name of a project instance."
           type: "string"
         project:
-          $ref: "#/components/schemas/Project"
+          $ref: "#/components/schemas/ProjectBasic"
         projectId:
           description: "Th id of a project."
           type: "integer"
