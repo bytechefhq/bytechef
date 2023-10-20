@@ -17,10 +17,10 @@ type MultiSelectProps = {
 
 const MultiSelect = forwardRef<CreatableSelect, MultiSelectProps>(
     ({error, label, name, ...props}) => (
-        <fieldset>
+        <fieldset className="mb-3">
             <label
                 htmlFor={name}
-                className="text-xs font-medium text-gray-700 dark:text-gray-400"
+                className="text-sm font-medium text-gray-700 dark:text-gray-400"
             >
                 {label}
             </label>

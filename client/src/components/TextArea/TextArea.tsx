@@ -13,7 +13,7 @@ type TextAreaProps = {
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     ({label, name, error, ...props}, ref) => (
-        <div>
+        <fieldset className="mb-3">
             <label
                 htmlFor={name}
                 className="block text-sm font-medium text-gray-700 dark:text-gray-400"
@@ -37,6 +37,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
                     id={name}
                     name={name}
                     ref={ref}
+                    rows={5}
                     {...props}
                 />
 
@@ -59,7 +60,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
                     This field is required
                 </p>
             )}
-        </div>
+        </fieldset>
     )
 );
 
