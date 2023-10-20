@@ -63,7 +63,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         {label}
                     </label>
 
-                    {required && <span className="pr-1 text-red-500">*</span>}
+                    {required && (
+                        <span className="px-1 leading-3 text-red-500">*</span>
+                    )}
 
                     {description && (
                         <Tooltip>
@@ -94,7 +96,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     )}
                 >
                     {type !== 'hidden' && leadingIcon && (
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 bg-gray-100 px-2">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 bg-gray-100 px-3">
                             {leadingIcon}
                         </div>
                     )}
@@ -107,7 +109,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                                 : 'border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring focus:ring-blue-500',
                             disabled &&
                                 'cursor-not-allowed bg-gray-100 text-gray-500',
-                            leadingIcon && 'border-0 pl-10',
+                            leadingIcon &&
+                                'border-0 pl-12 py-3 leading-relaxed',
                             trailing &&
                                 'rounded-none rounded-l-md bg-gray-50 text-gray-700 outline-0 focus:border-gray-300 focus:ring-0',
                             className
