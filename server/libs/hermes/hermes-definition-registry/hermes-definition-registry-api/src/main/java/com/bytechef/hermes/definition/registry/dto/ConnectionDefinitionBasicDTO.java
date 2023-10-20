@@ -29,12 +29,14 @@ import java.util.Optional;
  */
 @SuppressFBWarnings("EI")
 public record ConnectionDefinitionBasicDTO(
-    Optional<String> componentDescription, String componentName, String componentTitle, int version) {
+    boolean authorizationRequired, Optional<String> componentDescription, String componentName, String componentTitle,
+    int version) {
 
     public ConnectionDefinitionBasicDTO(
         ConnectionDefinition connectionDefinition, ComponentDefinition componentDefinition) {
 
         this(
+            OptionalUtils.orElse(connectionDefinition.getAuthorizationRequired(), true),
             componentDefinition.getDescription(), componentDefinition.getName(),
             ComponentDefinitionDTO.getTitle(
                 componentDefinition.getName(), OptionalUtils.orElse(componentDefinition.getTitle(), null)),

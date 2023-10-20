@@ -827,6 +827,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private List<? extends ModifiableInputProperty> properties;
         private TestConsumer testConsumer;
         private int version = 1;
+        private Boolean authorizationRequired;
 
         private ModifiableConnectionDefinition() {
         }
@@ -840,6 +841,12 @@ public final class ComponentDSL extends DefinitionDSL {
             }
 
             ((List) this.properties).add(property);
+
+            return this;
+        }
+
+        public ModifiableConnectionDefinition authorizationRequired(boolean authorizationRequired) {
+            this.authorizationRequired = authorizationRequired;
 
             return this;
         }
@@ -896,6 +903,11 @@ public final class ComponentDSL extends DefinitionDSL {
                 .filter(authorization -> Objects.equals(authorization.getName(), authorizationName))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
+        }
+
+        @Override
+        public Optional<Boolean> getAuthorizationRequired() {
+            return Optional.ofNullable(authorizationRequired);
         }
 
         @Override

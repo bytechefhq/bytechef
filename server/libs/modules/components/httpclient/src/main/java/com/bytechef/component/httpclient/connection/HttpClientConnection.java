@@ -44,6 +44,7 @@ public class HttpClientConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .properties(string(BASE_URI).label("Base URI"))
+        .authorizationRequired(false)
         .authorizations(
             authorization(Authorization.AuthorizationType.API_KEY.name()
                 .toLowerCase(), Authorization.AuthorizationType.API_KEY)
