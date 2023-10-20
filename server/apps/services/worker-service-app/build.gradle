@@ -23,6 +23,7 @@ dependencies {
     implementation project(":server:libs:atlas:atlas-worker:atlas-worker-config")
     implementation project(":server:libs:atlas:atlas-task-evaluator-impl")
     implementation project(":server:libs:core:autoconfigure:autoconfigure-consul")
+    implementation project(":server:libs:core:autoconfigure:autoconfigure-property")
     implementation project(":server:libs:core:commons:commons-utils")
     implementation project(":server:libs:core:encryption:encryption-filesystem")
     implementation project(":server:libs:core:rest:rest-impl")

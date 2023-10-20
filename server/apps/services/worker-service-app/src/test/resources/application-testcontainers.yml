@@ -8,6 +8,13 @@
 # More information on database containers: https://www.testcontainers.org/modules/databases/
 # ===================================================================
 
+discovery-client:
+  property:
+    platform-service-app:
+      instances:
+        - host: localhost
+          port: 7222
+
 workflow:
   message-broker:
     provider: jms
