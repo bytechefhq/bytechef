@@ -1,0 +1,6 @@
+dependencies {
+    api project(":modules:libs:atlas:atlas-engine:atlas-engine-coordinator-api")
+
+    implementation "com.google.guava:guava"
+    implementation "org.springframework:spring-core"
+}
