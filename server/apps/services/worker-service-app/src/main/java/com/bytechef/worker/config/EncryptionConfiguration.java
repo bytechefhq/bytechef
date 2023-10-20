@@ -15,20 +15,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.worker;
+package com.bytechef.worker.config;
 
-import com.bytechef.test.annotation.EmbeddedSql;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import com.bytechef.encryption.Encryption;
+import com.bytechef.encryption.EncryptionKey;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Ivica Cardic
  */
-@EmbeddedSql
-@SpringBootTest
-public class WorkerApplicationIntTest {
+@Configuration
+public class EncryptionConfiguration {
 
-    @Test
-    public void testContextLoads() {
+    @Bean
+    Encryption encryption(EncryptionKey encryptionKey) {
+        return new Encryption(encryptionKey);
     }
 }
