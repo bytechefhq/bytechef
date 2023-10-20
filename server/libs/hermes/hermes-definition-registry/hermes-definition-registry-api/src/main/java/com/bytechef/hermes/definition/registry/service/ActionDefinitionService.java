@@ -54,4 +54,6 @@ public interface ActionDefinitionService {
         String componentName, int componentVersion, String actionName);
 
     List<ActionDefinitionDTO> getActionDefinitions(String componentName, int componentVersion);
+
+    List<ActionDefinitionDTO> getActionDefinitions(List<String> types);
 }

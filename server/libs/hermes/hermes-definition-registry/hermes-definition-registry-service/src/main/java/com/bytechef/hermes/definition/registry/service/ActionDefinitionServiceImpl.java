@@ -42,6 +42,7 @@ import com.bytechef.hermes.definition.registry.dto.ComponentDefinitionDTO;
 import com.bytechef.hermes.definition.registry.dto.OptionDTO;
 import com.bytechef.hermes.definition.registry.dto.PropertyDTO;
 import com.bytechef.hermes.definition.registry.dto.ValuePropertyDTO;
+import com.bytechef.hermes.definition.registry.util.ComponentUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
@@ -209,6 +210,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         }
 
         return actionDefinitionDTOs;
+    }
+
+    @Override
+    public List<ActionDefinitionDTO> getActionDefinitions(List<String> types) {
+        return types.stream()
+            .map(ComponentUtils::getComponentType)
+            .map(componentType -> getActionDefinition(
+                componentType.componentName(), componentType.componentVersion(), componentType.operationName()))
+            .toList();
     }
 
     private ActionDefinitionDTO toActionDefinitionDTO(ActionDefinition actionDefinition) {
