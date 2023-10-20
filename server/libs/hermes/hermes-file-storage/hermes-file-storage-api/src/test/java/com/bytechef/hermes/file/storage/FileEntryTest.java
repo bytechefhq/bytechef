@@ -53,12 +53,12 @@ public class FileEntryTest {
 
     @Test
     public void testSpelEvaluation() {
-        TaskEvaluator evaluator = TaskEvaluator.create();
+        TaskEvaluator taskEvaluator = TaskEvaluator.create();
         TaskExecution taskExecution = new TaskExecution(
             WorkflowTask.of("result", "${fileEntry.name} ${fileEntry.url}"));
 
-        taskExecution.evaluate(
-            evaluator,
+        taskEvaluator.evaluate(
+            taskExecution,
             Collections.singletonMap("fileEntry", new FileEntry("sample.txt", "/tmp/fileName.txt")));
 
         assertEquals(

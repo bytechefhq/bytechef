@@ -101,7 +101,7 @@ public class IfTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDisp
 
             Map<String, Object> context = contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-            subTaskExecution.evaluate(taskEvaluator, context);
+            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 

@@ -173,7 +173,7 @@ public class Worker {
             // pre tasks
             executeSubTasks(taskExecution, taskExecution.getPre(), context);
 
-            taskExecution.evaluate(taskEvaluator, context);
+            taskExecution = taskEvaluator.evaluate(taskExecution, context);
 
             TaskHandler<?> taskHandler = taskHandlerResolver.resolve(taskExecution);
 
@@ -205,7 +205,7 @@ public class Worker {
         for (WorkflowTask subWorkflowTask : subWorkflowTasks) {
             TaskExecution subTaskExecution = TaskExecution.of(taskExecution.getJobId(), subWorkflowTask);
 
-            subTaskExecution.evaluate(taskEvaluator, context);
+            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
             TaskExecution completionTaskExecution = doExecuteTask(subTaskExecution);
 

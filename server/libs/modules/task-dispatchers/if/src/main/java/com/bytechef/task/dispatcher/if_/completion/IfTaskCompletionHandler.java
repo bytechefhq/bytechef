@@ -117,7 +117,7 @@ public class IfTaskCompletionHandler implements TaskCompletionHandler {
             Map<String, Object> context = contextService.peek(
                 ifTaskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-            subTaskExecution.evaluate(taskEvaluator, context);
+            subTaskExecution = taskEvaluator.evaluate(subTaskExecution, context);
 
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 

@@ -141,8 +141,11 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 Assert.isTrue(branchWorkflowTasks.size() > 0, "branch " + i + " does not contain any tasks");
 
-                TaskExecution branchTaskExecution = new TaskExecution(
-                    WorkflowTask.of(Map.of(BRANCH, i), branchWorkflowTasks.get(0)));
+                WorkflowTask branchWorkflowTask = branchWorkflowTasks.get(0);
+
+                branchWorkflowTask.put(BRANCH, i);
+
+                TaskExecution branchTaskExecution = new TaskExecution(branchWorkflowTask);
 
                 branchTaskExecution.setJobId(taskExecution.getJobId());
                 branchTaskExecution.setParentId(taskExecution.getId());
@@ -153,7 +156,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                 Map<String, Object> context = contextService.peek(
                     taskExecution.getId(), Context.Classname.TASK_EXECUTION);
 
-                branchTaskExecution.evaluate(taskEvaluator, context);
+                branchTaskExecution = taskEvaluator.evaluate(branchTaskExecution, context);
 
                 branchTaskExecution = taskExecutionService.create(branchTaskExecution);
 

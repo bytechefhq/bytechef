@@ -80,7 +80,7 @@ public class JobExecutor {
         Map<String, Object> context = contextService.peek(job.getId(), Context.Classname.JOB);
         TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);
 
-        nextTaskExecution.evaluate(taskEvaluator, context);
+        nextTaskExecution = taskEvaluator.evaluate(nextTaskExecution, context);
 
         nextTaskExecution = taskExecutionService.create(nextTaskExecution);
 

@@ -26,7 +26,6 @@ import com.bytechef.atlas.task.Progressable;
 import com.bytechef.atlas.task.Retryable;
 import com.bytechef.atlas.task.Task;
 import com.bytechef.atlas.task.WorkflowTask;
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
 import com.bytechef.commons.utils.LocalDateTimeUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -171,12 +170,6 @@ public final class TaskExecution
         this.workflowTask = workflowTask;
     }
 
-    public static TaskExecution of(long jobId, @NonNull WorkflowTask workflowTask) {
-        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
-
-        return new TaskExecution(jobId, null, 0, DEFAULT_TASK_NUMBER, workflowTask);
-    }
-
     public static TaskExecution of(long jobId, int priority, WorkflowTask workflowTask) {
         Assert.notNull(workflowTask, "'workflowTask' must not be null.");
 
@@ -198,6 +191,12 @@ public final class TaskExecution
         return new TaskExecution(jobId, parentId, priority, taskNumber, workflowTask);
     }
 
+    public static TaskExecution of(long jobId, @NonNull WorkflowTask workflowTask) {
+        Assert.notNull(workflowTask, "'workflowTask' must not be null.");
+
+        return new TaskExecution(jobId, null, 0, DEFAULT_TASK_NUMBER, workflowTask);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -211,12 +210,6 @@ public final class TaskExecution
         TaskExecution taskExecution = (TaskExecution) o;
 
         return Objects.equals(id, taskExecution.id);
-    }
-
-    public TaskExecution evaluate(TaskEvaluator taskEvaluator, Map<String, Object> context) {
-        this.workflowTask = taskEvaluator.evaluate(this.workflowTask, context);
-
-        return this;
     }
 
     @Override
