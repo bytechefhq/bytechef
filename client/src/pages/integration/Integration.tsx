@@ -165,6 +165,7 @@ const Integration: React.FC = () => {
                             {showWorkflowModal && (
                                 <WorkflowModal visible version={undefined} />
                             )}
+
                             <div>
                                 <ToggleGroup
                                     defaultValue="designer"
