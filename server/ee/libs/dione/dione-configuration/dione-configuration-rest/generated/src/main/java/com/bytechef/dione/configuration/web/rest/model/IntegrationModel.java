@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -28,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T07:29:10.906224+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-02T17:23:02.452877+02:00[Europe/Zagreb]")
 public class IntegrationModel {
 
   private CategoryModel category;

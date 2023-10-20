@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -27,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-08-20T08:21:10.828259+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-02T17:22:57.688736+02:00[Europe/Zagreb]")
 public class ComponentDefinitionModel {
 
   @Valid
