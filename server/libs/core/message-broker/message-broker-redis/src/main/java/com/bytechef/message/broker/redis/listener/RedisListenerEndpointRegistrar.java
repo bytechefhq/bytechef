@@ -65,7 +65,7 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
         Consumer<String> invokerConsumer = invokerMap.get(queueName);
 
         if (invokerConsumer == null) {
-            logger.error("No message listeners registered for queue='{}'", queueName);
+            logger.warn("No message listeners registered for queue='{}'", queueName);
 
             return;
         }
