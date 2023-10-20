@@ -86,6 +86,23 @@
             <Class name="com.bytechef.task.dispatcher.switch_.SwitchTaskDispatcher" />
             <Class name="com.bytechef.task.dispatcher.switch_.completion.SwitchTaskCompletionHandler" />
             <Class name="com.bytechef.task.dispatcher.if_.IfTaskDispatcher" />
+            <Class name="com.bytechef.task.handler.httpclient.v1_0.http.HttpClientHelper" />
+            <Class name="com.bytechef.task.handler.httpclient.v1_0.http.HttpClientHelper$HttpResponseEntry" />
+            <Class name="com.bytechef.task.handler.jsonfile.v1_0.JsonFileTaskHandler$JsonFileWriteTaskHandler" />
+            <Class name="com.bytechef.task.handler.objecthelpers.v1_0.ObjectHelpersTaskHandler$ObjectHelpersParseTaskHandler" />
+            <Class name="com.bytechef.task.handler.objecthelpers.v1_0.ObjectHelpersTaskHandler$ObjectHelpersStringifyTaskHandler" />
+            <Class name="com.bytechef.task.handler.jsonfile.v1_0.JsonFileTaskHandler$JsonFileReadTaskHandler" />
+            <Class name="com.bytechef.hermes.descriptor.client.listener.StartupApplicationListener" />
+            <Class name="com.bytechef.hermes.descriptor.client.listener.ShutdownApplicationListener" />
+            <Class name="com.bytechef.hermes.descriptor.ext.domain.DescriptorExtHandler" />
+            <Class name="com.bytechef.task.handler.xmlfile.v1_0.XmlFileTaskHandler$XmlFileReadTaskHandler" />
+            <Class name="com.bytechef.task.handler.xmlhelpers.v1_0.XmlHelpersTaskHandler$XmlHelpersParseTaskHandler" />
+            <Class name="com.bytechef.task.handler.xmlfile.v1_0.XmlFileTaskHandler$XmlFileWriteTaskHandler" />
+            <Class name="com.bytechef.task.handler.xmlhelpers.v1_0.XmlHelpersTaskHandler$XmlHelpersStringifyTaskHandler" />
+            <Class name="com.bytechef.hermes.descriptor.ext.web.rest.DescriptorExtHandlerController" />
+            <Class name="com.bytechef.hermes.descriptor.ext.repository.DescriptorExtHandlerRepository" />
+            <Class name="com.bytechef.hermes.descriptor.ext.service.DescriptorExtHandlerService" />
+            <Class name="com.bytechef.hermes.descriptor.ext.service.DescriptorExtHandlerServiceImpl" />
         </Or>
     </Match>
     <Match>
@@ -109,6 +126,9 @@
             <Class name="com.bytechef.hermes.descriptor.model.AuthenticationDescriptors" />
             <Class name="com.bytechef.hermes.descriptor.model.TaskOperation" />
             <Class name="com.bytechef.hermes.descriptor.model.TaskProperty$ArrayTaskProperty" />
+            <Class name="com.bytechef.task.handler.httpclient.v1_0.http.HttpClientHelper" />
+            <Class name="com.bytechef.task.handler.httpclient.v1_0.http.HttpClientHelper$HttpResponseEntry" />
+            <Class name="com.bytechef.hermes.descriptor.ext.domain.DescriptorExtHandler" />
         </Or>
     </Match>
     <Match>
@@ -122,6 +142,11 @@
             <Class name="com.bytechef.atlas.worker.WorkerImpl" />
             <Class name="com.bytechef.hermes.encryption.Encryption" />
             <Class name="com.bytechef.hermes.encryption.filesystem.FileSystemEncryptionKey" />
+            <Class name="com.bytechef.task.handler.httpclient.v1_0.http.HttpClientHelper" />
+            <Class name="com.bytechef.task.handler.media.Ffprobe" />
+            <Class name="com.bytechef.task.handler.map.MapTaskDispatcherAdapterTaskHandler" />
+            <Class name="com.bytechef.task.handler.s3.AmazonS3URI" />
+            <Class name="com.bytechef.hermes.descriptor.client.listener.ShutdownApplicationListener" />
         </Or>
     </Match>
     <Match>
@@ -142,6 +167,13 @@
             <Class name="com.bytechef.hermes.auth.repository.AuthenticationRepository" />
             <Class name="com.bytechef.hermes.file.storage.base64.service.Base64FileStorageService" />
             <Class name="com.bytechef.hermes.file.storage.filesystem.FileSystemFileStorageService" />
+            <Class name="com.bytechef.task.handler.media.Ffprobe" />
+            <Class name="com.bytechef.task.handler.jsonfile.v1_0.JsonFileTaskHandler$JsonFileWriteTaskHandler" />
+            <Class name="com.bytechef.task.handler.csvfile.v1_0.CSVFileTaskHandler$CSVFileReadTaskHandler" />
+            <Class name="com.bytechef.task.handler.csvfile.v1_0.CSVFileTaskHandler$CSVFileWriteTaskHandler" />
+            <Class name="com.bytechef.task.handler.jsonfile.v1_0.JsonFileTaskHandler$JsonFileReadTaskHandler" />
+            <Class name="com.bytechef.task.handler.shell.Bash" />
+            <Class name="com.bytechef.task.handler.xmlfile.v1_0.XmlFileTaskHandler$XmlFileWriteTaskHandler" />
         </Or>
     </Match>
     <Match>
@@ -150,6 +182,20 @@
         <And>
             <Class name="com.bytechef.hermes.file.storage.filesystem.FileSystemFileStorageService" />
             <Method name="deleteFiles" params="long"/>
+        </And>
+    </Match>
+    <Match>
+        <Bug code="FL" />
+        <And>
+            <Class name="com.bytechef.task.handler.media.Vsplit" />
+            <Method name="handle" params="com.bytechef.atlas.task.execution.domain.TaskExecution"/>
+        </And>
+    </Match>
+    <Match>
+        <Bug code="GC" />
+        <And>
+            <Class name="com.bytechef.hermes.descriptor.ext.resolver.AbstractTaskDescriptorExtHandlerResolver" />
+            <Method name="resolve" params="java.lang.String, float" />
         </And>
     </Match>
 </FindBugsFilter>
