@@ -4,7 +4,7 @@ import {
     TaskDispatcherDefinitionModel,
 } from 'middleware/definition-registry';
 import React, {HTMLAttributes} from 'react';
-import InlineSVG from "react-inlinesvg";
+import InlineSVG from 'react-inlinesvg';
 
 interface DragEvent<T = Element> extends React.MouseEvent<T, DragEventInit> {
     dataTransfer: DataTransfer;
@@ -33,9 +33,13 @@ const WorkflowNodesListItem = ({
             onDragStart={(event) => onDragStart(event, node.name!)}
             onClick={handleClick}
         >
-            {node.icon && <InlineSVG className="mr-2 h-7 w-7 flex-none" src={node.icon} />}
+            {node.icon && (
+                <InlineSVG className="mr-2 h-7 w-7 flex-none" src={node.icon} />
+            )}
 
-            {!node.icon && <Component1Icon className="mr-2 h-7 w-7 flex-none" />}
+            {!node.icon && (
+                <Component1Icon className="mr-2 h-7 w-7 flex-none" />
+            )}
 
             <div className="flex flex-col">
                 <p className="text-sm font-medium text-gray-900">
