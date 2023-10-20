@@ -31,6 +31,7 @@ dependencies {
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-each")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-fork")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-if")
+    implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-loop")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-map")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-parallel")
     implementation project(":modules:libs:atlas:task-dispatcher:task-dispatcher-sequence")

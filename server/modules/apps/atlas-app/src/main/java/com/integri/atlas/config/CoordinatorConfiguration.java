@@ -54,6 +54,8 @@ import com.integri.atlas.task.dispatcher.fork.completion.ForkTaskCompletionHandl
 import com.integri.atlas.task.dispatcher.if_.IfTaskDeclaration;
 import com.integri.atlas.task.dispatcher.if_.IfTaskDispatcher;
 import com.integri.atlas.task.dispatcher.if_.completion.IfTaskCompletionHandler;
+import com.integri.atlas.task.dispatcher.loop.LoopTaskDispatcher;
+import com.integri.atlas.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.map.MapTaskDispatcher;
 import com.integri.atlas.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import com.integri.atlas.task.dispatcher.parallel.ParallelTaskDispatcher;
@@ -149,6 +151,7 @@ public class CoordinatorConfiguration {
                 eachTaskCompletionHandler(taskCompletionHandlerChain),
                 forkTaskCompletionHandler(taskCompletionHandlerChain),
                 ifTaskCompletionHandler(taskCompletionHandlerChain),
+                loopTaskCompletionHandler(taskCompletionHandlerChain),
                 mapTaskCompletionHandler(taskCompletionHandlerChain),
                 parallelTaskCompletionHandler(taskCompletionHandlerChain),
                 sequenceTaskCompletionHandler(taskCompletionHandlerChain),
@@ -198,6 +201,11 @@ public class CoordinatorConfiguration {
             contextRepository,
             taskEvaluator
         );
+    }
+
+    @Bean
+    LoopTaskCompletionHandler loopTaskCompletionHandler(TaskCompletionHandler taskCompletionHandler) {
+        return new LoopTaskCompletionHandler(taskExecutionRepository, taskCompletionHandler, counterRepository);
     }
 
     @Bean
@@ -253,6 +261,7 @@ public class CoordinatorConfiguration {
         List<TaskDispatcherResolver> resolvers = Arrays.asList(
             eachTaskDispatcher(taskDispatcher),
             ifTaskDispatcher(taskDispatcher),
+            loopTaskDispatcher(taskDispatcher),
             forkTaskDispatcher(taskDispatcher),
             mapTaskDispatcher(taskDispatcher),
             parallelTaskDispatcher(taskDispatcher),
@@ -326,6 +335,18 @@ public class CoordinatorConfiguration {
         forkTaskDispatcher.setContextRepository(contextRepository);
         forkTaskDispatcher.setCounterRepository(counterRepository);
         return forkTaskDispatcher;
+    }
+
+    @Bean
+    LoopTaskDispatcher loopTaskDispatcher(TaskDispatcher taskDispatcher) {
+        return new LoopTaskDispatcher(
+            taskDispatcher,
+            taskExecutionRepository,
+            messageBroker,
+            contextRepository,
+            counterRepository,
+            taskEvaluator
+        );
     }
 
     @Bean
