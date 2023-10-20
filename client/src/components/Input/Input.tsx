@@ -4,6 +4,7 @@ import {forwardRef} from 'react';
 
 type InputProps = {
     name: string;
+    fieldsetClassName?: string;
     error?: boolean;
     label?: string;
     type?: string;
@@ -13,8 +14,19 @@ type InputProps = {
 >;
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({label, name, type = 'text', error, ...props}, ref) => (
-        <fieldset className="mb-3">
+    (
+        {
+            className,
+            fieldsetClassName,
+            label,
+            name,
+            type = 'text',
+            error,
+            ...props
+        },
+        ref
+    ) => (
+        <fieldset className={cx('mb-3', fieldsetClassName)}>
             {label && (
                 <label
                     htmlFor={name}
@@ -36,6 +48,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         error
                             ? 'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-500 dark:text-rose-500 sm:text-sm'
                             : 'border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:text-white dark:focus:border-sky-500 dark:focus:ring-sky-500 sm:text-sm',
+                        className,
                     ])}
                     id={name}
                     name={name}
