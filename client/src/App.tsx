@@ -4,8 +4,8 @@ import {
     QueueListIcon,
     RectangleStackIcon,
 } from '@heroicons/react/24/outline';
-import {useState} from 'react';
-import {Outlet} from 'react-router-dom';
+import {useEffect, useState} from 'react';
+import {Outlet, useLocation} from 'react-router-dom';
 
 import {DesktopSidebar} from './components/Sidebar/DesktopSidebar';
 import {MobileSidebar} from './components/Sidebar/MobileSidebar';
@@ -17,6 +17,7 @@ const user = {
         'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
     name: 'Emily Selman',
 };
+
 const navigation: {
     name: string;
     href: string;
@@ -42,30 +43,40 @@ const navigation: {
     },
 ];
 
+const titles: {[key: string]: string} = {
+    '/': 'Projects',
+    '/automation/connections': 'Connections',
+    '/automation/project-instances': 'Project Instances',
+    '/automation/projects': 'Projects',
+    '/automation/workflow-executions': 'Workflow Executions',
+};
+
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+    const location = useLocation();
+
+    useEffect(() => {
+        document.title = titles[location.pathname] ?? 'Bytechef';
+    }, [location]);
+
     return (
-        <>
-            <div className="flex h-full bg-gray-100">
-                <MobileSidebar
-                    user={user}
-                    navigation={navigation}
-                    mobileMenuOpen={mobileMenuOpen}
-                    setMobileMenuOpen={setMobileMenuOpen}
-                />
+        <div className="flex h-full bg-gray-100">
+            <MobileSidebar
+                user={user}
+                navigation={navigation}
+                mobileMenuOpen={mobileMenuOpen}
+                setMobileMenuOpen={setMobileMenuOpen}
+            />
 
-                <DesktopSidebar navigation={navigation} />
+            <DesktopSidebar navigation={navigation} />
 
-                <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-                    <MobileTopNavigation
-                        setMobileMenuOpen={setMobileMenuOpen}
-                    />
+            <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+                <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />
 
-                    <Outlet />
-                </div>
+                <Outlet />
             </div>
-        </>
+        </div>
     );
 }
 
