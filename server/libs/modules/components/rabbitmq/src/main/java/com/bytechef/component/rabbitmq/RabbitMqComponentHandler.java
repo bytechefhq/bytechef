@@ -37,6 +37,7 @@ public class RabbitMqComponentHandler implements ComponentHandler {
         .title("RabbitMQ")
         .description(
             "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.")
+        .icon("path:assets/rabbitmq.svg")
         .connection(RabbitMqConnection.CONNECTION_DEFINITION)
         .actions(RabbitMqSendMessageAction.ACTION_DEFINITION)
         .triggers(RabbitMqNewMessageTrigger.TRIGGER_DEFINITION);

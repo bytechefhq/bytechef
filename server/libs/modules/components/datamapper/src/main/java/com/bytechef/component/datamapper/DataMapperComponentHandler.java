@@ -39,6 +39,7 @@ public class DataMapperComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("dataMapper")
         .title("Data Mapper")
         .description("The Data Mapper enables you to configure data mappings.")
+        .icon("path:assets/datamapper.svg")
         .actions(
             DataMapperMapKeysAction.ACTION_DEFINITION,
             DataMapperMapListToObjectAction.ACTION_DEFINITION,

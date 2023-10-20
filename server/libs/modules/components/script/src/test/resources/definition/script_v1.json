@@ -1823,7 +1823,7 @@
   "category": null,
   "connection": null,
   "description": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
-  "icon": null,
+  "icon": "path:assets/script.svg",
   "tags": null,
   "name": "script",
   "resources": null,

@@ -1581,7 +1581,7 @@
     "version": 1
   },
   "description": "Query, insert nd update data from PostgreSQL.",
-  "icon": null,
+  "icon": "path:assets/postgresql.svg",
   "tags": null,
   "name": "postgresql",
   "resources": null,

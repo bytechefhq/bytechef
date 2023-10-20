@@ -34,6 +34,7 @@ public class PostgreSQLJdbcComponentDefinitionFactory implements JdbcComponentDe
     private static final JdbcComponentDefinition COMPONENT_DEFINITION = jdbcComponent(POSTGRESQL)
         .title("PostgreSQL")
         .description("Query, insert nd update data from PostgreSQL.")
+        .icon("path:assets/postgresql.svg")
         .databaseJdbcName("postgresql")
         .jdbcDriverClassName("org.postgresql.Driver");
 

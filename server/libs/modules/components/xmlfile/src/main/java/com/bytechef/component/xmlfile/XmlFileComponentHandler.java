@@ -35,6 +35,7 @@ public class XmlFileComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(XmlFileConstants.XML_FILE)
         .title("XML File")
         .description("Reads and writes data from a XML file.")
+        .icon("path:assets/xmlfile.svg")
         .actions(
             XmlFileReadAction.ACTION_DEFINITION,
             XmlFileWriteAction.ACTION_DEFINITION);

@@ -358,12 +358,12 @@
   } ],
   "category": null,
   "connection": null,
-  "description": "Reads or writes a binary file from/to disk",
-  "icon": null,
+  "description": "Allows multiple operations over files on the filesystem.",
+  "icon": "path:assets/filesystem.svg",
   "tags": null,
   "name": "filesystem",
   "resources": null,
   "version": 1,
-  "title": "Local File",
+  "title": "Filesystem",
   "triggers": null
 }

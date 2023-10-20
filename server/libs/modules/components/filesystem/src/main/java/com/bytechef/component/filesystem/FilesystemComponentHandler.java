@@ -38,8 +38,9 @@ import com.google.auto.service.AutoService;
 public class FilesystemComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(FILESYSTEM)
-        .title("Local File")
-        .description("Reads or writes a binary file from/to disk")
+        .title("Filesystem")
+        .description("Allows multiple operations over files on the filesystem.")
+        .icon("path:assets/filesystem.svg")
         .actions(
             FilesystemReadFileAction.ACTION_DEFINITION,
             FilesystemWriteFileAction.ACTION_DEFINITION,

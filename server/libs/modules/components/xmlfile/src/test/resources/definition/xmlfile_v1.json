@@ -381,7 +381,7 @@
   "category": null,
   "connection": null,
   "description": "Reads and writes data from a XML file.",
-  "icon": null,
+  "icon": "path:assets/xmlfile.svg",
   "tags": null,
   "name": "xmlFile",
   "resources": null,

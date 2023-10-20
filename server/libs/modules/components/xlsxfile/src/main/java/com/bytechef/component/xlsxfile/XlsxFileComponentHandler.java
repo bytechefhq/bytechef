@@ -35,6 +35,7 @@ public class XlsxFileComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(XlsxFileConstants.XLSX_FILE)
         .title("XLSX File")
         .description("Reads and writes data from a XLS/XLSX file.")
+        .icon("path:assets/xlsxfile.svg")
         .actions(
             XlsxFileReadAction.ACTION_DEFINITION,
             XlsxFileWriteAction.ACTION_DEFINITION);

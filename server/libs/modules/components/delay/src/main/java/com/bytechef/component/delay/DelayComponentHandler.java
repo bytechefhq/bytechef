@@ -34,6 +34,7 @@ public class DelayComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = ComponentDSL.component(DELAY)
         .title("Delay")
         .description("Sets a value which can then be referenced in other tasks.")
+        .icon("path:assets/delay.svg")
         .actions(DelayDelayAction.ACTION_DEFINITION);
 
     @Override

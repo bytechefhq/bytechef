@@ -35,7 +35,8 @@ public class FileStorageComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(FILE_STORAGE)
         .title("File Storage")
-        .description("Reads and writes data from a file")
+        .description("Reads and writes data from a file.")
+        .icon("path:assets/filestorage.svg")
         .actions(
             FileStorageReadAction.ACTION_DEFINITION,
             FileStorageWriteAction.ACTION_DEFINITION,

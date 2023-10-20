@@ -42,8 +42,9 @@ public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler
     public ComponentDSL.ModifiableComponentDefinition modifyComponent(
         ComponentDSL.ModifiableComponentDefinition componentDefinition) {
 
-        return componentDefinition.description(
-            "The first CRM designed by salespeople, for salespeople. Do more to grow your business.");
+        return componentDefinition
+            .description("The first CRM designed by salespeople, for salespeople. Do more to grow your business.")
+            .icon("path:assets/pipedrive.svg");
     }
 
     @Override

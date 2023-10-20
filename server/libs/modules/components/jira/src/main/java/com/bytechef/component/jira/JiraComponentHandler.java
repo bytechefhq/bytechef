@@ -18,6 +18,7 @@
 package com.bytechef.component.jira;
 
 import com.bytechef.hermes.component.OpenApiComponentHandler;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
@@ -25,4 +26,9 @@ import com.google.auto.service.AutoService;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class JiraComponentHandler extends AbstractJiraComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition.icon("path:assets/jira.svg");
+    }
 }

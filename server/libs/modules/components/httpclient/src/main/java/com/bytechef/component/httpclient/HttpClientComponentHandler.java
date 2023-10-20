@@ -41,6 +41,7 @@ public class HttpClientComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(HTTP_CLIENT)
         .title("HTTP Client")
         .description("Makes an HTTP request and returns the response data.")
+        .icon("path:assets/httpclient.svg")
         .connection(HttpClientConnection.CONNECTION_DEFINITION)
         .actions(
             HttpClientGetAction.ACTION_DEFINITION,

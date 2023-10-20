@@ -1690,7 +1690,7 @@
     "version": 1
   },
   "description": "Mailchimp REST API documentation",
-  "icon": null,
+  "icon": "path:assets/mailchimp.svg",
   "tags": null,
   "name": "mailchimp",
   "resources": null,
