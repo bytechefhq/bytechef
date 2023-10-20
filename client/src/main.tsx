@@ -8,26 +8,26 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 
 if (process.env.NODE_ENV === 'mock') {
-	worker.start().then(() => renderApp());
+    worker.start().then(() => renderApp());
 } else {
-	renderApp();
+    renderApp();
 }
 
 function renderApp() {
-	const container = document.getElementById('root') as HTMLDivElement;
-	const root = createRoot(container);
+    const container = document.getElementById('root') as HTMLDivElement;
+    const root = createRoot(container);
 
-	const queryClient = new QueryClient();
+    const queryClient = new QueryClient();
 
-	root.render(
-		<React.StrictMode>
-			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={router} />
-				<ReactQueryDevtools
-					initialIsOpen={false}
-					position={'bottom-right'}
-				/>
-			</QueryClientProvider>
-		</React.StrictMode>
-	);
+    root.render(
+        <React.StrictMode>
+            <QueryClientProvider client={queryClient}>
+                <RouterProvider router={router} />
+                <ReactQueryDevtools
+                    initialIsOpen={false}
+                    position={'bottom-right'}
+                />
+            </QueryClientProvider>
+        </React.StrictMode>
+    );
 }

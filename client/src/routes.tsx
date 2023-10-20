@@ -7,32 +7,32 @@ import React from 'react';
 import Settings from './pages/settings/Settings';
 
 export const router = createBrowserRouter([
-	{
-		path: '/',
-		element: <App />,
-		errorElement: <ErrorPage />,
-		children: [
-			{
-				errorElement: <ErrorPage />,
-				children: [
-					{
-						path: '',
-						element: <Integrations />,
-					},
-					{
-						path: 'integrations',
-						element: <Integrations />,
-					},
-					{
-						path: 'connections',
-						element: <Connections />,
-					},
-					{
-						path: 'settings',
-						element: <Settings />,
-					},
-				],
-			},
-		],
-	},
+    {
+        path: '/',
+        element: <App />,
+        errorElement: <ErrorPage />,
+        children: [
+            {
+                errorElement: <ErrorPage />,
+                children: [
+                    {
+                        path: '',
+                        element: <Integrations />,
+                    },
+                    {
+                        path: 'integrations',
+                        element: <Integrations />,
+                    },
+                    {
+                        path: 'connections',
+                        element: <Connections />,
+                    },
+                    {
+                        path: 'settings',
+                        element: <Settings />,
+                    },
+                ],
+            },
+        ],
+    },
 ]);
