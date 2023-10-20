@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("IntegerProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-20T11:29:33.968820+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
 public class IntegerPropertyAllOfModel {
 
   @JsonProperty("maxValue")
@@ -28,9 +28,6 @@ public class IntegerPropertyAllOfModel {
 
   @JsonProperty("minValue")
   private Integer minValue;
-
-  @JsonProperty("type")
-  private String type;
 
   public IntegerPropertyAllOfModel maxValue(Integer maxValue) {
     this.maxValue = maxValue;
@@ -70,25 +67,6 @@ public class IntegerPropertyAllOfModel {
     this.minValue = minValue;
   }
 
-  public IntegerPropertyAllOfModel type(String type) {
-    this.type = type;
-    return this;
-  }
-
-  /**
-   * Get type
-   * @return type
-  */
-  
-  @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -99,13 +77,12 @@ public class IntegerPropertyAllOfModel {
     }
     IntegerPropertyAllOfModel integerPropertyAllOf = (IntegerPropertyAllOfModel) o;
     return Objects.equals(this.maxValue, integerPropertyAllOf.maxValue) &&
-        Objects.equals(this.minValue, integerPropertyAllOf.minValue) &&
-        Objects.equals(this.type, integerPropertyAllOf.type);
+        Objects.equals(this.minValue, integerPropertyAllOf.minValue);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(maxValue, minValue, type);
+    return Objects.hash(maxValue, minValue);
   }
 
   @Override
@@ -114,7 +91,6 @@ public class IntegerPropertyAllOfModel {
     sb.append("class IntegerPropertyAllOfModel {\n");
     sb.append("    maxValue: ").append(toIndentedString(maxValue)).append("\n");
     sb.append("    minValue: ").append(toIndentedString(minValue)).append("\n");
-    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }

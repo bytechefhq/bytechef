@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "PropertyOption", description = "Defines valid property value.")
 @JsonTypeName("PropertyOption")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-20T11:29:33.968820+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
 public class PropertyOptionModel {
 
   @JsonProperty("description")

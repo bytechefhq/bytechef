@@ -17,19 +17,35 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * A type of the control to show in UI.
+ * A type of property.
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
-public enum ControlTypeModel {
+public enum PropertyTypeModel {
   
-  CODE("CODE"),
+  ARRAY("ARRAY"),
   
-  PASSWORD("PASSWORD");
+  BOOLEAN("BOOLEAN"),
+  
+  DATE("DATE"),
+  
+  DATE_TIME("DATE_TIME"),
+  
+  INTEGER("INTEGER"),
+  
+  NULL("NULL"),
+  
+  NUMBER("NUMBER"),
+  
+  STRING("STRING"),
+  
+  OBJECT("OBJECT"),
+  
+  ONE_OF("ONE_OF");
 
   private String value;
 
-  ControlTypeModel(String value) {
+  PropertyTypeModel(String value) {
     this.value = value;
   }
 
@@ -44,8 +60,8 @@ public enum ControlTypeModel {
   }
 
   @JsonCreator
-  public static ControlTypeModel fromValue(String value) {
-    for (ControlTypeModel b : ControlTypeModel.values()) {
+  public static PropertyTypeModel fromValue(String value) {
+    for (PropertyTypeModel b : PropertyTypeModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }

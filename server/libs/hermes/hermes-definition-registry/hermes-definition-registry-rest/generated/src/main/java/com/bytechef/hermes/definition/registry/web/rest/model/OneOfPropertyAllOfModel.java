@@ -23,37 +23,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OneOfProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-20T11:29:33.968820+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
 public class OneOfPropertyAllOfModel {
-
-  @JsonProperty("required")
-  private Boolean required;
 
   @JsonProperty("types")
   @Valid
   private List<PropertyModel> types = null;
-
-  @JsonProperty("type")
-  private String type;
-
-  public OneOfPropertyAllOfModel required(Boolean required) {
-    this.required = required;
-    return this;
-  }
-
-  /**
-   * Get required
-   * @return required
-  */
-  
-  @Schema(name = "required", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public Boolean getRequired() {
-    return required;
-  }
-
-  public void setRequired(Boolean required) {
-    this.required = required;
-  }
 
   public OneOfPropertyAllOfModel types(List<PropertyModel> types) {
     this.types = types;
@@ -82,25 +57,6 @@ public class OneOfPropertyAllOfModel {
     this.types = types;
   }
 
-  public OneOfPropertyAllOfModel type(String type) {
-    this.type = type;
-    return this;
-  }
-
-  /**
-   * Get type
-   * @return type
-  */
-  
-  @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -110,23 +66,19 @@ public class OneOfPropertyAllOfModel {
       return false;
     }
     OneOfPropertyAllOfModel oneOfPropertyAllOf = (OneOfPropertyAllOfModel) o;
-    return Objects.equals(this.required, oneOfPropertyAllOf.required) &&
-        Objects.equals(this.types, oneOfPropertyAllOf.types) &&
-        Objects.equals(this.type, oneOfPropertyAllOf.type);
+    return Objects.equals(this.types, oneOfPropertyAllOf.types);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(required, types, type);
+    return Objects.hash(types);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class OneOfPropertyAllOfModel {\n");
-    sb.append("    required: ").append(toIndentedString(required)).append("\n");
     sb.append("    types: ").append(toIndentedString(types)).append("\n");
-    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }

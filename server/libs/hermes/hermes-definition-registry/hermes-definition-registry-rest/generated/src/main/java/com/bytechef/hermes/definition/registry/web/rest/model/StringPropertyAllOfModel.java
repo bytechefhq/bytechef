@@ -22,14 +22,11 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("StringProperty_allOf")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-20T11:29:33.968820+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-24T18:32:48.786669+01:00[Europe/Zagreb]")
 public class StringPropertyAllOfModel {
 
   @JsonProperty("controlType")
   private ControlTypeModel controlType;
-
-  @JsonProperty("type")
-  private String type;
 
   public StringPropertyAllOfModel controlType(ControlTypeModel controlType) {
     this.controlType = controlType;
@@ -50,25 +47,6 @@ public class StringPropertyAllOfModel {
     this.controlType = controlType;
   }
 
-  public StringPropertyAllOfModel type(String type) {
-    this.type = type;
-    return this;
-  }
-
-  /**
-   * Get type
-   * @return type
-  */
-  
-  @Schema(name = "type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -78,13 +56,12 @@ public class StringPropertyAllOfModel {
       return false;
     }
     StringPropertyAllOfModel stringPropertyAllOf = (StringPropertyAllOfModel) o;
-    return Objects.equals(this.controlType, stringPropertyAllOf.controlType) &&
-        Objects.equals(this.type, stringPropertyAllOf.type);
+    return Objects.equals(this.controlType, stringPropertyAllOf.controlType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(controlType, type);
+    return Objects.hash(controlType);
   }
 
   @Override
@@ -92,7 +69,6 @@ public class StringPropertyAllOfModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class StringPropertyAllOfModel {\n");
     sb.append("    controlType: ").append(toIndentedString(controlType)).append("\n");
-    sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
   }

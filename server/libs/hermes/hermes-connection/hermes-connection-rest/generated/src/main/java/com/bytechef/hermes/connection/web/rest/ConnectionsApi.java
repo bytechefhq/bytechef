@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-18T22:15:44.357328+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-23T12:36:20.615811+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connections", description = "the connections API")
 public interface ConnectionsApi {
@@ -156,7 +156,7 @@ public interface ConnectionsApi {
      * TODO
      *
      * @param componentNames The list of component names used for filtering connections. (optional)
-     * @param tagId The list of tag ids of used for filtering connections. (optional)
+     * @param tagIds The list of tag ids of used for filtering connections. (optional)
      * @return TODO (status code 200)
      */
     @Operation(
@@ -176,7 +176,7 @@ public interface ConnectionsApi {
     )
     default Mono<ResponseEntity<Flux<ConnectionModel>>> getConnections(
         @Parameter(name = "componentNames", description = "The list of component names used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentNames", required = false) List<String> componentNames,
-        @Parameter(name = "tagId", description = "The list of tag ids of used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) List<Long> tagId,
+        @Parameter(name = "tagIds", description = "The list of tag ids of used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagIds", required = false) List<Long> tagIds,
         @Parameter(hidden = true) final ServerWebExchange exchange
     ) {
         Mono<Void> result = Mono.empty();
