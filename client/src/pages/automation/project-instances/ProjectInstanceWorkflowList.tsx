@@ -6,8 +6,12 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import {WorkflowModel} from '@/middleware/helios/configuration';
+import {
+    ProjectInstanceWorkflowModel,
+    WorkflowModel,
+} from '@/middleware/helios/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
+import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/projects.mutations';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
@@ -20,9 +24,11 @@ import {ProjectInstanceEditWorkflowDialog} from './ProjectInstanceEditWorkflowDi
 const ProjectInstanceWorkflowList = ({
     projectId,
     projectInstanceEnabled,
+    projectInstanceWorkflows,
 }: {
     projectId: number;
     projectInstanceEnabled?: boolean;
+    projectInstanceWorkflows?: Array<ProjectInstanceWorkflowModel>;
 }) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
@@ -44,6 +50,9 @@ const ProjectInstanceWorkflowList = ({
     const workflowTaskDispatcherDefinitions: {
         [key: string]: ComponentDefinitionBasicModel | undefined;
     } = {};
+
+    const enableProjectInstanceWorkflow =
+        useEnableProjectInstanceWorkflowMutation({});
 
     return (
         <div className="border-b border-b-gray-100 py-2">
@@ -153,7 +162,25 @@ const ProjectInstanceWorkflowList = ({
                                 </div>
 
                                 <div className="flex w-2/12 items-center justify-center">
-                                    <Switch disabled={projectInstanceEnabled} />
+                                    <Switch
+                                        disabled={projectInstanceEnabled}
+                                        checked={
+                                            projectInstanceWorkflows?.find(
+                                                (workflowInstance) =>
+                                                    workflowInstance.id ===
+                                                    workflow
+                                            )?.enabled
+                                        }
+                                        onCheckedChange={(value) =>
+                                            enableProjectInstanceWorkflow.mutateAsync(
+                                                {
+                                                    enable: value,
+                                                    id: projectId,
+                                                    workflowId: workflow.id!,
+                                                }
+                                            )
+                                        }
+                                    />
                                 </div>
 
                                 <div className="flex w-1/12 justify-end">
