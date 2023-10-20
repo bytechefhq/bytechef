@@ -4,7 +4,6 @@ plugins {
     id "com.gorylenko.gradle-git-properties" apply false
     id "io.spring.dependency-management" apply false
     id "org.springframework.boot" apply false
-    id "org.springframework.experimental.aot" apply false
 }
 
 subprojects {

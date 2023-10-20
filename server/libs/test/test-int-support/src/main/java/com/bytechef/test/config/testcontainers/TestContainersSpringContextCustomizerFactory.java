@@ -29,6 +29,8 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.test.context.ContextConfigurationAttributes;
 import org.springframework.test.context.ContextCustomizer;
 import org.springframework.test.context.ContextCustomizerFactory;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.JdbcDatabaseContainer;
 
 /**
  * @author Ivica Cardic
@@ -76,12 +78,10 @@ public class TestContainersSpringContextCustomizerFactory implements ContextCust
                 beanFactory.registerSingleton(containerClass.getName(), redisTestContainer);
             }
 
-            testValues = testValues.and(
-                "spring.redis.host=" + redisTestContainer.getTestContainer()
-                    .getHost());
-            testValues = testValues.and(
-                "spring.redis.port=" + redisTestContainer.getTestContainer()
-                    .getMappedPort(6379));
+            GenericContainer<?> genericContainer = redisTestContainer.getTestContainer();
+
+            testValues = testValues.and("spring.data.redis.host=" + genericContainer.getHost());
+            testValues = testValues.and("spring.data.redis.port=" + genericContainer.getMappedPort(6379));
         }
 
         return testValues;
@@ -103,15 +103,11 @@ public class TestContainersSpringContextCustomizerFactory implements ContextCust
                 beanFactory.registerSingleton(containerClass.getName(), postgreSqlTestContainer);
             }
 
-            testValues = testValues.and("spring.datasource.url="
-                + postgreSqlTestContainer.getTestContainer()
-                    .getJdbcUrl());
-            testValues = testValues.and("spring.datasource.username="
-                + postgreSqlTestContainer.getTestContainer()
-                    .getUsername());
-            testValues = testValues.and("spring.datasource.password="
-                + postgreSqlTestContainer.getTestContainer()
-                    .getPassword());
+            JdbcDatabaseContainer<?> jdbcDatabaseContainer = postgreSqlTestContainer.getTestContainer();
+
+            testValues = testValues.and("spring.datasource.url=" + jdbcDatabaseContainer.getJdbcUrl());
+            testValues = testValues.and("spring.datasource.username=" + jdbcDatabaseContainer.getUsername());
+            testValues = testValues.and("spring.datasource.password=" + jdbcDatabaseContainer.getPassword());
         }
 
         return testValues;

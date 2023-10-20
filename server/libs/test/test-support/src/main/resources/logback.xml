@@ -31,8 +31,8 @@
     <logger name="com.tngtech.archunit.core.importer" level="ERROR"/>
 
     <root>
-        <level>WARN</level>
+        <level value="WARN"/>
+
         <appender-ref ref="CONSOLE"/>
     </root>
-
 </configuration>

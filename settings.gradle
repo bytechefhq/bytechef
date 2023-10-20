@@ -18,7 +18,6 @@ pluginManagement {
         id "org.openapi.generator" version "${openAPIGeneratorPluginVersion}"
         id "org.sonarqube" version "${sonarqubePluginVersion}"
         id "org.springframework.boot" version "${springBootVersion}"
-        id "org.springframework.experimental.aot" version "${springAOTPluginVersion}"\
     }
 
     repositories {
@@ -39,17 +38,17 @@ dependencyResolutionManagement {
             library("commons-exec", "org.apache.commons:commons-exec:1.3")
             library("commons-io", "commons-io:commons-io:2.11.0")
             library("guava", "com.google.guava:guava:31.1-jre")
-            library("swagger-parser", "io.swagger.parser.v3:swagger-parser:2.1.8")
+            library("swagger-parser", "io.swagger.parser.v3:swagger-parser:2.1.9")
             library("jackson-databind-nullable", "org.openapitools:jackson-databind-nullable:0.2.4")
-            library("jackson-dataformat-xml", "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.4")
-            library("jackson-dataformat-yaml", "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.4")
-            library("jgit", "org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r")
+            library("jackson-dataformat-xml", "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.1")
+            library("jackson-dataformat-yaml", "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.1")
+            library("jgit", "org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
             library("jobrunr", "org.jobrunr:jobrunr:5.3.0")
             library("jobrunr-spring-boot-starter", "org.jobrunr:jobrunr-spring-boot-starter:5.3.0")
             library("json", "org.json:json:20220924")
             library("json-path", "com.jayway.jsonpath:json-path:2.7.0")
-            library("logback-core", "ch.qos.logback:logback-core:1.4.4")
-            library("logback-classic", "ch.qos.logback:logback-classic:1.4.4")
+            library("logback-core", "ch.qos.logback:logback-core:1.4.5")
+            library("logback-classic", "ch.qos.logback:logback-classic:1.4.5")
             library("mapstruct", "org.mapstruct:mapstruct:1.5.3.Final")
             library("mapstruct-processor", "org.mapstruct:mapstruct-processor:1.5.3.Final")
             library("mapstruct-spring-annotations", "org.mapstruct.extensions.spring:mapstruct-spring-annotations:0.1.2")
@@ -60,16 +59,14 @@ dependencyResolutionManagement {
             library("problem-spring-webflux", "org.zalando:problem-spring-webflux:0.28.0-RC.0")
             library("picocli", "info.picocli:picocli:4.7.0")
             library("picocli-codegen", "info.picocli:picocli-codegen:4.7.0")
-            library("poi-ooxml", "org.apache.poi:poi-ooxml:4.1.2")
-            library("sods", "com.github.miachm.sods:SODS:1.5.1")
+            library("poi-ooxml", "org.apache.poi:poi-ooxml:5.2.3")
+            library("sods", "com.github.miachm.sods:SODS:1.5.2")
             library("spotbugs-annotations", "com.github.spotbugs:spotbugs-annotations:4.7.3")
-            library("springdoc-openapi-webflux-ui", "org.springdoc:springdoc-openapi-webflux-ui:1.6.12")
-            library("springdoc-openapi-ui", "org.springdoc:springdoc-openapi-ui:1.6.12")
-            library("springdoc-openapi-native", "org.springdoc:springdoc-openapi-native:1.6.12")
-            library("swagger-annotations", "io.swagger.core.v3:swagger-annotations:2.2.3")
-            library("testcontainers", "org.testcontainers:testcontainers:1.17.5")
-            library("testcontainers-postgresql", "org.testcontainers:postgresql:1.17.5")
-            library("testcontainers-junit-jupiter", "org.testcontainers:junit-jupiter:1.17.5")
+            library("springdoc-openapi-starter-webflux-ui", "org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.0")
+            library("swagger-annotations", "io.swagger.core.v3:swagger-annotations:2.2.7")
+            library("testcontainers", "org.testcontainers:testcontainers:1.17.6")
+            library("testcontainers-postgresql", "org.testcontainers:postgresql:1.17.6")
+            library("testcontainers-junit-jupiter", "org.testcontainers:junit-jupiter:1.17.6")
             library("tika-core", "org.apache.tika:tika-core:2.4.1")
         }
     }

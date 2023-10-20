@@ -10,9 +10,7 @@ dependencies {
 //    implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
     implementation "org.springframework.cloud:spring-cloud-starter-gateway"
-    implementation libs.springdoc.openapi.native
-    implementation libs.springdoc.openapi.ui
-    implementation libs.springdoc.openapi.webflux.ui
+    implementation libs.springdoc.openapi.starter.webflux.ui
     implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
     implementation project(":server:libs:core:discovery:discovery-config")
     implementation project(":server:libs:core:discovery:discovery-redis")
