@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './ProjectCategoriesApi';
-export * from './ProjectInstanceTagsApi';
-export * from './ProjectInstancesApi';
-export * from './ProjectTagsApi';
-export * from './ProjectWorkflowsApi';
-export * from './ProjectsApi';
+export * from './AutomationProjectCategoriesApi';
+export * from './AutomationProjectInstanceTagsApi';
+export * from './AutomationProjectInstancesApi';
+export * from './AutomationProjectTagsApi';
+export * from './AutomationProjectsApi';
+export * from './AutomationWorkflowsApi';

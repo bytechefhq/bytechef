@@ -33,7 +33,7 @@ export interface UpdateIntegrationTagsRequest {
 /**
  * 
  */
-export class IntegrationTagsApi extends runtime.BaseAPI {
+export class EmbeddedIntegrationTagsApi extends runtime.BaseAPI {
 
     /**
      * Get integration tags.

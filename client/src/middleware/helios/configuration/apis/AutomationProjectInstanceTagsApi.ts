@@ -33,7 +33,7 @@ export interface UpdateProjectInstanceTagsRequest {
 /**
  * 
  */
-export class ProjectInstanceTagsApi extends runtime.BaseAPI {
+export class AutomationProjectInstanceTagsApi extends runtime.BaseAPI {
 
     /**
      * Get project instance tags.

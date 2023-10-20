@@ -42,7 +42,7 @@ export interface GetExecutionsRequest {
 /**
  * 
  */
-export class ProjectExecutionsApi extends runtime.BaseAPI {
+export class AutomationExecutionsApi extends runtime.BaseAPI {
 
     /**
      * Get workflow execution by id.

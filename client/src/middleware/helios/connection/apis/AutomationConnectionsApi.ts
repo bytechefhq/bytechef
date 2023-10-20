@@ -48,7 +48,7 @@ export interface UpdateConnectionRequest {
 /**
  * 
  */
-export class ConnectionsApi extends runtime.BaseAPI {
+export class AutomationConnectionsApi extends runtime.BaseAPI {
 
     /**
      * Create a new connection.

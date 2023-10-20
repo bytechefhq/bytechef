@@ -1,6 +1,7 @@
-apis/ProjectExecutionsApi.ts
-apis/ProjectJobsApi.ts
-apis/ProjectTestsApi.ts
+.openapi-generator-ignore
+apis/AutomationExecutionsApi.ts
+apis/AutomationJobsApi.ts
+apis/AutomationTestsApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts
@@ -9,13 +10,10 @@ models/CreateJob200ResponseModel.ts
 models/ExecutionBasicModel.ts
 models/ExecutionErrorModel.ts
 models/ExecutionModel.ts
-models/InputModel.ts
 models/JobAllOfModel.ts
 models/JobBasicModel.ts
-models/JobConnectionModel.ts
 models/JobModel.ts
 models/JobParametersModel.ts
-models/OutputModel.ts
 models/PageModel.ts
 models/ProjectBasicModel.ts
 models/ProjectInstanceBasicModel.ts
@@ -25,7 +23,9 @@ models/ProjectInstanceWorkflowConnectionModel.ts
 models/ProjectInstanceWorkflowModel.ts
 models/ProjectModel.ts
 models/TagModel.ts
+models/TaskConnectionModel.ts
 models/TaskExecutionModel.ts
+models/TestParametersModel.ts
 models/WebhookModel.ts
 models/WebhookRetryModel.ts
 models/WorkflowBasicModel.ts

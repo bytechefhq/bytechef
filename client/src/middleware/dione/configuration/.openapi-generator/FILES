@@ -1,8 +1,8 @@
 .openapi-generator-ignore
-apis/IntegrationCategoriesApi.ts
-apis/IntegrationTagsApi.ts
-apis/IntegrationWorkflowsApi.ts
-apis/IntegrationsApi.ts
+apis/EmbeddedIntegrationCategoriesApi.ts
+apis/EmbeddedIntegrationTagsApi.ts
+apis/EmbeddedIntegrationsApi.ts
+apis/EmbeddedWorkflowsApi.ts
 apis/index.ts
 index.ts
 models/CategoryModel.ts

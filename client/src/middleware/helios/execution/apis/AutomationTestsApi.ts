@@ -16,31 +16,31 @@
 import * as runtime from '../runtime';
 import type {
   JobModel,
-  JobParametersModel,
+  TestParametersModel,
 } from '../models';
 import {
     JobModelFromJSON,
     JobModelToJSON,
-    JobParametersModelFromJSON,
-    JobParametersModelToJSON,
+    TestParametersModelFromJSON,
+    TestParametersModelToJSON,
 } from '../models';
 
-export interface TestRequest {
-    jobParametersModel: JobParametersModel;
+export interface TestWorkflowRequest {
+    testParametersModel: TestParametersModel;
 }
 
 /**
  * 
  */
-export class ProjectTestsApi extends runtime.BaseAPI {
+export class AutomationTestsApi extends runtime.BaseAPI {
 
     /**
      * Execute a workflow synchronously for testing purposes.
      * Execute a workflow synchronously for testing purpose
      */
-    async testRaw(requestParameters: TestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JobModel>> {
-        if (requestParameters.jobParametersModel === null || requestParameters.jobParametersModel === undefined) {
-            throw new runtime.RequiredError('jobParametersModel','Required parameter requestParameters.jobParametersModel was null or undefined when calling test.');
+    async testWorkflowRaw(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JobModel>> {
+        if (requestParameters.testParametersModel === null || requestParameters.testParametersModel === undefined) {
+            throw new runtime.RequiredError('testParametersModel','Required parameter requestParameters.testParametersModel was null or undefined when calling testWorkflow.');
         }
 
         const queryParameters: any = {};
@@ -54,7 +54,7 @@ export class ProjectTestsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: JobParametersModelToJSON(requestParameters.jobParametersModel),
+            body: TestParametersModelToJSON(requestParameters.testParametersModel),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => JobModelFromJSON(jsonValue));
@@ -64,8 +64,8 @@ export class ProjectTestsApi extends runtime.BaseAPI {
      * Execute a workflow synchronously for testing purposes.
      * Execute a workflow synchronously for testing purpose
      */
-    async test(requestParameters: TestRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JobModel> {
-        const response = await this.testRaw(requestParameters, initOverrides);
+    async testWorkflow(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JobModel> {
+        const response = await this.testWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

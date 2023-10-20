@@ -16,43 +16,43 @@ import { exists, mapValues } from '../runtime';
 /**
  * The connection used in a particular task.
  * @export
- * @interface JobConnectionModel
+ * @interface TaskConnectionModel
  */
-export interface JobConnectionModel {
+export interface TaskConnectionModel {
     /**
      * The connection id
      * @type {number}
-     * @memberof JobConnectionModel
+     * @memberof TaskConnectionModel
      */
     id?: number;
     /**
      * The connection key under which a connection is defined in a workflow definition.
      * @type {string}
-     * @memberof JobConnectionModel
+     * @memberof TaskConnectionModel
      */
     key?: string;
     /**
      * The task name to which a connection belongs.
      * @type {string}
-     * @memberof JobConnectionModel
+     * @memberof TaskConnectionModel
      */
     taskName?: string;
 }
 
 /**
- * Check if a given object implements the JobConnectionModel interface.
+ * Check if a given object implements the TaskConnectionModel interface.
  */
-export function instanceOfJobConnectionModel(value: object): boolean {
+export function instanceOfTaskConnectionModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function JobConnectionModelFromJSON(json: any): JobConnectionModel {
-    return JobConnectionModelFromJSONTyped(json, false);
+export function TaskConnectionModelFromJSON(json: any): TaskConnectionModel {
+    return TaskConnectionModelFromJSONTyped(json, false);
 }
 
-export function JobConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): JobConnectionModel {
+export function TaskConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): TaskConnectionModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -64,7 +64,7 @@ export function JobConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function JobConnectionModelToJSON(value?: JobConnectionModel | null): any {
+export function TaskConnectionModelToJSON(value?: TaskConnectionModel | null): any {
     if (value === undefined) {
         return undefined;
     }
