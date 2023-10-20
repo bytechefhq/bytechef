@@ -14,7 +14,7 @@
 
 
 /**
- * A type of the editor to show in UI.
+ * A type of the control to show in UI.
  * @export
  */
 export const ControlType = {
