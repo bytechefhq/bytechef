@@ -26,7 +26,7 @@ import com.bytechef.component.map.constant.MapConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.bytechef.hermes.component.constant.ComponentConstants.Versions.VERSION_1;
+import static com.bytechef.hermes.component.constant.Version.VERSION_1;
 
 @Configuration
 public class MapTaskDispatcherAdapterConfiguration {

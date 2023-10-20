@@ -28,7 +28,7 @@ import com.bytechef.component.filesystem.action.FilesystemRmAction;
 import com.bytechef.component.filesystem.action.FilesystemWriteFileAction;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.io.File;
 import java.io.FileInputStream;
@@ -203,7 +203,7 @@ public class FilesystemComponentHandlerTest {
 
     @Test
     public void testCreateDir2() {
-        Assertions.assertThrows(ActionExecutionException.class, () -> {
+        Assertions.assertThrows(ComponentExecutionException.class, () -> {
             Parameters parameters = Mockito.mock(Parameters.class);
 
             Mockito.when(parameters.getRequiredString("path"))

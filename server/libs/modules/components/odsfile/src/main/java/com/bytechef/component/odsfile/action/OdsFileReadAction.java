@@ -20,7 +20,7 @@ package com.bytechef.component.odsfile.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.ObjectUtils;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
@@ -108,7 +108,7 @@ public class OdsFileReadAction {
 
         try (InputStream inputStream = context.getFileStream(parameters.get(FILE_ENTRY, Context.FileEntry.class))) {
             if (inputStream == null) {
-                throw new ActionExecutionException("Unable to get file content from task " + parameters);
+                throw new ComponentExecutionException("Unable to get file content from task " + parameters);
             }
 
             Integer rangeStartRow = null;
@@ -130,7 +130,7 @@ public class OdsFileReadAction {
                     readAsString,
                     sheetName));
         } catch (Exception exception) {
-            throw new ActionExecutionException("Unable to handle task " + parameters, exception);
+            throw new ComponentExecutionException("Unable to handle action " + parameters, exception);
         }
     }
 

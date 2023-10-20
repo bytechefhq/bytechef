@@ -21,7 +21,7 @@ import com.bytechef.component.jsonfile.constant.JsonFileTaskConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.util.JsonUtils;
 
 import java.io.BufferedReader;
@@ -99,7 +99,7 @@ public class JsonFileReadAction {
 
     @SuppressWarnings("unchecked")
     public static Object performRead(Context context, Parameters parameters)
-        throws ActionExecutionException {
+        throws ComponentExecutionException {
 
         JsonFileTaskConstants.FileType fileType = getFileType(parameters);
         Context.FileEntry fileEntry = parameters.getRequired(FILE_ENTRY, Context.FileEntry.class);
@@ -127,7 +127,7 @@ public class JsonFileReadAction {
                         .map(line -> (Map<String, ?>) JsonUtils.read(line, Map.class))
                         .collect(Collectors.toList());
                 } catch (IOException ioException) {
-                    throw new ActionExecutionException("Unable to open json file " + parameters, ioException);
+                    throw new ComponentExecutionException("Unable to open json file " + parameters, ioException);
                 }
             }
 

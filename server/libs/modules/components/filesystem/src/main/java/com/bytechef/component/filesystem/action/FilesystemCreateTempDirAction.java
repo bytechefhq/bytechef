@@ -20,7 +20,7 @@ package com.bytechef.component.filesystem.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class FilesystemCreateTempDirAction {
 
             return file.getAbsolutePath();
         } catch (IOException ioException) {
-            throw new ActionExecutionException(
+            throw new ComponentExecutionException(
                 "Unable to create temporary directory " + parameters, ioException);
         }
     }

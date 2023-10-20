@@ -21,7 +21,7 @@ import com.bytechef.component.delay.constant.DelayConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import java.util.concurrent.TimeUnit;
 
@@ -55,7 +55,7 @@ public class DelayDelayAction {
                 TimeUnit.SECONDS.sleep(1);
             }
         } catch (InterruptedException interruptedException) {
-            throw new ActionExecutionException("Unable to handle task " + parameters, interruptedException);
+            throw new ComponentExecutionException("Unable to handle action " + parameters, interruptedException);
         }
 
         return null;

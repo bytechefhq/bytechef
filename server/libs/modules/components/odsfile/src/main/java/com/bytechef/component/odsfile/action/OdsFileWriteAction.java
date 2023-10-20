@@ -20,7 +20,7 @@ package com.bytechef.component.odsfile.action;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.exception.ActionExecutionException;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -85,7 +85,7 @@ public class OdsFileWriteAction {
             return context.storeFileContent(
                 fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName))));
         } catch (IOException ioException) {
-            throw new ActionExecutionException("Unable to handle task " + parameters, ioException);
+            throw new ComponentExecutionException("Unable to handle action " + parameters, ioException);
         }
     }
 
@@ -93,7 +93,7 @@ public class OdsFileWriteAction {
         Objects.requireNonNull(names);
 
         if (names.isEmpty()) {
-            throw new IllegalArgumentException("Unable to create header values with empty names collection");
+            throw new ComponentExecutionException("Unable to create header values with empty names collection");
         }
 
         Object[] values = new Object[names.size()];

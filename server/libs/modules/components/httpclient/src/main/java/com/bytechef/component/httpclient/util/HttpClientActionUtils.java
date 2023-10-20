@@ -133,18 +133,18 @@ public class HttpClientActionUtils {
 
         HttpClientUtils.Response response = exchange(
             parameters.getRequiredString(URI), requestMethod)
-                .configuration(
-                    allowUnauthorizedCerts(parameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
-                        .filename(parameters.getString(RESPONSE_FILENAME))
-                        .followAllRedirects(parameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
-                        .followRedirect(parameters.getBoolean(FOLLOW_REDIRECT, false))
-                        .proxy(parameters.getString(PROXY))
-                        .responseFormat(getResponseFormat(parameters))
-                        .timeout(Duration.ofMillis(parameters.getInteger(TIMEOUT, 10000))))
-                .headers(parameters.getMap(HEADER_PARAMETERS))
-                .queryParameters(parameters.getMap(QUERY_PARAMETERS))
-                .payload(getPayload(parameters, getBodyContentType(parameters)))
-                .execute();
+            .configuration(
+                allowUnauthorizedCerts(parameters.getBoolean(ALLOW_UNAUTHORIZED_CERTS, false))
+                    .filename(parameters.getString(RESPONSE_FILENAME))
+                    .followAllRedirects(parameters.getBoolean(FOLLOW_ALL_REDIRECTS, false))
+                    .followRedirect(parameters.getBoolean(FOLLOW_REDIRECT, false))
+                    .proxy(parameters.getString(PROXY))
+                    .responseFormat(getResponseFormat(parameters))
+                    .timeout(Duration.ofMillis(parameters.getInteger(TIMEOUT, 10000))))
+            .headers(parameters.getMap(HEADER_PARAMETERS))
+            .queryParameters(parameters.getMap(QUERY_PARAMETERS))
+            .payload(getPayload(parameters, getBodyContentType(parameters)))
+            .execute();
 
         if (parameters.getBoolean(FULL_RESPONSE, false)) {
             return response;

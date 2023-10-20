@@ -21,6 +21,7 @@ import com.bytechef.component.filestorage.constant.FileStorageConstants;
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Parameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -86,9 +87,9 @@ public class FileStorageDownloadAction {
                 }
             }
 
-            throw new IllegalStateException("Server returned: " + connection.getResponseCode());
+            throw new ComponentExecutionException("Server returned: %s".formatted(connection.getResponseCode()));
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new ComponentExecutionException(e.getMessage(), e);
         }
     }
 
