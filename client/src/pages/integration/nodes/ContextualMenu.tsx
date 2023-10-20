@@ -1,21 +1,23 @@
 import {Component1Icon} from '@radix-ui/react-icons';
 import Input from 'components/Input/Input';
-import {ComponentDefinitionModel} from 'data-access/component-definition';
-import {TaskDispatcherDefinitionModel} from 'data-access/task-dispatcher-definition';
 import React, {HTMLAttributes, memo, useEffect, useState} from 'react';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
+import {
+    ComponentDefinitionBasicModel,
+    TaskDispatcherDefinitionModel,
+} from '../../../data-access/definition-registry';
 
 const uuid = (): string =>
     new Date().getTime().toString(36) + Math.random().toString(36).slice(2);
 
 interface ContextualMenuProps {
-    components: ComponentDefinitionModel[] | undefined;
+    components: ComponentDefinitionBasicModel[] | undefined;
     flowControls: TaskDispatcherDefinitionModel[] | undefined;
     id: string;
 }
 
 interface ContextualMenuItemProps extends HTMLAttributes<HTMLLIElement> {
-    item: ComponentDefinitionModel | TaskDispatcherDefinitionModel;
+    item: ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel;
     onClick: () => void;
 }
 
@@ -48,13 +50,15 @@ const ContextualMenu = ({
 }: ContextualMenuProps): JSX.Element => {
     const [filter, setFilter] = useState('');
     const [filteredNodes, setFilteredNodes] = useState<
-        Array<ComponentDefinitionModel | TaskDispatcherDefinitionModel>
+        Array<ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel>
     >([]);
 
     const {getNode, setEdges, setNodes} = useReactFlow();
 
     const handleItemClick = (
-        clickedItem: ComponentDefinitionModel | TaskDispatcherDefinitionModel
+        clickedItem:
+            | ComponentDefinitionBasicModel
+            | TaskDispatcherDefinitionModel
     ) => {
         const placeholderNode = getNode(id);
 
@@ -173,7 +177,7 @@ const ContextualMenu = ({
                         filteredNodes.map(
                             (
                                 filteredItem:
-                                    | ComponentDefinitionModel
+                                    | ComponentDefinitionBasicModel
                                     | TaskDispatcherDefinitionModel
                             ) => (
                                 <ContextualMenuItem

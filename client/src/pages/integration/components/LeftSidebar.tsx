@@ -2,10 +2,10 @@ import React, {useEffect, useState} from 'react';
 import {Provider} from '@radix-ui/react-tooltip';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {
-    ComponentDefinitionModel,
+    ComponentDefinitionBasicModel,
     DisplayModel,
-} from 'data-access/component-definition';
-import {TaskDispatcherDefinitionModel} from 'data-access/task-dispatcher-definition';
+    TaskDispatcherDefinitionModel,
+} from '../../../data-access/definition-registry';
 
 interface DragEvent<T = Element> extends React.MouseEvent<T, DragEventInit> {
     dataTransfer: DataTransfer;
@@ -13,7 +13,7 @@ interface DragEvent<T = Element> extends React.MouseEvent<T, DragEventInit> {
 
 interface SidebarProps {
     data: {
-        components: Array<ComponentDefinitionModel>;
+        components: Array<ComponentDefinitionBasicModel>;
         flowControls: Array<TaskDispatcherDefinitionModel>;
     };
     filter: string;
@@ -53,7 +53,7 @@ const LeftSidebar: React.FC<SidebarProps> = ({
     view = 'components',
 }): JSX.Element => {
     const [filteredComponents, setFilteredComponents] = useState<
-        Array<ComponentDefinitionModel>
+        Array<ComponentDefinitionBasicModel>
     >([]);
     const [filteredFlowControls, setFilteredFlowControls] = useState<
         Array<TaskDispatcherDefinitionModel>
@@ -93,7 +93,7 @@ const LeftSidebar: React.FC<SidebarProps> = ({
                 <ul role="list" className="mb-2">
                     {view === 'components'
                         ? filteredComponents.map(
-                              (component: ComponentDefinitionModel) => (
+                              (component: ComponentDefinitionBasicModel) => (
                                   <Item
                                       description={
                                           component.display?.description
