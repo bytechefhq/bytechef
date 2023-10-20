@@ -149,7 +149,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<List<? extends OutputProperty<?>>> getOutputSchema();
+    Optional<OutputProperty<?>> getOutputSchema();
 
     /**
      *

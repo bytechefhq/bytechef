@@ -73,7 +73,7 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         private String description;
         private String icon;
         private final String name;
-        private List<? extends ModifiableOutputProperty<?>> outputSchemaProperties;
+        private ModifiableOutputProperty<?> outputSchemaProperty;
         private List<? extends ModifiableInputProperty> properties;
         private Resources resources;
         private List<? extends ModifiableValueProperty<?, ?>> taskProperties;
@@ -96,28 +96,24 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             return this;
         }
 
-        @SafeVarargs
-        @SuppressWarnings({
-            "rawtypes", "unchecked"
-        })
-        public final <P extends ModifiableOutputProperty<?>> ModifiableTaskDispatcherDefinition outputSchema(
-            P... properties) {
+        public <P extends ModifiableOutputProperty<?>> ModifiableTaskDispatcherDefinition outputSchema(
+            P property) {
 
-            if (properties != null) {
-                this.outputSchemaProperties = checkPropertyNames((List) List.of(properties));
+            if (property != null) {
+                this.outputSchemaProperty = property;
             }
 
             return this;
         }
 
         public ModifiableTaskDispatcherDefinition resources(String documentationUrl) {
-            this.resources = new ResourcesImpl(null, null, documentationUrl);
+            this.resources = new ResourcesImpl(documentationUrl, null, null);
 
             return this;
         }
 
         public ModifiableTaskDispatcherDefinition resources(String documentationUrl, List<String> categories) {
-            this.resources = new ResourcesImpl(null, null, documentationUrl);
+            this.resources = new ResourcesImpl(documentationUrl, null, null);
 
             return this;
         }
@@ -125,7 +121,7 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         public ModifiableTaskDispatcherDefinition resources(
             String documentationUrl, List<String> categories, Map<String, String> additionalUrls) {
 
-            this.resources = new ResourcesImpl(null, null, documentationUrl);
+            this.resources = new ResourcesImpl(documentationUrl, categories, additionalUrls);
 
             return this;
         }
@@ -134,7 +130,9 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         public final <P extends ModifiableInputProperty> ModifiableTaskDispatcherDefinition properties(
             P... properties) {
 
-            this.properties = checkInputProperties(properties);
+            if (properties != null) {
+                this.properties = List.of(properties);
+            }
 
             return this;
         }
@@ -176,8 +174,8 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<List<? extends OutputProperty<?>>> getOutputSchema() {
-            return Optional.ofNullable(outputSchemaProperties);
+        public Optional<OutputProperty<?>> getOutputSchema() {
+            return Optional.ofNullable(outputSchemaProperty);
         }
 
         @Override

@@ -538,7 +538,9 @@ public abstract class DefinitionDSL {
             }
 
             public <P extends ModifiableValueProperty<?, ?>> ModifiableArrayProperty items(List<P> properties) {
-                this.items = checkPropertyNames(properties);
+                if (properties != null) {
+                    this.items = new ArrayList<>(properties);
+                }
 
                 return this;
             }
@@ -1153,7 +1155,9 @@ public abstract class DefinitionDSL {
             public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty additionalProperties(
                 List<? extends P> properties) {
 
-                this.additionalProperties = checkPropertyNames(properties);
+                if (properties != null) {
+                    this.additionalProperties = new ArrayList<>(properties);
+                }
 
                 return this;
             }
@@ -1549,7 +1553,7 @@ public abstract class DefinitionDSL {
         private final String documentationUrl;
 
         @SuppressFBWarnings("EI")
-        public ResourcesImpl(Map<String, String> additionalUrls, List<String> categories, String documentationUrl) {
+        public ResourcesImpl(String documentationUrl, List<String> categories, Map<String, String> additionalUrls) {
             this.additionalUrls = additionalUrls;
             this.categories = categories;
             this.documentationUrl = documentationUrl;
