@@ -1,7 +1,0 @@
-apis/ConnectionControllerApi.ts
-apis/index.ts
-index.ts
-models/Connection.ts
-models/ConnectionUpdate.ts
-models/index.ts
-runtime.ts
