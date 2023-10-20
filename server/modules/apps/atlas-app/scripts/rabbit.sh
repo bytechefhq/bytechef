@@ -1,4 +1,6 @@
-#!/bin/bash 
+#!/bin/bash
+
+docker rm -f rabbit
 
 docker run -d \
 	   --name=rabbit \

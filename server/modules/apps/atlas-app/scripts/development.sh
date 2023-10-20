@@ -12,4 +12,4 @@ java -jar \
      -Dpiper.pipeline-repository.filesystem.enabled=true \
      -Dpiper.pipeline-repository.filesystem.location-pattern=$HOME/piper/**/*.yaml \
      -Dspring.datasource.initialization-mode=always \
-     target/piper-0.0.1-SNAPSHOT.jar
+     lib/atlas-app.jar
