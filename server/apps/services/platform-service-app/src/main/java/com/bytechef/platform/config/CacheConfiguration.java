@@ -17,10 +17,16 @@
 package com.bytechef.platform.config;
 
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 // import org.springframework.context.annotation.Bean;
+import org.springframework.cache.support.NoOpCacheManager;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 /**
  * @author Ivica Cardic
@@ -28,4 +34,24 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableCaching
 @EnableConfigurationProperties(CacheProperties.class)
-public class CacheConfiguration {}
+public class CacheConfiguration {
+
+    @Bean("workflowRepositoryCacheManager")
+    @ConditionalOnProperty(
+            prefix = "bytechef.workflow",
+            name = "workflow-repository.cache.provider",
+            havingValue = "no-op")
+    public CacheManager noOpWorkflowRepositoryCacheManager() {
+        return new NoOpCacheManager();
+    }
+
+    @Bean("workflowRepositoryCacheManager")
+    @ConditionalOnProperty(
+            prefix = "bytechef.workflow",
+            name = "workflow-repository.cache.provider",
+            havingValue = "redis")
+    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(connectionFactory)
+                .build();
+    }
+}
