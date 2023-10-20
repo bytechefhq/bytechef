@@ -117,7 +117,6 @@ public class CoordinatorConfiguration {
             errorHandler(),
             eventPublisher,
             jobExecutor(),
-            jobFacade,
             jobService,
             taskCompletionHandler(),
             taskDispatcher(),

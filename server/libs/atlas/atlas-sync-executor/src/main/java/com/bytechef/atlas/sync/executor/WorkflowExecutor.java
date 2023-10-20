@@ -89,8 +89,7 @@ public class WorkflowExecutor {
 
     public Job execute(String workflowId, Map<String, Object> inputs) {
         return execute(
-            workflowId,
-            inputs,
+            workflowId, inputs,
             (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> Collections
                 .emptyList(),
             (
@@ -101,8 +100,7 @@ public class WorkflowExecutor {
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
         return execute(
-            workflowId,
-            inputs,
+            workflowId, inputs,
             (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> Collections
                 .emptyList(),
             (
@@ -112,8 +110,7 @@ public class WorkflowExecutor {
     }
 
     public Job execute(
-        String workflowId,
-        TaskCompletionHandlersFunction taskCompletionHandlersFunction,
+        String workflowId, TaskCompletionHandlersFunction taskCompletionHandlersFunction,
         TaskDispatcherResolversFunction taskDispatcherResolversFunction,
         TaskHandlerMapSupplier taskHandlerMapSupplier) {
 
@@ -123,14 +120,13 @@ public class WorkflowExecutor {
     }
 
     public Job execute(
-        String workflowId, Map<String, Object> inputs,
-        TaskCompletionHandlersFunction taskCompletionHandlersFunction,
+        String workflowId, Map<String, Object> inputs, TaskCompletionHandlersFunction taskCompletionHandlersFunction,
         TaskDispatcherResolversFunction taskDispatcherResolversFunction,
         TaskHandlerMapSupplier taskHandlerMapSupplier) {
 
-        SyncMessageBroker messageBroker = new SyncMessageBroker();
+        SyncMessageBroker workerMessageBroker = new SyncMessageBroker();
 
-        messageBroker.receive(Queues.ERRORS, message -> {
+        workerMessageBroker.receive(Queues.ERRORS, message -> {
             TaskExecution erroredTaskExecution = (TaskExecution) message;
 
             ExecutionError error = erroredTaskExecution.getError();
@@ -149,7 +145,7 @@ public class WorkflowExecutor {
 
         Worker worker = Worker.builder()
             .withTaskHandlerResolver(taskHandlerResolverChain)
-            .withMessageBroker(messageBroker)
+            .withMessageBroker(workerMessageBroker)
             .withEventPublisher(eventPublisher)
             .withTaskEvaluator(taskEvaluator)
             .build();
@@ -184,17 +180,17 @@ public class WorkflowExecutor {
                         taskExecutionService),
                 Stream.of(defaultTaskCompletionHandler)));
 
-        JobFacade jobFacade = new JobFacadeImpl(contextService, eventPublisher, jobService, messageBroker);
+        JobFacade jobFacade = new JobFacadeImpl(contextService, eventPublisher, jobService, workerMessageBroker);
 
         @SuppressWarnings({
             "rawtypes", "unchecked"
         })
         Coordinator coordinator = new Coordinator(
-            (ErrorHandler) getTaskExecutionErrorHandler(taskDispatcherChain), eventPublisher, jobExecutor, jobFacade,
+            (ErrorHandler) getTaskExecutionErrorHandler(taskDispatcherChain), eventPublisher, jobExecutor,
             jobService, taskCompletionHandlerChain, taskDispatcherChain, taskExecutionService);
 
-        messageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
-        messageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
+        workerMessageBroker.receive(Queues.COMPLETIONS, o -> coordinator.complete((TaskExecution) o));
+        workerMessageBroker.receive(Queues.JOBS, jobId -> coordinator.start((Long) jobId));
 
         long jobId = jobFacade.create(new JobParameters(inputs, workflowId));
 
