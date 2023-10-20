@@ -72,6 +72,15 @@ public class WorkflowServiceRSocketClient implements WorkflowService {
     }
 
     @Override
+    public List<Workflow> getWorkflows(List<String> ids) {
+        return rSocketRequester
+            .route("getWorkflows")
+            .data(ids)
+            .retrieveMono(new ParameterizedTypeReference<List<Workflow>>() {})
+            .block();
+    }
+
+    @Override
     public List<Workflow> getWorkflows() {
         return rSocketRequester
             .route("getWorkflows")

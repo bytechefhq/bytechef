@@ -23,6 +23,7 @@ import com.bytechef.atlas.repository.WorkflowRepository;
 import com.bytechef.atlas.service.WorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -161,6 +162,17 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
 
         throw new IllegalArgumentException("Workflow with id %s does not exist".formatted(id));
+    }
+
+    @Override
+    public List<Workflow> getWorkflows(List<String> workflowIds) {
+        List<Workflow> workflows = new ArrayList<>();
+
+        for (String workflowId : workflowIds) {
+            workflows.add(getWorkflow(workflowId));
+        }
+
+        return workflows;
     }
 
     @Override
