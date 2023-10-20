@@ -128,9 +128,7 @@ public class HttpClientActionUtils {
         return properties;
     }
 
-    protected static Object execute(
-        Context context, InputParameters inputParameters, RequestMethod requestMethod) {
-
+    public static Object execute(InputParameters inputParameters, RequestMethod requestMethod) {
         HttpClientUtils.Response response = exchange(
             inputParameters.getRequiredString(URI), requestMethod)
                 .configuration(

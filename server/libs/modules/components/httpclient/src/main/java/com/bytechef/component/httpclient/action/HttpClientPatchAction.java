@@ -19,7 +19,6 @@ package com.bytechef.component.httpclient.action;
 
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
-import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ActionDefinition;
 
@@ -53,9 +52,9 @@ public class HttpClientPatchAction {
 
                 HttpClientActionUtils.options(true)))
         .outputSchema(HttpClientActionUtils.toArray(HttpClientConstants.OUTPUT_PROPERTIES))
-        .execute(HttpClientPatchAction::executePatch);
+        .execute((inputParameters, inputParameters2) -> executePatch(inputParameters2));
 
-    protected static Object executePatch(Context context, InputParameters inputParameters) {
-        return HttpClientActionUtils.execute(context, inputParameters, RequestMethod.PATCH);
+    protected static Object executePatch(InputParameters inputParameters) {
+        return HttpClientActionUtils.execute(inputParameters, RequestMethod.PATCH);
     }
 }
