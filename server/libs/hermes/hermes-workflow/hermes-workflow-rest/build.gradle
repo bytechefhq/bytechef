@@ -11,15 +11,17 @@ task generateOpenAPISpring(type: org.openapitools.generator.gradle.plugin.tasks.
         "useSpringBoot3": "true"
     ]
     generatorName = "spring"
-    importMappings = [
-        "Page": "org.springframework.data.domain.Page",
-    ]
     inputSpec = "$projectDir/openapi.yaml".toString()
     modelNameSuffix = "Model"
     modelPackage = "com.bytechef.hermwes.workflow.web.rest.model"
     outputDir = "$projectDir/generated".toString()
     schemaMappings = [
-        "Page": "org.springframework.data.domain.Page"
+        ExecutionError: "org.springframework.data.domain.ExecutionErrorModel",
+        Job: "com.bytechef.atlas.web.rest.model.JobModel",
+        TaskExecution: "com.bytechef.atlas.web.rest.model.TaskExecutionModel",
+        Webhook: "com.bytechef.atlas.web.rest.model.WebhookModel",
+        WebhookRetry: "com.bytechef.atlas.web.rest.model.WebhookRetryModel",
+        WorkflowTask: "com.bytechef.atlas.web.rest.model.WorkflowTaskModel"
     ]
 }
 
@@ -40,6 +42,8 @@ tasks.register("generateOpenAPI") {
 sourceSets.main.java.srcDir "${projectDir}/generated/src/main/java"
 
 dependencies {
+    api project(":server:libs:atlas:atlas-rest:atlas-rest-api")
+
     annotationProcessor libs.org.mapstruct.mapstruct.processor
     annotationProcessor libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions
 

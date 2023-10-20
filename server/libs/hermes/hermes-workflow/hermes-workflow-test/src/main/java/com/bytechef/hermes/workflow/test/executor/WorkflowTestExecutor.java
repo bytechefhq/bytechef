@@ -18,7 +18,11 @@
 package com.bytechef.hermes.workflow.test.executor;
 
 import com.bytechef.atlas.domain.Job;
-import com.bytechef.atlas.sync.executor.WorkflowSyncExecutor;
+import com.bytechef.atlas.dto.JobParametersDTO;
+import com.bytechef.atlas.service.TaskExecutionService;
+import com.bytechef.atlas.sync.executor.JobSyncExecutor;
+import com.bytechef.hermes.workflow.test.dto.WorkflowTestResponse;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Map;
 
@@ -27,17 +31,22 @@ import java.util.Map;
  */
 public class WorkflowTestExecutor {
 
-    private final WorkflowSyncExecutor workflowSyncExecutor;
+    private final JobSyncExecutor jobSyncExecutor;
+    private final TaskExecutionService taskExecutionService;
 
-    public WorkflowTestExecutor(WorkflowSyncExecutor workflowSyncExecutor) {
-        this.workflowSyncExecutor = workflowSyncExecutor;
+    public WorkflowTestExecutor(JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService) {
+        this.jobSyncExecutor = jobSyncExecutor;
+        this.taskExecutionService = taskExecutionService;
     }
 
-    public Job execute(String workflowId) {
+    public WorkflowTestResponse execute(String workflowId) {
         return execute(workflowId, Map.of());
     }
 
-    public Job execute(String workflowId, Map<String, Object> inputs) {
-        return workflowSyncExecutor.execute(workflowId, inputs);
+    @SuppressFBWarnings("NP")
+    public WorkflowTestResponse execute(String workflowId, Map<String, Object> inputs) {
+        Job job = jobSyncExecutor.execute(new JobParametersDTO(inputs, workflowId));
+
+        return new WorkflowTestResponse(job, taskExecutionService.getJobTaskExecutions(job.getId()));
     }
 }
