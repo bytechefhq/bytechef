@@ -33,9 +33,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(
     classes = WorkflowIntTestConfiguration.class,
     properties = {
-        "bytechef.workflow.context-repository.provider=jdbc",
-        "bytechef.workflow.persistence.provider=jdbc",
-        "bytechef.workflow.workflow-repository.jdbc.enabled=true"
+        "bytechef.context-repository.provider=jdbc",
+        "bytechef.persistence.provider=jdbc",
+        "bytechef.workflow-repository.jdbc.enabled=true"
     })
 public class WorkflowServiceIntTest {
 

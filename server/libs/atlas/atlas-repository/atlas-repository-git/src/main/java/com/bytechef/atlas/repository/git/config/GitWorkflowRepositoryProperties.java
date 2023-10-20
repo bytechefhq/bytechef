@@ -24,7 +24,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @author Arik Cohen
  */
-@ConfigurationProperties(prefix = "bytechef.workflow.workflow-repository.git")
+@ConfigurationProperties(prefix = "bytechef.workflow-repository.git")
 public class GitWorkflowRepositoryProperties {
 
     private boolean enabled = false;

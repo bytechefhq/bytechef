@@ -45,8 +45,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(
     classes = ProjectIntTestConfiguration.class,
     properties = {
-        "bytechef.workflow.context-repository.provider=jdbc", "bytechef.workflow.persistence.provider=jdbc",
-        "bytechef.workflow.workflow-repository.jdbc.enabled=true"
+        "bytechef.context-repository.provider=jdbc", "bytechef.persistence.provider=jdbc",
+        "bytechef.workflow-repository.jdbc.enabled=true"
     })
 public class ProjectFacadeIntTest {
 
@@ -117,6 +117,8 @@ public class ProjectFacadeIntTest {
         assertThat(project.getId()).isNotNull();
         assertThat(project.getTagIds()).hasSize(1);
         assertThat(project.getWorkflowIds()).hasSize(1);
+        assertThat(categoryRepository.count()).isEqualTo(1);
+        assertThat(tagRepository.count()).isEqualTo(1);
 
         project = new Project();
 
