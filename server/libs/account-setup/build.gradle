@@ -3,5 +3,6 @@ dependencies {
     api project(":server:libs:helios:helios-project:helios-project-api")
 
     implementation "org.springframework:spring-context"
+    implementation "org.springframework:spring-tx"
     implementation project(":server:libs:core:commons:commons-util")
 }

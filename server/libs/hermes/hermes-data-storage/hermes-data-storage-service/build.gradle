@@ -3,7 +3,7 @@ dependencies {
     api project(":server:libs:hermes:hermes-data-storage:hermes-data-storage-api")
 
     implementation "org.springframework:spring-context"
-    implementation "org.springframework:spring-tx"
+    implementation "org.springframework.data:spring-data-relational"
     implementation project(":server:libs:core:commons:commons-util")
 
     testImplementation project(":server:libs::db-migration")

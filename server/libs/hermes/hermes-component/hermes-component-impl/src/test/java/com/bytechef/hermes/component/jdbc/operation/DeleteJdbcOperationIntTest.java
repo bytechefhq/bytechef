@@ -17,7 +17,7 @@
 
 package com.bytechef.hermes.component.jdbc.operation;
 
-import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.COLUMNS;
+import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.DELETE_KEY;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
@@ -26,7 +26,7 @@ import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
-import com.bytechef.hermes.component.jdbc.operation.config.JdbcActionIntTestConfiguration;
+import com.bytechef.hermes.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.List;
 import java.util.Map;
@@ -46,14 +46,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Ivica Cardic
  */
 @EmbeddedSql
-@SpringBootTest(classes = JdbcActionIntTestConfiguration.class)
-public class InsertJdbcActionIntTest {
+@SpringBootTest(classes = JdbcOperationIntTestConfiguration.class)
+public class DeleteJdbcOperationIntTest {
 
     @Autowired
     private DataSource dataSource;
 
     @Autowired
-    private InsertJdbcOperation insertJdbcOperation;
+    private DeleteJdbcOperation deleteJdbcOperation;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -70,42 +70,45 @@ public class InsertJdbcActionIntTest {
                         id   varchar(256) not null primary key,
                         name varchar(256) not null
                     );
+                    INSERT INTO test VALUES('id1', 'name1');
+                    INSERT INTO test VALUES('id2', 'name2');
+                    INSERT INTO test VALUES('id3', 'name3');
+                    INSERT INTO test VALUES('id4', 'name4');
                 """);
     }
 
     @Test
-    public void testInsert() {
+    public void testDelete() {
         Context context = Mockito.mock(Context.class);
 
         Mockito.when(context.fetchConnection())
             .thenReturn(Optional.of(Mockito.mock(Connection.class)));
 
         Map<String, ?> inputParameters = Map.of(
-            COLUMNS, List.of("id", "name"),
-            ROWS, List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2")),
+            ROWS, List.of(Map.of("id", "id1"), Map.of("id", "id2")),
+            DELETE_KEY, "id",
             SCHEMA, "public",
             TABLE, "test");
 
-        Map<String, Integer> result = insertJdbcOperation.execute(context, inputParameters);
+        Map<String, Integer> result = deleteJdbcOperation.execute(context, inputParameters);
 
         Assertions.assertEquals(2, result.get("rows"));
     }
 
     @TestConfiguration
-    public static class InsertJdbcActionIntTestConfiguration {
+    public static class DeleteJdbcActionIntTestConfiguration {
 
         @Autowired
         private DataSource dataSource;
 
         @Bean
-        InsertJdbcOperation insertJdbcOperation() {
-            return new InsertJdbcOperation(new JdbcExecutor(
+        DeleteJdbcOperation deleteJdbcOperation() {
+            return new DeleteJdbcOperation(new JdbcExecutor(
                 null,
                 new DataSourceFactory() {
-
                     @Override
                     public DataSource getDataSource(
-                        Connection connection, String databaseJdbcName, String jdbcDriverClassNamee) {
+                        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
 
                         return dataSource;
                     }

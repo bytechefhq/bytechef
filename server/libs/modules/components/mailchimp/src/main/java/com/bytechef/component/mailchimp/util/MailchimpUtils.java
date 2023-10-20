@@ -49,7 +49,7 @@ public class MailchimpUtils {
     @SuppressWarnings("unchecked")
     public static ComponentOptionsFunction getListIdOptions() {
         return (connection, inputParameters) -> {
-            Map<?, ?> response = ((Map<?, ?>) HttpClientUtils
+            Map<?, ?> response = (Map<?, ?>) HttpClientUtils
                 .get("https://%s.api.mailchimp.com/3.0/lists".formatted(
                     getMailChimpServer(MapValueUtils.getRequiredString(connection.getParameters(), ACCESS_TOKEN))))
                 .queryParameters(
@@ -58,12 +58,13 @@ public class MailchimpUtils {
                         "count", List.of("1000")))
                 .configuration(responseFormat(HttpClientUtils.ResponseFormat.JSON))
                 .execute()
-                .body());
+                .body();
 
             List<Option<?>> options = new ArrayList<>();
 
-            ((List<Map<?, ?>>) response.get("lists")).forEach(list -> options.add(
-                option((String) list.get("name"), list.get("id"))));
+            for (Map<?, ?> list : (List<Map<?, ?>>) response.get("lists")) {
+                options.add(option((String) list.get("name"), list.get("id")));
+            }
 
             return options;
         };

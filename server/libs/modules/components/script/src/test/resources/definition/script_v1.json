@@ -40,8 +40,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Add your Java custom logic here.",
@@ -51,7 +51,7 @@
       "label": "Java code",
       "metadata": { },
       "placeholder": null,
-      "required": null,
+      "required": true,
       "name": "script",
       "type": "STRING",
       "defaultValue": null,
@@ -62,6 +62,7 @@
       "optionsDataSource": null
     } ],
     "title": "Java",
+    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -77,8 +78,7 @@
       "types": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
@@ -120,8 +120,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Add your JavaScript custom logic here.",
@@ -131,7 +131,7 @@
       "label": "JavaScript code",
       "metadata": { },
       "placeholder": null,
-      "required": null,
+      "required": true,
       "name": "script",
       "type": "STRING",
       "defaultValue": null,
@@ -142,6 +142,7 @@
       "optionsDataSource": null
     } ],
     "title": "JavaScript",
+    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -157,8 +158,7 @@
       "types": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
@@ -200,8 +200,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Add your Python custom logic here.",
@@ -211,7 +211,7 @@
       "label": "Python code",
       "metadata": { },
       "placeholder": null,
-      "required": null,
+      "required": true,
       "name": "script",
       "type": "STRING",
       "defaultValue": null,
@@ -222,6 +222,7 @@
       "optionsDataSource": null
     } ],
     "title": "Python",
+    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -237,8 +238,7 @@
       "types": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
@@ -280,8 +280,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Add your R custom logic here.",
@@ -291,7 +291,7 @@
       "label": "R code",
       "metadata": { },
       "placeholder": null,
-      "required": null,
+      "required": true,
       "name": "script",
       "type": "STRING",
       "defaultValue": null,
@@ -302,6 +302,7 @@
       "optionsDataSource": null
     } ],
     "title": "R",
+    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -317,8 +318,7 @@
       "types": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "deprecated": null,
@@ -360,8 +360,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Add your Ruby custom logic here.",
@@ -371,7 +371,7 @@
       "label": "Ruby code",
       "metadata": { },
       "placeholder": null,
-      "required": null,
+      "required": true,
       "name": "script",
       "type": "STRING",
       "defaultValue": null,
@@ -382,6 +382,7 @@
       "optionsDataSource": null
     } ],
     "title": "Ruby",
+    "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
       "description": null,
@@ -397,8 +398,7 @@
       "types": null
     } ],
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": null,

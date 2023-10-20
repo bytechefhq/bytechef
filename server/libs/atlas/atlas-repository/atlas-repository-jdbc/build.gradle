@@ -2,6 +2,7 @@ dependencies {
     api "com.fasterxml.jackson.core:jackson-databind"
     api project(":server:libs:atlas:atlas-repository:atlas-repository-api")
 
+    implementation "org.springframework.data:spring-data-jdbc"
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation project(":server:libs:core:commons:commons-data")
     implementation project(":server:libs:core:commons:commons-util")

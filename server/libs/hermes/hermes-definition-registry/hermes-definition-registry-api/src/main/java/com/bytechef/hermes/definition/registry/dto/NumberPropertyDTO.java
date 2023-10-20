@@ -21,6 +21,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.Property.NumberProperty;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,7 +66,7 @@ public class NumberPropertyDTO extends ValuePropertyDTO<Double> {
     }
 
     public List<OptionDTO> getOptions() {
-        return options;
+        return Collections.unmodifiableList(options);
     }
 
     public Optional<OptionsDataSourceDTO> getOptionsDataSource() {

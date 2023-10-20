@@ -7,6 +7,7 @@ dependencies {
     api "org.springframework.data:spring-data-commons"
     api project(":server:libs:core:tag:tag-api")
 
+    implementation "org.springframework:spring-context"
     implementation libs.org.openapitools.jackson.databind.nullable
     implementation "jakarta.annotation:jakarta.annotation-api"
     implementation "jakarta.validation:jakarta.validation-api"

@@ -1,8 +1,10 @@
 dependencies {
+    api "org.springframework.data:spring-data-commons"
     api project(":server:libs:atlas:atlas-api")
     api project(":server:libs:core:error:error-api")
     api project(":server:libs:core:event:event-api")
 
+    implementation "org.springframework.data:spring-data-jdbc"
     implementation "com.fasterxml.jackson.core:jackson-annotations"
     implementation project(":server:libs:core:commons:commons-data")
     implementation project(":server:libs:core:commons:commons-util")

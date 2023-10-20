@@ -2,5 +2,5 @@ version="1.0"
 
 dependencies {
     implementation "org.apache.commons:commons-lang3"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.14.1"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
 }

@@ -28,6 +28,7 @@
       "optionsDataSource": null
     } ],
     "title": "Read from file",
+    "outputSchemaDataSource": null,
     "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
@@ -123,7 +124,6 @@
       "controlType": "EXPRESSION",
       "optionsDataSource": null
     } ],
-    "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
   }, {
     "batch": null,
@@ -247,6 +247,7 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
+    "outputSchemaDataSource": null,
     "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
@@ -289,7 +290,6 @@
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     } ],
-    "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
   }, {
     "batch": null,
@@ -302,9 +302,9 @@
     "name": "createTempDir",
     "properties": null,
     "title": "Create Temp Directory",
+    "outputSchemaDataSource": null,
     "editorDescriptionDataSource": null,
     "outputSchema": null,
-    "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
   }, {
     "batch": null,
@@ -335,6 +335,7 @@
       "optionsDataSource": null
     } ],
     "title": "File Path",
+    "outputSchemaDataSource": null,
     "editorDescriptionDataSource": null,
     "outputSchema": [ {
       "advancedOption": null,
@@ -355,7 +356,6 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
-    "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
   }, {
     "batch": null,
@@ -366,11 +366,55 @@
     "help": null,
     "metadata": null,
     "name": "ls",
-    "properties": null,
+    "properties": [ {
+      "advancedOption": null,
+      "description": "The path of a directory.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Path",
+      "metadata": { },
+      "placeholder": null,
+      "required": true,
+      "name": "path",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "sampleDataType": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": null,
+      "description": "Should subdirectories be included.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Recursive",
+      "metadata": { },
+      "placeholder": null,
+      "required": null,
+      "name": "recursive",
+      "type": "BOOLEAN",
+      "defaultValue": false,
+      "exampleValue": null,
+      "options": [ {
+        "description": null,
+        "displayCondition": null,
+        "name": "True",
+        "value": true
+      }, {
+        "description": null,
+        "displayCondition": null,
+        "name": "False",
+        "value": true
+      } ],
+      "controlType": "CHECKBOX"
+    } ],
     "title": "List",
+    "outputSchemaDataSource": null,
     "editorDescriptionDataSource": null,
     "outputSchema": null,
-    "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
   }, {
     "batch": null,
@@ -381,11 +425,29 @@
     "help": null,
     "metadata": null,
     "name": "mkdir",
-    "properties": null,
+    "properties": [ {
+      "advancedOption": null,
+      "description": "The path of a directory.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Path",
+      "metadata": { },
+      "placeholder": null,
+      "required": true,
+      "name": "path",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "sampleDataType": null,
+      "optionsDataSource": null
+    } ],
     "title": "Create",
+    "outputSchemaDataSource": null,
     "editorDescriptionDataSource": null,
     "outputSchema": null,
-    "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
   }, {
     "batch": null,
@@ -396,11 +458,29 @@
     "help": null,
     "metadata": null,
     "name": "rm",
-    "properties": null,
+    "properties": [ {
+      "advancedOption": null,
+      "description": "The path of a directory.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Path",
+      "metadata": { },
+      "placeholder": null,
+      "required": true,
+      "name": "path",
+      "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "sampleDataType": null,
+      "optionsDataSource": null
+    } ],
     "title": "Remove",
+    "outputSchemaDataSource": null,
     "editorDescriptionDataSource": null,
     "outputSchema": null,
-    "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
   } ],
   "category": null,

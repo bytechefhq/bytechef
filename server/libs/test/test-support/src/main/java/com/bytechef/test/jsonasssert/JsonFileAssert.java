@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.json.JSONException;
@@ -36,6 +37,8 @@ public class JsonFileAssert {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
         {
+            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
             registerModule(new JavaTimeModule());
             registerModule(new Jdk8Module());
         }

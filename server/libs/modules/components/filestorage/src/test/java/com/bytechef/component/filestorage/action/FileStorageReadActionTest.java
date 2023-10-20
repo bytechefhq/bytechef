@@ -38,7 +38,7 @@ public class FileStorageReadActionTest {
     public void testExecuteRead() {
         Context.FileEntry fileEntry = Mockito.mock(Context.FileEntry.class);
 
-        FileStorageReadAction.executeRead(context, Map.of(FILE_ENTRY, Mockito.mock(Context.FileEntry.class)));
+        FileStorageReadAction.executeRead(context, Map.of(FILE_ENTRY, fileEntry));
 
         ArgumentCaptor<Context.FileEntry> fileEntryArgumentCaptor = ArgumentCaptor.forClass(Context.FileEntry.class);
 

@@ -21,6 +21,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.Property;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
@@ -56,6 +57,6 @@ public class OneOfPropertyDTO extends PropertyDTO {
     }
 
     public List<? extends PropertyDTO> getTypes() {
-        return types;
+        return Collections.unmodifiableList(types);
     }
 }

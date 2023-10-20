@@ -586,7 +586,7 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         public ModifiableComponentDefinition connection(ConnectionDefinition connectionDefinition) {
-            this.connection = ((ModifiableConnectionDefinition) connectionDefinition);
+            this.connection = (ModifiableConnectionDefinition) connectionDefinition;
 
             return this;
         }
@@ -708,11 +708,6 @@ public final class ComponentDSL extends DefinitionDSL {
             this.version = version;
 
             return this;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name, version);
         }
 
         @Override

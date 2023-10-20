@@ -56,9 +56,10 @@ public class EachTaskDispatcherTest {
 
     @Test
     public void testDispatch1() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+        Assertions.assertThrows(NullPointerException.class, () -> {
             EachTaskDispatcher dispatcher = new EachTaskDispatcher(
                 taskDispatcher, taskExecutionService, messageBroker, contextService, counterService);
+
             dispatcher.dispatch(TaskExecution.builder()
                 .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.TYPE, "type")))
                 .build());

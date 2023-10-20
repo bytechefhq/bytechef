@@ -1,9 +1,10 @@
 dependencies {
-    api "org.springframework.data:spring-data-jdbc"
+    api "org.springframework.data:spring-data-commons"
     api project(":server:libs:atlas:atlas-api")
     api project(":server:libs:core:category:category-api")
     api project(":server:libs:core:tag:tag-api")
     api project(":server:libs:hermes:hermes-workflow:hermes-workflow-api")
 
+    implementation "org.springframework.data:spring-data-jdbc"
     implementation project(":server:libs:core:commons:commons-util")
 }

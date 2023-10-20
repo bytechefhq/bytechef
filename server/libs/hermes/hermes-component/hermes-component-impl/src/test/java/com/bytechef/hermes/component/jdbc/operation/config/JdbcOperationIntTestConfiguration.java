@@ -25,10 +25,10 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 
-@ComponentScan("com.bytechef.hermes.component.registrar.jdbc")
+@ComponentScan("com.bytechef.hermes.component.jdbc")
 @EnableAutoConfiguration
 @SpringBootConfiguration
-public class JdbcActionIntTestConfiguration {
+public class JdbcOperationIntTestConfiguration {
 
     @MockBean
     private ConnectionService connectionService;

@@ -34,12 +34,9 @@ public class ObjectHelperStringifyActionTest {
 
     @Test
     public void testExecuteStringify() {
-        Map<String, ?> inputParameters = Map.of(
-            SOURCE, (Map.of("key", 3)));
-
-        Map<String, Integer> input = Map.of("key", 3);
+        Map<String, ?> inputParameters = Map.of(SOURCE, Map.of("key", 3));
 
         assertThat(ObjectHelperStringifyAction.executeStringify(Mockito.mock(Context.class), inputParameters))
-            .isEqualTo(JsonUtils.write(input));
+            .isEqualTo(JsonUtils.write(Map.of("key", 3)));
     }
 }

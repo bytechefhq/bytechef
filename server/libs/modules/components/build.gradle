@@ -11,8 +11,6 @@ subprojects {
         implementation "org.slf4j:slf4j-api"
         implementation libs.com.google.auto.service.auto.service.annotations
 
-        testImplementation project(":server:libs:atlas:atlas-worker:atlas-worker-api")
-        testImplementation project(":server:libs:hermes:hermes-component:hermes-component-impl")
         testImplementation project(":server:libs:hermes:hermes-component:hermes-component-test-int-support")
         testImplementation project(":server:libs:test:test-support")
     }

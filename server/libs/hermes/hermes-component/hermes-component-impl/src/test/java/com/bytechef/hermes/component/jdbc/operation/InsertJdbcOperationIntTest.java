@@ -21,13 +21,12 @@ import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.COLUMNS;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
-import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.UPDATE_KEY;
 
 import com.bytechef.hermes.component.Context;
 import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
-import com.bytechef.hermes.component.jdbc.operation.config.JdbcActionIntTestConfiguration;
+import com.bytechef.hermes.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import com.bytechef.test.annotation.EmbeddedSql;
 import java.util.List;
 import java.util.Map;
@@ -47,14 +46,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Ivica Cardic
  */
 @EmbeddedSql
-@SpringBootTest(classes = JdbcActionIntTestConfiguration.class)
-public class UpdateJdbcActionIntTest {
+@SpringBootTest(classes = JdbcOperationIntTestConfiguration.class)
+public class InsertJdbcOperationIntTest {
 
     @Autowired
     private DataSource dataSource;
 
     @Autowired
-    private UpdateJdbcOperation updateJdbcOperation;
+    private InsertJdbcOperation insertJdbcOperation;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -71,49 +70,42 @@ public class UpdateJdbcActionIntTest {
                         id   varchar(256) not null primary key,
                         name varchar(256) not null
                     );
-                    INSERT INTO test VALUES('id1', 'name1');
-                    INSERT INTO test VALUES('id2', 'name2');
-                    INSERT INTO test VALUES('id3', 'name3');
-                    INSERT INTO test VALUES('id4', 'name4');
                 """);
     }
 
     @Test
-    public void testUpdate() {
+    public void testInsert() {
         Context context = Mockito.mock(Context.class);
 
         Mockito.when(context.fetchConnection())
             .thenReturn(Optional.of(Mockito.mock(Connection.class)));
 
         Map<String, ?> inputParameters = Map.of(
-            COLUMNS, List.of("name"),
-            ROWS, List.of(Map.of("id", "id2", "name", "name3")),
+            COLUMNS, List.of("id", "name"),
+            ROWS, List.of(Map.of("id", "id1", "name", "name1"), Map.of("id", "id2", "name", "name2")),
             SCHEMA, "public",
-            TABLE, "test",
-            UPDATE_KEY, "id");
+            TABLE, "test");
 
-        Map<String, Integer> result = updateJdbcOperation.execute(context, inputParameters);
+        Map<String, Integer> result = insertJdbcOperation.execute(context, inputParameters);
 
-        Assertions.assertEquals(1, result.get("rows"));
-        Assertions.assertEquals(
-            "name3", jdbcTemplate.queryForObject("SELECT name FROM test WHERE id='id2'", String.class));
+        Assertions.assertEquals(2, result.get("rows"));
     }
 
     @TestConfiguration
-    public static class UpdateJdbcActionIntTestConfiguration {
+    public static class InsertJdbcActionIntTestConfiguration {
 
         @Autowired
         private DataSource dataSource;
 
         @Bean
-        UpdateJdbcOperation updateJdbcOperation() {
-            return new UpdateJdbcOperation(new JdbcExecutor(
+        InsertJdbcOperation insertJdbcOperation() {
+            return new InsertJdbcOperation(new JdbcExecutor(
                 null,
                 new DataSourceFactory() {
 
                     @Override
                     public DataSource getDataSource(
-                        Connection connection, String databaseJdbcName, String jdbcDriverClassName) {
+                        Connection connection, String databaseJdbcName, String jdbcDriverClassNamee) {
 
                         return dataSource;
                     }

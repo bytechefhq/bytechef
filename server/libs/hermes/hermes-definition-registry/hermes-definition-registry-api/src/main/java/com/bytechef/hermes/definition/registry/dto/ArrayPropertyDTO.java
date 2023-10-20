@@ -22,6 +22,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.definition.Property.ArrayProperty;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +53,7 @@ public class ArrayPropertyDTO extends ValuePropertyDTO<Object[]> {
     }
 
     public List<PropertyDTO> getItems() {
-        return items;
+        return Collections.unmodifiableList(items);
     }
 
     public boolean isMultipleValues() {
@@ -60,7 +61,7 @@ public class ArrayPropertyDTO extends ValuePropertyDTO<Object[]> {
     }
 
     public List<OptionDTO> getOptions() {
-        return options;
+        return Collections.unmodifiableList(options);
     }
 
     public Optional<OptionsDataSourceDTO> getOptionsDataSource() {
