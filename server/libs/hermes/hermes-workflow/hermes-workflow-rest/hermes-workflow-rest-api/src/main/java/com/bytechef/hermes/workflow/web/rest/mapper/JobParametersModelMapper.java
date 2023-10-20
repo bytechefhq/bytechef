@@ -44,12 +44,15 @@ public interface JobParametersModelMapper extends Converter<JobParametersModel, 
     default Map<String, Object> getMetadata(JobParametersModel jobParametersModel) {
         Map<String, Map<String, Map<String, Long>>> workflowConnectionMap = new HashMap<>();
 
-        for (JobWorkflowConnectionModel jobWorkflowConnectionModel : jobParametersModel.getConnections()) {
-            Map<String, Map<String, Long>> workflowConnection = workflowConnectionMap.computeIfAbsent(
-                jobWorkflowConnectionModel.getTaskName(), key -> new HashMap<>());
+        if (jobParametersModel.getConnections() != null) {
+            for (JobWorkflowConnectionModel jobWorkflowConnectionModel : jobParametersModel.getConnections()) {
+                Map<String, Map<String, Long>> workflowConnection = workflowConnectionMap.computeIfAbsent(
+                    jobWorkflowConnectionModel.getTaskName(), key -> new HashMap<>());
 
-            workflowConnection.put(
-                jobWorkflowConnectionModel.getKey(), Map.of(WorkflowConnection.ID, jobWorkflowConnectionModel.getId()));
+                workflowConnection.put(
+                    jobWorkflowConnectionModel.getKey(),
+                    Map.of(WorkflowConnection.ID, jobWorkflowConnectionModel.getId()));
+            }
         }
 
         return Map.of(WorkflowConnection.CONNECTIONS, workflowConnectionMap);
