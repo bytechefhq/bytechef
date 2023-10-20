@@ -179,6 +179,7 @@ public class OpenApiComponentGenerator {
             .addStaticImport(AUTHORIZATION_CLASS_NAME, "TOKEN_URL")
             .addStaticImport(AUTHORIZATION_CLASS_NAME, "USERNAME")
             .addStaticImport(AUTHORIZATION_CLASS_NAME, "VALUE")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "component")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "connection")
@@ -194,6 +195,7 @@ public class OpenApiComponentGenerator {
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "number")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "object")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "option")
+            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "oneOf")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "string")
             .addStaticImport(HTTP_CLIENT_UTILS_CLASS, "BodyContentType", "ResponseFormat")
             .addStaticImport(OPEN_API_COMPONENT_HANDLER_CLASS, "PropertyType")
@@ -354,7 +356,7 @@ public class OpenApiComponentGenerator {
 
     private CodeBlock getActionCodeBlock(OperationItem operationItem, OpenAPI openAPI) {
         Operation operation = operationItem.operation();
-        String requestMethod = operationItem.requestMethod();
+        String method = operationItem.method();
 
         OutputEntry outputEntry = getOutputEntry(operation, openAPI);
         PropertiesEntry propertiesEntry = getPropertiesEntry(operation, openAPI);
@@ -365,10 +367,10 @@ public class OpenApiComponentGenerator {
 
         metadataBuilder.add(
             """
-                "requestMethod", $S,
+                "method", $S,
                 "path", $S
                 """,
-            requestMethod,
+            method,
             operationItem.path);
 
         if (propertiesEntry.bodyContentType != null) {
@@ -491,22 +493,18 @@ public class OpenApiComponentGenerator {
         builder.add(
             """
                 authorization(
-                    $T.AuthorizationType.API_KEY.name().toLowerCase(),
-                    $T.AuthorizationType.API_KEY
-                )
-                .display(
-                    display($S)
-                )
-                .properties(
-                    $L
-                    string(VALUE)
-                        .label($S)
-                        .required($L)
-                    $L
-                )
+                    AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
+                    .display(
+                        display($S)
+                    )
+                    .properties(
+                        $L
+                        string(VALUE)
+                            .label($S)
+                            .required($L)
+                        $L
+                    )
                 """,
-            AUTHORIZATION_CLASS_NAME,
-            AUTHORIZATION_CLASS_NAME,
             "API Key",
             apiKeyCodeBlock,
             "Value",
@@ -522,23 +520,19 @@ public class OpenApiComponentGenerator {
         builder.add(
             """
                 authorization(
-                    $T.AuthorizationType.BASIC_AUTH.name().toLowerCase(),
-                    $T.AuthorizationType.BASIC_AUTH
-                )
-                .display(
-                    display($S)
-                )
-                .properties(
-                    string(USERNAME)
-                        .label($S)
-                        .required($L),
-                    string(PASSWORD)
-                        .label($S)
-                        .required($L)
-                )
+                    AuthorizationType.BASIC_AUTH.toLowerCase(), AuthorizationType.BASIC_AUTH)
+                    .display(
+                        display($S)
+                    )
+                    .properties(
+                        string(USERNAME)
+                            .label($S)
+                            .required($L),
+                        string(PASSWORD)
+                            .label($S)
+                            .required($L)
+                    )
                 """,
-            AUTHORIZATION_CLASS_NAME,
-            AUTHORIZATION_CLASS_NAME,
             "Basic Auth",
             "Username",
             true,
@@ -554,20 +548,16 @@ public class OpenApiComponentGenerator {
         builder.add(
             """
                 authorization(
-                    $T.AuthorizationType.BEARER_TOKEN.name().toLowerCase(),
-                    $T.AuthorizationType.BEARER_TOKEN
-                )
-                .display(
-                    display($S)
-                )
-                .properties(
-                    string(TOKEN)
-                        .label($S)
-                        .required($L)
-                )
+                    AuthorizationType.BEARER_TOKEN.toLowerCase(), AuthorizationType.BEARER_TOKEN)
+                    .display(
+                        display($S)
+                    )
+                    .properties(
+                        string(TOKEN)
+                            .label($S)
+                            .required($L)
+                    )
                 """,
-            AUTHORIZATION_CLASS_NAME,
-            AUTHORIZATION_CLASS_NAME,
             "Bearer Token",
             "Token",
             true);
@@ -582,26 +572,21 @@ public class OpenApiComponentGenerator {
         builder.add(
             """
                 authorization(
-                    $T.AuthorizationType.OAUTH2_AUTHORIZATION_CODE.name().toLowerCase(),
-                    $T.AuthorizationType.OAUTH2_AUTHORIZATION_CODE
-                )
-                .display(
-                    display($S)
-                )
-                .properties(
-                    string(CLIENT_ID)
-                        .label($S)
-                        .required($L),
-                    string(CLIENT_SECRET)
-                        .label($S)
-                        .required($L)
-                )
-                .authorizationUrl(connection -> $S)
-                $L
-                .tokenUrl(connection -> $S)
+                    AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                    .display(
+                        display($S)
+                    )
+                    .properties(
+                        string(CLIENT_ID)
+                            .label($S)
+                            .required($L),
+                        string(CLIENT_SECRET)
+                            .label($S)
+                            .required($L)
+                    )
+                    .authorizationUrl(connection -> $S)
+                    $L.tokenUrl(connection -> $S)
                 """,
-            AUTHORIZATION_CLASS_NAME,
-            AUTHORIZATION_CLASS_NAME,
             "OAuth2 Authorization Code",
             "Client Id",
             true,
@@ -627,25 +612,21 @@ public class OpenApiComponentGenerator {
         builder.add(
             """
                 authorization(
-                    $T.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS.name().toLowerCase(),
-                    $T.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS
-                )
-                .display(
-                    display($S)
-                )
-                .properties(
-                    string(CLIENT_ID)
-                        .label($S)
-                        .required($L),
-                    string(CLIENT_SECRET)
-                        .label($S)
-                        .required($L)
-                )
-                .scopes(connection -> $T.of($L))
-                .tokenUrl(connection -> $S)
+                    AuthorizationType.OAUTH2_CLIENT_CREDENTIALS.toLowerCase(), AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
+                    .display(
+                        display($S)
+                    )
+                    .properties(
+                        string(CLIENT_ID)
+                            .label($S)
+                            .required($L),
+                        string(CLIENT_SECRET)
+                            .label($S)
+                            .required($L)
+                    )
+                    .scopes(connection -> $T.of($L))
+                    .tokenUrl(connection -> $S)
                 """,
-            AUTHORIZATION_CLASS_NAME,
-            AUTHORIZATION_CLASS_NAME,
             "Client Credentials",
             "Client Id",
             true,
@@ -668,25 +649,21 @@ public class OpenApiComponentGenerator {
         builder.add(
             """
                 authorization(
-                    $T.AuthorizationType.OAUTH2_IMPLICIT_CODE.name().toLowerCase(),
-                    $T.AuthorizationType.OAUTH2_IMPLICIT_CODE
-                )
-                .display(
-                    display($S)
-                )
-                .properties(
-                    string(CLIENT_ID)
-                        .label($S)
-                        .required($L),
-                    string(CLIENT_SECRET)
-                        .label($S)
-                        .required($L)
-                )
-                .authorizationUrl(connection -> $S)
-                .scopes(connection -> $T.of($L))
+                    AuthorizationType.OAUTH2_IMPLICIT_CODE.toLowerCase(), AuthorizationType.OAUTH2_IMPLICIT_CODE)
+                    .display(
+                        display($S)
+                    )
+                    .properties(
+                        string(CLIENT_ID)
+                            .label($S)
+                            .required($L),
+                        string(CLIENT_SECRET)
+                            .label($S)
+                            .required($L)
+                    )
+                    .authorizationUrl(connection -> $S)
+                    .scopes(connection -> $T.of($L))
                 """,
-            AUTHORIZATION_CLASS_NAME,
-            AUTHORIZATION_CLASS_NAME,
             "OAuth2 Implicit",
             "Client Id",
             true,
@@ -709,25 +686,21 @@ public class OpenApiComponentGenerator {
         builder.add(
             """
                 authorization(
-                    $T.AuthorizationType.OAUTH2_RESOURCE_OWNER_PASSWORD.name().toLowerCase(),
-                    $T.AuthorizationType.OAUTH2_RESOURCE_OWNER_PASSWORD
-                )
-                .display(
-                    display($S)
-                )
-                .properties(
-                    string(CLIENT_ID)
-                        .label($S)
-                        .required($L),
-                    string(CLIENT_SECRET)
-                        .label($S)
-                        .required($L)
-                )
-                .scopes(connection -> $T.of($L))
-                .tokenUrl(connection -> $S)
+                    AuthorizationType.OAUTH2_RESOURCE_OWNER_PASSWORD.toLowerCase(), AuthorizationType.OAUTH2_RESOURCE_OWNER_PASSWORD)
+                    .display(
+                        display($S)
+                    )
+                    .properties(
+                        string(CLIENT_ID)
+                            .label($S)
+                            .required($L),
+                        string(CLIENT_SECRET)
+                            .label($S)
+                            .required($L)
+                    )
+                    .scopes(connection -> $T.of($L))
+                    .tokenUrl(connection -> $S)
                 """,
-            AUTHORIZATION_CLASS_NAME,
-            AUTHORIZATION_CLASS_NAME,
             "OAuth2 Resource Owner Password",
             "Client Id",
             true,
@@ -835,9 +808,7 @@ public class OpenApiComponentGenerator {
             if (servers.size() == 1) {
                 Server server = servers.get(0);
 
-                if (Objects.equals(server.getUrl(), "/")) {
-                    builder.add(".baseUri(connection -> null)");
-                } else {
+                if (!StringUtils.isEmpty(server.getUrl()) && !Objects.equals(server.getUrl(), "/")) {
                     builder.add(".baseUri(connection -> $S)", server.getUrl());
                 }
             } else {
@@ -894,6 +865,8 @@ public class OpenApiComponentGenerator {
             builder.add(".connection(modifyConnection($L))", codeBlock);
         }
 
+        builder.add(".triggers(getTriggers())");
+
         return builder.build();
     }
 
@@ -916,8 +889,7 @@ public class OpenApiComponentGenerator {
                 CodeBlock connectionCodeBlock = CodeBlock.of(
                     """
                         connection()
-                            $L
-                            .authorizations($L)
+                            $L.authorizations($L)
                         """,
                     getBaseUriCodeBlock(servers),
                     getAuthorizationsCodeBlock(securitySchemeMap));
@@ -975,8 +947,8 @@ public class OpenApiComponentGenerator {
         List<OperationItem> operationItems = new ArrayList<>();
 
         for (Map.Entry<String, PathItem> pathEntry : paths.entrySet()) {
-            PathItem pathItem = pathEntry.getValue();
             String path = pathEntry.getKey();
+            PathItem pathItem = pathEntry.getValue();
 
             if (pathItem.getDelete() != null) {
                 operationItems.add(new OperationItem(pathItem.getDelete(), "DELETE", path));
@@ -1256,16 +1228,12 @@ public class OpenApiComponentGenerator {
         CodeBlock.Builder builder = CodeBlock.builder();
 
         if (schema.getAdditionalProperties() instanceof Boolean) {
-            builder.add(
-                ".additionalProperties($L)",
-                schema.getAdditionalProperties());
+            builder.add(".additionalProperties(oneOf())");
         } else {
             Schema<?> additionalPropertiesSchema = (Schema<?>) schema.getAdditionalProperties();
 
             if (additionalPropertiesSchema.get$ref() == null) {
-                builder.add(
-                    ".additionalProperties($L())",
-                    getAdditionalPropertiesItemType(additionalPropertiesSchema));
+                builder.add(".additionalProperties($L())", getAdditionalPropertiesItemType(additionalPropertiesSchema));
             } else {
                 String ref = additionalPropertiesSchema.get$ref();
 
@@ -1381,11 +1349,18 @@ public class OpenApiComponentGenerator {
 
             switch (type) {
                 case "array" -> {
-                    builder.add(
-                        "array($S).items($L)",
-                        propertyName == null ? "array" : propertyName,
-                        getSchemaCodeBlock(
-                            null, schema.getDescription(), null, null, schema.getItems(), openAPI, true));
+                    if (StringUtils.isEmpty(propertyName) && outputEntry) {
+                        builder.add(
+                            "array().items($L)",
+                            getSchemaCodeBlock(
+                                null, schema.getDescription(), null, null, schema.getItems(), openAPI, true));
+                    } else {
+                        builder.add(
+                            "array($S).items($L)",
+                            propertyName == null ? "array" : propertyName,
+                            getSchemaCodeBlock(
+                                null, schema.getDescription(), null, null, schema.getItems(), openAPI, true));
+                    }
 
                     if (!outputEntry) {
                         builder.add(".placeholder($S)", "Add");
@@ -1439,7 +1414,11 @@ public class OpenApiComponentGenerator {
                     } else if (Objects.equals(schema.getFormat(), "binary")) {
                         builder.add("fileEntry($S)", propertyName == null ? "fileEntry" : propertyName);
                     } else {
-                        builder.add("string($S)", propertyName);
+                        if (StringUtils.isEmpty(propertyName)) {
+                            builder.add("string()");
+                        } else {
+                            builder.add("string($S)", propertyName);
+                        }
                     }
                 }
                 default -> throw new IllegalArgumentException(
@@ -1562,9 +1541,8 @@ public class OpenApiComponentGenerator {
                     .returns(COMPONENT_DEFINITION_CLASS_NAME)
                     .addStatement("return componentDefinition")
                     .build())
-                .build())
-            .addStaticImport(AUTHORIZATION_CLASS_NAME, "ApiTokenLocation", "AuthorizationType"))
-            .build();
+                .build()))
+                    .build();
 
         return javaFile.writeToPath(sourceDirPath);
     }
@@ -1617,7 +1595,7 @@ public class OpenApiComponentGenerator {
                     .initializer(actionsCodeBlock)
                     .build())
                 .build()))
-            .build();
+                    .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
@@ -1644,7 +1622,7 @@ public class OpenApiComponentGenerator {
                     .initializer(connectionCodeBlock)
                     .build())
                 .build()))
-            .build();
+                    .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
@@ -1747,7 +1725,7 @@ public class OpenApiComponentGenerator {
                     .initializer("$T.of($L)", List.class, componentSchemaCodeBlock)
                     .build())
                 .build()))
-            .build();
+                    .build();
 
         javaFile.writeTo(componentHandlerDirPath);
     }
@@ -1782,7 +1760,7 @@ public class OpenApiComponentGenerator {
         }
     }
 
-    private record OperationItem(Operation operation, String requestMethod, String path) {
+    private record OperationItem(Operation operation, String method, String path) {
         public String getOperationId() {
             return operation.getOperationId();
         }
