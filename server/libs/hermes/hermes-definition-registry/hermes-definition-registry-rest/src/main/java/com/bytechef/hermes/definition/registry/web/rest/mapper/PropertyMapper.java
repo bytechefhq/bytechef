@@ -27,6 +27,7 @@ import com.bytechef.hermes.definition.registry.web.rest.model.DatePropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DateTimePropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.DynamicPropertiesPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.IntegerPropertyModel;
+import com.bytechef.hermes.definition.registry.web.rest.model.NullPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.NumberPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.ObjectPropertyModel;
 import com.bytechef.hermes.definition.registry.web.rest.model.OneOfPropertyModel;
@@ -89,6 +90,11 @@ public interface PropertyMapper extends Converter<Property<?>, PropertyModel>, P
     }
 
     @Override
+    default NullPropertyModel visit(Property.NullProperty nullProperty) {
+        return map(nullProperty);
+    }
+
+    @Override
     default NumberPropertyModel visit(Property.NumberProperty numberProperty) {
         return map(numberProperty);
     }
@@ -124,6 +130,8 @@ public interface PropertyMapper extends Converter<Property<?>, PropertyModel>, P
     DynamicPropertiesPropertyModel map(Property.DynamicPropertiesProperty dynamicPropertiesProperty);
 
     IntegerPropertyModel map(Property.IntegerProperty integerProperty);
+
+    NullPropertyModel map(Property.NullProperty nullProperty);
 
     NumberPropertyModel map(Property.NumberProperty numberProperty);
 
