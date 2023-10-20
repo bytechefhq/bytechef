@@ -3,24 +3,36 @@ import {
     TaskDispatcherDefinitionBasicModel,
 } from 'middleware/hermes/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
-import ReactFlow, {Controls, MiniMap, useReactFlow, useStore} from 'reactflow';
+import ReactFlow, {
+    Controls,
+    MiniMap,
+    ReactFlowProvider,
+    useReactFlow,
+    useStore,
+} from 'reactflow';
 
-import PlaceholderEdge from '../edges/PlaceholderEdge';
-import WorkflowEdge from '../edges/WorkflowEdge';
-import defaultEdges from '../edges/defaultEdges';
-import useHandleDrop from '../hooks/useHandleDrop';
-import useLayout from '../hooks/useLayout';
-import PlaceholderNode from '../nodes/PlaceholderNode';
-import WorkflowNode from '../nodes/WorkflowNode';
-import defaultNodes from '../nodes/defaultNodes';
-import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
+import NodeDetailsDialog from './components/NodeDetailsDialog';
+import PlaceholderEdge from './edges/PlaceholderEdge';
+import WorkflowEdge from './edges/WorkflowEdge';
+import defaultEdges from './edges/defaultEdges';
+import useHandleDrop from './hooks/useHandleDrop';
+import useLayout from './hooks/useLayout';
+import PlaceholderNode from './nodes/PlaceholderNode';
+import WorkflowNode from './nodes/WorkflowNode';
+import defaultNodes from './nodes/defaultNodes';
 
-export type WorkflowEditorProps = {
+import 'reactflow/dist/base.css';
+
+import './WorkflowEditor.css';
+import DataPillPanel from './components/DataPillPanel';
+import {useNodeDetailsDialogStore} from './stores/useNodeDetailsDialogStore';
+
+type WorkflowProps = {
     components: ComponentDefinitionBasicModel[];
     flowControls: TaskDispatcherDefinitionBasicModel[];
 };
 
-const WorkflowEditor = ({components, flowControls}: WorkflowEditorProps) => {
+const Workflow = ({components, flowControls}: WorkflowProps) => {
     const [viewportWidth, setViewportWidth] = useState(0);
 
     const {nodeDetailsDialogOpen} = useNodeDetailsDialogStore();
@@ -138,5 +150,19 @@ const WorkflowEditor = ({components, flowControls}: WorkflowEditorProps) => {
         </div>
     );
 };
+
+type WorkflowEditorProps = WorkflowProps;
+
+function WorkflowEditor({components, flowControls}: WorkflowEditorProps) {
+    return (
+        <ReactFlowProvider>
+            <Workflow components={components} flowControls={flowControls} />
+
+            <NodeDetailsDialog />
+
+            <DataPillPanel />
+        </ReactFlowProvider>
+    );
+}
 
 export default WorkflowEditor;
