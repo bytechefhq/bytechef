@@ -226,7 +226,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get all deals",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -2551,11 +2552,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -2895,7 +2895,8 @@
       "optionsDataSource": null
     } ],
     "title": "Add a deal",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -5095,11 +5096,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -5346,7 +5346,8 @@
       "optionsDataSource": null
     } ],
     "title": "Search deals",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -6039,11 +6040,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -6081,7 +6081,8 @@
       "optionsDataSource": null
     } ],
     "title": "Delete a deal",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -6170,11 +6171,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -6212,7 +6212,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get details of a deal",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -8901,11 +8902,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -9157,7 +9157,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get all leads",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -9735,11 +9736,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -10033,7 +10033,8 @@
       "optionsDataSource": null
     } ],
     "title": "Add a lead",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -10507,11 +10508,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -10548,7 +10548,8 @@
       "optionsDataSource": null
     } ],
     "title": "Delete a lead",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -10636,11 +10637,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -10677,7 +10677,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get one lead",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -11151,11 +11152,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -11367,7 +11367,8 @@
       "optionsDataSource": null
     } ],
     "title": "Search leads",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -12083,11 +12084,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -12234,7 +12234,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get all organizations",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -13984,11 +13985,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -14123,7 +14123,8 @@
       "optionsDataSource": null
     } ],
     "title": "Add an organization",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -15734,11 +15735,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -15885,7 +15885,8 @@
       "optionsDataSource": null
     } ],
     "title": "Search organizations",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -16367,11 +16368,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -16409,7 +16409,8 @@
       "optionsDataSource": null
     } ],
     "title": "Delete an organization",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -16498,11 +16499,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -16540,7 +16540,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get details of an organization",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -18345,11 +18346,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -18496,7 +18496,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get all persons",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -20361,11 +20362,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -20761,7 +20761,8 @@
       "optionsDataSource": null
     } ],
     "title": "Add a person",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -22114,11 +22115,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -22316,7 +22316,8 @@
       "optionsDataSource": null
     } ],
     "title": "Search persons",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -22912,11 +22913,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -22954,7 +22954,8 @@
       "optionsDataSource": null
     } ],
     "title": "Delete a person",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -23043,11 +23044,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -23085,7 +23085,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get details of a person",
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -24824,11 +24825,10 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   } ],
   "category": null,
   "connection": {
@@ -24987,7 +24987,8 @@
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -26376,10 +26377,9 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -26405,7 +26405,8 @@
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -28189,10 +28190,9 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -28218,7 +28218,8 @@
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -29426,10 +29427,9 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -29455,7 +29455,8 @@
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -30953,10 +30954,9 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -30982,7 +30982,8 @@
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -32766,10 +32767,9 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -32795,7 +32795,8 @@
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -34003,10 +34004,9 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "pipedrive",
@@ -34032,7 +34032,8 @@
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -35530,9 +35531,8 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ]
 }

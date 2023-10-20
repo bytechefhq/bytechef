@@ -132,27 +132,12 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Query",
-    "outputSchema": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ANY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
-    } ],
+    "perform": { },
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -469,7 +454,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Insert",
-    "outputSchema": [ {
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -509,10 +495,9 @@
       } ],
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -847,7 +832,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Update",
-    "outputSchema": [ {
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -887,10 +873,9 @@
       } ],
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -1188,7 +1173,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Delete",
-    "outputSchema": [ {
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1228,10 +1214,9 @@
       } ],
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -1595,7 +1580,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Execute",
-    "outputSchema": [ {
+    "perform": { },
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1635,10 +1621,9 @@
       } ],
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { },
     "editorDescriptionDataSource": null
   } ],
   "category": null,

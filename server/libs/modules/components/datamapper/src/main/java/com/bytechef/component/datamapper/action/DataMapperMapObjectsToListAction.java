@@ -20,7 +20,8 @@ package com.bytechef.component.datamapper.action;
 import com.bytechef.hermes.component.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.util.MapValueUtils;
 
 import java.util.Map;
 
@@ -65,10 +66,7 @@ public class DataMapperMapObjectsToListAction {
             string(VALUE_KEY)
                 .label("Value key")
                 .description("The key name to which values should be mapped."))
-        .outputSchema(
-            getOutputSchemaFunction(),
-            object().displayCondition("type === 1"),
-            array().displayCondition("type === 2"))
+        .outputSchema(getOutputSchemaFunction())
         .perform(DataMapperMapObjectsToListAction::perform);
 
     protected static Object perform(Map<String, ?> inputParameters, ActionContext context) {
@@ -76,8 +74,14 @@ public class DataMapperMapObjectsToListAction {
         return null;
     }
 
-    protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
+    protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (connection, inputParameters) -> {
+            if (MapValueUtils.getInteger(inputParameters, TYPE, 1) == 1) {
+                return object();
+            } else {
+                return array();
+            }
+        };
     }
 }

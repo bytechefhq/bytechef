@@ -47,27 +47,12 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Send Message",
     "perform": { },
-    "outputSchema": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ANY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
-    } ],
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
@@ -116,8 +101,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -181,7 +166,6 @@
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "sampleOutput": null,
     "help": null,
     "listenerEnable": { },
     "listenerDisable": { },
@@ -206,13 +190,14 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "staticWebhookRequest": null,
     "title": "New Message",
     "type": "LISTENER",
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -231,9 +216,9 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    } ],
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
     "editorDescriptionDataSource": null

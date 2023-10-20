@@ -61,13 +61,15 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
         }
 
         if (Objects.equals(property.getName(), "__item")) {
-            ((ModifiableDynamicPropertiesProperty) property).loadPropertiesDependsOn(BASE_ID, TABLE_ID);
-            ((ModifiableDynamicPropertiesProperty) property).properties(AirtableUtils.getFieldsProperties());
+            ((ModifiableDynamicPropertiesProperty) property)
+                .loadPropertiesDependsOn(BASE_ID, TABLE_ID)
+                .properties(AirtableUtils.getFieldsProperties());
         }
 
         if (Objects.equals(property.getName(), TABLE_ID)) {
-            ((ModifiableStringProperty) property).loadOptionsDependsOn(BASE_ID);
-            ((ModifiableStringProperty) property).options(AirtableUtils.getTableIdOptions());
+            ((ModifiableStringProperty) property)
+                .loadOptionsDependsOn(BASE_ID)
+                .options(AirtableUtils.getTableIdOptions());
         }
 
         return property;

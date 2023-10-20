@@ -30,28 +30,13 @@
       "optionsDataSource": null
     } ],
     "title": "Convert from JSON string",
-    "perform": { },
-    "outputSchema": [ {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ANY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
-    } ],
+    "editorDescriptionDataSource": null,
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "objectHelper",
@@ -134,8 +119,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Convert to JSON string",
-    "perform": { },
-    "outputSchema": [ {
+    "editorDescriptionDataSource": null,
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -153,10 +138,10 @@
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

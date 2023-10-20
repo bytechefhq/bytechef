@@ -56,13 +56,6 @@ public class WebhookValidateAndRespondTrigger {
                 .label("CSRF Token")
                 .description(
                     "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client."))
-        .outputSchema(
-            object()
-                .properties(
-                    string(METHOD),
-                    object(HEADERS),
-                    object(PARAMETERS),
-                    any(BODY)))
         .outputSchema(getOutputSchemaFunction())
         .staticWebhookRequest(WebhookValidateAndRespondTrigger::staticWebhookRequest)
         .webhookValidate(WebhookValidateAndRespondTrigger::webhookValidate);
@@ -87,6 +80,11 @@ public class WebhookValidateAndRespondTrigger {
 
     protected static OutputSchemaDataSource.OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (connection, inputParameters) -> null;
+        return (connection, inputParameters) -> object()
+            .properties(
+                string(METHOD),
+                object(HEADERS),
+                object(PARAMETERS),
+                any(BODY));
     }
 }

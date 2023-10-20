@@ -359,7 +359,7 @@
     } ],
     "title": "Create",
     "perform": null,
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -556,7 +556,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
     "editorDescriptionDataSource": null
@@ -769,7 +769,7 @@
     } ],
     "title": "Update",
     "perform": null,
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -966,7 +966,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
     "editorDescriptionDataSource": null
@@ -1022,12 +1022,12 @@
       "pkce": null,
       "refresh": null,
       "scopes": { },
-      "tokenUrl": { },
-      "refreshUrl": null,
+      "authorizationCallback": null,
+      "authorizationUrl": { },
       "clientId": null,
       "clientSecret": null,
-      "authorizationUrl": { },
-      "authorizationCallback": null
+      "refreshUrl": null,
+      "tokenUrl": { }
     } ],
     "baseUri": { },
     "componentName": "hubspot",
@@ -1332,7 +1332,7 @@
     "webhookBodyRaw": null,
     "webhookValidate": null,
     "workflowSyncExecution": null,
-    "outputSchema": [ {
+    "outputSchema": {
       "advancedOption": null,
       "description": null,
       "displayCondition": null,
@@ -1635,7 +1635,7 @@
       "options": null,
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    } ],
+    },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
     "editorDescriptionDataSource": null

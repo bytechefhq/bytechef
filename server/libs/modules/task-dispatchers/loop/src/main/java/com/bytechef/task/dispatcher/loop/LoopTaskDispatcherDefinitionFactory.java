@@ -17,6 +17,7 @@
 
 package com.bytechef.task.dispatcher.loop;
 
+import static com.bytechef.hermes.definition.DefinitionDSL.any;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
@@ -62,7 +63,9 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .label("Loop Forever")
                 .description("Should loop iterate until condition set by 'Loop Break' statement is met.")
                 .defaultValue(false))
-        .outputSchema(object("item"), integer("itemIndex"))
+        .outputSchema(
+            object()
+                .properties(any("item"), integer("itemIndex")))
         .taskProperties(task(ITERATEE));
 
     @Override
