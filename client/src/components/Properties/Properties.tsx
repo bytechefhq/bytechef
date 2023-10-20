@@ -1,4 +1,7 @@
-import {PropertyModel} from '../../middleware/definition-registry';
+import {
+    PropertyModel,
+    ValuePropertyModel,
+} from '../../middleware/definition-registry';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
 import Input from '../Input/Input';
 import {Path, FieldValues} from 'react-hook-form/dist/types';
@@ -42,8 +45,17 @@ const Properties = <
                     if (property.type === 'STRING') {
                         return (
                             <Input
-                                key={property.name}
+                                description={property?.description}
+                                defaultValue={
+                                    (property as ValuePropertyModel)
+                                        ?.defaultValue
+                                        ? (property as ValuePropertyModel)
+                                              ?.defaultValue + ''
+                                        : ''
+                                }
                                 error={isError(property.name!)}
+                                type={property.hidden ? 'hidden' : 'text'}
+                                key={property.name}
                                 label={property.label}
                                 {...register(
                                     (path +
