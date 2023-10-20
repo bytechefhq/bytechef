@@ -21,87 +21,87 @@ import {
 } from './WorkflowTask';
 
 /**
- * The lueprint that describe the execution of a job.
+ * 
  * @export
- * @interface Workflow
+ * @interface PostWorkflowRequest
  */
-export interface Workflow {
+export interface PostWorkflowRequest {
     /**
      * Definition of the workflow that is executed as a job.
      * @type {string}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
     definition?: string;
     /**
      * The created by.
      * @type {string}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
     readonly createdBy?: string;
     /**
      * The created date.
      * @type {Date}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
     readonly createdDate?: Date;
     /**
      * The format of the workflow definition.
      * @type {string}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
-    format?: WorkflowFormatEnum;
+    format?: PostWorkflowRequestFormatEnum;
     /**
      * The id of the workflow.
      * @type {string}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
     readonly id?: string;
     /**
      * The workflow's expected list of inputs.
      * @type {Array<{ [key: string]: object; }>}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
     inputs?: Array<{ [key: string]: object; }>;
     /**
      * The descriptive name for the workflow
      * @type {string}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
     label?: string;
     /**
      * The last modified by.
      * @type {string}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
      * @type {Date}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
     readonly lastModifiedDate?: Date;
     /**
-     * The type of the provider which stores the workflow definition.
+     * 
      * @type {string}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
-    readonly providerType?: string;
+    providerType?: PostWorkflowRequestProviderTypeEnum;
     /**
      * The workflow's list of expected outputs.
      * @type {Array<{ [key: string]: object; }>}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
     outputs?: Array<{ [key: string]: object; }>;
     /**
      * The maximum number of times a task may retry.
      * @type {number}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
     retry?: number;
     /**
      * The steps that make up the workflow.
      * @type {Array<WorkflowTask>}
-     * @memberof Workflow
+     * @memberof PostWorkflowRequest
      */
     tasks?: Array<WorkflowTask>;
 }
@@ -110,28 +110,36 @@ export interface Workflow {
 /**
  * @export
  */
-export const WorkflowFormatEnum = {
+export const PostWorkflowRequestFormatEnum = {
     Json: 'JSON',
     Yml: 'YML',
     Yaml: 'YAML'
 } as const;
-export type WorkflowFormatEnum = typeof WorkflowFormatEnum[keyof typeof WorkflowFormatEnum];
+export type PostWorkflowRequestFormatEnum = typeof PostWorkflowRequestFormatEnum[keyof typeof PostWorkflowRequestFormatEnum];
+
+/**
+ * @export
+ */
+export const PostWorkflowRequestProviderTypeEnum = {
+    Jdbc: 'JDBC'
+} as const;
+export type PostWorkflowRequestProviderTypeEnum = typeof PostWorkflowRequestProviderTypeEnum[keyof typeof PostWorkflowRequestProviderTypeEnum];
 
 
 /**
- * Check if a given object implements the Workflow interface.
+ * Check if a given object implements the PostWorkflowRequest interface.
  */
-export function instanceOfWorkflow(value: object): boolean {
+export function instanceOfPostWorkflowRequest(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function WorkflowFromJSON(json: any): Workflow {
-    return WorkflowFromJSONTyped(json, false);
+export function PostWorkflowRequestFromJSON(json: any): PostWorkflowRequest {
+    return PostWorkflowRequestFromJSONTyped(json, false);
 }
 
-export function WorkflowFromJSONTyped(json: any, ignoreDiscriminator: boolean): Workflow {
+export function PostWorkflowRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): PostWorkflowRequest {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -153,7 +161,7 @@ export function WorkflowFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function WorkflowToJSON(value?: Workflow | null): any {
+export function PostWorkflowRequestToJSON(value?: PostWorkflowRequest | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -166,6 +174,7 @@ export function WorkflowToJSON(value?: Workflow | null): any {
         'format': value.format,
         'inputs': value.inputs,
         'label': value.label,
+        'providerType': value.providerType,
         'outputs': value.outputs,
         'retry': value.retry,
         'tasks': value.tasks === undefined ? undefined : ((value.tasks as Array<any>).map(WorkflowTaskToJSON)),

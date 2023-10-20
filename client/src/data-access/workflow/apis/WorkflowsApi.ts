@@ -15,9 +15,12 @@
 
 import * as runtime from '../runtime';
 import type {
+  PostWorkflowRequest,
   Workflow,
 } from '../models';
 import {
+    PostWorkflowRequestFromJSON,
+    PostWorkflowRequestToJSON,
     WorkflowFromJSON,
     WorkflowToJSON,
 } from '../models';
@@ -30,8 +33,8 @@ export interface GetWorkflowRequest {
     id: string;
 }
 
-export interface PostWorkflowRequest {
-    workflow: Workflow;
+export interface PostWorkflowOperationRequest {
+    postWorkflowRequest: PostWorkflowRequest;
 }
 
 export interface PutWorkflowRequest {
@@ -139,9 +142,9 @@ export class WorkflowsApi extends runtime.BaseAPI {
      * Create a new workflow.
      * Create a new workflow.
      */
-    async postWorkflowRaw(requestParameters: PostWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Workflow>> {
-        if (requestParameters.workflow === null || requestParameters.workflow === undefined) {
-            throw new runtime.RequiredError('workflow','Required parameter requestParameters.workflow was null or undefined when calling postWorkflow.');
+    async postWorkflowRaw(requestParameters: PostWorkflowOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Workflow>> {
+        if (requestParameters.postWorkflowRequest === null || requestParameters.postWorkflowRequest === undefined) {
+            throw new runtime.RequiredError('postWorkflowRequest','Required parameter requestParameters.postWorkflowRequest was null or undefined when calling postWorkflow.');
         }
 
         const queryParameters: any = {};
@@ -155,7 +158,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: WorkflowToJSON(requestParameters.workflow),
+            body: PostWorkflowRequestToJSON(requestParameters.postWorkflowRequest),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowFromJSON(jsonValue));
@@ -165,7 +168,7 @@ export class WorkflowsApi extends runtime.BaseAPI {
      * Create a new workflow.
      * Create a new workflow.
      */
-    async postWorkflow(requestParameters: PostWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Workflow> {
+    async postWorkflow(requestParameters: PostWorkflowOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Workflow> {
         const response = await this.postWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }

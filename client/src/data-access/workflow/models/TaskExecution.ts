@@ -73,7 +73,7 @@ export interface TaskExecution {
      * @type {string}
      * @memberof TaskExecution
      */
-    jobId?: string;
+    jobId: string;
     /**
      * The last modified by.
      * @type {string}
@@ -103,7 +103,7 @@ export interface TaskExecution {
      * @type {number}
      * @memberof TaskExecution
      */
-    priority?: number;
+    priority: number;
     /**
      * The current progress value, a number between 0 and 100.
      * @type {number}
@@ -139,13 +139,13 @@ export interface TaskExecution {
      * @type {Date}
      * @memberof TaskExecution
      */
-    startTime?: Date;
+    startTime: Date;
     /**
      * The current status of this task.
      * @type {string}
      * @memberof TaskExecution
      */
-    status?: TaskExecutionStatusEnum;
+    status: TaskExecutionStatusEnum;
     /**
      * The numeric order of the task in the workflow.
      * @type {number}
@@ -191,6 +191,10 @@ export type TaskExecutionStatusEnum = typeof TaskExecutionStatusEnum[keyof typeo
  */
 export function instanceOfTaskExecution(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "jobId" in value;
+    isInstance = isInstance && "priority" in value;
+    isInstance = isInstance && "startTime" in value;
+    isInstance = isInstance && "status" in value;
 
     return isInstance;
 }
@@ -211,19 +215,19 @@ export function TaskExecutionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'error': !exists(json, 'error') ? undefined : ExecutionErrorFromJSON(json['error']),
         'executionTime': !exists(json, 'executionTime') ? undefined : json['executionTime'],
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'jobId': !exists(json, 'jobId') ? undefined : json['jobId'],
+        'jobId': json['jobId'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'output': !exists(json, 'output') ? undefined : json['output'],
         'parentId': !exists(json, 'parentId') ? undefined : json['parentId'],
-        'priority': !exists(json, 'priority') ? undefined : json['priority'],
+        'priority': json['priority'],
         'progress': !exists(json, 'progress') ? undefined : json['progress'],
         'retry': !exists(json, 'retry') ? undefined : json['retry'],
         'retryAttempts': !exists(json, 'retryAttempts') ? undefined : json['retryAttempts'],
         'retryDelay': !exists(json, 'retryDelay') ? undefined : json['retryDelay'],
         'retryDelayFactor': !exists(json, 'retryDelayFactor') ? undefined : json['retryDelayFactor'],
-        'startTime': !exists(json, 'startTime') ? undefined : (new Date(json['startTime'])),
-        'status': !exists(json, 'status') ? undefined : json['status'],
+        'startTime': (new Date(json['startTime'])),
+        'status': json['status'],
         'taskNumber': !exists(json, 'taskNumber') ? undefined : json['taskNumber'],
         'retryDelayMillis': !exists(json, 'retryDelayMillis') ? undefined : json['retryDelayMillis'],
         'workflowTask': !exists(json, 'workflowTask') ? undefined : WorkflowTaskFromJSON(json['workflowTask']),
@@ -252,7 +256,7 @@ export function TaskExecutionToJSON(value?: TaskExecution | null): any {
         'retryAttempts': value.retryAttempts,
         'retryDelay': value.retryDelay,
         'retryDelayFactor': value.retryDelayFactor,
-        'startTime': value.startTime === undefined ? undefined : (value.startTime.toISOString()),
+        'startTime': (value.startTime.toISOString()),
         'status': value.status,
         'taskNumber': value.taskNumber,
         'retryDelayMillis': value.retryDelayMillis,

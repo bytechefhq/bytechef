@@ -36,7 +36,7 @@ export interface WorkflowTask {
      * @type {string}
      * @memberof WorkflowTask
      */
-    name?: string;
+    name: string;
     /**
      * Defines the name of the type of the node that the task execution will be routed to. For instance, if the node value is "encoder", then the task will be routed to the "encoder" queue which is presumably subscribed to by worker nodes of "encoder" type.
      * @type {string}
@@ -80,6 +80,7 @@ export interface WorkflowTask {
  */
 export function instanceOfWorkflowTask(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "name" in value;
 
     return isInstance;
 }
@@ -96,7 +97,7 @@ export function WorkflowTaskFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'finalize': !exists(json, 'finalize') ? undefined : ((json['finalize'] as Array<any>).map(WorkflowTaskFromJSON)),
         'label': !exists(json, 'label') ? undefined : json['label'],
-        'name': !exists(json, 'name') ? undefined : json['name'],
+        'name': json['name'],
         'node': !exists(json, 'node') ? undefined : json['node'],
         'parameters': !exists(json, 'parameters') ? undefined : json['parameters'],
         'post': !exists(json, 'post') ? undefined : ((json['post'] as Array<any>).map(WorkflowTaskFromJSON)),
