@@ -59,11 +59,11 @@ export interface PropertyModel {
      */
     displayCondition?: string;
     /**
-     * Defines if the property can contain expressions or only constant values.
+     * Defines if the property can contain expressions or only constant values. Defaults to true.
      * @type {boolean}
      * @memberof PropertyModel
      */
-    expressionDisabled?: boolean;
+    expressionEnabled?: boolean;
     /**
      * If the property should be visible or not.
      * @type {boolean}
@@ -159,7 +159,7 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'advancedOption': !exists(json, 'advancedOption') ? undefined : json['advancedOption'],
         'description': !exists(json, 'description') ? undefined : json['description'],
         'displayCondition': !exists(json, 'displayCondition') ? undefined : json['displayCondition'],
-        'expressionDisabled': !exists(json, 'expressionDisabled') ? undefined : json['expressionDisabled'],
+        'expressionEnabled': !exists(json, 'expressionEnabled') ? undefined : json['expressionEnabled'],
         'hidden': !exists(json, 'hidden') ? undefined : json['hidden'],
         'label': !exists(json, 'label') ? undefined : json['label'],
         'name': !exists(json, 'name') ? undefined : json['name'],
@@ -181,7 +181,7 @@ export function PropertyModelToJSON(value?: PropertyModel | null): any {
         'advancedOption': value.advancedOption,
         'description': value.description,
         'displayCondition': value.displayCondition,
-        'expressionDisabled': value.expressionDisabled,
+        'expressionEnabled': value.expressionEnabled,
         'hidden': value.hidden,
         'label': value.label,
         'name': value.name,
