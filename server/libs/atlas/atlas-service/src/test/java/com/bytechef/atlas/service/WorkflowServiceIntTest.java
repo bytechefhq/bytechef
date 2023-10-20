@@ -53,7 +53,7 @@ public class WorkflowServiceIntTest {
 
         Assertions.assertEquals(
             workflow, workflowCrudRepository.findById(workflow.getId())
-                .orElseThrow());
+                .orElseThrow(IllegalArgumentException::new));
     }
 
     @Test

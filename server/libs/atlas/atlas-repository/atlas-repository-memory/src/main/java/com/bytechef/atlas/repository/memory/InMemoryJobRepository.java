@@ -104,13 +104,13 @@ public class InMemoryJobRepository implements JobRepository {
     @Override
     public Job findByTaskExecutionId(Long taskExecutionId) {
         TaskExecution taskExecution = inMemoryTaskExecutionRepository.findById(taskExecutionId)
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
 
         return jobs.values()
             .stream()
             .filter(job -> Objects.equals(job.getId(), taskExecution.getJobId()))
             .findFirst()
-            .orElseThrow();
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
