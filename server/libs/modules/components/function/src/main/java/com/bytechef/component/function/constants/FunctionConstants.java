@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.task.handler.function;
+package com.bytechef.component.function.constants;
 
 /**
  * @author Matija Petanjek
  */
-public class FunctionTaskConstants {
+public class FunctionConstants {
 
     public static final String FUNCTION = "function";
+    public static final String INPUT = "input";
     public static final String JAVA = "java";
-    public static final String JS = "js";
+    public static final String JAVASCRIPT = "javascript";
     public static final String PYTHON = "python";
-    public static final float VERSION_1_0 = 1.0f;
-    public static final String CONTEXT = "context";
-    public static final String SOURCE = "source";
-    public static final String PARAMETER = "parameter";
+    public static final String RUBY = "ruby";
+    public static final String R = "r";
+    public static final String SCRIPT = "script";
 }

@@ -1,0 +1,176 @@
+{
+  "display": {
+    "description": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
+    "label": "Function"
+  },
+  "name": "function",
+  "actions": [
+    {
+      "display": {
+        "description": "Executes custom Java code.",
+        "label": "Java"
+      },
+      "name": "java",
+      "inputs": [
+        {
+          "description": "Initialize parameter values used in the custom code.",
+          "displayOption": {},
+          "label": "Input",
+          "name": "input",
+          "type": "OBJECT",
+          "additionalProperties": true,
+          "properties": [
+            {
+              "type": "ANY"
+            }
+          ]
+        },
+        {
+          "description": "Add your Java custom logic here.",
+          "label": "Java code",
+          "name": "script",
+          "type": "STRING",
+          "editorType": "CODE"
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "ANY"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Executes custom JavaScript code.",
+        "label": "JavaScript"
+      },
+      "name": "javascript",
+      "inputs": [
+        {
+          "description": "Initialize parameter values used in the custom code.",
+          "label": "Input",
+          "name": "input",
+          "type": "OBJECT",
+          "additionalProperties": true,
+          "properties": [
+            {
+              "type": "ANY"
+            }
+          ]
+        },
+        {
+          "description": "Add your JavaScript custom logic here.",
+          "label": "JavaScript code",
+          "name": "script",
+          "type": "STRING",
+          "editorType": "CODE"
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "ANY"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Executes custom Python code.",
+        "label": "Python"
+      },
+      "name": "python",
+      "inputs": [
+        {
+          "description": "Initialize parameter values used in the custom code.",
+          "label": "Input",
+          "name": "input",
+          "type": "OBJECT",
+          "additionalProperties": true,
+          "properties": [
+            {
+              "type": "ANY"
+            }
+          ]
+        },
+        {
+          "description": "Add your Python custom logic here.",
+          "label": "Python code",
+          "name": "script",
+          "type": "STRING",
+          "editorType": "CODE"
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "ANY"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Executes custom R code.",
+        "label": "R"
+      },
+      "name": "r",
+      "inputs": [
+        {
+          "description": "Initialize parameter values used in the custom code.",
+          "label": "Input",
+          "name": "input",
+          "type": "OBJECT",
+          "additionalProperties": true,
+          "properties": [
+            {
+              "type": "ANY"
+            }
+          ]
+        },
+        {
+          "description": "Add your R custom logic here.",
+          "label": "R code",
+          "name": "script",
+          "type": "STRING",
+          "editorType": "CODE"
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "ANY"
+        }
+      ]
+    },
+    {
+      "display": {
+        "description": "Executes custom Ruby code.",
+        "label": "Ruby"
+      },
+      "name": "ruby",
+      "inputs": [
+        {
+          "description": "Initialize parameter values used in the custom code.",
+          "label": "Input",
+          "name": "input",
+          "type": "OBJECT",
+          "additionalProperties": true,
+          "properties": [
+            {
+              "type": "ANY"
+            }
+          ]
+        },
+        {
+          "description": "Add your Ruby custom logic here.",
+          "label": "Ruby code",
+          "name": "script",
+          "type": "STRING",
+          "editorType": "CODE"
+        }
+      ],
+      "outputSchema": [
+        {
+          "type": "ANY"
+        }
+      ]
+    }
+  ],
+  "version": 1
+}
