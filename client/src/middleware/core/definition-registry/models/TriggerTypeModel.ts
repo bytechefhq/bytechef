@@ -18,12 +18,11 @@
  * @export
  */
 export const TriggerTypeModel = {
-    HybridDynamic: 'HYBRID_DYNAMIC',
-    HybridStatic: 'HYBRID_STATIC',
+    StaticWebhook: 'STATIC_WEBHOOK',
+    Hybrid: 'HYBRID',
     Listener: 'LISTENER',
     Polling: 'POLLING',
-    WebhookDynamic: 'WEBHOOK_DYNAMIC',
-    WebhookStatic: 'WEBHOOK_STATIC'
+    DynamicWebhook: 'DYNAMIC_WEBHOOK'
 } as const;
 export type TriggerTypeModel = typeof TriggerTypeModel[keyof typeof TriggerTypeModel];
 
