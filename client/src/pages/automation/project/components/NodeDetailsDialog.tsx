@@ -172,12 +172,14 @@ const NodeDetailsDialog = () => {
                             </Dialog.Title>
 
                             <div className="flex h-full flex-col">
-                                <CurrentActionSelect
-                                    actions={currentComponent.actions!}
-                                    description={currentAction?.description}
-                                    handleValueChange={setCurrentActionName}
-                                    loading={currentActionLoading}
-                                />
+                                {!!currentComponent?.actions?.length && (
+                                    <CurrentActionSelect
+                                        actions={currentComponent.actions}
+                                        description={currentAction?.description}
+                                        handleValueChange={setCurrentActionName}
+                                        loading={currentActionLoading}
+                                    />
+                                )}
 
                                 {componentTabs.length > 1 && (
                                     <div className="flex justify-center pt-4">
