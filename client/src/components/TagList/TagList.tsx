@@ -138,7 +138,7 @@ const TagList = ({
                         setIsNewTagWindowVisible(true);
                     }}
                 >
-                    <PlusIcon className="h-3 w-3 rounded-full hover:bg-gray-300" />
+                    <PlusIcon className="h-3 w-3" />
                 </div>
             )}
         </div>
