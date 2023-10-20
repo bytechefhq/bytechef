@@ -12,15 +12,15 @@ import {useState} from 'react';
 import {UseFormGetValues} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
-interface InstanceDialogWorkflowListItemProps {
+interface ProjectInstanceDialogWorkflowListItemProps {
     workflow: WorkflowModel;
     label: string;
 }
 
-export const InstanceDialogWorkflowListItem = ({
+export const ProjectInstanceDialogWorkflowListItem = ({
     label,
     workflow,
-}: InstanceDialogWorkflowListItemProps) => {
+}: ProjectInstanceDialogWorkflowListItemProps) => {
     const [selectedTabIndex, setSelectedTabIndex] = useState(0);
     const [isEnabled, setIsEnabled] = useState(false);
 
@@ -136,7 +136,7 @@ export const InstanceDialogWorkflowListItem = ({
     );
 };
 
-const InstanceDialogWorkflowsStep = (props: {
+const ProjectInstanceDialogWorkflowsStep = (props: {
     getValues: UseFormGetValues<ProjectInstanceModel>;
 }) => {
     const {data: workflows} = useGetProjectWorkflowsQuery(
@@ -146,7 +146,7 @@ const InstanceDialogWorkflowsStep = (props: {
     return (
         <ul className="space-y-4">
             {workflows?.map((workflow) => (
-                <InstanceDialogWorkflowListItem
+                <ProjectInstanceDialogWorkflowListItem
                     key={workflow.id!}
                     workflow={workflow}
                     label={workflow.label!}
@@ -156,4 +156,4 @@ const InstanceDialogWorkflowsStep = (props: {
     );
 };
 
-export default InstanceDialogWorkflowsStep;
+export default ProjectInstanceDialogWorkflowsStep;

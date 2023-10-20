@@ -27,7 +27,7 @@ interface ProjectDialogProps {
     touchedFields: UseFormReturn<ProjectInstanceModel>['formState']['touchedFields'];
 }
 
-const InstanceDialogBasicStep = ({
+const ProjectInstanceDialogBasicStep = ({
     control,
     getValues,
     projectInstance,
@@ -158,4 +158,4 @@ const InstanceDialogBasicStep = ({
     );
 };
 
-export default InstanceDialogBasicStep;
+export default ProjectInstanceDialogBasicStep;
