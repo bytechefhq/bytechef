@@ -26,9 +26,9 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
     testImplementation(project(":server:libs:atlas:atlas-sync-executor"))
     testImplementation(project(":server:libs:atlas:atlas-worker:atlas-worker-impl"))
-    testImplementation(project(":server:libs:configs:liquibase-config"))
     testImplementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
+    testImplementation(project(":server:libs:core:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

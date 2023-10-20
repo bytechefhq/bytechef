@@ -17,6 +17,7 @@
 
 package com.bytechef.connection.config;
 
+import com.bytechef.helios.swagger.util.SwaggerUtils;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,23 +29,6 @@ public class SwaggerConfiguration {
 
     @Bean
     public GroupedOpenApi automationOpenApi() {
-        return GroupedOpenApi.builder()
-            .group("automation")
-            .displayName("Automation API")
-            .pathsToMatch(new String[] {
-                "/api/automation/**"
-            })
-            .build();
-    }
-
-    @Bean
-    public GroupedOpenApi embeddedOpenApi() {
-        return GroupedOpenApi.builder()
-            .group("embedded")
-            .displayName("Embedded API")
-            .pathsToMatch(new String[] {
-                "/api/embedded/**"
-            })
-            .build();
+        return SwaggerUtils.AUTOMATION_GROUP_API;
     }
 }

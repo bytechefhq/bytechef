@@ -6,8 +6,6 @@ springBoot {
 }
 
 dependencies {
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
-    implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("org.springframework:spring-webflux")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
@@ -15,6 +13,9 @@ dependencies {
     implementation("org.springframework.retry:spring-retry")
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-config"))
+    implementation(project(":server:libs:core:async-config"))
+    implementation(project(":server:libs:core:environment-config"))
+    implementation(project(":server:libs:core:jackson-config"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-amqp"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
