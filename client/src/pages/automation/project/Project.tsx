@@ -193,7 +193,10 @@ const Project: React.FC = () => {
                 }
                 leftSidebarOpen={leftSidebarOpen}
             >
-                <WorkflowEditor />
+                <WorkflowEditor
+                    components={components}
+                    flowControls={flowControls}
+                />
             </LayoutContainer>
         );
     } else {

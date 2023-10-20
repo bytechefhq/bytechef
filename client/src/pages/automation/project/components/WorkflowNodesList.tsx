@@ -14,16 +14,16 @@ interface WorkflowNodesListItemProps
     extends HTMLAttributes<HTMLLIElement>,
         DisplayModel {
     handleClick?: () => void;
+    node: ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel;
 }
 
 const WorkflowNodesListItem = ({
-    description,
     draggable,
     handleClick,
-    label,
+    node,
 }: WorkflowNodesListItemProps): JSX.Element => {
-    const onDragStart = (event: DragEvent, label: string) => {
-        event.dataTransfer.setData('application/reactflow', label);
+    const onDragStart = (event: DragEvent, name: string) => {
+        event.dataTransfer.setData('application/reactflow', name);
         event.dataTransfer.effectAllowed = 'move';
     };
 
@@ -31,18 +31,20 @@ const WorkflowNodesListItem = ({
         <li
             className="mb-2 flex h-[72px] cursor-pointer items-center rounded-md bg-white p-2 hover:bg-gray-50"
             draggable={draggable}
-            id={label}
-            onDragStart={(event) => onDragStart(event, label!)}
+            id={node.display?.label}
+            onDragStart={(event) => onDragStart(event, node.name!)}
             onClick={handleClick}
         >
             <Component1Icon className="mr-2 h-7 w-7 flex-none" />
 
             <div className="flex flex-col">
-                <p className="text-sm font-medium text-gray-900">{label}</p>
+                <p className="text-sm font-medium text-gray-900">
+                    {node.display?.label}
+                </p>
 
                 {/* eslint-disable-next-line tailwindcss/no-custom-classname */}
                 <p className="text-left text-xs text-gray-500 line-clamp-2">
-                    {description}
+                    {node.display?.description}
                 </p>
             </div>
         </li>
@@ -75,13 +77,12 @@ const WorkflowNodesList = ({
             {components.length ? (
                 components.map((component: ComponentDefinitionBasicModel) => (
                     <WorkflowNodesListItem
-                        description={component.display?.description}
                         draggable={itemsDraggable}
                         handleClick={() =>
                             onItemClick && onItemClick(component)
                         }
-                        label={component.display?.label}
                         key={component.name}
+                        node={component}
                     />
                 ))
             ) : (
@@ -100,13 +101,12 @@ const WorkflowNodesList = ({
                 flowControls.map(
                     (flowControl: TaskDispatcherDefinitionModel) => (
                         <WorkflowNodesListItem
-                            description={flowControl.display?.description}
                             draggable={itemsDraggable}
                             handleClick={() =>
                                 onItemClick && onItemClick(flowControl)
                             }
-                            label={flowControl.display?.label}
                             key={flowControl.name}
+                            node={flowControl}
                         />
                     )
                 )

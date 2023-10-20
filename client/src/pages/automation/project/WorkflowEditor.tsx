@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import ReactFlow, {
     ReactFlowProvider,
     Controls,
@@ -18,8 +18,20 @@ import './WorkflowEditor.css';
 import useLayout from './hooks/useLayout';
 import {PlayIcon} from '@heroicons/react/24/outline';
 import RightSlideOver from './components/NodeDetailsDialog';
+import {
+    ComponentDefinitionModel,
+    TaskDispatcherDefinitionModel,
+} from 'middleware/definition-registry';
 
-const Workflow = (): JSX.Element => {
+const uuid = (): string =>
+    new Date().getTime().toString(36) + Math.random().toString(36).slice(2);
+
+type WorkflowProps = {
+    components: ComponentDefinitionModel[];
+    flowControls: TaskDispatcherDefinitionModel[];
+};
+
+const Workflow = ({components, flowControls}: WorkflowProps): JSX.Element => {
     const [viewportWidth, setViewportWidth] = useState(0);
 
     const defaultEdges: Edge[] = [
@@ -67,7 +79,9 @@ const Workflow = (): JSX.Element => {
         []
     );
 
-    const {setViewport} = useReactFlow();
+    const {getNode, getNodes, setNodes, setEdges, setViewport} = useReactFlow();
+
+    const nodes = getNodes();
 
     const {width} = useStore((store) => ({
         width: store.width,
@@ -84,30 +98,107 @@ const Workflow = (): JSX.Element => {
         });
     }, [setViewport, width]);
 
+    const createPlaceholderNode = (
+        sourceId: string,
+        droppedNode: ComponentDefinitionModel | TaskDispatcherDefinitionModel
+    ) => {
+        const dropTargetNode = getNode(sourceId);
+
+        if (!dropTargetNode) {
+            return;
+        }
+
+        const nodeIndex = nodes.findIndex(
+            (node) => node.id === dropTargetNode.id
+        );
+
+        const newWorkflowNode = {
+            ...dropTargetNode,
+            display: droppedNode.display,
+            name: droppedNode.name,
+            data: {
+                icon: droppedNode.display?.icon || (
+                    <PlayIcon className="h-8 w-8 text-gray-700" />
+                ),
+                label: droppedNode.display?.label,
+                name: droppedNode.name,
+            },
+            type: 'workflow',
+        };
+
+        const targetId = uuid();
+
+        const newPlaceholderNode = {
+            id: targetId,
+            data: {label: '+'},
+            position: {x: 0, y: 150},
+            type: 'placeholder',
+        };
+
+        setNodes((nodes) => {
+            nodes[nodeIndex] = newWorkflowNode;
+
+            return [...nodes, newPlaceholderNode];
+        });
+
+        const newPlaceholderEdge = {
+            id: `${sourceId}=>${targetId}`,
+            source: sourceId,
+            target: targetId,
+            type: 'placeholder',
+        };
+
+        setEdges((edges) => [...edges, newPlaceholderEdge]);
+    };
+
+    const onDrop: DragEventHandler = (event) => {
+        if (event.target instanceof HTMLElement) {
+            const targetNodeElement = event.target.closest(
+                '.react-flow__node'
+            ) as HTMLElement;
+
+            const nodeName = event.dataTransfer.getData(
+                'application/reactflow'
+            );
+
+            const droppedNode = [...components, ...flowControls].find(
+                (node) => node.name === nodeName
+            );
+
+            if (targetNodeElement && droppedNode) {
+                const targetNodeId = targetNodeElement.dataset.id!;
+
+                createPlaceholderNode(targetNodeId, droppedNode);
+            }
+        }
+    };
+
     useLayout();
 
     return (
         <div className="flex h-full flex-1 flex-col">
             <ReactFlow
-                defaultNodes={defaultNodes}
                 defaultEdges={defaultEdges}
+                defaultNodes={defaultNodes}
                 defaultViewport={{
                     x: viewportWidth / 2,
                     y: 50,
                     zoom: 1,
                 }}
+                deleteKeyCode={null}
                 edgeTypes={edgeTypes}
                 minZoom={0.6}
                 maxZoom={1.5}
                 nodeTypes={nodeTypes}
                 nodesDraggable={false}
                 nodesConnectable={false}
+                onDrop={onDrop}
+                // onDragOver={onDragOver}
                 panOnDrag
                 panOnScroll
                 proOptions={{hideAttribution: true}}
                 zoomOnDoubleClick={false}
                 zoomOnScroll={false}
-                deleteKeyCode={null}
             >
                 <MiniMap />
 
@@ -117,11 +208,13 @@ const Workflow = (): JSX.Element => {
     );
 };
 
-function WorkflowEditor() {
+type WorkflowEditorProps = WorkflowProps;
+
+function WorkflowEditor({components, flowControls}: WorkflowEditorProps) {
     return (
         <>
             <ReactFlowProvider>
-                <Workflow />
+                <Workflow components={components} flowControls={flowControls} />
             </ReactFlowProvider>
 
             <RightSlideOver />

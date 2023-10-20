@@ -1,33 +1,44 @@
-import React, {memo} from 'react';
+import {memo, useState} from 'react';
 import {Handle, Position, NodeProps} from 'reactflow';
 
 import styles from './NodeTypes.module.css';
 import PopoverMenu from '../components/PopoverMenu';
+import {twMerge} from 'tailwind-merge';
 
-const PlaceholderNode = ({id, data}: NodeProps) => (
-    <PopoverMenu id={id}>
-        <div
-            // eslint-disable-next-line tailwindcss/no-custom-classname
-            className="mx-[24px] flex h-6 w-6 cursor-pointer items-center justify-center rounded-md bg-gray-300 font-bold text-white shadow-none hover:scale-110 hover:rounded-sm hover:bg-gray-500"
-            title="Click to add a component"
-        >
-            <span className="text-lg">{data.label}</span>
+const PlaceholderNode = ({id, data}: NodeProps) => {
+    const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
 
-            <Handle
-                className={styles.handle}
-                type="target"
-                position={Position.Top}
-                isConnectable={false}
-            />
+    return (
+        <PopoverMenu id={id}>
+            <div
+                className={twMerge(
+                    'mx-[24px] flex h-6 w-6 cursor-pointer items-center justify-center rounded-md bg-gray-300 font-bold text-white shadow-none hover:scale-110 hover:rounded-sm hover:bg-gray-500',
+                    isDropzoneActive && 'bg-gray-500'
+                )}
+                title="Click to add a node"
+                onDrop={() => setDropzoneActive(false)}
+                onDragOver={(event) => event.preventDefault()}
+                onDragEnter={() => setDropzoneActive(true)}
+                onDragLeave={() => setDropzoneActive(false)}
+            >
+                <span className="text-lg">{data.label}</span>
 
-            <Handle
-                className={styles.handle}
-                type="source"
-                position={Position.Bottom}
-                isConnectable={false}
-            />
-        </div>
-    </PopoverMenu>
-);
+                <Handle
+                    className={styles.handle}
+                    type="target"
+                    position={Position.Top}
+                    isConnectable={false}
+                />
+
+                <Handle
+                    className={styles.handle}
+                    type="source"
+                    position={Position.Bottom}
+                    isConnectable={false}
+                />
+            </div>
+        </PopoverMenu>
+    );
+};
 
 export default memo(PlaceholderNode);
