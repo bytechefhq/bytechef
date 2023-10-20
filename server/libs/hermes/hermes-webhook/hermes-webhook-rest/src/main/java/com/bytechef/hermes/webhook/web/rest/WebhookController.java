@@ -119,7 +119,7 @@ public class WebhookController {
                         multipartFormDataMap.put(
                             part.getName(),
                             fileStorageService.storeFileContent(
-                                FileEntryConstants.DOCUMENTS_DIR, part.getName(), part.getInputStream()));
+                                FileEntryConstants.FILES_DIR, part.getName(), part.getInputStream()));
                     } else {
                         multipartFormDataMap.put(
                             part.getName(),
@@ -170,7 +170,7 @@ public class WebhookController {
             } else if (mediaType.startsWith("application/")) {
                 body = new WebhookBodyImpl(
                     fileStorageService.storeFileContent(
-                        FileEntryConstants.DOCUMENTS_DIR, getFilename(httpServletRequest.getContentType()),
+                        FileEntryConstants.FILES_DIR, getFilename(httpServletRequest.getContentType()),
                         httpServletRequest.getInputStream()),
                     ContentType.BINARY, httpServletRequest.getContentType());
             } else {

@@ -168,26 +168,26 @@ public class ContextImpl implements ActionContext, TriggerContext {
         @Override
         public InputStream getStream(Context.FileEntry fileEntry) {
             return fileStorageService.getFileStream(
-                FileEntryConstants.DOCUMENTS_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
+                FileEntryConstants.FILES_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
         public String readToString(Context.FileEntry fileEntry) {
             return fileStorageService.readFileToString(
-                FileEntryConstants.DOCUMENTS_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
+                FileEntryConstants.FILES_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
         public FileEntry storeContent(String fileName, String data) {
             return new ContextFileEntryImpl(
-                fileStorageService.storeFileContent(FileEntryConstants.DOCUMENTS_DIR, fileName, data));
+                fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, data));
         }
 
         @Override
         public FileEntry storeContent(String fileName, InputStream inputStream) {
             try {
                 return new ContextFileEntryImpl(
-                    fileStorageService.storeFileContent(FileEntryConstants.DOCUMENTS_DIR, fileName, inputStream));
+                    fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, inputStream));
             } catch (Exception exception) {
                 throw new ComponentExecutionException("Unable to store file " + fileName, exception);
             }

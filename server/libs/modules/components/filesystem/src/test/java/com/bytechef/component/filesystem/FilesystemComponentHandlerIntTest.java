@@ -66,7 +66,7 @@ public class FilesystemComponentHandlerIntTest {
         Map<String, ?> outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
 
         FileEntry fileEntry = fileStorageService.storeFileContent(
-            FileEntryConstants.DOCUMENTS_DIR, "sample.txt", Files.contentOf(getFile(), StandardCharsets.UTF_8));
+            FileEntryConstants.FILES_DIR, "sample.txt", Files.contentOf(getFile(), StandardCharsets.UTF_8));
 
         assertThat(outputs.get("readLocalFile"))
             .hasFieldOrPropertyWithValue("extension", "txt")
@@ -86,7 +86,7 @@ public class FilesystemComponentHandlerIntTest {
                 FILE_ENTRY,
                 fileStorageService
                     .storeFileContent(
-                        FileEntryConstants.DOCUMENTS_DIR, sampleFile.getAbsolutePath(),
+                        FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(),
                         Files.contentOf(getFile(), StandardCharsets.UTF_8)),
                 "filename", tempFile.getAbsolutePath()));
 

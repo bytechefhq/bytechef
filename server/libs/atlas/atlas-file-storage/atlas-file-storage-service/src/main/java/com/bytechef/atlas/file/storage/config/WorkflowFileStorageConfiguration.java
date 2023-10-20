@@ -20,7 +20,7 @@ package com.bytechef.atlas.file.storage.config;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacade;
 import com.bytechef.atlas.file.storage.facade.WorkflowFileStorageFacadeImpl;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.file.storage.config.FileStorageProperties;
+import com.bytechef.file.storage.filesystem.config.FilesystemFileStorageProperties;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +42,7 @@ public class WorkflowFileStorageConfiguration {
     @Bean
     @ConditionalOnProperty("bytechef.workflow.async.output-storage.provider")
     WorkflowFileStorageFacade workflowAsyncFileStorageFacade(
-        FileStorageProperties fileStorageProperties, ObjectMapper objectMapper,
+        FilesystemFileStorageProperties fileStorageProperties, ObjectMapper objectMapper,
         @Value("${bytechef.workflow.async.output-storage.provider}") String workflowAsyncOutputStorageProvider) {
 
         if (logger.isInfoEnabled()) {
@@ -58,7 +58,7 @@ public class WorkflowFileStorageConfiguration {
     @Bean
     @ConditionalOnProperty("bytechef.workflow.sync.output-storage.provider")
     WorkflowFileStorageFacade workflowSyncFileStorageFacade(
-        FileStorageProperties fileStorageProperties, ObjectMapper objectMapper,
+        FilesystemFileStorageProperties fileStorageProperties, ObjectMapper objectMapper,
         @Value("${bytechef.workflow.sync.output-storage.provider}") String workflowSyncOutputStorageProvider) {
 
         if (logger.isInfoEnabled()) {
@@ -71,11 +71,11 @@ public class WorkflowFileStorageConfiguration {
     }
 
     private static FileStorageService getFileStorageService(
-        FileStorageProperties fileStorageProperties, String workflowAsyncOutputStorageProvider) {
+        FilesystemFileStorageProperties fileStorageProperties, String workflowAsyncOutputStorageProvider) {
 
         return switch (workflowAsyncOutputStorageProvider) {
             case "base64" -> new Base64FileStorageService();
-            case "filesystem" -> new FilesystemFileStorageService(fileStorageProperties.getFilesystemDirectory());
+            case "filesystem" -> new FilesystemFileStorageService(fileStorageProperties.getBasedir());
             default -> throw new IllegalArgumentException(
                 "Output storage %s does not exist".formatted(workflowAsyncOutputStorageProvider));
         };

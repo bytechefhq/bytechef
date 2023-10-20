@@ -26,17 +26,20 @@ import java.io.InputStream;
  */
 public interface FileStorageService {
 
-    boolean fileExists(String directory, FileEntry fileEntry) throws FileStorageException;
+    void deleteFile(String directoryPath, FileEntry fileEntry);
 
-    InputStream getFileStream(String directory, FileEntry fileEntry) throws FileStorageException;
+    boolean fileExists(String directoryPath, FileEntry fileEntry) throws FileStorageException;
 
-    byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException;
+    InputStream getFileStream(String directoryPath, FileEntry fileEntry) throws FileStorageException;
 
-    String readFileToString(String directory, FileEntry fileEntry) throws FileStorageException;
+    byte[] readFileToBytes(String directoryPath, FileEntry fileEntry) throws FileStorageException;
 
-    FileEntry storeFileContent(String directory, String fileName, byte[] data) throws FileStorageException;
+    String readFileToString(String directoryPath, FileEntry fileEntry) throws FileStorageException;
 
-    FileEntry storeFileContent(String directory, String fileName, String data) throws FileStorageException;
+    FileEntry storeFileContent(String directoryPath, String fileName, byte[] data) throws FileStorageException;
 
-    FileEntry storeFileContent(String directory, String fileName, InputStream inputStream) throws FileStorageException;
+    FileEntry storeFileContent(String directoryPath, String fileName, String data) throws FileStorageException;
+
+    FileEntry storeFileContent(String directoryPath, String fileName, InputStream inputStream)
+        throws FileStorageException;
 }

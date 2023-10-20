@@ -46,8 +46,9 @@ public class FilesystemFileStorageService implements FileStorageService {
         this.rootLocation = Paths.get(fileStorageDir);
     }
 
-    public void deleteFile(String context, FileEntry fileEntry) {
-        Path path = resolveDirectory(context);
+    @Override
+    public void deleteFile(String directoryPath, FileEntry fileEntry) {
+        Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
         boolean deleted = path.resolve(url.replace("file://", ""))
@@ -60,8 +61,8 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public boolean fileExists(String directory, FileEntry fileEntry) throws FileStorageException {
-        Path path = resolveDirectory(directory);
+    public boolean fileExists(String directoryPath, FileEntry fileEntry) throws FileStorageException {
+        Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
         return path.resolve(url.replace("file://", ""))
@@ -70,8 +71,8 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public InputStream getFileStream(String directory, FileEntry fileEntry) {
-        Path path = resolveDirectory(directory);
+    public InputStream getFileStream(String directoryPath, FileEntry fileEntry) {
+        Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
         try {
@@ -82,8 +83,8 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException {
-        Path path = resolveDirectory(directory);
+    public byte[] readFileToBytes(String directoryPath, FileEntry fileEntry) throws FileStorageException {
+        Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
         try {
@@ -94,8 +95,8 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public String readFileToString(String directory, FileEntry fileEntry) throws FileStorageException {
-        Path path = resolveDirectory(directory);
+    public String readFileToString(String directoryPath, FileEntry fileEntry) throws FileStorageException {
+        Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
         try {
@@ -106,38 +107,39 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry storeFileContent(String directory, String fileName, byte[] data) throws FileStorageException {
-        Objects.requireNonNull(directory, "context is required");
+    public FileEntry storeFileContent(String directoryPath, String fileName, byte[] data) throws FileStorageException {
+        Objects.requireNonNull(directoryPath, "directory is required");
         Objects.requireNonNull(fileName, "fileName is required");
         Objects.requireNonNull(data, "data is required");
 
-        return storeFileContent(directory, fileName, new ByteArrayInputStream(data));
+        return storeFileContent(directoryPath, fileName, new ByteArrayInputStream(data));
     }
 
     @Override
-    public FileEntry storeFileContent(String directory, String fileName, String data) throws FileStorageException {
-        Objects.requireNonNull(directory, "context is required");
+    public FileEntry storeFileContent(String directoryPath, String fileName, String data) throws FileStorageException {
+        Objects.requireNonNull(directoryPath, "directory is required");
         Objects.requireNonNull(fileName, "fileName is required");
         Objects.requireNonNull(data, "data is required");
 
-        return storeFileContent(directory, fileName, new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
+        return storeFileContent(directoryPath, fileName,
+            new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Override
-    public FileEntry storeFileContent(String directory, String fileName, InputStream inputStream)
+    public FileEntry storeFileContent(String directoryPath, String fileName, InputStream inputStream)
         throws FileStorageException {
 
-        Objects.requireNonNull(directory, "context is required");
+        Objects.requireNonNull(directoryPath, "directory is required");
         Objects.requireNonNull(fileName, "fileName is required");
         Objects.requireNonNull(inputStream, "inputStream is required");
 
-        return doStoreFileContent(directory, fileName, inputStream);
+        return doStoreFileContent(directoryPath, fileName, inputStream);
     }
 
-    private FileEntry doStoreFileContent(String context, String fileName, InputStream inputStream) {
-        context = StringUtils.trimAllWhitespace(context.replaceAll("[^0-9a-zA-Z/_]", ""));
+    private FileEntry doStoreFileContent(String directory, String fileName, InputStream inputStream) {
+        directory = StringUtils.trimAllWhitespace(directory.replaceAll("[^0-9a-zA-Z/_]", ""));
 
-        Path path = resolveDirectory(context.toLowerCase());
+        Path path = resolveDirectoryPath(directory.toLowerCase());
 
         path = path.resolve(generateUuid());
 
@@ -156,9 +158,9 @@ public class FilesystemFileStorageService implements FileStorageService {
         return new FileEntry(fileName, "file://" + path.toString());
     }
 
-    private Path resolveDirectory(String context) {
+    private Path resolveDirectoryPath(String directory) {
         try {
-            return Files.createDirectories(rootLocation.resolve(context));
+            return Files.createDirectories(rootLocation.resolve(directory));
         } catch (IOException ioe) {
             throw new FileStorageException("Could not initialize storage", ioe);
         }

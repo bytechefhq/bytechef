@@ -247,7 +247,7 @@ public class HttpClientExecutor {
             name, fileEntry.getName(),
             MoreBodyPublishers.ofMediaType(
                 BodyPublishers.ofInputStream(() -> fileStorageService.getFileStream(
-                    FileEntryConstants.DOCUMENTS_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry())),
+                    FileEntryConstants.FILES_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry())),
                 MediaType.parse(fileEntry.getMimeType())));
     }
 
@@ -300,7 +300,7 @@ public class HttpClientExecutor {
     private BodyPublisher getBinaryBodyPublisher(Body body, FileEntry fileEntry) {
         return MoreBodyPublishers.ofMediaType(
             BodyPublishers.ofInputStream(() -> fileStorageService.getFileStream(
-                FileEntryConstants.DOCUMENTS_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry())),
+                FileEntryConstants.FILES_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry())),
             MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
     }
 
@@ -370,7 +370,7 @@ public class HttpClientExecutor {
         }
 
         return new ContextFileEntryImpl(
-            fileStorageService.storeFileContent(FileEntryConstants.DOCUMENTS_DIR, filename, httpResponseBody));
+            fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, filename, httpResponseBody));
     }
 
     private BodyPublisher getJsonBodyPublisher(Body body) {

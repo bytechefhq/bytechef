@@ -69,7 +69,7 @@ public class OdsFileComponentHandlerIntTest {
                 Map.of(
                     FILE_ENTRY,
                     fileStorageService.storeFileContent(
-                        FileEntryConstants.DOCUMENTS_DIR, sampleFile.getAbsolutePath(), fileInputStream)));
+                        FileEntryConstants.FILES_DIR, sampleFile.getAbsolutePath(), fileInputStream)));
 
             Assertions.assertThat(job.getStatus())
                 .isEqualTo(Job.Status.COMPLETED);
@@ -107,7 +107,7 @@ public class OdsFileComponentHandlerIntTest {
                 Map.of(
                     FILE_ENTRY,
                     fileStorageService.storeFileContent(
-                        FileEntryConstants.DOCUMENTS_DIR, sampleFile.getName(), fileInputStream)));
+                        FileEntryConstants.FILES_DIR, sampleFile.getName(), fileInputStream)));
 
             outputs = workflowFileStorageFacade.readJobOutputs(job.getOutputs());
 
