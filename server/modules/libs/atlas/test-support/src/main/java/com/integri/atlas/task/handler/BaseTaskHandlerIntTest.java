@@ -24,12 +24,11 @@ import com.integri.atlas.engine.coordinator.task.completion.DefaultTaskCompletio
 import com.integri.atlas.engine.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.integri.atlas.engine.coordinator.workflow.repository.JSONWorkflowMapper;
 import com.integri.atlas.engine.core.MapObject;
-import com.integri.atlas.engine.core.binary.BinaryHelper;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.error.Error;
+import com.integri.atlas.engine.core.file.storage.FileStorageService;
 import com.integri.atlas.engine.core.json.JSONHelper;
 import com.integri.atlas.engine.core.message.broker.Queues;
-import com.integri.atlas.engine.core.storage.StorageService;
 import com.integri.atlas.engine.core.task.TaskExecution;
 import com.integri.atlas.engine.core.task.evaluator.spel.SpelTaskEvaluator;
 import com.integri.atlas.engine.core.task.repository.TaskExecutionRepository;
@@ -51,9 +50,6 @@ public class BaseTaskHandlerIntTest {
     private static final Logger logger = LoggerFactory.getLogger(BaseTaskHandlerIntTest.class);
 
     @Autowired
-    protected BinaryHelper binaryHelper;
-
-    @Autowired
     protected ContextRepository contextRepository;
 
     @Autowired
@@ -63,7 +59,7 @@ public class BaseTaskHandlerIntTest {
     protected JSONHelper jsonHelper;
 
     @Autowired
-    protected StorageService storageService;
+    protected FileStorageService fileStorageService;
 
     @Autowired
     protected TaskExecutionRepository taskRepository;
