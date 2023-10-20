@@ -1,6 +1,6 @@
 import {TagIcon} from '@heroicons/react/20/solid';
 import React, {useState} from 'react';
-import {useSearchParams} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 
 import PageHeader from '../../../components/PageHeader/PageHeader';
 import LayoutContainer from '../../../layouts/LayoutContainer/LayoutContainer';
@@ -34,6 +34,8 @@ const Projects = () => {
         defaultCurrentState
     );
 
+    const navigate = useNavigate();
+
     const {isLoading: categoriesLoading, data: categories} =
         useGetProjectCategoriesQuery();
     const {isLoading: tagsLoading, data: tags} = useGetProjectTagsQuery();
@@ -59,7 +61,18 @@ const Projects = () => {
             header={
                 <PageHeader
                     position="main"
-                    right={<ProjectDialog project={undefined} />}
+                    right={
+                        <ProjectDialog
+                            project={undefined}
+                            onClose={(project) => {
+                                navigate(
+                                    `/automation/projects/${
+                                        project?.id
+                                    }/workflow/${project?.workflowIds![0]}`
+                                );
+                            }}
+                        />
+                    }
                     title={title}
                 />
             }
