@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar.openapi;
+package com.bytechef.hermes.component.registrar.rest;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class OpenApiComponentTaskHandlerTest {
+public class RestComponentTaskHandlerTest {
 
     @Disabled
     @Test

@@ -14,32 +14,34 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar.openapi.client;
+package com.bytechef.hermes.component.registrar.rest.client;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.task.WorkflowTask;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.definition.Action;
+import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.http.client.HttpClient;
-import com.bytechef.hermes.component.http.client.constants.HttpClientConstants.RequestMethod;
 import com.bytechef.hermes.component.impl.ExecutionParametersImpl;
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class OpenApiClient {
+public class RestClient {
 
     private static final HttpClient HTTP_CLIENT = new HttpClient();
 
-    public Object execute(Action action, Context context, TaskExecution taskExecution) throws Exception {
-        Map<String, Object> metadata = action.getMetadata();
+    public Object execute(ActionDefinition actionDefinition, Context context, TaskExecution taskExecution)
+            throws Exception {
+        Map<String, Object> metadata = actionDefinition.getMetadata();
 
         WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
-        // workflowTask.put();
+        ExecutionParametersImpl executionParameters = new ExecutionParametersImpl(workflowTask);
 
-        return HTTP_CLIENT.execute(context, new ExecutionParametersImpl(workflowTask), RequestMethod.valueOf((String)
-                metadata.get("requestMethod")));
+        //        executionParameters.put();
+
+        return HTTP_CLIENT.execute(
+                context, executionParameters, HttpClient.RequestMethod.valueOf((String) metadata.get("requestMethod")));
     }
 }

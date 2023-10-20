@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar.openapi;
+package com.bytechef.hermes.component.registrar.rest;
 
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.Action;
+import com.bytechef.hermes.component.RestComponentHandler;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.registrar.AbstractTaskHandlerRegistrar;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
@@ -30,24 +31,32 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class OpenApiComponentTaskHandlerRegistrar extends AbstractTaskHandlerRegistrar<OpenApiComponentHandler> {
+public class RestComponentTaskHandlerRegistrar extends AbstractTaskHandlerRegistrar<RestComponentHandler> {
 
     private final ConnectionService connectionService;
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI2")
-    public OpenApiComponentTaskHandlerRegistrar(
+    public RestComponentTaskHandlerRegistrar(
             ConnectionService connectionService, EventPublisher eventPublisher, FileStorageService fileStorageService) {
-        super(OpenApiComponentHandler.class);
+        super(RestComponentHandler.class);
         this.connectionService = connectionService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
     }
 
     @Override
-    protected TaskHandler<?> createTaskHandler(Action action, OpenApiComponentHandler openApiComponentHandler) {
-        return new OpenApiComponentTaskHandler(
-                action, connectionService, openApiComponentHandler, eventPublisher, fileStorageService);
+    protected TaskHandler<?> createTaskHandler(
+            ActionDefinition actionDefinition,
+            ConnectionDefinition connectionDefinition,
+            RestComponentHandler restComponentHandler) {
+        return new RestComponentTaskHandler(
+                actionDefinition,
+                connectionDefinition,
+                connectionService,
+                restComponentHandler,
+                eventPublisher,
+                fileStorageService);
     }
 }

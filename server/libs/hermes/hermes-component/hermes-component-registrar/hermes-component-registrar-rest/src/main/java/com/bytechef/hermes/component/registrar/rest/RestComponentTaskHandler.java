@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.registrar.openapi;
+package com.bytechef.hermes.component.registrar.rest;
 
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.event.EventPublisher;
 import com.bytechef.atlas.worker.task.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.hermes.component.Context;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.Action;
+import com.bytechef.hermes.component.RestComponentHandler;
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.impl.ContextImpl;
-import com.bytechef.hermes.component.registrar.openapi.client.OpenApiClient;
+import com.bytechef.hermes.component.registrar.rest.client.RestClient;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -32,37 +33,42 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * @author Ivica Cardic
  */
-public class OpenApiComponentTaskHandler implements TaskHandler<Object> {
+public class RestComponentTaskHandler implements TaskHandler<Object> {
 
-    private static final OpenApiClient OPEN_API_CLIENT = new OpenApiClient();
+    private static final RestClient REST_CLIENT = new RestClient();
 
-    private final Action action;
+    private final ActionDefinition actionDefinition;
+    private ConnectionDefinition connectionDefinition;
     private final ConnectionService connectionService;
-    private final OpenApiComponentHandler openApiComponentHandler;
+    private final RestComponentHandler restComponentHandler;
 
     private final EventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI2")
-    public OpenApiComponentTaskHandler(
-            Action action,
+    public RestComponentTaskHandler(
+            ActionDefinition actionDefinition,
+            ConnectionDefinition connectionDefinition,
             ConnectionService connectionService,
-            OpenApiComponentHandler openApiComponentHandler,
+            RestComponentHandler restComponentHandler,
             EventPublisher eventPublisher,
             FileStorageService fileStorageService) {
-        this.action = action;
+        this.actionDefinition = actionDefinition;
+        this.connectionDefinition = connectionDefinition;
         this.connectionService = connectionService;
-        this.openApiComponentHandler = openApiComponentHandler;
+        this.restComponentHandler = restComponentHandler;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
     }
 
     @Override
     public Object handle(TaskExecution taskExecution) throws TaskExecutionException {
-        Context context = new ContextImpl(connectionService, eventPublisher, fileStorageService, taskExecution);
+        Context context = new ContextImpl(
+                connectionDefinition, connectionService, eventPublisher, fileStorageService, taskExecution);
 
         try {
-            return openApiComponentHandler.postExecute(action, OPEN_API_CLIENT.execute(action, context, taskExecution));
+            return restComponentHandler.postExecute(
+                    actionDefinition, REST_CLIENT.execute(actionDefinition, context, taskExecution));
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }
