@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef;
+package com.bytechef.worker;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
