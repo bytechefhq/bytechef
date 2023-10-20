@@ -100,7 +100,7 @@ const ObjectProperty = ({
                                             Type
                                         </span>
 
-                                        <span className="inline-flex w-full rounded-md bg-white p-2 text-sm">
+                                        <span className="inline-flex w-full rounded-md bg-white py-2 text-sm">
                                             {additionalProperties[0]?.type}
                                         </span>
                                     </div>
