@@ -19,7 +19,6 @@ package com.bytechef.hermes.connection.rsocket.client;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Component;
@@ -48,15 +47,6 @@ public class ConnectionRSocketClient implements ConnectionService {
     @Override
     public void delete(String id) {
         rSocketRequester.route("removeConnection").data(id).send().block();
-    }
-
-    @Override
-    public Optional<Connection> fetchConnection(String id) {
-        return Optional.ofNullable(rSocketRequester
-                .route("fetchConnection")
-                .data(id)
-                .retrieveMono(Connection.class)
-                .block());
     }
 
     @Override

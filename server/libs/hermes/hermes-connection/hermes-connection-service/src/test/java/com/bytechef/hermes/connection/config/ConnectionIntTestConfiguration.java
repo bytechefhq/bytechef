@@ -16,7 +16,9 @@
 
 package com.bytechef.hermes.connection.config;
 
-import com.bytechef.test.config.EncryptionIntTestConfiguration;
+import com.bytechef.encryption.Encryption;
+import com.bytechef.encryption.EncryptionKey;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -24,7 +26,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.auditing.CurrentDateTimeProvider;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.domain.AuditorAware;
@@ -36,13 +37,31 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @ComponentScan(basePackages = {"com.bytechef.hermes.connection"})
 @EnableAutoConfiguration
-@Import(EncryptionIntTestConfiguration.class)
 @SpringBootConfiguration
 public class ConnectionIntTestConfiguration {
+
+    @Bean
+    ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
 
     @EnableCaching
     @TestConfiguration
     public static class CacheConfiguration {}
+
+    @TestConfiguration
+    public static class EncryptionIntTestConfiguration {
+
+        @Bean
+        Encryption encryption(EncryptionKey encryptionKey) {
+            return new Encryption(encryptionKey);
+        }
+
+        @Bean
+        EncryptionKey encryptionKey() {
+            return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+        }
+    }
 
     @EnableJdbcAuditing
     @EnableJdbcRepositories(basePackages = "com.bytechef.hermes.connection.repository")

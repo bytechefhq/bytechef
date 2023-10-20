@@ -1,6 +1,7 @@
 dependencies {
     api project(":server:libs:hermes:hermes-connection:hermes-connection-api")
 
+    implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "org.springframework:spring-context"
     implementation "org.springframework.data:spring-data-jdbc"
     implementation project(":server:libs:core:commons:commons-data")
@@ -8,5 +9,5 @@ dependencies {
     implementation project(":server:libs:core:encryption:encryption-api")
 
     testImplementation project(":server:libs:hermes:hermes-connection:hermes-connection-upgrade")
-    testImplementation project(":server:libs:test-support")
+    testImplementation project(":server:libs:test:test-int-support")
 }
