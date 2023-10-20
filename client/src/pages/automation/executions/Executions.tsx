@@ -69,7 +69,7 @@ const columns = [
         cell: (info) => getDuration(info),
     }),
     columnHelper.accessor((row) => row.job, {
-        header: 'Completed time',
+        header: 'Completed date',
         cell: (info) => (
             <>
                 {`${info.getValue()?.endDate?.toLocaleDateString()} ${info
