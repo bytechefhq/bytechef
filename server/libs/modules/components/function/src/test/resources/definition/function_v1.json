@@ -11,7 +11,12 @@
         "label": "Java"
       },
       "name": "java",
-      "inputs": [
+      "output": [
+        {
+          "type": "ANY"
+        }
+      ],
+      "properties": [
         {
           "description": "Initialize parameter values used in the custom code.",
           "displayOption": {},
@@ -32,11 +37,6 @@
           "type": "STRING",
           "editorType": "CODE"
         }
-      ],
-      "outputSchema": [
-        {
-          "type": "ANY"
-        }
       ]
     },
     {
@@ -45,7 +45,12 @@
         "label": "JavaScript"
       },
       "name": "javascript",
-      "inputs": [
+      "output": [
+        {
+          "type": "ANY"
+        }
+      ],
+      "properties": [
         {
           "description": "Initialize parameter values used in the custom code.",
           "label": "Input",
@@ -65,11 +70,6 @@
           "type": "STRING",
           "editorType": "CODE"
         }
-      ],
-      "outputSchema": [
-        {
-          "type": "ANY"
-        }
       ]
     },
     {
@@ -78,7 +78,12 @@
         "label": "Python"
       },
       "name": "python",
-      "inputs": [
+      "output": [
+        {
+          "type": "ANY"
+        }
+      ],
+      "properties": [
         {
           "description": "Initialize parameter values used in the custom code.",
           "label": "Input",
@@ -98,11 +103,6 @@
           "type": "STRING",
           "editorType": "CODE"
         }
-      ],
-      "outputSchema": [
-        {
-          "type": "ANY"
-        }
       ]
     },
     {
@@ -111,7 +111,12 @@
         "label": "R"
       },
       "name": "r",
-      "inputs": [
+      "output": [
+        {
+          "type": "ANY"
+        }
+      ],
+      "properties": [
         {
           "description": "Initialize parameter values used in the custom code.",
           "label": "Input",
@@ -131,11 +136,6 @@
           "type": "STRING",
           "editorType": "CODE"
         }
-      ],
-      "outputSchema": [
-        {
-          "type": "ANY"
-        }
       ]
     },
     {
@@ -144,7 +144,12 @@
         "label": "Ruby"
       },
       "name": "ruby",
-      "inputs": [
+      "output": [
+        {
+          "type": "ANY"
+        }
+      ],
+      "properties": [
         {
           "description": "Initialize parameter values used in the custom code.",
           "label": "Input",
@@ -163,11 +168,6 @@
           "name": "script",
           "type": "STRING",
           "editorType": "CODE"
-        }
-      ],
-      "outputSchema": [
-        {
-          "type": "ANY"
         }
       ]
     }

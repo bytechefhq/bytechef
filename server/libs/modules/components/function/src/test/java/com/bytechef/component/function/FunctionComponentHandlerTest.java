@@ -16,7 +16,7 @@
 
 package com.bytechef.component.function;
 
-import com.bytechef.hermes.test.definition.DefinitionAssert;
+import com.bytechef.test.jsonasssert.AssertUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,6 +26,6 @@ public class FunctionComponentHandlerTest {
 
     @Test
     public void testGetDefinition() {
-        DefinitionAssert.assertEquals("definition/function_v1.json", new FunctionComponentHandler().getDefinition());
+        AssertUtils.assertEquals("definition/function_v1.json", new FunctionComponentHandler().getDefinition());
     }
 }

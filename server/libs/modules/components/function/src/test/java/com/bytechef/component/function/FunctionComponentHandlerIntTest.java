@@ -20,20 +20,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.job.JobStatus;
-import com.bytechef.atlas.test.workflow.WorkflowExecutor;
-import com.bytechef.hermes.test.task.handler.TestVarTaskHandler;
+import com.bytechef.atlas.sync.executor.WorkflowExecutor;
+import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
+import com.bytechef.test.task.handler.TestVarTaskHandler;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Ivica Cardic
  */
-@SpringBootTest
+@ComponentIntTest
 public class FunctionComponentHandlerIntTest {
 
     private TestVarTaskHandler<Integer, Integer> testVarTaskHandler;
