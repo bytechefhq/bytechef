@@ -14,23 +14,21 @@ tasks:
   - name: randomNumber
     label: Generate a random number
     type: randomHelper/v1/randomInt
-    startInclusive: 0
-    endInclusive: 5000
-    pre:
-      - name: workDir
-        type: var/v1/set
-        value: "${tempDir()}/${uuid()}"
-      - type: filesystem/v1/mkdir
-        path: "${workDir}"
+    parameters:
+      startInclusive: 0
+      endInclusive: 5000
 
   - label: Print a greeting
     type: logger/v1/info
-    text: Hello ${yourName}
+    parameters:
+      text: Hello ${yourName}
 
   - label: Sleep a little
     type: delay/v1/delay
-    millis: ${randomNumber}
+    parameters:
+      millis: ${randomNumber}
 
   - label: Print a farewell
     type: logger/v1/info
-    text: Goodbye ${yourName}
+    parameters:
+      text: Goodbye ${yourName}
