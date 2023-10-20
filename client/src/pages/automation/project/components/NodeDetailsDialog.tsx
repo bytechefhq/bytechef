@@ -55,7 +55,7 @@ const NodeDetailsDialog = () => {
         >
             <Dialog.Portal>
                 <Dialog.Content
-                    className="fixed inset-y-0 right-2 top-16 bottom-2 z-10 w-screen max-w-md overflow-hidden rounded-xl border-l bg-white shadow-lg"
+                    className="fixed inset-y-0 bottom-2 right-2 top-16 z-10 w-screen max-w-md overflow-hidden rounded-xl border-l bg-white shadow-lg"
                     onInteractOutside={(event) => event.preventDefault()}
                 >
                     {currentComponent ? (
@@ -104,8 +104,6 @@ const NodeDetailsDialog = () => {
                                                 <span className="inline-flex px-4 text-sm font-medium">
                                                     {firstAction.display.label}
                                                 </span>
-
-                                                {/* eslint-disable-next-line tailwindcss/no-custom-classname */}
 
                                                 <p className="mt-1 line-clamp-2 w-full overflow-hidden px-4 text-xs text-gray-500">
                                                     {

@@ -85,7 +85,6 @@ const Select = ({
                                 <Item
                                     key={selectItem.value}
                                     value={selectItem.value}
-                                    // eslint-disable-next-line tailwindcss/classnames-order
                                     className="relative flex cursor-pointer select-none items-center rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none radix-disabled:opacity-50 dark:text-gray-300 dark:focus:bg-gray-900"
                                 >
                                     <ItemIndicator className="absolute left-2 inline-flex items-center">
@@ -96,7 +95,6 @@ const Select = ({
                                         <ItemText>{selectItem.label}</ItemText>
 
                                         {selectItem.description && (
-                                            // eslint-disable-next-line tailwindcss/no-custom-classname
                                             <span
                                                 className="mt-1 line-clamp-2 text-xs text-gray-500"
                                                 title={selectItem.description}

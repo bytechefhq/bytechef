@@ -196,7 +196,6 @@ const ContextualMenu = ({
     }, [components, filter, flowControls, edge]);
 
     return (
-        // eslint-disable-next-line tailwindcss/no-custom-classname
         <div className="nowheel rounded-md bg-white shadow-md">
             {typeof components === 'undefined' ||
                 (typeof flowControls === 'undefined' && (
