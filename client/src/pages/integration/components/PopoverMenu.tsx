@@ -25,7 +25,7 @@ const PopoverMenu = ({children, id}: PopoverMenuProps) => {
                     align="center"
                     sideOffset={4}
                     // eslint-disable-next-line tailwindcss/no-custom-classname
-                    className="nowheel radix-side-bottom:animate-slide-down radix-side-top:animate-slide-up z-50 w-48 rounded-lg bg-white shadow-md dark:bg-gray-800 md:w-56"
+                    className="nowheel z-50 w-48 rounded-lg bg-white shadow-md radix-side-bottom:animate-slide-down radix-side-top:animate-slide-up dark:bg-gray-800 md:w-56"
                 >
                     <Arrow className="fill-current text-white dark:text-gray-800" />
 

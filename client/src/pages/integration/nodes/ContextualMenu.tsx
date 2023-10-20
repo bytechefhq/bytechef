@@ -1,45 +1,41 @@
-import {Component1Icon, Cross1Icon} from '@radix-ui/react-icons';
+import {Component1Icon} from '@radix-ui/react-icons';
 import Input from 'components/Input/Input';
 import {ComponentDefinitionModel} from 'data-access/component-definition';
 import {TaskDispatcherDefinitionModel} from 'data-access/task-dispatcher-definition';
 import React, {memo, useEffect, useState} from 'react';
-import {Edge, Node, NodeProps, useReactFlow} from 'reactflow';
+import {Edge, Node, useReactFlow} from 'reactflow';
 
 const uuid = (): string =>
     new Date().getTime().toString(36) + Math.random().toString(36).slice(2);
 
-const ContextualMenu = ({data, id}: NodeProps): JSX.Element => {
+interface ContextualMenuProps {
+    components: ComponentDefinitionModel[] | undefined;
+    flowControls: TaskDispatcherDefinitionModel[] | undefined;
+    id: string;
+}
+
+const ContextualMenu = ({
+    components,
+    flowControls,
+    id,
+}: ContextualMenuProps): JSX.Element => {
     const [filter, setFilter] = useState('');
     const [filteredNodes, setFilteredNodes] = useState<
         Array<ComponentDefinitionModel | TaskDispatcherDefinitionModel>
     >([]);
 
-    const {getNode, setEdges} = useReactFlow();
-
-    const {components, flowControls, label, setNodes} = data;
-
-    const handleCloseClick = () => {
-        setNodes((nodes: Node[]) =>
-            nodes.filter((node) => node.data.label !== label)
-        );
-    };
+    const {getNode, setEdges, setNodes} = useReactFlow();
 
     const handleItemClick = (
-        filteredItem: ComponentDefinitionModel | TaskDispatcherDefinitionModel
+        clickedItem: ComponentDefinitionModel | TaskDispatcherDefinitionModel
     ) => {
-        const contextualMenuNode = getNode(id);
-
-        if (!contextualMenuNode) {
-            return;
-        }
-
-        const {placeholderId} = contextualMenuNode.data;
-
-        const placeholderNode = getNode(placeholderId);
+        const placeholderNode = getNode(id);
 
         if (!placeholderNode) {
             return;
         }
+
+        const placeholderId = placeholderNode.id;
 
         // create a unique id for the placeholder node that will be added as a child of the clicked node
         const childPlaceholderId = uuid();
@@ -74,14 +70,15 @@ const ContextualMenu = ({data, id}: NodeProps): JSX.Element => {
                             ...node,
                             type: 'workflow',
                             data: {
-                                label: filteredItem.display?.label,
-                                name: filteredItem?.name,
+                                label: clickedItem.display?.label,
+                                name: clickedItem?.name,
                                 icon: (
                                     <Component1Icon className="h-8 w-8 text-gray-700" />
                                 ),
                             },
                         };
                     }
+
                     return node;
                 })
                 // add the new placeholder node
@@ -98,6 +95,7 @@ const ContextualMenu = ({data, id}: NodeProps): JSX.Element => {
                             type: 'workflow',
                         };
                     }
+
                     return edge;
                 })
                 // add the new placeholder edge
@@ -106,20 +104,31 @@ const ContextualMenu = ({data, id}: NodeProps): JSX.Element => {
     };
 
     useEffect(() => {
-        setFilteredNodes(
-            [...components, ...flowControls].filter(
-                (item) =>
-                    item.name.toLowerCase().includes(filter.toLowerCase()) ||
-                    item.display.label
-                        .toLowerCase()
-                        .includes(filter.toLowerCase())
-            )
-        );
+        if (components && flowControls) {
+            setFilteredNodes(
+                [...components, ...flowControls].filter(
+                    (item) =>
+                        item.name
+                            ?.toLowerCase()
+                            .includes(filter.toLowerCase()) ||
+                        item.display?.label
+                            ?.toLowerCase()
+                            .includes(filter.toLowerCase())
+                )
+            );
+        }
     }, [components, flowControls, filter]);
 
     return (
         // eslint-disable-next-line tailwindcss/no-custom-classname
         <div className="nowheel rounded-md bg-white shadow-md" draggable>
+            {typeof components === 'undefined' ||
+                (typeof flowControls === 'undefined' && (
+                    <div className="py-2 px-3 text-xs text-gray-500">
+                        Something went wrong.
+                    </div>
+                ))}
+
             <header className="flex items-center px-3 pt-2 text-center font-bold text-gray-600">
                 <Input
                     name="contextualMenuFilter"
@@ -127,8 +136,6 @@ const ContextualMenu = ({data, id}: NodeProps): JSX.Element => {
                     value={filter}
                     onChange={(event) => setFilter(event.target.value)}
                 />
-
-                <Cross1Icon className="ml-2 mb-3" onClick={handleCloseClick} />
             </header>
 
             <main className="max-h-64 overflow-auto">
@@ -152,6 +159,11 @@ const ContextualMenu = ({data, id}: NodeProps): JSX.Element => {
 
                                         {filteredItem.display?.label}
                                     </span>
+
+                                    {/* eslint-disable-next-line tailwindcss/no-custom-classname */}
+                                    <p className="text-left text-xs text-gray-500 line-clamp-2">
+                                        {filteredItem.display?.description}
+                                    </p>
                                 </li>
                             )
                         )
