@@ -50,7 +50,7 @@ public class PipedriveAddLeadAction {
                 "path", "/leads", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object().properties(string("title").label("Title")
+        .properties(object("__item").properties(string("title").label("Title")
             .description("The name of the lead")
             .required(true),
             integer("owner_id").label("Owner Id")

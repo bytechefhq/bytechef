@@ -56,7 +56,7 @@ public class AirtableCreateRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)),
-            object().properties(object("fields").additionalProperties(oneOf())
+            object("__item").properties(object("fields").additionalProperties(oneOf())
                 .placeholder("Add")
                 .label("Fields")
                 .required(false))

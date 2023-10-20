@@ -61,7 +61,7 @@ public class MailchimpAddMemberToListAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            object().properties(string("email_address").label("Email Address")
+            object("__item").properties(string("email_address").label("Email Address")
                 .description("Email address for a subscriber.")
                 .required(true),
                 string("status").label("Status")
@@ -72,6 +72,7 @@ public class MailchimpAddMemberToListAction {
                     .required(true),
                 string("email_type").label("Email Type")
                     .description("Type of email this member asked to get ('html' or 'text').")
+                    .options(option("Html", "html"), option("Text", "text"))
                     .required(false),
                 object("merge_fields").additionalProperties(string())
                     .placeholder("Add")
