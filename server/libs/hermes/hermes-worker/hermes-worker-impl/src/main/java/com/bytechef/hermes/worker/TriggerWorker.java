@@ -18,7 +18,6 @@
 package com.bytechef.hermes.worker;
 
 import com.bytechef.event.EventPublisher;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerOutput;
 import com.bytechef.hermes.event.TriggerStartedWorkflowEvent;
 import com.bytechef.hermes.trigger.CancelControlTrigger;
 import com.bytechef.hermes.worker.trigger.handler.TriggerHandler;
@@ -143,10 +142,10 @@ public class TriggerWorker {
 
         TriggerHandler triggerHandler = triggerHandlerResolver.resolve(triggerExecution);
 
-        TriggerOutput output = triggerHandler.handle(triggerExecution.clone());
+        Object output = triggerHandler.handle(triggerExecution.clone());
 
         if (output != null) {
-            triggerExecution.setOutput(output.getValue());
+            triggerExecution.setOutput(output);
         }
 
         triggerExecution.setEndDate(LocalDateTime.now());

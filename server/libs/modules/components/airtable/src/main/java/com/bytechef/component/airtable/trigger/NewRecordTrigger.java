@@ -60,7 +60,7 @@ public class NewRecordTrigger {
                 .required(true))
         .poll(NewRecordTrigger::poll);
 
-    protected static TriggerDefinition.PollFunction.Output poll(TriggerDefinition.PollFunction.Context context) {
+    protected static TriggerDefinition.PollOutput poll(TriggerDefinition.PollContext context) {
         InputParameters inputParameters = context.inputParameters();
         Map<String, Object> closureParameters = context.closureParameters();
 
@@ -85,6 +85,6 @@ public class NewRecordTrigger {
             .execute()
             .getBody();
 
-        return new TriggerDefinition.PollFunction.Output(records, Map.of(LAST_TIME_CHECKED, endDate), false);
+        return new TriggerDefinition.PollOutput(records, Map.of(LAST_TIME_CHECKED, endDate), false);
     }
 }

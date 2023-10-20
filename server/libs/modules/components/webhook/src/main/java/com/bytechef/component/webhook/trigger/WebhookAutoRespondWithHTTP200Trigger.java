@@ -18,7 +18,7 @@
 package com.bytechef.component.webhook.trigger;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestFunction.Context;
+import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
@@ -54,7 +54,7 @@ public class WebhookAutoRespondWithHTTP200Trigger {
                     oneOf(BODY).types(array(), object())))
         .staticWebhookRequest(WebhookAutoRespondWithHTTP200Trigger::staticWebhookRequest);
 
-    protected static WebhookOutput staticWebhookRequest(Context context) {
+    protected static WebhookOutput staticWebhookRequest(StaticWebhookRequestContext context) {
         WebhookBody webhookBody = context.body();
 
         return WebhookOutput.map(

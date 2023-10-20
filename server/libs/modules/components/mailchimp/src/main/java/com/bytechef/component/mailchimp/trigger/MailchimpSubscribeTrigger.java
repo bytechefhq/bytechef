@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.Context.Connection;
 import com.bytechef.hermes.component.InputParameters;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer.Context;
+import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
@@ -80,7 +80,7 @@ public class MailchimpSubscribeTrigger {
         .dynamicWebhookDisable(MailchimpSubscribeTrigger::dynamicWebhookDisable)
         .dynamicWebhookRequest(MailchimpSubscribeTrigger::dynamicWebhookRequest);
 
-    protected static void dynamicWebhookDisable(Context context) {
+    protected static void dynamicWebhookDisable(DynamicWebhookDisableContext context) {
         Connection connection = context.connection();
         DynamicWebhookEnableOutput dynamicWebhookEnableOutput = context.dynamicWebhookEnableOutput();
         InputParameters inputParameters = context.inputParameters();
@@ -95,7 +95,7 @@ public class MailchimpSubscribeTrigger {
     }
 
     protected static DynamicWebhookEnableOutput
-        dynamicWebhookEnable(TriggerDefinition.DynamicWebhookEnableFunction.Context context) {
+        dynamicWebhookEnable(TriggerDefinition.DynamicWebhookEnableContext context) {
         Connection connection = context.connection();
         InputParameters inputParameters = context.inputParameters();
 
@@ -123,7 +123,7 @@ public class MailchimpSubscribeTrigger {
     }
 
     protected static WebhookOutput
-        dynamicWebhookRequest(TriggerDefinition.DynamicWebhookRequestFunction.Context context) {
+        dynamicWebhookRequest(TriggerDefinition.DynamicWebhookRequestContext context) {
         WebhookBody webhookBody = context.body();
 
         return WebhookOutput.map((Map<?, ?>) webhookBody.getContent());
