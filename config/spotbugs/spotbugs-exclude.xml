@@ -1,0 +1,273 @@
+<FindBugsFilter>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Class name="com.bytechef.atlas.coordinator.config.CoordinatorProperties" />
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Class name="com.bytechef.atlas.config.WorkflowRepositoryProperties" />
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Class name="com.bytechef.atlas.config.WorkflowRepositoryProperties$GitProperties" />
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="EI2" />
+        <Or>
+            <Class name="com.bytechef.atlas.service.ContextServiceIntTest" />
+            <Class name="com.bytechef.atlas.service.CounterService" />
+            <Class name="com.bytechef.atlas.service.JobService" />
+            <Class name="com.bytechef.atlas.coordinator.event.DeleteContextEventListener" />
+            <Class name="com.bytechef.atlas.test.workflow.WorkflowExecutor" />
+            <Class name="com.bytechef.hermes.registry.InMemoryDefinitionRegistry" />
+            <Class name="com.bytechef.hermes.registry.DefinitionRegistryChain" />
+            <Class name="com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain" />
+            <Class name="com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain" />
+            <Class name="com.bytechef.atlas.repository.WorkflowRepositoryChain" />
+            <Class name="com.bytechef.atlas.repository.jdbc.JdbcWorkflowRepository" />
+            <Class name="com.bytechef.atlas.coordinator.event.EventListenerChain" />
+            <Class name="com.bytechef.atlas.coordinator.job.executor.DefaultJobExecutor" />
+            <Class name="com.bytechef.atlas.repository.jdbc.JdbcJobRepository" />
+            <Class name="com.bytechef.atlas.repository.jdbc.JdbcContextRepository" />
+            <Class name="com.bytechef.atlas.repository.jdbc.JdbcTaskExecutionRepository" />
+            <Class name="com.bytechef.atlas.coordinator.Coordinator" />
+            <Class name="com.bytechef.atlas.coordinator.CoordinatorManagerImpl(" />
+            <Class name="com.bytechef.atlas.coordinator.error.ErrorHandlerChain" />
+            <Class name="com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler" />
+            <Class name="com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain" />
+            <Class name="com.bytechef.atlas.message.broker.jms.JmsMessageBroker" />
+            <Class name="com.bytechef.atlas.message.broker.kafka.KafkaMessageBroker" />
+            <Class name="com.bytechef.atlas.repository.jdbc.JdbcCounterRepository" />
+            <Class name="com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver" />
+            <Class name="com.bytechef.atlas.repository.git.workflow.JGitWorkflowOperations" />
+            <Class name="com.bytechef.atlas.repository.workflow.mapper.WorkflowMapperChain" />
+            <Class name="com.bytechef.hermes.component.domain.Connection" />
+            <Class name="com.bytechef.hermes.description.accessor.InMemoryConnectionDescriptorResolver" />
+            <Class name="com.bytechef.hermes.description.accessor.ComponentDescriptorDescriptorResolverChain" />
+            <Class name="com.bytechef.hermes.connection.repository.ConnectionRepository" />
+            <Class name="com.bytechef.hermes.connection.service.ConnectionService" />
+            <Class name="com.bytechef.hermes.description.accessor.ConnectionDescriptorResolverChain" />
+            <Class name="com.bytechef.hermes.description.client.listener.StartupApplicationListener" />
+            <Class name="com.bytechef.hermes.description.client.listener.ShutdownApplicationListener" />
+            <Class name="com.bytechef.hermes.description.ext.domain.ExtDescriptor" />
+            <Class name="com.bytechef.hermes.description.ext.web.rest.ExtDescriptorController" />
+            <Class name="com.bytechef.hermes.description.ext.repository.ExtDescriptorRepository" />
+            <Class name="com.bytechef.hermes.description.ext.service.ExtDescriptorService" />
+            <Class name="com.bytechef.hermes.description.ext.service.ExtDescriptorServiceImpl" />
+            <Class name="com.bytechef.hermes.file.storage.job.FileStorageFileRetentionCheckJob" />
+            <Class name="com.bytechef.hermes.connection.web.rest.ConnectionController" />
+            <Class name="com.bytechef.hermes.connection.web.rest.ConnectionController$ConnectionCreateDTO" />
+            <Class name="com.bytechef.task.dispatcher.map.MapTaskDispatcher$Builder" />
+            <Class name="com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.if_.completion.IfTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.switch_.SwitchTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.switch_.completion.SwitchTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.if_.IfTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.fork.completion.ForkJoinTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.fork.ForkJoinTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.each.EachTaskDispatcher" />
+            <Class name="com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler" />
+            <Class name="com.bytechef.task.dispatcher.loop.LoopTaskDispatcher" />
+            <Class name="com.bytechef.component.http.client.HttpClientHelper" />
+            <Class name="com.bytechef.component.http.client.HttpClientHelper$HttpResponseEntry" />
+            <Class name="com.bytechef.component.json.file.JsonFileComponentHandler" />
+            <Class name="com.bytechef.component.xml.file.XmlFileComponentHandler" />
+            <Class name="com.bytechef.component.object.helper.ObjectHelperComponentHandler" />
+            <Class name="com.bytechef.component.xml.helper.XmlHelperComponentHandler" />
+            <Class name="com.bytechef.hermes.registry.RemoteDefinitionRegistry" />
+            <Class name="com.bytechef.hermes.connection.domain.Connection" />
+            <Class name="com.bytechef.hermes.component.ComponentDSL$ComponentDisplay" />
+            <Class name="com.bytechef.hermes.component.ComponentDSL$ComponentDefinition" />
+            <Class name="com.bytechef.hermes.component.ComponentDSL$ConnectionDefinition" />
+            <Class name="com.bytechef.hermes.component.impl.ContextImpl" />
+            <Class name="com.bytechef.hermes.component.ComponentAdapterTaskHandler" />
+            <Class name="com.bytechef.hermes.component.jdbc.DataSourceFactory" />
+            <Class name="com.bytechef.hermes.component.test.MockExecutionParameters" />
+            <Class name="com.bytechef.atlas.worker.config.WorkerProperties" />
+            <Class name="com.bytechef.atlas.domain.Counter" />
+            <Class name="com.bytechef.atlas.domain.Context"/>
+            <Class name="com.bytechef.atlas.task.WorkflowTask" />
+            <Class name="com.bytechef.atlas.error.ExecutionError" />
+            <Class name="com.bytechef.atlas.domain.Workflow" />
+            <Class name="com.bytechef.atlas.domain.TaskExecution"/>
+            <Class name="com.bytechef.atlas.domain.Job"/>
+            <Class name="com.bytechef.atlas.coordinator.CoordinatorManagerImpl"/>
+            <Class name="com.bytechef.atlas.repository.git.config.GitWorkflowRepositoryProperties"/>
+            <Class name="com.bytechef.atlas.domain.JobSummary"/>
+            <Class name="com.bytechef.hermes.component.impl.FileEntryImpl"/>
+            <Class name="com.bytechef.atlas.service.ContextService"/>
+            <Class name="com.bytechef.atlas.service.WorkflowService"/>
+            <Class name="com.bytechef.atlas.repository.jdbc.event.JobCallback"/>
+            <Class name="com.bytechef.atlas.repository.jdbc.event.ContextCallback"/>
+            <Class name="com.bytechef.hermes.connection.event.ConnectionCallback"/>
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="EI" />
+        <Or>
+            <Class name="com.bytechef.hermes.component.ConnectionParameters" />
+            <Class name="com.bytechef.hermes.connection.web.rest.ConnectionController$ConnectionCreateDTO" />
+            <Class name="com.bytechef.hermes.component.definition.ConnectionDefinition" />
+            <Class name="com.bytechef.hermes.definition.DisplayOption" />
+            <Class name="com.bytechef.hermes.definition.DisplayOption$DisplayOptionEntryValue" />
+            <Class name="com.bytechef.hermes.description.model.TaskDispatcherDefinition" />
+            <Class name="com.bytechef.hermes.component.definition.ComponentDefinition" />
+            <Class name="com.bytechef.hermes.definition.Property$OptionProperty" />
+            <Class name="com.bytechef.hermes.definition.Property$AnyProperty" />
+            <Class name="com.bytechef.hermes.definition.Property$ObjectProperty" />
+            <Class name="com.bytechef.hermes.definition.Property$PrimitiveValueProperty" />
+            <Class name="com.bytechef.hermes.definition.Property$ValueProperty" />
+            <Class name="com.bytechef.hermes.definition.Property$ArrayProperty" />
+            <Class name="com.bytechef.hermes.componentDefinition.web.rest.accessor.InMemoryComponentDescriptorAccessor" />
+            <Class name="com.bytechef.hermes.description.accessor.InMemoryConnectionDescriptorResolver" />
+            <Class name="com.bytechef.hermes.description.accessor.ConnectionDescriptorResolverChain" />
+            <Class name="com.bytechef.hermes.description.model.ConnectionDescription1" />
+            <Class name="com.bytechef.hermes.component.definition.ComponentAction" />
+            <Class name="com.bytechef.hermes.description.ext.domain.ExtDescriptor" />
+            <Class name="com.bytechef.hermes.component.http.clientn.HttpClientHelper" />
+            <Class name="com.bytechef.component.http.client.HttpClientHelper$HttpResponseEntry" />
+            <Class name="com.bytechef.atlas.event.WorkflowEvent" />
+            <Class name="com.bytechef.hermes.connection.domain.Connection" />
+            <Class name="com.bytechef.atlas.repository.git.config.GitWorkflowRepositoryProperties" />
+            <Class name="com.bytechef.hermes.component.ComponentDSL$ComponentDisplay" />
+            <Class name="com.bytechef.hermes.component.ComponentDSL$ComponentDefinition" />
+            <Class name="com.bytechef.hermes.component.ComponentDSL$ConnectionDefinition" />
+            <Class name="com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL$Operation" />
+            <Class name="com.bytechef.hermes.task.dispatcher.TaskDispatcherDSL$TaskDispatcherDefinition" />
+            <Class name="com.bytechef.hermes.component.ComponentDSL$ComponentOperation" />
+            <Class name="com.bytechef.atlas.worker.config.WorkerProperties" />
+            <Class name="com.bytechef.atlas.domain.Counter" />
+            <Class name="com.bytechef.atlas.domain.Context"/>
+            <Class name="com.bytechef.atlas.task.WorkflowTask" />
+            <Class name="com.bytechef.atlas.error.ExecutionError" />
+            <Class name="com.bytechef.atlas.domain.Workflow" />
+            <Class name="com.bytechef.atlas.domain.TaskExecution"/>
+            <Class name="com.bytechef.atlas.domain.Job"/>
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="Eq" />
+        <Or>
+            <Class name="com.bytechef.atlas.event.WorkflowEvent" />
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="RV" />
+        <Or>
+            <Class name="com.bytechef.hermes.file.storage.filesystem.service.FilesystemFileStorageService" />
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="THROWS" />
+        <Or>
+            <Class name="com.bytechef.atlas.repository.git.workflow.JGitWorkflowOperations" />
+            <Class name="com.bytechef.atlas.repository.classpath.AbstractResourceWorkflowRepository" />
+            <Class name="com.bytechef.atlas.repository.WorkflowRepositoryChain" />
+            <Class name="com.bytechef.atlas.repository.workflow.mapper.AbstractWorkflowMapper" />
+            <Class name="com.bytechef.atlas.worker.Worker" />
+            <Class name="com.bytechef.cli.command.componentDefinition.subcomand.InitSubcommand" />
+            <Class name="com.bytechef.componentDefinition.task.handler.aws.s3.action.AmazonS3URI" />
+            <Class name="com.bytechef.component.http.client.HttpClientHelper" />
+            <Class name="com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler" />
+            <Class name="com.bytechef.encryption.Encryption" />
+            <Class name="com.bytechef.encryption.filesystem.FileSystemEncryptionKey" />
+            <Class name="com.bytechef.hermes.description.client.listener.ShutdownApplicationListener" />
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="NP" />
+        <Or>
+            <Class name="com.bytechef.atlas.repository.WorkflowRepositoryChain" />
+            <Class name="com.bytechef.atlas.repository.jdbc.JdbcJobRepository" />
+            <Class name="com.bytechef.atlas.repository.jdbc.JdbcTaskExecutionRepository" />
+            <Class name="com.bytechef.atlas.repository.workflow.mapper.AbstractWorkflowMapper" />
+            <Class name="com.bytechef.component.ods.file.OdsFileComponentHandlerTest" />
+            <Class name="com.bytechef.component.csv.file.CsvFileComponentHandlerTest" />
+            <Class name="com.bytechef.component.xlsx.file.XlsxFileComponentHandlerTest" />
+            <Class name="com.bytechef.component.xml.file.XmlFileComponentHandlerTest" />
+            <Class name="com.bytechef.hermes.connection.service.impl.ConnectionServiceIntTest"/>
+            <Class name="com.bytechef.hermes.connection.repository.ConnectionRepositoryIntTest"/>
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="Dm" />
+        <Or>
+            <Class name="com.bytechef.encryption.Encryption" />
+            <Class name="com.bytechef.hermes.connection.repository.ConnectionRepository" />
+            <Class name="com.bytechef.hermes.file.storage.base64,service.Base64FileStorageService" />
+            <Class name="com.bytechef.hermes.file.storage.filesystem.service.FilesystemFileStorageService" />
+            <Class name="com.bytechef.component.json.file.JsonFileComponentHandler" />
+            <Class name="com.bytechef.component.csv.file.CsvFileComponentHandler" />
+            <Class name="com.bytechef.componentDefinition.shell.task.handler.ShellTaskHandler" />
+            <Class name="com.bytechef.component.xml.file.XmlFileComponentHandler" />
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="RCN" />
+        <Or>
+            <Class name="com.bytechef.componentDefinition.io.task.handler.IoTaskHandler" />
+            <And>
+                <Class name="com.bytechef.hermes.file.storage.filesystem.service.FilesystemFileStorageService" />
+                <Method name="deleteFiles" params="long"/>
+            </And>
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="GC" />
+        <And>
+            <Class name="com.bytechef.hermes.description.ext.resolver.AbstractExtTaskDescriptorResolver" />
+            <Method name="resolve" params="java.lang.String, float" />
+        </And>
+    </Match>
+
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="THROWS" />
+        <Or>
+            <Class name="com.bytechef.component.file.storage.FileStorageComponentHandlerTest" />
+            <Class name="com.bytechef.component.csv.file.CsvFileComponentHandlerTest" />
+            <Class name="com.bytechef.componentDefinition.io.task.handler.IoTaskHandlerTest" />
+            <Class name="com.bytechef.componentDefinition.task.dispatcher.each.EachTaskDispatcherTest" />
+            <Class name="com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandlerTest" />
+            <Class name="com.bytechef.componentDefinition.httpclient.task.handler.util.HttpClientHelperTest" />
+            <And>
+                <Class name="com.bytechef.atlas.coordinator.impl.CoordinatorIntTest" />
+                <Method name="testRequiredParams" />
+            </And>
+        </Or>
+    </Match>
+    <Match>
+        <!-- TODO Review this issues -->
+        <Bug code="OBL" />
+        <Or>
+            <Class name="com.bytechef.component.file.storage.FileStorageComponentHandlerTest" />
+            <Class name="com.bytechef.component.csv.file.CsvFileComponentHandlerTest" />
+            <Class name="com.bytechef.component.json.file.JsonFileComponentHandlerTest" />
+            <Class name="com.bytechef.component.filesystem.FilesystemComponentHandlerTest" />
+            <Class name="com.bytechef.component.ods.file.OdsFileComponentHandlerTest" />
+            <Class name="com.bytechef.component.ods.file.OdsFileComponentHandlerIntTest" />
+            <Class name="com.bytechef.component.xlsx.file.XlsxFileComponentHandlerTest" />
+            <Class name="com.bytechef.component.xlsx.file.XlsxFileComponentHandlerIntTest" />
+            <Class name="com.bytechef.component.xml.file.XmlFileComponentHandlerTest" />
+            <Class name="com.bytechef.component.xml.file.XmlFileComponentHandlerIntTest" />
+        </Or>
+    </Match>
+
+    <Match>
+        <Source name="~.*generated.*"/>
+    </Match>
+</FindBugsFilter>

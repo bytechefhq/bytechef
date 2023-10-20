@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="ByteChef ruleset"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+    <description>
+        ByteChef ruleset for PMD
+    </description>
+
+    <exclude-pattern>.*/com/bytechef/cli/cmd/ComponentCommand.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/cli/command/component/subcomand/InitSubcommand.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/dispatcher/switch_/SwitchTaskDispatcherDefinitionFactory.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/dispatcher/map/MapTaskDispatcherDefinitionFactory.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/dispatcher/loop/LoopTaskDispatcher.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/dispatcher/loop/LoopTaskDispatcherDefinitionFactory.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/dispatcher/if_/IfTaskDispatcherDefinitionFactory.java</exclude-pattern>
+    <exclude-pattern>.*com/bytechef/task/dispatcher/each/EachTaskDispatcherDefinitionFactory.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/hermes/file/storage/filesystem/FilesystemFileStorageService.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/hermes/connection/repository/ConnectionRepository.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/aws/s3/util/AmazonS3Uri.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/repository/jdbc/JdbcWorkflowRepository.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/repository/jdbc/JdbcTaskExecutionRepository.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/repository/jdbc/JdbcContextRepository.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/repository/git/workflow/JGitTemplate.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/message/broker/sync/SyncMessageBroker.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/message/broker/kafka/config/KafkaMessageBrokerConfiguration.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/event/Events.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/coordinator/config/CoordinatorConfiguration.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/coordinator/task/dispatcher/TaskDispatcherPreSendProcessor.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/commons/jdbc/UpdateJdbcTaskOperation.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/commons/jdbc/JdbcOperation.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/commons/jdbc/JdbcConstants.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/commons/xml/XmlHelper.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/xml/file/XmlFileComponentHandler.java</exclude-pattern>>
+    <exclude-pattern>.*/com/bytechef/component/xlsx/file/XlsxFileComponentHandler.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/json/file/JsonFileComponentHandler.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/filesystem/FilesystemComponentHandler.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/http/client/HttpClientHelper.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/csv/file/CsvFileComponentHandler.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/service/JobService.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/task/evaluator/spel/SpelTaskEvaluator.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/task/ControlTask.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/priority/Prioritizable.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/commons/data/access/ObjectMap.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/dispatcher/switch_/SwitchTaskDispatcherTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/dispatcher/each/EachTaskDispatcherTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/hermes/connection/web/rest/ConnectionControllerTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/worker/WorkerTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/coordinator/error/TaskExecutionErrorHandlerTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/xml/file/XmlFileComponentHandlerTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/xlsx/file/XlsxFileComponentHandlerTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/xlsx/file/XlsxFileComponentHandlerIntTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/ods/file/OdsFileComponentHandlerTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/ods/file/OdsFileComponentHandlerIntTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/json/file/JsonFileComponentHandlerTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/json/file/JsonFileComponentHandlerIntTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/http/client/HttpClientHelperTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/filesystem/FilesystemComponentHandlerTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/csv/file/CsvFileComponentHandlerTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/csv/file/CsvFileComponentHandlerIntTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/repository/git/workflow/JGitWorkflowOperations.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/commons/xml/XmlUtils.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/hermes/component/jdbc/JdbcComponentHandler.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/http/client/HttpClientComponentHandler.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/object/helper/ObjectHelperComponentHandler.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/random/helper/RandomHelperComponentHandler.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/var/VarComponentHandler.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/xml/helper/XmlHelperComponentHandler.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/dispatcher/fork/ForkJoinTaskDispatcherDefinitionFactory.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/aws/s3/AmazonS3Uri.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/task/evaluator/SpelTaskEvaluatorTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/worker/impl/WorkerImplTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/var/VarComponentHandlerTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/task/dispatcher/loop/completion/LoopTaskCompletionHandler.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/hermes/component/definition/ComponentDefinition.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/rest/error/ExceptionTranslatorIntTest.java	</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/atlas/repository/jdbc/JdbcJobRepository.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/rest/error/ExceptionTranslatorIntTest.java</exclude-pattern>
+    <exclude-pattern>.*/com/bytechef/component/logger/LoggerComponentHandler.java</exclude-pattern>
+
+    <exclude-pattern>.*/generated/.*</exclude-pattern>
+
+    <rule ref="category/java/bestpractices.xml/AvoidUsingHardCodedIP" />
+    <rule ref="category/java/bestpractices.xml/CheckResultSet" />
+    <rule ref="category/java/bestpractices.xml/PrimitiveWrapperInstantiation" />
+    <rule ref="category/java/bestpractices.xml/UnusedFormalParameter" />
+    <rule ref="category/java/bestpractices.xml/UnusedLocalVariable" />
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateField" />
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod" />
+
+    <rule ref="category/java/codestyle.xml/EmptyControlStatement" />
+    <rule ref="category/java/codestyle.xml/ExtendsObject" />
+    <rule ref="category/java/codestyle.xml/ForLoopShouldBeWhileLoop" />
+    <!--<rule ref="category/java/codestyle.xml/TooManyStaticImports" />-->
+    <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName" />
+    <rule ref="category/java/codestyle.xml/UnnecessaryImport" />
+    <rule ref="category/java/codestyle.xml/UnnecessaryModifier" />
+    <rule ref="category/java/codestyle.xml/UnnecessaryReturn" />
+    <rule ref="category/java/codestyle.xml/UnnecessarySemicolon" />
+    <rule ref="category/java/codestyle.xml/UselessParentheses" />
+    <rule ref="category/java/codestyle.xml/UselessQualifiedThis" />
+
+    <rule ref="category/java/design.xml/CollapsibleIfStatements" />
+    <rule ref="category/java/design.xml/SimplifiedTernary" />
+    <rule ref="category/java/design.xml/UselessOverridingMethod" />
+
+    <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop" />
+    <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor" />
+    <rule ref="category/java/errorprone.xml/AvoidMultipleUnaryOperators" />
+    <rule ref="category/java/errorprone.xml/AvoidUsingOctalValues" />
+    <rule ref="category/java/errorprone.xml/BrokenNullCheck" />
+    <rule ref="category/java/errorprone.xml/CheckSkipResult" />
+    <rule ref="category/java/errorprone.xml/ClassCastExceptionWithToArray" />
+    <rule ref="category/java/errorprone.xml/DontUseFloatTypeForLoopIndices" />
+    <rule ref="category/java/errorprone.xml/EmptyCatchBlock" />
+    <rule ref="category/java/errorprone.xml/JumbledIncrementer" />
+    <rule ref="category/java/errorprone.xml/MisplacedNullCheck" />
+    <rule ref="category/java/errorprone.xml/OverrideBothEqualsAndHashcode" />
+    <rule ref="category/java/errorprone.xml/ReturnFromFinallyBlock" />
+    <rule ref="category/java/errorprone.xml/UnconditionalIfStatement" />
+    <rule ref="category/java/errorprone.xml/UnnecessaryConversionTemporary" />
+    <rule ref="category/java/errorprone.xml/UnusedNullCheckInEquals" />
+    <rule ref="category/java/errorprone.xml/UselessOperationOnImmutable" />
+
+    <rule ref="category/java/multithreading.xml/AvoidThreadGroup" />
+    <rule ref="category/java/multithreading.xml/DontCallThreadRun" />
+    <rule ref="category/java/multithreading.xml/DoubleCheckedLocking" />
+
+    <rule ref="category/java/performance.xml/BigIntegerInstantiation" />
+</ruleset>

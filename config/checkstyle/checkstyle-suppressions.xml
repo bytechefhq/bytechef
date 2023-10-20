@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <suppress checks="JavadocVariable"/>
+    <suppress checks="MissingJavadocMethod"/>
+    <suppress checks="WhitespaceAround"/>
+    <suppress checks="FinalParameters"/>
+    <suppress checks="DesignForExtension"/>
+    <suppress checks="FinalClass"/>
+    <suppress checks="FinalParameters"/>
+    <suppress checks="HideUtilityClassConstructor"/>
+    <suppress checks="RedundantModifier"/>
+    <suppress checks="JavadocStyle"/>
+    <suppress checks="JavadocMethod"/>
+    <suppress checks="JavadocType"/>
+    <suppress checks="NeedBraces"/>
+    <suppress checks="InterfaceIsType"/>
+    <suppress checks="HiddenField"/>
+    <suppress checks="ConstantName"/>
+    <suppress checks="VisibilityModifier"/>
+    <suppress checks="MagicNumber"/>
+    <suppress checks="OperatorWrap"/>
+    <suppress checks="RightCurly"/>
+    <suppress checks="LineLength"/>
+    <suppress checks="ParameterNumber"/>
+    <suppress checks="ParameterName"/>
+    <suppress checks="AvoidNestedBlocks"/>
+    <suppress message="Missing a Javadoc comment"/>
+
+    <suppress files="[/\\]generated[/\\]" checks=".*" />
+</suppressions>
