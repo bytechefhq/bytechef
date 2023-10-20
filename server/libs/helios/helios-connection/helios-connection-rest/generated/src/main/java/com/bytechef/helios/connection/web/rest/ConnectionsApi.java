@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-02T17:22:53.302944+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-09-15T07:35:17.507364+02:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "automation-connection", description = "The Automation Connection API")
 public interface ConnectionsApi {
