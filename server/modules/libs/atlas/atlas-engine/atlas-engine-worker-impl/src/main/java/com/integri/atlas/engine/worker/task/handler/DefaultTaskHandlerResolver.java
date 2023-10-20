@@ -19,9 +19,6 @@
 package com.integri.atlas.engine.worker.task.handler;
 
 import com.integri.atlas.engine.core.task.Task;
-import com.integri.atlas.engine.worker.task.handler.TaskHandler;
-import com.integri.atlas.engine.worker.task.handler.TaskHandlerResolver;
-import java.util.HashMap;
 import java.util.Map;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -34,7 +31,7 @@ import org.springframework.stereotype.Component;
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class DefaultTaskHandlerResolver implements TaskHandlerResolver {
 
-    private Map<String, TaskHandler<?>> taskHandlers = new HashMap<String, TaskHandler<?>>();
+    private final Map<String, TaskHandler<?>> taskHandlers;
 
     public DefaultTaskHandlerResolver(Map<String, TaskHandler<?>> aTaskHandlers) {
         taskHandlers = aTaskHandlers;
