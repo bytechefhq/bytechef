@@ -1,0 +1,26 @@
+{
+  "label": "Binary File - READ operation",
+  "inputs": [
+    {
+      "name": "fileName",
+      "label": "Absolute file path to read from",
+      "type": "string",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "readFromFile",
+      "value": "${readFromFile}"
+    }
+  ],
+  "tasks": [
+    {
+      "name": "readFromFile",
+      "label": "Read from file",
+      "type": "binaryFile",
+      "operation": "READ",
+      "fileName": "${fileName}"
+    }
+  ]
+}
