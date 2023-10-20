@@ -66,10 +66,11 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
             return Objects.equals(extension.toLowerCase(), "json") ? JSON : YAML;
         }
+
     }
 
     public enum SourceType {
-        CLASSPATH, FILESYSTEM, GIT, JDBC
+        CLASSPATH, FILESYSTEM, GIT, JDBC;
     }
 
     @Column
@@ -94,6 +95,9 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
     @Transient
     private final List<Map<String, Object>> inputs;
+
+    @Transient
+    private boolean isNew;
 
     @Transient
     private final String label;
@@ -236,7 +240,7 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
     @Override
     public boolean isNew() {
-        return id == null;
+        return isNew;
     }
 
     public void setDefinition(String definition) {
@@ -261,6 +265,10 @@ public final class Workflow implements Errorable, Persistable<String>, Serializa
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
     public void setLastModifiedBy(String lastModifiedBy) {

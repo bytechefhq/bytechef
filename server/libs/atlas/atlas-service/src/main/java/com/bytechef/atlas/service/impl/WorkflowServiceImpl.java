@@ -81,6 +81,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
 
         workflow.setFormat(format);
+        workflow.setNew(true);
 
         return workflowCrudRepositories.stream()
             .filter(workflowCrudRepository -> Objects.equals(workflowCrudRepository.getSourceType(), sourceType))

@@ -22,7 +22,6 @@ import com.bytechef.atlas.repository.workflow.mapper.WorkflowMapper;
 import com.bytechef.atlas.repository.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.utils.UUIDUtils;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ByteArrayResource;
@@ -50,10 +49,7 @@ public class WorkflowCallback implements AfterConvertCallback<Workflow>, BeforeC
 
     @Override
     public Workflow onBeforeConvert(Workflow workflow) {
-        // TODO check why Auditing does not populate auditing fields
         if (workflow.isNew()) {
-            workflow.setCreatedBy("system");
-            workflow.setCreatedDate(LocalDateTime.now());
             workflow.setId(UUIDUtils.generate());
         }
 

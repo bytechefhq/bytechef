@@ -101,6 +101,7 @@ public class WorkflowServiceIntTest {
 
         workflow.setDefinition("{\"tasks\": []}");
         workflow.setFormat(Workflow.Format.JSON);
+        workflow.setNew(true);
 
         return workflow;
     }
