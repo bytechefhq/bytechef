@@ -25,36 +25,24 @@ tasks:
     text: Received ${apiEndpointUrl} to post payload in ${sourceFileUrl}
 
   - type: filesystem/v1/readFile
-    name: jsonFileEntry
-    description: Read file at `filename` location on local file system and create `jsonFileEntry` object in memory
+    name: csvFileEntry
+    description: Read file at `filename` location on local file system and create `csvFileEntry` object in memory
     filename: ${sourceFileUrl}
-
-  - type: jsonFile/v1/read
-    name: jsonObject
-    description: Create Json object `jsonObject` by reading bytes of fileEntry `jsonFileEntry`
-    fileEntry: ${jsonFileEntry}
-    isArray: false
-
-  - type: logger/v1/info
-    name: loggJsonObject
-    description: Print created Json object `jsonObject` in log with INFO log level
-    text: Payload in the file ${jsonObject}
 
   - type: httpClient/v1/post
     name: liferayApiPost
     description: >
-      Post content of `jsonFileEntry` to Liferay `apiEndpointUrl`. `sendFile` is
-      set to `true` to tell processor to seek content bytes in fileEntry `jsonFileEntry`
-      and bodyContentType `JSON` creates request's `ContentType` header value application/json
+      Post content of `csvFileEntry` to Liferay `apiEndpointUrl`. `bodyContent` is
+      set to `csvFileEntry` to tell processor to seek content bytes in fileEntry `csvFileEntry`
+      and bodyContentType `TXT` creates request's `ContentType` header value application/text
     label: Post content to Liferay REST endpoint
     uri: ${apiEndpointUrl}
     responseFormat: JSON
     headerParameters:
       Authorization:
         - Basic ${apiToken}
-    bodyContentType: JSON
-    sendFile: true
-    fileEntry: ${jsonFileEntry}
+    bodyContentType: BINARY
+    bodyContent: ${csvFileEntry}
 
   - type: logger/v1/info
     name: loggEndpointResponse

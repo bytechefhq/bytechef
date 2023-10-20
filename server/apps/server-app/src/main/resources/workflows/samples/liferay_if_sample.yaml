@@ -61,7 +61,7 @@ tasks:
         name: jsonFileEntry1
         description: Read file at `filename` location on local file system and create `jsonFileEntry1` object in memory
         filename: ${objectDefinitionSourceFileUrl}
-
+# ovdje imas primjer ucitavanja u jsonObject iz filesistema
       - type: jsonFile/v1/read
         name: jsonObject1
         description: Create Json object `jsonObject1` by reading bytes of fileEntry `jsonFileEntry1`
