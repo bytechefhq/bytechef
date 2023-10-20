@@ -21,21 +21,21 @@ import jakarta.annotation.Generated;
  * The request object that contains the array of tags.
  */
 
-@Schema(name = "putConnectionTags_request", description = "The request object that contains the array of tags.")
-@JsonTypeName("putConnectionTags_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-01T11:45:15.933556+01:00[Europe/Zagreb]")
-public class PutConnectionTagsRequestModel {
+@Schema(name = "updateConnectionTags_request", description = "The request object that contains the array of tags.")
+@JsonTypeName("updateConnectionTags_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-03-02T19:53:05.159071+01:00[Europe/Zagreb]")
+public class UpdateConnectionTagsRequestModel {
 
   @JsonProperty("tags")
   @Valid
   private List<com.bytechef.tag.web.rest.model.TagModel> tags = null;
 
-  public PutConnectionTagsRequestModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
+  public UpdateConnectionTagsRequestModel tags(List<com.bytechef.tag.web.rest.model.TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public PutConnectionTagsRequestModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
+  public UpdateConnectionTagsRequestModel addTagsItem(com.bytechef.tag.web.rest.model.TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -65,8 +65,8 @@ public class PutConnectionTagsRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    PutConnectionTagsRequestModel putConnectionTagsRequest = (PutConnectionTagsRequestModel) o;
-    return Objects.equals(this.tags, putConnectionTagsRequest.tags);
+    UpdateConnectionTagsRequestModel updateConnectionTagsRequest = (UpdateConnectionTagsRequestModel) o;
+    return Objects.equals(this.tags, updateConnectionTagsRequest.tags);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class PutConnectionTagsRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PutConnectionTagsRequestModel {\n");
+    sb.append("class UpdateConnectionTagsRequestModel {\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("}");
     return sb.toString();
