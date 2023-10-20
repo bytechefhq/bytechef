@@ -23,7 +23,7 @@ const PageFooter = ({
             <div
                 className={twMerge(
                     'flex h-[34px] w-full items-center text-lg tracking-tight text-gray-900 dark:text-gray-200',
-                    leftSidebar ? 'font-semibold' : ''
+                    leftSidebar && 'font-semibold'
                 )}
             >
                 {children}
