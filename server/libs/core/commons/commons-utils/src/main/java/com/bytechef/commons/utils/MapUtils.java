@@ -40,11 +40,14 @@ import org.springframework.util.Assert;
 /**
  * @author Ivica Cardic
  */
-public class MapUtils {
+public final class MapUtils {
 
     private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     private static final DefaultConversionService conversionService = new DefaultConversionService();
+
+    private MapUtils() {
+    }
 
     public static boolean containsKey(Map<String, Object> map, String key) {
         Assert.notNull(map, "'map' must not be null");

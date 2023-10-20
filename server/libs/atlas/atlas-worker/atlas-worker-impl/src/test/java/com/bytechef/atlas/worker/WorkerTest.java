@@ -17,6 +17,7 @@
 
 package com.bytechef.atlas.worker;
 
+import com.bytechef.atlas.constants.WorkflowConstants;
 import com.bytechef.atlas.domain.TaskExecution;
 import com.bytechef.atlas.message.broker.Queues;
 import com.bytechef.atlas.message.broker.sync.SyncMessageBroker;
@@ -109,9 +110,10 @@ public class WorkerTest {
             .build();
 
         TaskExecution task = new TaskExecution(new WorkflowTask(Map.of(
-            "pre", List.of(Map.of("name", "myVar", "type", "var", "value", "done")),
+            "pre",
+            List.of(Map.of("name", "myVar", "type", "var", WorkflowConstants.PARAMETERS, Map.of("value", "done"))),
             "type", "var",
-            "value", "${myVar}")));
+            WorkflowConstants.PARAMETERS, Map.of("value", "${myVar}"))));
 
         task.setId(1234L);
         task.setJobId(4567L);
@@ -155,8 +157,8 @@ public class WorkerTest {
             .build();
 
         TaskExecution taskExecution = new TaskExecution(new WorkflowTask(Map.of(
-            "post", List.of(Map.of("type", "rm", "path", tempDir)),
-            "pre", List.of(Map.of("type", "mkdir", "path", tempDir)),
+            "post", List.of(Map.of("type", "rm", WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
+            "pre", List.of(Map.of("type", "mkdir", WorkflowConstants.PARAMETERS, Map.of("path", tempDir))),
             "type", "pass")));
 
         taskExecution.setId(1234L);

@@ -31,6 +31,7 @@ import java.util.Map;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Base64Utils;
 
 /**
  * @author Ivica Cardic
@@ -48,7 +49,9 @@ public class FilesystemComponentHandlerIntTest {
     public void testRead() throws IOException {
         File sampleFile = getFile();
 
-        Job job = workflowExecutor.execute("filesystem_v1_readFile", Map.of("filename", sampleFile.getAbsolutePath()));
+        Job job = workflowExecutor.execute(
+            Base64Utils.encodeToString("filesystem_v1_readFile".getBytes(StandardCharsets.UTF_8)),
+            Map.of("filename", sampleFile.getAbsolutePath()));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
@@ -70,7 +73,7 @@ public class FilesystemComponentHandlerIntTest {
         File tempFile = Files.newTemporaryFile();
 
         Job job = workflowExecutor.execute(
-            "filesystem_v1_writeFile",
+            Base64Utils.encodeToString("filesystem_v1_writeFile".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService

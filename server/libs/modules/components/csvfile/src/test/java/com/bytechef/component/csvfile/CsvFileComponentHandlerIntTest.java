@@ -34,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Base64Utils;
 
 /**
  * @author Ivica Cardic
@@ -52,7 +53,7 @@ public class CsvFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.csv");
 
         Job job = workflowExecutor.execute(
-            "csvfile_v1_read",
+            Base64Utils.encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService
@@ -74,7 +75,7 @@ public class CsvFileComponentHandlerIntTest {
     @Test
     public void testWrite() throws JSONException {
         Job job = workflowExecutor.execute(
-            "csvfile_v1_write",
+            Base64Utils.encodeToString("csvfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "rows",
                 new JSONArray(Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8)).toList()));
@@ -89,7 +90,7 @@ public class CsvFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.csv");
 
         job = workflowExecutor.execute(
-            "csvfile_v1_read",
+            Base64Utils.encodeToString("csvfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
                 fileStorageService

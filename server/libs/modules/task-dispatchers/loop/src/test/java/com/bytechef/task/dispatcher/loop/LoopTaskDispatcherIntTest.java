@@ -27,6 +27,8 @@ import com.bytechef.task.dispatcher.if_.completion.IfTaskCompletionHandler;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
+
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Base64Utils;
 
 /**
  * @author Ivica Cardic
@@ -64,7 +67,8 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch1() {
         workflowExecutor.execute(
-            "loop_v1_1", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            Base64Utils.encodeToString("loop_v1_1".getBytes(StandardCharsets.UTF_8)),
+            getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(2, 11)
@@ -76,7 +80,8 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch2() {
         workflowExecutor.execute(
-            "loop_v1_2", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            Base64Utils.encodeToString("loop_v1_2".getBytes(StandardCharsets.UTF_8)),
+            getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(1, 10)
@@ -90,7 +95,8 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch3() {
         workflowExecutor.execute(
-            "loop_v1_3", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            Base64Utils.encodeToString("loop_v1_3".getBytes(StandardCharsets.UTF_8)),
+            getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 13)
@@ -102,7 +108,8 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch4() {
         workflowExecutor.execute(
-            "loop_v1_4", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            Base64Utils.encodeToString("loop_v1_4".getBytes(StandardCharsets.UTF_8)),
+            getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 8)
@@ -114,7 +121,8 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch5() {
         workflowExecutor.execute(
-            "loop_v1_5", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            Base64Utils.encodeToString("loop_v1_5".getBytes(StandardCharsets.UTF_8)),
+            getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(4, 8)
@@ -126,7 +134,8 @@ public class LoopTaskDispatcherIntTest {
     @Test
     public void testDispatch6() {
         workflowExecutor.execute(
-            "loop_v1_6", getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
+            Base64Utils.encodeToString("loop_v1_6".getBytes(StandardCharsets.UTF_8)),
+            getGetTaskCompletionHandlers(), getGetTaskDispatcherResolvers(), getTaskHandlerMap());
 
         Assertions.assertEquals(
             IntStream.rangeClosed(3, 8)

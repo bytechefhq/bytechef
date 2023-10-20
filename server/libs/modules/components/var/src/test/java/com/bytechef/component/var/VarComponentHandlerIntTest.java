@@ -20,10 +20,13 @@ package com.bytechef.component.var;
 import com.bytechef.atlas.domain.Job;
 import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Base64Utils;
 
 /**
  * @author Ivica Cardic
@@ -36,7 +39,8 @@ public class VarComponentHandlerIntTest {
 
     @Test
     public void testVar() {
-        Job job = workflowExecutor.execute("var_v1", Map.of());
+        Job job = workflowExecutor.execute(
+            Base64Utils.encodeToString("var_v1".getBytes(StandardCharsets.UTF_8)), Map.of());
 
         Map<String, Object> outputs = job.getOutputs();
 

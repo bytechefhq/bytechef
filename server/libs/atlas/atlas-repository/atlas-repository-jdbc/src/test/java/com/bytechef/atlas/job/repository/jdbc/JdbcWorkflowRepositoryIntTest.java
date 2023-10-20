@@ -20,6 +20,8 @@ package com.bytechef.atlas.job.repository.jdbc;
 import com.bytechef.atlas.domain.Workflow;
 import com.bytechef.atlas.job.repository.jdbc.config.WorkflowRepositoryIntTestConfiguration;
 import com.bytechef.atlas.repository.WorkflowCrudRepository;
+import com.bytechef.commons.utils.CollectionUtils;
+import com.bytechef.commons.utils.OptionalUtils;
 import com.bytechef.test.annotation.EmbeddedSql;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -45,9 +47,9 @@ public class JdbcWorkflowRepositoryIntTest {
 
             tasks:
               - name: stringNumber
-                type: var/1.0
-                action: set
-                value: "1234"
+                type: var/1.0/set
+                parameters:
+                  value: "1234"
             """,
             Workflow.Format.YAML);
 
@@ -55,11 +57,9 @@ public class JdbcWorkflowRepositoryIntTest {
 
         workflow = workflowCrudRepository.save(workflow);
 
-        Workflow resultWorkflow = workflowCrudRepository.findById(workflow.getId())
-            .orElseThrow();
+        Workflow resultWorkflow = OptionalUtils.get(workflowCrudRepository.findById(workflow.getId()));
 
         Assertions.assertEquals("My Label", resultWorkflow.getLabel());
-        Assertions.assertEquals(1, resultWorkflow.getTasks()
-            .size());
+        Assertions.assertEquals(1, CollectionUtils.size(resultWorkflow.getTasks()));
     }
 }

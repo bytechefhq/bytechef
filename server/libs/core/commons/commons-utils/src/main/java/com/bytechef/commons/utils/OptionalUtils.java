@@ -17,20 +17,17 @@
 
 package com.bytechef.commons.utils;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public final class LocalDateTimeUtils {
+public final class OptionalUtils {
 
-    private LocalDateTimeUtils() {
+    private OptionalUtils() {
     }
 
-    public static long getTime(LocalDateTime localDateTime) {
-        return localDateTime.atZone(ZoneId.systemDefault())
-            .toInstant()
-            .toEpochMilli();
+    public static <T> T get(Optional<T> optional) {
+        return optional.orElseThrow();
     }
 }

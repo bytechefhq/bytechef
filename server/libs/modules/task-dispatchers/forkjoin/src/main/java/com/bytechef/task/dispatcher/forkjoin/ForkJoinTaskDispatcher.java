@@ -37,6 +37,7 @@ import com.bytechef.atlas.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.task.execution.TaskStatus;
+import com.bytechef.commons.utils.CollectionUtils;
 import com.bytechef.commons.utils.MapUtils;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -114,10 +115,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
-            .map(curList -> curList
-                .stream()
-                .map(WorkflowTask::new)
-                .toList())
+            .map(curList -> CollectionUtils.map(curList, WorkflowTask::new))
             .toList();
 
         taskExecution.setStartTime(LocalDateTime.now());
@@ -132,6 +130,8 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
             messageBroker.send(Queues.COMPLETIONS, taskExecution);
         } else {
+            Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
+
             counterService.set(taskExecution.getId(), branchesWorkflowTasks.size());
 
             for (int i = 0; i < branchesWorkflowTasks.size(); i++) {
@@ -143,6 +143,8 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
 
                 branchWorkflowTask.put(BRANCH, i);
 
+                Assert.notNull(taskExecution.getJobId(), "'taskExecution.jobId' must not be null");
+
                 TaskExecution branchTaskExecution = TaskExecution.of(
                     taskExecution.getJobId(), taskExecution.getId(), taskExecution.getPriority(), 1,
                     branchWorkflowTask);
@@ -153,6 +155,8 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                 branchTaskExecution = taskEvaluator.evaluate(branchTaskExecution, context);
 
                 branchTaskExecution = taskExecutionService.create(branchTaskExecution);
+
+                Assert.notNull(branchTaskExecution.getId(), "'branchTaskExecution.getId' must not be null");
 
                 contextService.push(branchTaskExecution.getId(), Context.Classname.TASK_EXECUTION, context);
                 contextService.push(taskExecution.getId(), i, Context.Classname.TASK_EXECUTION, context);

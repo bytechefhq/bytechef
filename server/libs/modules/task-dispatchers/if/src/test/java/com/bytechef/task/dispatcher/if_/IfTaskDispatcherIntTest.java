@@ -23,12 +23,15 @@ import com.bytechef.atlas.sync.executor.WorkflowExecutor;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.task.dispatcher.if_.completion.IfTaskCompletionHandler;
+
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Base64Utils;
 
 /**
  * @author Matija Petanjek
@@ -56,7 +59,7 @@ public class IfTaskDispatcherIntTest {
     @Test
     public void testDispatchBoolean() {
         workflowExecutor.execute(
-            "if_v1-conditions-boolean",
+            Base64Utils.encodeToString("if_v1-conditions-boolean".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "true", "value2", "false"),
             getGetTaskCompletionHandlers(),
             getGetTaskDispatcherResolvers(),
@@ -69,7 +72,7 @@ public class IfTaskDispatcherIntTest {
     @Test
     public void testDispatchDateTime() {
         workflowExecutor.execute(
-            "if_v1-conditions-dateTime",
+            Base64Utils.encodeToString("if_v1-conditions-dateTime".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "2022-01-01T00:00:00", "value2", "2022-01-01T00:00:01"),
             getGetTaskCompletionHandlers(),
             getGetTaskDispatcherResolvers(),
@@ -82,7 +85,7 @@ public class IfTaskDispatcherIntTest {
     @Test
     public void testDispatchExpression() {
         workflowExecutor.execute(
-            "if_v1-conditions-expression",
+            Base64Utils.encodeToString("if_v1-conditions-expression".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
             getGetTaskCompletionHandlers(),
             getGetTaskDispatcherResolvers(),
@@ -94,7 +97,7 @@ public class IfTaskDispatcherIntTest {
     @Test
     public void testDispatchNumber() {
         workflowExecutor.execute(
-            "if_v1-conditions-number",
+            Base64Utils.encodeToString("if_v1-conditions-number".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
             getGetTaskCompletionHandlers(),
             getGetTaskDispatcherResolvers(),
@@ -111,7 +114,7 @@ public class IfTaskDispatcherIntTest {
     @Test
     public void testDispatchString() {
         workflowExecutor.execute(
-            "if_v1-conditions-string",
+            Base64Utils.encodeToString("if_v1-conditions-string".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "Hello World", "value2", "Hello"),
             getGetTaskCompletionHandlers(),
             getGetTaskDispatcherResolvers(),
