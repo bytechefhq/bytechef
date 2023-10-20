@@ -135,18 +135,18 @@ public class IfTaskDispatcherIntTest {
         Assertions.assertEquals("false branch", testVarTaskHandler.get("regexResult"));
     }
 
-    private WorkflowExecutor.GetTaskHandlerMapSupplier getTaskHandlerMap() {
+    private WorkflowExecutor.TaskHandlerMapSupplier getTaskHandlerMap() {
         return () -> Map.of("var", testVarTaskHandler);
     }
 
-    private static WorkflowExecutor.GetTaskDispatcherResolversFunction getGetTaskDispatcherResolvers() {
+    private static WorkflowExecutor.TaskDispatcherResolversFunction getGetTaskDispatcherResolvers() {
         return (
             contextService, counterService, messageBroker, taskDispatcher, taskEvaluator,
             taskExecutionService) -> List.of(new IfTaskDispatcher(
                 contextService, messageBroker, taskDispatcher, taskEvaluator, taskExecutionService));
     }
 
-    private WorkflowExecutor.GetTaskCompletionHandlersFunction getGetTaskCompletionHandlers() {
+    private WorkflowExecutor.TaskCompletionHandlersFunction getGetTaskCompletionHandlers() {
         return (counterService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService) -> List
             .of(new IfTaskCompletionHandler(
                 contextService, taskCompletionHandler, taskDispatcher, taskEvaluator, taskExecutionService));
