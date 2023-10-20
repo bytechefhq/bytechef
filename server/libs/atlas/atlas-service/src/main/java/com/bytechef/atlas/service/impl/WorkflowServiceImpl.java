@@ -190,10 +190,9 @@ public class WorkflowServiceImpl implements WorkflowService {
 
             cacheAll.put(CACHE_ALL, workflows);
         } else {
-            Cache.ValueWrapper valueWrapper = cacheAll.get(CACHE_ALL);
+            Cache.ValueWrapper valueWrapper = Objects.requireNonNull(cacheAll.get(CACHE_ALL));
 
-            workflows = (List<Workflow>) Objects.requireNonNull(valueWrapper)
-                .get();
+            workflows = (List<Workflow>) valueWrapper.get();
         }
 
         return workflows;
