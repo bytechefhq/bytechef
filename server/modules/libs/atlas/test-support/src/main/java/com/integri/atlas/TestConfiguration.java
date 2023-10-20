@@ -18,6 +18,7 @@ package com.integri.atlas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.integri.atlas.engine.coordinator.job.repository.JobRepository;
+import com.integri.atlas.engine.core.MapObject;
 import com.integri.atlas.engine.core.context.repository.ContextRepository;
 import com.integri.atlas.engine.core.json.DefaultJSONHelper;
 import com.integri.atlas.engine.core.json.JSONHelper;
@@ -46,6 +47,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 @ImportAutoConfiguration(DataSourceAutoConfiguration.class)
 @SpringBootConfiguration
 public class TestConfiguration {
+
+    @PostConstruct
+    void afterPropertiesSet() {
+        MapObject.addConverter(new FileEntryConverter());
+    }
 
     @Bean
     CounterRepository counterRepository(JdbcTemplate jdbcTemplate) {
