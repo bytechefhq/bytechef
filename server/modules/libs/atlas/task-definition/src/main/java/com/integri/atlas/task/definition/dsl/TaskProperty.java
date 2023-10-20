@@ -16,501 +16,37 @@
 
 package com.integri.atlas.task.definition.dsl;
 
-import static com.integri.atlas.task.definition.dsl.TaskParameter.parameter;
-import static com.integri.atlas.task.definition.dsl.TaskParameter.parameters;
-
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
  * @author Ivica Cardic
  */
-public abstract sealed class TaskProperty<T extends TaskProperty<?>>
-    permits
-        TaskProperty.BooleanTaskProperty,
-        TaskProperty.CollectionTaskProperty,
-        TaskProperty.ColorTaskProperty,
-        TaskProperty.DateTimeTaskProperty,
-        TaskProperty.GroupTaskProperty,
-        TaskProperty.IntegerTaskProperty,
-        TaskProperty.JSONTaskProperty,
-        TaskProperty.MultiSelectTaskProperty,
-        TaskProperty.NumberTaskProperty,
-        TaskProperty.SelectTaskProperty,
-        TaskProperty.StringTaskProperty {
+public abstract sealed class TaskProperty<T extends TaskProperty<T>>
+    permits TaskProperty.OptionTaskProperty, TaskProperty.TypeTaskProperty {
 
-    protected TaskParameter defaultValue;
+    public enum Type {
+        ARRAY,
+        BOOLEAN,
+        DATE_TIME,
+        INTEGER,
+        NULL,
+        NUMBER,
+        OBJECT,
+        STRING,
+    }
+
     protected String description;
-    protected String displayName;
     protected DisplayOption displayOption;
+    protected String displayName;
     protected String name;
     protected String placeholder;
-    protected Boolean required;
-    protected TaskPropertyType type;
-    protected TaskPropertyTypeOption typeOption;
 
-    private TaskProperty() {}
-
-    public static BooleanTaskProperty BOOLEAN_PROPERTY(String name) {
-        return new BooleanTaskProperty(name);
-    }
-
-    public static ColorTaskProperty COLOR_PROPERTY(String name) {
-        return new ColorTaskProperty(name);
-    }
-
-    public static DateTimeTaskProperty DATE_TIME_PROPERTY(String name) {
-        return new DateTimeTaskProperty(name);
-    }
-
-    public static CollectionTaskProperty COLLECTION_PROPERTY(String name) {
-        return new CollectionTaskProperty(name);
-    }
-
-    public static GroupTaskProperty GROUP_PROPERTY(String name) {
-        return new GroupTaskProperty(name);
-    }
-
-    public static IntegerTaskProperty INTEGER_PROPERTY(String name) {
-        return new IntegerTaskProperty(name);
-    }
-
-    public static JSONTaskProperty JSON_PROPERTY(String name) {
-        return new JSONTaskProperty(name);
-    }
-
-    public static MultiSelectTaskProperty MULTI_SELECT_PROPERTY(String name) {
-        return new MultiSelectTaskProperty(name);
-    }
-
-    public static NumberTaskProperty NUMBER_PROPERTY(String name) {
-        return new NumberTaskProperty(name);
-    }
-
-    public static SelectTaskProperty SELECT_PROPERTY(String name) {
-        return new SelectTaskProperty(name);
-    }
-
-    public static StringTaskProperty STRING_PROPERTY(String name) {
-        return new StringTaskProperty(name);
-    }
-
-    public static DisplayOption hide(String k1) {
-        return DisplayOption.displayOption().hide(k1);
-    }
-
-    public static DisplayOption hide(String k1, Boolean... values) {
-        return DisplayOption.displayOption().hide(k1, values);
-    }
-
-    public static DisplayOption hide(String k1, Integer... values) {
-        return DisplayOption.displayOption().hide(k1, values);
-    }
-
-    public static DisplayOption hide(String k1, Long... values) {
-        return DisplayOption.displayOption().hide(k1, values);
-    }
-
-    public static DisplayOption hide(String k1, Float... values) {
-        return DisplayOption.displayOption().hide(k1, values);
-    }
-
-    public static DisplayOption hide(String k1, Double... values) {
-        return DisplayOption.displayOption().hide(k1, values);
-    }
-
-    public static DisplayOption hide(String k1, String... values) {
-        return DisplayOption.displayOption().hide(k1, values);
-    }
-
-    public static DisplayOption hide(String k1, List<TaskParameterValue> v1) {
-        return DisplayOption.displayOption().hide(k1, v1);
-    }
-
-    public static DisplayOption hide(String k1, List<TaskParameterValue> v1, String k2, List<TaskParameterValue> v2) {
-        return DisplayOption.displayOption().hide(k1, v1, k2, v2);
-    }
-
-    public static DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3
-    ) {
-        return DisplayOption.displayOption().hide(k1, v1, k2, v2, k3, v3);
-    }
-
-    public static DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4
-    ) {
-        return DisplayOption.displayOption().hide(k1, v1, k2, v2, k3, v3, k4, v4);
-    }
-
-    public static DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5
-    ) {
-        return DisplayOption.displayOption().hide(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
-    }
-
-    public static DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6
-    ) {
-        return DisplayOption.displayOption().hide(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6);
-    }
-
-    public static DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7
-    ) {
-        return DisplayOption.displayOption().hide(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7);
-    }
-
-    public static DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7,
-        String k8,
-        List<TaskParameterValue> v8
-    ) {
-        return DisplayOption.displayOption().hide(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8);
-    }
-
-    public static DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7,
-        String k8,
-        List<TaskParameterValue> v8,
-        String k9,
-        List<TaskParameterValue> v9
-    ) {
-        return DisplayOption
-            .displayOption()
-            .hide(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9);
-    }
-
-    public static DisplayOption hide(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7,
-        String k8,
-        List<TaskParameterValue> v8,
-        String k9,
-        List<TaskParameterValue> v9,
-        String k10,
-        List<TaskParameterValue> v10
-    ) {
-        return DisplayOption
-            .displayOption()
-            .hide(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9, k10, v10);
-    }
-
-    public static DisplayOption show(String k1) {
-        return DisplayOption.displayOption().show(k1, List.of());
-    }
-
-    public static DisplayOption show(String k1, Boolean... values) {
-        return DisplayOption
-            .displayOption()
-            .show(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-    }
-
-    public static DisplayOption show(String k1, Integer... values) {
-        return DisplayOption
-            .displayOption()
-            .show(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-    }
-
-    public static DisplayOption show(String k1, Long... values) {
-        return DisplayOption
-            .displayOption()
-            .show(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-    }
-
-    public static DisplayOption show(String k1, Float... values) {
-        return DisplayOption
-            .displayOption()
-            .show(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-    }
-
-    public static DisplayOption show(String k1, Double... values) {
-        return DisplayOption
-            .displayOption()
-            .show(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-    }
-
-    public static DisplayOption show(String k1, String... values) {
-        return DisplayOption
-            .displayOption()
-            .show(k1, Stream.of(values).map(TaskParameterValue::parameterValue).collect(Collectors.toList()));
-    }
-
-    public static DisplayOption show(String k1, TaskParameterValue... v1) {
-        return DisplayOption.displayOption().show(k1, List.of(v1));
-    }
-
-    public static DisplayOption show(String k1, List<TaskParameterValue> v1) {
-        return DisplayOption.displayOption().show(k1, v1);
-    }
-
-    public static DisplayOption show(String k1, List<TaskParameterValue> v1, String k2, List<TaskParameterValue> v2) {
-        return DisplayOption.displayOption().show(k1, v1, k2, v2);
-    }
-
-    public static DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3
-    ) {
-        return DisplayOption.displayOption().show(k1, v1, k2, v2, k3, v3);
-    }
-
-    public static DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4
-    ) {
-        return DisplayOption.displayOption().show(k1, v1, k2, v2, k3, v3, k4, v4);
-    }
-
-    public static DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5
-    ) {
-        return DisplayOption.displayOption().show(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
-    }
-
-    public static DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6
-    ) {
-        return DisplayOption.displayOption().show(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6);
-    }
-
-    public static DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7
-    ) {
-        return DisplayOption.displayOption().show(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7);
-    }
-
-    public static DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7,
-        String k8,
-        List<TaskParameterValue> v8
-    ) {
-        return DisplayOption.displayOption().show(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8);
-    }
-
-    public static DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7,
-        String k8,
-        List<TaskParameterValue> v8,
-        String k9,
-        List<TaskParameterValue> v9
-    ) {
-        return DisplayOption
-            .displayOption()
-            .show(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9);
-    }
-
-    public static DisplayOption show(
-        String k1,
-        List<TaskParameterValue> v1,
-        String k2,
-        List<TaskParameterValue> v2,
-        String k3,
-        List<TaskParameterValue> v3,
-        String k4,
-        List<TaskParameterValue> v4,
-        String k5,
-        List<TaskParameterValue> v5,
-        String k6,
-        List<TaskParameterValue> v6,
-        String k7,
-        List<TaskParameterValue> v7,
-        String k8,
-        List<TaskParameterValue> v8,
-        String k9,
-        List<TaskParameterValue> v9,
-        String k10,
-        List<TaskParameterValue> v10
-    ) {
-        return DisplayOption
-            .displayOption()
-            .show(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5, k6, v6, k7, v7, k8, v8, k9, v9, k10, v10);
-    }
-
-    public static TaskPropertyTypeOption loadOptionsDependsOn(String... loadOptionsDependsOn) {
-        return TaskPropertyTypeOption.propertyTypeOption().loadOptionsDependsOn(loadOptionsDependsOn);
-    }
-
-    public static TaskPropertyTypeOption loadOptionsMethod(String loadOptionsMethod) {
-        return TaskPropertyTypeOption.propertyTypeOption().loadOptionsMethod(loadOptionsMethod);
-    }
-
-    public static TaskPropertyTypeOption maxValue(Integer maxValue) {
-        return TaskPropertyTypeOption.propertyTypeOption().maxValue(maxValue);
-    }
-
-    public static TaskPropertyTypeOption minValue(Integer minValue) {
-        return TaskPropertyTypeOption.propertyTypeOption().minValue(minValue);
-    }
-
-    public static TaskPropertyTypeOption multipleValues(Boolean multipleValues) {
-        return TaskPropertyTypeOption.propertyTypeOption().multipleValues(multipleValues);
-    }
-
-    public static TaskPropertyTypeOption multipleValueButtonText(String multipleValueButtonText) {
-        return TaskPropertyTypeOption.propertyTypeOption().multipleValueButtonText(multipleValueButtonText);
-    }
-
-    public static TaskPropertyTypeOption numberPrecision(Integer numberPrecision) {
-        return TaskPropertyTypeOption.propertyTypeOption().numberPrecision(numberPrecision);
-    }
-
-    public static List<TaskProperty<?>> properties(TaskProperty<?>... taskProperties) {
-        return List.of(taskProperties);
+    private TaskProperty(String name) {
+        this.name = name;
     }
 
     @SuppressWarnings("unchecked")
@@ -528,8 +64,8 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
     }
 
     @SuppressWarnings("unchecked")
-    public T displayOption(DisplayOption displayOption) {
-        this.displayOption = displayOption;
+    public T displayOption(DisplayOption.DisplayOptionEntry... displayOptionEntries) {
+        this.displayOption = DisplayOption.build(List.of(displayOptionEntries));
 
         return (T) this;
     }
@@ -539,24 +75,6 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         this.placeholder = placeholder;
 
         return (T) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T required(Boolean required) {
-        this.required = required;
-
-        return (T) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T typeOption(TaskPropertyTypeOption typeOption) {
-        this.typeOption = typeOption;
-
-        return (T) this;
-    }
-
-    public TaskParameter getDefaultValue() {
-        return defaultValue;
     }
 
     public String getDescription() {
@@ -575,315 +93,392 @@ public abstract sealed class TaskProperty<T extends TaskProperty<?>>
         return name;
     }
 
-    public Boolean isRequired() {
-        return required;
-    }
-
     public String getPlaceholder() {
         return placeholder;
     }
 
-    public TaskPropertyTypeOption getTypeOption() {
-        return typeOption;
-    }
+    public static final class OptionTaskProperty extends TaskProperty<OptionTaskProperty> {
 
-    public TaskPropertyType getType() {
-        return type;
-    }
-
-    public static final class BooleanTaskProperty extends TaskProperty<BooleanTaskProperty> {
-
-        public BooleanTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.BOOLEAN;
-        }
-
-        public BooleanTaskProperty defaultValue(boolean defaultValue) {
-            this.defaultValue = parameter(defaultValue);
-
-            return this;
-        }
-    }
-
-    public static final class CollectionTaskProperty extends TaskProperty<CollectionTaskProperty> {
-
+        private Boolean multipleValues;
         private List<TaskProperty<?>> options;
 
-        public CollectionTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.COLLECTION;
+        OptionTaskProperty() {
+            super(null);
         }
 
-        public CollectionTaskProperty defaultValue(int value) {
-            defaultValue = parameter(value);
+        public OptionTaskProperty multipleValues(Boolean multipleValues) {
+            this.multipleValues = multipleValues;
 
             return this;
         }
 
-        public CollectionTaskProperty defaultValue(long value) {
-            defaultValue = parameter(value);
+        public OptionTaskProperty options(TaskProperty<?>... options) {
+            this.options = Stream.of(options).filter(Objects::nonNull).toList();
 
             return this;
         }
 
-        public CollectionTaskProperty defaultValue(float value) {
-            defaultValue = parameter(value);
-
-            return this;
-        }
-
-        public CollectionTaskProperty defaultValue(double value) {
-            defaultValue = parameter(value);
-
-            return this;
-        }
-
-        public CollectionTaskProperty defaultValue(String value) {
-            defaultValue = parameter(value);
-
-            return this;
-        }
-
-        public CollectionTaskProperty defaultValue(Boolean... values) {
-            defaultValue = parameters(values);
-
-            return this;
-        }
-
-        public CollectionTaskProperty defaultValue(Integer... values) {
-            defaultValue = parameters(values);
-
-            return this;
-        }
-
-        public CollectionTaskProperty defaultValue(Long... values) {
-            defaultValue = parameters(values);
-
-            return this;
-        }
-
-        public CollectionTaskProperty defaultValue(Float... values) {
-            defaultValue = parameters(values);
-
-            return this;
-        }
-
-        public CollectionTaskProperty defaultValue(Double... values) {
-            defaultValue = parameters(values);
-
-            return this;
-        }
-
-        public CollectionTaskProperty defaultValue(String... values) {
-            defaultValue = parameters(values);
-
-            return this;
-        }
-
-        public CollectionTaskProperty defaultValue(TaskParameter defaultValue) {
-            this.defaultValue = defaultValue;
-
-            return this;
-        }
-
-        public CollectionTaskProperty defaultValue(TaskParameter... defaultValue) {
-            this.defaultValue = parameter(defaultValue);
-
-            return this;
+        public Boolean getMultipleValues() {
+            return multipleValues;
         }
 
         public List<TaskProperty<?>> getOptions() {
             return options;
         }
+    }
 
-        public CollectionTaskProperty options(TaskProperty<?>... options) {
+    public static sealed class TypeTaskProperty<T extends TypeTaskProperty<T>>
+        extends TaskProperty<T>
+        permits TaskProperty.AnyTaskProperty, TaskProperty.ValueTaskProperty {
+
+        protected Boolean required;
+
+        TypeTaskProperty(String name) {
+            super(name);
+        }
+
+        @SuppressWarnings("unchecked")
+        public T required(Boolean required) {
+            this.required = required;
+
+            return (T) this;
+        }
+
+        public Boolean getRequired() {
+            return required;
+        }
+    }
+
+    public static final class AnyTaskProperty extends TypeTaskProperty<AnyTaskProperty> {
+
+        private List<? extends TypeTaskProperty<?>> types;
+
+        AnyTaskProperty(String name) {
+            super(name);
+        }
+
+        public AnyTaskProperty types(TypeTaskProperty<?>... properties) {
+            this.types = List.of(properties);
+
+            return this;
+        }
+
+        public List<? extends TypeTaskProperty<?>> getTypes() {
+            return types;
+        }
+    }
+
+    public static sealed class ValueTaskProperty<T, V extends ValueTaskProperty<T, V>>
+        extends TypeTaskProperty<V>
+        permits
+            TaskProperty.ArrayTaskProperty,
+            TaskProperty.BooleanTaskProperty,
+            TaskProperty.DateTimeTaskProperty,
+            TaskProperty.IntegerTaskProperty,
+            TaskProperty.NullTaskProperty,
+            TaskProperty.NumberTaskProperty,
+            TaskProperty.ObjectTaskProperty,
+            TaskProperty.StringTaskProperty {
+
+        protected List<TaskPropertyOption> options;
+        protected T defaultValue;
+        protected List<String> loadOptionsDependsOn;
+        protected String loadOptionsMethod;
+        protected Type type;
+
+        public ValueTaskProperty(String name) {
+            super(name);
+        }
+
+        @SuppressWarnings("unchecked")
+        public V loadOptionsDependsOn(String... propertyNames) {
+            this.loadOptionsDependsOn = List.of(propertyNames);
+
+            return (V) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public V loadOptionsMethod(String loadOptionsMethod) {
+            this.loadOptionsMethod = loadOptionsMethod;
+
+            return (V) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public V options(TaskPropertyOption... options) {
             this.options = List.of(options);
 
-            return this;
+            return (V) this;
+        }
+
+        public T getDefaultValue() {
+            return defaultValue;
+        }
+
+        public List<String> getLoadOptionsDependsOn() {
+            return loadOptionsDependsOn;
+        }
+
+        public String getLoadOptionsMethod() {
+            return loadOptionsMethod;
+        }
+
+        public List<TaskPropertyOption> getOptions() {
+            return options;
+        }
+
+        public Type getType() {
+            return type;
         }
     }
 
-    public static final class ColorTaskProperty extends TaskProperty<ColorTaskProperty> {
+    public static final class ArrayTaskProperty extends ValueTaskProperty<Object[], ArrayTaskProperty> {
 
-        public ColorTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.COLOR;
+        private List<? extends TypeTaskProperty<?>> items;
+
+        ArrayTaskProperty(String name) {
+            super(name);
+            this.type = Type.ARRAY;
         }
 
-        public ColorTaskProperty defaultValue(String defaultValue) {
-            this.defaultValue = parameter(defaultValue);
-
-            return this;
-        }
-    }
-
-    public static final class DateTimeTaskProperty extends TaskProperty<DateTimeTaskProperty> {
-
-        public DateTimeTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.DATE_TIME;
-        }
-
-        public DateTimeTaskProperty defaultValue(LocalDateTime defaultValue) {
-            this.defaultValue = parameter(defaultValue);
-
-            return this;
-        }
-    }
-
-    public static final class GroupTaskProperty extends TaskProperty<GroupTaskProperty> {
-
-        private List<TaskProperty<?>> fields;
-
-        public GroupTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.GROUP;
-        }
-
-        public GroupTaskProperty fields(TaskProperty<?>... fields) {
-            this.fields = List.of(fields);
+        public ArrayTaskProperty defaultValue(Boolean... values) {
+            this.defaultValue = values;
 
             return this;
         }
 
-        public List<TaskProperty<?>> getFields() {
-            return fields;
-        }
-    }
-
-    public static final class IntegerTaskProperty extends TaskProperty<IntegerTaskProperty> {
-
-        public IntegerTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.INTEGER;
-        }
-
-        public IntegerTaskProperty defaultValue(int value) {
-            this.defaultValue = parameter(value);
+        public ArrayTaskProperty defaultValue(Integer... values) {
+            this.defaultValue = values;
 
             return this;
         }
-    }
 
-    public static final class JSONTaskProperty extends TaskProperty<JSONTaskProperty> {
+        public ArrayTaskProperty defaultValue(Long... values) {
+            this.defaultValue = values;
 
-        public JSONTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.JSON;
+            return this;
         }
 
-        public JSONTaskProperty defaultValue(TaskParameter defaultValue) {
+        public ArrayTaskProperty defaultValue(Float... values) {
+            this.defaultValue = values;
+
+            return this;
+        }
+
+        public ArrayTaskProperty defaultValue(Double... values) {
+            this.defaultValue = values;
+
+            return this;
+        }
+
+        public ArrayTaskProperty defaultValue(String... values) {
+            this.defaultValue = values;
+
+            return this;
+        }
+
+        public ArrayTaskProperty defaultValue(Map<String, ?>... values) {
+            this.defaultValue = values;
+
+            return this;
+        }
+
+        public ArrayTaskProperty items(TypeTaskProperty<?>... items) {
+            this.items = List.of(items);
+
+            return this;
+        }
+
+        public List<? extends TypeTaskProperty<?>> getItems() {
+            return items;
+        }
+    }
+
+    public static final class ObjectTaskProperty extends ValueTaskProperty<Object, ObjectTaskProperty> {
+
+        private Boolean additionalProperties;
+        private List<? extends TypeTaskProperty<?>> properties;
+
+        ObjectTaskProperty(String name) {
+            super(name);
+            this.type = Type.OBJECT;
+        }
+
+        public ObjectTaskProperty additionalProperties(boolean additionalProperties) {
+            this.additionalProperties = additionalProperties;
+
+            return this;
+        }
+
+        public ObjectTaskProperty defaultValue(Object value) {
+            this.defaultValue = value;
+
+            return this;
+        }
+
+        public Boolean getAdditionalProperties() {
+            return additionalProperties;
+        }
+
+        public ObjectTaskProperty properties(TypeTaskProperty<?>... properties) {
+            this.properties = List.of(properties);
+
+            return this;
+        }
+
+        public List<? extends TypeTaskProperty<?>> getProperties() {
+            return properties;
+        }
+    }
+
+    public static final class BooleanTaskProperty extends ValueTaskProperty<Boolean, BooleanTaskProperty> {
+
+        BooleanTaskProperty(String name) {
+            super(name);
+            this.type = Type.BOOLEAN;
+        }
+
+        public BooleanTaskProperty defaultValue(boolean defaultValue) {
             this.defaultValue = defaultValue;
 
             return this;
         }
     }
 
-    public static final class MultiSelectTaskProperty extends TaskProperty<MultiSelectTaskProperty> {
+    public static final class DateTimeTaskProperty extends ValueTaskProperty<LocalDateTime, DateTimeTaskProperty> {
 
-        private List<TaskPropertyOption> options;
-
-        public MultiSelectTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.MULTI_SELECT;
+        DateTimeTaskProperty(String name) {
+            super(name);
+            this.type = Type.DATE_TIME;
         }
 
-        public MultiSelectTaskProperty defaultValue(Integer... value) {
-            this.defaultValue = parameters(value);
+        public DateTimeTaskProperty defaultValue(LocalDateTime defaultValue) {
+            this.defaultValue = defaultValue;
 
             return this;
-        }
-
-        public MultiSelectTaskProperty defaultValue(String... value) {
-            this.defaultValue = parameters(value);
-
-            return this;
-        }
-
-        public MultiSelectTaskProperty options(TaskPropertyOption... options) {
-            this.options = List.of(options);
-
-            return this;
-        }
-
-        public List<TaskPropertyOption> getOptions() {
-            return options;
         }
     }
 
-    public static final class NumberTaskProperty extends TaskProperty<NumberTaskProperty> {
+    public static final class NullTaskProperty extends ValueTaskProperty<Void, NullTaskProperty> {
 
-        public NumberTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.NUMBER;
+        NullTaskProperty(String name) {
+            super(name);
+            this.type = Type.NULL;
+        }
+    }
+
+    public static final class NumberTaskProperty extends ValueTaskProperty<Number, NumberTaskProperty> {
+
+        private Integer maxValue;
+        private Integer minValue;
+        private Integer numberPrecision;
+
+        NumberTaskProperty(String name) {
+            super(name);
+            this.type = Type.NUMBER;
         }
 
         public NumberTaskProperty defaultValue(int value) {
-            this.defaultValue = parameter(value);
+            this.defaultValue = value;
 
             return this;
         }
 
         public NumberTaskProperty defaultValue(long value) {
-            this.defaultValue = parameter(value);
+            this.defaultValue = value;
 
             return this;
         }
 
         public NumberTaskProperty defaultValue(float value) {
-            this.defaultValue = parameter(value);
+            this.defaultValue = value;
 
             return this;
         }
 
         public NumberTaskProperty defaultValue(double value) {
-            this.defaultValue = parameter(value);
+            this.defaultValue = value;
 
             return this;
+        }
+
+        public NumberTaskProperty numberPrecision(Integer numberPrecision) {
+            this.numberPrecision = numberPrecision;
+
+            return this;
+        }
+
+        public NumberTaskProperty maxValue(int maxValue) {
+            this.maxValue = maxValue;
+
+            return this;
+        }
+
+        public NumberTaskProperty minValue(int minValue) {
+            this.minValue = minValue;
+
+            return this;
+        }
+
+        public Integer getMaxValue() {
+            return maxValue;
+        }
+
+        public Integer getMinValue() {
+            return minValue;
+        }
+
+        public Integer getNumberPrecision() {
+            return numberPrecision;
         }
     }
 
-    public static final class SelectTaskProperty extends TaskProperty<SelectTaskProperty> {
+    public static final class IntegerTaskProperty extends ValueTaskProperty<Integer, IntegerTaskProperty> {
 
-        private List<TaskPropertyOption> options;
+        private Integer maxValue;
+        private Integer minValue;
 
-        public SelectTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.SELECT;
+        IntegerTaskProperty(String name) {
+            super(name);
+            this.type = Type.INTEGER;
         }
 
-        public SelectTaskProperty defaultValue(int defaultValue) {
-            this.defaultValue = parameter(defaultValue);
+        public IntegerTaskProperty defaultValue(Integer value) {
+            this.defaultValue = value;
 
             return this;
         }
 
-        public SelectTaskProperty defaultValue(String defaultValue) {
-            this.defaultValue = parameter(defaultValue);
+        public IntegerTaskProperty maxValue(int maxValue) {
+            this.maxValue = maxValue;
 
             return this;
         }
 
-        public SelectTaskProperty options(TaskPropertyOption... options) {
-            this.options = List.of(options);
+        public IntegerTaskProperty minValue(int minValue) {
+            this.minValue = minValue;
 
             return this;
         }
 
-        public List<TaskPropertyOption> getOptions() {
-            return options;
+        public Integer getMaxValue() {
+            return maxValue;
+        }
+
+        public Integer getMinValue() {
+            return minValue;
         }
     }
 
-    public static final class StringTaskProperty extends TaskProperty<StringTaskProperty> {
+    public static final class StringTaskProperty extends ValueTaskProperty<String, StringTaskProperty> {
 
-        public StringTaskProperty(String name) {
-            this.name = name;
-            this.type = TaskPropertyType.STRING;
+        StringTaskProperty(String name) {
+            super(name);
+            this.type = Type.STRING;
         }
 
         public StringTaskProperty defaultValue(String value) {
-            this.defaultValue = parameter(value);
+            this.defaultValue = value;
 
             return this;
         }

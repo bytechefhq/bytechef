@@ -21,39 +21,38 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public final class TaskPropertyOption {
+public class TaskAction {
 
     private String description;
-    private DisplayOption displayOption;
     private String name;
-    private TaskPropertyOptionValue value;
+    private List<TaskProperty<?>> inputs;
+    private List<TaskProperty<?>> outputs;
+    private String displayName;
 
-    TaskPropertyOption(String name, TaskPropertyOptionValue value, String description) {
+    TaskAction(String name) {
         this.name = name;
-        this.value = value;
-        this.description = description;
     }
 
-    public TaskPropertyOption description(String description) {
+    public TaskAction description(String description) {
         this.description = description;
 
         return this;
     }
 
-    public TaskPropertyOption displayOption(DisplayOption.DisplayOptionEntry... displayOptionEntries) {
-        this.displayOption = DisplayOption.build(List.of(displayOptionEntries));
+    public TaskAction displayName(String displayName) {
+        this.displayName = displayName;
 
         return this;
     }
 
-    public TaskPropertyOption name(String name) {
-        this.name = name;
+    public TaskAction inputs(TaskProperty<?>... inputs) {
+        this.inputs = List.of(inputs);
 
         return this;
     }
 
-    public TaskPropertyOption value(TaskPropertyOptionValue value) {
-        this.value = value;
+    public TaskAction outputs(TaskProperty<?>... outputs) {
+        this.outputs = List.of(outputs);
 
         return this;
     }
@@ -62,15 +61,19 @@ public final class TaskPropertyOption {
         return description;
     }
 
-    public DisplayOption getDisplayOption() {
-        return displayOption;
+    public String getDisplayName() {
+        return displayName;
     }
 
     public String getName() {
         return name;
     }
 
-    public TaskPropertyOptionValue getValue() {
-        return value;
+    public List<TaskProperty<?>> getInputs() {
+        return inputs;
+    }
+
+    public List<TaskProperty<?>> getOutputs() {
+        return outputs;
     }
 }
