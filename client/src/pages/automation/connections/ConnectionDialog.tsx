@@ -5,7 +5,6 @@ import Button from 'components/Button/Button';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Dialog from 'components/Dialog/Dialog';
 import Input from 'components/Input/Input';
-import {timeout} from 'd3-timer';
 import React, {useEffect, useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 import {OnChangeValue} from 'react-select';
@@ -252,7 +251,7 @@ const ConnectionDialog = ({
     function closeDialog() {
         setIsOpen(false);
 
-        timeout(() => {
+        setTimeout(() => {
             formReset();
 
             setAuthorizationName(undefined);
