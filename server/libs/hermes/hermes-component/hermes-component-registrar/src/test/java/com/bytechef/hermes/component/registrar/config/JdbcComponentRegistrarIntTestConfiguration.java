@@ -31,11 +31,11 @@ import org.springframework.context.annotation.ComponentScan;
 public class JdbcComponentRegistrarIntTestConfiguration {
 
     @MockBean
-    ConnectionService connectionService;
+    private ConnectionService connectionService;
 
     @MockBean
-    EventPublisher eventPublisher;
+    private EventPublisher eventPublisher;
 
     @MockBean
-    FileStorageService fileStorageService;
+    private FileStorageService fileStorageService;
 }
