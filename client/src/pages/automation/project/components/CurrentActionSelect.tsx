@@ -28,15 +28,13 @@ const CurrentActionSelect = ({
                     </span>
 
                     {description && (
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <QuestionMarkCircledIcon />
-                                </TooltipTrigger>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <QuestionMarkCircledIcon />
+                            </TooltipTrigger>
 
-                                <TooltipContent>{description}</TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                            <TooltipContent>{description}</TooltipContent>
+                        </Tooltip>
                     )}
                 </div>
 

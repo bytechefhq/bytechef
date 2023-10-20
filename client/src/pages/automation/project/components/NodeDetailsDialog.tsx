@@ -346,17 +346,15 @@ const NodeDetailsDialog = ({
                                 </span>
 
                                 {currentComponent?.description && (
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <InfoCircledIcon className="h-4 w-4" />
-                                            </TooltipTrigger>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <InfoCircledIcon className="h-4 w-4" />
+                                        </TooltipTrigger>
 
-                                            <TooltipContent>
-                                                {currentComponent?.description}
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
+                                        <TooltipContent>
+                                            {currentComponent?.description}
+                                        </TooltipContent>
+                                    </Tooltip>
                                 )}
 
                                 <Button
@@ -447,6 +445,7 @@ const NodeDetailsDialog = ({
                             <footer className="z-50 mt-auto flex bg-white p-4">
                                 <Select
                                     defaultValue={currentComponent.version.toString()}
+                                    name="componentVersionSelect"
                                     options={[
                                         {label: 'v1', value: '1'},
                                         {label: 'v2', value: '2'},

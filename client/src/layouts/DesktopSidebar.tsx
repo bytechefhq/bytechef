@@ -45,20 +45,18 @@ export function DesktopSidebar({
                                     to={item.href}
                                     className="flex items-center rounded-lg p-4 hover:text-blue-600"
                                 >
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <item.icon
-                                                    className="h-7 w-7"
-                                                    aria-hidden="true"
-                                                />
-                                            </TooltipTrigger>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <item.icon
+                                                className="h-7 w-7"
+                                                aria-hidden="true"
+                                            />
+                                        </TooltipTrigger>
 
-                                            <TooltipContent side="right">
-                                                {item.name}
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
+                                        <TooltipContent side="right">
+                                            {item.name}
+                                        </TooltipContent>
+                                    </Tooltip>
 
                                     <span className="sr-only">{item.name}</span>
                                 </Link>

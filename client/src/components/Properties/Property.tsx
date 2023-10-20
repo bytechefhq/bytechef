@@ -105,15 +105,13 @@ const Property = ({
                     <span className="text-sm font-medium">{label}</span>
 
                     {description && (
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <QuestionMarkCircledIcon className="ml-1" />
-                                </TooltipTrigger>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <QuestionMarkCircledIcon className="ml-1" />
+                            </TooltipTrigger>
 
-                                <TooltipContent>{description}</TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                            <TooltipContent>{description}</TooltipContent>
+                        </Tooltip>
                     )}
                 </div>
             )}
