@@ -18,15 +18,14 @@
 package com.bytechef.component.webhook;
 
 import com.bytechef.component.webhook.constant.WebhookConstants;
-import com.bytechef.component.webhook.trigger.AutoRespondWithHTTP200Trigger;
-import com.bytechef.component.webhook.trigger.AwaitWorkflowAndRespondTrigger;
-import com.bytechef.component.webhook.trigger.ValidateAndRespondTrigger;
+import com.bytechef.component.webhook.trigger.WebhookAutoRespondWithHTTP200Trigger;
+import com.bytechef.component.webhook.trigger.WebhookAwaitWorkflowAndRespondTrigger;
+import com.bytechef.component.webhook.trigger.WebhookValidateAndRespondTrigger;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -35,12 +34,13 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
 public class WebhookComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(WebhookConstants.WEBHOOK)
-        .display(display("Webhook").description(
-            "Webhook is a method utilized by applications to supply real-time information to other apps. Such a process usually delivers data immediately as and when it occurs. Webhook Trigger enables users to receive callouts whenever a service provides the option of distributing signals to a user-defined URL."))
+        .title("Webhook")
+        .description(
+            "Webhook is a method utilized by applications to supply real-time information to other apps. Such a process usually delivers data immediately as and when it occurs. Webhook Trigger enables users to receive callouts whenever a service provides the option of distributing signals to a user-defined URL.")
         .triggers(
-            AutoRespondWithHTTP200Trigger.TRIGGER_DEFINITION,
-            ValidateAndRespondTrigger.TRIGGER_DEFINITION,
-            AwaitWorkflowAndRespondTrigger.TRIGGER_DEFINITION);
+            WebhookAutoRespondWithHTTP200Trigger.TRIGGER_DEFINITION,
+            WebhookValidateAndRespondTrigger.TRIGGER_DEFINITION,
+            WebhookAwaitWorkflowAndRespondTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

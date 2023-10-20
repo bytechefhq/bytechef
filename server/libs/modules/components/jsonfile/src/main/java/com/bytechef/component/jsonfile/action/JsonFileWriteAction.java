@@ -40,7 +40,7 @@ import static com.bytechef.component.jsonfile.constant.JsonFileTaskConstants.WRI
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
@@ -52,7 +52,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class JsonFileWriteAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(WRITE)
-        .display(display("Write to file").description("Writes the data to a JSON file."))
+        .title("Write to file")
+        .description("Writes the data to a JSON file.")
         .properties(
             string(FILE_TYPE)
                 .label("File Type")

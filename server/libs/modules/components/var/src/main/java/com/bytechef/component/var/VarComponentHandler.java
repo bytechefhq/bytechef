@@ -18,7 +18,6 @@
 package com.bytechef.component.var;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.var.action.VarSetAction;
 import com.bytechef.component.var.constant.VarConstants;
@@ -33,7 +32,8 @@ import com.google.auto.service.AutoService;
 public class VarComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(VarConstants.VAR)
-        .display(display("Var").description("Sets a value which can then be referenced in other tasks."))
+        .title("Var")
+        .description("Sets a value which can then be referenced in other tasks.")
         .actions(VarSetAction.ACTION_DEFINITION);
 
     @Override

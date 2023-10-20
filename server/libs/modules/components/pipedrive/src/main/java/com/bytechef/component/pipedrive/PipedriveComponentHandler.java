@@ -17,16 +17,16 @@
 
 package com.bytechef.component.pipedrive;
 
-import com.bytechef.component.pipedrive.trigger.NewActivityTrigger;
-import com.bytechef.component.pipedrive.trigger.NewDealTrigger;
-import com.bytechef.component.pipedrive.trigger.NewOrganizationTrigger;
-import com.bytechef.component.pipedrive.trigger.NewPersonTrigger;
-import com.bytechef.component.pipedrive.trigger.UpdatedDealTrigger;
-import com.bytechef.component.pipedrive.trigger.UpdatedOrganizationTrigger;
-import com.bytechef.component.pipedrive.trigger.UpdatedPersonTrigger;
+import com.bytechef.component.pipedrive.trigger.PipedriveNewActivityTrigger;
+import com.bytechef.component.pipedrive.trigger.PipedriveNewDealTrigger;
+import com.bytechef.component.pipedrive.trigger.PipedriveNewOrganizationTrigger;
+import com.bytechef.component.pipedrive.trigger.PipedriveNewPersonTrigger;
+import com.bytechef.component.pipedrive.trigger.PipedriveUpdatedDealTrigger;
+import com.bytechef.component.pipedrive.trigger.PipedriveUpdatedOrganizationTrigger;
+import com.bytechef.component.pipedrive.trigger.PipedriveUpdatedPersonTrigger;
 import com.bytechef.hermes.component.OpenApiComponentHandler;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.definition.DefinitionDSL;
 import com.google.auto.service.AutoService;
 
 import java.util.List;
@@ -39,20 +39,22 @@ import java.util.List;
 public class PipedriveComponentHandler extends AbstractPipedriveComponentHandler {
 
     @Override
-    public DefinitionDSL.ModifiableDisplay modifyDisplay(DefinitionDSL.ModifiableDisplay modifiableDisplay) {
-        return modifiableDisplay.description(
+    public ComponentDSL.ModifiableComponentDefinition modifyComponent(
+        ComponentDSL.ModifiableComponentDefinition componentDefinition) {
+
+        return componentDefinition.description(
             "The first CRM designed by salespeople, for salespeople. Do more to grow your business.");
     }
 
     @Override
     public List<TriggerDefinition> getTriggers() {
         return List.of(
-            NewActivityTrigger.TRIGGER_DEFINITION,
-            NewDealTrigger.TRIGGER_DEFINITION,
-            NewOrganizationTrigger.TRIGGER_DEFINITION,
-            NewPersonTrigger.TRIGGER_DEFINITION,
-            UpdatedDealTrigger.TRIGGER_DEFINITION,
-            UpdatedOrganizationTrigger.TRIGGER_DEFINITION,
-            UpdatedPersonTrigger.TRIGGER_DEFINITION);
+            PipedriveNewActivityTrigger.TRIGGER_DEFINITION,
+            PipedriveNewDealTrigger.TRIGGER_DEFINITION,
+            PipedriveNewOrganizationTrigger.TRIGGER_DEFINITION,
+            PipedriveNewPersonTrigger.TRIGGER_DEFINITION,
+            PipedriveUpdatedDealTrigger.TRIGGER_DEFINITION,
+            PipedriveUpdatedOrganizationTrigger.TRIGGER_DEFINITION,
+            PipedriveUpdatedPersonTrigger.TRIGGER_DEFINITION);
     }
 }

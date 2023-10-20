@@ -1,635 +1,1185 @@
 {
-  "display": {
-    "description": "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.",
-    "title": "Schedule"
-  },
+  "actions": null,
+  "category": null,
+  "connection": null,
+  "description": "With the Scheduled Trigger, you can initiate customized workflows at specific time intervals.",
+  "icon": null,
+  "tags": null,
   "name": "schedule",
+  "resources": null,
   "version": 1,
+  "title": "Schedule",
   "triggers": [ {
-    "batch": false,
-    "deduplicate": {
-      "empty": true,
-      "present": false
-    },
-    "display": {
-      "description": "Schedule workflows to execute at a specific time either on a daily basis or selected days of the week.",
-      "title": "Every day"
-    },
-    "dynamicWebhookDisable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookEnable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRefresh": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
-    "executeWorkflowSynchronously": false,
-    "help": {
-      "empty": true,
-      "present": false
-    },
-    "listenerEnable": {
-      "empty": false,
-      "present": true
-    },
-    "listenerDisable": {
-      "empty": false,
-      "present": true
-    },
+    "batch": null,
+    "deduplicate": null,
+    "description": "Trigger off at a specific time either on a daily basis or selected days of the week.",
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "exampleOutput": null,
+    "exampleOutputDataSource": null,
+    "help": null,
+    "listenerEnable": { },
+    "listenerDisable": { },
+    "name": "everyDay",
+    "nodeDescription": null,
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "datetime",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "hour",
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "minute",
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "dayOfWeek",
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
         "multipleValues": true,
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
         "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
           "name": "1",
           "type": "BOOLEAN",
-          "controlType": "CHECKBOX"
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "CHECKBOX",
+          "expressionDisabled": null
         }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
           "name": "2",
           "type": "BOOLEAN",
-          "controlType": "CHECKBOX"
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "CHECKBOX",
+          "expressionDisabled": null
         }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
           "name": "3",
           "type": "BOOLEAN",
-          "controlType": "CHECKBOX"
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "CHECKBOX",
+          "expressionDisabled": null
         }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
           "name": "4",
           "type": "BOOLEAN",
-          "controlType": "CHECKBOX"
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "CHECKBOX",
+          "expressionDisabled": null
         }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
           "name": "5",
           "type": "BOOLEAN",
-          "controlType": "CHECKBOX"
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "CHECKBOX",
+          "expressionDisabled": null
         }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
           "name": "6",
           "type": "BOOLEAN",
-          "controlType": "CHECKBOX"
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "CHECKBOX",
+          "expressionDisabled": null
         }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "hidden": null,
+          "label": null,
+          "metadata": null,
+          "placeholder": null,
+          "required": null,
           "name": "7",
           "type": "BOOLEAN",
-          "controlType": "CHECKBOX"
+          "defaultValue": null,
+          "exampleValue": null,
+          "controlType": "CHECKBOX",
+          "expressionDisabled": null
         } ],
-        "controlType": "JSON_BUILDER"
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "timezone",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
     } ],
-    "name": "everyDay",
-    "poll": {
-      "empty": true,
-      "present": false
-    },
+    "outputSchemaDataSource": null,
+    "poll": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The hour at which a workflow will be triggered.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Hour",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "hour",
       "type": "INTEGER",
       "defaultValue": 0,
+      "exampleValue": null,
       "maxValue": 23,
       "minValue": 0,
-      "controlType": "INPUT_INTEGER"
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The minute at which a workflow will be triggered.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Minute",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "minute",
       "type": "INTEGER",
       "defaultValue": 0,
+      "exampleValue": null,
       "maxValue": 59,
       "minValue": 0,
-      "controlType": "INPUT_INTEGER"
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "Days at which a workflow will be triggered.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Day of week",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "dayOfWeek",
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
         "label": "Monday",
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "1",
         "type": "BOOLEAN",
         "defaultValue": true,
-        "controlType": "CHECKBOX"
+        "exampleValue": null,
+        "controlType": "CHECKBOX",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
         "label": "Tuesday",
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "2",
         "type": "BOOLEAN",
         "defaultValue": true,
-        "controlType": "CHECKBOX"
+        "exampleValue": null,
+        "controlType": "CHECKBOX",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
         "label": "Wednesday",
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "3",
         "type": "BOOLEAN",
         "defaultValue": true,
-        "controlType": "CHECKBOX"
+        "exampleValue": null,
+        "controlType": "CHECKBOX",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
         "label": "Thursday",
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "4",
         "type": "BOOLEAN",
         "defaultValue": true,
-        "controlType": "CHECKBOX"
+        "exampleValue": null,
+        "controlType": "CHECKBOX",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
         "label": "Friday",
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "5",
         "type": "BOOLEAN",
         "defaultValue": true,
-        "controlType": "CHECKBOX"
+        "exampleValue": null,
+        "controlType": "CHECKBOX",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
         "label": "Saturday",
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "6",
         "type": "BOOLEAN",
         "defaultValue": true,
-        "controlType": "CHECKBOX"
+        "exampleValue": null,
+        "controlType": "CHECKBOX",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
         "label": "Sunday",
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "7",
         "type": "BOOLEAN",
         "defaultValue": true,
-        "controlType": "CHECKBOX"
+        "exampleValue": null,
+        "controlType": "CHECKBOX",
+        "expressionDisabled": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Timezone",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "timezone",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     } ],
-    "staticWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
+    "staticWebhookRequest": null,
+    "title": "Every day",
     "type": "LISTENER",
-    "webhookBodyRaw": false,
-    "webhookValidate": {
-      "empty": true,
-      "present": false
-    }
+    "webhookBodyRaw": null,
+    "webhookValidate": null,
+    "workflowSyncExecution": null
   }, {
-    "batch": false,
-    "deduplicate": {
-      "empty": true,
-      "present": false
-    },
-    "display": {
-      "description": "Schedule workflows to execute at a specific day of the week.",
-      "title": "Every week"
-    },
-    "dynamicWebhookDisable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookEnable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRefresh": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
-    "executeWorkflowSynchronously": false,
-    "help": {
-      "empty": true,
-      "present": false
-    },
-    "listenerEnable": {
-      "empty": false,
-      "present": true
-    },
-    "listenerDisable": {
-      "empty": false,
-      "present": true
-    },
+    "batch": null,
+    "deduplicate": null,
+    "description": "Trigger off at a specific day of the week.",
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "exampleOutput": null,
+    "exampleOutputDataSource": null,
+    "help": null,
+    "listenerEnable": { },
+    "listenerDisable": { },
+    "name": "everyWeek",
+    "nodeDescription": null,
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "datetime",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "hour",
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "minute",
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "dayOfWeek",
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "timezone",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
     } ],
-    "name": "everyWeek",
-    "poll": {
-      "empty": true,
-      "present": false
-    },
+    "outputSchemaDataSource": null,
+    "poll": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The hour at which a workflow will be triggered.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Hour",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "hour",
       "type": "INTEGER",
       "defaultValue": 0,
+      "exampleValue": null,
       "maxValue": 23,
       "minValue": 0,
-      "controlType": "INPUT_INTEGER"
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The minute at which a workflow will be triggered.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Minute",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "minute",
       "type": "INTEGER",
       "defaultValue": 0,
+      "exampleValue": null,
       "maxValue": 59,
       "minValue": 0,
-      "controlType": "INPUT_INTEGER"
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "Days at which a workflow will be triggered.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Day of week",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "dayOfWeek",
       "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
       "options": [ {
+        "description": null,
+        "displayCondition": null,
         "name": "Monday",
         "value": 1
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Tuesday",
         "value": 2
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Wednesday",
         "value": 3
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Thursday",
         "value": 4
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Friday",
         "value": 5
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Saturday",
         "value": 6
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Sunday",
         "value": 7
       } ],
-      "controlType": "SELECT"
+      "optionsDataSource": null,
+      "controlType": "SELECT",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Timezone",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "timezone",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     } ],
-    "staticWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
+    "staticWebhookRequest": null,
+    "title": "Every week",
     "type": "LISTENER",
-    "webhookBodyRaw": false,
-    "webhookValidate": {
-      "empty": true,
-      "present": false
-    }
+    "webhookBodyRaw": null,
+    "webhookValidate": null,
+    "workflowSyncExecution": null
   }, {
-    "batch": false,
-    "deduplicate": {
-      "empty": true,
-      "present": false
-    },
-    "display": {
-      "description": "Schedule workflows to execute at a specific time in month.",
-      "title": "Every month"
-    },
-    "dynamicWebhookDisable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookEnable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRefresh": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
-    "executeWorkflowSynchronously": false,
-    "help": {
-      "empty": true,
-      "present": false
-    },
-    "listenerEnable": {
-      "empty": false,
-      "present": true
-    },
-    "listenerDisable": {
-      "empty": false,
-      "present": true
-    },
+    "batch": null,
+    "deduplicate": null,
+    "description": "Trigger off at a specific time in month.",
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "exampleOutput": null,
+    "exampleOutputDataSource": null,
+    "help": null,
+    "listenerEnable": { },
+    "listenerDisable": { },
+    "name": "everyMonth",
+    "nodeDescription": null,
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "datetime",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "hour",
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "minute",
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "dayOfMonth",
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "timezone",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
     } ],
-    "name": "everyMonth",
-    "poll": {
-      "empty": true,
-      "present": false
-    },
+    "outputSchemaDataSource": null,
+    "poll": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The hour at which a workflow will be triggered.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Hour",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "hour",
       "type": "INTEGER",
       "defaultValue": 0,
+      "exampleValue": null,
       "maxValue": 23,
       "minValue": 0,
-      "controlType": "INPUT_INTEGER"
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The minute at which a workflow will be triggered.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Minute",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "minute",
       "type": "INTEGER",
       "defaultValue": 0,
+      "exampleValue": null,
       "maxValue": 59,
       "minValue": 0,
-      "controlType": "INPUT_INTEGER"
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The day of the month  at which a workflow will be triggered.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Day of month",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "dayOfMonth",
       "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
       "maxValue": 31,
       "minValue": 1,
-      "controlType": "INPUT_INTEGER"
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Timezone",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "timezone",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     } ],
-    "staticWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
+    "staticWebhookRequest": null,
+    "title": "Every month",
     "type": "LISTENER",
-    "webhookBodyRaw": false,
-    "webhookValidate": {
-      "empty": true,
-      "present": false
-    }
+    "webhookBodyRaw": null,
+    "webhookValidate": null,
+    "workflowSyncExecution": null
   }, {
-    "batch": false,
-    "deduplicate": {
-      "empty": true,
-      "present": false
-    },
-    "display": {
-      "description": "Schedule workflows to execute periodically, for example every minute or day, based on a set interval.",
-      "title": "Interval"
-    },
-    "dynamicWebhookDisable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookEnable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRefresh": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
-    "executeWorkflowSynchronously": false,
-    "help": {
-      "empty": true,
-      "present": false
-    },
-    "listenerEnable": {
-      "empty": false,
-      "present": true
-    },
-    "listenerDisable": {
-      "empty": false,
-      "present": true
-    },
+    "batch": null,
+    "deduplicate": null,
+    "description": "Trigger off periodically, for example every minute or day, based on a set interval.",
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "exampleOutput": null,
+    "exampleOutputDataSource": null,
+    "help": null,
+    "listenerEnable": { },
+    "listenerDisable": { },
+    "name": "interval",
+    "nodeDescription": null,
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "datetime",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "interval",
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "timeUnit",
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
     } ],
-    "name": "interval",
-    "poll": {
-      "empty": true,
-      "present": false
-    },
+    "outputSchemaDataSource": null,
+    "poll": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The hour at which a workflow will be triggered.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Interval",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "interval",
       "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
+      "maxValue": null,
       "minValue": 1,
-      "controlType": "INPUT_INTEGER"
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "Days at which a workflow will be triggered.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Day of week",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "timeUnit",
       "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
       "options": [ {
+        "description": null,
+        "displayCondition": null,
         "name": "Minute",
         "value": 1
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Hour",
         "value": 2
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Day",
         "value": 3
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Month",
         "value": 4
       } ],
-      "controlType": "SELECT"
+      "optionsDataSource": null,
+      "controlType": "SELECT",
+      "expressionDisabled": null
     } ],
-    "staticWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
+    "staticWebhookRequest": null,
+    "title": "Interval",
     "type": "LISTENER",
-    "webhookBodyRaw": false,
-    "webhookValidate": {
-      "empty": true,
-      "present": false
-    }
+    "webhookBodyRaw": null,
+    "webhookValidate": null,
+    "workflowSyncExecution": null
   }, {
-    "batch": false,
-    "deduplicate": {
-      "empty": true,
-      "present": false
-    },
-    "display": {
-      "description": "Schedule workflows to execute based on a custom schedule.",
-      "title": "Cron"
-    },
-    "dynamicWebhookDisable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookEnable": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRefresh": {
-      "empty": true,
-      "present": false
-    },
-    "dynamicWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
-    "executeWorkflowSynchronously": false,
-    "help": {
-      "empty": true,
-      "present": false
-    },
-    "listenerEnable": {
-      "empty": false,
-      "present": true
-    },
-    "listenerDisable": {
-      "empty": false,
-      "present": true
-    },
+    "batch": null,
+    "deduplicate": null,
+    "description": "Trigger off based on a custom schedule.",
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "exampleOutput": null,
+    "exampleOutputDataSource": null,
+    "help": null,
+    "listenerEnable": { },
+    "listenerDisable": { },
+    "name": "cron",
+    "nodeDescription": null,
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "datetime",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "expression",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "timezone",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
     } ],
-    "name": "cron",
-    "poll": {
-      "empty": true,
-      "present": false
-    },
+    "outputSchemaDataSource": null,
+    "poll": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The chron schedule expression. Format: [Minute] [Hour] [Day of Month] [Month] [Day of Week]",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Expression",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "expression",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The timezone at which the cron expression will be scheduled.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Timezone",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "timezone",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     } ],
-    "staticWebhookRequest": {
-      "empty": true,
-      "present": false
-    },
+    "staticWebhookRequest": null,
+    "title": "Cron",
     "type": "LISTENER",
-    "webhookBodyRaw": false,
-    "webhookValidate": {
-      "empty": true,
-      "present": false
-    }
+    "webhookBodyRaw": null,
+    "webhookValidate": null,
+    "workflowSyncExecution": null
   } ]
 }

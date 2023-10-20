@@ -26,7 +26,6 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.DELETE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.util.HttpClientUtils.RequestMethod;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -34,7 +33,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
 public class HttpClientDeleteAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(DELETE)
-        .display(display("DELETE").description("The request method to use."))
+        .title("DELETE")
+        .description("The request method to use.")
         .properties(
             HttpClientActionUtils.toArray(
                 //

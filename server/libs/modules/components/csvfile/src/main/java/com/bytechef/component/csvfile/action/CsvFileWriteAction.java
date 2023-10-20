@@ -42,7 +42,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.number;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -53,7 +53,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class CsvFileWriteAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(WRITE)
-        .display(display("Write to file").description("Writes the data to a csv file."))
+        .title("Write to file")
+        .description("Writes the data to a csv file.")
         .properties(
             array(ROWS)
                 .label("Rows")

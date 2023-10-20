@@ -27,7 +27,7 @@ import static com.bytechef.component.randomhelper.constant.RandomHelperConstants
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.RANDOM_INT;
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.START_INCLUSIVE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 
 /**
@@ -36,7 +36,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 public class RandomHelperRandomIntAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(RANDOM_INT)
-        .display(display("Int").description("Generates a random integer value."))
+        .title("Int")
+        .description("Generates a random integer value.")
         .properties(
             integer(START_INCLUSIVE)
                 .description("The minimum possible generated value.")

@@ -19,7 +19,6 @@ package com.bytechef.component.script;
 
 import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.script.action.ScriptJavaAction;
 import com.bytechef.component.script.action.ScriptJavaScriptAction;
@@ -38,10 +37,9 @@ import com.google.auto.service.AutoService;
 public class ScriptComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(SCRIPT)
-        .display(
-            display("Script")
-                .description(
-                    "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages."))
+        .title("Script")
+        .description(
+            "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.")
         .actions(
             ScriptJavaAction.ACTION_DEFINITION,
             ScriptJavaScriptAction.ACTION_DEFINITION,

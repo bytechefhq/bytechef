@@ -37,7 +37,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import static com.bytechef.component.bash.constant.BashConstants.EXECUTE;
 import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -46,7 +46,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class BashExecuteAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(EXECUTE)
-        .display(display("Execute").description("Executes the script."))
+        .title("Execute")
+        .description("Executes the script.")
         .properties(string(SCRIPT)
             .label("Script")
             .description("Script written in bash.")

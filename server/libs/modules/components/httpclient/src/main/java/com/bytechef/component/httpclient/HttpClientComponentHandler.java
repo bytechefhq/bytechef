@@ -19,7 +19,6 @@ package com.bytechef.component.httpclient;
 
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.HTTP_CLIENT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.httpclient.action.HttpClientDeleteAction;
 import com.bytechef.component.httpclient.action.HttpClientGetAction;
@@ -40,7 +39,8 @@ import com.google.auto.service.AutoService;
 public class HttpClientComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(HTTP_CLIENT)
-        .display(display("HTTP Client").description("Makes an HTTP request and returns the response data."))
+        .title("HTTP Client")
+        .description("Makes an HTTP request and returns the response data.")
         .connection(HttpClientConnection.CONNECTION_DEFINITION)
         .actions(
             HttpClientGetAction.ACTION_DEFINITION,

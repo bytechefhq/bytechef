@@ -19,7 +19,6 @@ package com.bytechef.component.filesystem;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILESYSTEM;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.filesystem.action.FilesystemCreateTempDirAction;
 import com.bytechef.component.filesystem.action.FilesystemGetFilePathAction;
@@ -39,7 +38,8 @@ import com.google.auto.service.AutoService;
 public class FilesystemComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(FILESYSTEM)
-        .display(display("Local File").description("Reads or writes a binary file from/to disk"))
+        .title("Local File")
+        .description("Reads or writes a binary file from/to disk")
         .actions(
             FilesystemReadFileAction.ACTION_DEFINITION,
             FilesystemWriteFileAction.ACTION_DEFINITION,

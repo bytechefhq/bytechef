@@ -30,7 +30,7 @@ import java.io.InputStream;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.READ_FILE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -39,7 +39,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class FilesystemReadFileAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(READ_FILE)
-        .display(display("Read from file"))
+        .title("Read from file")
         .properties(string(FILENAME)
             .label("Filename")
             .description("The path of the file to read.")

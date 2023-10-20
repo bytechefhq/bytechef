@@ -1,475 +1,1222 @@
 {
   "actions": [ {
-    "batch": false,
-    "display": {
-      "description": "",
-      "title": "Append Value to List"
-    },
+    "batch": null,
+    "description": "Append value to the end of a list. If the list does not exist, it will be created.",
+    "exampleOutput": null,
+    "help": null,
     "name": "appendValueToList",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The identifier of a list must be unique within the chosen scope, or a new value will overwrite the existing one.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Key",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "key",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The namespace for appending a value.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Scope",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "scope",
       "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
       "controlType": "SELECT",
       "options": [ {
+        "description": null,
+        "displayCondition": null,
         "name": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow instance",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Account",
         "value": "ACCOUNT"
-      } ]
+      } ],
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The value to set under given key.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Value",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "value",
       "type": "ONE_OF",
       "types": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "ARRAY",
+        "defaultValue": null,
+        "exampleValue": null,
+        "items": null,
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "BOOLEAN",
-        "controlType": "CHECKBOX"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "CHECKBOX",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "NUMBER",
-        "controlType": "INPUT_NUMBER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "numberPrecision": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_NUMBER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
-        "type": "NULL"
-      } ]
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
+        "type": "NULL",
+        "expressionDisabled": null
+      } ],
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "When the specified list doesn't exist, it will be created with the provided value during the append operation.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Create value if missing",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "createValueIfMissing",
       "type": "BOOLEAN",
-      "controlType": "CHECKBOX"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "CHECKBOX",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Append a list as a single item",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "appendListAsSingleItem",
       "type": "BOOLEAN",
-      "controlType": "CHECKBOX"
-    } ]
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "CHECKBOX",
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Append Value to List"
   }, {
-    "batch": false,
-    "display": {
-      "description": "The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions.",
-      "title": "Atomic Increment"
-    },
+    "batch": null,
+    "description": "The numeric value can be incremented atomically, and the action can be used concurrently from multiple executions.",
+    "exampleOutput": null,
+    "help": null,
     "name": "atomicIncrement",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The identifier of a value to increment.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Key",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "key",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The namespace to obtain a value from.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Scope",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "scope",
       "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
       "controlType": "SELECT",
       "options": [ {
+        "description": null,
+        "displayCondition": null,
         "name": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow instance",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Account",
         "value": "ACCOUNT"
-      } ]
+      } ],
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The value that can be added to the existing numeric value, which may have a negative value.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Value to add",
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
       "name": "valueToAdd",
       "type": "INTEGER",
       "defaultValue": 1,
-      "controlType": "INPUT_INTEGER"
-    } ]
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Atomic Increment"
   }, {
-    "batch": false,
-    "display": {
-      "description": "",
-      "title": "Await Get Value"
-    },
+    "batch": null,
+    "description": "",
+    "exampleOutput": null,
+    "help": null,
     "name": "awaitGetValue",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The identifier of a value to wait for.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Key",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "key",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The namespace to obtain a value from.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Scope",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "scope",
       "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
       "controlType": "SELECT",
       "options": [ {
+        "description": null,
+        "displayCondition": null,
         "name": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow instance",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Account",
         "value": "ACCOUNT"
-      } ]
+      } ],
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Timeout (1 to 300 sec)",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "timeout",
       "type": "INTEGER",
+      "defaultValue": null,
+      "exampleValue": null,
       "maxValue": 300,
       "minValue": 1,
-      "controlType": "INPUT_INTEGER"
-    } ]
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Await Get Value"
   }, {
-    "batch": false,
-    "display": {
-      "description": "Remove a value associated with a key in the specified scope.",
-      "title": "Delete Value"
-    },
+    "batch": null,
+    "description": "Remove a value associated with a key in the specified scope.",
+    "exampleOutput": null,
+    "help": null,
     "name": "deleteValue",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The identifier of a value to delete, stored earlier in the selected scope.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Key",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "key",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Scope",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "scope",
       "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
       "controlType": "SELECT",
       "options": [ {
+        "description": null,
+        "displayCondition": null,
         "name": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow instance",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Account",
         "value": "ACCOUNT"
-      } ]
-    } ]
+      } ],
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Delete Value"
   }, {
-    "batch": false,
-    "display": {
-      "description": "Delete a value from the given index in a list.",
-      "title": "Delete Value from List"
-    },
+    "batch": null,
+    "description": "Delete a value from the given index in a list.",
+    "exampleOutput": null,
+    "help": null,
     "name": "deleteValueFromlist",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The identifier of a list to delete value from, stored earlier in the selected scope.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Key",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "key",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Scope",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "scope",
       "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
       "controlType": "SELECT",
       "options": [ {
+        "description": null,
+        "displayCondition": null,
         "name": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow instance",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Account",
         "value": "ACCOUNT"
-      } ]
+      } ],
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The specified index in the list will be removed, and if it doesn't exist, the list will remain unaltered.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Index",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "index",
       "type": "INTEGER",
-      "controlType": "INPUT_INTEGER"
-    } ]
+      "defaultValue": null,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Delete Value from List"
   }, {
-    "batch": false,
-    "display": {
-      "description": "Retrieve all the currently existing keys from storage, along with their values within the provided scope.",
-      "title": "Get All Keys"
-    },
+    "batch": null,
+    "description": "Retrieve all the currently existing keys from storage, along with their values within the provided scope.",
+    "exampleOutput": null,
+    "help": null,
     "name": "getAllKeys",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The namespace to get keys from.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Scope",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "scope",
       "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
       "controlType": "SELECT",
       "options": [ {
+        "description": null,
+        "displayCondition": null,
         "name": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow instance",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Account",
         "value": "ACCOUNT"
-      } ]
-    } ]
+      } ],
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Get All Keys"
   }, {
-    "batch": false,
-    "display": {
-      "description": "",
-      "title": "Get Value"
-    },
+    "batch": null,
+    "description": "Retrieve a previously assigned value within the specified scope using its corresponding key.",
+    "exampleOutput": null,
+    "help": null,
     "name": "getValue",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The identifier of a value to get, stored earlier in the selected scope.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Key",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "key",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The namespace to get a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Scope",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "scope",
       "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
       "controlType": "SELECT",
       "options": [ {
+        "description": null,
+        "displayCondition": null,
         "name": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow instance",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Account",
         "value": "ACCOUNT"
-      } ]
+      } ],
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The default value to return if no value exists under the given key.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Default value",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "defaultValue",
       "type": "ONE_OF",
       "types": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "ARRAY",
+        "defaultValue": null,
+        "exampleValue": null,
+        "items": null,
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "BOOLEAN",
-        "controlType": "CHECKBOX"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "CHECKBOX",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "NUMBER",
-        "controlType": "INPUT_NUMBER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "numberPrecision": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_NUMBER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
-        "type": "NULL"
-      } ]
-    } ]
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
+        "type": "NULL",
+        "expressionDisabled": null
+      } ],
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Get Value"
   }, {
-    "batch": false,
-    "display": {
-      "description": "Set a value under a key, in the specified scope.",
-      "title": "Set Value"
-    },
+    "batch": null,
+    "description": "Set a value under a key, in the specified scope.",
+    "exampleOutput": null,
+    "help": null,
     "name": "setValue",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The identifier of a value. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Key",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "key",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Scope",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "scope",
       "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
       "controlType": "SELECT",
       "options": [ {
+        "description": null,
+        "displayCondition": null,
         "name": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow instance",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Account",
         "value": "ACCOUNT"
-      } ]
+      } ],
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The value to set under the specified key.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Value",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "value",
       "type": "ONE_OF",
       "types": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "ARRAY",
+        "defaultValue": null,
+        "exampleValue": null,
+        "items": null,
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "BOOLEAN",
-        "controlType": "CHECKBOX"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "CHECKBOX",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "NUMBER",
-        "controlType": "INPUT_NUMBER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "numberPrecision": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_NUMBER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
-        "type": "NULL"
-      } ]
-    } ]
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
+        "type": "NULL",
+        "expressionDisabled": null
+      } ],
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Set Value"
   }, {
-    "batch": false,
-    "display": {
-      "description": "Set value under a specified index in a list.",
-      "title": "Set Value in List"
-    },
+    "batch": null,
+    "description": "Set value under a specified index in a list.",
+    "exampleOutput": null,
+    "help": null,
     "name": "setValueInList",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The identifier of a list. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Key",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "key",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Scope",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "scope",
       "type": "STRING",
+      "defaultValue": null,
+      "exampleValue": null,
       "controlType": "SELECT",
       "options": [ {
+        "description": null,
+        "displayCondition": null,
         "name": "Current Execution",
         "value": "CURRENT_EXECUTION"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow instance",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Workflow",
         "value": "WORKFLOW"
       }, {
+        "description": null,
+        "displayCondition": null,
         "name": "Account",
         "value": "ACCOUNT"
-      } ]
+      } ],
+      "optionsDataSource": null,
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The index in a list to set a value under. The previous value will be overridden.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Index",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "index",
       "type": "INTEGER",
-      "controlType": "INPUT_INTEGER"
+      "defaultValue": null,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": null,
+      "optionsDataSource": null,
+      "controlType": "INPUT_INTEGER",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The value to set under the specified list's key.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Value",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "value",
       "type": "ONE_OF",
       "types": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "ARRAY",
+        "defaultValue": null,
+        "exampleValue": null,
+        "items": null,
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "BOOLEAN",
-        "controlType": "CHECKBOX"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "CHECKBOX",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "NUMBER",
-        "controlType": "INPUT_NUMBER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "numberPrecision": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_NUMBER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
         "multipleValues": true,
-        "controlType": "JSON_BUILDER"
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
+        "controlType": "JSON_BUILDER",
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
-        "type": "NULL"
-      } ]
-    } ]
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
+        "type": "NULL",
+        "expressionDisabled": null
+      } ],
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Set Value in List"
   } ],
-  "display": {
-    "description": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
-    "title": "Data Storage"
-  },
+  "category": null,
+  "connection": null,
+  "description": "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.",
+  "icon": null,
+  "tags": null,
   "name": "dataStorage",
-  "version": 1
+  "resources": null,
+  "version": 1,
+  "title": "Data Storage",
+  "triggers": null
 }

@@ -1,56 +1,141 @@
 {
   "actions": [ {
-    "batch": false,
-    "display": {
-      "description": "Converts the XML string to object/array.",
-      "title": "Convert from XML string"
-    },
+    "batch": null,
+    "description": "Converts the XML string to object/array.",
+    "exampleOutput": null,
+    "help": null,
     "name": "parse",
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
+      "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
+      "properties": null,
       "controlType": "JSON_BUILDER",
-      "multipleValues": true
+      "expressionDisabled": null
     } ],
     "properties": [ {
+      "advancedOption": null,
       "description": "The XML string to convert to the data.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Source",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "source",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
-    } ]
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Convert from XML string"
   }, {
-    "batch": false,
-    "display": {
-      "description": "Writes the object/array to a XML string.",
-      "title": "Convert to XML string"
-    },
+    "batch": null,
+    "description": "Writes the object/array to a XML string.",
+    "exampleOutput": null,
+    "help": null,
     "name": "stringify",
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     } ],
     "properties": [ {
+      "advancedOption": null,
       "description": "The data to convert to XML string.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Source",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "source",
       "type": "ONE_OF",
       "types": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "ARRAY",
+        "defaultValue": null,
+        "exampleValue": null,
+        "items": null,
+        "multipleValues": true,
+        "options": null,
+        "optionsDataSource": null,
         "controlType": "JSON_BUILDER",
-        "multipleValues": true
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
+        "name": null,
         "type": "OBJECT",
+        "defaultValue": null,
+        "exampleValue": null,
+        "additionalProperties": null,
+        "multipleValues": true,
+        "objectType": null,
+        "options": null,
+        "optionsDataSource": null,
+        "properties": null,
         "controlType": "JSON_BUILDER",
-        "multipleValues": true
-      } ]
-    } ]
+        "expressionDisabled": null
+      } ],
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Convert to XML string"
   } ],
-  "display": {
-    "description": "Converts between XML string and object/array.",
-    "title": "XML Helper"
-  },
+  "category": null,
+  "connection": null,
+  "description": "Converts between XML string and object/array.",
+  "icon": null,
+  "tags": null,
   "name": "xmlHelper",
-  "version": 1
+  "resources": null,
+  "version": 1,
+  "title": "XML Helper",
+  "triggers": null
 }

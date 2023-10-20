@@ -27,7 +27,7 @@ import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.JAVA;
 import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -39,7 +39,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class ScriptJavaAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(JAVA)
-        .display(display("Java").description("Executes custom Java code."))
+        .title("Java")
+        .description("Executes custom Java code.")
         .properties(
             object(INPUT)
                 .label("Input")

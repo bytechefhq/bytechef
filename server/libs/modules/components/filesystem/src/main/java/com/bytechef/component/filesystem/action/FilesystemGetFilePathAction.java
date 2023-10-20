@@ -26,7 +26,7 @@ import java.io.File;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.GET_FILE_PATH;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -35,10 +35,9 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class FilesystemGetFilePathAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(GET_FILE_PATH)
-        .display(
-            display("File Path")
-                .description(
-                    "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator."))
+        .title("File Path")
+        .description(
+            "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.")
         .properties(string(FILENAME)
             .label("Filename")
             .description("The path to full filename.")

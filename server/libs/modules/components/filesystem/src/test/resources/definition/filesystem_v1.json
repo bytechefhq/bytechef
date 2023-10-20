@@ -1,155 +1,369 @@
 {
   "actions": [ {
-    "batch": false,
-    "display": {
-      "title": "Read from file"
-    },
+    "batch": null,
+    "description": "filesystem: readFile",
+    "exampleOutput": null,
+    "help": null,
     "name": "readFile",
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
       "objectType": "FILE_ENTRY",
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
         "required": true,
         "name": "extension",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
         "required": true,
         "name": "mimeType",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
         "required": true,
         "name": "name",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
         "required": true,
         "name": "url",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       } ],
-      "controlType": "INPUT_TEXT"
+      "controlType": "INPUT_TEXT",
+      "expressionDisabled": null
     } ],
     "properties": [ {
+      "advancedOption": null,
       "description": "The path of the file to read.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Filename",
+      "metadata": null,
       "placeholder": "/data/your_file.pdf",
       "required": true,
       "name": "filename",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
-    } ]
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Read from file"
   }, {
-    "batch": false,
-    "display": {
-      "title": "Write to file"
-    },
+    "batch": null,
+    "description": "filesystem: writeFile",
+    "exampleOutput": null,
+    "help": null,
     "name": "writeFile",
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
+      "objectType": null,
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
+        "required": null,
         "name": "bytes",
         "type": "INTEGER",
-        "controlType": "INPUT_INTEGER"
+        "defaultValue": null,
+        "exampleValue": null,
+        "maxValue": null,
+        "minValue": null,
+        "options": null,
+        "optionsDataSource": null,
+        "controlType": "INPUT_INTEGER",
+        "expressionDisabled": null
       } ],
-      "controlType": "JSON_BUILDER"
+      "controlType": "JSON_BUILDER",
+      "expressionDisabled": null
     } ],
     "properties": [ {
+      "advancedOption": null,
       "description": "The object property which contains a reference to the file to be written.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "File",
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "fileEntry",
       "type": "OBJECT",
+      "defaultValue": null,
+      "exampleValue": null,
+      "additionalProperties": null,
       "multipleValues": true,
       "objectType": "FILE_ENTRY",
+      "options": null,
+      "optionsDataSource": null,
       "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
         "required": true,
         "name": "extension",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
         "required": true,
         "name": "mimeType",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
         "required": true,
         "name": "name",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "hidden": null,
+        "label": null,
+        "metadata": null,
+        "placeholder": null,
         "required": true,
         "name": "url",
         "type": "STRING",
-        "controlType": "INPUT_TEXT"
+        "defaultValue": null,
+        "exampleValue": null,
+        "controlType": "INPUT_TEXT",
+        "options": null,
+        "optionsDataSource": null,
+        "expressionDisabled": null
       } ],
-      "controlType": "INPUT_TEXT"
+      "controlType": "INPUT_TEXT",
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The path to which the file should be written.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Filename",
+      "metadata": null,
       "placeholder": "/data/your_file.pdf",
       "required": true,
       "name": "filename",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
-    } ]
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Write to file"
   }, {
-    "batch": false,
-    "display": {
-      "description": "Creates a temporary directory oon the filesystem.",
-      "title": "Create Temp Directory"
-    },
-    "name": "createTempDir"
+    "batch": null,
+    "description": "Creates a temporary directory oon the filesystem.",
+    "exampleOutput": null,
+    "help": null,
+    "name": "createTempDir",
+    "outputSchema": null,
+    "properties": null,
+    "outputSchemaDataSource": null,
+    "title": "Create Temp Directory"
   }, {
-    "batch": false,
-    "display": {
-      "description": "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.",
-      "title": "File Path"
-    },
+    "batch": null,
+    "description": "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.",
     "exampleOutput": "/data",
+    "help": null,
     "name": "getFilePath",
     "outputSchema": [ {
+      "advancedOption": null,
+      "description": null,
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
+      "required": null,
+      "name": null,
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
     } ],
     "properties": [ {
+      "advancedOption": null,
       "description": "The path to full filename.",
+      "displayCondition": null,
+      "hidden": null,
       "label": "Filename",
+      "metadata": null,
       "placeholder": "/data/your_file.pdf",
       "required": true,
       "name": "filename",
       "type": "STRING",
-      "controlType": "INPUT_TEXT"
-    } ]
+      "defaultValue": null,
+      "exampleValue": null,
+      "controlType": "INPUT_TEXT",
+      "options": null,
+      "optionsDataSource": null,
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "File Path"
   }, {
-    "batch": false,
-    "display": {
-      "description": "Lists a content of directory for the given path.",
-      "title": "List"
-    },
-    "name": "ls"
+    "batch": null,
+    "description": "Lists a content of directory for the given path.",
+    "exampleOutput": null,
+    "help": null,
+    "name": "ls",
+    "outputSchema": null,
+    "properties": null,
+    "outputSchemaDataSource": null,
+    "title": "List"
   }, {
-    "batch": false,
-    "display": {
-      "description": "Creates a directory.",
-      "title": "Create"
-    },
-    "name": "mkdir"
+    "batch": null,
+    "description": "Creates a directory.",
+    "exampleOutput": null,
+    "help": null,
+    "name": "mkdir",
+    "outputSchema": null,
+    "properties": null,
+    "outputSchemaDataSource": null,
+    "title": "Create"
   }, {
-    "batch": false,
-    "display": {
-      "description": "Removes the content of a directory.",
-      "title": "Remove"
-    },
-    "name": "rm"
+    "batch": null,
+    "description": "Removes the content of a directory.",
+    "exampleOutput": null,
+    "help": null,
+    "name": "rm",
+    "outputSchema": null,
+    "properties": null,
+    "outputSchemaDataSource": null,
+    "title": "Remove"
   } ],
-  "display": {
-    "description": "Reads or writes a binary file from/to disk",
-    "title": "Local File"
-  },
+  "category": null,
+  "connection": null,
+  "description": "Reads or writes a binary file from/to disk",
+  "icon": null,
+  "tags": null,
   "name": "filesystem",
-  "version": 1
+  "resources": null,
+  "version": 1,
+  "title": "Local File",
+  "triggers": null
 }

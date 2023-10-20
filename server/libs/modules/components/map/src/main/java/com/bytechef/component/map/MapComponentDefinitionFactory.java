@@ -20,7 +20,6 @@ package com.bytechef.component.map;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM_VAR;
@@ -38,10 +37,9 @@ import org.springframework.stereotype.Component;
 public class MapComponentDefinitionFactory implements ComponentDefinitionFactory {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(MAP)
-        .display(
-            display("Map")
-                .description(
-                    "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`."))
+        .title("Map")
+        .description(
+            "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`.")
         .actions(action(MAP)
             .properties(
                 array(LIST).label("List of items")

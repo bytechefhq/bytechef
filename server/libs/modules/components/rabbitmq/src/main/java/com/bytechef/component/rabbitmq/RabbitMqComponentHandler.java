@@ -17,16 +17,15 @@
 
 package com.bytechef.component.rabbitmq;
 
-import com.bytechef.component.rabbitmq.action.SendMessageAction;
-import com.bytechef.component.rabbitmq.connection.RabbitMQConnection;
+import com.bytechef.component.rabbitmq.action.RabbitMqSendMessageAction;
+import com.bytechef.component.rabbitmq.connection.RabbitMqConnection;
 import com.bytechef.component.rabbitmq.constant.RabbitMqConstants;
-import com.bytechef.component.rabbitmq.trigger.NewMessageTrigger;
+import com.bytechef.component.rabbitmq.trigger.RabbitMqNewMessageTrigger;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -35,11 +34,12 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
 public class RabbitMqComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(RabbitMqConstants.RABBIT_MQ)
-        .display(display("RabbitMQ").description(
-            "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system."))
-        .connection(RabbitMQConnection.CONNECTION_DEFINITION)
-        .actions(SendMessageAction.ACTION_DEFINITION)
-        .triggers(NewMessageTrigger.TRIGGER_DEFINITION);
+        .title("RabbitMQ")
+        .description(
+            "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.")
+        .connection(RabbitMqConnection.CONNECTION_DEFINITION)
+        .actions(RabbitMqSendMessageAction.ACTION_DEFINITION)
+        .triggers(RabbitMqNewMessageTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

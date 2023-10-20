@@ -34,7 +34,6 @@ import java.util.stream.Stream;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.LS;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -42,8 +41,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
 public class FilesystemLsAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(LS)
-        .display(display("List")
-            .description("Lists a content of directory for the given path."))
+        .title("List")
+        .description("Lists a content of directory for the given path.")
         .execute(FilesystemLsAction::executeLs);
 
     public static List<FileInfo> executeLs(Context context, InputParameters inputParameters) {

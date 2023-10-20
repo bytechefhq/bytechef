@@ -17,7 +17,6 @@
 
 package com.bytechef.component.map.config;
 
-import com.bytechef.atlas.task.evaluator.TaskEvaluator;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
@@ -37,8 +36,8 @@ public class MapTaskDispatcherAdapterConfiguration {
         return new TaskDispatcherAdapterFactory() {
 
             @Override
-            public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver, TaskEvaluator taskEvaluator) {
-                return new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver, taskEvaluator);
+            public TaskHandler<?> create(TaskHandlerResolver taskHandlerResolver) {
+                return new MapTaskDispatcherAdapterTaskHandler(taskHandlerResolver);
             }
 
             @Override

@@ -19,7 +19,6 @@ package com.bytechef.component.bash;
 
 import static com.bytechef.component.bash.constant.BashConstants.BASH;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.bash.action.BashExecuteAction;
 import com.bytechef.hermes.component.ComponentHandler;
@@ -35,7 +34,8 @@ import com.google.auto.service.AutoService;
 public class BashComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(BASH)
-        .display(display("Bash").description("Allows you to run arbitrary Bash scripts."))
+        .title("Bash")
+        .description("Allows you to run arbitrary Bash scripts.")
         .actions(BashExecuteAction.ACTION_DEFINITION);
 
     @Override

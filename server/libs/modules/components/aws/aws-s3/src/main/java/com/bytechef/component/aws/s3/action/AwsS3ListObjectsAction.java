@@ -38,7 +38,7 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constant.LIST_OBJECTS;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constant.PREFIX;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
@@ -48,7 +48,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class AwsS3ListObjectsAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(LIST_OBJECTS)
-        .display(display("List Objects").description("Get the list AWS S3 objects."))
+        .title("List Objects")
+        .description("Get the list AWS S3 objects.")
         .properties(
             string(BUCKET)
                 .label("Bucket")

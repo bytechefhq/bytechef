@@ -19,7 +19,6 @@ package com.bytechef.component.randomhelper;
 
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.RANDOM_HELPER;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.randomhelper.action.RandomHelperRandomFloatAction;
 import com.bytechef.component.randomhelper.action.RandomHelperRandomIntAction;
@@ -34,7 +33,8 @@ import com.google.auto.service.AutoService;
 public class RandomHelperComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(RANDOM_HELPER)
-        .display(display("Random Helper").description("The Random Helper allows you to generate random values."))
+        .title("Random Helper")
+        .description("The Random Helper allows you to generate random values.")
         .actions(
             RandomHelperRandomIntAction.ACTION_DEFINITION,
             RandomHelperRandomFloatAction.ACTION_DEFINITION);

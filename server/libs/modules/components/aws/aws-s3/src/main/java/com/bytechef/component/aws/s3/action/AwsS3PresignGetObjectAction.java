@@ -30,7 +30,7 @@ import java.time.Duration;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constant.PRESIGN_GET_OBJECT;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constant.URI;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -39,8 +39,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class AwsS3PresignGetObjectAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(PRESIGN_GET_OBJECT)
-        .display(display("Get Pre-signed Object")
-            .description("Get the url of an pre-signed AWS S3 object."))
+        .title("Get Pre-signed Object")
+        .description("Get the url of an pre-signed AWS S3 object.")
         .properties(string(URI)
             .label("URI")
             .description("The AWS S3 uri.")

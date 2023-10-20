@@ -25,7 +25,7 @@ import com.bytechef.hermes.component.util.JsonUtils;
 import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.SOURCE;
 import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.STRINGIFY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.oneOf;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
@@ -35,8 +35,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class JsonHelperStringifyAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(STRINGIFY)
-        .display(display("Convert to JSON string")
-            .description("Writes the object/array to a JSON string."))
+        .title("Convert to JSON string")
+        .description("Writes the object/array to a JSON string.")
         .properties(oneOf(SOURCE)
             .label("Source")
             .description("The data to convert to JSON string.")

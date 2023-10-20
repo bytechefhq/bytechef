@@ -19,7 +19,6 @@ package com.bytechef.component.jsonhelper;
 
 import static com.bytechef.component.jsonhelper.constant.JsonHelperConstants.JSON_HELPER;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.jsonhelper.action.JsonHelperParseAction;
 import com.bytechef.component.jsonhelper.action.JsonHelperStringifyAction;
@@ -34,7 +33,8 @@ import com.google.auto.service.AutoService;
 public class JsonHelperComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(JSON_HELPER)
-        .display(display("JSON Helper").description("JSON Helper allows you to do various operations on objects."))
+        .title("JSON Helper")
+        .description("JSON Helper allows you to do various operations on objects.")
         .actions(
             JsonHelperParseAction.ACTION_DEFINITION,
             JsonHelperStringifyAction.ACTION_DEFINITION);

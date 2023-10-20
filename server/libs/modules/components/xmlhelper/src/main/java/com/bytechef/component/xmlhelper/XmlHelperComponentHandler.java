@@ -19,7 +19,6 @@ package com.bytechef.component.xmlhelper;
 
 import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.XML_HELPER;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.xmlhelper.action.XmlHelperParseAction;
 import com.bytechef.component.xmlhelper.action.XmlHelperStringifyAction;
@@ -34,7 +33,8 @@ import com.google.auto.service.AutoService;
 public class XmlHelperComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(XML_HELPER)
-        .display(display("XML Helper").description("Converts between XML string and object/array."))
+        .title("XML Helper")
+        .description("Converts between XML string and object/array.")
         .actions(
             XmlHelperParseAction.ACTION_DEFINITION,
             XmlHelperStringifyAction.ACTION_DEFINITION);

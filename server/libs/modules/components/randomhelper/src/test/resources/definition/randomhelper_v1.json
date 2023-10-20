@@ -1,38 +1,71 @@
 {
   "actions": [ {
-    "batch": false,
-    "display": {
-      "description": "Generates a random integer value.",
-      "title": "Int"
-    },
+    "batch": null,
+    "description": "Generates a random integer value.",
+    "exampleOutput": null,
+    "help": null,
     "name": "randomInt",
+    "outputSchema": null,
     "properties": [ {
+      "advancedOption": null,
       "description": "The minimum possible generated value.",
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "startInclusive",
       "type": "INTEGER",
+      "defaultValue": 0,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": null,
+      "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "defaultValue": 0
+      "expressionDisabled": null
     }, {
+      "advancedOption": null,
       "description": "The maximum possible generated value.",
+      "displayCondition": null,
+      "hidden": null,
+      "label": null,
+      "metadata": null,
+      "placeholder": null,
       "required": true,
       "name": "endInclusive",
       "type": "INTEGER",
+      "defaultValue": 100,
+      "exampleValue": null,
+      "maxValue": null,
+      "minValue": null,
+      "options": null,
+      "optionsDataSource": null,
       "controlType": "INPUT_INTEGER",
-      "defaultValue": 100
-    } ]
+      "expressionDisabled": null
+    } ],
+    "outputSchemaDataSource": null,
+    "title": "Int"
   }, {
-    "batch": false,
-    "display": {
-      "description": "Generates a random float value.",
-      "title": "Float"
-    },
-    "name": "randomFloat"
+    "batch": null,
+    "description": "Generates a random float value.",
+    "exampleOutput": null,
+    "help": null,
+    "name": "randomFloat",
+    "outputSchema": null,
+    "properties": null,
+    "outputSchemaDataSource": null,
+    "title": "Float"
   } ],
-  "display": {
-    "description": "The Random Helper allows you to generate random values.",
-    "title": "Random Helper"
-  },
+  "category": null,
+  "connection": null,
+  "description": "The Random Helper allows you to generate random values.",
+  "icon": null,
+  "tags": null,
   "name": "randomHelper",
-  "version": 1
+  "resources": null,
+  "version": 1,
+  "title": "Random Helper",
+  "triggers": null
 }

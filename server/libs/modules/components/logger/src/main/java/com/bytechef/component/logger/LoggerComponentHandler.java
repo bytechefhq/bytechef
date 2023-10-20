@@ -18,7 +18,6 @@
 package com.bytechef.component.logger;
 
 import static com.bytechef.component.logger.constant.LoggerConstants.LOGGER;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.logger.action.LoggerDebugAction;
 import com.bytechef.component.logger.action.LoggerErrorAction;
@@ -36,7 +35,8 @@ import com.google.auto.service.AutoService;
 public class LoggerComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = ComponentDSL.component(LOGGER)
-        .display(display("Logger").description("Logs a value to the system log."))
+        .title("Logger")
+        .description("Logs a value to the system log.")
         .actions(LoggerDebugAction.ACTION_DEFINITION, LoggerErrorAction.ACTION_DEFINITION,
             LoggerInfoAction.ACTION_DEFINITION,
             LoggerWarnAction.ACTION_DEFINITION);

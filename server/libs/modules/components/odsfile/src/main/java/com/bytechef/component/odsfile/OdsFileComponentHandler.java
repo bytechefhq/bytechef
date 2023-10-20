@@ -19,7 +19,6 @@ package com.bytechef.component.odsfile;
 
 import static com.bytechef.component.odsfile.constant.OdsFileConstants.ODS_FILE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.odsfile.action.OdsFileReadAction;
 import com.bytechef.component.odsfile.action.OdsFileWriteAction;
@@ -35,7 +34,8 @@ import com.google.auto.service.AutoService;
 public class OdsFileComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(ODS_FILE)
-        .display(display("ODS File").description("Reads and writes data from a ODS file."))
+        .title("ODS File")
+        .description("Reads and writes data from a ODS file.")
         .actions(
             OdsFileReadAction.ACTION_DEFINITION,
             OdsFileWriteAction.ACTION_DEFINITION);

@@ -18,7 +18,6 @@
 package com.bytechef.component.delay;
 
 import static com.bytechef.component.delay.constant.DelayConstants.DELAY;
-import static com.bytechef.hermes.component.definition.ComponentDSL.display;
 
 import com.bytechef.component.delay.action.DelayDelayAction;
 import com.bytechef.hermes.component.ComponentHandler;
@@ -33,7 +32,8 @@ import com.google.auto.service.AutoService;
 public class DelayComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = ComponentDSL.component(DELAY)
-        .display(display("Delay").description("Sets a value which can then be referenced in other tasks."))
+        .title("Delay")
+        .description("Sets a value which can then be referenced in other tasks.")
         .actions(DelayDelayAction.ACTION_DEFINITION);
 
     @Override

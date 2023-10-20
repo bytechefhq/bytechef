@@ -17,22 +17,21 @@
 
 package com.bytechef.component.datastorage;
 
-import com.bytechef.component.datastorage.action.AppendValueToListAction;
-import com.bytechef.component.datastorage.action.AtomicIncrementAction;
-import com.bytechef.component.datastorage.action.AwaitGetValueAction;
-import com.bytechef.component.datastorage.action.DeleteValueAction;
-import com.bytechef.component.datastorage.action.DeleteValueFromListAction;
-import com.bytechef.component.datastorage.action.GetAllKeysAction;
-import com.bytechef.component.datastorage.action.GetValueAction;
-import com.bytechef.component.datastorage.action.SetValueInListAction;
-import com.bytechef.component.datastorage.action.SetValueAction;
+import com.bytechef.component.datastorage.action.DataStorageAppendValueToListAction;
+import com.bytechef.component.datastorage.action.DataStorageAtomicIncrementAction;
+import com.bytechef.component.datastorage.action.DataStorageAwaitGetValueAction;
+import com.bytechef.component.datastorage.action.DataStorageDeleteValueAction;
+import com.bytechef.component.datastorage.action.DataStorageDeleteValueFromListAction;
+import com.bytechef.component.datastorage.action.DataStorageGetAllKeysAction;
+import com.bytechef.component.datastorage.action.DataStorageGetValueAction;
+import com.bytechef.component.datastorage.action.DataStorageSetValueInListAction;
+import com.bytechef.component.datastorage.action.DataStorageSetValueAction;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.data.storage.service.DataStorageService;
 import org.springframework.stereotype.Component;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -44,18 +43,19 @@ public class DataStorageComponentHandler implements ComponentDefinitionFactory {
 
     public DataStorageComponentHandler(DataStorageService dataStorageService) {
         componentDefinition = component("dataStorage")
-            .display(display("Data Storage").description(
-                "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value."))
+            .title("Data Storage")
+            .description(
+                "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.")
             .actions(
-                new AppendValueToListAction(dataStorageService).actionDefinition,
-                new AtomicIncrementAction(dataStorageService).actionDefinition,
-                new AwaitGetValueAction(dataStorageService).actionDefinition,
-                new DeleteValueAction(dataStorageService).actionDefinition,
-                new DeleteValueFromListAction(dataStorageService).actionDefinition,
-                new GetAllKeysAction(dataStorageService).actionDefinition,
-                new GetValueAction(dataStorageService).actionDefinition,
-                new SetValueAction(dataStorageService).actionDefinition,
-                new SetValueInListAction(dataStorageService).actionDefinition);
+                new DataStorageAppendValueToListAction(dataStorageService).actionDefinition,
+                new DataStorageAtomicIncrementAction(dataStorageService).actionDefinition,
+                new DataStorageAwaitGetValueAction(dataStorageService).actionDefinition,
+                new DataStorageDeleteValueAction(dataStorageService).actionDefinition,
+                new DataStorageDeleteValueFromListAction(dataStorageService).actionDefinition,
+                new DataStorageGetAllKeysAction(dataStorageService).actionDefinition,
+                new DataStorageGetValueAction(dataStorageService).actionDefinition,
+                new DataStorageSetValueAction(dataStorageService).actionDefinition,
+                new DataStorageSetValueInListAction(dataStorageService).actionDefinition);
     }
 
     @Override

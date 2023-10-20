@@ -37,7 +37,7 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constant.PUT_OBJECT;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constant.URI;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 /**
@@ -46,7 +46,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 public class AwsS3PutObjectAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(PUT_OBJECT)
-        .display(display("Put Object").description("Store an object to AWS S3."))
+        .title("Put Object")
+        .description("Store an object to AWS S3.")
         .properties(
             string(URI)
                 .label("URI")

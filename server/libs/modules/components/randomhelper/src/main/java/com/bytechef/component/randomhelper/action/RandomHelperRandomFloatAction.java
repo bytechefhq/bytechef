@@ -25,7 +25,6 @@ import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.RANDOM_FLOAT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
 
 /**
  * @author Ivica Cardic
@@ -33,7 +32,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.display;
 public class RandomHelperRandomFloatAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(RANDOM_FLOAT)
-        .display(display("Float").description("Generates a random float value."))
+        .title("Float")
+        .description("Generates a random float value.")
         .execute(RandomHelperRandomFloatAction::executeNextFloat);
 
     /**

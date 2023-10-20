@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.bytechef.component.delay.constant.DelayConstants.DELAY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.display;
+
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 
 /**
@@ -36,7 +36,8 @@ import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 public class DelayDelayAction {
 
     public static final ActionDefinition ACTION_DEFINITION = action(DELAY)
-        .display(display("Delay"))
+        .title("Delay")
+        .description("Delay action execution.")
         .properties(integer(DelayConstants.MILLIS)
             .label("Millis")
             .description("Time in milliseconds.")
