@@ -6,13 +6,19 @@
 
 ByteChef is an open-source, low-code, extendable API integration & workflow automation platform that allows you to automate work by connecting applications and building workflows across your organization.
 
-[Website](https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) • [Docs](https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) • [Blog](https://blog.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) • [Discord](https://discord.gg/PybnUM3Y) • [Forum](https://github.com/bytechefhq/bytechef/discussions) • [Twitter](https://twitter.com/bytechefhq)
+[//]: # ([Website]&#40;https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; • [Docs]&#40;https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; • [Blog]&#40;https://blog.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; • [Discord]&#40;https://discord.gg/PybnUM3Y&#41; • [Forum]&#40;https://github.com/bytechefhq/bytechef/discussions&#41; • [Twitter]&#40;https://twitter.com/bytechefhq&#41;)
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bytechefhq/bytechef/ByteChef%20CI)](https://github.com/bytechefhq/bytechef/actions/workflows/gradle.yml) [![License](https://img.shields.io/static/v1?label=license&message=Apache&nbsp;v2.0&color=brightgreen)](https://github.com/bytechefhq/bytechef/blob/master/LICENSE)
+[Website](https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) - [Discord](https://discord.gg/Y9Dejg5R) - [Twitter](https://twitter.com/bytechefhq)
+
+[![CI Build](https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml/badge.svg)](https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml) [![License](https://img.shields.io/static/v1?label=license&message=Apache&nbsp;v2.0&color=brightgreen)](https://github.com/bytechefhq/bytechef/blob/master/LICENSE)
+
+> UPDATE: ByteChef is under active development, we are in the alpha stage and some features might be currently missing or disabled.
+
+<img src="static/screenshot.png" alt="ByteChef Screenshot" style="max-width: 100%;">
 
 ## Why ByteChef?
 
-Due to increasing number of various applications and services used inside organizations engineering teams are under constant pressure to develop new integrations and workflows to automate work inside those organizations.
+Due to increasing number of various applications and services used inside organizations, engineering teams are under constant pressure to develop new integrations and workflows to automate work inside those organizations.
 ByteChef has the necessary infrastructure and features to integrate various applications and services and build workflows across organization:
 
 1. Install ByteChef on the premise to have a full control over execution and data, besides being able to use a hosted version.
@@ -20,50 +26,59 @@ ByteChef has the necessary infrastructure and features to integrate various appl
 3. A more extensive range of various flow controls that can be used in the workflow like if, switch, loop, each, parallel, etc. Also, new conditionals can be added.
 4. Develop custom connectors in four languages: Java, JavaScript, Python, and Ruby.
 5. Write custom functions(executed during the workflow execution when you need to write the code) in the languages mentioned above.
-6. Regarding multiple languages support, it is essential to emphasize that all languages are executed inside ONE runtime(no need for various execution runtimes for each language), simplifying scalability. You can start with one instance only, scale as required, and at the same time mix languages for your customizations.
+6. All languages are executed inside ONE runtime(no need for various execution runtimes for each language), simplifying scalability. You can start with one instance only, scale as required, and at the same time mix languages for your customizations.
 
-[//]: # (7. embedded solution targeted explicitly for saas products which allow customers using your saas product to integrate application they use with it.)
+ByteChef can help you as:
 
-## Getting Started
+1. Automation solution, which allows customers to integrate applications used internally to automate their own business processes.
+2. Embedded solution targeted explicitly for products which allow your customers to integrate applications they use with your product.
 
-### ByteChef Cloud
-
-[ByteChef Cloud](https://app.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) is the fastest way to get started with ByteChef. It provides managed infrastructure as well as an instant and free trial access for development projects and proofs of concept.
-
-<a href="https://app.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme"><img src="static/button_get-started-now.png" alt="Get started now" width="200px"></a>
-
-For a step-by-step guide on ByteChef Cloud, [see the docs](https://docs.bytechef.io/cloud/getting-started?utm_medium=organic&utm_campaign=readme).
-
-### Try using Docker
-Want to give ByteChef a quick spin on your local machine? You can run the following command from your terminal to have ByteChef up and running right away.
-
-```bashTaskHandler
-docker run \
-  --name bytechef \
-  --restart unless-stopped \
-  -p 3000:3000 \
-  -v bytechef_data:/var/lib/postgresql/13/main \
-  bytechef/try:latest
-```
-
-Then, open http://localhost:3000 in your browser.
-
-### Self-Hosted
-
-If you want to self-host ByteChef, we have [guides](https://docs.bytechef.io/self-hosting?utm_source=github&utm_medium=organic&utm_campaign=readme) for Docker, AWS and more.
-
-## Documentation
-
-- [Getting Started](https://docs.bytechef.io/introduction?utm_source=github&utm_medium=organic&utm_campaign=readme)
-- [Architecture](https://docs.bytechef.io/architecture?utm_source=github&utm_medium=organic&utm_campaign=readme)
-- [Components Reference](https://docs.bytechef.io/components)
+[//]: # (## Getting Started)
+[//]: # ()
+[//]: # (### ByteChef Cloud)
+[//]: # ()
+[//]: # ([ByteChef Cloud]&#40;https://app.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; is the fastest way to get started with ByteChef. It provides managed infrastructure as well as an instant and free trial access for development projects and proofs of concept.)
+[//]: # ()
+[//]: # (<a href="https://app.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme"><img src="static/button_get-started-now.png" alt="Get started now" width="200px"></a>)
+[//]: # ()
+[//]: # (For a step-by-step guide on ByteChef Cloud, [see the docs]&#40;https://docs.bytechef.io/cloud/getting-started?utm_medium=organic&utm_campaign=readme&#41;.)
+[//]: # ()
+[//]: # (### Try using Docker)
+[//]: # ()
+[//]: # (Want to give ByteChef a quick spin on your local machine? You can run the following command from your terminal to have ByteChef up and running right away.)
+[//]: # ()
+[//]: # (```bashTaskHandler)
+[//]: # (docker run \)
+[//]: # (  --name bytechef \)
+[//]: # (  --restart unless-stopped \)
+[//]: # (  -p 3000:3000 \)
+[//]: # (  bytechef/try:latest)
+[//]: # (```)
+[//]: # (Then, open http://localhost:3000 in your browser.)
+[//]: # ()
+[//]: # (### Self-Hosted)
+[//]: # ()
+[//]: # (If you want to self-host ByteChef, we have [guides]&#40;https://docs.bytechef.io/self-hosting?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; for Docker, AWS and more.)
+[//]: # ()
+[//]: # (## Documentation)
+[//]: # ()
+[//]: # (- [Getting Started]&#40;https://docs.bytechef.io/introduction?utm_source=github&utm_medium=organic&utm_campaign=readme&#41;)
+[//]: # (- [Architecture]&#40;https://docs.bytechef.io/architecture?utm_source=github&utm_medium=organic&utm_campaign=readme&#41;)
+[//]: # (- [Components Reference]&#40;https://docs.bytechef.io/components&#41;)
 
 ## Community support
-For general help using ByteChef, please refer to the official [documentation](https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme). For additional help, you can use one of these channels to ask a question:
 
-- [Discord](https://discord.gg/PybnUM3Y) - Discussions with the community and the team.
+[//]: # (For general help using ByteChef, please refer to the official [documentation]&#40;https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41;. For additional help, you can use one of these channels to ask a question:)
+
+[//]: # (- [Discord]&#40;https://discord.gg/PybnUM3Y&#41; - Discussions with the community and the team.)
+[//]: # (- [GitHub]&#40;https://github.com/bytechefhq/bytechef/issues&#41; - For bug reports and feature requests.)
+[//]: # (- [Forum]&#40;https://github.com/bytechefhq/bytechef/discussions&#41; - Ask for help and propose new ideas.)
+[//]: # (- [Twitter]&#40;https://twitter.com/bytechefhq&#41; - Get the product updates easily.)
+
+For help, you can use one of these channels to ask a question:
+
+- [Discord](https://discord.gg/Y9Dejg5R) - Discussions with the community and the team.
 - [GitHub](https://github.com/bytechefhq/bytechef/issues) - For bug reports and feature requests.
-- [Forum](https://github.com/bytechefhq/bytechef/discussions) - Ask for help and propose new ideas.
 - [Twitter](https://twitter.com/bytechefhq) - Get the product updates easily.
 
 ## Roadmap
@@ -74,7 +89,7 @@ Check out our [roadmap](https://github.com/orgs/bytechefhq/projects/3) to get in
 If you'd like to contribute, kindly read our [Contributing Guide](CONTRIBUTING.md) to learn and understand about our development process, how to propose bug fixes and improvements, and how to build and test your changes to ByteChef.
 
 ## License
-ByteChef is released under version 2.0 of the [Apache License](LICENSE).
+ByteChef is released under Apache License v2.0. See [LICENSE](LICENSE) for more information.
 
 ## Note
 This project has started as a fork of [Piper](https://github.com/okayrunner/piper), an open-source, distributed workflow engine.
