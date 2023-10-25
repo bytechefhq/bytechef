@@ -42,7 +42,7 @@ const DataPill = ({
                 value: dataPillLabel,
             },
             true,
-            {blotName: 'bytechef-mention'}
+            {blotName: 'property-mention'}
         );
     };
 

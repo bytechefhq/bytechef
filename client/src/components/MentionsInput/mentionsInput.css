@@ -13,7 +13,7 @@
 
 .ql-editor {
     @apply rounded-md;
-    @apply p-2;
+    @apply p-1.5;
     @apply text-sm;
     @apply leading-6;
     @apply focus:outline-none;
