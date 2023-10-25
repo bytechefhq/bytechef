@@ -10,11 +10,11 @@ type SidebarContentLayoutProps = {
     leftSidebarBody?: ReactNode;
     leftSidebarHeader?: ReactNode;
     leftSidebarOpen?: boolean;
-    leftSidebarWidth?: '64' | '72';
+    leftSidebarWidth?: '64' | '72' | '96';
     rightSidebarBody?: ReactNode;
     rightSidebarHeader?: ReactNode;
     rightSidebarOpen?: boolean;
-    rightSidebarWidth?: '460';
+    rightSidebarWidth?: '96' | '460';
     rightToolbarBody?: ReactNode;
     rightToolbarOpen?: boolean;
 };
@@ -22,9 +22,11 @@ type SidebarContentLayoutProps = {
 const leftSidebarWidths = {
     64: ['md:w-64', 'md:pl-64'],
     72: ['md:w-72', 'md:pl-72'],
+    96: ['md:w-96', 'md:pl-96'],
 };
 
 const rightSidebarWidths = {
+    96: 'w-96',
     460: 'w-[460px]',
 };
 
@@ -126,7 +128,7 @@ const LayoutContainer = ({
             {leftSidebarOpen && (
                 <aside
                     className={twMerge(
-                        'hidden md:fixed md:inset-y-0 md:flex md:flex-col',
+                        'hidden md:fixed md:inset-y-0 md:flex md:flex-col border-r',
                         leftSidebarWidths[leftSidebarWidth][0]
                     )}
                 >
@@ -146,7 +148,7 @@ const LayoutContainer = ({
             >
                 <main
                     className={twMerge(
-                        'flex h-full w-full flex-col border-l',
+                        'flex h-full w-full flex-col',
                         className
                     )}
                 >
@@ -167,7 +169,7 @@ const LayoutContainer = ({
                                 rightSidebarWidths[rightSidebarWidth]
                             )}
                         >
-                            <div className="flex h-full flex-col">
+                            <div className="flex h-full flex-1 flex-col">
                                 {rightSidebarHeader}
 
                                 <div className="overflow-y-auto">
@@ -180,7 +182,7 @@ const LayoutContainer = ({
 
                 {rightToolbarOpen && !!rightToolbarBody && (
                     <aside className="hidden border-l bg-muted lg:flex lg:shrink-0">
-                        <div className="flex w-[60px]">
+                        <div className="flex w-[56px]">
                             <div className="flex flex-1 flex-col overflow-y-auto">
                                 {rightToolbarBody}
                             </div>

@@ -11,9 +11,9 @@ const useLeftSidebarStore = create<LeftSidebarState>()(
         persist(
             (set) => ({
                 leftSidebarOpen: false,
-                setLeftSidebarOpen: (leftSidebarStatus) =>
+                setLeftSidebarOpen: (leftSidebarOpen) =>
                     set(() => ({
-                        leftSidebarOpen: leftSidebarStatus,
+                        leftSidebarOpen: leftSidebarOpen,
                     })),
             }),
             {
