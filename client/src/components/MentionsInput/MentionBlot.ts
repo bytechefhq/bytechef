@@ -3,9 +3,9 @@ import {Quill} from 'react-quill';
 const Embed = Quill.import('blots/embed');
 
 export default class MentionBlot extends Embed {
-    static blotName = 'bytechef-mention';
+    static blotName = 'property-mention';
     static tagName = 'div';
-    static className = 'bytechef-mention';
+    static className = 'property-mention';
 
     static create(data: {
         denotationChar: string;

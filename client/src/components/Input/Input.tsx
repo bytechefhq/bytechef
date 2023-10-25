@@ -109,8 +109,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                                 : 'border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring focus:ring-blue-500',
                             disabled &&
                                 'cursor-not-allowed bg-gray-100 text-gray-500',
-                            leadingIcon &&
-                                'border-0 pl-12 py-3 leading-relaxed',
+                            leadingIcon && 'border-0 pl-12 leading-relaxed',
                             trailing &&
                                 'rounded-none rounded-l-md bg-gray-50 text-gray-700 outline-0 focus:border-gray-300 focus:ring-0',
                             className

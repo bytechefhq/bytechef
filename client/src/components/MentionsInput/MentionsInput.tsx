@@ -23,7 +23,7 @@ import {twMerge} from 'tailwind-merge';
 
 import MentionBlot from './MentionBlot';
 
-Quill.register('formats/bytechef-mention', MentionBlot);
+Quill.register('formats/property-mention', MentionBlot);
 
 const MentionInputListItem = (item: DataPillType) => {
     const div = document.createElement('div');
@@ -80,7 +80,7 @@ const MentionsInput = ({
 
     const modules = {
         mention: {
-            blotName: 'bytechef-mention',
+            blotName: 'property-mention',
             dataAttributes: ['componentIcon'],
             fixMentionsToQuill: true,
             mentionDenotationChars: ['{'],
@@ -119,7 +119,7 @@ const MentionsInput = ({
                     },
                     false,
                     {
-                        blotName: 'bytechef-mention',
+                        blotName: 'property-mention',
                     }
                 );
             },
@@ -213,7 +213,7 @@ const MentionsInput = ({
                         leadingIcon && 'border-0 pl-10'
                     )}
                     defaultValue={defaultValue}
-                    formats={['bytechef-mention', 'mention']}
+                    formats={['property-mention', 'mention']}
                     id={elementId}
                     key={elementId}
                     // eslint-disable-next-line react-hooks/exhaustive-deps -- put data as dependency and it will render empty editor, but it will update available datapills
@@ -228,7 +228,7 @@ const MentionsInput = ({
                         setValue(value);
 
                         setMentionOccurences(
-                            value.match(/bytechef-mention/g)?.length || 0
+                            value.match(/property-mention/g)?.length || 0
                         );
                     }}
                     onFocus={() => {
