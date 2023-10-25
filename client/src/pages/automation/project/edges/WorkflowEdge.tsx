@@ -46,22 +46,22 @@ export default function WorkflowEdge({
                 >
                     <rect
                         className={twMerge(
-                            'react-flow__edge pointer-events-auto cursor-pointer fill-white stroke-gray-400 hover:fill-gray-200',
-                            isDropzoneActive && 'fill-gray-500 stroke-white'
+                            'react-flow__edge pointer-events-auto cursor-pointer fill-white stroke-gray-400 hover:fill-gray-200 hover:scale-110',
+                            isDropzoneActive &&
+                                'scale-150 fill-blue-100 stroke-blue-100 z-40'
                         )}
                         id={id}
-                        height={24}
+                        height={isDropzoneActive ? 72 : 24}
                         rx={4}
                         ry={4}
-                        width={24}
-                        x={-12}
-                        y={-12}
+                        width={isDropzoneActive ? 72 : 24}
+                        x={isDropzoneActive ? -36 : -12}
+                        y={isDropzoneActive ? -36 : -12}
                     />
 
                     <text
                         className={twMerge(
-                            'pointer-events-none select-none fill-gray-500',
-                            isDropzoneActive && 'fill-white'
+                            'pointer-events-none select-none fill-gray-500'
                         )}
                         y={5}
                         x={-5}

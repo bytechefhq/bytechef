@@ -12,8 +12,10 @@ const PlaceholderNode = ({data, id}: NodeProps) => {
         <PopoverMenu id={id}>
             <div
                 className={twMerge(
-                    'mx-[24px] flex h-6 w-6 cursor-pointer items-center justify-center rounded-md bg-gray-300 text-lg font-bold text-white shadow-none hover:scale-110 hover:rounded-sm hover:bg-gray-500',
-                    isDropzoneActive && 'scale-150 cursor-pointer bg-gray-500'
+                    'mx-[22px] flex cursor-pointer items-center justify-center rounded-md text-lg text-gray-500 shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white',
+                    isDropzoneActive
+                        ? 'scale-150 cursor-pointer bg-blue-100 h-16 w-16 mx-1.5'
+                        : 'h-7 w-7 bg-gray-300'
                 )}
                 title="Click to add a node"
                 onDrop={() => setDropzoneActive(false)}
