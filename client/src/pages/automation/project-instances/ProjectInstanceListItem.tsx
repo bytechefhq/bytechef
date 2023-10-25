@@ -12,9 +12,10 @@ import {
 } from '@/mutations/projects.mutations';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
 import {ProjectKeys} from '@/queries/projects.queries';
-import {CalendarIcon, ChevronDownIcon} from '@heroicons/react/24/outline';
 import {AccordionTrigger} from '@radix-ui/react-accordion';
+import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 
 import AlertDialog from '../../../components/AlertDialog/AlertDialog';

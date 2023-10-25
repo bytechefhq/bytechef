@@ -1,4 +1,4 @@
-import {XCircleIcon} from '@heroicons/react/24/outline';
+import {CrossCircledIcon} from '@radix-ui/react-icons';
 import {PropsWithChildren} from 'react';
 
 type TError = Error | null;
@@ -22,7 +22,7 @@ const PageLoader = ({
                 <div className="flex min-h-screen min-w-full items-center justify-center p-5">
                     {errorExists ? (
                         <div className="flex items-center text-red-700">
-                            <XCircleIcon
+                            <CrossCircledIcon
                                 className="mr-1 h-5 w-5 text-red-400"
                                 aria-hidden="true"
                             />

@@ -1,10 +1,10 @@
-import {CheckCircleIcon} from '@heroicons/react/24/outline';
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from '@radix-ui/react-accordion';
+import {CheckCircledIcon} from '@radix-ui/react-icons';
 import {TaskExecutionModel} from 'middleware/helios/execution';
 import InlineSVG from 'react-inlinesvg';
 import ReactJson from 'react-json-view';
@@ -55,7 +55,7 @@ const WorkflowTaskListAccordion = ({
                                     </span>
                                 )}
 
-                                <CheckCircleIcon
+                                <CheckCircledIcon
                                     className={twMerge(
                                         'h-5 w-5',
                                         allTasksCompleted

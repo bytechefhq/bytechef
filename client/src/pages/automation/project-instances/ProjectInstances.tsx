@@ -6,8 +6,7 @@ import {
     useGetProjectInstancesQuery,
     useGetProjectsQuery,
 } from '@/queries/projects.queries';
-import {TagIcon} from '@heroicons/react/20/solid';
-import {FolderPlusIcon} from '@heroicons/react/24/outline';
+import {FolderPlusIcon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';

@@ -3,7 +3,7 @@ import {
     useGetProjectCategoriesQuery,
     useGetProjectTagsQuery,
 } from '@/queries/projects.queries';
-import {TagIcon} from '@heroicons/react/20/solid';
+import {TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 

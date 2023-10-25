@@ -2,7 +2,7 @@ import {
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from '@/queries/connections.queries';
-import {LinkIcon} from '@heroicons/react/24/outline';
+import {LinkIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 

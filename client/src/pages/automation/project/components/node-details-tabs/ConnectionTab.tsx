@@ -1,7 +1,8 @@
-import {LinkIcon, PlusIcon, XMarkIcon} from '@heroicons/react/24/outline';
+import {Cross1Icon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
 import EmptyList from 'components/EmptyList/EmptyList';
 import Select from 'components/Select/Select';
+import {LinkIcon, PlusIcon} from 'lucide-react';
 import {ComponentDefinitionModel} from 'middleware/hermes/configuration';
 import ConnectionDialog from 'pages/automation/connections/components/ConnectionDialog';
 import {useGetConnectionsQuery} from 'queries/connections.queries';
@@ -74,7 +75,7 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
                         <Button
                             className="ml-auto p-0"
                             displayType="icon"
-                            icon={<XMarkIcon className="ml-auto h-5 w-5" />}
+                            icon={<Cross1Icon className="ml-auto h-5 w-5" />}
                             onClick={() => setShowConnectionNote(false)}
                             title="Close the note"
                         />

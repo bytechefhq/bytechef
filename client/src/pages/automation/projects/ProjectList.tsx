@@ -2,12 +2,12 @@ import {
     useGetProjectTagsQuery,
     useGetProjectsQuery,
 } from '@/queries/projects.queries';
-import {FolderPlusIcon} from '@heroicons/react/24/outline';
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
 } from '@radix-ui/react-accordion';
+import {FolderPlusIcon} from 'lucide-react';
 import ProjectListItem from 'pages/automation/projects/ProjectListItem';
 import {useSearchParams} from 'react-router-dom';
 

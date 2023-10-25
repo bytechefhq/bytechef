@@ -1,7 +1,7 @@
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {useGetConnectionTagsQuery} from '@/queries/connections.queries';
-import {TagIcon} from '@heroicons/react/20/solid';
+import {TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 

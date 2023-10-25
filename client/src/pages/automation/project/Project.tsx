@@ -22,12 +22,14 @@ import {
     useGetProjectWorkflowsQuery,
 } from '@/queries/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
-import {
-    ArrowLeftOnRectangleIcon,
-    ArrowRightOnRectangleIcon,
-} from '@heroicons/react/24/solid';
 import {useQueryClient} from '@tanstack/react-query';
-import {Code2, Play, Puzzle} from 'lucide-react';
+import {
+    ArrowLeftSquareIcon,
+    ArrowRightSquareIcon,
+    Code2Icon,
+    PlayIcon,
+    PuzzleIcon,
+} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 
@@ -58,7 +60,7 @@ const Project = () => {
         onClick?: () => void;
     }[] = [
         {
-            icon: Puzzle,
+            icon: PuzzleIcon,
             name: 'Components & Control Flows',
             onClick: () => {
                 setNodeDetailsDialogOpen(false);
@@ -66,7 +68,7 @@ const Project = () => {
             },
         },
         {
-            icon: Code2,
+            icon: Code2Icon,
             name: 'Workflow Code Editor',
         },
     ];
@@ -141,9 +143,9 @@ const Project = () => {
                                     }
                                 >
                                     {leftSidebarOpen ? (
-                                        <ArrowLeftOnRectangleIcon className="h-6 w-6" />
+                                        <ArrowLeftSquareIcon className="h-6 w-6" />
                                     ) : (
-                                        <ArrowRightOnRectangleIcon className="h-6 w-6" />
+                                        <ArrowRightSquareIcon className="h-6 w-6" />
                                     )}
                                 </Button>
                             </TooltipTrigger>
@@ -217,7 +219,7 @@ const Project = () => {
                                         className="mr-1 border-green-500 text-green-500 hover:border-green-300 hover:bg-green-300"
                                         onClick={() => setLeftSidebarOpen(true)}
                                     >
-                                        <Play className="h-5" /> Test
+                                        <PlayIcon className="h-5" /> Test
                                     </Button>
                                 </TooltipTrigger>
 

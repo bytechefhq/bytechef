@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Dialog, Transition} from '@headlessui/react';
-import {XMarkIcon} from '@heroicons/react/24/outline';
+import {Cross1Icon} from '@radix-ui/react-icons';
 import {Fragment} from 'react';
 
 import reactLogo from '../assets/logo.svg';
@@ -68,7 +68,7 @@ export function MobileSidebar({
                                         className="ml-1 items-center justify-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
                                         displayType="icon"
                                         icon={
-                                            <XMarkIcon
+                                            <Cross1Icon
                                                 className="h-6 w-6 text-white"
                                                 aria-hidden="true"
                                             />

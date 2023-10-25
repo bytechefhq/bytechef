@@ -1,9 +1,8 @@
+import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ClipboardIcon} from '@heroicons/react/24/outline';
-import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import {QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import Alert from 'components/Alert/Alert';
 import Button from 'components/Button/Button';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Dialog from 'components/Dialog/Dialog';
@@ -13,6 +12,7 @@ import Label from 'components/Label/Label';
 import NativeSelect from 'components/NativeSelect/NativeSelect';
 import Properties from 'components/Properties/Properties';
 import useCopyToClipboard from 'hooks/useCopyToClipboard';
+import {ClipboardIcon} from 'lucide-react';
 import {ConnectionModel, TagModel} from 'middleware/helios/connection';
 import {
     AuthorizationModel,
@@ -662,21 +662,23 @@ const ConnectionDialog = ({
                     {!oAuth2AuthorizationParametersLoading &&
                         wizardStep === 'oauth_step' && (
                             <div>
-                                <Alert
-                                    text={
-                                        <>
-                                            Excellent! You can connect and
-                                            create the
-                                            <span className="mx-0.5 font-semibold">
-                                                {componentDefinition?.title}
-                                            </span>
-                                            connection under name
-                                            <span className="mx-0.5 font-semibold">{`'${getValues()
-                                                ?.name}'`}</span>
-                                            .
-                                        </>
-                                    }
-                                />
+                                <Alert variant="info">
+                                    <RocketIcon className="h-4 w-4" />
+
+                                    <AlertTitle>Heads up!</AlertTitle>
+
+                                    <AlertDescription>
+                                        Excellent! You can connect and create
+                                        the
+                                        <span className="mx-0.5 font-semibold">
+                                            {componentDefinition?.title}
+                                        </span>
+                                        connection under name
+                                        <span className="mx-0.5 font-semibold">{`'${getValues()
+                                            ?.name}'`}</span>
+                                        .
+                                    </AlertDescription>
+                                </Alert>
 
                                 {scopes && scopes.length > 0 && (
                                     <Scopes scopes={scopes} />
