@@ -1,3 +1,4 @@
+import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
 import {useCallback} from 'react';
 import {NodeProps, useReactFlow} from 'reactflow';
 
@@ -9,20 +10,28 @@ export default function useNodeClick(
 ) {
     const {setCurrentNode, setNodeDetailsDialogOpen} =
         useNodeDetailsDialogStore();
+    const {setRightSidebarOpen} = useRightSidebarStore();
 
     const {getNode} = useReactFlow();
 
-    const onClick = useCallback(() => {
+    return useCallback(() => {
         const currentNode = getNode(id);
 
         if (!currentNode) {
             return;
         }
 
+        setRightSidebarOpen(false);
+
         setNodeDetailsDialogOpen(true);
 
         setCurrentNode(data);
-    }, [data, getNode, id, setCurrentNode, setNodeDetailsDialogOpen]);
-
-    return onClick;
+    }, [
+        data,
+        getNode,
+        id,
+        setCurrentNode,
+        setNodeDetailsDialogOpen,
+        setRightSidebarOpen,
+    ]);
 }

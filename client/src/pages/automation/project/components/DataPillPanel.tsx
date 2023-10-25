@@ -118,7 +118,7 @@ const DataPillPanel = () => {
         >
             <Dialog.Portal>
                 <Dialog.Content
-                    className="fixed inset-y-2 right-[472px] top-16 w-screen max-w-[400px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
+                    className="fixed inset-y-2 right-[535px] top-[70px] w-screen max-w-[400px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
                     onInteractOutside={(event) => event.preventDefault()}
                     onOpenAutoFocus={(event) => event.preventDefault()}
                 >

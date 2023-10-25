@@ -6,7 +6,7 @@ import {useEffect, useState} from 'react';
 
 import WorkflowNodesList from './WorkflowNodesList';
 
-interface LeftSidebarProps {
+interface ComponentSidebarProps {
     data: {
         components: Array<ComponentDefinitionBasicModel>;
         flowControls: Array<TaskDispatcherDefinitionModel>;
@@ -14,7 +14,7 @@ interface LeftSidebarProps {
     filter: string;
 }
 
-const LeftSidebar = ({data, filter}: LeftSidebarProps) => {
+const ComponentSidebar = ({data, filter}: ComponentSidebarProps) => {
     const [filteredComponents, setFilteredComponents] = useState<
         Array<ComponentDefinitionBasicModel>
     >([]);
@@ -59,4 +59,4 @@ const LeftSidebar = ({data, filter}: LeftSidebarProps) => {
     );
 };
 
-export default LeftSidebar;
+export default ComponentSidebar;
