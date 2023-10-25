@@ -460,19 +460,17 @@ const ConnectionDialog = ({
                                                         (
                                                             componentDefinition
                                                         ) => {
-                                                            const {icon, name} =
+                                                            const {
+                                                                icon,
+                                                                name,
+                                                                title,
+                                                            } =
                                                                 componentDefinition;
-
-                                                            const capitalizedName = `${name
-                                                                .charAt(0)
-                                                                .toUpperCase()}${name.slice(
-                                                                1
-                                                            )}`;
 
                                                             return {
                                                                 componentDefinition,
                                                                 icon,
-                                                                label: capitalizedName,
+                                                                label: title!,
                                                                 value: name,
                                                             };
                                                         }
@@ -537,13 +535,15 @@ const ConnectionDialog = ({
 
                             {showConnectionProperties &&
                                 !!connectionDefinition.properties && (
-                                    <Properties
-                                        formState={formState}
-                                        properties={
-                                            connectionDefinition?.properties
-                                        }
-                                        register={register}
-                                    />
+                                    <fieldset className="mb-3">
+                                        <Properties
+                                            formState={formState}
+                                            properties={
+                                                connectionDefinition?.properties
+                                            }
+                                            register={register}
+                                        />
+                                    </fieldset>
                                 )}
 
                             {showAuthorizations && (

@@ -320,7 +320,7 @@ const Property = ({
                             />
                         )}
 
-                        {type === 'BOOLEAN' && (
+                        {!register && type === 'BOOLEAN' && (
                             <Select
                                 description={description}
                                 fieldsetClassName="mt-2"
