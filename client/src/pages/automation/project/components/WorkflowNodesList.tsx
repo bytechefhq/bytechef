@@ -1,3 +1,4 @@
+import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {
     ComponentDefinitionBasicModel,
@@ -69,54 +70,60 @@ const WorkflowNodesList = ({
     itemsDraggable = false,
     onItemClick,
 }: WorkflowNodesListProps) => (
-    <div className="px-2">
-        <span className="sticky top-0 z-10 block w-full bg-gray-100 p-2 text-center text-sm font-bold uppercase text-gray-500">
-            Components
-        </span>
+    <div className="w-full px-3">
+        <Tabs defaultValue="account" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="account">Components</TabsTrigger>
 
-        <ul role="list" className="mb-2">
-            {components.length ? (
-                components.map((component: ComponentDefinitionBasicModel) => (
-                    <WorkflowNodesListItem
-                        draggable={itemsDraggable}
-                        handleClick={() =>
-                            onItemClick && onItemClick(component)
-                        }
-                        key={component.name}
-                        node={component}
-                    />
-                ))
-            ) : (
-                <span className="block px-3 py-2 text-xs text-gray-500">
-                    No components found.
-                </span>
-            )}
-        </ul>
+                <TabsTrigger value="password">Flow Controls</TabsTrigger>
+            </TabsList>
 
-        <span className="sticky top-0 z-10 mt-2 block w-full bg-gray-100 p-2 text-center text-sm font-bold uppercase text-gray-500">
-            Flow Controls
-        </span>
+            <TabsContent value="account">
+                <ul role="list" className="mb-2">
+                    {components.length ? (
+                        components.map(
+                            (component: ComponentDefinitionBasicModel) => (
+                                <WorkflowNodesListItem
+                                    draggable={itemsDraggable}
+                                    handleClick={() =>
+                                        onItemClick && onItemClick(component)
+                                    }
+                                    key={component.name}
+                                    node={component}
+                                />
+                            )
+                        )
+                    ) : (
+                        <span className="block px-3 py-2 text-xs text-gray-500">
+                            No components found.
+                        </span>
+                    )}
+                </ul>
+            </TabsContent>
 
-        <ul role="list" className="mb-2">
-            {flowControls.length ? (
-                flowControls.map(
-                    (flowControl: TaskDispatcherDefinitionModel) => (
-                        <WorkflowNodesListItem
-                            draggable={itemsDraggable}
-                            handleClick={() =>
-                                onItemClick && onItemClick(flowControl)
-                            }
-                            key={flowControl.name}
-                            node={flowControl}
-                        />
-                    )
-                )
-            ) : (
-                <span className="block px-3 py-2 text-xs text-gray-500">
-                    No flow controls found.
-                </span>
-            )}
-        </ul>
+            <TabsContent value="password">
+                <ul role="list" className="mb-2">
+                    {flowControls.length ? (
+                        flowControls.map(
+                            (flowControl: TaskDispatcherDefinitionModel) => (
+                                <WorkflowNodesListItem
+                                    draggable={itemsDraggable}
+                                    handleClick={() =>
+                                        onItemClick && onItemClick(flowControl)
+                                    }
+                                    key={flowControl.name}
+                                    node={flowControl}
+                                />
+                            )
+                        )
+                    ) : (
+                        <span className="block px-3 py-2 text-xs text-gray-500">
+                            No flow controls found.
+                        </span>
+                    )}
+                </ul>
+            </TabsContent>
+        </Tabs>
     </div>
 );
 
