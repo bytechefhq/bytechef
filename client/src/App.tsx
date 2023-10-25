@@ -3,10 +3,11 @@ import {MobileSidebar} from '@/layouts/MobileSidebar';
 import {MobileTopNavigation} from '@/layouts/MobileTopNavigation';
 import {
     FolderIcon,
-    LinkIcon,
-    QueueListIcon,
-    RectangleStackIcon,
-} from '@heroicons/react/24/outline';
+    Layers3Icon,
+    Link2Icon,
+    ListEndIcon,
+    LucideIcon,
+} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 
@@ -22,9 +23,7 @@ const user = {
 const navigation: {
     name: string;
     href: string;
-    icon: React.ForwardRefExoticComponent<
-        Omit<React.SVGProps<SVGSVGElement>, 'ref'>
-    >;
+    icon: LucideIcon;
 }[] = [
     {
         href: '/automation/projects',
@@ -33,13 +32,13 @@ const navigation: {
     },
     {
         href: '/automation/instances',
-        icon: RectangleStackIcon,
+        icon: Layers3Icon,
         name: 'Instances',
     },
-    {href: '/automation/connections', icon: LinkIcon, name: 'Connections'},
+    {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
     {
         href: '/automation/executions',
-        icon: QueueListIcon,
+        icon: ListEndIcon,
         name: 'Executions',
     },
 ];

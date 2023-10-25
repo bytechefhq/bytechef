@@ -1,5 +1,5 @@
 import {Dialog, Transition} from '@headlessui/react';
-import {XMarkIcon} from '@heroicons/react/24/outline';
+import {Cross1Icon} from '@radix-ui/react-icons';
 import {Fragment, PropsWithChildren, ReactNode, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -96,7 +96,7 @@ const LayoutContainer = ({
                                                 setSidebarOpen(false)
                                             }
                                         >
-                                            <XMarkIcon
+                                            <Cross1Icon
                                                 className="h-6 w-6 text-white"
                                                 aria-hidden="true"
                                             />

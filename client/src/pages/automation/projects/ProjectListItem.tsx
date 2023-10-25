@@ -11,10 +11,10 @@ import {
     useUpdateProjectTagsMutation,
 } from '@/mutations/projects.mutations';
 import {ProjectKeys} from '@/queries/projects.queries';
-import {CalendarIcon} from '@heroicons/react/24/outline';
 import {AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 

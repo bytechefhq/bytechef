@@ -1,9 +1,9 @@
-import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import ReactSelectCreatable, {CreatableProps} from 'react-select/creatable';
 import {twMerge} from 'tailwind-merge';
 
 import './CreatableSelect.css';
 
+import {ExclamationTriangleIcon} from '@radix-ui/react-icons';
 import {FieldPath, FieldValues} from 'react-hook-form/dist/types';
 import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
 import {GroupBase} from 'react-select';
@@ -67,7 +67,7 @@ const CreatableSelect = <
 
             {error && (
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                    <ExclamationCircleIcon
+                    <ExclamationTriangleIcon
                         className="h-5 w-5 text-red-500"
                         aria-hidden="true"
                     />

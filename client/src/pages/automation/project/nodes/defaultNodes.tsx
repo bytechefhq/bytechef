@@ -1,4 +1,4 @@
-import {PlayIcon} from '@heroicons/react/24/outline';
+import {PlayIcon} from 'lucide-react';
 import {Node} from 'reactflow';
 
 const defaultNodes: Node[] = [

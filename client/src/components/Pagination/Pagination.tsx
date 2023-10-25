@@ -1,4 +1,4 @@
-import {ChevronLeftIcon, ChevronRightIcon} from '@heroicons/react/24/outline';
+import {ChevronLeftIcon, ChevronRightIcon} from '@radix-ui/react-icons';
 import {useCallback} from 'react';
 import {twMerge} from 'tailwind-merge';
 

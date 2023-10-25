@@ -1,5 +1,5 @@
-import {PencilIcon, TrashIcon} from '@heroicons/react/24/outline';
 import Button from 'components/Button/Button';
+import {PencilIcon, TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
 import {
     Handle,

@@ -1,5 +1,5 @@
 import getRandomId from '@/utils/getRandomId';
-import {PlayIcon} from '@heroicons/react/24/outline';
+import {PlayIcon} from 'lucide-react';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionBasicModel,

@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Bars3Icon} from '@heroicons/react/24/outline';
+import {Menu} from 'lucide-react';
 
 import reactLogo from '../assets/logo.svg';
 
@@ -22,9 +22,7 @@ export function MobileTopNavigation({
                 <div>
                     <Button
                         displayType="icon"
-                        icon={
-                            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-                        }
+                        icon={<Menu className="h-6 w-6" aria-hidden="true" />}
                         onClick={() => setMobileMenuOpen(true)}
                     >
                         <span className="sr-only">Open sidebar</span>

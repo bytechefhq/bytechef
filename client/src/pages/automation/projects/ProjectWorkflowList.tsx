@@ -4,8 +4,8 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/projects.mutations';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
-import {CalendarIcon} from '@heroicons/react/24/outline';
 import {useQueryClient} from '@tanstack/react-query';
+import {CalendarIcon} from 'lucide-react';
 import {ProjectModel, WorkflowModel} from 'middleware/helios/configuration';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {
@@ -150,9 +150,9 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                                     <div className="flex flex-1 justify-end">
                                         <Tooltip>
                                             <TooltipTrigger>
-                                                <div className="flex text-sm text-gray-500">
+                                                <div className="flex items-center text-sm text-gray-500">
                                                     <CalendarIcon
-                                                        className="mr-1 h-5 w-5 shrink-0 text-gray-400"
+                                                        className="mr-1 h-4 w-4 shrink-0 text-gray-400"
                                                         aria-hidden="true"
                                                     />
 

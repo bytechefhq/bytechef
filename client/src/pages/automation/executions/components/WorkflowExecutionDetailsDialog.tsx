@@ -1,5 +1,5 @@
-import {CheckCircleIcon} from '@heroicons/react/24/outline';
 import * as Dialog from '@radix-ui/react-dialog';
+import {CheckCircledIcon} from '@radix-ui/react-icons';
 import {useGetWorkflowExecutionQuery} from 'queries/projects.queries';
 import {twMerge} from 'tailwind-merge';
 
@@ -61,7 +61,7 @@ const WorkflowExecutionDetailsDialog = () => {
                                         : 'Workflow failed'}
                                 </span>
 
-                                <CheckCircleIcon
+                                <CheckCircledIcon
                                     className={twMerge(
                                         'h-5 w-5',
                                         allTasksCompleted

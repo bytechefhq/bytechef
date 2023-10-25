@@ -1,5 +1,4 @@
-import {XMarkIcon} from '@heroicons/react/24/outline';
-import {ChevronDownIcon, PlusIcon} from '@radix-ui/react-icons';
+import {ChevronDownIcon, Cross1Icon, PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
 import CreatableSelect, {
@@ -27,7 +26,7 @@ const Tag = ({onDeleteTag, tag}: TagProps) => (
     <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
         {tag.name}
 
-        <XMarkIcon
+        <Cross1Icon
             className="ml-1.5 h-3 w-3 rounded-full hover:bg-gray-300"
             onClick={() => onDeleteTag(tag)}
         />

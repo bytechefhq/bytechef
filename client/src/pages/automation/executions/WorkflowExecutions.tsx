@@ -8,7 +8,7 @@ import Pagination from '@/components/Pagination/Pagination';
 import LayoutContainer from '@/layouts/LayoutContainer';
 import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
-import {QueueListIcon} from '@heroicons/react/24/outline';
+import {ListEndIcon} from 'lucide-react';
 import {
     GetExecutionsJobStatusEnum,
     WorkflowExecutionModel,
@@ -272,7 +272,7 @@ export const WorkflowExecutions = () => {
                             ) : (
                                 <EmptyList
                                     icon={
-                                        <QueueListIcon className="h-12 w-12 text-gray-400" />
+                                        <ListEndIcon className="h-12 w-12 text-gray-400" />
                                     }
                                     message={emptyListMessage}
                                     title="No executed workflows"

@@ -1,5 +1,5 @@
 import {DataPillType} from '@/types/types';
-import {PlusIcon} from '@heroicons/react/24/outline';
+import {PlusIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
 import ContextualDialog from 'components/ContextualDialog/ContextualDialog';
 import Input from 'components/Input/Input';

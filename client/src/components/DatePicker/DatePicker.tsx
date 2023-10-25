@@ -1,4 +1,3 @@
-import {ExclamationCircleIcon} from '@heroicons/react/24/outline';
 import ReactDatePicker, {
     ReactDatePickerCustomHeaderProps,
 } from 'react-datepicker';
@@ -6,7 +5,11 @@ import {twMerge} from 'tailwind-merge';
 
 import './DatePicker.css';
 
-import {ChevronLeftIcon, ChevronRightIcon} from '@heroicons/react/24/solid';
+import {
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    ExclamationTriangleIcon,
+} from '@radix-ui/react-icons';
 import {format} from 'date-fns';
 import {useState} from 'react';
 
@@ -66,7 +69,7 @@ const DatePicker = ({
 
                 {error && (
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <ExclamationCircleIcon
+                        <ExclamationTriangleIcon
                             className="h-5 w-5 text-rose-500"
                             aria-hidden="true"
                         />
