@@ -12,7 +12,7 @@ import DataPillPanel from './components/DataPillPanel';
 import WorkflowEditor, {WorkflowEditorProps} from './components/WorkflowEditor';
 import {useNodeDetailsDialogStore} from './stores/useNodeDetailsDialogStore';
 
-const Workflow = ({components, flowControls}: WorkflowEditorProps) => {
+const ProjectWorkflow = ({components, flowControls}: WorkflowEditorProps) => {
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
     });
@@ -37,4 +37,4 @@ const Workflow = ({components, flowControls}: WorkflowEditorProps) => {
     );
 };
 
-export default Workflow;
+export default ProjectWorkflow;

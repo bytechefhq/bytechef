@@ -36,7 +36,7 @@ import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 import PageLoader from '../../../components/PageLoader/PageLoader';
 import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 import LayoutContainer from '../../../layouts/LayoutContainer';
-import WorkflowEditor from './Workflow';
+import WorkflowEditor from './ProjectWorkflow';
 import ComponentSidebar from './components/ComponentSidebar';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
 
