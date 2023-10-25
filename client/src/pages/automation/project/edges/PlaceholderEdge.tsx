@@ -1,6 +1,6 @@
 import {EdgeProps, getBezierPath} from 'reactflow';
 
-import styles from './EdgeTypes.module.css';
+import styles from './PlaceholderEdge.module.css';
 
 export default function PlaceholderEdge({
     id,
