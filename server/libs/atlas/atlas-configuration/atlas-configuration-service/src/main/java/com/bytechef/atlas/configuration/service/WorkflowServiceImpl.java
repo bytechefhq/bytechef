@@ -80,7 +80,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         Workflow savedWorkflow = CollectionUtils.getFirst(
             workflowCrudRepositories,
             workflowCrudRepository -> Objects.equals(workflowCrudRepository.getSourceType(), sourceType),
-            workflowCrudRepository -> updateCache(workflowCrudRepository.save(workflow)));
+            workflowCrudRepository -> workflowCrudRepository.save(workflow));
 
         return getWorkflow(Validate.notNull(savedWorkflow.getId(), "id"));
     }
