@@ -525,7 +525,7 @@ public abstract class DefinitionDSL {
             @Override
             public ControlType getControlType() {
                 if ((options == null || options.isEmpty()) && optionsFunction == null) {
-                    return ControlType.OBJECT_BUILDER;
+                    return ControlType.ARRAY_BUILDER;
                 } else {
                     return ControlType.MULTI_SELECT;
                 }
@@ -1172,9 +1172,7 @@ public abstract class DefinitionDSL {
 
             @Override
             public ControlType getControlType() {
-                if (objectType != null && !objectType.isEmpty()) {
-                    return ControlType.EXPRESSION;
-                } else if ((options == null || options.isEmpty()) && optionsFunction == null) {
+                if ((options == null || options.isEmpty()) && optionsFunction == null) {
                     return ControlType.OBJECT_BUILDER;
                 } else {
                     return ControlType.SELECT;

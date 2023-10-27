@@ -33,12 +33,12 @@ public interface Property {
      *
      */
     enum ControlType {
+        ARRAY_BUILDER,
         CHECKBOX,
         CODE_EDITOR,
         DATE,
         DATE_TIME,
         EMAIL,
-        EXPRESSION,
         INTEGER,
         MULTI_SELECT,
         NUMBER,
