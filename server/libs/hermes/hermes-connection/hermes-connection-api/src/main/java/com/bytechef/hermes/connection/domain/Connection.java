@@ -44,6 +44,29 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table
 public final class Connection implements Persistable<Long> {
 
+    public enum CredentialStatus {
+        INVALID(0),
+        VALID(1);
+
+        private final int id;
+
+        CredentialStatus(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public static CredentialStatus valueOf(int id) {
+            return switch (id) {
+                case 0 -> CredentialStatus.INVALID;
+                case 1 -> CredentialStatus.VALID;
+                default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
+            };
+        }
+    }
+
     @Column("authorization_name")
     private String authorizationName;
 
@@ -55,6 +78,9 @@ public final class Connection implements Persistable<Long> {
 
     @MappedCollection(idColumn = "connection_id")
     private Set<ConnectionTag> connectionTags = new HashSet<>();
+
+    @Column("credential_status")
+    private int credentialStatus = 1;
 
     @CreatedBy
     @Column("created_by")
@@ -153,6 +179,10 @@ public final class Connection implements Persistable<Long> {
         return createdDate;
     }
 
+    public CredentialStatus getCredentialStatus() {
+        return CredentialStatus.valueOf(credentialStatus);
+    }
+
     /**
      * Return the ID of the connection.
      */
@@ -226,6 +256,10 @@ public final class Connection implements Persistable<Long> {
 
     public void setConnectionVersion(int connectionVersion) {
         this.connectionVersion = connectionVersion;
+    }
+
+    public void setCredentialStatus(CredentialStatus credentialStatus) {
+        this.credentialStatus = credentialStatus.getId();
     }
 
     public void setId(Long id) {

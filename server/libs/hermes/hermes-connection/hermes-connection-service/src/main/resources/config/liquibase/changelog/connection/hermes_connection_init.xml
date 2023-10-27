@@ -23,6 +23,9 @@
                 <column name="parameters" type="TEXT">
                     <constraints nullable="false"/>
                 </column>
+                <column name="credential_status" type="INT">
+                    <constraints nullable="false"/>
+                </column>
                 <column name="type" type="INT">
                     <constraints nullable="false"/>
                 </column>
