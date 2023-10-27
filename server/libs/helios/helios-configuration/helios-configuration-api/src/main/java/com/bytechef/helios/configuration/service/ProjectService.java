@@ -51,6 +51,8 @@ public interface ProjectService {
 
     Project getWorkflowProject(String workflowId);
 
+    Project publish(long id);
+
     void removeWorkflow(long id, String workflowId);
 
     Project update(long id, List<Long> tagIds);

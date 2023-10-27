@@ -20,6 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.repository.ProjectRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -152,6 +153,15 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return projects;
+    }
+
+    @Override
+    public Project publish(long id) {
+        Project curProject = getProject(id);
+
+        curProject.setPublishedDate(LocalDateTime.now());
+
+        return projectRepository.save(curProject);
     }
 
     @Override

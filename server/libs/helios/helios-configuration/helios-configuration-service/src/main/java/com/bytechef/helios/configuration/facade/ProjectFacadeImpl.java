@@ -133,15 +133,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         project.setId(null);
         project.setName(generateName(project.getName()));
+        project.setPublishedDate(null);
         project.setVersion(0);
         project.setTagIds(project.getTagIds());
         project.setWorkflowIds(copyWorkflowIds(project.getWorkflowIds()));
 
         project = projectService.create(project);
 
-        return new ProjectDTO(
-            project, project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()),
-            tagService.getTags(project.getTagIds()));
+        return getProjectDTO(project);
     }
 
     @Override
@@ -158,9 +157,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public ProjectDTO getProject(long id) {
         Project project = projectService.getProject(id);
 
-        return new ProjectDTO(
-            project, project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()),
-            tagService.getTags(project.getTagIds()));
+        return getProjectDTO(project);
     }
 
     @Override
@@ -205,6 +202,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
                             .filter(Objects::nonNull)
                             .toList()),
                     tag -> CollectionUtils.contains(project.getTagIds(), tag.getId()))));
+    }
+
+    @Override
+    public ProjectDTO publishProject(long id) {
+        return getProjectDTO(projectService.publish(id));
     }
 
     @Override
@@ -284,5 +286,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
 
         return oldName + " (%s)".formatted(addendum);
+    }
+
+    private ProjectDTO getProjectDTO(Project project) {
+        return new ProjectDTO(
+            project, project.getCategoryId() == null ? null : categoryService.getCategory(project.getCategoryId()),
+            tagService.getTags(project.getTagIds()));
     }
 }

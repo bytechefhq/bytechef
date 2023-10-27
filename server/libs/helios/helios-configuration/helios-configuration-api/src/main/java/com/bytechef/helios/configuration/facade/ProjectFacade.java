@@ -50,6 +50,8 @@ public interface ProjectFacade {
 
     List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Boolean published);
 
+    ProjectDTO publishProject(long id);
+
     ProjectDTO updateProject(@NonNull ProjectDTO projectDTO);
 
     void updateProjectTags(long id, @NonNull List<Tag> tags);

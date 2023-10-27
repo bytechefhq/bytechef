@@ -120,6 +120,11 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
+    public Project publish(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void removeWorkflow(long id, String workflowId) {
         throw new UnsupportedOperationException();
     }
