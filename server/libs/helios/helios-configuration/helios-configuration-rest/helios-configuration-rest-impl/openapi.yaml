@@ -482,6 +482,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Project"
+  /projects/{id}/publish:
+    post:
+      description: "Publishes existing project."
+      summary: "Publishes existing project."
+      tags:
+        - "project"
+      operationId: "publishProject"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The published project object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
   /projects/{id}/tags:
     put:
       description: "Updates tags of an existing project."
