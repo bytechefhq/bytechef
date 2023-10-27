@@ -169,13 +169,13 @@ bytechef:
         # Enable classpath based workflow repository
         enabled: false
         projects:
-          location-pattern: workflows/projects/**/*.{json|yml|yaml}
+          location-pattern: workflows/projects/**/*.{json,yml,yaml}
       filesystem:
         # Enable filesystem based workflow repository
         enabled: true
         projects:
           # Location of workflows on the file system
-          location-pattern: ${user.home}/bytechef/data/workflows/projects/**/*.{json|yml|yaml}
+          location-pattern: ${user.home}/bytechef/data/workflows/projects/**/*.{json,yml,yaml}
         watch: true
       git:
         # Enable a git-based workflow repository
