@@ -18,11 +18,11 @@
  * @export
  */
 export const ControlTypeModel = {
+    ArrayBuilder: 'ARRAY_BUILDER',
     Checkbox: 'CHECKBOX',
     CodeEditor: 'CODE_EDITOR',
     Date: 'DATE',
     DateTime: 'DATE_TIME',
-    Expression: 'EXPRESSION',
     Email: 'EMAIL',
     Integer: 'INTEGER',
     ObjectBuilder: 'OBJECT_BUILDER',
