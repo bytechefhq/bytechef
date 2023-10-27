@@ -1206,11 +1206,11 @@ components:
       description: "A type of the control to show in UI."
       type: "string"
       enum:
+      - "ARRAY_BUILDER"
       - "CHECKBOX"
       - "CODE_EDITOR"
       - "DATE"
       - "DATE_TIME"
-      - "EXPRESSION"
       - "EMAIL"
       - "INTEGER"
       - "OBJECT_BUILDER"
