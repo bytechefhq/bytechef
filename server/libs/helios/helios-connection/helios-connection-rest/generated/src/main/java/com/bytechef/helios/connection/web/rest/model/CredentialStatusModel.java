@@ -1,4 +1,4 @@
-package com.bytechef.hermes.configuration.web.rest.model;
+package com.bytechef.helios.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -17,39 +17,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * A type of property.
+ * Gets or Sets CredentialStatus
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-27T12:43:21.815235+02:00[Europe/Zagreb]")
-public enum PropertyTypeModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-27T12:43:20.645890+02:00[Europe/Zagreb]")
+public enum CredentialStatusModel {
   
-  ANY("ANY"),
+  VALID("VALID"),
   
-  ARRAY("ARRAY"),
-  
-  BOOLEAN("BOOLEAN"),
-  
-  DATE("DATE"),
-  
-  DATE_TIME("DATE_TIME"),
-  
-  DYNAMIC_PROPERTIES("DYNAMIC_PROPERTIES"),
-  
-  INTEGER("INTEGER"),
-  
-  NULL("NULL"),
-  
-  NUMBER("NUMBER"),
-  
-  STRING("STRING"),
-  
-  OBJECT("OBJECT"),
-  
-  TIME("TIME");
+  INVALID("INVALID");
 
   private String value;
 
-  PropertyTypeModel(String value) {
+  CredentialStatusModel(String value) {
     this.value = value;
   }
 
@@ -64,8 +44,8 @@ public enum PropertyTypeModel {
   }
 
   @JsonCreator
-  public static PropertyTypeModel fromValue(String value) {
-    for (PropertyTypeModel b : PropertyTypeModel.values()) {
+  public static CredentialStatusModel fromValue(String value) {
+    for (CredentialStatusModel b : CredentialStatusModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }

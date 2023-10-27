@@ -2,10 +2,12 @@ package com.bytechef.helios.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.helios.connection.web.rest.model.CredentialStatusModel;
 import com.bytechef.helios.connection.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-19T19:33:23.290812+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-27T12:43:20.645890+02:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   private Boolean active;
@@ -44,6 +46,8 @@ public class ConnectionModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
+
+  private CredentialStatusModel credentialStatus;
 
   private String name;
 
@@ -193,6 +197,26 @@ public class ConnectionModel {
 
   public void setCreatedDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
+  }
+
+  public ConnectionModel credentialStatus(CredentialStatusModel credentialStatus) {
+    this.credentialStatus = credentialStatus;
+    return this;
+  }
+
+  /**
+   * Get credentialStatus
+   * @return credentialStatus
+  */
+  @Valid 
+  @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("credentialStatus")
+  public CredentialStatusModel getCredentialStatus() {
+    return credentialStatus;
+  }
+
+  public void setCredentialStatus(CredentialStatusModel credentialStatus) {
+    this.credentialStatus = credentialStatus;
   }
 
   public ConnectionModel name(String name) {
@@ -366,6 +390,7 @@ public class ConnectionModel {
         Objects.equals(this.connectionVersion, connection.connectionVersion) &&
         Objects.equals(this.createdBy, connection.createdBy) &&
         Objects.equals(this.createdDate, connection.createdDate) &&
+        Objects.equals(this.credentialStatus, connection.credentialStatus) &&
         Objects.equals(this.name, connection.name) &&
         Objects.equals(this.id, connection.id) &&
         Objects.equals(this.lastModifiedBy, connection.lastModifiedBy) &&
@@ -377,7 +402,7 @@ public class ConnectionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(active, authorizationName, componentName, connectionVersion, createdBy, createdDate, name, id, lastModifiedBy, lastModifiedDate, parameters, tags, version);
+    return Objects.hash(active, authorizationName, componentName, connectionVersion, createdBy, createdDate, credentialStatus, name, id, lastModifiedBy, lastModifiedDate, parameters, tags, version);
   }
 
   @Override
@@ -390,6 +415,7 @@ public class ConnectionModel {
     sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
