@@ -158,6 +158,10 @@ public class ProjectServiceImpl implements ProjectService {
     public void removeWorkflow(long id, String workflowId) {
         Project project = getProject(id);
 
+        if (CollectionUtils.count(project.getWorkflowIds()) == 1) {
+            throw new IllegalArgumentException("The last workflow cannot be deleted");
+        }
+
         project.removeWorkflow(workflowId);
 
         update(project);
