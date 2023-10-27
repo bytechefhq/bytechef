@@ -68,7 +68,7 @@ public class ComponentDefinitionRegistry {
             CollectionUtils.map(mergedComponentDefinitionFactories, ComponentDefinitionFactory::getDefinition),
             MANUAL_COMPONENT_DEFINITION);
 
-        this.componentDefinitions = CollectionUtils.sorted(componentDefinitions, this::compare);
+        this.componentDefinitions = CollectionUtils.sort(componentDefinitions, this::compare);
 
         // Validate
 

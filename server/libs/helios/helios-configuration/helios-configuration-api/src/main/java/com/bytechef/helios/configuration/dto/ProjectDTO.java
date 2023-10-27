@@ -17,6 +17,7 @@
 package com.bytechef.helios.configuration.dto;
 
 import com.bytechef.category.domain.Category;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,7 +37,8 @@ public record ProjectDTO(
         this(
             category, project.getCreatedBy(), project.getCreatedDate(), project.getDescription(), project.getId(),
             project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(), project.getProjectVersion(),
-            project.getPublishedDate(), project.getStatus(), tags, project.getVersion(), project.getWorkflowIds());
+            project.getPublishedDate(), project.getStatus(), tags, project.getVersion(),
+            CollectionUtils.sort(project.getWorkflowIds()));
     }
 
     public static Builder builder() {
