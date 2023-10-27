@@ -188,7 +188,13 @@ public final class CollectionUtils {
         return collection.size();
     }
 
-    public static <T> List<T> sorted(Collection<T> collection, Comparator<? super T> comparator) {
+    public static <T> List<T> sort(List<T> workflowIds) {
+        return workflowIds.stream()
+            .sorted()
+            .toList();
+    }
+
+    public static <T> List<T> sort(Collection<T> collection, Comparator<? super T> comparator) {
         Validate.notNull(collection, "'collection' must not be null");
         Validate.notNull(comparator, "'comparator' must not be null");
 

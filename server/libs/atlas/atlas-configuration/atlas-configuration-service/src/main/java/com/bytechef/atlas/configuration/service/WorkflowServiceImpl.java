@@ -203,7 +203,11 @@ public class WorkflowServiceImpl implements WorkflowService {
             workflows.add(getWorkflow(workflowId));
         }
 
-        return workflows;
+        return CollectionUtils.sort(workflows, (workflow1, workflow2) -> {
+            String label1 = workflow1.getLabel();
+
+            return label1.compareTo(workflow2.getLabel());
+        });
     }
 
     @Override

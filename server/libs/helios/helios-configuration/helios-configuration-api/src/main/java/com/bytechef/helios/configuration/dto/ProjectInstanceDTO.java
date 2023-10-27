@@ -16,6 +16,7 @@
 
 package com.bytechef.helios.configuration.dto;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
@@ -41,7 +42,8 @@ public record ProjectInstanceDTO(
             projectInstance.getCreatedBy(), projectInstance.getCreatedDate(), projectInstance.getDescription(),
             projectInstance.isEnabled(), projectInstance.getId(), projectInstance.getName(), lastExecutionDate,
             projectInstance.getLastModifiedBy(), projectInstance.getLastModifiedDate(), project,
-            projectInstance.getProjectId(), projectInstanceWorkflows, tags, projectInstance.getVersion());
+            projectInstance.getProjectId(), CollectionUtils.sort(projectInstanceWorkflows), tags,
+            projectInstance.getVersion());
     }
 
     public static Builder builder() {

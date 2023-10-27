@@ -41,7 +41,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("project_instance_workflow")
-public class ProjectInstanceWorkflow implements Persistable<Long> {
+public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<ProjectInstanceWorkflow> {
 
     @CreatedBy
     @Column("created_by")
@@ -92,6 +92,11 @@ public class ProjectInstanceWorkflow implements Persistable<Long> {
         this.projectInstanceWorkflowConnections = new HashSet<>(connections);
         this.inputs = new MapWrapper(inputs);
         this.workflowId = workflowId;
+    }
+
+    @Override
+    public int compareTo(ProjectInstanceWorkflow projectInstanceWorkflow) {
+        return workflowId.compareTo(projectInstanceWorkflow.workflowId);
     }
 
     @Override
