@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { CredentialStatusModel } from './CredentialStatusModel';
+import {
+    CredentialStatusModelFromJSON,
+    CredentialStatusModelFromJSONTyped,
+    CredentialStatusModelToJSON,
+} from './CredentialStatusModel';
 import type { TagModel } from './TagModel';
 import {
     TagModelFromJSON,
@@ -62,6 +68,12 @@ export interface ConnectionModel {
      * @memberof ConnectionModel
      */
     readonly createdDate?: Date;
+    /**
+     * 
+     * @type {CredentialStatusModel}
+     * @memberof ConnectionModel
+     */
+    credentialStatus?: CredentialStatusModel;
     /**
      * The name of a connection.
      * @type {string}
@@ -134,6 +146,7 @@ export function ConnectionModelFromJSONTyped(json: any, ignoreDiscriminator: boo
         'connectionVersion': !exists(json, 'connectionVersion') ? undefined : json['connectionVersion'],
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
+        'credentialStatus': !exists(json, 'credentialStatus') ? undefined : CredentialStatusModelFromJSON(json['credentialStatus']),
         'name': json['name'],
         'id': !exists(json, 'id') ? undefined : json['id'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
@@ -156,6 +169,7 @@ export function ConnectionModelToJSON(value?: ConnectionModel | null): any {
         'authorizationName': value.authorizationName,
         'componentName': value.componentName,
         'connectionVersion': value.connectionVersion,
+        'credentialStatus': CredentialStatusModelToJSON(value.credentialStatus),
         'name': value.name,
         'parameters': value.parameters,
         'tags': value.tags === undefined ? undefined : ((value.tags as Array<any>).map(TagModelToJSON)),
