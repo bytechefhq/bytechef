@@ -95,10 +95,16 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
+    public ResponseEntity<ProjectModel> publishProject(Long id) {
+        return ResponseEntity.ok(conversionService.convert(projectFacade.publishProject(id), ProjectModel.class));
+    }
+
+    @Override
     public ResponseEntity<ProjectModel> updateProject(Long id, ProjectModel projectModel) {
-        return ResponseEntity.ok(conversionService.convert(
-            projectFacade.updateProject(
-                Validate.notNull(conversionService.convert(projectModel.id(id), ProjectDTO.class), "projectDTO")),
-            ProjectModel.class));
+        return ResponseEntity.ok(
+            conversionService.convert(
+                projectFacade.updateProject(
+                    Validate.notNull(conversionService.convert(projectModel.id(id), ProjectDTO.class), "projectDTO")),
+                ProjectModel.class));
     }
 }
