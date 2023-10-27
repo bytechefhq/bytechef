@@ -76,6 +76,7 @@ public class WorkflowServiceImpl implements WorkflowService {
         final Workflow workflow = new Workflow(definition, format, type);
 
         workflow.setNew(true);
+        workflow.setSourceType(sourceType);
 
         Workflow savedWorkflow = CollectionUtils.getFirst(
             workflowCrudRepositories,
