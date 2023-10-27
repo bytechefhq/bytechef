@@ -208,6 +208,8 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
+        credentialStatus:
+          $ref: "#/components/schemas/CredentialStatus"
         name:
           description: "The name of a connection."
           type: "string"
@@ -238,6 +240,11 @@ components:
         __version:
           type: "integer"
           format: "int32"
+    CredentialStatus:
+      type: "string"
+      enum:
+        - "VALID"
+        - "INVALID"
     UpdateTagsRequest:
       description: "The request object that contains the array of tags."
       type: "object"
