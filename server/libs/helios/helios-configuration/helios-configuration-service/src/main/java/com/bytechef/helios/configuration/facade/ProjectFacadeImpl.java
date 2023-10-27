@@ -177,27 +177,6 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Tag> getProjectTags() {
-        List<Project> projects = projectService.getProjects();
-
-        List<Long> tagIds = projects.stream()
-            .map(Project::getTagIds)
-            .flatMap(Collection::stream)
-            .toList();
-
-        return tagService.getTags(tagIds);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Workflow> getProjectWorkflows(long id) {
-        Project project = projectService.getProject(id);
-
-        return workflowService.getWorkflows(project.getWorkflowIds());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Boolean published) {
         List<Long> projectIds = null;
 
@@ -226,6 +205,27 @@ public class ProjectFacadeImpl implements ProjectFacade {
                             .filter(Objects::nonNull)
                             .toList()),
                     tag -> CollectionUtils.contains(project.getTagIds(), tag.getId()))));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Tag> getProjectTags() {
+        List<Project> projects = projectService.getProjects();
+
+        List<Long> tagIds = projects.stream()
+            .map(Project::getTagIds)
+            .flatMap(Collection::stream)
+            .toList();
+
+        return tagService.getTags(tagIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Workflow> getProjectWorkflows(long id) {
+        Project project = projectService.getProject(id);
+
+        return workflowService.getWorkflows(project.getWorkflowIds());
     }
 
     @Override
