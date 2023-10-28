@@ -1,7 +1,8 @@
 ---
 label: "Hello Parallel"
 tasks:
-- type: "parallel"
+- name: "parallel-1"
+  type: "parallel"
   parameters:
     tasks:
     - type: "time/sleep"

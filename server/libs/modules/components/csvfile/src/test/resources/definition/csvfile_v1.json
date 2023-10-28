@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Reads data from a csv file.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "read",
@@ -102,7 +101,7 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
+      "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": true,
@@ -239,6 +238,7 @@
       } ],
       "controlType": "CHECKBOX"
     } ],
+    "sampleOutput": null,
     "title": "Read from file",
     "perform": { },
     "outputSchema": {
@@ -258,7 +258,7 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
@@ -272,7 +272,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Writes the data to a csv file.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "write",
@@ -395,7 +394,7 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": true,
@@ -416,6 +415,7 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Write to file",
     "perform": { },
     "outputSchema": {
@@ -509,7 +509,7 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
+      "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
@@ -523,11 +523,11 @@
   "description": "Reads and writes data from a csv file.",
   "icon": "path:assets/csvfile.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "csvFile",
   "resources": null,
   "version": 1,
   "title": "CSV File",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

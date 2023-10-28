@@ -10,7 +10,6 @@
     "help": null,
     "metadata": null,
     "name": "java",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Initialize parameter values used in the custom code.",
@@ -42,7 +41,7 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "OBJECT_BUILDER",
+        "controlType": "ARRAY_BUILDER",
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -242,12 +241,13 @@
     } ],
     "sampleOutput": null,
     "title": "Java",
-    "editorDescriptionDataSource": null,
+    "perform": { },
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "script",
@@ -259,7 +259,6 @@
     "help": null,
     "metadata": null,
     "name": "javascript",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Initialize parameter values used in the custom code.",
@@ -291,7 +290,7 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "OBJECT_BUILDER",
+        "controlType": "ARRAY_BUILDER",
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -491,12 +490,13 @@
     } ],
     "sampleOutput": null,
     "title": "JavaScript",
-    "editorDescriptionDataSource": null,
+    "perform": { },
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "script",
@@ -508,7 +508,6 @@
     "help": null,
     "metadata": null,
     "name": "python",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Initialize parameter values used in the custom code.",
@@ -540,7 +539,7 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "OBJECT_BUILDER",
+        "controlType": "ARRAY_BUILDER",
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -740,12 +739,13 @@
     } ],
     "sampleOutput": null,
     "title": "Python",
-    "editorDescriptionDataSource": null,
+    "perform": { },
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "script",
@@ -757,7 +757,6 @@
     "help": null,
     "metadata": null,
     "name": "ruby",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Initialize parameter values used in the custom code.",
@@ -789,7 +788,7 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "OBJECT_BUILDER",
+        "controlType": "ARRAY_BUILDER",
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -989,12 +988,13 @@
     } ],
     "sampleOutput": null,
     "title": "Ruby",
-    "editorDescriptionDataSource": null,
+    "perform": { },
+    "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,

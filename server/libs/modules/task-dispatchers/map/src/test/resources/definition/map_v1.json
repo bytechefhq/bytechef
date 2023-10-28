@@ -20,7 +20,7 @@
     "items": null,
     "multipleValues": null,
     "options": null,
-    "controlType": "OBJECT_BUILDER",
+    "controlType": "ARRAY_BUILDER",
     "optionsDataSource": null
   }, {
     "advancedOption": null,
@@ -79,7 +79,7 @@
     "objectType": "TASK",
     "options": null,
     "properties": null,
-    "controlType": "EXPRESSION",
+    "controlType": "OBJECT_BUILDER",
     "optionsDataSource": null
   } ],
   "title": "Map",

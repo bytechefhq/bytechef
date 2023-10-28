@@ -10,7 +10,6 @@
     "help": null,
     "metadata": null,
     "name": "send",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "From who to send the email.",
@@ -65,7 +64,7 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -102,7 +101,7 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -139,7 +138,7 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -176,7 +175,7 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -319,20 +318,21 @@
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "controlType": "EXPRESSION",
+        "controlType": "OBJECT_BUILDER",
         "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Send",
-    "editorDescriptionDataSource": null,
     "perform": { },
+    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": {

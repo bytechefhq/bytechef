@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Reads data from the file.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "read",
@@ -102,12 +101,11 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
+      "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Read from file",
-    "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -128,7 +126,9 @@
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "fileStorage",
@@ -137,7 +137,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Writes the data to the file.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "write",
@@ -178,9 +177,8 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Write to file",
-    "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -272,11 +270,13 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
+      "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "fileStorage",
@@ -285,7 +285,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Download a file from the URL.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "download",
@@ -326,9 +325,8 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Download file",
-    "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -420,11 +418,13 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
+      "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,
@@ -433,11 +433,11 @@
   "description": "Reads and writes data from a file stored inside the file storage.",
   "icon": "path:assets/filestorage.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "fileStorage",
   "resources": null,
   "version": 1,
   "title": "File Storage",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

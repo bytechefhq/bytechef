@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Add a new pet to the store",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "path": "/pet",
@@ -167,7 +166,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -244,7 +243,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -282,8 +281,9 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Add a new pet to the store",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -435,7 +435,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -512,7 +512,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -552,7 +552,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -561,7 +561,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Update an existing pet by Id",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "path": "/pet",
@@ -721,7 +720,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -798,7 +797,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -836,8 +835,9 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Update an existing pet",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -989,7 +989,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1066,7 +1066,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -1106,7 +1106,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -1115,7 +1115,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Multiple status values can be provided with comma separated strings",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -1158,8 +1157,9 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Finds Pets by status",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -1325,7 +1325,7 @@
           "multipleValues": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1402,7 +1402,7 @@
           "multipleValues": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": "pet status in the store",
@@ -1443,11 +1443,11 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -1456,7 +1456,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -1501,10 +1500,11 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Finds Pets by tags",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -1670,7 +1670,7 @@
           "multipleValues": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1747,7 +1747,7 @@
           "multipleValues": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": "pet status in the store",
@@ -1788,11 +1788,11 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -1801,7 +1801,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "delete a pet",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -1850,12 +1849,13 @@
       "optionsDataSource": null,
       "controlType": "INTEGER"
     } ],
+    "sampleOutput": null,
     "title": "Deletes a pet",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -1864,7 +1864,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Returns a single pet",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -1893,8 +1892,9 @@
       "optionsDataSource": null,
       "controlType": "INTEGER"
     } ],
+    "sampleOutput": null,
     "title": "Find pet by ID",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -2046,7 +2046,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2123,7 +2123,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": "pet status in the store",
@@ -2163,7 +2163,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2172,7 +2172,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "method": "POST",
@@ -2241,12 +2240,13 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Updates a pet in the store with form data",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2255,7 +2255,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "path": "/pet/{petId}/uploadImage",
@@ -2399,10 +2398,11 @@
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
-      "controlType": "EXPRESSION"
+      "controlType": "OBJECT_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "uploads an image",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -2484,7 +2484,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2493,7 +2493,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Returns a map of status codes to quantities",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -2501,8 +2500,9 @@
     },
     "name": "getInventory",
     "properties": [ ],
+    "sampleOutput": null,
     "title": "Returns pet inventories by status",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -2548,7 +2548,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2557,7 +2557,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Place a new order in the store",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "path": "/store/order",
@@ -2723,8 +2722,9 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Place an order for a pet",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -2884,7 +2884,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2893,7 +2893,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -2922,12 +2921,13 @@
       "optionsDataSource": null,
       "controlType": "INTEGER"
     } ],
+    "sampleOutput": null,
     "title": "Delete purchase order by ID",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2936,7 +2936,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -2965,8 +2964,9 @@
       "optionsDataSource": null,
       "controlType": "INTEGER"
     } ],
+    "sampleOutput": null,
     "title": "Find purchase order by ID",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -3126,7 +3126,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -3135,7 +3135,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "path": "/user",
@@ -3314,8 +3313,9 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Create user",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -3488,7 +3488,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -3497,7 +3497,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Creates list of users with given input array",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "path": "/user/createWithList",
@@ -3693,10 +3692,11 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Creates list of users with given input array",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -3884,11 +3884,11 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -3897,7 +3897,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -3925,12 +3924,13 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Delete user",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -3939,7 +3939,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -3967,8 +3966,9 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Get user by user name",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -4141,7 +4141,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -4150,7 +4150,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "path": "/user/{username}",
@@ -4349,8 +4348,9 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Update user",
-    "editorDescriptionDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -4523,11 +4523,10 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": {
-    "authorizationRequired": null,
     "authorizations": [ {
       "detectOn": null,
       "description": null,
@@ -4573,16 +4572,16 @@
       "title": "OAuth2 Implicit",
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
+      "apply": null,
+      "pkce": null,
+      "refresh": null,
+      "scopes": { },
       "authorizationCallback": null,
       "authorizationUrl": { },
       "clientId": null,
       "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": { }
+      "tokenUrl": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4628,23 +4627,24 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
+      "apply": null,
+      "pkce": null,
+      "refresh": null,
+      "scopes": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
       "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": null
+      "tokenUrl": null
     } ],
-    "baseUri": { },
     "componentName": "petstore",
     "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
     "componentTitle": "Petstore",
     "properties": null,
     "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
     "test": null
   },
   "customAction": null,
@@ -4652,11 +4652,11 @@
   "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
   "icon": "path:assets/petstore.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "petstore",
   "resources": null,
   "version": 1,
   "title": "Petstore",
-  "triggers": [ ]
+  "triggers": [ ],
+  "filterCompatibleConnections": null
 }

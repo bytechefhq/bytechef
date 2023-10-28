@@ -21,7 +21,7 @@
     "multipleValues": null,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": "ARRAY_BUILDER"
   }, {
     "advancedOption": null,
     "description": "Should loop iterate until condition set by 'Loop Break' statement is met.",
@@ -70,7 +70,7 @@
     "options": null,
     "properties": null,
     "optionsDataSource": null,
-    "controlType": "EXPRESSION"
+    "controlType": "OBJECT_BUILDER"
   } ],
   "title": "Loop",
   "version": 1,

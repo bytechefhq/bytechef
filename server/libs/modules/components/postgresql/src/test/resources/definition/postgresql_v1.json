@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Execute an SQL query.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "query",
@@ -132,13 +131,14 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Query",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -148,7 +148,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Insert rows in database.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "insert",
@@ -224,7 +223,7 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "List of rows.",
@@ -271,7 +270,7 @@
           "multipleValues": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -453,10 +452,10 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Insert",
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -500,6 +499,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -509,7 +509,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Update rows in database.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "update",
@@ -585,7 +584,7 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The name of the property which decides which rows in the database should be updated.",
@@ -650,7 +649,7 @@
           "multipleValues": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -832,10 +831,10 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Update",
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -879,6 +878,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -888,7 +888,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Delete rows from database.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "delete",
@@ -992,7 +991,7 @@
           "multipleValues": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1174,10 +1173,10 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Delete",
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -1221,6 +1220,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -1230,7 +1230,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Execute an SQL DML or DML statement.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "execute",
@@ -1298,7 +1297,7 @@
           "multipleValues": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1480,7 +1479,7 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The list of properties which should be used as parameters.",
@@ -1584,8 +1583,8 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Execute",
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -1629,13 +1628,12 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": {
-    "authorizationRequired": null,
     "authorizations": null,
-    "baseUri": null,
     "componentName": "postgresql",
     "componentDescription": "Query, insert and update data from PostgreSQL.",
     "componentTitle": "PostgreSQL",
@@ -1732,6 +1730,8 @@
       "optionsDataSource": null
     } ],
     "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
     "test": null
   },
   "customAction": null,
@@ -1739,11 +1739,11 @@
   "description": "Query, insert and update data from PostgreSQL.",
   "icon": "path:assets/postgresql.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "postgresql",
   "resources": null,
   "version": 1,
   "title": "PostgreSQL",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

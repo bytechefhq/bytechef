@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Get the AWS S3 object.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "getObject",
@@ -48,9 +47,9 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Get Object",
     "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -142,11 +141,12 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
+      "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "aws-s3",
@@ -155,7 +155,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Get the url of an AWS S3 object.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "getUrl",
@@ -178,9 +177,9 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Get URL",
     "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -201,7 +200,8 @@
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "aws-s3",
@@ -210,7 +210,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Get the list AWS S3 objects.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "listObjects",
@@ -233,9 +232,9 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "List Objects",
     "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -328,11 +327,12 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "aws-s3",
@@ -341,7 +341,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Get the url of an pre-signed AWS S3 object.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "presignGetObject",
@@ -382,9 +381,9 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Get Pre-signed Object",
     "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -405,7 +404,8 @@
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "aws-s3",
@@ -414,7 +414,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Store an object to AWS S3.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "putObject",
@@ -509,7 +508,7 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
+      "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -583,9 +582,9 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Put Object",
     "editorDescriptionDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -606,13 +605,12 @@
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": {
-    "authorizationRequired": null,
     "authorizations": null,
-    "baseUri": null,
     "componentName": "aws-s3",
     "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
     "componentTitle": "AWS S3",
@@ -835,6 +833,8 @@
       "optionsDataSource": null
     } ],
     "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
     "test": null
   },
   "customAction": null,
@@ -842,11 +842,11 @@
   "description": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
   "icon": "path:assets/awss3.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "aws-s3",
   "resources": null,
   "version": 1,
   "title": "AWS S3",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

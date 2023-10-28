@@ -35,7 +35,7 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -210,7 +210,7 @@
     "multipleValues": null,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": "ARRAY_BUILDER"
   } ],
   "resources": null,
   "taskProperties": [ {
@@ -233,7 +233,7 @@
     "options": null,
     "properties": null,
     "optionsDataSource": null,
-    "controlType": "EXPRESSION"
+    "controlType": "OBJECT_BUILDER"
   } ],
   "title": "Each",
   "version": 1,

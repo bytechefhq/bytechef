@@ -27,8 +27,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The name of the item variable.",
@@ -68,11 +68,11 @@
     } ],
     "sampleOutput": null,
     "title": null,
-    "editorDescriptionDataSource": null,
-    "perform": null,
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": null,
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,
