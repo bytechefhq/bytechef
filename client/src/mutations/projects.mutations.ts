@@ -208,7 +208,7 @@ export const useEnableProjectInstanceWorkflowMutation = (
 
 type PublishProjectMutationProps = {
     onSuccess?: (
-        result: void,
+        result: ProjectModel,
         variables: PublishProjectRequest
     ) => void;
     onError?: (error: object, variables: PublishProjectRequest) => void;

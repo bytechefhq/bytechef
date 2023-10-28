@@ -166,17 +166,19 @@ const ProjectWorkflowListItem = ({
                             Edit
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem
-                            className="text-xs"
-                            onClick={() =>
-                                duplicateWorkflowMutationMutation.mutate({
-                                    id: project?.id!,
-                                    workflowId: workflow?.id!,
-                                })
-                            }
-                        >
-                            Duplicate
-                        </DropdownMenuItem>
+                        {project && workflow && (
+                            <DropdownMenuItem
+                                className="text-xs"
+                                onClick={() =>
+                                    duplicateWorkflowMutationMutation.mutate({
+                                        id: project.id!,
+                                        workflowId: workflow.id!,
+                                    })
+                                }
+                            >
+                                Duplicate
+                            </DropdownMenuItem>
+                        )}
 
                         <DropdownMenuSeparator />
 
