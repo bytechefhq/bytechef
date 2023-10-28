@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Execute an SQL query.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "query",
@@ -132,14 +131,15 @@
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Query",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "mysql",
@@ -148,7 +148,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Insert rows in database.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "insert",
@@ -223,7 +222,7 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -270,7 +269,7 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "OBJECT_BUILDER",
+          "controlType": "ARRAY_BUILDER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -452,11 +451,12 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Insert",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -500,7 +500,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "mysql",
@@ -509,7 +509,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Update rows in database.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "update",
@@ -584,7 +583,7 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -649,7 +648,7 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "OBJECT_BUILDER",
+          "controlType": "ARRAY_BUILDER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -831,11 +830,12 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Update",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -879,7 +879,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "mysql",
@@ -888,7 +888,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Delete rows from database.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "delete",
@@ -991,7 +990,7 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "OBJECT_BUILDER",
+          "controlType": "ARRAY_BUILDER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -1173,11 +1172,12 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Delete",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -1221,7 +1221,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "mysql",
@@ -1230,7 +1230,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Execute an SQL DML or DML statement.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "execute",
@@ -1297,7 +1296,7 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "OBJECT_BUILDER",
+          "controlType": "ARRAY_BUILDER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -1479,7 +1478,7 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -1584,8 +1583,9 @@
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Execute",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -1629,13 +1629,11 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": {
-    "authorizationRequired": null,
     "authorizations": null,
-    "baseUri": null,
     "componentName": "mysql",
     "componentDescription": "Query, insert and update data from MySQL.",
     "componentTitle": "MySQL",
@@ -1732,6 +1730,8 @@
       "optionsDataSource": null
     } ],
     "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
     "test": null
   },
   "customAction": null,
@@ -1739,11 +1739,11 @@
   "description": "Query, insert and update data from MySQL.",
   "icon": "path:assets/mysql.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "mysql",
   "resources": null,
   "version": 1,
   "title": "MySQL",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

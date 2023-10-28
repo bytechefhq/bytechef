@@ -52,18 +52,18 @@
         "objectType": "TASK",
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "EXPRESSION"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     } ],
     "multipleValues": null,
     "options": null,
-    "optionsDataSource": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": "ARRAY_BUILDER",
+    "optionsDataSource": null
   } ],
   "title": "Fork/Join",
   "version": 1,

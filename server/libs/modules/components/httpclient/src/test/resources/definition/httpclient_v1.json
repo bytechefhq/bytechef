@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The request method to use.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "get",
@@ -190,13 +189,14 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "GET",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -206,7 +206,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The request method to use.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "post",
@@ -420,7 +419,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -743,7 +742,7 @@
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
-        "controlType": "EXPRESSION"
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "objectType": null,
@@ -900,7 +899,7 @@
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
-      "controlType": "EXPRESSION"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Content-Type to use when sending body parameters.",
@@ -1109,13 +1108,14 @@
       "optionsDataSource": null,
       "controlType": "INTEGER"
     } ],
+    "sampleOutput": null,
     "title": "POST",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -1125,7 +1125,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The request method to use.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "put",
@@ -1339,7 +1338,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1662,7 +1661,7 @@
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
-        "controlType": "EXPRESSION"
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "objectType": null,
@@ -1819,7 +1818,7 @@
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
-      "controlType": "EXPRESSION"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Content-Type to use when sending body parameters.",
@@ -2028,13 +2027,14 @@
       "optionsDataSource": null,
       "controlType": "INTEGER"
     } ],
+    "sampleOutput": null,
     "title": "PUT",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -2044,7 +2044,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The request method to use.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "patch",
@@ -2258,7 +2257,7 @@
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2581,7 +2580,7 @@
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
-        "controlType": "EXPRESSION"
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "objectType": null,
@@ -2738,7 +2737,7 @@
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
-      "controlType": "EXPRESSION"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Content-Type to use when sending body parameters.",
@@ -2947,13 +2946,14 @@
       "optionsDataSource": null,
       "controlType": "INTEGER"
     } ],
+    "sampleOutput": null,
     "title": "PATCH",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -2963,7 +2963,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The request method to use.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "delete",
@@ -3287,13 +3286,14 @@
       "optionsDataSource": null,
       "controlType": "INTEGER"
     } ],
+    "sampleOutput": null,
     "title": "DELETE",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   }, {
     "batch": null,
@@ -3303,7 +3303,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The request method to use.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "head",
@@ -3627,18 +3626,18 @@
       "optionsDataSource": null,
       "controlType": "INTEGER"
     } ],
+    "sampleOutput": null,
     "title": "HEAD",
-    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
+    "perform": { },
     "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": {
-    "authorizationRequired": false,
     "authorizations": [ {
       "detectOn": null,
       "description": null,
@@ -3712,16 +3711,16 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
       "clientSecret": null,
+      "tokenUrl": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "pkce": null,
+      "refresh": null,
+      "scopes": null,
+      "apply": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3749,16 +3748,16 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
       "clientSecret": null,
+      "tokenUrl": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "pkce": null,
+      "refresh": null,
+      "scopes": null,
+      "apply": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3804,16 +3803,16 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
       "clientSecret": null,
+      "tokenUrl": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "pkce": null,
+      "refresh": null,
+      "scopes": null,
+      "apply": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3859,16 +3858,16 @@
       "title": "Digest Auth",
       "type": "DIGEST_AUTH",
       "acquire": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
       "clientSecret": null,
+      "tokenUrl": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "pkce": null,
+      "refresh": null,
+      "scopes": null,
+      "apply": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3986,16 +3985,16 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
       "clientSecret": null,
+      "tokenUrl": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "pkce": null,
+      "refresh": null,
+      "scopes": null,
+      "apply": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4095,16 +4094,16 @@
       "title": "OAuth2 Implicit Code",
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
       "clientSecret": null,
+      "tokenUrl": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "pkce": null,
+      "refresh": null,
+      "scopes": null,
+      "apply": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4204,18 +4203,17 @@
       "title": "OAuth2 Client Credentials",
       "type": "OAUTH2_CLIENT_CREDENTIALS",
       "acquire": null,
-      "apply": null,
-      "pkce": null,
-      "refresh": null,
-      "scopes": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
       "clientSecret": null,
+      "tokenUrl": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "pkce": null,
+      "refresh": null,
+      "scopes": null,
+      "apply": null
     } ],
-    "baseUri": null,
     "componentName": "httpClient",
     "componentDescription": "Makes an HTTP request and returns the response data.",
     "componentTitle": "HTTP Client",
@@ -4239,6 +4237,8 @@
       "optionsDataSource": null
     } ],
     "version": 1,
+    "authorizationRequired": false,
+    "baseUri": null,
     "test": null
   },
   "customAction": null,
@@ -4246,11 +4246,11 @@
   "description": "Makes an HTTP request and returns the response data.",
   "icon": "path:assets/httpclient.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "httpClient",
   "resources": null,
   "version": 1,
   "title": "HTTP Client",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

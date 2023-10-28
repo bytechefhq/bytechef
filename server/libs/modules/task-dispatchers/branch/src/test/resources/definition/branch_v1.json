@@ -107,12 +107,12 @@
           "options": null,
           "properties": null,
           "optionsDataSource": null,
-          "controlType": "EXPRESSION"
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": null,
         "options": null,
         "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "ARRAY_BUILDER"
       } ],
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
@@ -120,7 +120,7 @@
     "multipleValues": null,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": "ARRAY_BUILDER"
   }, {
     "advancedOption": null,
     "description": "The list of tasks to execute if the result of expression does not match any of 'key' values.",
@@ -155,12 +155,12 @@
       "options": null,
       "properties": null,
       "optionsDataSource": null,
-      "controlType": "EXPRESSION"
+      "controlType": "OBJECT_BUILDER"
     } ],
     "multipleValues": null,
     "options": null,
     "optionsDataSource": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": "ARRAY_BUILDER"
   } ],
   "title": "Branch",
   "version": 1,

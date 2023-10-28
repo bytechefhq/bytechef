@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Converts the JSON string to object/array.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "parse",
@@ -30,14 +29,15 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Convert from JSON string",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "objectHelper",
@@ -46,7 +46,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Writes the object/array to a JSON string.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "stringify",
@@ -77,8 +76,8 @@
         "name": "Array",
         "value": 2
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The data to convert to JSON string.",
@@ -98,8 +97,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The data to convert to JSON string.",
@@ -117,11 +116,12 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Convert to JSON string",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -143,7 +143,7 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,
@@ -152,11 +152,11 @@
   "description": "Object Helper allows you to do various operations on objects.",
   "icon": "path:assets/objecthelper.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "objectHelper",
   "resources": null,
   "version": 1,
   "title": "Object Helper",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

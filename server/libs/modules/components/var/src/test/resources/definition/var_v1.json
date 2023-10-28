@@ -77,8 +77,8 @@
         "name": "Time",
         "value": 10
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -96,8 +96,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -139,8 +139,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE"
+      "controlType": "DATE",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -156,8 +156,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE_TIME"
+      "controlType": "DATE_TIME",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -175,8 +175,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -210,8 +210,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -231,8 +231,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Value of any type to set.",
@@ -266,8 +266,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "TIME"
+      "controlType": "TIME",
+      "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Set value",

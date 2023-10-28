@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Reads data from a ODS file.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "read",
@@ -103,7 +102,7 @@
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
-      "controlType": "EXPRESSION"
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "The first row of the file contains the header names.",
@@ -239,8 +238,9 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Read from file",
-    "perform": { },
+    "editorDescriptionDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -259,11 +259,11 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "odsFile",
@@ -272,7 +272,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Writes the data to a ODS file.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "write",
@@ -322,7 +321,7 @@
           "multipleValues": null,
           "options": null,
           "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -504,7 +503,7 @@
       "multipleValues": null,
       "options": null,
       "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.ods\" will be used.",
@@ -542,8 +541,9 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Write to file",
-    "perform": { },
+    "editorDescriptionDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -636,11 +636,11 @@
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
-      "controlType": "EXPRESSION"
+      "controlType": "OBJECT_BUILDER"
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "perform": { }
   } ],
   "category": null,
   "connection": null,
@@ -649,11 +649,11 @@
   "description": "Reads and writes data from a ODS file.",
   "icon": "path:assets/odsfile.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "odsFile",
   "resources": null,
   "version": 1,
   "title": "ODS File",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

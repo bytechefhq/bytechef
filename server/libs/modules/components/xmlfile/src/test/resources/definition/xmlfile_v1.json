@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Reads data from a XML file.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "read",
@@ -102,7 +101,7 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
+      "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -187,14 +186,15 @@
       "controlType": "INTEGER",
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Read from file",
     "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "xmlFile",
@@ -203,7 +203,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Writes the data to a XML file.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "write",
@@ -274,7 +273,7 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": true,
@@ -295,8 +294,10 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Write to file",
     "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -388,12 +389,11 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
+      "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": null,
@@ -402,11 +402,11 @@
   "description": "Reads and writes data from a XML file.",
   "icon": "path:assets/xmlfile.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "xmlFile",
   "resources": null,
   "version": 1,
   "title": "XML File",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

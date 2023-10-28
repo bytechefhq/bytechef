@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": null,
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "readFile",
@@ -30,7 +29,10 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Read from file",
+    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -122,13 +124,11 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
+      "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -137,7 +137,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": null,
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "writeFile",
@@ -232,7 +231,7 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "EXPRESSION",
+      "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -253,7 +252,10 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Write to file",
+    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -296,9 +298,7 @@
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -307,17 +307,17 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Creates a temporary directory on the filesystem.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "createTempDir",
     "properties": null,
+    "sampleOutput": null,
     "title": "Create Temp Directory",
+    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -326,7 +326,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory separator.",
-    "sampleOutput": "/data",
     "help": null,
     "metadata": null,
     "name": "getFilePath",
@@ -349,7 +348,10 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": "/data",
     "title": "File Path",
+    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -370,9 +372,7 @@
       "optionsDataSource": null
     },
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -381,7 +381,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Lists a content of directory for the given path.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "ls",
@@ -430,12 +429,13 @@
       } ],
       "controlType": "CHECKBOX"
     } ],
+    "sampleOutput": null,
     "title": "List",
+    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -444,7 +444,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Creates a directory.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "mkdir",
@@ -467,12 +466,13 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Create",
+    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -481,7 +481,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Removes the content of a directory.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "rm",
@@ -504,12 +503,13 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Remove",
+    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": null,
@@ -518,11 +518,11 @@
   "description": "Allows multiple operations over files on the filesystem.",
   "icon": "path:assets/filesystem.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "filesystem",
   "resources": null,
   "version": 1,
   "title": "Filesystem",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

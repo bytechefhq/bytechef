@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Converts the XML string to object/array.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "parse",
@@ -30,8 +29,8 @@
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Convert from XML string",
-    "editorDescriptionDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -56,7 +55,8 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "perform": { },
+    "editorDescriptionDataSource": null
   }, {
     "batch": null,
     "componentName": "xmlHelper",
@@ -65,7 +65,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Writes the object/array to a XML string.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "stringify",
@@ -136,11 +135,11 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "OBJECT_BUILDER",
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Convert to XML string",
-    "editorDescriptionDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -162,7 +161,8 @@
     },
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { }
+    "perform": { },
+    "editorDescriptionDataSource": null
   } ],
   "category": null,
   "connection": null,
@@ -171,11 +171,11 @@
   "description": "Converts between XML string and object/array.",
   "icon": "path:assets/xmlhelper.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "xmlHelper",
   "resources": null,
   "version": 1,
   "title": "XML Helper",
-  "triggers": null
+  "triggers": null,
+  "filterCompatibleConnections": null
 }

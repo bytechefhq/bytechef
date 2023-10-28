@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Adds a record into an Airtable table.",
-    "sampleOutput": null,
     "help": null,
     "metadata": {
       "path": "/{baseId}/{tableId}",
@@ -81,6 +80,7 @@
         "properties": { }
       }
     } ],
+    "sampleOutput": null,
     "title": "Creates a record",
     "editorDescriptionDataSource": null,
     "outputSchema": {
@@ -151,7 +151,7 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "OBJECT_BUILDER",
+          "controlType": "ARRAY_BUILDER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -340,7 +340,6 @@
   } ],
   "category": null,
   "connection": {
-    "authorizationRequired": null,
     "authorizations": [ {
       "detectOn": null,
       "description": null,
@@ -379,12 +378,13 @@
       "refresh": null,
       "scopes": null
     } ],
-    "baseUri": { },
     "componentName": "airtable",
     "componentDescription": "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way.",
     "componentTitle": "Airtable",
     "properties": null,
     "version": 1,
+    "authorizationRequired": null,
+    "baseUri": { },
     "test": null
   },
   "customAction": true,
@@ -392,7 +392,6 @@
   "description": "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way.",
   "icon": "path:assets/airtable.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
   "metadata": null,
   "name": "airtable",
   "resources": null,
@@ -403,19 +402,11 @@
     "componentName": "airtable",
     "componentDescription": "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way.",
     "componentTitle": "Airtable",
-    "deduplicate": null,
     "componentVersion": 1,
     "deprecated": null,
     "description": "Trigger off when a new entry is added to the table that you have selected.",
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
     "help": null,
-    "listenerEnable": null,
-    "listenerDisable": null,
     "name": "newRecord",
-    "poll": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The base id.",
@@ -476,12 +467,21 @@
     "title": "New Record",
     "type": "POLLING",
     "webhookRawBody": null,
-    "webhookValidate": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
     "editorDescriptionDataSource": null,
+    "deduplicate": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "webhookValidate": null,
     "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
-  } ]
+    "sampleOutputDataSource": null,
+    "poll": { }
+  } ],
+  "filterCompatibleConnections": null
 }
