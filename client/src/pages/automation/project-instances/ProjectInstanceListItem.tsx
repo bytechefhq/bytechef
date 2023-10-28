@@ -150,30 +150,28 @@ const ProjectInstanceListItem = ({
                         </div>
 
                         <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                            {projectInstance.lastExecutionDate ? (
-                                <>
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <div className="flex text-sm text-gray-500">
-                                                <CalendarIcon
-                                                    className="mr-1 h-5 w-5 shrink-0 text-gray-400"
-                                                    aria-hidden="true"
-                                                />
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    {projectInstance.lastExecutionDate ? (
+                                        <div className="flex text-sm text-gray-500">
+                                            <CalendarIcon
+                                                className="mr-1 h-5 w-5 shrink-0 text-gray-400"
+                                                aria-hidden="true"
+                                            />
 
-                                                <span>
-                                                    {`${projectInstance.lastExecutionDate?.toLocaleDateString()} ${projectInstance.lastExecutionDate?.toLocaleTimeString()}`}
-                                                </span>
-                                            </div>
-                                        </TooltipTrigger>
+                                            <span>
+                                                {`${projectInstance.lastExecutionDate?.toLocaleDateString()} ${projectInstance.lastExecutionDate?.toLocaleTimeString()}`}
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        '-'
+                                    )}
+                                </TooltipTrigger>
 
-                                        <TooltipContent>
-                                            Last Execution Date
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </>
-                            ) : (
-                                '-'
-                            )}
+                                <TooltipContent>
+                                    Last Execution Date
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
                     </div>
                 </div>
