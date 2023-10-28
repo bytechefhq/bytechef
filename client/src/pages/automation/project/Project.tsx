@@ -257,16 +257,18 @@ const Project = () => {
                                         Edit
                                     </DropdownMenuItem>
 
-                                    <DropdownMenuItem
-                                        className="text-xs"
-                                        onClick={() =>
-                                            duplicateProjectMutation.mutate(
-                                                project?.id!
-                                            )
-                                        }
-                                    >
-                                        Duplicate
-                                    </DropdownMenuItem>
+                                    {project && (
+                                        <DropdownMenuItem
+                                            className="text-xs"
+                                            onClick={() =>
+                                                duplicateProjectMutation.mutate(
+                                                    project.id!
+                                                )
+                                            }
+                                        >
+                                            Duplicate
+                                        </DropdownMenuItem>
+                                    )}
 
                                     <DropdownMenuSeparator />
 
@@ -345,20 +347,22 @@ const Project = () => {
                                         Edit
                                     </DropdownMenuItem>
 
-                                    <DropdownMenuItem
-                                        className="text-xs"
-                                        onClick={() =>
-                                            duplicateWorkflowMutationMutation.mutate(
-                                                {
-                                                    id: project?.id!,
-                                                    workflowId:
-                                                        currentWorkflow?.id!,
-                                                }
-                                            )
-                                        }
-                                    >
-                                        Duplicate
-                                    </DropdownMenuItem>
+                                    {project && currentWorkflow && (
+                                        <DropdownMenuItem
+                                            className="text-xs"
+                                            onClick={() =>
+                                                duplicateWorkflowMutationMutation.mutate(
+                                                    {
+                                                        id: project.id!,
+                                                        workflowId:
+                                                            currentWorkflow.id!,
+                                                    }
+                                                )
+                                            }
+                                        >
+                                            Duplicate
+                                        </DropdownMenuItem>
+                                    )}
 
                                     <DropdownMenuSeparator />
 
@@ -431,7 +435,11 @@ const Project = () => {
                                     <Button
                                         className="mr-4"
                                         disabled={!!project?.publishedDate}
-                                        onClick={() => publishProjectMutation.mutate({id: +projectId!})}
+                                        onClick={() =>
+                                            publishProjectMutation.mutate({
+                                                id: +projectId!,
+                                            })
+                                        }
                                     >
                                         {!project?.publishedDate && (
                                             <CircleDotDashedIcon className="mr-1 h-5" />
@@ -534,7 +542,7 @@ const Project = () => {
                             </AlertDialogContent>
                         </AlertDialog>
 
-                        {showEditProjectDialog && (
+                        {showEditProjectDialog && project && (
                             <ProjectDialog
                                 project={project}
                                 showTrigger={false}
@@ -543,7 +551,7 @@ const Project = () => {
                                     setShowEditProjectDialog(false);
 
                                     queryClient.invalidateQueries(
-                                        ProjectKeys.project(project?.id!)
+                                        ProjectKeys.project(project.id!)
                                     );
                                 }}
                             />

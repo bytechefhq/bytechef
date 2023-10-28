@@ -21,17 +21,21 @@ import {
 } from 'middleware/helios/configuration';
 
 export const ProjectKeys = {
-    project: (id: number) => [...ProjectKeys.projects, id],
-    projectCategories: ['projectCategories'] as const,
     filteredProjectInstances: (filters: {
         projectId?: number;
         tagId?: number;
     }) => [...ProjectKeys.projectInstances, filters],
-    projectInstanceTags: ['projectInstanceTags'] as const,
-    projectInstances: ['projectInstances'] as const,
     filteredProjects: (
         filters: {categoryId?: number; tagId?: number} | undefined
     ) => [...ProjectKeys.projects, filters],
+    filteredWorkflowExecutions: (request: GetExecutionsRequest) => [
+        'workflowExecutions',
+        request,
+    ],
+    project: (id: number) => [...ProjectKeys.projects, id],
+    projectCategories: ['projectCategories'] as const,
+    projectInstanceTags: ['projectInstanceTags'] as const,
+    projectInstances: ['projectInstances'] as const,
     projectTags: ['projectTags'] as const,
     projectWorkflows: (id: number) => [
         ...ProjectKeys.projects,
@@ -39,14 +43,7 @@ export const ProjectKeys = {
         'projectWorkflows',
     ],
     projects: ['projects'] as const,
-    workflowExecution: (id: number) => [
-        'workflowExecutions',
-        id,
-    ],
-    filteredWorkflowExecutions: (request: GetExecutionsRequest) => [
-        'workflowExecutions',
-        request,
-    ],
+    workflowExecution: (id: number) => ['workflowExecutions', id],
 };
 
 export const WorkflowKeys = {
@@ -103,8 +100,9 @@ export const useGetProjectWorkflowsQuery = (id: number) =>
     );
 
 export const useGetExecutionsQuery = (request: GetExecutionsRequest) =>
-    useQuery<PageModel, Error>(ProjectKeys.filteredWorkflowExecutions(request), () =>
-        new WorkflowExecutionApi().getExecutions(request)
+    useQuery<PageModel, Error>(
+        ProjectKeys.filteredWorkflowExecutions(request),
+        () => new WorkflowExecutionApi().getExecutions(request)
     );
 
 export const useGetWorkflowExecutionQuery = (

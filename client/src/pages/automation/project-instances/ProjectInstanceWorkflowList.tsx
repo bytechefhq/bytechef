@@ -75,32 +75,36 @@ const ProjectInstanceWorkflowList = ({
                             (projectInstanceWorkflow) =>
                                 projectInstanceWorkflow.workflowId ===
                                 workflow?.id
-                        )!;
+                        );
 
                     return (
                         <li
                             key={workflow.id}
                             className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
                         >
-                            <ProjectInstanceWorkflowListItem
-                                key={workflow.id}
-                                filteredDefinitionNames={
-                                    filteredDefinitionNames
-                                }
-                                projectId={projectId}
-                                projectInstanceEnabled={projectInstanceEnabled}
-                                projectInstanceId={projectInstanceId}
-                                projectInstanceWorkflow={
-                                    projectInstanceWorkflow
-                                }
-                                workflow={workflow}
-                                workflowComponentDefinitions={
-                                    workflowComponentDefinitions
-                                }
-                                workflowTaskDispatcherDefinitions={
-                                    workflowTaskDispatcherDefinitions
-                                }
-                            />
+                            {projectInstanceWorkflow && (
+                                <ProjectInstanceWorkflowListItem
+                                    key={workflow.id}
+                                    filteredDefinitionNames={
+                                        filteredDefinitionNames
+                                    }
+                                    projectId={projectId}
+                                    projectInstanceEnabled={
+                                        projectInstanceEnabled
+                                    }
+                                    projectInstanceId={projectInstanceId}
+                                    projectInstanceWorkflow={
+                                        projectInstanceWorkflow
+                                    }
+                                    workflow={workflow}
+                                    workflowComponentDefinitions={
+                                        workflowComponentDefinitions
+                                    }
+                                    workflowTaskDispatcherDefinitions={
+                                        workflowTaskDispatcherDefinitions
+                                    }
+                                />
+                            )}
                         </li>
                     );
                 })}
