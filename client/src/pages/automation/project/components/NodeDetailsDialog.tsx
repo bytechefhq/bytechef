@@ -439,7 +439,10 @@ const NodeDetailsDialog = ({
                                             <InfoCircledIcon className="h-4 w-4" />
                                         </TooltipTrigger>
 
-                                        <TooltipContent>
+                                        <TooltipContent
+                                            className="max-w-md"
+                                            side="bottom"
+                                        >
                                             {currentComponent?.description}
                                         </TooltipContent>
                                     </Tooltip>

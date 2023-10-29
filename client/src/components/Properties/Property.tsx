@@ -174,7 +174,7 @@ const Property = ({
                                             <QuestionMarkCircledIcon className="ml-1" />
                                         </TooltipTrigger>
 
-                                        <TooltipContent>
+                                        <TooltipContent className="max-w-md">
                                             {description}
                                         </TooltipContent>
                                     </Tooltip>
