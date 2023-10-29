@@ -65,7 +65,7 @@ const MentionsInput = ({
     name,
     onChange,
     onKeyPress,
-    placeholder = "Mention datapills using '{'",
+    placeholder = "Show data pills using '{'",
     singleMention,
 }: MentionsInputProps) => {
     const [value, setValue] = useState('');

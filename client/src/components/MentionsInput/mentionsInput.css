@@ -40,15 +40,14 @@
     @apply px-2 py-1;
     @apply text-sm;
     @apply bg-white;
-    @apply rounded-md;
+    @apply rounded-full;
     @apply cursor-pointer;
-    @apply border-2 border-transparent;
+    @apply border border-transparent;
     @apply flex;
-    @apply hover:border-gray-400;
 }
 
 .ql-mention-list-item.selected {
-    @apply border-gray-400;
+    @apply bg-gray-200;
 }
 
 .ql-mention-list-item div {
@@ -61,21 +60,23 @@
     @apply h-4 w-4;
 }
 
-.bytechef-mention {
+.property-mention {
     @apply inline-flex;
     @apply items-center;
+    @apply h-[24px];
 }
 
-.bytechef-mention > span {
+.property-mention > span {
     @apply inline-flex;
     @apply items-center;
     @apply border;
     @apply bg-gray-100;
+    @apply hover:bg-gray-100;
     @apply px-2;
     @apply rounded-full;
 }
 
-.bytechef-mention svg {
+.property-mention svg {
     @apply mr-1;
     @apply h-4 w-4;
 }
