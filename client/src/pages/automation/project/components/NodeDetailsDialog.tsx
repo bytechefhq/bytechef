@@ -425,8 +425,8 @@ const NodeDetailsDialog = ({
                     onInteractOutside={(event) => event.preventDefault()}
                 >
                     {currentComponent ? (
-                        <div className="flex h-full flex-col divide-y divide-gray-100 bg-white shadow-xl">
-                            <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium text-gray-900">
+                        <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
+                            <Dialog.Title className="flex items-center p-4 text-lg font-medium text-gray-900">
                                 {currentNode.label}
 
                                 <span className="mx-2 text-sm text-gray-500">
@@ -496,7 +496,7 @@ const NodeDetailsDialog = ({
                                         </div>
                                     )}
 
-                                <div className="relative h-full">
+                                <div className="relative h-full overflow-y-scroll">
                                     <div className="absolute left-0 top-0 h-full w-full">
                                         {activeTab === 'description' && (
                                             <DescriptionTab
@@ -526,7 +526,7 @@ const NodeDetailsDialog = ({
                                                     currentComponentData={
                                                         currentComponentData
                                                     }
-                                                    customClassName="p-4 overflow-y-auto relative"
+                                                    customClassName="p-4"
                                                     dataPills={dataPills}
                                                     properties={
                                                         currentActionProperties
