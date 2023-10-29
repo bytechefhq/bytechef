@@ -7,39 +7,43 @@ import {PropertyType} from 'types/projectTypes';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 
 const DataPill = ({
+    arrayIndex,
     component,
     componentAlias,
     parentProperty,
     property,
 }: {
+    arrayIndex?: number;
     component: ComponentDefinitionModel;
     componentAlias: string;
     onClick?: (event: MouseEvent<HTMLDivElement>) => void;
     parentProperty?: PropertyType;
     property: PropertyType;
 }) => {
-    const {focusedInput} = useNodeDetailsDialogStore();
-
     const subProperties = property.properties || property.items;
+
+    const {focusedInput} = useNodeDetailsDialogStore();
 
     const mentionInput = focusedInput?.getEditor().getModule('mention');
 
     const addDataPillToInput = (
-        dataPill: PropertyType,
-        parentProperty?: PropertyType
+        property: PropertyType,
+        parentProperty?: PropertyType,
+        arrayIndex?: number
     ) => {
-        const parentPropertyLabel =
-            parentProperty?.label || parentProperty?.name;
+        const parentPropertyName = parentProperty?.name;
 
-        const dataPillLabel = parentPropertyLabel
-            ? `${parentPropertyLabel}/${dataPill.label || dataPill.name}`
-            : `${dataPill.label || dataPill.name}`;
+        const dataPillName = parentPropertyName
+            ? `${parentPropertyName}/${
+                  property.name ? property.name : `[${arrayIndex}]`
+              }`
+            : `${property.name}`;
 
         mentionInput.insertItem(
             {
                 componentIcon: component.icon,
-                id: dataPill.name,
-                value: dataPillLabel,
+                id: property.name,
+                value: dataPillName,
             },
             true,
             {blotName: 'property-mention'}
@@ -51,46 +55,42 @@ const DataPill = ({
             className={twMerge(
                 'mr-auto',
                 subProperties &&
-                    'flex-col space-y-2 border-0 bg-transparent p-0 hover:cursor-default hover:bg-transparent'
+                    'flex flex-col space-y-2 border-0 bg-transparent p-0 hover:cursor-default hover:bg-transparent'
             )}
         >
+            <div
+                className="mr-auto flex cursor-pointer items-center rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50"
+                data-name={property.name}
+                draggable
+                onDragStart={(event) =>
+                    event.dataTransfer.setData('name', property.name!)
+                }
+                onClick={() =>
+                    addDataPillToInput(property, parentProperty, arrayIndex)
+                }
+            >
+                <span className="mr-2" title={property.type}>
+                    {TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}
+                </span>
+
+                {property.name ? property.name : `[${arrayIndex}]`}
+            </div>
+
             {subProperties?.length ? (
-                <fieldset className="flex flex-col rounded-lg border-2 border-gray-400 px-2 pb-2">
-                    <legend className="px-2 pb-2 text-sm font-semibold uppercase text-gray-500">
-                        {property.label || property.name}
-                    </legend>
-
-                    <ul className="flex flex-col space-y-2">
-                        {subProperties?.map((subProperty, index) => (
-                            <DataPill
-                                component={component}
-                                componentAlias={componentAlias}
-                                key={`${componentAlias}-${subProperty.name}-${index}`}
-                                onClick={() =>
-                                    addDataPillToInput(subProperty, property)
-                                }
-                                property={subProperty}
-                                parentProperty={property}
-                            />
-                        ))}
-                    </ul>
-                </fieldset>
+                <ul className="mt-2 flex flex-col space-y-2 border-l border-gray-200 pl-4">
+                    {subProperties?.map((subProperty, index) => (
+                        <DataPill
+                            arrayIndex={index}
+                            component={component}
+                            componentAlias={componentAlias}
+                            key={`${componentAlias}-${subProperty.name}-${index}`}
+                            property={subProperty}
+                            parentProperty={property}
+                        />
+                    ))}
+                </ul>
             ) : (
-                <div
-                    className="mr-auto flex cursor-pointer items-center rounded-full border border-gray-300 bg-white px-2 py-1 text-sm hover:bg-gray-50"
-                    data-name={property.name}
-                    draggable
-                    onDragStart={(event) =>
-                        event.dataTransfer.setData('name', property.name!)
-                    }
-                    onClick={() => addDataPillToInput(property, parentProperty)}
-                >
-                    <span className="mr-2" title={property.type}>
-                        {TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}
-                    </span>
-
-                    {property.label}
-                </div>
+                ''
             )}
         </li>
     );
