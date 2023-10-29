@@ -232,11 +232,10 @@ const NodeDetailsDialog = ({
 
     const nodeTabs = TABS.filter(({name}) => {
         if (name === 'connection') {
-            const componentHasConnection =
+            return (
                 currentComponent?.name &&
-                componentDefinitionNames?.includes(currentComponent.name);
-
-            return componentHasConnection;
+                componentDefinitionNames?.includes(currentComponent.name)
+            );
         }
 
         if (name === 'output') {
