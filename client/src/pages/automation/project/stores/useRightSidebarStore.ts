@@ -17,7 +17,7 @@ const useRightSidebarStore = create<RightSidebarState>()(
                     })),
             }),
             {
-                name: 'right-sidebar-open',
+                name: 'right-sidebar',
             }
         )
     )

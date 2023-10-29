@@ -1,5 +1,5 @@
 import {Switch} from '@/components/ui/switch';
-import {useWorkflowsEnabledStateStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStateStore';
+import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
 import {PropertyType} from '@/types/projectTypes';
 import Button from 'components/Button/Button';
 import Input from 'components/Input/Input';
@@ -35,13 +35,12 @@ export const ProjectInstanceDialogWorkflowListItem = ({
     workflowIndex,
 }: ProjectInstanceDialogWorkflowListItemProps) => {
     const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-    const [setWorkflowEnabled, workflowEnabledMap] =
-        useWorkflowsEnabledStateStore(
-            useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [
-                setWorkflowEnabled,
-                workflowEnabledMap,
-            ])
-        );
+    const [setWorkflowEnabled, workflowEnabledMap] = useWorkflowsEnabledStore(
+        useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [
+            setWorkflowEnabled,
+            workflowEnabledMap,
+        ])
+    );
 
     let connections: WorkflowConnectionModel[] = [];
 

@@ -6,7 +6,7 @@ export interface WorkflowsEnabledState {
     setWorkflowEnabled: (workflowId: string, enabled: boolean) => void;
 }
 
-export const useWorkflowsEnabledStateStore = create<WorkflowsEnabledState>()(
+export const useWorkflowsEnabledStore = create<WorkflowsEnabledState>()(
     devtools(
         (set) => ({
             setWorkflowEnabled: (workflowId, enabled) =>
@@ -18,7 +18,7 @@ export const useWorkflowsEnabledStateStore = create<WorkflowsEnabledState>()(
             workflowEnabledMap: new Map<string, boolean>(),
         }),
         {
-            name: 'workflow-enabled',
+            name: 'workflows-enabled',
         }
     )
 );
