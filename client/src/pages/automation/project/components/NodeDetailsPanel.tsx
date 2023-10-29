@@ -551,7 +551,7 @@ const NodeDetailsPanel = ({
                                 </div>
                             </div>
 
-                            <footer className="z-50 mt-auto flex bg-white p-4">
+                            <footer className="z-50 mt-auto flex bg-white px-4 py-2">
                                 <Select
                                     defaultValue={currentComponent.version.toString()}
                                     name="componentVersionSelect"
