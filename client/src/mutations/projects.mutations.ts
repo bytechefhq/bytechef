@@ -1,6 +1,8 @@
 import {useMutation} from '@tanstack/react-query';
 import {
     CreateProjectWorkflowRequest,
+    DeleteProjectWorkflowRequest,
+    DuplicateWorkflowRequest,
     EnableProjectInstanceRequest,
     EnableProjectInstanceWorkflowRequest,
     ProjectApi,
@@ -10,6 +12,7 @@ import {
     ProjectInstanceWorkflowModel,
     ProjectModel,
     ProjectTagApi,
+    PublishProjectRequest,
     UpdateProjectInstanceTagsRequest,
     UpdateProjectTagsRequest,
     UpdateWorkflowRequest,
@@ -110,6 +113,22 @@ export const useDeleteProjectInstanceMutation = (
         onSuccess: mutationProps?.onSuccess,
     });
 
+type DeleteWorkflowMutationProps = {
+    onSuccess?: (result: void, variables: DeleteProjectWorkflowRequest) => void;
+    onError?: (error: object, variables: DeleteProjectWorkflowRequest) => void;
+};
+
+export const useDeleteWorkflowMutation = (
+    mutationProps?: DeleteWorkflowMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: DeleteProjectWorkflowRequest) => {
+            return new WorkflowApi().deleteProjectWorkflow(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
 type DuplicateProjectMutationProps = {
     onSuccess?: (result: ProjectModel, variables: number) => void;
     onError?: (error: object, variables: number) => void;
@@ -123,6 +142,25 @@ export const useDuplicateProjectMutation = (
             return new ProjectApi().duplicateProject({
                 id: id,
             });
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+type DuplicateWorkflowMutationProps = {
+    onSuccess?: (
+        result: WorkflowModel,
+        variables: DuplicateWorkflowRequest
+    ) => void;
+    onError?: (error: object, variables: DuplicateWorkflowRequest) => void;
+};
+
+export const useDuplicateWorkflowMutation = (
+    mutationProps?: DuplicateWorkflowMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: DuplicateWorkflowRequest) => {
+            return new WorkflowApi().duplicateWorkflow(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
@@ -163,6 +201,25 @@ export const useEnableProjectInstanceWorkflowMutation = (
             return new ProjectInstanceApi().enableProjectInstanceWorkflow(
                 request
             );
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+type PublishProjectMutationProps = {
+    onSuccess?: (
+        result: void,
+        variables: PublishProjectRequest
+    ) => void;
+    onError?: (error: object, variables: PublishProjectRequest) => void;
+};
+
+export const usePublishProjectMutation = (
+    mutationProps?: PublishProjectMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: PublishProjectRequest) => {
+            return new ProjectApi().publishProject(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

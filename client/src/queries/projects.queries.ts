@@ -21,15 +21,15 @@ import {
 } from 'middleware/helios/configuration';
 
 export const ProjectKeys = {
-    project: (id: number) => ['project', id],
+    project: (id: number) => [...ProjectKeys.projects, id],
     projectCategories: ['projectCategories'] as const,
-    projectInstanceList: (filters: {projectId?: number; tagId?: number}) => [
-        ...ProjectKeys.projectInstances,
-        filters,
-    ],
+    filteredProjectInstances: (filters: {
+        projectId?: number;
+        tagId?: number;
+    }) => [...ProjectKeys.projectInstances, filters],
     projectInstanceTags: ['projectInstanceTags'] as const,
     projectInstances: ['projectInstances'] as const,
-    projectList: (
+    filteredProjects: (
         filters: {categoryId?: number; tagId?: number} | undefined
     ) => [...ProjectKeys.projects, filters],
     projectTags: ['projectTags'] as const,
@@ -39,13 +39,13 @@ export const ProjectKeys = {
         'projectWorkflows',
     ],
     projects: ['projects'] as const,
-    workflowExecution: (request: GetExecutionRequest) => [
-        'workflowExecution',
-        request,
-    ],
-    workflowExecutions: (filter: GetExecutionsRequest) => [
+    workflowExecution: (id: number) => [
         'workflowExecutions',
-        filter,
+        id,
+    ],
+    filteredWorkflowExecutions: (request: GetExecutionsRequest) => [
+        'workflowExecutions',
+        request,
     ],
 };
 
@@ -64,7 +64,7 @@ export const useGetProjectInstancesQuery = (filters: {
     tagId?: number;
 }) =>
     useQuery<ProjectInstanceModel[], Error>(
-        ProjectKeys.projectInstanceList(filters),
+        ProjectKeys.filteredProjectInstances(filters),
         () => new ProjectInstanceApi().getProjectInstances(filters)
     );
 
@@ -93,7 +93,7 @@ export const useGetProjectsQuery = (filters?: {
     tagId?: number;
     published?: boolean;
 }) =>
-    useQuery<ProjectModel[], Error>(ProjectKeys.projectList(filters), () =>
+    useQuery<ProjectModel[], Error>(ProjectKeys.filteredProjects(filters), () =>
         new ProjectApi().getProjects(filters)
     );
 
@@ -103,7 +103,7 @@ export const useGetProjectWorkflowsQuery = (id: number) =>
     );
 
 export const useGetExecutionsQuery = (request: GetExecutionsRequest) =>
-    useQuery<PageModel, Error>(ProjectKeys.workflowExecutions(request), () =>
+    useQuery<PageModel, Error>(ProjectKeys.filteredWorkflowExecutions(request), () =>
         new WorkflowExecutionApi().getExecutions(request)
     );
 
@@ -112,7 +112,7 @@ export const useGetWorkflowExecutionQuery = (
     isEnabled: boolean
 ) =>
     useQuery<WorkflowExecutionModel, Error>(
-        ProjectKeys.workflowExecution(request),
+        ProjectKeys.workflowExecution(request.id),
         () => new WorkflowExecutionApi().getExecution(request),
         {
             enabled: isEnabled,

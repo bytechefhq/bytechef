@@ -1,3 +1,27 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {Badge} from '@/components/ui/badge';
+import {Button} from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from '@/components/ui/hover-card';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     ProjectModel,
@@ -12,18 +36,12 @@ import {
 } from '@/mutations/projects.mutations';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {AccordionTrigger} from '@radix-ui/react-accordion';
-import {ChevronDownIcon} from '@radix-ui/react-icons';
+import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 
-import AlertDialog from '../../../components/AlertDialog/AlertDialog';
-import Badge from '../../../components/Badge/Badge';
-import DropdownMenu, {
-    IDropdownMenuItem,
-} from '../../../components/DropdownMenu/DropdownMenu';
-import HoverCard from '../../../components/HoverCard/HoverCard';
 import TagList from '../../../components/TagList/TagList';
 import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 import ProjectDialog from './ProjectDialog';
@@ -74,46 +92,33 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
         },
     });
 
-    const dropdownItems: IDropdownMenuItem[] = [
-        {
-            label: 'Edit',
-            onClick: () => setShowEditDialog(true),
-        },
-        {
-            label: 'Duplicate',
-            onClick: () => duplicateProjectMutation.mutate(project.id!),
-        },
-        {
-            label: 'New Workflow',
-            onClick: () => setShowWorkflowDialog(true),
-        },
-        {
-            separator: true,
-        },
-        {
-            danger: true,
-            label: 'Delete',
-            onClick: () => setShowDeleteDialog(true),
-        },
-    ];
-
     return (
         <>
             <div className="flex items-center justify-between">
-                <AccordionTrigger className="group w-10/12">
+                <div className="w-10/12">
                     <div className="flex items-center justify-between">
                         <div className="relative flex items-center">
-                            {project.description ? (
-                                <HoverCard text={project.description}>
+                            <Link
+                                to={`/automation/projects/${project?.id}/workflow/${project?.workflowIds![0]}`}
+                            >
+                                {project.description ? (
+                                    <HoverCard>
+                                        <HoverCardTrigger asChild>
+                                            <span className="mr-2 text-base font-semibold text-gray-900">
+                                                {project.name}
+                                            </span>
+                                        </HoverCardTrigger>
+
+                                        <HoverCardContent className="w-80">
+                                            {project.description}
+                                        </HoverCardContent>
+                                    </HoverCard>
+                                ) : (
                                     <span className="mr-2 text-base font-semibold text-gray-900">
                                         {project.name}
                                     </span>
-                                </HoverCard>
-                            ) : (
-                                <span className="mr-2 text-base font-semibold text-gray-900">
-                                    {project.name}
-                                </span>
-                            )}
+                                )}
+                            </Link>
 
                             {project.category && (
                                 <span className="text-xs uppercase text-gray-700">
@@ -124,25 +129,24 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                         <div className="ml-2 flex shrink-0">
                             <Badge
-                                color={
+                                variant={
                                     project.status ===
                                     ProjectModelStatusEnum.Published
-                                        ? 'green'
-                                        : 'default'
+                                        ? 'success'
+                                        : 'secondary'
                                 }
-                                text={
-                                    project.status ===
-                                    ProjectModelStatusEnum.Published
-                                        ? `Published V${project.projectVersion}`
-                                        : 'Not Published'
-                                }
-                            />
+                            >
+                                {project.status ===
+                                ProjectModelStatusEnum.Published
+                                    ? `Published V${project.projectVersion}`
+                                    : 'Not Published'}
+                            </Badge>
                         </div>
                     </div>
 
                     <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
                         <div className="flex items-center">
-                            <div className="mr-4 flex text-xs font-semibold text-gray-700">
+                            <AccordionTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
                                 <div className="mr-1">
                                     {project.workflowIds?.length === 1
                                         ? `${project.workflowIds?.length} workflow`
@@ -150,7 +154,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                 </div>
 
                                 <ChevronDownIcon className="duration-300 group-data-[state=open]:rotate-180" />
-                            </div>
+                            </AccordionTrigger>
 
                             <div onClick={(event) => event.preventDefault()}>
                                 {project.tags && (
@@ -200,25 +204,86 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                             )}
                         </div>
                     </div>
-                </AccordionTrigger>
+                </div>
 
                 <div className="flex w-2/12 justify-end">
-                    <DropdownMenu id={project.id} menuItems={dropdownItems} />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                            </Button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                className="text-xs"
+                                onClick={() => setShowEditDialog(true)}
+                            >
+                                Edit
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                className="text-xs"
+                                onClick={() =>
+                                    duplicateProjectMutation.mutate(project.id!)
+                                }
+                            >
+                                Duplicate
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                className="text-xs"
+                                onClick={() => setShowWorkflowDialog(true)}
+                            >
+                                New Workflow
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+
+                            <DropdownMenuItem
+                                className="text-xs text-red-600"
+                                onClick={() => setShowDeleteDialog(true)}
+                            >
+                                Delete
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
 
-            <AlertDialog
-                danger
-                isOpen={showDeleteDialog}
-                message="This action cannot be undone. This will permanently delete the project and workflows it contains."
-                title="Are you absolutely sure?"
-                setIsOpen={setShowDeleteDialog}
-                onConfirmClick={() => {
-                    if (project.id) {
-                        deleteProjectMutation.mutate(project.id);
-                    }
-                }}
-            />
+            <AlertDialog open={showDeleteDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Are you absolutely sure?
+                        </AlertDialogTitle>
+
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete the project and workflows it contains..
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            onClick={() => setShowDeleteDialog(false)}
+                        >
+                            Cancel
+                        </AlertDialogCancel>
+
+                        <AlertDialogAction
+                            className="bg-red-600"
+                            onClick={() => {
+                                if (project.id) {
+                                    deleteProjectMutation.mutate(project.id);
+                                }
+                            }}
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             {showEditDialog && (
                 <ProjectDialog

@@ -62,7 +62,7 @@ const ProjectInstanceDialog = ({
         onSuccess: () => {
             queryClient.invalidateQueries(ProjectKeys.projectInstances);
             queryClient.invalidateQueries(ProjectKeys.projectInstanceTags);
-            queryClient.invalidateQueries(ProjectKeys.projectList({}));
+            queryClient.invalidateQueries(ProjectKeys.filteredProjects({}));
 
             closeDialog();
             setActiveStepIndex(0);
@@ -73,7 +73,7 @@ const ProjectInstanceDialog = ({
         onSuccess: () => {
             queryClient.invalidateQueries(ProjectKeys.projectInstances);
             queryClient.invalidateQueries(ProjectKeys.projectInstanceTags);
-            queryClient.invalidateQueries(ProjectKeys.projectList({}));
+            queryClient.invalidateQueries(ProjectKeys.filteredProjects({}));
 
             closeDialog();
             setActiveStepIndex(0);
