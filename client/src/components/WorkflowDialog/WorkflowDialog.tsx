@@ -1,8 +1,8 @@
+import {Button} from '@/components/ui/button';
 import {WorkflowModel} from '@/middleware/helios/configuration';
 import {PlusIcon} from '@heroicons/react/24/outline';
 import {Close} from '@radix-ui/react-dialog';
 import {UseMutationResult} from '@tanstack/react-query';
-import Button from 'components/Button/Button';
 import Dialog from 'components/Dialog/Dialog';
 import Input from 'components/Input/Input';
 import TextArea from 'components/TextArea/TextArea';
@@ -113,11 +113,9 @@ const WorkflowDialog = ({
             title="Create Workflow"
             customTrigger={
                 showTrigger && (
-                    <Button
-                        displayType="light"
-                        icon={<PlusIcon className="h-5 w-5" />}
-                        size="small"
-                    />
+                    <Button variant="outline" size="icon" className="bg-white">
+                        <PlusIcon className="h-5 w-5" />
+                    </Button>
                 )
             }
         >
@@ -135,19 +133,18 @@ const WorkflowDialog = ({
 
             <div className="mt-8 flex justify-end space-x-1">
                 <Close asChild>
-                    <Button
-                        displayType="lightBorder"
-                        label="Cancel"
-                        type="button"
-                    />
+                    <Button variant="outline" type="button">
+                        Cancel
+                    </Button>
                 </Close>
 
                 <Button
-                    label={isLoading ? 'Saving...' : 'Save'}
                     onClick={handleSubmit(saveWorkflow)}
                     type="submit"
                     disabled={isLoading}
-                />
+                >
+                    {isLoading ? 'Saving...' : 'Save'}
+                </Button>
             </div>
         </Dialog>
     );
