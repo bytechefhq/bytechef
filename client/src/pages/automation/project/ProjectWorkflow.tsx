@@ -27,9 +27,7 @@ const ProjectWorkflow = ({components, flowControls}: WorkflowEditorProps) => {
             />
 
             {componentDefinitions && currentNode.name && (
-                <NodeDetailsPanel
-                    componentDefinitions={componentDefinitions}
-                />
+                <NodeDetailsPanel componentDefinitions={componentDefinitions} />
             )}
 
             <DataPillPanel />
