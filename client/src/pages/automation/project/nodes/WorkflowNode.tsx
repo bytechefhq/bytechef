@@ -1,5 +1,5 @@
 import Button from 'components/Button/Button';
-import {PencilIcon, TrashIcon} from 'lucide-react';
+import {TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
 import {
     Handle,
@@ -10,13 +10,11 @@ import {
 } from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
-import EditNodeDialog from '../components/EditNodeDialog';
 import useNodeClickHandler from '../hooks/useNodeClick';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import styles from './NodeTypes.module.css';
 
 const WorkflowNode = ({data, id}: NodeProps) => {
-    const [showEditNodeDialog, setShowEditNodeDialog] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
 
     const {currentNode, nodeDetailsDialogOpen} = useNodeDetailsDialogStore();
@@ -86,15 +84,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
         >
             {!isFirstNode && !!isHovered && (
                 <div className="absolute left-[-46px] pr-4">
-                    {data.type === 'trigger' ? (
-                        <Button
-                            className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
-                            displayType="icon"
-                            icon={<PencilIcon className="h-4 w-4" />}
-                            onClick={() => setShowEditNodeDialog(true)}
-                            title="Edit a node"
-                        />
-                    ) : (
+                    {
                         <Button
                             className="bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
                             displayType="icon"
@@ -102,7 +92,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                             onClick={handleDeleteNodeClick}
                             title="Delete a node"
                         />
-                    )}
+                    }
                 </div>
             )}
 
@@ -123,13 +113,6 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
                 <span className="text-xs text-gray-500">{data.name}</span>
             </div>
-
-            {showEditNodeDialog && (
-                <EditNodeDialog
-                    onClose={() => setShowEditNodeDialog(false)}
-                    visible={showEditNodeDialog}
-                />
-            )}
 
             <Handle
                 className={twMerge('left-[36px]', styles.handle)}
