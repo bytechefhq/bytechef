@@ -558,10 +558,12 @@ const ConnectionDialog = ({
                                     placeholder="Select..."
                                     value={authorizationName}
                                     {...register('authorizationName', {
-                                        onChange: (event) =>
+                                        onChange: (event) => {
                                             setAuthorizationName(
                                                 event.target.value
-                                            ),
+                                            );
+                                            setUsePredefinedOAuthApp(false);
+                                        },
                                     })}
                                 />
                             )}
