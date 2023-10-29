@@ -58,7 +58,7 @@ type CurrentComponentType =
       } & ComponentDefinitionModel)
     | undefined;
 
-const NodeDetailsDialog = ({
+const NodeDetailsPanel = ({
     componentDefinitions,
 }: {
     componentDefinitions: Array<ComponentDefinitionBasicModel>;
@@ -576,4 +576,4 @@ const NodeDetailsDialog = ({
     );
 };
 
-export default NodeDetailsDialog;
+export default NodeDetailsPanel;
