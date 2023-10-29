@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
+const colors = require('tailwindcss/colors');
+
 module.exports = {
     content: ['./src/**/*.{js,ts,jsx,tsx}', './*.html'],
     darkMode: 'class',
@@ -18,35 +20,12 @@ module.exports = {
             },
         },
         extend: {
-            animation: {
-                'accordion-down': 'accordion-down 0.2s ease-out',
-                'accordion-up': 'accordion-up 0.2s ease-out',
-            },
             colors: {
-                accent: {
-                    DEFAULT: 'hsl(var(--accent))',
-                    foreground: 'hsl(var(--accent-foreground))',
-                },
                 background: 'hsl(var(--background))',
-                border: 'hsl(var(--border))',
-                borderRadius: {
-                    lg: 'var(--radius)',
-                    md: 'calc(var(--radius) - 2px)',
-                    sm: 'calc(var(--radius) - 4px)',
-                },
+                foreground: 'hsl(var(--foreground))',
                 card: {
                     DEFAULT: 'hsl(var(--card))',
                     foreground: 'hsl(var(--card-foreground))',
-                },
-                destructive: {
-                    DEFAULT: 'hsl(var(--destructive))',
-                    foreground: 'hsl(var(--destructive-foreground))',
-                },
-                foreground: 'hsl(var(--foreground))',
-                input: 'hsl(var(--input))',
-                muted: {
-                    DEFAULT: 'hsl(var(--muted))',
-                    foreground: 'hsl(var(--muted-foreground))',
                 },
                 popover: {
                     DEFAULT: 'hsl(var(--popover))',
@@ -56,11 +35,54 @@ module.exports = {
                     DEFAULT: 'hsl(var(--primary))',
                     foreground: 'hsl(var(--primary-foreground))',
                 },
-                ring: 'hsl(var(--ring))',
                 secondary: {
                     DEFAULT: 'hsl(var(--secondary))',
                     foreground: 'hsl(var(--secondary-foreground))',
                 },
+                muted: {
+                    DEFAULT: 'hsl(var(--muted))',
+                    foreground: 'hsl(var(--muted-foreground))',
+                },
+                accent: {
+                    DEFAULT: 'hsl(var(--accent))',
+                    foreground: 'hsl(var(--accent-foreground))',
+                },
+                info: {
+                    DEFAULT: 'hsl(var(--info))',
+                    foreground: 'hsl(var(--info-foreground))',
+                },
+                success: {
+                    DEFAULT: 'hsl(var(--success))',
+                    foreground: 'hsl(var(--success-foreground))',
+                },
+                destructive: {
+                    DEFAULT: 'hsl(var(--destructive))',
+                    foreground: 'hsl(var(--destructive-foreground))',
+                },
+                border: 'hsl(var(--border))',
+                input: 'hsl(var(--input))',
+                ring: 'hsl(var(--ring))',
+            },
+            animation: {
+                'accordion-down': 'accordion-down 0.2s ease-out',
+                'accordion-up': 'accordion-up 0.2s ease-out',
+            },
+            borderRadius: {
+                lg: 'var(--radius)',
+                md: 'calc(var(--radius) - 2px)',
+                sm: 'calc(var(--radius) - 4px)',
+            },
+            minWidth: {
+                'select-trigger-width': 'var(--radix-select-trigger-width)',
+            },
+            maxWidth: {
+                'select-trigger-width': 'var(--radix-select-trigger-width)',
+            },
+            maxHeight: {
+                'select-content-available-height':
+                    'var(--radix-select-content-available-height)',
+                'select-content-available-height-1/2':
+                    'calc(var(--radix-select-content-available-height) / 2)',
             },
             keyframes: {
                 'accordion-down': {
@@ -71,28 +93,6 @@ module.exports = {
                     from: {height: 'var(--radix-accordion-content-height)'},
                     to: {height: 0},
                 },
-            },
-            maxHeight: {
-                'select-content-available-height':
-                    'var(--radix-select-content-available-height)',
-                'select-content-available-height-1/2':
-                    'calc(var(--radix-select-content-available-height) / 2)',
-            },
-            maxWidth: {
-                'select-trigger-width': 'var(--radix-select-trigger-width)',
-                'tooltip-lg': '500px',
-                'tooltip-sm': '250px',
-            },
-            minWidth: {
-                'select-trigger-width': 'var(--radix-select-trigger-width)',
-            },
-            origin: {
-                'select-content-transform-origin':
-                    '--radix-select-content-transform-origin',
-            },
-            width: {
-                112: '30rem',
-                'select-trigger-width': 'var(--radix-select-trigger-width)',
             },
         },
     },
