@@ -10,7 +10,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
 import Input from 'components/Input/Input';
-import {useCallback, useState} from 'react';
+import {useState} from 'react';
 
 import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
@@ -23,20 +23,10 @@ export type ComponentActionData = {
 } & ActionDefinitionModel;
 
 const DataPillPanel = () => {
-    const [panelContainerHeight, setPanelContainerHeight] = useState(0);
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
-
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
     const {currentNode, nodeDetailsDialogOpen} = useNodeDetailsDialogStore();
     const {componentNames} = useWorkflowDataStore();
-
-    const panelContainerRef = useCallback(
-        (panelContainer: HTMLDivElement) =>
-            setPanelContainerHeight(
-                panelContainer?.getBoundingClientRect().height
-            ),
-        []
-    );
 
     const currentNodeIndex = componentNames.indexOf(currentNode.name);
 
@@ -118,48 +108,43 @@ const DataPillPanel = () => {
         >
             <Dialog.Portal>
                 <Dialog.Content
-                    className="fixed inset-y-2 right-[535px] top-[70px] w-screen max-w-[400px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
+                    className="fixed inset-y-2 bottom-4 right-[535px] top-[70px] z-10 w-screen max-w-[400px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
                     onInteractOutside={(event) => event.preventDefault()}
                     onOpenAutoFocus={(event) => event.preventDefault()}
                 >
-                    <div
-                        className="flex h-full flex-col bg-white shadow-xl"
-                        ref={panelContainerRef}
-                    >
-                        <header className="border-b border-gray-100 p-4">
-                            <Dialog.Title className="flex content-center items-center text-lg font-medium text-gray-900">
-                                <span>Data Pill Panel</span>
+                    <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
+                        <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium text-gray-900">
+                            <span>Data Pill Panel</span>
 
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <InfoCircledIcon className="ml-1 h-4 w-4" />
-                                    </TooltipTrigger>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <InfoCircledIcon className="ml-1 h-4 w-4" />
+                                </TooltipTrigger>
 
-                                    <TooltipContent>
-                                        To use data from the previous step drag
-                                        its datapill into a field, or click on
-                                        the datapill.
-                                    </TooltipContent>
-                                </Tooltip>
+                                <TooltipContent>
+                                    To use data from the previous step drag its
+                                    data pill into a field, or click on the data
+                                    pill.
+                                </TooltipContent>
+                            </Tooltip>
 
-                                <Button
-                                    aria-label="Close the data pill panel"
-                                    className="ml-auto pr-0"
-                                    displayType="icon"
-                                    icon={
-                                        <Cross1Icon
-                                            className="h-3 w-3 cursor-pointer text-gray-900"
-                                            aria-hidden="true"
-                                        />
-                                    }
-                                    onClick={() => setDataPillPanelOpen(false)}
-                                />
-                            </Dialog.Title>
-                        </header>
+                            <Button
+                                aria-label="Close the data pill panel"
+                                className="ml-auto pr-0"
+                                displayType="icon"
+                                icon={
+                                    <Cross1Icon
+                                        className="h-3 w-3 cursor-pointer text-gray-900"
+                                        aria-hidden="true"
+                                    />
+                                }
+                                onClick={() => setDataPillPanelOpen(false)}
+                            />
+                        </Dialog.Title>
 
-                        <main className="flex h-full w-full flex-col">
+                        <div className="flex w-full grow flex-col">
                             <Input
-                                fieldsetClassName="p-2 border-b border-gray-100 mb-0"
+                                fieldsetClassName="p-4 border-b border-gray-100 mb-0"
                                 name="dataPillFilter"
                                 onChange={(event) =>
                                     setDataPillFilterQuery(event.target.value)
@@ -172,10 +157,9 @@ const DataPillPanel = () => {
                                 componentData={
                                     dataPillComponentData as Array<ComponentActionData>
                                 }
-                                containerHeight={panelContainerHeight}
                                 dataPillFilterQuery={dataPillFilterQuery}
                             />
-                        </main>
+                        </div>
                     </div>
                 </Dialog.Content>
             </Dialog.Portal>
