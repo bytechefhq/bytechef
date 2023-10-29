@@ -622,7 +622,7 @@ const ConnectionDialog = ({
                                     render={({field}) => (
                                         <CreatableSelect
                                             field={field}
-                                            fieldsetClassName="mt-3 mb-0"
+                                            fieldsetClassName="mb-0"
                                             isMulti={true}
                                             label="Tags"
                                             options={remainingTags!.map(
