@@ -1,20 +1,9 @@
-import DropdownMenu from '@/components/DropdownMenu/DropdownMenu';
-import WorkflowDialog from '@/components/WorkflowDialog/WorkflowDialog';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
-import {useUpdateWorkflowMutation} from '@/mutations/projects.mutations';
+import ProjectWorkflowListItem from '@/pages/automation/projects/ProjectWorkflowListItem';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
-import {useQueryClient} from '@tanstack/react-query';
-import {CalendarIcon} from 'lucide-react';
-import {ProjectModel, WorkflowModel} from 'middleware/helios/configuration';
+import {ProjectModel} from 'middleware/helios/configuration';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
-import {
-    ProjectKeys,
-    useGetProjectWorkflowsQuery,
-} from 'queries/projects.queries';
-import {useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
-import {Link} from 'react-router-dom';
+import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 
 const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     const {data: workflows} = useGetProjectWorkflowsQuery(project.id!);
@@ -31,22 +20,6 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     const workflowTaskDispatcherDefinitions: {
         [key: string]: ComponentDefinitionBasicModel | undefined;
     } = {};
-
-    const [selectedWorkflow, setSelectedWorkflow] = useState<
-        WorkflowModel | undefined
-    >(undefined);
-
-    const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
-
-    const queryClient = useQueryClient();
-
-    const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projects);
-
-            setShowEditWorkflowDialog(false);
-        },
-    });
 
     return (
         <div className="border-b border-b-gray-100 py-3 pl-4">
@@ -94,123 +67,20 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                             key={workflow.id}
                             className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
                         >
-                            <div className="w-10/12">
-                                <Link
-                                    className="flex items-center"
-                                    to={`/automation/projects/${project.id}/workflow/${workflow.id}`}
-                                >
-                                    <div className="w-6/12 text-sm font-semibold">
-                                        {workflow.label}
-                                    </div>
-
-                                    <div className="ml-6 flex">
-                                        {filteredDefinitionNames?.map(
-                                            (name) => {
-                                                const componentDefinition =
-                                                    workflowComponentDefinitions[
-                                                        name
-                                                    ];
-
-                                                const taskDispatcherDefinition =
-                                                    workflowTaskDispatcherDefinitions[
-                                                        name
-                                                    ];
-
-                                                return (
-                                                    <div
-                                                        key={name}
-                                                        className="mr-0.5 flex items-center justify-center rounded-full border p-1"
-                                                    >
-                                                        <Tooltip>
-                                                            <TooltipTrigger>
-                                                                <InlineSVG
-                                                                    className="h-5 w-5 flex-none"
-                                                                    key={name}
-                                                                    src={
-                                                                        componentDefinition?.icon
-                                                                            ? componentDefinition?.icon
-                                                                            : taskDispatcherDefinition?.icon ??
-                                                                              ''
-                                                                    }
-                                                                />
-                                                            </TooltipTrigger>
-
-                                                            <TooltipContent side="right">
-                                                                {
-                                                                    componentDefinition?.title
-                                                                }
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                    </div>
-                                                );
-                                            }
-                                        )}
-                                    </div>
-
-                                    <div className="flex flex-1 justify-end">
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <div className="flex items-center text-sm text-gray-500">
-                                                    <CalendarIcon
-                                                        className="mr-1 h-4 w-4 shrink-0 text-gray-400"
-                                                        aria-hidden="true"
-                                                    />
-
-                                                    <span>{`${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}</span>
-                                                </div>
-                                            </TooltipTrigger>
-
-                                            <TooltipContent>
-                                                Last Modified Date
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </div>
-                                </Link>
-                            </div>
-
-                            <div className="flex w-2/12 justify-end">
-                                <DropdownMenu
-                                    id={project.id}
-                                    menuItems={[
-                                        {
-                                            label: 'Edit',
-                                            onClick: () => {
-                                                setSelectedWorkflow(workflow);
-
-                                                setShowEditWorkflowDialog(true);
-                                            },
-                                        },
-                                        {
-                                            label: 'Duplicate',
-                                            onClick: () => console.log('TODO'),
-                                        },
-                                        {
-                                            separator: true,
-                                        },
-                                        {
-                                            danger: true,
-                                            label: 'Delete',
-                                            onClick: () => {
-                                                console.log('TODO');
-                                            },
-                                        },
-                                    ]}
-                                />
-                            </div>
-
-                            {showEditWorkflowDialog && (
-                                <WorkflowDialog
-                                    onClose={() =>
-                                        setShowEditWorkflowDialog(false)
-                                    }
-                                    showTrigger={false}
-                                    updateWorkflowMutationMutation={
-                                        updateWorkflowMutationMutation
-                                    }
-                                    visible
-                                    workflow={selectedWorkflow!}
-                                />
-                            )}
+                            <ProjectWorkflowListItem
+                                key={workflow.id}
+                                filteredDefinitionNames={
+                                    filteredDefinitionNames
+                                }
+                                project={project}
+                                workflow={workflow}
+                                workflowComponentDefinitions={
+                                    workflowComponentDefinitions
+                                }
+                                workflowTaskDispatcherDefinitions={
+                                    workflowTaskDispatcherDefinitions
+                                }
+                            />
                         </li>
                     );
                 })}

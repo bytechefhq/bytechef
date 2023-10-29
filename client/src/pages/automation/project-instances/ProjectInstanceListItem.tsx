@@ -85,7 +85,7 @@ const ProjectInstanceListItem = ({
     return (
         <>
             <div className="flex items-center justify-between">
-                <AccordionTrigger className="group w-10/12">
+                <div className="w-10/12">
                     <div className="flex items-center justify-between">
                         <div className="flex w-full items-center justify-between">
                             {projectInstance.description ? (
@@ -119,7 +119,7 @@ const ProjectInstanceListItem = ({
 
                     <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                         <div className="flex items-center">
-                            <div className="mr-4 flex text-xs font-semibold text-gray-700">
+                            <AccordionTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
                                 <span className="mr-1">
                                     {project.workflowIds?.length === 1
                                         ? `1 workflow`
@@ -127,7 +127,7 @@ const ProjectInstanceListItem = ({
                                 </span>
 
                                 <ChevronDownIcon className="h-4 w-4 duration-300 group-data-[state=open]:rotate-180" />
-                            </div>
+                            </AccordionTrigger>
 
                             <div onClick={(event) => event.preventDefault()}>
                                 {projectInstance.tags && (
@@ -176,7 +176,7 @@ const ProjectInstanceListItem = ({
                             )}
                         </div>
                     </div>
-                </AccordionTrigger>
+                </div>
 
                 <div className="flex w-1/12 items-center justify-end">
                     <Switch

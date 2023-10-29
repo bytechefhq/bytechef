@@ -9,8 +9,9 @@ export interface IToggleItem {
 type ToggleGroupProps = {
     containerClassName?: string;
     defaultValue?: string;
-    toggleItems: IToggleItem[];
     onValueChange?(value: string): void;
+    toggleItems: IToggleItem[];
+    value?: string;
 };
 
 const ToggleGroup = ({
@@ -18,18 +19,20 @@ const ToggleGroup = ({
     defaultValue,
     onValueChange,
     toggleItems,
+    value,
 }: ToggleGroupProps) => (
     <ToggleGroupPrimitive.Root
         aria-label="Items"
-        className={twMerge('flex px-2 py-4', containerClassName)}
+        className={twMerge('flex shadow-sm', containerClassName)}
         defaultValue={defaultValue}
         type="single"
+        value={value}
         onValueChange={onValueChange}
     >
         {toggleItems.map(({label, value}) => (
             <ToggleGroupPrimitive.Item
                 aria-label={label}
-                className="border-y border-gray-100 bg-white px-2.5 py-2 first:rounded-l-md first:border-x last:rounded-r-md last:border-x-2 focus:relative focus:outline-none focus-visible:z-20 focus-visible:ring focus-visible:ring-purple-500/75 data-[state=on]:pointer-events-none data-[state=on]:bg-gray-50 [&:not(:last-child)]:border-r-transparent"
+                className="border-y border-input bg-white px-2.5 py-2 text-sm first:rounded-l-md first:border-x last:rounded-r-md last:border-x-2 focus:relative focus:outline-none focus-visible:z-20 focus-visible:ring-1 focus-visible:ring-ring data-[state=on]:pointer-events-none data-[state=on]:bg-gray-100 [&:not(:last-child)]:border-r-transparent"
                 key={`group-item-${value}-${label}`}
                 value={value}
             >

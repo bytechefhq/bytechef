@@ -8,6 +8,7 @@ import Input from 'components/Input/Input';
 import TextArea from 'components/TextArea/TextArea';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
+import {twMerge} from 'tailwind-merge';
 
 type WorkflowDialogProps = {
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -20,6 +21,7 @@ type WorkflowDialogProps = {
     onClose?: () => void;
     parentId?: number;
     showTrigger?: boolean;
+    triggerClassName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     updateWorkflowMutationMutation?: UseMutationResult<
         any,
@@ -36,6 +38,7 @@ const WorkflowDialog = ({
     onClose,
     parentId,
     showTrigger = true,
+    triggerClassName,
     updateWorkflowMutationMutation,
     visible = false,
     workflow,
@@ -113,8 +116,12 @@ const WorkflowDialog = ({
             title="Create Workflow"
             customTrigger={
                 showTrigger && (
-                    <Button variant="outline" size="icon" className="bg-white">
-                        <PlusIcon className="h-5 w-5" />
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className={twMerge('bg-white', triggerClassName)}
+                    >
+                        <PlusIcon className="mx-1 h-5 w-5" />
                     </Button>
                 )
             }
