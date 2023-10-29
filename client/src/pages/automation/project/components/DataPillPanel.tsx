@@ -1,8 +1,7 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {
-    ActionDefinitionModel,
-    ComponentDefinitionBasicModel,
-} from '@/middleware/hermes/configuration';
+import DataPillPanelBody, {
+    ComponentActionData,
+} from '@/pages/automation/project/components/DataPillPanelBody';
 import {useGetActionDefinitionsQuery} from '@/queries/actionDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {PropertyType} from '@/types/projectTypes';
@@ -15,12 +14,6 @@ import {useState} from 'react';
 import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
 import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import DataPillPanelBody from './DataPillPanelBody';
-
-export type ComponentActionData = {
-    component: ComponentDefinitionBasicModel;
-    workflowAlias: string;
-} & ActionDefinitionModel;
 
 const DataPillPanel = () => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');

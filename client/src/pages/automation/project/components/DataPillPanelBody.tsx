@@ -1,3 +1,9 @@
+import {
+    ActionDefinitionModel,
+    ComponentDefinitionBasicModel,
+} from '@/middleware/hermes/configuration';
+import DataPill from '@/pages/automation/project/components/DataPill';
+import getFilteredProperties from '@/pages/automation/project/utils/getFilteredProperties';
 import {PropertyType} from '@/types/projectTypes';
 import {
     Accordion,
@@ -8,9 +14,10 @@ import {
 import {ChevronDownIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
-import getFilteredProperties from '../utils/getFilteredProperties';
-import DataPill from './DataPill';
-import {ComponentActionData} from './DataPillPanel';
+export type ComponentActionData = {
+    component: ComponentDefinitionBasicModel;
+    workflowAlias: string;
+} & ActionDefinitionModel;
 
 type DataPillPanelBodyProps = {
     componentData: Array<ComponentActionData>;

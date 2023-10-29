@@ -1,10 +1,9 @@
-import {ComponentDefinitionModel} from '@/middleware/helios/execution/models';
+import {ComponentDefinitionModel} from '@/middleware/helios/execution';
+import {useNodeDetailsDialogStore} from '@/pages/automation/project/stores/useNodeDetailsDialogStore';
+import {TYPE_ICONS} from '@/shared/typeIcons';
+import {PropertyType} from '@/types/projectTypes';
 import {MouseEvent} from 'react';
-import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
-import {PropertyType} from 'types/projectTypes';
-
-import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
 
 const DataPill = ({
     arrayIndex,
