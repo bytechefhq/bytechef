@@ -1,6 +1,6 @@
 import {ReactFlowProvider} from 'reactflow';
 
-import NodeDetailsDialog from './components/NodeDetailsDialog';
+import NodeDetailsPanel from './components/NodeDetailsPanel';
 
 import 'reactflow/dist/base.css';
 
@@ -27,7 +27,7 @@ const ProjectWorkflow = ({components, flowControls}: WorkflowEditorProps) => {
             />
 
             {componentDefinitions && currentNode.name && (
-                <NodeDetailsDialog
+                <NodeDetailsPanel
                     componentDefinitions={componentDefinitions}
                 />
             )}
