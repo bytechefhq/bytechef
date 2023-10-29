@@ -2,7 +2,7 @@
   "actions": [ {
     "batch": null,
     "componentName": "map",
-    "componentDescription": "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`.",
+    "componentDescription": "Produces a new collection of values by mapping each value in list through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source list.",
     "componentTitle": "Map",
     "componentVersion": 1,
     "deprecated": null,
@@ -78,7 +78,7 @@
   "connection": null,
   "customAction": null,
   "customActionHelp": null,
-  "description": "Produces a new collection of values by mapping each value in `list` through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source `list`.",
+  "description": "Produces a new collection of values by mapping each value in list through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source list.",
   "icon": "path:assets/map.svg",
   "tags": null,
   "metadata": null,

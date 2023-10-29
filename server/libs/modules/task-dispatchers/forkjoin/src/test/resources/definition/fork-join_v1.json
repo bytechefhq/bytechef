@@ -1,5 +1,5 @@
 {
-  "description": "Executes each branch in the branches as a separate and isolated sub-flow. Branches are executed internally in sequence.",
+  "description": "Executes each branch (list of tasks) in parallel as a separate and isolated sub-flow. Branches are executed internally in sequence.",
   "help": null,
   "icon": "path:assets/forkjoin.svg",
   "name": "fork-join",
