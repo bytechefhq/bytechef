@@ -8,7 +8,7 @@ import ConnectionDialog from 'pages/automation/connections/components/Connection
 import {useGetConnectionsQuery} from 'queries/connections.queries';
 import {useState} from 'react';
 
-import {useConnectionNoteStore} from '../../stores/useNodeDetailsDialogStore';
+import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 
 const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
     const [showEditConnectionDialog, setShowEditConnectionDialog] =

@@ -1,7 +1,6 @@
 /* eslint-disable sort-keys */
 import {ReactNode} from 'react';
 import {create} from 'zustand';
-import {devtools, persist} from 'zustand/middleware';
 
 interface Node {
     name: string;
@@ -25,11 +24,6 @@ interface NodeDetailsState {
     setFocusedInput: (focusedInput: any) => void;
 }
 
-interface ConnectionNoteState {
-    showConnectionNote: boolean;
-    setShowConnectionNote: (showConnectionNote: boolean) => void;
-}
-
 export const useNodeDetailsDialogStore = create<NodeDetailsState>()((set) => ({
     nodeDetailsDialogOpen: false,
     setNodeDetailsDialogOpen: (nodeDetailsDialogOpen) =>
@@ -42,20 +36,3 @@ export const useNodeDetailsDialogStore = create<NodeDetailsState>()((set) => ({
     setFocusedInput: (focusedInput) =>
         set((state) => ({...state, focusedInput})),
 }));
-
-export const useConnectionNoteStore = create<ConnectionNoteState>()(
-    devtools(
-        persist(
-            (set) => ({
-                showConnectionNote: true,
-                setShowConnectionNote: (connectionNoteStatus) =>
-                    set(() => ({
-                        showConnectionNote: connectionNoteStatus,
-                    })),
-            }),
-            {
-                name: 'show-connection-note',
-            }
-        )
-    )
-);

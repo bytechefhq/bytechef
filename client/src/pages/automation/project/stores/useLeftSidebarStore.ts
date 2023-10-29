@@ -12,11 +12,11 @@ const useLeftSidebarStore = create<LeftSidebarState>()(
             leftSidebarOpen: false,
             setLeftSidebarOpen: (leftSidebarOpen) =>
                 set(() => ({
-                    leftSidebarOpen: leftSidebarOpen,
+                    leftSidebarOpen,
                 })),
         }),
         {
-            name: 'left-sidebar-open',
+            name: 'left-sidebar',
         }
     )
 );
