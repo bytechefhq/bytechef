@@ -433,7 +433,7 @@ const NodeDetailsPanel = ({
                                 </span>
 
                                 {currentComponent?.description && (
-                                    <Tooltip>
+                                    <Tooltip delayDuration={500}>
                                         <TooltipTrigger>
                                             <InfoCircledIcon className="h-4 w-4" />
                                         </TooltipTrigger>
