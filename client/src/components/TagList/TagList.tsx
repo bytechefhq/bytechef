@@ -23,11 +23,11 @@ interface TagProps {
 }
 
 const Tag = ({onDeleteTag, tag}: TagProps) => (
-    <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
+    <span className="inline-flex items-center rounded-full border border-gray-100 px-3 py-1 text-xs text-gray-700 hover:border-gray-200">
         {tag.name}
 
         <Cross1Icon
-            className="ml-1.5 h-3 w-3 rounded-full hover:bg-gray-300"
+            className="ml-1.5 h-3 w-3 cursor-pointer rounded-full hover:bg-gray-200"
             onClick={() => onDeleteTag(tag)}
         />
     </span>
@@ -128,7 +128,7 @@ const TagList = ({
                 />
             ) : (
                 <div
-                    className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-gray-100 hover:bg-gray-200"
+                    className="flex h-6 w-6 cursor-pointer items-center justify-center rounded border border-gray-100 hover:bg-gray-200"
                     onClick={(event) => {
                         event.preventDefault();
 
