@@ -209,10 +209,12 @@ const Project = () => {
                     (workflow: WorkflowModel) => workflow.id === workflowId
                 )!
             );
-
-            setLeftSidebarOpen(false);
         }
-    }, [projectWorkflows, setLeftSidebarOpen, workflowId]);
+        setLeftSidebarOpen(false);
+        setNodeDetailsPanelOpen(false);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflowId]);
 
     useEffect(() => {
         if (currentWorkflow?.id) {
@@ -220,8 +222,6 @@ const Project = () => {
                 `/automation/projects/${projectId}/workflow/${currentWorkflow.id}`
             );
         }
-
-        setNodeDetailsDialogOpen(false);
     }, [currentWorkflow, navigate, projectId, setNodeDetailsPanelOpen]);
 
     return (
