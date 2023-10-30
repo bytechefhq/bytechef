@@ -2,14 +2,14 @@ import useRightSidebarStore from '@/pages/automation/project/stores/useRightSide
 import {useCallback} from 'react';
 import {NodeProps, useReactFlow} from 'reactflow';
 
-import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
+import {useNodeDetailsPanelStore} from '../stores/useNodeDetailsPanelStore';
 
 export default function useNodeClick(
     data: NodeProps['data'],
     id: NodeProps['id']
 ) {
-    const {setCurrentNode, setNodeDetailsDialogOpen} =
-        useNodeDetailsDialogStore();
+    const {setCurrentNode, setNodeDetailsPanelOpen} =
+        useNodeDetailsPanelStore();
     const {setRightSidebarOpen} = useRightSidebarStore();
 
     const {getNode} = useReactFlow();
@@ -23,7 +23,7 @@ export default function useNodeClick(
 
         setRightSidebarOpen(false);
 
-        setNodeDetailsDialogOpen(true);
+        setNodeDetailsPanelOpen(true);
 
         setCurrentNode(data);
     }, [
@@ -31,7 +31,7 @@ export default function useNodeClick(
         getNode,
         id,
         setCurrentNode,
-        setNodeDetailsDialogOpen,
+        setNodeDetailsPanelOpen,
         setRightSidebarOpen,
     ]);
 }

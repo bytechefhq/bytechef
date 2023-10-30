@@ -12,8 +12,8 @@ interface Node {
 }
 
 interface NodeDetailsState {
-    nodeDetailsDialogOpen: boolean;
-    setNodeDetailsDialogOpen: (nodeDetailsDialogOpen: boolean) => void;
+    nodeDetailsPanelOpen: boolean;
+    setNodeDetailsPanelOpen: (nodeDetailsPanelOpen: boolean) => void;
 
     currentNode: Node;
     setCurrentNode: (currentNode: Node) => void;
@@ -24,10 +24,13 @@ interface NodeDetailsState {
     setFocusedInput: (focusedInput: any) => void;
 }
 
-export const useNodeDetailsDialogStore = create<NodeDetailsState>()((set) => ({
-    nodeDetailsDialogOpen: false,
-    setNodeDetailsDialogOpen: (nodeDetailsDialogOpen) =>
-        set((state) => ({...state, nodeDetailsDialogOpen})),
+export const useNodeDetailsPanelStore = create<NodeDetailsState>()((set) => ({
+    nodeDetailsPanelOpen: false,
+    setNodeDetailsPanelOpen: (nodeDetailsDialogOpen) =>
+        set((state) => ({
+            ...state,
+            nodeDetailsPanelOpen: nodeDetailsDialogOpen,
+        })),
 
     currentNode: {name: '', type: 'component', version: 1},
     setCurrentNode: (currentNode) => set((state) => ({...state, currentNode})),

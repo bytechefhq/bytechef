@@ -16,7 +16,7 @@ import ReactQuill, {Quill} from 'react-quill';
 import './mentionsInput.css';
 
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
-import {useNodeDetailsDialogStore} from '@/pages/automation/project/stores/useNodeDetailsDialogStore';
+import {useNodeDetailsPanelStore} from '@/pages/automation/project/stores/useNodeDetailsPanelStore';
 import {DataPillType} from '@/types/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {twMerge} from 'tailwind-merge';
@@ -73,7 +73,7 @@ const MentionsInput = ({
 
     const editorRef = useRef<ReactQuill>(null);
 
-    const {focusedInput, setFocusedInput} = useNodeDetailsDialogStore();
+    const {focusedInput, setFocusedInput} = useNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
 
     const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);

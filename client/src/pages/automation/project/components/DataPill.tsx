@@ -1,5 +1,5 @@
 import {ComponentDefinitionModel} from '@/middleware/helios/execution';
-import {useNodeDetailsDialogStore} from '@/pages/automation/project/stores/useNodeDetailsDialogStore';
+import {useNodeDetailsPanelStore} from '@/pages/automation/project/stores/useNodeDetailsPanelStore';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {PropertyType} from '@/types/projectTypes';
 import {MouseEvent} from 'react';
@@ -21,7 +21,7 @@ const DataPill = ({
 }) => {
     const subProperties = property.properties || property.items;
 
-    const {focusedInput} = useNodeDetailsDialogStore();
+    const {focusedInput} = useNodeDetailsPanelStore();
 
     const mentionInput = focusedInput?.getEditor().getModule('mention');
 

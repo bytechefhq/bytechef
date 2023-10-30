@@ -21,7 +21,7 @@ import {ChangeEvent, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Select from '../../../../components/Select/Select';
-import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
+import {useNodeDetailsPanelStore} from '../stores/useNodeDetailsPanelStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import getSubProperties from '../utils/getSubProperties';
@@ -66,8 +66,8 @@ const NodeDetailsPanel = ({
     const [activeTab, setActiveTab] = useState('description');
     const [currentActionName, setCurrentActionName] = useState('');
 
-    const {currentNode, nodeDetailsDialogOpen, setNodeDetailsDialogOpen} =
-        useNodeDetailsDialogStore();
+    const {currentNode, nodeDetailsPanelOpen, setNodeDetailsPanelOpen} =
+        useNodeDetailsPanelStore();
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery({
         componentName: currentNode.originNodeName || currentNode.name,
@@ -412,10 +412,8 @@ const NodeDetailsPanel = ({
 
     return (
         <Dialog.Root
-            open={nodeDetailsDialogOpen}
-            onOpenChange={() =>
-                setNodeDetailsDialogOpen(!nodeDetailsDialogOpen)
-            }
+            open={nodeDetailsPanelOpen}
+            onOpenChange={() => setNodeDetailsPanelOpen(!nodeDetailsPanelOpen)}
             modal={false}
         >
             <Dialog.Portal>
@@ -458,7 +456,7 @@ const NodeDetailsPanel = ({
                                         />
                                     }
                                     onClick={() =>
-                                        setNodeDetailsDialogOpen(false)
+                                        setNodeDetailsPanelOpen(false)
                                     }
                                 />
                             </Dialog.Title>

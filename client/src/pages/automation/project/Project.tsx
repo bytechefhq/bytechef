@@ -39,7 +39,7 @@ import {
     usePublishProjectMutation,
     useUpdateWorkflowMutation,
 } from '@/mutations/projects.mutations';
-import {useNodeDetailsDialogStore} from '@/pages/automation/project/stores/useNodeDetailsDialogStore';
+import {useNodeDetailsPanelStore} from '@/pages/automation/project/stores/useNodeDetailsPanelStore';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
 import ProjectDialog from '@/pages/automation/projects/ProjectDialog';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
@@ -79,7 +79,7 @@ const Project = () => {
 
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
-    const {setNodeDetailsDialogOpen} = useNodeDetailsDialogStore();
+    const {setNodeDetailsPanelOpen} = useNodeDetailsPanelStore();
 
     const {projectId, workflowId} = useParams();
     const navigate = useNavigate();
@@ -106,7 +106,7 @@ const Project = () => {
             icon: PuzzleIcon,
             name: 'Components & Control Flows',
             onClick: () => {
-                setNodeDetailsDialogOpen(false);
+                setNodeDetailsPanelOpen(false);
                 setRightSidebarOpen(!rightSidebarOpen);
             },
         },
@@ -222,7 +222,7 @@ const Project = () => {
         }
 
         setNodeDetailsDialogOpen(false);
-    }, [currentWorkflow, navigate, projectId, setNodeDetailsDialogOpen]);
+    }, [currentWorkflow, navigate, projectId, setNodeDetailsPanelOpen]);
 
     return (
         <PageLoader

@@ -10,14 +10,14 @@ import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.qu
 
 import DataPillPanel from './components/DataPillPanel';
 import WorkflowEditor, {WorkflowEditorProps} from './components/WorkflowEditor';
-import {useNodeDetailsDialogStore} from './stores/useNodeDetailsDialogStore';
+import {useNodeDetailsPanelStore} from './stores/useNodeDetailsPanelStore';
 
 const ProjectWorkflow = ({components, flowControls}: WorkflowEditorProps) => {
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
     });
 
-    const {currentNode} = useNodeDetailsDialogStore();
+    const {currentNode} = useNodeDetailsPanelStore();
 
     return (
         <ReactFlowProvider>

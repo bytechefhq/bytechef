@@ -14,7 +14,7 @@ import useLayout from '../hooks/useLayout';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import defaultNodes from '../nodes/defaultNodes';
-import {useNodeDetailsDialogStore} from '../stores/useNodeDetailsDialogStore';
+import {useNodeDetailsPanelStore} from '../stores/useNodeDetailsPanelStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 
 export type WorkflowEditorProps = {
@@ -26,7 +26,7 @@ const WorkflowEditor = ({components, flowControls}: WorkflowEditorProps) => {
     const [nodeNames, setNodeNames] = useState<Array<string>>([]);
     const [viewportWidth, setViewportWidth] = useState(0);
 
-    const {nodeDetailsDialogOpen} = useNodeDetailsDialogStore();
+    const {nodeDetailsPanelOpen} = useNodeDetailsPanelStore();
 
     const nodeTypes = useMemo(
         () => ({
@@ -142,7 +142,7 @@ const WorkflowEditor = ({components, flowControls}: WorkflowEditorProps) => {
     useEffect(() => {
         setViewportWidth(width);
 
-        const adaptedViewportWidth = nodeDetailsDialogOpen
+        const adaptedViewportWidth = nodeDetailsPanelOpen
             ? width / 2 - window.innerWidth / 6
             : width / 2;
 
@@ -151,7 +151,7 @@ const WorkflowEditor = ({components, flowControls}: WorkflowEditorProps) => {
             y: 50,
             zoom: 1,
         });
-    }, [nodeDetailsDialogOpen, setViewport, width]);
+    }, [nodeDetailsPanelOpen, setViewport, width]);
 
     useLayout();
 
