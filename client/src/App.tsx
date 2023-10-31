@@ -2,10 +2,10 @@ import {DesktopSidebar} from '@/layouts/DesktopSidebar';
 import {MobileSidebar} from '@/layouts/MobileSidebar';
 import {MobileTopNavigation} from '@/layouts/MobileTopNavigation';
 import {
+    ActivityIcon,
     FolderIcon,
     Layers3Icon,
     Link2Icon,
-    ListEndIcon,
     LucideIcon,
 } from 'lucide-react';
 import {useEffect, useState} from 'react';
@@ -38,7 +38,7 @@ const navigation: {
     {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
     {
         href: '/automation/executions',
-        icon: ListEndIcon,
+        icon: ActivityIcon,
         name: 'Executions',
     },
 ];
