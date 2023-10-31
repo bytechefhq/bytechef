@@ -24,7 +24,7 @@ import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 import {twMerge} from 'tailwind-merge';
 
-import useWorkflowExecutionDetailsDialogStore from '../project/stores/useWorkflowExecutionDetailsDialogStore';
+import useWorkflowExecutionDetailsDialogStore from './stores/useWorkflowExecutionDetailsDialogStore';
 import WorkflowExecutionDetailsDialog from './components/WorkflowExecutionDetailsDialog';
 import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
 
