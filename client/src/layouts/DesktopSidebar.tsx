@@ -18,7 +18,7 @@ export function DesktopSidebar({
     return (
         <aside className="hidden border-r bg-muted lg:flex lg:shrink-0">
             <div className="flex w-[64px]">
-                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+                <div className="flex min-h-0 flex-1 flex-col">
                     <div className="flex-1">
                         <Link to="">
                             <div className="flex items-center justify-center py-4">
@@ -32,7 +32,7 @@ export function DesktopSidebar({
 
                         <nav
                             aria-label="Sidebar"
-                            className="flex flex-col items-center py-3"
+                            className="flex flex-col items-center overflow-y-auto py-3"
                         >
                             {navigation.map((item) => (
                                 <Link
