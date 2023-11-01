@@ -1,1 +1,2 @@
+com.bytechef.hermes.configuration.connection.WorkflowConnection$WorkflowConnectionConverter
 com.bytechef.hermes.configuration.trigger.WorkflowTrigger$WorkflowTriggerConverter

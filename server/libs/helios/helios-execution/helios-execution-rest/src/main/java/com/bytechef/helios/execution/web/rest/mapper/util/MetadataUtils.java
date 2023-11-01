@@ -16,8 +16,8 @@
 
 package com.bytechef.helios.execution.web.rest.mapper.util;
 
-import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.helios.execution.web.rest.model.TaskConnectionModel;
+import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

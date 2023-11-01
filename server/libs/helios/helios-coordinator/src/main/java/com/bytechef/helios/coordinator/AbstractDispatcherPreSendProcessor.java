@@ -16,8 +16,8 @@
 
 package com.bytechef.helios.coordinator;
 
-import com.bytechef.helios.configuration.connection.WorkflowConnection;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
