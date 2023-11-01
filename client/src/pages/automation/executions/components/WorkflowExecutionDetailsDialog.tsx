@@ -3,7 +3,7 @@ import {CheckCircledIcon} from '@radix-ui/react-icons';
 import {useGetWorkflowExecutionQuery} from 'queries/projects.queries';
 import {twMerge} from 'tailwind-merge';
 
-import useWorkflowExecutionDetailsDialogStore from '../../project/stores/useWorkflowExecutionDetailsDialogStore';
+import useWorkflowExecutionDetailsDialogStore from '..//stores/useWorkflowExecutionDetailsDialogStore';
 import ReadOnlyWorkflow from './dialog-content/ReadOnlyWorkflow';
 import WorkflowTaskListAccordion from './dialog-content/WorkflowTaskListAccordion';
 

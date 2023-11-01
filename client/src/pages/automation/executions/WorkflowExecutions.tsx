@@ -24,9 +24,9 @@ import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 import {twMerge} from 'tailwind-merge';
 
-import useWorkflowExecutionDetailsDialogStore from './stores/useWorkflowExecutionDetailsDialogStore';
 import WorkflowExecutionDetailsDialog from './components/WorkflowExecutionDetailsDialog';
 import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
+import useWorkflowExecutionDetailsDialogStore from './stores/useWorkflowExecutionDetailsDialogStore';
 
 const jobStatusOptions = [
     {

@@ -10,7 +10,8 @@ import {
     JobBasicModel,
     WorkflowExecutionModel,
 } from 'middleware/helios/execution';
-import useWorkflowExecutionDetailsDialogStore from 'pages/automation/project/stores/useWorkflowExecutionDetailsDialogStore';
+
+import useWorkflowExecutionDetailsDialogStore from '../stores/useWorkflowExecutionDetailsDialogStore';
 
 const getDuration = (
     info: CellContext<WorkflowExecutionModel, JobBasicModel | undefined>
