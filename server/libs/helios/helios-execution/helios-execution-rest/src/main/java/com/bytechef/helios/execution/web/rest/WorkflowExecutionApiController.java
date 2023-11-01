@@ -48,14 +48,14 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     }
 
     @Override
-    public ResponseEntity<WorkflowExecutionModel> getExecution(Long id) {
+    public ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(Long id) {
         return ResponseEntity.ok(
             conversionService.convert(workflowExecutionFacade.getWorkflowExecution(id),
                 WorkflowExecutionModel.class));
     }
 
     @Override
-    public ResponseEntity<Page> getExecutions(
+    public ResponseEntity<Page> getWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
 
