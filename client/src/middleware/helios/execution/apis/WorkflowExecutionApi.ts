@@ -25,12 +25,12 @@ import {
     WorkflowExecutionModelToJSON,
 } from '../models/index';
 
-export interface GetExecutionRequest {
+export interface GetWorkflowExecutionRequest {
     id: number;
 }
 
-export interface GetExecutionsRequest {
-    jobStatus?: GetExecutionsJobStatusEnum;
+export interface GetWorkflowExecutionsRequest {
+    jobStatus?: GetWorkflowExecutionsJobStatusEnum;
     jobStartDate?: Date;
     jobEndDate?: Date;
     projectId?: number;
@@ -48,9 +48,9 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      * Get workflow execution by id.
      * Get workflow executions by id
      */
-    async getExecutionRaw(requestParameters: GetExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecutionModel>> {
+    async getWorkflowExecutionRaw(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecutionModel>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getExecution.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getWorkflowExecution.');
         }
 
         const queryParameters: any = {};
@@ -71,8 +71,8 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      * Get workflow execution by id.
      * Get workflow executions by id
      */
-    async getExecution(requestParameters: GetExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowExecutionModel> {
-        const response = await this.getExecutionRaw(requestParameters, initOverrides);
+    async getWorkflowExecution(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowExecutionModel> {
+        const response = await this.getWorkflowExecutionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -80,7 +80,7 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      * Get project workflow executions.
      * Get project workflow executions
      */
-    async getExecutionsRaw(requestParameters: GetExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
+    async getWorkflowExecutionsRaw(requestParameters: GetWorkflowExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
         const queryParameters: any = {};
 
         if (requestParameters.jobStatus !== undefined) {
@@ -127,8 +127,8 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      * Get project workflow executions.
      * Get project workflow executions
      */
-    async getExecutions(requestParameters: GetExecutionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageModel> {
-        const response = await this.getExecutionsRaw(requestParameters, initOverrides);
+    async getWorkflowExecutions(requestParameters: GetWorkflowExecutionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageModel> {
+        const response = await this.getWorkflowExecutionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -137,11 +137,11 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
 /**
  * @export
  */
-export const GetExecutionsJobStatusEnum = {
+export const GetWorkflowExecutionsJobStatusEnum = {
     Created: 'CREATED',
     Started: 'STARTED',
     Stopped: 'STOPPED',
     Failed: 'FAILED',
     Completed: 'COMPLETED'
 } as const;
-export type GetExecutionsJobStatusEnum = typeof GetExecutionsJobStatusEnum[keyof typeof GetExecutionsJobStatusEnum];
+export type GetWorkflowExecutionsJobStatusEnum = typeof GetWorkflowExecutionsJobStatusEnum[keyof typeof GetWorkflowExecutionsJobStatusEnum];
