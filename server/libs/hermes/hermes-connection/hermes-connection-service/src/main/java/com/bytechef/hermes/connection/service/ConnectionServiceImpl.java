@@ -59,6 +59,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Connection> fetchConnection(long id) {
         return connectionRepository.findById(id);
     }
@@ -76,11 +77,13 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Connection> getConnections(List<Long> ids) {
         return connectionRepository.findAllById(ids);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Connection> getConnections(String componentName, int version) {
         return connectionRepository.findAllByComponentNameAndConnectionVersionOrderByName(componentName, version);
     }

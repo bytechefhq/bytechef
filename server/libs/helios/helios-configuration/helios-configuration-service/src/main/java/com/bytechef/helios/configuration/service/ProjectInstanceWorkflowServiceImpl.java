@@ -58,6 +58,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isProjectInstanceWorkflowEnabled(long projectInstanceId, String workflowId) {
         ProjectInstanceWorkflow projectInstanceWorkflow = getProjectInstanceWorkflow(projectInstanceId, workflowId);
 
@@ -65,6 +66,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
         String workflowConnectionOperationName, String workflowConnectionKey) {
 
@@ -73,6 +75,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
+    @Transactional(readOnly = true)
     public long getProjectInstanceWorkflowConnectionId(
         String workflowConnectionOperationName, String workflowConnectionKey) {
 
@@ -83,6 +86,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId) {
         Validate.notNull(workflowId, "'workflowId' must not be null");
 
@@ -91,11 +95,13 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(long projectInstanceId) {
         return projectInstanceWorkflowRepository.findAllByProjectInstanceId(projectInstanceId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(List<Long> projectInstanceIds) {
         Validate.notNull(projectInstanceIds, "'projectInstanceIds' must not be null");
 

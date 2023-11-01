@@ -81,6 +81,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isProjectEnabled(long projectId) {
         Project project = getProject(projectId);
 
@@ -88,24 +89,15 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Project getProjectInstanceProject(long projectInstanceId) {
         return projectRepository.findByProjectInstanceId(projectInstanceId);
-    }
-
-    @Override
-    public Project getWorkflowProject(String workflowId) {
-        return OptionalUtils.get(projectRepository.findByWorkflowId(workflowId));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Project getProject(long id) {
         return OptionalUtils.get(projectRepository.findById(id));
-    }
-
-    @Override
-    public Project getProject(String name) {
-        return OptionalUtils.get(fetchProject(name));
     }
 
     @Override
@@ -153,6 +145,12 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return projects;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Project getWorkflowProject(String workflowId) {
+        return OptionalUtils.get(projectRepository.findByWorkflowId(workflowId));
     }
 
     @Override
