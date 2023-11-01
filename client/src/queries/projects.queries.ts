@@ -1,6 +1,6 @@
 import {
-    GetExecutionRequest,
-    GetExecutionsRequest,
+    GetWorkflowExecutionRequest,
+    GetWorkflowExecutionsRequest,
     WorkflowExecutionApi,
     WorkflowExecutionModel,
 } from '@/middleware/helios/execution';
@@ -28,7 +28,7 @@ export const ProjectKeys = {
     filteredProjects: (
         filters: {categoryId?: number; tagId?: number} | undefined
     ) => [...ProjectKeys.projects, filters],
-    filteredWorkflowExecutions: (request: GetExecutionsRequest) => [
+    filteredWorkflowExecutions: (request: GetWorkflowExecutionsRequest) => [
         'workflowExecutions',
         request,
     ],
@@ -99,19 +99,21 @@ export const useGetProjectWorkflowsQuery = (id: number) =>
         new WorkflowApi().getProjectWorkflows({id})
     );
 
-export const useGetExecutionsQuery = (request: GetExecutionsRequest) =>
+export const useGetWorkflowExecutionsQuery = (
+    request: GetWorkflowExecutionsRequest
+) =>
     useQuery<PageModel, Error>(
         ProjectKeys.filteredWorkflowExecutions(request),
-        () => new WorkflowExecutionApi().getExecutions(request)
+        () => new WorkflowExecutionApi().getWorkflowExecutions(request)
     );
 
 export const useGetWorkflowExecutionQuery = (
-    request: GetExecutionRequest,
+    request: GetWorkflowExecutionRequest,
     isEnabled: boolean
 ) =>
     useQuery<WorkflowExecutionModel, Error>(
         ProjectKeys.workflowExecution(request.id),
-        () => new WorkflowExecutionApi().getExecution(request),
+        () => new WorkflowExecutionApi().getWorkflowExecution(request),
         {
             enabled: isEnabled,
         }

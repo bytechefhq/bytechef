@@ -10,14 +10,14 @@ import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
 import {ListEndIcon} from 'lucide-react';
 import {
-    GetExecutionsJobStatusEnum,
+    GetWorkflowExecutionsJobStatusEnum,
     WorkflowExecutionModel,
     WorkflowExecutionModelFromJSON,
 } from 'middleware/helios/execution';
 import {
-    useGetExecutionsQuery,
     useGetProjectInstancesQuery,
     useGetProjectsQuery,
+    useGetWorkflowExecutionsQuery,
     useGetWorkflowsQuery,
 } from 'queries/projects.queries';
 import {useState} from 'react';
@@ -30,30 +30,30 @@ import useWorkflowExecutionDetailsDialogStore from './stores/useWorkflowExecutio
 
 const jobStatusOptions = [
     {
-        label: GetExecutionsJobStatusEnum.Started,
-        value: GetExecutionsJobStatusEnum.Started,
+        label: GetWorkflowExecutionsJobStatusEnum.Started,
+        value: GetWorkflowExecutionsJobStatusEnum.Started,
     },
     {
-        label: GetExecutionsJobStatusEnum.Completed,
-        value: GetExecutionsJobStatusEnum.Completed,
+        label: GetWorkflowExecutionsJobStatusEnum.Completed,
+        value: GetWorkflowExecutionsJobStatusEnum.Completed,
     },
     {
-        label: GetExecutionsJobStatusEnum.Created,
-        value: GetExecutionsJobStatusEnum.Created,
+        label: GetWorkflowExecutionsJobStatusEnum.Created,
+        value: GetWorkflowExecutionsJobStatusEnum.Created,
     },
     {
-        label: GetExecutionsJobStatusEnum.Stopped,
-        value: GetExecutionsJobStatusEnum.Stopped,
+        label: GetWorkflowExecutionsJobStatusEnum.Stopped,
+        value: GetWorkflowExecutionsJobStatusEnum.Stopped,
     },
     {
-        label: GetExecutionsJobStatusEnum.Failed,
-        value: GetExecutionsJobStatusEnum.Failed,
+        label: GetWorkflowExecutionsJobStatusEnum.Failed,
+        value: GetWorkflowExecutionsJobStatusEnum.Failed,
     },
 ];
 
 export const WorkflowExecutions = () => {
     const [filterStatus, setFilterStatus] =
-        useState<GetExecutionsJobStatusEnum>();
+        useState<GetWorkflowExecutionsJobStatusEnum>();
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
         undefined
     );
@@ -77,7 +77,7 @@ export const WorkflowExecutions = () => {
         data: WorkflowExecutionsPage,
         error: WorkflowExecutionsError,
         isLoading: WorkflowExecutionsLoading,
-    } = useGetExecutionsQuery({
+    } = useGetWorkflowExecutionsQuery({
         jobEndDate: filterEndDate,
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,
@@ -152,7 +152,7 @@ export const WorkflowExecutions = () => {
                                 ) => {
                                     if (value) {
                                         setFilterStatus(
-                                            value.value as GetExecutionsJobStatusEnum
+                                            value.value as GetWorkflowExecutionsJobStatusEnum
                                         );
                                     } else {
                                         setFilterStatus(undefined);
