@@ -140,7 +140,7 @@ paths:
       summary: "Get project workflow executions"
       tags:
       - "workflow-execution"
-      operationId: "getExecutions"
+      operationId: "getWorkflowExecutions"
       parameters:
       - name: "jobStatus"
         description: "The status of an executed job"
@@ -209,7 +209,7 @@ paths:
       summary: "Get workflow executions by id"
       tags:
       - "workflow-execution"
-      operationId: "getExecution"
+      operationId: "getWorkflowExecution"
       parameters:
       - name: "id"
         description: "The id of an execution."
