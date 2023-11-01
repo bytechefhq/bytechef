@@ -1,7 +1,5 @@
-import {
-    useGetProjectInstanceTagsQuery,
-    useGetProjectsQuery,
-} from '@/queries/projects.queries';
+import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstances.queries';
+import {useGetProjectsQuery} from '@/queries/projects.queries';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Input from 'components/Input/Input';
 import {ProjectInstanceModel} from 'middleware/helios/configuration';

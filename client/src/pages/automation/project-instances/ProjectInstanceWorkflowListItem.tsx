@@ -6,9 +6,9 @@ import {
     WorkflowModel,
 } from '@/middleware/helios/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
-import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/projects.mutations';
+import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/projectInstances.mutations';
 import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/ProjectInstanceEditWorkflowDialog';
-import {ProjectKeys} from '@/queries/projects.queries';
+import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -45,7 +45,9 @@ const ProjectInstanceWorkflowListItem = ({
     const enableProjectInstanceWorkflowMutation =
         useEnableProjectInstanceWorkflowMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries(ProjectKeys.projectInstances);
+                queryClient.invalidateQueries(
+                    ProjectInstanceKeys.projectInstances
+                );
             },
         });
 

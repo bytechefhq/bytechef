@@ -12,16 +12,14 @@ import {
     useGetWorkflowExecutionsQuery,
     useGetWorkflowsQuery,
 } from '@/queries/executions';
+import {useGetProjectInstancesQuery} from '@/queries/projectInstances.queries';
 import {ListEndIcon} from 'lucide-react';
 import {
     GetWorkflowExecutionsJobStatusEnum,
     WorkflowExecutionModel,
     WorkflowExecutionModelFromJSON,
 } from 'middleware/helios/execution';
-import {
-    useGetProjectInstancesQuery,
-    useGetProjectsQuery,
-} from 'queries/projects.queries';
+import {useGetProjectsQuery} from 'queries/projects.queries';
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 import {twMerge} from 'tailwind-merge';

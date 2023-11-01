@@ -9,9 +9,9 @@ import {
     useDeleteProjectInstanceMutation,
     useEnableProjectInstanceMutation,
     useUpdateProjectInstanceTagsMutation,
-} from '@/mutations/projects.mutations';
+} from '@/mutations/projectInstances.mutations';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
-import {ProjectKeys} from '@/queries/projects.queries';
+import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
 import {AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -48,16 +48,22 @@ const ProjectInstanceListItem = ({
 
     const deleteProjectInstanceMutation = useDeleteProjectInstanceMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projectInstances);
-            queryClient.invalidateQueries(ProjectKeys.projectInstanceTags);
+            queryClient.invalidateQueries(ProjectInstanceKeys.projectInstances);
+            queryClient.invalidateQueries(
+                ProjectInstanceKeys.projectInstanceTags
+            );
         },
     });
 
     const updateProjectInstanceTagsMutation =
         useUpdateProjectInstanceTagsMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries(ProjectKeys.projectInstances);
-                queryClient.invalidateQueries(ProjectKeys.projectInstanceTags);
+                queryClient.invalidateQueries(
+                    ProjectInstanceKeys.projectInstances
+                );
+                queryClient.invalidateQueries(
+                    ProjectInstanceKeys.projectInstanceTags
+                );
             },
         });
 
@@ -78,7 +84,7 @@ const ProjectInstanceListItem = ({
 
     const enableProjectInstanceMutation = useEnableProjectInstanceMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projectInstances);
+            queryClient.invalidateQueries(ProjectInstanceKeys.projectInstances);
         },
     });
 

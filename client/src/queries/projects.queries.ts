@@ -3,9 +3,6 @@ import {
     CategoryApi,
     CategoryModel,
     ProjectApi,
-    ProjectInstanceApi,
-    ProjectInstanceModel,
-    ProjectInstanceTagApi,
     ProjectModel,
     ProjectTagApi,
     TagModel,
@@ -14,17 +11,12 @@ import {
 } from 'middleware/helios/configuration';
 
 export const ProjectKeys = {
-    filteredProjectInstances: (filters: {
-        projectId?: number;
-        tagId?: number;
-    }) => [...ProjectKeys.projectInstances, filters],
     filteredProjects: (
         filters: {categoryId?: number; tagId?: number} | undefined
     ) => [...ProjectKeys.projects, filters],
     project: (id: number) => [...ProjectKeys.projects, id],
     projectCategories: ['projectCategories'] as const,
-    projectInstanceTags: ['projectInstanceTags'] as const,
-    projectInstances: ['projectInstances'] as const,
+
     projectTags: ['projectTags'] as const,
     projectWorkflows: (id: number) => [
         ...ProjectKeys.projects,
@@ -37,20 +29,6 @@ export const ProjectKeys = {
 export const useGetProjectCategoriesQuery = () =>
     useQuery<CategoryModel[], Error>(ProjectKeys.projectCategories, () =>
         new CategoryApi().getProjectCategories()
-    );
-
-export const useGetProjectInstancesQuery = (filters: {
-    projectId?: number;
-    tagId?: number;
-}) =>
-    useQuery<ProjectInstanceModel[], Error>(
-        ProjectKeys.filteredProjectInstances(filters),
-        () => new ProjectInstanceApi().getProjectInstances(filters)
-    );
-
-export const useGetProjectInstanceTagsQuery = () =>
-    useQuery<TagModel[], Error>(ProjectKeys.projectInstanceTags, () =>
-        new ProjectInstanceTagApi().getProjectInstanceTags()
     );
 
 export const useGetProjectTagsQuery = () =>

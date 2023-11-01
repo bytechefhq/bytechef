@@ -1,5 +1,5 @@
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
-import {useGetProjectInstanceTagsQuery} from '@/queries/projects.queries';
+import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstances.queries';
 import {
     Accordion,
     AccordionContent,

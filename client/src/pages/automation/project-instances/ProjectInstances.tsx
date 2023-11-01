@@ -4,8 +4,8 @@ import {ProjectInstanceModel} from '@/middleware/helios/configuration';
 import {
     useGetProjectInstanceTagsQuery,
     useGetProjectInstancesQuery,
-    useGetProjectsQuery,
-} from '@/queries/projects.queries';
+} from '@/queries/projectInstances.queries';
+import {useGetProjectsQuery} from '@/queries/projects.queries';
 import {FolderPlusIcon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';

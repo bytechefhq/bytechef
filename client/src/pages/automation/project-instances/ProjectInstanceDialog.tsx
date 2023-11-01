@@ -1,3 +1,5 @@
+import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
+import {ProjectKeys} from '@/queries/projects.queries';
 import {Close} from '@radix-ui/react-dialog';
 import {useQueryClient} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
@@ -6,8 +8,7 @@ import {ProjectInstanceModel} from 'middleware/helios/configuration';
 import {
     useCreateProjectInstanceMutation,
     useUpdateProjectInstanceMutation,
-} from 'mutations/projects.mutations';
-import {ProjectKeys} from 'queries/projects.queries';
+} from 'mutations/projectInstances.mutations';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
@@ -60,8 +61,10 @@ const ProjectInstanceDialog = ({
 
     const createProjectInstanceMutation = useCreateProjectInstanceMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projectInstances);
-            queryClient.invalidateQueries(ProjectKeys.projectInstanceTags);
+            queryClient.invalidateQueries(ProjectInstanceKeys.projectInstances);
+            queryClient.invalidateQueries(
+                ProjectInstanceKeys.projectInstanceTags
+            );
             queryClient.invalidateQueries(ProjectKeys.filteredProjects({}));
 
             closeDialog();
@@ -71,8 +74,10 @@ const ProjectInstanceDialog = ({
 
     const updateProjectInstanceMutation = useUpdateProjectInstanceMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projectInstances);
-            queryClient.invalidateQueries(ProjectKeys.projectInstanceTags);
+            queryClient.invalidateQueries(ProjectInstanceKeys.projectInstances);
+            queryClient.invalidateQueries(
+                ProjectInstanceKeys.projectInstanceTags
+            );
             queryClient.invalidateQueries(ProjectKeys.filteredProjects({}));
 
             closeDialog();
