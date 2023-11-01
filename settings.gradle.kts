@@ -86,8 +86,8 @@ include("server:libs:core:message:message-event:message-event-impl")
 include("server:libs:core:rest:rest-api")
 include("server:libs:core:rest:rest-impl")
 include("server:libs:core:tag:tag-api")
-
 include("server:libs:core:tag:tag-service")
+
 include("server:libs:helios:helios-connection:helios-connection-api")
 include("server:libs:helios:helios-connection:helios-connection-rest")
 include("server:libs:helios:helios-connection:helios-connection-service")
@@ -171,8 +171,8 @@ include("server:libs:modules:components:var")
 include("server:libs:modules:components:xlsxfile")
 include("server:libs:modules:components:xmlfile")
 include("server:libs:modules:components:xmlhelper")
-
 include("server:libs:modules:components:webhook")
+
 include("server:libs:modules:task-dispatchers:branch")
 include("server:libs:modules:task-dispatchers:condition")
 include("server:libs:modules:task-dispatchers:each")
