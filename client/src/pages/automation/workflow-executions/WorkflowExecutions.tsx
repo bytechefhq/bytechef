@@ -8,6 +8,10 @@ import Pagination from '@/components/Pagination/Pagination';
 import LayoutContainer from '@/layouts/LayoutContainer';
 import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
+import {
+    useGetWorkflowExecutionsQuery,
+    useGetWorkflowsQuery,
+} from '@/queries/executions';
 import {ListEndIcon} from 'lucide-react';
 import {
     GetWorkflowExecutionsJobStatusEnum,
@@ -17,8 +21,6 @@ import {
 import {
     useGetProjectInstancesQuery,
     useGetProjectsQuery,
-    useGetWorkflowExecutionsQuery,
-    useGetWorkflowsQuery,
 } from 'queries/projects.queries';
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';

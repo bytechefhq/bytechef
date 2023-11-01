@@ -1,14 +1,7 @@
-import {
-    GetWorkflowExecutionRequest,
-    GetWorkflowExecutionsRequest,
-    WorkflowExecutionApi,
-    WorkflowExecutionModel,
-} from '@/middleware/helios/execution';
 import {useQuery} from '@tanstack/react-query';
 import {
     CategoryApi,
     CategoryModel,
-    PageModel,
     ProjectApi,
     ProjectInstanceApi,
     ProjectInstanceModel,
@@ -28,10 +21,6 @@ export const ProjectKeys = {
     filteredProjects: (
         filters: {categoryId?: number; tagId?: number} | undefined
     ) => [...ProjectKeys.projects, filters],
-    filteredWorkflowExecutions: (request: GetWorkflowExecutionsRequest) => [
-        'workflowExecutions',
-        request,
-    ],
     project: (id: number) => [...ProjectKeys.projects, id],
     projectCategories: ['projectCategories'] as const,
     projectInstanceTags: ['projectInstanceTags'] as const,
@@ -43,12 +32,6 @@ export const ProjectKeys = {
         'projectWorkflows',
     ],
     projects: ['projects'] as const,
-    workflowExecution: (id: number) => ['workflowExecutions', id],
-};
-
-export const WorkflowKeys = {
-    workflow: (id: number) => ['workflow', id],
-    workflows: ['workflows'] as const,
 };
 
 export const useGetProjectCategoriesQuery = () =>
@@ -97,29 +80,4 @@ export const useGetProjectsQuery = (filters?: {
 export const useGetProjectWorkflowsQuery = (id: number) =>
     useQuery<WorkflowModel[], Error>(ProjectKeys.projectWorkflows(id), () =>
         new WorkflowApi().getProjectWorkflows({id})
-    );
-
-export const useGetWorkflowExecutionsQuery = (
-    request: GetWorkflowExecutionsRequest
-) =>
-    useQuery<PageModel, Error>(
-        ProjectKeys.filteredWorkflowExecutions(request),
-        () => new WorkflowExecutionApi().getWorkflowExecutions(request)
-    );
-
-export const useGetWorkflowExecutionQuery = (
-    request: GetWorkflowExecutionRequest,
-    isEnabled: boolean
-) =>
-    useQuery<WorkflowExecutionModel, Error>(
-        ProjectKeys.workflowExecution(request.id),
-        () => new WorkflowExecutionApi().getWorkflowExecution(request),
-        {
-            enabled: isEnabled,
-        }
-    );
-
-export const useGetWorkflowsQuery = () =>
-    useQuery<WorkflowModel[], Error>(WorkflowKeys.workflows, () =>
-        new WorkflowApi().getWorkflows()
     );

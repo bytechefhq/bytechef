@@ -1,6 +1,6 @@
+import {useGetWorkflowExecutionQuery} from '@/queries/executions';
 import * as Dialog from '@radix-ui/react-dialog';
 import {CheckCircledIcon} from '@radix-ui/react-icons';
-import {useGetWorkflowExecutionQuery} from 'queries/projects.queries';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowExecutionDetailsDialogStore from '..//stores/useWorkflowExecutionDetailsDialogStore';
