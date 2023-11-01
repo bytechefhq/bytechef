@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-01T06:10:06.957596+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-01T08:25:58.564496+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-execution", description = "The Automation Workflow Execution API")
 public interface WorkflowExecutionApi {
@@ -51,7 +51,7 @@ public interface WorkflowExecutionApi {
      * @return The execution object. (status code 200)
      */
     @Operation(
-        operationId = "getExecution",
+        operationId = "getWorkflowExecution",
         summary = "Get workflow executions by id",
         description = "Get workflow execution by id.",
         tags = { "workflow-execution" },
@@ -66,7 +66,7 @@ public interface WorkflowExecutionApi {
         value = "/workflow-executions/{id}",
         produces = { "application/json" }
     )
-    default ResponseEntity<WorkflowExecutionModel> getExecution(
+    default ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(
         @Parameter(name = "id", description = "The id of an execution.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
@@ -97,7 +97,7 @@ public interface WorkflowExecutionApi {
      * @return The page of workflow executions. (status code 200)
      */
     @Operation(
-        operationId = "getExecutions",
+        operationId = "getWorkflowExecutions",
         summary = "Get project workflow executions",
         description = "Get project workflow executions.",
         tags = { "workflow-execution" },
@@ -112,7 +112,7 @@ public interface WorkflowExecutionApi {
         value = "/workflow-executions",
         produces = { "application/json" }
     )
-    default ResponseEntity<org.springframework.data.domain.Page> getExecutions(
+    default ResponseEntity<org.springframework.data.domain.Page> getWorkflowExecutions(
         @Parameter(name = "jobStatus", description = "The status of an executed job", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStatus", required = false) String jobStatus,
         @Parameter(name = "jobStartDate", description = "The start date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStartDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobStartDate,
         @Parameter(name = "jobEndDate", description = "The end date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobEndDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime jobEndDate,
