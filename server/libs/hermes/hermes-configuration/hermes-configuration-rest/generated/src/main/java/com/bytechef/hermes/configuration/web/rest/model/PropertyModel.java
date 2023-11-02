@@ -45,7 +45,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-27T12:43:21.815235+02:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-02T08:08:17.565400+01:00[Europe/Zagreb]")
 public class PropertyModel {
 
   private Boolean advancedOption;
