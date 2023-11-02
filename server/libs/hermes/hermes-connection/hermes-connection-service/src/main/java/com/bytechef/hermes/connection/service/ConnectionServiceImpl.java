@@ -72,7 +72,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections() {
+    public List<Connection> getConnections(int type) {
         return connectionRepository.findAll(Sort.by("name"));
     }
 
@@ -84,13 +84,13 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(String componentName, int version) {
+    public List<Connection> getConnections(String componentName, int version, int type) {
         return connectionRepository.findAllByComponentNameAndConnectionVersionOrderByName(componentName, version);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId) {
+    public List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId, int type) {
         Iterable<Connection> connectionIterable;
 
         if (StringUtils.isBlank(componentName) && tagId == null) {

@@ -50,11 +50,11 @@ public class RemoteConnectionServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/get-connections",
+        value = "/get-connections/{type}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<Connection>> getConnections() {
-        return ResponseEntity.ok(connectionService.getConnections());
+    public ResponseEntity<List<Connection>> getConnections(@PathVariable int type) {
+        return ResponseEntity.ok(connectionService.getConnections(type));
     }
 }

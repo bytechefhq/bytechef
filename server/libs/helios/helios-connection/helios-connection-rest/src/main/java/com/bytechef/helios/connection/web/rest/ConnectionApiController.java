@@ -78,7 +78,7 @@ public class ConnectionApiController implements ConnectionApi {
         String componentName, Integer connectionVersion, Long tagId) {
 
         return ResponseEntity.ok(
-            connectionFacade.getConnections(componentName, connectionVersion, tagId)
+            connectionFacade.getConnections(componentName, connectionVersion, tagId, ProjectConstants.PROJECT_TYPE)
                 .stream()
                 .map(connection -> conversionService.convert(connection, ConnectionModel.class)
                     .parameters(null))

@@ -16,6 +16,7 @@
 
 package com.bytechef.helios.connection.web.rest;
 
+import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.connection.web.rest.model.TagModel;
 import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
@@ -48,7 +49,7 @@ public class ConnectionTagApiController implements ConnectionTagApi {
     @Override
     public ResponseEntity<List<TagModel>> getConnectionTags() {
         return ResponseEntity.ok(
-            connectionFacade.getConnectionTags()
+            connectionFacade.getConnectionTags(ProjectConstants.PROJECT_TYPE)
                 .stream()
                 .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());

@@ -25,6 +25,6 @@ import java.util.List;
 public interface ComponentDefinitionFacade {
 
     List<ComponentDefinition> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
+        Boolean actionDefinitions, Boolean connectionDefinitions,
         Boolean triggerDefinitions, List<String> include);
 }

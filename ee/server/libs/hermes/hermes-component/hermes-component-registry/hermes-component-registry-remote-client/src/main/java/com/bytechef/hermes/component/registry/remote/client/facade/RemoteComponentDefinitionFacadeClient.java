@@ -44,7 +44,7 @@ public class RemoteComponentDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public List<ComponentDefinition> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
+        Boolean actionDefinitions, Boolean connectionDefinitions,
         Boolean triggerDefinitions, List<String> include) {
 
         return Mono.zip(
@@ -54,8 +54,7 @@ public class RemoteComponentDefinitionFacadeClient extends AbstractWorkerClient
                     uriBuilder -> toUri(
                         uriBuilder, serviceInstance, COMPONENT_DEFINITION_FACADE + "/get-component-definitions",
                         Map.of(),
-                        getQueryParams(
-                            actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions)),
+                        getQueryParams(actionDefinitions, connectionDefinitions, triggerDefinitions)),
                     new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
                 .toList(),
             this::toComponentDefinitions)
@@ -63,8 +62,7 @@ public class RemoteComponentDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     private static LinkedMultiValueMap<String, String> getQueryParams(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
-        Boolean triggerDefinitions) {
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions) {
 
         LinkedMultiValueMap<String, String> queryParamsMap = new LinkedMultiValueMap<>();
 
@@ -74,10 +72,6 @@ public class RemoteComponentDefinitionFacadeClient extends AbstractWorkerClient
 
         if (connectionDefinitions != null) {
             queryParamsMap.put("connectionDefinitions", List.of(connectionDefinitions.toString()));
-        }
-
-        if (connectionInstances != null) {
-            queryParamsMap.put("connectionInstances", List.of(connectionInstances.toString()));
         }
 
         if (triggerDefinitions != null) {

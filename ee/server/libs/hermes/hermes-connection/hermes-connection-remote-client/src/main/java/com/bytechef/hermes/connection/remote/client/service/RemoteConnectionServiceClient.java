@@ -58,7 +58,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections() {
+    public List<Connection> getConnections(int type) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host("connection-app")
@@ -73,12 +73,12 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections(String componentName, int version) {
+    public List<Connection> getConnections(String componentName, int version, int type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId) {
+    public List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId, int type) {
         throw new UnsupportedOperationException();
     }
 

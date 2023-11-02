@@ -79,7 +79,7 @@ public class ComponentDefinitionController implements ComponentDefinitionApi {
 
         return ResponseEntity.ok(
             componentDefinitionFacade.getComponentDefinitions(
-                actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions, include)
+                actionDefinitions, connectionDefinitions, triggerDefinitions, include)
                 .stream()
                 .map(componentDefinition -> conversionService.convert(
                     componentDefinition, ComponentDefinitionBasicModel.class))

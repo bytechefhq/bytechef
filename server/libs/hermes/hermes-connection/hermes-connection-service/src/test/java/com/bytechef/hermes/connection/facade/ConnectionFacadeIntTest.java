@@ -156,7 +156,7 @@ public class ConnectionFacadeIntTest {
 
         connection = connectionRepository.save(connection);
 
-        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(null, null, null);
+        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(null, null, null, 1);
 
         Assertions.assertThat(
             CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))
@@ -182,7 +182,7 @@ public class ConnectionFacadeIntTest {
 
         connectionRepository.save(connection);
 
-        Assertions.assertThat(connectionFacade.getConnectionTags()
+        Assertions.assertThat(connectionFacade.getConnectionTags(1)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet()))
@@ -199,7 +199,7 @@ public class ConnectionFacadeIntTest {
 
         connectionRepository.save(connection);
 
-        Assertions.assertThat(connectionFacade.getConnectionTags()
+        Assertions.assertThat(connectionFacade.getConnectionTags(1)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet()))
@@ -207,7 +207,7 @@ public class ConnectionFacadeIntTest {
 
         connectionRepository.deleteById(Validate.notNull(connection.getId(), "id"));
 
-        Assertions.assertThat(connectionFacade.getConnectionTags()
+        Assertions.assertThat(connectionFacade.getConnectionTags(1)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet()))

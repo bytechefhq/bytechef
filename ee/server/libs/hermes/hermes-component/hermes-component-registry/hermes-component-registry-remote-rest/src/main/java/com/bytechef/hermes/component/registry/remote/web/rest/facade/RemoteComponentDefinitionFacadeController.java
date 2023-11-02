@@ -46,6 +46,6 @@ public class RemoteComponentDefinitionFacadeController {
 
         return ResponseEntity.ok(
             componentDefinitionFacade.getComponentDefinitions(
-                actionDefinitions, connectionDefinitions, connectionInstances, triggerDefinitions, include));
+                actionDefinitions, connectionDefinitions, triggerDefinitions, include));
     }
 }

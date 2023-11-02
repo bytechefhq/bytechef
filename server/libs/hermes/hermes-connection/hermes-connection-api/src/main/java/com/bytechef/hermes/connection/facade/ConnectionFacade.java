@@ -31,11 +31,11 @@ public interface ConnectionFacade {
 
     ConnectionDTO getConnection(Long id);
 
-    List<ConnectionDTO> getConnections(String componentName, Integer componentVersion);
+    List<ConnectionDTO> getConnections(String componentName, Integer componentVersion, int type);
 
-    List<ConnectionDTO> getConnections(String componentName, Integer connectionVersion, Long tagId);
+    List<ConnectionDTO> getConnections(String componentName, Integer connectionVersion, Long tagId, int type);
 
-    List<Tag> getConnectionTags();
+    List<Tag> getConnectionTags(int type);
 
     ConnectionDTO update(Long id, List<Tag> tags);
 

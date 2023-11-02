@@ -17,6 +17,7 @@
 package com.bytechef.hermes.connection.dto;
 
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.domain.Connection.CredentialStatus;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -29,21 +30,21 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record ConnectionDTO(
     boolean active, String authorizationName, String componentName, int connectionVersion, String createdBy,
-    LocalDateTime createdDate, Long id, String lastModifiedBy, LocalDateTime lastModifiedDate, String name,
-    Map<String, ?> parameters, List<Tag> tags, int version) {
+    LocalDateTime createdDate, CredentialStatus credentialStatus, Long id, String lastModifiedBy,
+    LocalDateTime lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version) {
 
     public ConnectionDTO(boolean active, Connection connection, List<Tag> tags) {
         this(
             active, connection.getAuthorizationName(), connection.getComponentName(), connection.getConnectionVersion(),
-            connection.getCreatedBy(), connection.getCreatedDate(), connection.getId(), connection.getLastModifiedBy(),
-            connection.getLastModifiedDate(), connection.getName(), connection.getParameters(), tags,
-            connection.getVersion());
+            connection.getCreatedBy(), connection.getCreatedDate(), connection.getCredentialStatus(),
+            connection.getId(), connection.getLastModifiedBy(), connection.getLastModifiedDate(), connection.getName(),
+            connection.getParameters(), tags, connection.getVersion());
     }
 
     public ConnectionDTO(
         boolean active, String componentName, long id, String name, Map<String, Object> parameters, int version) {
 
-        this(active, null, componentName, 0, null, null, id, null, null, name, parameters, null, version);
+        this(active, null, componentName, 0, null, null, null, id, null, null, name, parameters, null, version);
     }
 
     public Connection toConnection() {
@@ -73,6 +74,7 @@ public record ConnectionDTO(
         private int connectionVersion;
         private String createdBy;
         private LocalDateTime createdDate;
+        private CredentialStatus credentialStatus;
         private Long id;
         private String lastModifiedBy;
         private LocalDateTime lastModifiedDate;
@@ -114,6 +116,11 @@ public record ConnectionDTO(
             return this;
         }
 
+        public Builder credentialStatus(CredentialStatus credentialStatus) {
+            this.credentialStatus = credentialStatus;
+            return this;
+        }
+
         public Builder id(Long id) {
             this.id = id;
             return this;
@@ -151,8 +158,8 @@ public record ConnectionDTO(
 
         public ConnectionDTO build() {
             return new ConnectionDTO(
-                active, authorizationName, componentName, connectionVersion, createdBy, createdDate, id, lastModifiedBy,
-                lastModifiedDate, name, parameters, tags, version);
+                active, authorizationName, componentName, connectionVersion, createdBy, createdDate, credentialStatus,
+                id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version);
         }
     }
 }

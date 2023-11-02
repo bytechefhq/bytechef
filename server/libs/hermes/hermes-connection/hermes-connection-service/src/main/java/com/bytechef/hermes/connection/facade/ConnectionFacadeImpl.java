@@ -64,10 +64,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
-        ConnectionDefinitionFacade connectionDefinitionFacade,
-        ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        InstanceAccessorRegistry instanceAccessorRegistry, OAuth2Service oAuth2Service, TagService tagService,
-        WorkflowService workflowService) {
+        ConnectionDefinitionFacade connectionDefinitionFacade, ConnectionDefinitionService connectionDefinitionService,
+        ConnectionService connectionService, InstanceAccessorRegistry instanceAccessorRegistry,
+        OAuth2Service oAuth2Service, TagService tagService, WorkflowService workflowService) {
 
         this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionDefinitionService = connectionDefinitionService;
@@ -143,7 +142,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ConnectionDTO> getConnections(String componentName, Integer componentVersion) {
+    public List<ConnectionDTO> getConnections(String componentName, Integer componentVersion, int type) {
         List<Connection> connections = new ArrayList<>();
 
         List<ConnectionDefinition> connectionDefinitions = connectionDefinitionService.getConnectionDefinitions(
@@ -151,7 +150,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         for (ConnectionDefinition connectionDefinition : connectionDefinitions) {
             connections.addAll(connectionService.getConnections(
-                connectionDefinition.getComponentName(), connectionDefinition.getVersion()));
+                connectionDefinition.getComponentName(), connectionDefinition.getVersion(), type));
         }
 
         return getConnections(connections);
@@ -159,16 +158,16 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ConnectionDTO> getConnections(String componentName, Integer connectionVersion, Long tagId) {
-        List<Connection> connections = connectionService.getConnections(componentName, connectionVersion, tagId);
+    public List<ConnectionDTO> getConnections(String componentName, Integer connectionVersion, Long tagId, int type) {
+        List<Connection> connections = connectionService.getConnections(componentName, connectionVersion, tagId, type);
 
         return getConnections(connections);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Tag> getConnectionTags() {
-        List<Connection> connections = connectionService.getConnections();
+    public List<Tag> getConnectionTags(int type) {
+        List<Connection> connections = connectionService.getConnections(type);
 
         return tagService.getTags(connections.stream()
             .map(Connection::getTagIds)
