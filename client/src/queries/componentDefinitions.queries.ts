@@ -9,13 +9,13 @@ import {useQuery} from '@tanstack/react-query';
 
 export const ComponentDefinitionKeys = {
     componentDefinition: (request: GetComponentDefinitionRequest) => [
-        'componentDefinition',
+        ComponentDefinitionKeys.componentDefinitions,
         request,
     ],
-    componentDefinitions: (request?: GetComponentDefinitionsRequest) => [
-        'componentDefinitions',
-        request,
-    ],
+    componentDefinitions: ['componentDefinitions'] as const,
+    filteredComponentDefinitions: (
+        request?: GetComponentDefinitionsRequest
+    ) => [ComponentDefinitionKeys.componentDefinitions, request],
 };
 
 export const useGetComponentDefinitionQuery = (
@@ -35,7 +35,7 @@ export const useGetComponentDefinitionsQuery = (
     enabledCondition?: boolean
 ) =>
     useQuery<ComponentDefinitionBasicModel[], Error>(
-        ComponentDefinitionKeys.componentDefinitions(request),
+        ComponentDefinitionKeys.filteredComponentDefinitions(request),
         () => new ComponentDefinitionApi().getComponentDefinitions(request),
         {
             enabled: false || enabledCondition,

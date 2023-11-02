@@ -7,20 +7,20 @@ import {
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectDefinitionKeys = {
-    connectionDefinition: ['connectionDefinition'],
-    connectionDefinitionDetails: (
+    connectionDefinition: (
         request?: GetComponentConnectionDefinitionRequest
-    ) => [...ConnectDefinitionKeys.connectionDefinition, request],
-    connectionDefinitions: (
+    ) => [...ConnectDefinitionKeys.connectionDefinitions, request],
+    connectionDefinitions: ['connectionDefinitions'],
+    filteredConnectionDefinitions: (
         request: GetComponentConnectionDefinitionsRequest
-    ) => ['connectionDefinitions', request],
+    ) => [...ConnectDefinitionKeys.connectionDefinitions, request],
 };
 
 export const useGetConnectionDefinitionQuery = (
     request?: GetComponentConnectionDefinitionRequest
 ) =>
     useQuery<ConnectionDefinitionModel, Error>(
-        ConnectDefinitionKeys.connectionDefinitionDetails(request),
+        ConnectDefinitionKeys.connectionDefinition(request),
         () =>
             new ConnectionDefinitionApi().getComponentConnectionDefinition(
                 request!
@@ -35,7 +35,7 @@ export const useGetConnectionDefinitionsQuery = (
     enabledCondition?: boolean
 ) =>
     useQuery<ConnectionDefinitionModel[], Error>(
-        ConnectDefinitionKeys.connectionDefinitions(request),
+        ConnectDefinitionKeys.filteredConnectionDefinitions(request),
         () =>
             new ConnectionDefinitionApi().getComponentConnectionDefinitions(
                 request

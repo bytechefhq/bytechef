@@ -16,7 +16,6 @@ export const ProjectKeys = {
     ) => [...ProjectKeys.projects, filters],
     project: (id: number) => [...ProjectKeys.projects, id],
     projectCategories: ['projectCategories'] as const,
-
     projectTags: ['projectTags'] as const,
     projectWorkflows: (id: number) => [
         ...ProjectKeys.projects,

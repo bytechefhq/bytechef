@@ -13,11 +13,11 @@ import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowKeys = {
     filteredWorkflowExecutions: (request: GetWorkflowExecutionsRequest) => [
-        'workflowExecutions',
+        ...WorkflowKeys.workflows,
         request,
     ],
     workflow: (id: number) => ['workflow', id],
-    workflowExecution: (id: number) => ['workflowExecutions', id],
+    workflowExecution: (id: number) => [...WorkflowKeys.workflows, id],
     workflows: ['workflows'] as const,
 };
 

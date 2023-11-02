@@ -1,9 +1,8 @@
-import {useQuery} from '@tanstack/react-query';
-
 import {
     TaskDispatcherDefinitionApi,
     TaskDispatcherDefinitionModel,
-} from '../middleware/hermes/configuration';
+} from '@/middleware/hermes/configuration';
+import {useQuery} from '@tanstack/react-query';
 
 export const TaskDispatcherKeys = {
     taskDispatcherDefinitions: ['taskDispatcherDefinitions'] as const,
