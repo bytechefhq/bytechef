@@ -162,9 +162,7 @@ const ConnectionDialog = ({
     const createConnectionMutation = useCreateConnectionMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(
-                ComponentDefinitionKeys.componentDefinitions({
-                    connectionInstances: true,
-                })
+                ComponentDefinitionKeys.componentDefinitions
             );
             queryClient.invalidateQueries(ConnectionKeys.connections);
             queryClient.invalidateQueries(ConnectionKeys.connectionTags);
@@ -176,9 +174,7 @@ const ConnectionDialog = ({
     const updateConnectionMutation = useUpdateConnectionMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(
-                ComponentDefinitionKeys.componentDefinitions({
-                    connectionInstances: true,
-                })
+                ComponentDefinitionKeys.componentDefinitions
             );
             queryClient.invalidateQueries(ConnectionKeys.connections);
             queryClient.invalidateQueries(ConnectionKeys.connectionTags);

@@ -43,9 +43,7 @@ const ConnectionListItem = ({
     const deleteConnectionMutation = useDeleteConnectionMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(
-                ComponentDefinitionKeys.componentDefinitions({
-                    connectionInstances: true,
-                })
+                ComponentDefinitionKeys.componentDefinitions
             );
             queryClient.invalidateQueries(ConnectionKeys.connections);
             queryClient.invalidateQueries(ConnectionKeys.connectionTags);

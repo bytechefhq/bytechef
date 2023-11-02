@@ -1,6 +1,10 @@
+import PageLoader from '@/components/PageLoader/PageLoader';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
-import {useGetConnectionTagsQuery} from '@/queries/connections.queries';
+import {
+    useGetConnectionTagsQuery,
+    useGetConnectionsQuery,
+} from '@/queries/connections.queries';
 import {TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
@@ -32,10 +36,40 @@ const Connections = () => {
         type: Type;
     }>(defaultCurrentState);
 
-    const {data: components, isLoading: componentsLoading} =
-        useGetComponentDefinitionsQuery({connectionInstances: true});
+    const {
+        data: allConnections,
+        error: allConnectionsError,
+        isLoading: allConnectionsIsLoading,
+    } = useGetConnectionsQuery({});
 
-    const {data: tags, isLoading: tagsLoading} = useGetConnectionTagsQuery();
+    const allComponentNames = allConnections?.map(
+        (connection) => connection.componentName
+    );
+
+    const {data: components, isLoading: componentsLoading} =
+        useGetComponentDefinitionsQuery(
+            {include: allComponentNames},
+            allComponentNames !== undefined
+        );
+
+    const {
+        data: connections,
+        error: connectionsError,
+        isLoading: connectionsIsLoading,
+    } = useGetConnectionsQuery({
+        componentName: searchParams.get('componentName')
+            ? searchParams.get('componentName')!
+            : undefined,
+        tagId: searchParams.get('tagId')
+            ? parseInt(searchParams.get('tagId')!)
+            : undefined,
+    });
+
+    const {
+        data: tags,
+        error: tagsError,
+        isLoading: tagsLoading,
+    } = useGetConnectionTagsQuery();
 
     let pageTitle: string | undefined;
 
@@ -145,7 +179,18 @@ const Connections = () => {
                 />
             }
         >
-            <ConnectionList />
+            <PageLoader
+                errors={[allConnectionsError, connectionsError, tagsError]}
+                loading={
+                    allConnectionsIsLoading ||
+                    connectionsIsLoading ||
+                    tagsLoading
+                }
+            >
+                {connections && tags && (
+                    <ConnectionList connections={connections} tags={tags} />
+                )}
+            </PageLoader>
         </LayoutContainer>
     );
 };
