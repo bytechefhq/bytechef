@@ -63,13 +63,6 @@ paths:
         required: false
         schema:
           type: "boolean"
-      - name: "connectionInstances"
-        description: "Use for filtering components which have connection instances\
-          \ created."
-        in: "query"
-        required: false
-        schema:
-          type: "boolean"
       - name: "triggerDefinitions"
         description: "Use for filtering components which define trigger definitions."
         in: "query"
