@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.connection.facade;
+package com.bytechef.hermes.connection.facade;
 
-import com.bytechef.helios.connection.dto.ConnectionDTO;
+import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.tag.domain.Tag;
 import java.util.List;
 
@@ -25,7 +25,7 @@ import java.util.List;
  */
 public interface ConnectionFacade {
 
-    ConnectionDTO create(ConnectionDTO connectionDTO);
+    ConnectionDTO create(ConnectionDTO connectionDTO, int type);
 
     void delete(Long id);
 
@@ -39,5 +39,5 @@ public interface ConnectionFacade {
 
     ConnectionDTO update(Long id, List<Tag> tags);
 
-    ConnectionDTO update(ConnectionDTO connectionDTO);
+    ConnectionDTO update(ConnectionDTO connectionDTO, int type);
 }

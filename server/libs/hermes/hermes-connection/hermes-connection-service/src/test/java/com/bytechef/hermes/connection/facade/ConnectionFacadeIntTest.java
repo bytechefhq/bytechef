@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.connection.facade;
+package com.bytechef.hermes.connection.facade;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowConnectionRepository;
-import com.bytechef.helios.configuration.repository.ProjectInstanceWorkflowRepository;
-import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
-import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowServiceImpl;
-import com.bytechef.helios.connection.config.ConnectionIntTestConfiguration;
-import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
-import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.connection.service.ConnectionServiceImpl;
 import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
@@ -45,7 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
@@ -60,17 +53,11 @@ import org.springframework.context.annotation.Import;
 @Import(PostgreSQLContainerConfiguration.class)
 public class ConnectionFacadeIntTest {
 
-    @MockBean
-    ConnectionDefinitionFacade connectionDefinitionFacade;
-
     @Autowired
     private ConnectionFacade connectionFacade;
 
     @Autowired
     private ConnectionRepository connectionRepository;
-
-    @MockBean
-    private OAuth2Service oAuth2Service;
 
     @Autowired
     private TagRepository tagRepository;
@@ -89,7 +76,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        connectionDTO = connectionFacade.create(connectionDTO);
+        connectionDTO = connectionFacade.create(connectionDTO, 1);
 
         Assertions.assertThat(connectionDTO.name())
             .isEqualTo("name1");
@@ -107,7 +94,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        connectionDTO1 = connectionFacade.create(connectionDTO1);
+        connectionDTO1 = connectionFacade.create(connectionDTO1, 1);
 
         ConnectionDTO connectionDTO2 = ConnectionDTO.builder()
             .componentName("componentName")
@@ -115,7 +102,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        connectionDTO2 = connectionFacade.create(connectionDTO2);
+        connectionDTO2 = connectionFacade.create(connectionDTO2, 1);
 
         Assertions.assertThat(connectionRepository.count())
             .isEqualTo(2);
@@ -237,7 +224,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
             .build();
 
-        connectionDTO = connectionFacade.create(connectionDTO);
+        connectionDTO = connectionFacade.create(connectionDTO, 1);
 
         Assertions.assertThat(connectionDTO.tags())
             .hasSize(2);
@@ -250,34 +237,28 @@ public class ConnectionFacadeIntTest {
             .version(connectionDTO.version())
             .build();
 
-        connectionDTO = connectionFacade.update(connectionDTO);
+        connectionDTO = connectionFacade.update(connectionDTO, 1);
 
         Assertions.assertThat(connectionDTO.tags())
             .hasSize(1);
     }
 
-    @ComponentScan(basePackages = "com.bytechef.tag")
+    @ComponentScan(basePackages = {
+        "com.bytechef.hermes.configuration.instance.accessor", "com.bytechef.tag"
+    })
     @TestConfiguration
     public static class ConnectionFacadeIntTestConfiguration {
+
+        @MockBean
+        ConnectionDefinitionFacade connectionDefinitionFacade;
 
         @MockBean
         ConnectionDefinitionService connectionDefinitionService;
 
         @MockBean
+        private OAuth2Service oAuth2Service;
+
+        @MockBean
         WorkflowService workflowService;
-
-        @Bean
-        ConnectionService connectionService(ConnectionRepository connectionRepository) {
-            return new ConnectionServiceImpl(connectionRepository);
-        }
-
-        @Bean
-        ProjectInstanceWorkflowService projectInstanceWorkflowService(
-            ProjectInstanceWorkflowConnectionRepository projectInstanceWorkflowConnectionRepository,
-            ProjectInstanceWorkflowRepository projectInstanceWorkflowRepository) {
-
-            return new ProjectInstanceWorkflowServiceImpl(
-                projectInstanceWorkflowConnectionRepository, projectInstanceWorkflowRepository);
-        }
     }
 }

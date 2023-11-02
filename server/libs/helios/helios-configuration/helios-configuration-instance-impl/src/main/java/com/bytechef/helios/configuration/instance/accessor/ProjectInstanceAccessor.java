@@ -18,6 +18,7 @@ package com.bytechef.helios.configuration.instance.accessor;
 
 import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
@@ -61,6 +62,15 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
             instanceId, workflowId);
 
         return projectInstanceWorkflow.getInputs();
+    }
+
+    @Override
+    public long getInstanceWorkflowConnectionId(String workflowConnectionOperationName, String workflowConnectionKey) {
+        ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
+            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(
+                workflowConnectionOperationName, workflowConnectionKey);
+
+        return projectInstanceWorkflowConnection.getConnectionId();
     }
 
     @Override

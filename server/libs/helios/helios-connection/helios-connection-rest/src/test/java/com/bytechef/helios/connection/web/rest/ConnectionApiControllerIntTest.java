@@ -21,12 +21,12 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.helios.connection.dto.ConnectionDTO;
-import com.bytechef.helios.connection.facade.ConnectionFacade;
 import com.bytechef.helios.connection.web.rest.mapper.ConnectionMapper;
 import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
 import com.bytechef.helios.connection.web.rest.model.TagModel;
 import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.hermes.connection.dto.ConnectionDTO;
+import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.tag.domain.Tag;
 import java.util.Iterator;
 import java.util.List;
@@ -199,7 +199,7 @@ public class ConnectionApiControllerIntTest {
             .name("name")
             .parameters(Map.of("key1", "value1"));
 
-        when(connectionFacade.create(any())).thenReturn(getConnection());
+        when(connectionFacade.create(any(), 1)).thenReturn(getConnection());
 
         try {
             assert connectionDTO.id() != null;
@@ -227,7 +227,7 @@ public class ConnectionApiControllerIntTest {
 
         ArgumentCaptor<ConnectionDTO> connectionArgumentCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
 
-        verify(connectionFacade).create(connectionArgumentCaptor.capture());
+        verify(connectionFacade).create(connectionArgumentCaptor.capture(), 1);
 
         org.assertj.core.api.Assertions.assertThat(connectionArgumentCaptor.getValue())
             .hasFieldOrPropertyWithValue("componentName", "componentName")
@@ -246,7 +246,7 @@ public class ConnectionApiControllerIntTest {
             .build();
         ConnectionModel connectionModel = new ConnectionModel().name("name2");
 
-        when(connectionFacade.update(any(ConnectionDTO.class))).thenReturn(connection);
+        when(connectionFacade.update(any(ConnectionDTO.class), 1)).thenReturn(connection);
 
         try {
             this.webTestClient

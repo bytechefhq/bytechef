@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.connection.dto;
+package com.bytechef.hermes.connection.dto;
 
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.tag.domain.Tag;

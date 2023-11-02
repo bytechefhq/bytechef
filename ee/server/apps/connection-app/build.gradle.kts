@@ -26,7 +26,6 @@ dependencies {
     implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:core:tag:tag-service"))
     implementation(project(":server:libs:helios:helios-connection:helios-connection-rest"))
-    implementation(project(":server:libs:helios:helios-connection:helios-connection-service"))
     implementation(project(":server:libs:helios:helios-swagger"))
     implementation(project(":server:libs:hermes:hermes-connection:hermes-connection-service"))
     implementation(project(":server:libs:hermes:hermes-oauth2:hermes-oauth2-service"))

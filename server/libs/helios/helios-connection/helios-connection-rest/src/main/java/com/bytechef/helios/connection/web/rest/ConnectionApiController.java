@@ -16,9 +16,10 @@
 
 package com.bytechef.helios.connection.web.rest;
 
-import com.bytechef.helios.connection.dto.ConnectionDTO;
-import com.bytechef.helios.connection.facade.ConnectionFacade;
+import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
+import com.bytechef.hermes.connection.dto.ConnectionDTO;
+import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -49,7 +50,8 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<ConnectionModel> createConnection(ConnectionModel connectionModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                connectionFacade.create(conversionService.convert(connectionModel, ConnectionDTO.class)),
+                connectionFacade.create(
+                    conversionService.convert(connectionModel, ConnectionDTO.class), ProjectConstants.PROJECT_TYPE),
                 ConnectionModel.class));
     }
 
@@ -87,7 +89,9 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<ConnectionModel> updateConnection(Long id, ConnectionModel connectionModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class)),
+                connectionFacade.update(
+                    conversionService.convert(connectionModel.id(id), ConnectionDTO.class),
+                    ProjectConstants.PROJECT_TYPE),
                 ConnectionModel.class));
     }
 }

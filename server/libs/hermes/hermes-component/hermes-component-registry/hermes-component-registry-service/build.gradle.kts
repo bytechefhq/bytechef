@@ -27,8 +27,10 @@ dependencies {
     testImplementation(project(":server:libs:core:tag:tag-service"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     testImplementation(project(":server:libs:core:liquibase-config"))
+    testImplementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-instance-api"))
     testImplementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-service"))
     testImplementation(project(":server:libs:hermes:hermes-connection:hermes-connection-service"))
+    testImplementation(project(":server:libs:hermes:hermes-oauth2:hermes-oauth2-api"))
     testImplementation(project(":server:libs:modules:components:petstore"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

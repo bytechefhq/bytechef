@@ -27,5 +27,7 @@ public interface InstanceAccessor {
 
     Map<String, ?> getInputMap(long instanceId, String workflowId);
 
+    long getInstanceWorkflowConnectionId(String workflowConnectionOperationName, String workflowConnectionKey);
+
     int getType();
 }

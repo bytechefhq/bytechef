@@ -29,6 +29,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
@@ -51,9 +52,12 @@ import com.bytechef.hermes.component.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.hermes.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
+import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.tag.service.TagService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -834,7 +838,19 @@ public class OpenApiComponentTaskHandlerIntTest {
         DataStorageService dataStorageService;
 
         @MockBean
+        InstanceAccessorRegistry instanceAccessorRegistry;
+
+        @MockBean
         MessageBroker messageBroker;
+
+        @MockBean
+        OAuth2Service oAuth2Service;
+
+        @MockBean
+        TagService tagService;
+
+        @MockBean
+        WorkflowService workflowService;
 
         @Bean
         List<ComponentHandler> componentHandlers() {

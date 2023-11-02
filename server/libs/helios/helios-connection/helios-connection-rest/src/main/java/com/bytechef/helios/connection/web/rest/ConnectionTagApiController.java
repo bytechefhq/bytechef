@@ -16,9 +16,9 @@
 
 package com.bytechef.helios.connection.web.rest;
 
-import com.bytechef.helios.connection.facade.ConnectionFacade;
 import com.bytechef.helios.connection.web.rest.model.TagModel;
 import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.hermes.connection.facade.ConnectionFacade;
 import com.bytechef.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;

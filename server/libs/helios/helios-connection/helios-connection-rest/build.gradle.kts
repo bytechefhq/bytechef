@@ -59,7 +59,8 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation(project(":server:libs:helios:helios-connection:helios-connection-api"))
+    implementation(project(":server:libs:helios:helios-configuration:helios-configuration-api"))
+    implementation(project(":server:libs:hermes:hermes-connection:hermes-connection-api"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")

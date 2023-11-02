@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.connection.facade;
+package com.bytechef.hermes.connection.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.helios.configuration.constant.ProjectConstants;
-import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
-import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
-import com.bytechef.helios.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
@@ -32,7 +28,10 @@ import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
+import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.oauth2.service.OAuth2Service;
 import com.bytechef.tag.domain.Tag;
@@ -58,8 +57,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private final ConnectionDefinitionFacade connectionDefinitionFacade;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
+    private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final OAuth2Service oAuth2Service;
-    private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final TagService tagService;
     private final WorkflowService workflowService;
 
@@ -67,20 +66,20 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public ConnectionFacadeImpl(
         ConnectionDefinitionFacade connectionDefinitionFacade,
         ConnectionDefinitionService connectionDefinitionService, ConnectionService connectionService,
-        OAuth2Service oAuth2Service, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        TagService tagService, WorkflowService workflowService) {
+        InstanceAccessorRegistry instanceAccessorRegistry, OAuth2Service oAuth2Service, TagService tagService,
+        WorkflowService workflowService) {
 
         this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
+        this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.oAuth2Service = oAuth2Service;
-        this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.tagService = tagService;
         this.workflowService = workflowService;
     }
 
     @Override
-    public ConnectionDTO create(ConnectionDTO connectionDTO) {
+    public ConnectionDTO create(ConnectionDTO connectionDTO, int type) {
         Connection connection = connectionDTO.toConnection();
 
         if (StringUtils.isNotBlank(connection.getAuthorizationName()) &&
@@ -114,11 +113,11 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             connection.setTags(tags);
         }
 
-        connection.setType(ProjectConstants.PROJECT_TYPE);
+        connection.setType(type);
 
         connection = connectionService.create(connection);
 
-        return new ConnectionDTO(isConnectionUsed(Validate.notNull(connection.getId(), "id")), connection, tags);
+        return new ConnectionDTO(isConnectionUsed(Validate.notNull(connection.getId(), "id"), type), connection, tags);
     }
 
     @Override
@@ -138,7 +137,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         Connection connection = connectionService.getConnection(id);
 
         return new ConnectionDTO(
-            isConnectionUsed(Validate.notNull(connection.getId(), "id")), connection,
+            isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()), connection,
             tagService.getTags(connection.getTagIds()));
     }
 
@@ -183,27 +182,32 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         Connection connection = connectionService.update(id, CollectionUtils.map(tags, Tag::getId));
 
-        return new ConnectionDTO(isConnectionUsed(Validate.notNull(connection.getId(), "id")), connection, tags);
+        return new ConnectionDTO(
+            isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()), connection, tags);
     }
 
     @Override
-    public ConnectionDTO update(ConnectionDTO connectionDTO) {
+    public ConnectionDTO update(ConnectionDTO connectionDTO, int type) {
         List<Tag> tags = checkTags(connectionDTO.tags());
 
+        Connection connection = connectionDTO.toConnection();
+
+        connection.setType(type);
+
         return new ConnectionDTO(
-            isConnectionUsed(connectionDTO.id()), connectionService.update(connectionDTO.toConnection()), tags);
+            isConnectionUsed(connectionDTO.id(), type), connectionService.update(connection), tags);
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
         return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
 
-    private boolean isConnectionUsed(long id) {
-        List<Workflow> workflows = workflowService.getWorkflows(ProjectConstants.PROJECT_TYPE);
+    private boolean isConnectionUsed(long id, int type) {
+        List<Workflow> workflows = workflowService.getWorkflows(type);
 
         for (Workflow workflow : workflows) {
             for (WorkflowTask workflowTask : workflow.getTasks()) {
-                if (containsConnection(workflowTask, id)) {
+                if (containsConnection(workflowTask, id, type)) {
                     return true;
                 }
             }
@@ -212,16 +216,17 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return false;
     }
 
-    private boolean containsConnection(WorkflowConnection workflowConnection, long id) {
+    private boolean containsConnection(WorkflowConnection workflowConnection, long id, int type) {
         return workflowConnection.getId()
             .map(connectionId -> id == connectionId)
-            .orElseGet(() -> getConnection(workflowConnection.getOperationName(), workflowConnection.getKey()) != null);
+            .orElseGet(() -> getConnection(
+                workflowConnection.getOperationName(), workflowConnection.getKey(), type) != null);
     }
 
-    private boolean containsConnection(WorkflowTask workflowTask, long id) {
+    private boolean containsConnection(WorkflowTask workflowTask, long id, int type) {
         return WorkflowConnection.of(workflowTask)
             .stream()
-            .map(workflowConnection -> containsConnection(workflowConnection, id))
+            .map(workflowConnection -> containsConnection(workflowConnection, id, type))
             .findFirst()
             .orElse(false);
     }
@@ -238,12 +243,11 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             .toList();
     }
 
-    private Connection getConnection(String workflowConnectionOperationName, String workflowConnectionKey) {
-        ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
-            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(
-                workflowConnectionOperationName, workflowConnectionKey);
+    private Connection getConnection(String workflowConnectionOperationName, String workflowConnectionKey, int type) {
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(type);
 
-        return connectionService.getConnection(projectInstanceWorkflowConnection.getConnectionId());
+        return connectionService.getConnection(
+            instanceAccessor.getInstanceWorkflowConnectionId(workflowConnectionOperationName, workflowConnectionKey));
     }
 
     private List<ConnectionDTO> getConnections(List<Connection> connections) {
@@ -255,8 +259,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return CollectionUtils.map(
             connections,
             connection -> new ConnectionDTO(
-                isConnectionUsed(
-                    Validate.notNull(connection.getId(), "id")),
+                isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()),
                 connection, filterTags(tags, connection)));
     }
 }
