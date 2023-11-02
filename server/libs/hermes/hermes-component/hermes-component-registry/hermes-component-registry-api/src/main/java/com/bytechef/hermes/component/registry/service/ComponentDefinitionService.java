@@ -29,8 +29,7 @@ public interface ComponentDefinitionService {
     List<ComponentDefinition> getComponentDefinitions();
 
     List<ComponentDefinition> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions,
-        Boolean triggerDefinitions, List<String> include);
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include);
 
     List<ComponentDefinition> getComponentDefinitionVersions(String name);
 }

@@ -52,26 +52,18 @@ public class RemoteComponentDefinitionServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<ComponentDefinition>> getComponentDefinitions() {
-        return ResponseEntity.ok(componentDefinitionService.getComponentDefinitions());
-    }
-
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/get-component-definitions",
-        produces = {
-            "application/json"
-        })
     public ResponseEntity<List<ComponentDefinition>> getComponentDefinitions(
         @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
         @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
-        @RequestParam(value = "connectionInstances", required = false) Boolean connectionInstances,
         @RequestParam(value = "triggerDefinitions", required = false) Boolean triggerDefinitions,
         @RequestParam(value = "include", required = false) List<String> include) {
 
         return ResponseEntity.ok(
-            componentDefinitionService.getComponentDefinitions(
-                actionDefinitions, connectionDefinitions, triggerDefinitions, include));
+            actionDefinitions == null && connectionDefinitions == null && triggerDefinitions == null
+                && include == null
+                    ? componentDefinitionService.getComponentDefinitions()
+                    : componentDefinitionService.getComponentDefinitions(
+                        actionDefinitions, connectionDefinitions, triggerDefinitions, include));
     }
 
     @RequestMapping(
