@@ -45,8 +45,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  */
 @Disabled
 @ContextConfiguration(classes = WorkflowConfigurationRestTestConfiguration.class)
-@WebMvcTest(TaskDispatcherDefinitionController.class)
-public class TaskDispatcherDefinitionControllerIntTest {
+@WebMvcTest(TaskDispatcherDefinitionApiController.class)
+public class TaskDispatcherDefinitionApiControllerIntTest {
 
     @MockBean
     private ActionDefinitionFacade actionDefinitionFacade;

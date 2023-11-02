@@ -38,13 +38,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.core:}")
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
-public class TriggerDefinitionController implements TriggerDefinitionApi {
+public class TriggerDefinitionApiController implements TriggerDefinitionApi {
 
     private final ConversionService conversionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
 
-    public TriggerDefinitionController(
+    public TriggerDefinitionApiController(
         ConversionService conversionService, TriggerDefinitionFacade triggerDefinitionFacade,
         TriggerDefinitionService triggerDefinitionService) {
 

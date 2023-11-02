@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.helios.configuration.web.rest.categoryApiController")
+@RestController("com.bytechef.helios.configuration.web.rest.CategoryApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 public class CategoryApiController implements CategoryApi {

@@ -34,12 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.core:}")
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
-public class TaskDispatcherDefinitionController implements TaskDispatcherDefinitionApi {
+public class TaskDispatcherDefinitionApiController implements TaskDispatcherDefinitionApi {
 
     private final ConversionService conversionService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
-    public TaskDispatcherDefinitionController(
+    public TaskDispatcherDefinitionApiController(
         ConversionService conversionService, TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
 
         this.conversionService = conversionService;

@@ -39,14 +39,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.core:}")
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
-public class ActionDefinitionController implements ActionDefinitionApi {
+public class ActionDefinitionApiController implements ActionDefinitionApi {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ActionDefinitionService actionDefinitionService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public ActionDefinitionController(
+    public ActionDefinitionApiController(
         ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
         ConversionService conversionService) {
 

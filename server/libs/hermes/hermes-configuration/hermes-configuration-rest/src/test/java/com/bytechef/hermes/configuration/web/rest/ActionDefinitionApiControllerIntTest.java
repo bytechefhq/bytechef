@@ -24,8 +24,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
  * @author Ivica Cardic
  */
 @Disabled
-@WebMvcTest(ActionDefinitionController.class)
-public class ActionDefinitionControllerIntTest {
+@WebMvcTest(ActionDefinitionApiController.class)
+public class ActionDefinitionApiControllerIntTest {
 
     @Test
     public void getActionDefinitions() {

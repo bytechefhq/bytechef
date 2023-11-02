@@ -32,12 +32,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.core:}")
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
-public class ConnectionDefinitionController implements ConnectionDefinitionApi {
+public class ConnectionDefinitionApiController implements ConnectionDefinitionApi {
 
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConversionService conversionService;
 
-    public ConnectionDefinitionController(
+    public ConnectionDefinitionApiController(
         ConnectionDefinitionService connectionDefinitionService, ConversionService conversionService) {
 
         this.connectionDefinitionService = connectionDefinitionService;

@@ -34,14 +34,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.core:}")
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
-public class OAuth2Controller implements Oauth2Api {
+public class OAuth2ApiController implements Oauth2Api {
 
     private final ConversionService conversionService;
     private final OAuth2ParameterFacade oAuth2ParameterFacade;
     private final OAuth2Service oAuth2Service;
 
     @SuppressFBWarnings("EI")
-    public OAuth2Controller(
+    public OAuth2ApiController(
         ConversionService conversionService, OAuth2ParameterFacade oAuth2ParameterFacade, OAuth2Service oAuth2Service) {
 
         this.conversionService = conversionService;
