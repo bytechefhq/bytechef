@@ -16,10 +16,15 @@
 
 package com.bytechef.hermes.component.registry.service;
 
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import org.springframework.stereotype.Service;
 
 /**
@@ -52,10 +57,53 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
+    public List<ComponentDefinition> getComponentDefinitions(
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
+
+        List<ComponentDefinition> components = getComponentDefinitions()
+            .stream()
+            .filter(filter(actionDefinitions, connectionDefinitions, triggerDefinitions, include))
+            .distinct()
+            .toList();
+
+        if (include != null && !include.isEmpty()) {
+            components = new ArrayList<>(components);
+
+            components.sort(Comparator.comparing(component -> include.indexOf(component.getName())));
+        }
+
+        return components;
+    }
+
+    @Override
     public List<ComponentDefinition> getComponentDefinitionVersions(String name) {
         return componentDefinitionRegistry.getComponentDefinitions(name)
             .stream()
             .map(ComponentDefinition::new)
             .toList();
+    }
+
+    private static Predicate<ComponentDefinition> filter(
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
+
+        return componentDefinition -> {
+            if (include != null && !include.isEmpty() && !include.contains(componentDefinition.getName())) {
+                return false;
+            }
+
+            if (actionDefinitions != null && CollectionUtils.isEmpty(componentDefinition.getActions())) {
+                return false;
+            }
+
+            if (connectionDefinitions != null && !OptionalUtils.isPresent(componentDefinition.getConnection())) {
+                return false;
+            }
+
+            if (triggerDefinitions != null && CollectionUtils.isEmpty(componentDefinition.getTriggers())) {
+                return false;
+            }
+
+            return true;
+        };
     }
 }

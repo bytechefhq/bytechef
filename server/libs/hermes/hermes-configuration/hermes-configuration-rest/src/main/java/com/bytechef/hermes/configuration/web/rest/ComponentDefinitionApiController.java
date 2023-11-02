@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.configuration.web.rest;
 
-import com.bytechef.hermes.component.registry.facade.ComponentDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionModel;
@@ -37,15 +36,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ComponentDefinitionApiController implements ComponentDefinitionApi {
 
     private final ConversionService conversionService;
-    private final ComponentDefinitionFacade componentDefinitionFacade;
     private final ComponentDefinitionService componentDefinitionService;
 
     @SuppressFBWarnings("EI")
     public ComponentDefinitionApiController(
-        ConversionService conversionService, ComponentDefinitionFacade componentDefinitionFacade,
-        ComponentDefinitionService componentDefinitionService) {
+        ConversionService conversionService, ComponentDefinitionService componentDefinitionService) {
 
-        this.componentDefinitionFacade = componentDefinitionFacade;
         this.conversionService = conversionService;
         this.componentDefinitionService = componentDefinitionService;
     }
@@ -74,11 +70,10 @@ public class ComponentDefinitionApiController implements ComponentDefinitionApi 
 
     @Override
     public ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean connectionInstances,
-        Boolean triggerDefinitions, List<String> include) {
+        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
 
         return ResponseEntity.ok(
-            componentDefinitionFacade.getComponentDefinitions(
+            componentDefinitionService.getComponentDefinitions(
                 actionDefinitions, connectionDefinitions, triggerDefinitions, include)
                 .stream()
                 .map(componentDefinition -> conversionService.convert(

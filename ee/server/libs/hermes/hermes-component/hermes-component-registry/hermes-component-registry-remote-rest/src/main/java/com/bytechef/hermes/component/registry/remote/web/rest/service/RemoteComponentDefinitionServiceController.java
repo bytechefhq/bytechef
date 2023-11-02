@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -53,6 +54,24 @@ public class RemoteComponentDefinitionServiceController {
         })
     public ResponseEntity<List<ComponentDefinition>> getComponentDefinitions() {
         return ResponseEntity.ok(componentDefinitionService.getComponentDefinitions());
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/get-component-definitions",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<List<ComponentDefinition>> getComponentDefinitions(
+        @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
+        @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
+        @RequestParam(value = "connectionInstances", required = false) Boolean connectionInstances,
+        @RequestParam(value = "triggerDefinitions", required = false) Boolean triggerDefinitions,
+        @RequestParam(value = "include", required = false) List<String> include) {
+
+        return ResponseEntity.ok(
+            componentDefinitionService.getComponentDefinitions(
+                actionDefinitions, connectionDefinitions, triggerDefinitions, include));
     }
 
     @RequestMapping(
