@@ -37,7 +37,6 @@ export interface GetComponentDefinitionVersionsRequest {
 export interface GetComponentDefinitionsRequest {
     actionDefinitions?: boolean;
     connectionDefinitions?: boolean;
-    connectionInstances?: boolean;
     triggerDefinitions?: boolean;
     include?: Array<string>;
 }
@@ -128,10 +127,6 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
         if (requestParameters.connectionDefinitions !== undefined) {
             queryParameters['connectionDefinitions'] = requestParameters.connectionDefinitions;
-        }
-
-        if (requestParameters.connectionInstances !== undefined) {
-            queryParameters['connectionInstances'] = requestParameters.connectionInstances;
         }
 
         if (requestParameters.triggerDefinitions !== undefined) {
