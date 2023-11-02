@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-02T08:08:17.565400+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-02T11:55:59.714736+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "component-definition", description = "The Core Component Definition API")
 public interface ComponentDefinitionApi {
@@ -130,7 +130,6 @@ public interface ComponentDefinitionApi {
      *
      * @param actionDefinitions Use for filtering components which define action definitions. (optional)
      * @param connectionDefinitions Use for filtering components which define connection definitions. (optional)
-     * @param connectionInstances Use for filtering components which have connection instances created. (optional)
      * @param triggerDefinitions Use for filtering components which define trigger definitions. (optional)
      * @param include The list of component names to include in the result. (optional)
      * @return Successful operation. (status code 200)
@@ -154,7 +153,6 @@ public interface ComponentDefinitionApi {
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
         @Parameter(name = "actionDefinitions", description = "Use for filtering components which define action definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
         @Parameter(name = "connectionDefinitions", description = "Use for filtering components which define connection definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
-        @Parameter(name = "connectionInstances", description = "Use for filtering components which have connection instances created.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionInstances", required = false) Boolean connectionInstances,
         @Parameter(name = "triggerDefinitions", description = "Use for filtering components which define trigger definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "triggerDefinitions", required = false) Boolean triggerDefinitions,
         @Parameter(name = "include", description = "The list of component names to include in the result.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "include", required = false) List<String> include
     ) {
