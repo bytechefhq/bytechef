@@ -27,7 +27,7 @@ public class WorkerMessageRoute implements MessageRoute {
     public static final WorkerMessageRoute CONTROL_EVENTS = new WorkerMessageRoute(
         Exchange.CONTROL, "task.control_events");
     public static final WorkerMessageRoute TASK_EXECUTION_EVENTS = new WorkerMessageRoute(
-        Exchange.MESSAGE, "task.task_execution_events");
+        Exchange.MESSAGE, "task.default_task_execution_events");
 
     protected Exchange exchange;
     protected String routeName;
@@ -41,10 +41,10 @@ public class WorkerMessageRoute implements MessageRoute {
     }
 
     public static WorkerMessageRoute ofTaskMessageRoute(String routName) {
-        if (Objects.equals(routName, "tasks")) {
+        if (Objects.equals(routName, "default")) {
             return TASK_EXECUTION_EVENTS;
         } else {
-            return new WorkerMessageRoute(Exchange.MESSAGE, routName);
+            return new WorkerMessageRoute(Exchange.MESSAGE, "task." + routName + "_task_execution_events");
         }
     }
 

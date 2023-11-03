@@ -115,10 +115,16 @@ bytechef:
     redirect-uri: ${bytechef.public-url}/callback
   public-url: http://127.0.0.1:5173
   webhook-url: http://127.0.0.1:7888
+  # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
+  # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
+  # property on any given task.
+  # E.g. node: captions will route to the captions queue which a worker would subscribe to with workflow.worker.subscriptions.captions.
+  # Note: queue must be created before tasks can be routed to it. ByteChef will create the queue if it isn't already there when the worker
+  # bootstraps.
   worker:
     task:
       subscriptions:
-        tasks: "10"
+        default: "10"
   workflow:
     async:
       output-storage:
