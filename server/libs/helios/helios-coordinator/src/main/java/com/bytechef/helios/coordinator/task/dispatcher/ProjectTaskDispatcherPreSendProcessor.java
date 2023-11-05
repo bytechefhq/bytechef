@@ -66,7 +66,8 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
 
             // defined in the workflow definition
 
-            connectionIdMap = getConnectionIdMap(WorkflowConnection.of(taskExecution.getWorkflowTask()));
+            connectionIdMap = getConnectionIdMap(
+                job.getWorkflowId(), WorkflowConnection.of(taskExecution.getWorkflowTask()));
         }
 
         taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);

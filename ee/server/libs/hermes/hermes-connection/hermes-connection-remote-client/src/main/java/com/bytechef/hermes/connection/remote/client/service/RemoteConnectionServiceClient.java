@@ -12,7 +12,6 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -42,19 +41,13 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public Optional<Connection> fetchConnection(long id) {
-        return Optional.ofNullable(
-            loadBalancedWebClient.get(
-                uriBuilder -> uriBuilder
-                    .host("connection-app")
-                    .path("/remote/connection-service/fetch-connection/{id}")
-                    .build(id),
-                Connection.class));
-    }
-
-    @Override
     public Connection getConnection(long id) {
-        return fetchConnection(id).orElseThrow();
+        return loadBalancedWebClient.get(
+            uriBuilder -> uriBuilder
+                .host("connection-app")
+                .path("/remote/connection-service/get-connection/{id}")
+                .build(id),
+            Connection.class);
     }
 
     @Override

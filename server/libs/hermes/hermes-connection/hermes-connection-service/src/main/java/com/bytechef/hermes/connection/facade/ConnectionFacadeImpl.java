@@ -206,7 +206,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         for (Workflow workflow : workflows) {
             for (WorkflowTask workflowTask : workflow.getTasks()) {
-                if (containsConnection(workflowTask, id, type)) {
+                if (containsConnection(workflow.getId(), workflowTask, id, type)) {
                     return true;
                 }
             }
@@ -215,17 +215,21 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return false;
     }
 
-    private boolean containsConnection(WorkflowConnection workflowConnection, long id, int type) {
+    private boolean containsConnection(
+        String workflowId, WorkflowConnection workflowConnection, long id, int type) {
+
         return workflowConnection.getId()
             .map(connectionId -> id == connectionId)
-            .orElseGet(() -> getConnection(
-                workflowConnection.getOperationName(), workflowConnection.getKey(), type) != null);
+            .orElseGet(() -> connectionIdExists(
+                workflowId, workflowConnection.getOperationName(), workflowConnection.getKey(), id, type));
     }
 
-    private boolean containsConnection(WorkflowTask workflowTask, long id, int type) {
+    private boolean containsConnection(
+        String workflowId, WorkflowTask workflowTask, long id, int type) {
+
         return WorkflowConnection.of(workflowTask)
             .stream()
-            .map(workflowConnection -> containsConnection(workflowConnection, id, type))
+            .map(workflowConnection -> containsConnection(workflowId, workflowConnection, id, type))
             .findFirst()
             .orElse(false);
     }
@@ -236,17 +240,22 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return curTagIds.contains(tag.getId());
     }
 
+    private boolean connectionIdExists(
+        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey, long connectionId,
+        int type) {
+
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(type);
+
+        return instanceAccessor.fetchInstanceWorkflowConnectionId(
+            workflowId, workflowConnectionOperationName, workflowConnectionKey)
+            .map(curConnectionId -> Objects.equals(curConnectionId, connectionId))
+            .orElse(false);
+    }
+
     private List<Tag> filterTags(List<Tag> tags, Connection connection) {
         return tags.stream()
             .filter(tag -> containsTag(connection, tag))
             .toList();
-    }
-
-    private Connection getConnection(String workflowConnectionOperationName, String workflowConnectionKey, int type) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(type);
-
-        return connectionService.getConnection(
-            instanceAccessor.getInstanceWorkflowConnectionId(workflowConnectionOperationName, workflowConnectionKey));
     }
 
     private List<ConnectionDTO> getConnections(List<Connection> connections) {

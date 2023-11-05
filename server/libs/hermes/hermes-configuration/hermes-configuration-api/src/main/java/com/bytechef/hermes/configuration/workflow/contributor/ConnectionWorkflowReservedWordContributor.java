@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.instance.accessor;
+package com.bytechef.hermes.configuration.workflow.contributor;
 
-import java.util.Map;
-import java.util.Optional;
+import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWordContributor;
+import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface InstanceAccessor {
+public class ConnectionWorkflowReservedWordContributor implements WorkflowReservedWordContributor {
 
-    Optional<Long> fetchInstanceWorkflowConnectionId(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey);
-
-    boolean isWorkflowEnabled(long instanceId, String workflowId);
-
-    Map<String, ?> getInputMap(long instanceId, String workflowId);
-
-    int getType();
+    @Override
+    public List<String> getReservedWords() {
+        return List.of(
+            WorkflowConnection.COMPONENT_NAME, WorkflowConnection.COMPONENT_VERSION, WorkflowConnection.CONNECTIONS,
+            WorkflowConnection.ID, WorkflowConnection.KEY);
+    }
 }

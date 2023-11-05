@@ -139,17 +139,18 @@ public class TriggerCoordinator {
             logger.debug("onTriggerListenerEvent: triggerListenerEvent={}", triggerListenerEvent);
         }
 
-        TriggerListenerEvent.ListenerParameters listenerParameters = triggerListenerEvent.getListenerParameters();
-
         TriggerExecution triggerExecution = TriggerExecution.builder()
-            .workflowExecutionId(listenerParameters.workflowExecutionId())
+            .startDate(triggerListenerEvent.getExecutionDate())
+            .endDate(triggerListenerEvent.getExecutionDate())
+            .workflowExecutionId(triggerListenerEvent.getWorkflowExecutionId())
+            .workflowTrigger(getWorkflowTrigger(triggerListenerEvent.getWorkflowExecutionId()))
             .build();
 
         triggerExecution = triggerExecutionService.create(triggerExecution);
 
         triggerExecution.setOutput(
             triggerFileStorage.storeTriggerExecutionOutput(
-                Validate.notNull(triggerExecution.getId(), "id"), listenerParameters.output()));
+                Validate.notNull(triggerExecution.getId(), "id"), triggerListenerEvent.getOutput()));
 
         handleTriggerExecutionCompletion(triggerExecution);
     }

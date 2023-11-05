@@ -13,6 +13,7 @@ import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnectio
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,6 +44,22 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
     }
 
     @Override
+    public Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
+        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
+
+        return Optional.ofNullable(
+            loadBalancedWebClient.get(
+                uriBuilder -> uriBuilder
+                    .host(CONFIGURATION_APP)
+                    .path(
+                        PROJECT_INSTANCE_WORKFLOW_SERVICE +
+                            "/fetch-project-instance-workflow-connection/{workflowId}/" +
+                            "{workflowConnectionOperationName}/{workflowConnectionKey}")
+                    .build(workflowId, workflowConnectionOperationName, workflowConnectionKey),
+                ProjectInstanceWorkflowConnection.class));
+    }
+
+    @Override
     public boolean isProjectInstanceWorkflowEnabled(long projectInstanceId, String workflowId) {
         throw new UnsupportedOperationException();
     }
@@ -61,7 +78,7 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
 
     @Override
     public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
-        String workflowConnectionOperationName, String workflowConnectionKey) {
+        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
 
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
@@ -76,14 +93,14 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
 
     @Override
     public long getProjectInstanceWorkflowConnectionId(
-        String workflowConnectionOperationName, String workflowConnectionKey) {
+        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
 
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(
                     PROJECT_INSTANCE_WORKFLOW_SERVICE + "/get-project-instance-workflow-connection-id" +
-                        "/{operationName}/{key}")
+                        "/{workflowConnectionOperationName}/{workflowConnectionKey}")
                 .build(workflowConnectionOperationName, workflowConnectionKey),
             Long.class);
     }

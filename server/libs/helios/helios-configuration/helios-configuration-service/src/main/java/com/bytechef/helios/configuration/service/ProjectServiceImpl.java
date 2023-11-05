@@ -132,9 +132,10 @@ public class ProjectServiceImpl implements ProjectService {
 
         if (published != null) {
             if (published) {
-                projects = CollectionUtils.filter(projects, project -> project.getPublishedDate() != null);
+                projects = CollectionUtils.filter(projects, project -> project.getStatus() == Project.Status.PUBLISHED);
             } else {
-                projects = CollectionUtils.filter(projects, project -> project.getPublishedDate() == null);
+                projects = CollectionUtils.filter(
+                    projects, project -> project.getStatus() == Project.Status.UNPUBLISHED);
             }
         }
 
@@ -158,6 +159,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project curProject = getProject(id);
 
         curProject.setPublishedDate(LocalDateTime.now());
+        curProject.setStatus(Project.Status.PUBLISHED);
 
         return projectRepository.save(curProject);
     }

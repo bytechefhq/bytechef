@@ -62,6 +62,7 @@ import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.Property;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -194,7 +195,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             output -> eventPublisher.publishEvent(
                 new TriggerListenerEvent(
                     new TriggerListenerEvent.ListenerParameters(
-                        WorkflowExecutionId.parse(workflowExecutionId), output))),
+                        WorkflowExecutionId.parse(workflowExecutionId), LocalDateTime.now(), output))),
             context);
     }
 
