@@ -125,11 +125,7 @@ const ProjectInstanceDialogBasicStep = ({
                                     label="Tags"
                                     options={remainingTags.map((tag) => {
                                         return {
-                                            label: `${tag.name
-                                                .charAt(0)
-                                                .toUpperCase()}${tag.name.slice(
-                                                1
-                                            )}`,
+                                            label: tag.name,
                                             value: tag.name
                                                 .toLowerCase()
                                                 .replace(/\W/g, ''),

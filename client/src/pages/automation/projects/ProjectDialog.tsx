@@ -193,11 +193,7 @@ const ProjectDialog = ({
                             label="Category"
                             options={categories!.map(
                                 (category: CategoryModel) => ({
-                                    label: `${category.name
-                                        .charAt(0)
-                                        .toUpperCase()}${category.name.slice(
-                                        1
-                                    )}`,
+                                    label: category.name,
                                     value: category.name
                                         .toLowerCase()
                                         .replace(/\W/g, ''),
@@ -229,9 +225,7 @@ const ProjectDialog = ({
                             label="Tags"
                             options={remainingTags!.map((tag: TagModel) => {
                                 return {
-                                    label: `${tag.name
-                                        .charAt(0)
-                                        .toUpperCase()}${tag.name.slice(1)}`,
+                                    label: tag.name,
                                     value: tag.name
                                         .toLowerCase()
                                         .replace(/\W/g, ''),
