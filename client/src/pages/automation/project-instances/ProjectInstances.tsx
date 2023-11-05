@@ -6,7 +6,7 @@ import {
     useGetProjectInstancesQuery,
 } from '@/queries/projectInstances.queries';
 import {useGetProjectsQuery} from '@/queries/projects.queries';
-import {FolderPlusIcon, TagIcon} from 'lucide-react';
+import {Layers3Icon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -205,7 +205,7 @@ const ProjectInstances = () => {
                     <EmptyList
                         button={<ProjectInstanceDialog />}
                         icon={
-                            <FolderPlusIcon className="h-12 w-12 text-gray-400" />
+                            <Layers3Icon className="h-12 w-12 text-gray-400" />
                         }
                         message="Get started by creating a new project instance."
                         title="No instances of projects"
