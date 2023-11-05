@@ -41,9 +41,7 @@ const WorkflowNodesListItem = ({
             )}
 
             <div className="flex flex-col">
-                <p className="text-sm font-medium text-gray-900">
-                    {node?.title}
-                </p>
+                <p className="text-sm font-medium">{node?.title}</p>
 
                 <p className="line-clamp-2 text-left text-xs text-gray-500">
                     {node?.description}

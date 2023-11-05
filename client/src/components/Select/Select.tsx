@@ -65,7 +65,7 @@ const Select = ({
         {label && (
             <Label
                 className={twMerge(
-                    'flex items-center text-sm font-medium text-gray-900',
+                    'flex items-center text-sm font-medium',
                     description && 'space-x-1'
                 )}
             >

@@ -38,7 +38,7 @@ const ReadOnlyWorkflow = ({
                     size="small"
                     icon={
                         <Cross1Icon
-                            className="h-3 w-3 cursor-pointer text-gray-900"
+                            className="h-3 w-3 cursor-pointer"
                             aria-hidden="true"
                         />
                     }

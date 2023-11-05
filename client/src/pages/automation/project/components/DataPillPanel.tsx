@@ -106,7 +106,7 @@ const DataPillPanel = () => {
                     onOpenAutoFocus={(event) => event.preventDefault()}
                 >
                     <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
-                        <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium text-gray-900">
+                        <Dialog.Title className="flex content-center items-center p-4 text-lg font-medium">
                             <span>Data Pill Panel</span>
 
                             <Tooltip>
@@ -127,7 +127,7 @@ const DataPillPanel = () => {
                                 displayType="icon"
                                 icon={
                                     <Cross1Icon
-                                        className="h-3 w-3 cursor-pointer text-gray-900"
+                                        className="h-3 w-3 cursor-pointer"
                                         aria-hidden="true"
                                     />
                                 }

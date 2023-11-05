@@ -423,7 +423,7 @@ const NodeDetailsPanel = ({
                 >
                     {currentComponent ? (
                         <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
-                            <Dialog.Title className="flex items-center p-4 text-lg font-medium text-gray-900">
+                            <Dialog.Title className="flex items-center p-4 text-lg font-medium">
                                 {currentNode.label}
 
                                 <span className="mx-2 text-sm text-gray-500">
@@ -451,7 +451,7 @@ const NodeDetailsPanel = ({
                                     displayType="icon"
                                     icon={
                                         <Cross1Icon
-                                            className="h-3 w-3 cursor-pointer text-gray-900"
+                                            className="h-3 w-3 cursor-pointer"
                                             aria-hidden="true"
                                         />
                                     }

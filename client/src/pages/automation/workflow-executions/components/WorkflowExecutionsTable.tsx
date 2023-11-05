@@ -129,7 +129,7 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
                         {row.getVisibleCells().map((cell) => (
                             <td
                                 key={cell.id}
-                                className="whitespace-nowrap px-3 py-4 text-sm text-gray-900"
+                                className="whitespace-nowrap px-3 py-4 text-sm"
                             >
                                 {flexRender(
                                     cell.column.columnDef.cell,
