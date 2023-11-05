@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflowConnection", description = "The connection used in a particular task.")
 @JsonTypeName("ProjectInstanceWorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-02T08:08:18.642473+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-05T15:46:04.098445+01:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowConnectionModel {
 
   private Long connectionId;
@@ -29,6 +29,19 @@ public class ProjectInstanceWorkflowConnectionModel {
   private String key;
 
   private String operationName;
+
+  public ProjectInstanceWorkflowConnectionModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public ProjectInstanceWorkflowConnectionModel(Long connectionId, String key, String operationName) {
+    this.connectionId = connectionId;
+    this.key = key;
+    this.operationName = operationName;
+  }
 
   public ProjectInstanceWorkflowConnectionModel connectionId(Long connectionId) {
     this.connectionId = connectionId;
@@ -39,8 +52,8 @@ public class ProjectInstanceWorkflowConnectionModel {
    * The connection id
    * @return connectionId
   */
-  
-  @Schema(name = "connectionId", description = "The connection id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "connectionId", description = "The connection id", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("connectionId")
   public Long getConnectionId() {
     return connectionId;
@@ -59,8 +72,8 @@ public class ProjectInstanceWorkflowConnectionModel {
    * The connection key under which a connection is defined in a workflow definition.
    * @return key
   */
-  
-  @Schema(name = "key", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "key", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("key")
   public String getKey() {
     return key;
@@ -79,8 +92,8 @@ public class ProjectInstanceWorkflowConnectionModel {
    * The action/trigger name to which a connection belongs.
    * @return operationName
   */
-  
-  @Schema(name = "operationName", description = "The action/trigger name to which a connection belongs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "operationName", description = "The action/trigger name to which a connection belongs.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("operationName")
   public String getOperationName() {
     return operationName;
