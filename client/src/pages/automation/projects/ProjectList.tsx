@@ -7,7 +7,7 @@ import {
     AccordionContent,
     AccordionItem,
 } from '@radix-ui/react-accordion';
-import {FolderPlusIcon} from 'lucide-react';
+import {FolderIcon} from 'lucide-react';
 import ProjectListItem from 'pages/automation/projects/ProjectListItem';
 import {useSearchParams} from 'react-router-dom';
 
@@ -45,7 +45,7 @@ const ProjectList = () => {
                     <EmptyList
                         button={<ProjectDialog project={undefined} />}
                         icon={
-                            <FolderPlusIcon className="h-12 w-12 text-gray-400" />
+                            <FolderIcon className="h-12 w-12 text-gray-400" />
                         }
                         message="Get started by creating a new project."
                         title="No projects"

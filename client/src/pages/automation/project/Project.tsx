@@ -420,7 +420,7 @@ const Project = () => {
                                         className="mr-1 border border-success bg-transparent text-success shadow-sm hover:border-success hover:bg-success hover:text-success-foreground"
                                         onClick={() => setLeftSidebarOpen(true)}
                                     >
-                                        <PlayIcon className="h-5" /> Run
+                                        <PlayIcon className="mr-0.5 h-5" /> Run
                                     </Button>
                                 </TooltipTrigger>
 
@@ -440,9 +440,7 @@ const Project = () => {
                                             })
                                         }
                                     >
-                                        {!project?.publishedDate && (
-                                            <CircleDotDashedIcon className="mr-1 h-5" />
-                                        )}
+                                        <CircleDotDashedIcon className="mr-0.5 h-5" />{' '}
                                         Publish
                                     </Button>
                                 </TooltipTrigger>

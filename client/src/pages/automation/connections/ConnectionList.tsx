@@ -1,5 +1,5 @@
 import {ConnectionModel, TagModel} from '@/middleware/helios/connection';
-import {LinkIcon} from 'lucide-react';
+import {Link2Icon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 import EmptyList from '../../../components/EmptyList/EmptyList';
@@ -24,7 +24,7 @@ const ConnectionList = ({
                 {connections?.length === 0 ? (
                     <EmptyList
                         button={<ConnectionDialog />}
-                        icon={<LinkIcon className="h-12 w-12 text-gray-400" />}
+                        icon={<Link2Icon className="h-12 w-12 text-gray-400" />}
                         message="You do not have any Connections created yet."
                         title="No Connections"
                     />
