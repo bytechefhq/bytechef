@@ -4,7 +4,7 @@ This is a [ReactJS](https://reactjs.org) + [Vite](https://vitejs.dev) boilerplat
 
 ## What is inside?
 
-This project uses many tools like:
+This project uses many tools and libs like:
 
 -   [ReactJS](https://reactjs.org)
 -   [Vite](https://vitejs.dev)
@@ -14,5 +14,9 @@ This project uses many tools like:
 -   [Tailwindcss](https://tailwindcss.com)
 -   [Eslint](https://eslint.org)
 -   [Prettier](https://prettier.io)
+-   [shadcn/ui](https://ui.shadcn.com/)
+-   [Radix UI](https://www.radix-ui.com/)
+-   [TanStack](https://tanstack.com/)
+-   [zustand](https://github.com/pmndrs/zustand)
 
 For details on setting up your development machine, please refer to the [Setup Guide](../CONTRIBUTING.md#client-side)
