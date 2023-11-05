@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.coordinator.event;
 
-import com.bytechef.hermes.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.hermes.coordinator.message.route.TriggerCoordinatorMessageRoute;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -32,7 +32,7 @@ public class TriggerPollEvent extends AbstractEvent {
 
     @SuppressFBWarnings("EI")
     public TriggerPollEvent(WorkflowExecutionId workflowExecutionId) {
-        super(CoordinatorMessageRoute.TRIGGER_POLL_EVENTS);
+        super(TriggerCoordinatorMessageRoute.TRIGGER_POLL_EVENTS);
 
         this.workflowExecutionId = workflowExecutionId;
     }

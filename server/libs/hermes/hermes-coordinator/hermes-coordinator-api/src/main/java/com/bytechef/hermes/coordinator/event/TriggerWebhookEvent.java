@@ -17,7 +17,7 @@
 package com.bytechef.hermes.coordinator.event;
 
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.hermes.coordinator.message.route.TriggerCoordinatorMessageRoute;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -33,7 +33,7 @@ public class TriggerWebhookEvent extends AbstractEvent {
 
     @SuppressFBWarnings("EI")
     public TriggerWebhookEvent(WebhookParameters webhookParameters) {
-        super(CoordinatorMessageRoute.TRIGGER_WEBHOOK_EVENTS);
+        super(TriggerCoordinatorMessageRoute.TRIGGER_WEBHOOK_EVENTS);
 
         this.webhookParameters = webhookParameters;
     }

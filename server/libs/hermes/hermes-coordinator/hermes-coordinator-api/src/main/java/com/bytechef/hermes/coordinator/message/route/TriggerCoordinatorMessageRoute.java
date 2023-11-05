@@ -21,7 +21,7 @@ import com.bytechef.message.route.MessageRoute;
 /**
  * @author Ivica Cardic
  */
-public enum CoordinatorMessageRoute implements MessageRoute {
+public enum TriggerCoordinatorMessageRoute implements MessageRoute {
 
     APPLICATION_EVENTS(MessageRoute.Exchange.MESSAGE, "trigger.application_events"),
     ERROR_EVENTS(MessageRoute.Exchange.MESSAGE, "trigger.error_events"),
@@ -33,10 +33,10 @@ public enum CoordinatorMessageRoute implements MessageRoute {
     private MessageRoute.Exchange exchange;
     private String routeName;
 
-    CoordinatorMessageRoute() {
+    TriggerCoordinatorMessageRoute() {
     }
 
-    CoordinatorMessageRoute(MessageRoute.Exchange exchange, String routeName) {
+    TriggerCoordinatorMessageRoute(MessageRoute.Exchange exchange, String routeName) {
         this.exchange = exchange;
         this.routeName = routeName;
     }

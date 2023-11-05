@@ -17,7 +17,7 @@
 package com.bytechef.atlas.worker.event;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
+import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.message.Prioritizable;
 import com.bytechef.message.Retryable;
 import com.bytechef.message.event.MessageEvent;
@@ -28,10 +28,10 @@ import org.apache.commons.lang3.Validate;
 /**
  * @author Ivica CardFic
  */
-public class TaskExecutionEvent implements Prioritizable, Retryable, MessageEvent<WorkerMessageRoute> {
+public class TaskExecutionEvent implements Prioritizable, Retryable, MessageEvent<TaskWorkerMessageRoute> {
 
     private LocalDateTime createdDate;
-    private WorkerMessageRoute route;
+    private TaskWorkerMessageRoute route;
     private TaskExecution taskExecution;
 
     private TaskExecutionEvent() {
@@ -39,11 +39,11 @@ public class TaskExecutionEvent implements Prioritizable, Retryable, MessageEven
 
     @SuppressFBWarnings("EI")
     public TaskExecutionEvent(TaskExecution taskExecution) {
-        this(WorkerMessageRoute.TASK_EXECUTION_EVENTS, taskExecution);
+        this(TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, taskExecution);
     }
 
     @SuppressFBWarnings("EI")
-    public TaskExecutionEvent(WorkerMessageRoute route, TaskExecution taskExecution) {
+    public TaskExecutionEvent(TaskWorkerMessageRoute route, TaskExecution taskExecution) {
         Validate.notNull(taskExecution, "'taskExecution' must not be null");
 
         this.createdDate = LocalDateTime.now();
@@ -86,7 +86,7 @@ public class TaskExecutionEvent implements Prioritizable, Retryable, MessageEven
     }
 
     @Override
-    public WorkerMessageRoute getRoute() {
+    public TaskWorkerMessageRoute getRoute() {
         return route;
     }
 

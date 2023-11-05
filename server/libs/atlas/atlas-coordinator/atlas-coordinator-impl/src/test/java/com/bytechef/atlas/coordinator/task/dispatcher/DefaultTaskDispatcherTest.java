@@ -21,7 +21,7 @@ package com.bytechef.atlas.coordinator.task.dispatcher;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
+import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.message.event.MessageEvent;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class DefaultTaskDispatcherTest {
     public void test1() {
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
             event -> Assertions.assertEquals(
-                WorkerMessageRoute.TASK_EXECUTION_EVENTS, ((MessageEvent<?>) event).getRoute()),
+                TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, ((MessageEvent<?>) event).getRoute()),
             List.of());
 
         defaultTaskDispatcher.dispatch(
@@ -60,7 +60,7 @@ public class DefaultTaskDispatcherTest {
 
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
             event -> Assertions.assertEquals(
-                WorkerMessageRoute.ofTaskMessageRoute("encoder"), ((MessageEvent<?>) event).getRoute()),
+                TaskWorkerMessageRoute.ofTaskMessageRoute("encoder"), ((MessageEvent<?>) event).getRoute()),
             List.of());
 
         defaultTaskDispatcher.dispatch(taskExecution);
@@ -78,7 +78,7 @@ public class DefaultTaskDispatcherTest {
 
         DefaultTaskDispatcher defaultTaskDispatcher = new DefaultTaskDispatcher(
             event -> Assertions.assertEquals(
-                WorkerMessageRoute.ofTaskMessageRoute("encoder.xlarge"), ((MessageEvent<?>) event).getRoute()),
+                TaskWorkerMessageRoute.ofTaskMessageRoute("encoder.xlarge"), ((MessageEvent<?>) event).getRoute()),
             List.of());
 
         defaultTaskDispatcher.dispatch(taskExecution);

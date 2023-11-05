@@ -17,7 +17,7 @@
 package com.bytechef.atlas.worker.config;
 
 import com.bytechef.atlas.worker.TaskWorker;
-import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
+import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -39,11 +39,11 @@ public class TaskWorkerMessageBrokerConfigurerConfiguration {
             Map<String, Object> subscriptions = taskWorkerProperties.getSubscriptions();
 
             subscriptions.forEach((routeName, concurrency) -> messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, WorkerMessageRoute.ofTaskMessageRoute(routeName),
+                listenerEndpointRegistrar, TaskWorkerMessageRoute.ofTaskMessageRoute(routeName),
                 Integer.parseInt((String) concurrency), taskWorker, "onTaskExecutionEvent"));
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, WorkerMessageRoute.CONTROL_EVENTS, 1, taskWorker,
+                listenerEndpointRegistrar, TaskWorkerMessageRoute.CONTROL_EVENTS, 1, taskWorker,
                 "onCancelControlTaskEvent");
         };
     }

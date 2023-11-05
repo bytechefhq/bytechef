@@ -17,14 +17,14 @@
 package com.bytechef.hermes.worker.trigger.event;
 
 import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
-import com.bytechef.hermes.worker.trigger.message.route.WorkerMessageRoute;
+import com.bytechef.hermes.worker.trigger.message.route.TriggerWorkerMessageRoute;
 import com.bytechef.message.event.MessageEvent;
 import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic
  */
-public class CancelControlTriggerEvent implements MessageEvent<WorkerMessageRoute> {
+public class CancelControlTriggerEvent implements MessageEvent<TriggerWorkerMessageRoute> {
 
     private LocalDateTime createdDate;
     private CancelControlTrigger controlTrigger;
@@ -47,8 +47,8 @@ public class CancelControlTriggerEvent implements MessageEvent<WorkerMessageRout
     }
 
     @Override
-    public WorkerMessageRoute getRoute() {
-        return WorkerMessageRoute.CONTROL_EVENTS;
+    public TriggerWorkerMessageRoute getRoute() {
+        return TriggerWorkerMessageRoute.CONTROL_EVENTS;
     }
 
     @Override

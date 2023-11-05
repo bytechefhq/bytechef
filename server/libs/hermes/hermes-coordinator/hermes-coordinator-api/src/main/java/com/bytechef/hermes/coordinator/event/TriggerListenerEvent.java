@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.coordinator.event;
 
-import com.bytechef.hermes.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.hermes.coordinator.message.route.TriggerCoordinatorMessageRoute;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -32,7 +32,7 @@ public class TriggerListenerEvent extends AbstractEvent {
 
     @SuppressFBWarnings("EI")
     public TriggerListenerEvent(ListenerParameters listenerParameters) {
-        super(CoordinatorMessageRoute.TRIGGER_LISTENER_EVENTS);
+        super(TriggerCoordinatorMessageRoute.TRIGGER_LISTENER_EVENTS);
 
         this.listenerParameters = listenerParameters;
     }

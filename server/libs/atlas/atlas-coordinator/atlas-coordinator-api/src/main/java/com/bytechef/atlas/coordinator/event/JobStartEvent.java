@@ -16,7 +16,7 @@
 
 package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 
 /**
  * @author Ivica Cardic
@@ -29,7 +29,7 @@ public class JobStartEvent extends AbstractEvent {
     }
 
     public JobStartEvent(long jobId) {
-        super(CoordinatorMessageRoute.JOB_START_EVENTS);
+        super(TaskCoordinatorMessageRoute.JOB_START_EVENTS);
 
         this.jobId = jobId;
     }

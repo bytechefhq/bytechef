@@ -18,7 +18,7 @@ package com.bytechef.atlas.coordinator.config;
 
 import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.config.TaskCoordinatorProperties.TaskCoordinatorSubscriptions;
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
@@ -39,23 +39,25 @@ public class TaskCoordinatorMessageBrokerConfigurerConfiguration {
             TaskCoordinatorSubscriptions subscriptions = taskCoordinatorProperties.getSubscriptions();
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, CoordinatorMessageRoute.APPLICATION_EVENTS,
+                listenerEndpointRegistrar, TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
                 subscriptions.getApplicationEvents(), taskCoordinator, "onApplicationEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, CoordinatorMessageRoute.ERROR_EVENTS,
+                listenerEndpointRegistrar, TaskCoordinatorMessageRoute.ERROR_EVENTS,
                 subscriptions.getTaskExecutionErrorEvents(), taskCoordinator, "onErrorEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, CoordinatorMessageRoute.JOB_RESUME_EVENTS,
+                listenerEndpointRegistrar, TaskCoordinatorMessageRoute.JOB_RESUME_EVENTS,
                 subscriptions.getJobResumeEvents(),
                 taskCoordinator, "onJobResumeEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, CoordinatorMessageRoute.JOB_START_EVENTS, subscriptions.getJobStartEvents(),
+                listenerEndpointRegistrar, TaskCoordinatorMessageRoute.JOB_START_EVENTS,
+                subscriptions.getJobStartEvents(),
                 taskCoordinator, "onJobStartEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, CoordinatorMessageRoute.JOB_STOP_EVENTS, subscriptions.getJobStopEvents(),
+                listenerEndpointRegistrar, TaskCoordinatorMessageRoute.JOB_STOP_EVENTS,
+                subscriptions.getJobStopEvents(),
                 taskCoordinator, "onJobStopEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
+                listenerEndpointRegistrar, TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
                 subscriptions.getTaskExecutionCompleteEvents(), taskCoordinator, "onTaskExecutionCompleteEvent");
         };
     }

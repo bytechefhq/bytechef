@@ -21,27 +21,27 @@ import com.bytechef.message.route.MessageRoute;
 /**
  * @author Ivica Cardic
  */
-public class CoordinatorMessageRoute implements MessageRoute {
+public class TaskCoordinatorMessageRoute implements MessageRoute {
 
-    public static final CoordinatorMessageRoute APPLICATION_EVENTS = new CoordinatorMessageRoute(
+    public static final TaskCoordinatorMessageRoute APPLICATION_EVENTS = new TaskCoordinatorMessageRoute(
         Exchange.MESSAGE, "task.application_events");
-    public static final CoordinatorMessageRoute ERROR_EVENTS = new CoordinatorMessageRoute(
+    public static final TaskCoordinatorMessageRoute ERROR_EVENTS = new TaskCoordinatorMessageRoute(
         Exchange.MESSAGE, "task.error_events");
-    public static final CoordinatorMessageRoute JOB_RESUME_EVENTS =
-        new CoordinatorMessageRoute(Exchange.MESSAGE, "task.job_resume_events");
-    public static final CoordinatorMessageRoute JOB_START_EVENTS =
-        new CoordinatorMessageRoute(Exchange.MESSAGE, "task.job_start_events");
-    public static final CoordinatorMessageRoute JOB_STOP_EVENTS =
-        new CoordinatorMessageRoute(Exchange.MESSAGE, "task.job_stop_events");
-    public static final CoordinatorMessageRoute TASK_EXECUTION_COMPLETE_EVENTS =
-        new CoordinatorMessageRoute(Exchange.MESSAGE, "task.task_execution_complete_events");
+    public static final TaskCoordinatorMessageRoute JOB_RESUME_EVENTS =
+        new TaskCoordinatorMessageRoute(Exchange.MESSAGE, "task.job_resume_events");
+    public static final TaskCoordinatorMessageRoute JOB_START_EVENTS =
+        new TaskCoordinatorMessageRoute(Exchange.MESSAGE, "task.job_start_events");
+    public static final TaskCoordinatorMessageRoute JOB_STOP_EVENTS =
+        new TaskCoordinatorMessageRoute(Exchange.MESSAGE, "task.job_stop_events");
+    public static final TaskCoordinatorMessageRoute TASK_EXECUTION_COMPLETE_EVENTS =
+        new TaskCoordinatorMessageRoute(Exchange.MESSAGE, "task.task_execution_complete_events");
     protected MessageRoute.Exchange exchange;
     protected String routeName;
 
-    private CoordinatorMessageRoute() {
+    private TaskCoordinatorMessageRoute() {
     }
 
-    private CoordinatorMessageRoute(MessageRoute.Exchange exchange, String routeName) {
+    private TaskCoordinatorMessageRoute(MessageRoute.Exchange exchange, String routeName) {
         this.exchange = exchange;
         this.routeName = routeName;
     }

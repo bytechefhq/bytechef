@@ -29,7 +29,7 @@ import com.bytechef.atlas.configuration.task.CancelControlTask;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
@@ -77,12 +77,12 @@ public class TaskWorkerTest {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
         syncMessageBroker.receive(
-            CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
+            TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             t -> Assertions.assertEquals(
                 "done", taskFileStorage.readTaskExecutionOutput(
                     ((TaskExecutionCompleteEvent) t).getTaskExecution()
                         .getOutput())));
-        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
             t -> {});
 
         TaskWorker worker =
@@ -106,11 +106,11 @@ public class TaskWorkerTest {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
         syncMessageBroker.receive(
-            CoordinatorMessageRoute.ERROR_EVENTS,
+            TaskCoordinatorMessageRoute.ERROR_EVENTS,
             t -> Assertions.assertEquals("bad input", ((TaskExecutionErrorEvent) t).getTaskExecution()
                 .getError()
                 .getMessage()));
-        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
             t -> {});
 
         TaskWorker worker = new TaskWorker(
@@ -135,18 +135,18 @@ public class TaskWorkerTest {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
         syncMessageBroker.receive(
-            CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
+            TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             t -> Assertions.assertEquals(
                 "done", taskFileStorage.readTaskExecutionOutput(
                     ((TaskExecutionCompleteEvent) t).getTaskExecution()
                         .getOutput())));
-        syncMessageBroker.receive(CoordinatorMessageRoute.ERROR_EVENTS,
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.ERROR_EVENTS,
             t -> {
                 TaskExecution taskExecution = (TaskExecution) t;
 
                 Assertions.assertNull(taskExecution.getError());
             });
-        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
             t -> {});
 
         TaskWorker worker = new TaskWorker(
@@ -192,9 +192,9 @@ public class TaskWorkerTest {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
         syncMessageBroker.receive(
-            CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
+            TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             t -> Assertions.assertFalse(new File(tempDir).exists()));
-        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
             t -> {});
 
         TaskWorker worker = new TaskWorker(
@@ -254,9 +254,9 @@ public class TaskWorkerTest {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
         syncMessageBroker.receive(
-            CoordinatorMessageRoute.ERROR_EVENTS,
+            TaskCoordinatorMessageRoute.ERROR_EVENTS,
             t -> Assertions.assertFalse(new File(tempDir).exists()));
-        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS, t -> {});
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, t -> {});
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
@@ -311,7 +311,7 @@ public class TaskWorkerTest {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
-        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
@@ -357,7 +357,7 @@ public class TaskWorkerTest {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
-        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
@@ -413,7 +413,7 @@ public class TaskWorkerTest {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
-        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskWorker worker = new TaskWorker(
             event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),

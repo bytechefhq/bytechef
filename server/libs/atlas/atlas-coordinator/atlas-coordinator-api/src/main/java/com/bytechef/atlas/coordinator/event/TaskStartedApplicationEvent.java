@@ -16,7 +16,7 @@
 
 package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 
 /**
  * @author Ivica Cardic
@@ -32,13 +32,13 @@ public class TaskStartedApplicationEvent extends AbstractEvent implements Applic
     }
 
     public TaskStartedApplicationEvent(long taskExecutionId) {
-        super(CoordinatorMessageRoute.APPLICATION_EVENTS);
+        super(TaskCoordinatorMessageRoute.APPLICATION_EVENTS);
 
         this.taskExecutionId = taskExecutionId;
     }
 
     public TaskStartedApplicationEvent(long jobId, long taskExecutionId) {
-        super(CoordinatorMessageRoute.APPLICATION_EVENTS);
+        super(TaskCoordinatorMessageRoute.APPLICATION_EVENTS);
 
         this.jobId = jobId;
         this.taskExecutionId = taskExecutionId;

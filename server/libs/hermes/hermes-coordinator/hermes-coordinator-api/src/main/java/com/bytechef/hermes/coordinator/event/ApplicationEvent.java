@@ -16,11 +16,11 @@
 
 package com.bytechef.hermes.coordinator.event;
 
-import com.bytechef.hermes.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.hermes.coordinator.message.route.TriggerCoordinatorMessageRoute;
 import com.bytechef.message.event.MessageEvent;
 
 /**
  * @author Ivica Cardic
  */
-public interface ApplicationEvent extends MessageEvent<CoordinatorMessageRoute> {
+public interface ApplicationEvent extends MessageEvent<TriggerCoordinatorMessageRoute> {
 }

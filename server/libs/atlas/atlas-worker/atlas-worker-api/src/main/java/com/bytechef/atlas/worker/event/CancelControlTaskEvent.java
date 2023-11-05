@@ -17,7 +17,7 @@
 package com.bytechef.atlas.worker.event;
 
 import com.bytechef.atlas.configuration.task.CancelControlTask;
-import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
+import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.message.event.MessageEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 /**
  * @author Ivica Cardic
  */
-public class CancelControlTaskEvent implements MessageEvent<WorkerMessageRoute> {
+public class CancelControlTaskEvent implements MessageEvent<TaskWorkerMessageRoute> {
 
     private LocalDateTime createdDate;
     private CancelControlTask controlTask;
@@ -49,8 +49,8 @@ public class CancelControlTaskEvent implements MessageEvent<WorkerMessageRoute> 
     }
 
     @Override
-    public WorkerMessageRoute getRoute() {
-        return WorkerMessageRoute.CONTROL_EVENTS;
+    public TaskWorkerMessageRoute getRoute() {
+        return TaskWorkerMessageRoute.CONTROL_EVENTS;
     }
 
     public String getType() {

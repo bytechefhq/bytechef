@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.coordinator.event;
 
-import com.bytechef.hermes.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.hermes.coordinator.message.route.TriggerCoordinatorMessageRoute;
 
 /**
  * @author Ivica Cardic
@@ -29,7 +29,7 @@ public class TriggerStartedApplicationEvent extends AbstractEvent implements App
     }
 
     public TriggerStartedApplicationEvent(long triggerExecutionId) {
-        super(CoordinatorMessageRoute.APPLICATION_EVENTS);
+        super(TriggerCoordinatorMessageRoute.APPLICATION_EVENTS);
 
         this.triggerExecutionId = triggerExecutionId;
     }

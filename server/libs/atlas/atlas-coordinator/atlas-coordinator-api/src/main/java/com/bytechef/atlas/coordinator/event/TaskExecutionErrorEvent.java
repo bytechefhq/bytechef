@@ -16,7 +16,7 @@
 
 package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,7 +34,7 @@ public class TaskExecutionErrorEvent extends AbstractEvent implements ErrorEvent
 
     @SuppressFBWarnings("EI")
     public TaskExecutionErrorEvent(TaskExecution taskExecution) {
-        super(CoordinatorMessageRoute.ERROR_EVENTS);
+        super(TaskCoordinatorMessageRoute.ERROR_EVENTS);
 
         Validate.notNull(taskExecution, "'taskExecution' must not be null");
 

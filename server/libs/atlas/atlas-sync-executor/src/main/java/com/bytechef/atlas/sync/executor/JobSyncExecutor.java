@@ -25,7 +25,7 @@ import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
@@ -45,7 +45,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
-import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
+import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.DefaultTaskHandlerResolver;
 import com.bytechef.atlas.worker.task.handler.TaskDispatcherAdapterTaskHandlerResolver;
@@ -107,7 +107,7 @@ public class JobSyncExecutor {
             new JobServiceImpl(jobService), taskFileStorage, workflowService);
 
         syncMessageBroker.receive(
-            CoordinatorMessageRoute.ERROR_EVENTS, event -> {
+            TaskCoordinatorMessageRoute.ERROR_EVENTS, event -> {
                 TaskExecution erroredTaskExecution = ((TaskExecutionErrorEvent) event).getTaskExecution();
 
                 ExecutionError error = erroredTaskExecution.getError();
@@ -127,7 +127,7 @@ public class JobSyncExecutor {
             taskFileStorage);
 
         syncMessageBroker.receive(
-            WorkerMessageRoute.TASK_EXECUTION_EVENTS, e -> worker.onTaskExecutionEvent((TaskExecutionEvent) e));
+            TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, e -> worker.onTaskExecutionEvent((TaskExecutionEvent) e));
 
         TaskDispatcherChain taskDispatcherChain = new TaskDispatcherChain();
 
@@ -157,12 +157,12 @@ public class JobSyncExecutor {
             applicationEventListeners, List.of(), getEventPublisher(syncMessageBroker), jobExecutor, jobService,
             taskCompletionHandlerChain, taskDispatcherChain, taskExecutionService);
 
-        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
             event -> taskCoordinator.onApplicationEvent((ApplicationEvent) event));
         syncMessageBroker.receive(
-            CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
+            TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             e -> taskCoordinator.onTaskExecutionCompleteEvent((TaskExecutionCompleteEvent) e));
-        syncMessageBroker.receive(CoordinatorMessageRoute.JOB_START_EVENTS,
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.JOB_START_EVENTS,
             e -> taskCoordinator.onJobStartEvent((JobStartEvent) e));
     }
 

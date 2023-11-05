@@ -16,22 +16,22 @@
 
 package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.message.event.MessageEvent;
 import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic
  */
-public abstract class AbstractEvent implements MessageEvent<CoordinatorMessageRoute> {
+public abstract class AbstractEvent implements MessageEvent<TaskCoordinatorMessageRoute> {
 
     protected LocalDateTime createDate;
-    protected CoordinatorMessageRoute route;
+    protected TaskCoordinatorMessageRoute route;
 
     protected AbstractEvent() {
     }
 
-    public AbstractEvent(CoordinatorMessageRoute route) {
+    public AbstractEvent(TaskCoordinatorMessageRoute route) {
         this.createDate = LocalDateTime.now();
         this.route = route;
     }
@@ -42,7 +42,7 @@ public abstract class AbstractEvent implements MessageEvent<CoordinatorMessageRo
     }
 
     @Override
-    public CoordinatorMessageRoute getRoute() {
+    public TaskCoordinatorMessageRoute getRoute() {
         return route;
     }
 }
