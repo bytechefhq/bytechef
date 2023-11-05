@@ -1049,6 +1049,10 @@ components:
     ProjectInstanceWorkflowConnection:
       description: "The connection used in a particular task."
       type: "object"
+      required:
+        - "connectionId"
+        - "key"
+        - "operationName"
       properties:
         connectionId:
           description: "The connection id"
@@ -1186,12 +1190,15 @@ components:
       - "componentName"
       - "componentVersion"
       - "key"
+      - "operationName"
       properties:
         componentName:
           type: "string"
         componentVersion:
           type: "integer"
         key:
+          type: "string"
+        operationName:
           type: "string"
     WorkflowFormat:
       type: "string"
