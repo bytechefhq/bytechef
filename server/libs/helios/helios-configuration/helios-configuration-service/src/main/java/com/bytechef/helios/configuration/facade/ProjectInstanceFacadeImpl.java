@@ -326,7 +326,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             triggerLifecycleFacade.executeTriggerDisable(
                 workflow.getId(), ProjectConstants.PROJECT_TYPE, projectInstanceWorkflow.getProjectInstanceId(),
                 workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
-                getConnectionId(workflowTrigger));
+                getConnectionId(workflow.getId(), workflowTrigger));
         }
     }
 
@@ -341,27 +341,30 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             triggerLifecycleFacade.executeTriggerEnable(
                 workflow.getId(), ProjectConstants.PROJECT_TYPE, projectInstanceWorkflow.getProjectInstanceId(),
                 workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
-                getConnectionId(workflowTrigger), webhookUrl);
+                getConnectionId(workflow.getId(), workflowTrigger), webhookUrl);
         }
     }
 
-    private Long getConnectionId(WorkflowConnection workflowConnection) {
+    private Long getConnectionId(String workflowId, WorkflowConnection workflowConnection) {
         return workflowConnection.getId()
-            .orElseGet(() -> getConnectionId(workflowConnection.getOperationName(), workflowConnection.getKey()));
+            .orElseGet(() -> getConnectionId(
+                workflowId, workflowConnection.getOperationName(), workflowConnection.getKey()));
     }
 
-    private Long getConnectionId(WorkflowTrigger workflowTrigger) {
+    private Long getConnectionId(String workflowId, WorkflowTrigger workflowTrigger) {
         return WorkflowConnection.of(workflowTrigger)
             .stream()
             .findFirst()
-            .map(this::getConnectionId)
+            .map(workflowConnection -> getConnectionId(workflowId, workflowConnection))
             .orElse(null);
     }
 
-    private Long getConnectionId(String workflowConnectionOperationName, String workflowConnectionKey) {
+    private Long getConnectionId(
+        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
+
         ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
             projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(
-                workflowConnectionOperationName, workflowConnectionKey);
+                workflowId, workflowConnectionOperationName, workflowConnectionKey);
 
         return projectInstanceWorkflowConnection.getConnectionId();
     }

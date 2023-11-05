@@ -108,8 +108,8 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
         try {
             return WorkflowReader.readWorkflow(workflowResource, type);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(e.getMessage());
+            if (logger.isErrorEnabled()) {
+                logger.error(e.getMessage());
             }
         }
 

@@ -106,6 +106,10 @@ public class WorkflowTrigger implements Serializable, Trigger {
         return MapUtils.get(extensions, name, elementType, defaultValue);
     }
 
+    public Map<String, Object> getExtensions() {
+        return Collections.unmodifiableMap(extensions);
+    }
+
     public <T> List<T> getExtensions(String name, Class<T> elementType, List<T> defaultValue) {
         return MapUtils.getList(extensions, name, elementType, defaultValue);
     }
@@ -137,6 +141,10 @@ public class WorkflowTrigger implements Serializable, Trigger {
 
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
+
+        for (Map.Entry<String, Object> entry : extensions.entrySet()) {
+            map.put(entry.getKey(), entry.getValue());
+        }
 
         if (label != null) {
             map.put(WorkflowConstants.LABEL, label);

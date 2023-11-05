@@ -19,6 +19,7 @@ package com.bytechef.hermes.coordinator.event;
 import com.bytechef.hermes.coordinator.message.route.TriggerCoordinatorMessageRoute;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic
@@ -41,6 +42,18 @@ public class TriggerListenerEvent extends AbstractEvent {
         return listenerParameters;
     }
 
+    public LocalDateTime getExecutionDate() {
+        return listenerParameters.executionDate;
+    }
+
+    public Object getOutput() {
+        return listenerParameters.output;
+    }
+
+    public WorkflowExecutionId getWorkflowExecutionId() {
+        return listenerParameters.workflowExecutionId;
+    }
+
     @Override
     public String toString() {
         return "TriggerListenerEvent{" +
@@ -50,6 +63,7 @@ public class TriggerListenerEvent extends AbstractEvent {
             "} ";
     }
 
-    public record ListenerParameters(WorkflowExecutionId workflowExecutionId, Object output) {
+    public record ListenerParameters(
+        WorkflowExecutionId workflowExecutionId, LocalDateTime executionDate, Object output) {
     }
 }

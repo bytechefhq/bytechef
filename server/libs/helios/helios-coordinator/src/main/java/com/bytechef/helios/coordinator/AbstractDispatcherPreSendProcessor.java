@@ -33,14 +33,18 @@ public abstract class AbstractDispatcherPreSendProcessor {
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
     }
 
-    protected Map<String, Long> getConnectionIdMap(List<WorkflowConnection> workflowConnections) {
+    protected Map<String, Long> getConnectionIdMap(
+        String workflowId, List<WorkflowConnection> workflowConnections) {
+
         return workflowConnections.stream()
-            .collect(Collectors.toMap(WorkflowConnection::getKey, this::getConnectionId));
+            .collect(Collectors.toMap(
+                WorkflowConnection::getKey,
+                workflowConnection -> getConnectionId(workflowId, workflowConnection)));
     }
 
-    private Long getConnectionId(WorkflowConnection workflowConnection) {
+    private Long getConnectionId(String workflowId, WorkflowConnection workflowConnection) {
         return workflowConnection.getId()
             .orElseGet(() -> projectInstanceWorkflowService.getProjectInstanceWorkflowConnectionId(
-                workflowConnection.getOperationName(), workflowConnection.getKey()));
+                workflowId, workflowConnection.getOperationName(), workflowConnection.getKey()));
     }
 }

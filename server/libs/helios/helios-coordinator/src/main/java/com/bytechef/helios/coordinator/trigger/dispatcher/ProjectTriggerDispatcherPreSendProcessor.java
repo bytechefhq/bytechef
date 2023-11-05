@@ -35,6 +35,7 @@ public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcher
     @SuppressFBWarnings("EI")
     public ProjectTriggerDispatcherPreSendProcessor(
         ProjectInstanceWorkflowService projectInstanceWorkflowService) {
+
         super(projectInstanceWorkflowService);
     }
 
@@ -42,7 +43,9 @@ public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcher
     public TriggerExecution process(TriggerExecution triggerExecution) {
         triggerExecution.putMetadata(
             MetadataConstants.CONNECTION_IDS,
-            getConnectionIdMap(WorkflowConnection.of(triggerExecution.getWorkflowTrigger())));
+            getConnectionIdMap(
+                triggerExecution.getWorkflowId(),
+                WorkflowConnection.of(triggerExecution.getWorkflowTrigger())));
 
         return triggerExecution;
     }

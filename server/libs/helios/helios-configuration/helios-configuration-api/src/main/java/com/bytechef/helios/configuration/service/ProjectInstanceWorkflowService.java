@@ -19,6 +19,7 @@ package com.bytechef.helios.configuration.service;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -29,14 +30,18 @@ public interface ProjectInstanceWorkflowService {
 
     void delete(Long id);
 
+    Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
+        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey);
+
     boolean isProjectInstanceWorkflowEnabled(long projectInstanceId, String workflowId);
 
     ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId);
 
     ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
-        String workflowConnectionOperationName, String workflowConnectionKey);
+        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey);
 
-    long getProjectInstanceWorkflowConnectionId(String workflowConnectionOperationName, String workflowConnectionKey);
+    long getProjectInstanceWorkflowConnectionId(
+        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey);
 
     List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(long projectInstanceId);
 

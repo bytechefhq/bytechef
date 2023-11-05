@@ -17,6 +17,7 @@
 package com.bytechef.hermes.scheduler.job;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.coordinator.event.TriggerListenerEvent;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
@@ -47,6 +48,7 @@ public class ScheduleTriggerJob implements Job {
             new TriggerListenerEvent(
                 new TriggerListenerEvent.ListenerParameters(
                     WorkflowExecutionId.parse(jobDataMap.getString("workflowExecutionId")),
+                    LocalDateTimeUtils.getLocalDateTime(fireTime),
                     MapUtils.concat(
                         Map.of("datetime", fireTime.toString()),
                         JsonUtils.readMap(jobDataMap.getString("output"), String.class, objectMapper)))));

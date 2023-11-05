@@ -24,6 +24,7 @@ import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,6 +42,15 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
 
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
+    }
+
+    @Override
+    public Optional<Long> fetchInstanceWorkflowConnectionId(
+        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
+
+        return projectInstanceWorkflowService.fetchProjectInstanceWorkflowConnection(
+            workflowId, workflowConnectionOperationName, workflowConnectionKey)
+            .map(ProjectInstanceWorkflowConnection::getConnectionId);
     }
 
     @Override
@@ -62,15 +72,6 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
             instanceId, workflowId);
 
         return projectInstanceWorkflow.getInputs();
-    }
-
-    @Override
-    public long getInstanceWorkflowConnectionId(String workflowConnectionOperationName, String workflowConnectionKey) {
-        ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
-            projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(
-                workflowConnectionOperationName, workflowConnectionKey);
-
-        return projectInstanceWorkflowConnection.getConnectionId();
     }
 
     @Override

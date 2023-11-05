@@ -18,6 +18,7 @@ package com.bytechef.hermes.configuration.connection;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import java.util.ArrayList;
@@ -31,8 +32,13 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class WorkflowConnection {
 
+    public static final String COMPONENT_NAME = "componentName";
+    public static final String COMPONENT_VERSION = "componentVersion";
     public static final String CONNECTIONS = "connections";
     public static final String ID = "id";
+    public static final String KEY = "key";
+
+    private static final String OPERATION_NAME = "operationName";
 
     private final String componentName; // required if a component supports multiple connections
     private final Integer componentVersion; // required if a component supports multiple connections
@@ -76,14 +82,24 @@ public class WorkflowConnection {
         return workflowConnections;
     }
 
-    private static List<WorkflowConnection> toList(Map<String, Map<String, Object>> source, String operationName) {
-        return source.entrySet()
-            .stream()
-            .map(entry -> new WorkflowConnection(
-                MapUtils.getString(entry.getValue(), "componentName"),
-                MapUtils.getInteger(entry.getValue(), "componentVersion"), operationName, entry.getKey(),
-                MapUtils.getLong(entry.getValue(), ID)))
-            .toList();
+    private static List<WorkflowConnection> toList(Map<String, Map<String, Object>> connections, String operationName) {
+        return CollectionUtils.map(
+            connections.entrySet(),
+            entry -> {
+                Map<String, Object> connection = entry.getValue();
+
+                if (!connection.containsKey(ID) &&
+                    (!connection.containsKey(COMPONENT_NAME) || !connection.containsKey(COMPONENT_VERSION))) {
+
+                    throw new IllegalStateException(
+                        "%s and %s must be set".formatted(COMPONENT_NAME, COMPONENT_VERSION));
+                }
+
+                return new WorkflowConnection(
+                    MapUtils.getString(connection, COMPONENT_NAME),
+                    MapUtils.getInteger(connection, COMPONENT_VERSION), operationName, entry.getKey(),
+                    MapUtils.getLong(connection, ID));
+            });
     }
 
     public Optional<String> getComponentName() {
@@ -124,9 +140,9 @@ public class WorkflowConnection {
         @SuppressWarnings("unchecked")
         public WorkflowConnection convert(Map source) {
             return new WorkflowConnection(
-                MapUtils.getString(source, "componentName"), MapUtils.getInteger(source, "componentVersion"),
-                MapUtils.getString(source, "operationName"), MapUtils.getString(source, "key"),
-                MapUtils.getLong(source, "id"));
+                MapUtils.getString(source, COMPONENT_NAME), MapUtils.getInteger(source, COMPONENT_VERSION),
+                MapUtils.getString(source, OPERATION_NAME), MapUtils.getString(source, KEY),
+                MapUtils.getLong(source, ID));
         }
     }
 }

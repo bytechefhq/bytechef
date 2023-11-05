@@ -111,8 +111,7 @@ public class TriggerSchedulerImpl implements TriggerScheduler {
 
         Trigger trigger = TriggerBuilder.newTrigger()
             .withIdentity(TriggerKey.triggerKey(workflowExecutionId.toString(), "ScheduleTrigger"))
-            .withSchedule(
-                CronScheduleBuilder.cronSchedule(pattern))
+            .withSchedule(CronScheduleBuilder.cronSchedule(pattern))
             .startNow()
             .build();
 
@@ -146,6 +145,8 @@ public class TriggerSchedulerImpl implements TriggerScheduler {
 
     private void schedule(JobDetail jobDetail, Trigger trigger) {
         try {
+            scheduler.deleteJob(jobDetail.getKey());
+
             scheduler.scheduleJob(jobDetail, trigger);
         } catch (SchedulerException e) {
             throw new RuntimeException(e);

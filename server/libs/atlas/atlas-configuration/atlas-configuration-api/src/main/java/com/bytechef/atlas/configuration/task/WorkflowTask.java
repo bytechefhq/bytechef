@@ -47,6 +47,7 @@ public class WorkflowTask implements Task, Serializable {
     private Map<String, ?> parameters = Collections.emptyMap();
     private List<WorkflowTask> post = Collections.emptyList();
     private List<WorkflowTask> pre = Collections.emptyList();
+    private int taskNumber;
     private String timeout;
     private String type;
 
@@ -76,6 +77,8 @@ public class WorkflowTask implements Task, Serializable {
             } else if (WorkflowConstants.PRE.equals(entry.getKey())) {
                 this.pre = MapUtils.getList(
                     source, WorkflowConstants.PRE, WorkflowTask.class, Collections.emptyList());
+            } else if (WorkflowConstants.TASK_NUMBER.equals(entry.getKey())) {
+                this.taskNumber = MapUtils.getInteger(source, WorkflowConstants.TASK_NUMBER);
             } else if (WorkflowConstants.TIMEOUT.equals(entry.getKey())) {
                 this.timeout = MapUtils.getString(source, WorkflowConstants.TIMEOUT);
             } else if (WorkflowConstants.TYPE.equals(entry.getKey())) {
@@ -112,6 +115,7 @@ public class WorkflowTask implements Task, Serializable {
             && parameters.equals(that.parameters)
             && post.equals(that.post)
             && pre.equals(that.pre)
+            && Objects.equals(taskNumber, that.taskNumber)
             && Objects.equals(timeout, that.timeout)
             && Objects.equals(type, that.type);
     }
@@ -120,13 +124,17 @@ public class WorkflowTask implements Task, Serializable {
         return MapUtils.get(extensions, name, elementType, defaultValue);
     }
 
+    public Map<String, Object> getExtensions() {
+        return Collections.unmodifiableMap(extensions);
+    }
+
     public <T> List<T> getExtensions(String name, Class<T> elementType, List<T> defaultValue) {
         return MapUtils.getList(extensions, name, elementType, defaultValue);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(finalize, label, name, node, parameters, post, pre, timeout, type);
+        return Objects.hash(finalize, label, name, node, parameters, post, pre, taskNumber, timeout, type);
     }
 
     /**
@@ -203,6 +211,10 @@ public class WorkflowTask implements Task, Serializable {
         return Collections.unmodifiableList(pre);
     }
 
+    public int getTaskNumber() {
+        return taskNumber;
+    }
+
     /**
      * Returns the timeout expression which describes when this task should be deemed as timed-out.
      *
@@ -221,6 +233,10 @@ public class WorkflowTask implements Task, Serializable {
 
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
+
+        for (Map.Entry<String, Object> entry : extensions.entrySet()) {
+            map.put(entry.getKey(), entry.getValue());
+        }
 
         map.put(WorkflowConstants.FINALIZE, CollectionUtils.map(finalize, WorkflowTask::toMap));
 
