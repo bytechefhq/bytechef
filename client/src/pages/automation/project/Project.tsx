@@ -28,6 +28,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useToast} from '@/components/ui/use-toast';
 import {RightSidebar} from '@/layouts/RightSidebar';
 import {ProjectModel, WorkflowModel} from '@/middleware/helios/configuration';
 import {
@@ -80,6 +81,8 @@ const Project = () => {
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
     const {setNodeDetailsPanelOpen} = useNodeDetailsPanelStore();
+
+    const {toast} = useToast();
 
     const {projectId, workflowId} = useParams();
     const navigate = useNavigate();
@@ -189,8 +192,12 @@ const Project = () => {
     });
 
     const publishProjectMutation = usePublishProjectMutation({
-        onSuccess: () => {
+        onSuccess: (project) => {
             queryClient.invalidateQueries(ProjectKeys.projects);
+
+            toast({
+                description: `The project ${project.name} is published.`,
+            });
         },
     });
 
