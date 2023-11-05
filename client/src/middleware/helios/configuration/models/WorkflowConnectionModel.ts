@@ -37,6 +37,12 @@ export interface WorkflowConnectionModel {
      * @memberof WorkflowConnectionModel
      */
     key: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WorkflowConnectionModel
+     */
+    operationName: string;
 }
 
 /**
@@ -47,6 +53,7 @@ export function instanceOfWorkflowConnectionModel(value: object): boolean {
     isInstance = isInstance && "componentName" in value;
     isInstance = isInstance && "componentVersion" in value;
     isInstance = isInstance && "key" in value;
+    isInstance = isInstance && "operationName" in value;
 
     return isInstance;
 }
@@ -64,6 +71,7 @@ export function WorkflowConnectionModelFromJSONTyped(json: any, ignoreDiscrimina
         'componentName': json['componentName'],
         'componentVersion': json['componentVersion'],
         'key': json['key'],
+        'operationName': json['operationName'],
     };
 }
 
@@ -79,6 +87,7 @@ export function WorkflowConnectionModelToJSON(value?: WorkflowConnectionModel | 
         'componentName': value.componentName,
         'componentVersion': value.componentVersion,
         'key': value.key,
+        'operationName': value.operationName,
     };
 }
 
