@@ -109,7 +109,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             />
 
             <div className="ml-2 flex w-full min-w-max flex-col items-start">
-                <span className="text-sm text-gray-900">{data.label}</span>
+                <span className="text-sm">{data.label}</span>
 
                 <span className="text-xs text-gray-500">{data.name}</span>
             </div>

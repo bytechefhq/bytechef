@@ -105,7 +105,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                 {project.description ? (
                                     <HoverCard>
                                         <HoverCardTrigger asChild>
-                                            <span className="mr-2 text-base font-semibold text-gray-900">
+                                            <span className="mr-2 text-base font-semibold">
                                                 {project.name}
                                             </span>
                                         </HoverCardTrigger>
@@ -115,7 +115,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                         </HoverCardContent>
                                     </HoverCard>
                                 ) : (
-                                    <span className="mr-2 text-base font-semibold text-gray-900">
+                                    <span className="mr-2 text-base font-semibold">
                                         {project.name}
                                     </span>
                                 )}

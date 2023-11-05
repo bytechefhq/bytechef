@@ -54,7 +54,7 @@ const WorkflowExecutionDetailsDialog = () => {
 
                     <div className="flex w-7/12 flex-col border-r border-gray-100 bg-white">
                         <Dialog.Title className="px-3 py-4">
-                            <div className="mb-3 flex items-center justify-between text-gray-900">
+                            <div className="mb-3 flex items-center justify-between">
                                 <span className="text-lg">
                                     {allTasksCompleted
                                         ? 'Workflow executed successfully'

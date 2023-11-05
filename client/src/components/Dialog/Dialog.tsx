@@ -80,9 +80,7 @@ const Dialog = ({
                             className
                         )}
                     >
-                        <Title className="text-base font-medium text-gray-900">
-                            {title}
-                        </Title>
+                        <Title className="text-base font-medium">{title}</Title>
 
                         {description && (
                             <Description className="my-4 text-sm font-normal text-gray-700">

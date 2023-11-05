@@ -68,7 +68,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
                         'block w-full rounded-md border focus:outline-none focus:ring-1 sm:text-sm',
                         error
                             ? 'border-red-300 pr-10 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500'
-                            : 'border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-transparent focus:ring focus:ring-blue-500',
+                            : 'border-gray-300 placeholder:text-gray-400 focus:border-transparent focus:ring focus:ring-blue-500',
                     ])}
                     id={name}
                     name={name}
