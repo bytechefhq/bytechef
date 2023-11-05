@@ -17,7 +17,7 @@
 package com.bytechef.hermes.worker.trigger.event;
 
 import com.bytechef.hermes.execution.domain.TriggerExecution;
-import com.bytechef.hermes.worker.trigger.message.route.WorkerMessageRoute;
+import com.bytechef.hermes.worker.trigger.message.route.TriggerWorkerMessageRoute;
 import com.bytechef.message.Prioritizable;
 import com.bytechef.message.event.MessageEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -27,7 +27,7 @@ import org.apache.commons.lang3.Validate;
 /**
  * @author Ivica Cardic
  */
-public class TriggerExecutionEvent implements Prioritizable, MessageEvent<WorkerMessageRoute> {
+public class TriggerExecutionEvent implements Prioritizable, MessageEvent<TriggerWorkerMessageRoute> {
 
     private LocalDateTime createdDate;
     private TriggerExecution triggerExecution;
@@ -60,8 +60,8 @@ public class TriggerExecutionEvent implements Prioritizable, MessageEvent<Worker
         return createdDate;
     }
 
-    public WorkerMessageRoute getRoute() {
-        return WorkerMessageRoute.TRIGGER_EXECUTION_EVENTS;
+    public TriggerWorkerMessageRoute getRoute() {
+        return TriggerWorkerMessageRoute.TRIGGER_EXECUTION_EVENTS;
     }
 
     @Override

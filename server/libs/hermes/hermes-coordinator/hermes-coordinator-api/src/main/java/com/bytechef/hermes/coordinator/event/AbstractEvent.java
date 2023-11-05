@@ -16,22 +16,22 @@
 
 package com.bytechef.hermes.coordinator.event;
 
-import com.bytechef.hermes.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.hermes.coordinator.message.route.TriggerCoordinatorMessageRoute;
 import com.bytechef.message.event.MessageEvent;
 import java.time.LocalDateTime;
 
 /**
  * @author Ivica Cardic
  */
-public abstract class AbstractEvent implements MessageEvent<CoordinatorMessageRoute> {
+public abstract class AbstractEvent implements MessageEvent<TriggerCoordinatorMessageRoute> {
 
     protected LocalDateTime createDate;
-    protected CoordinatorMessageRoute route;
+    protected TriggerCoordinatorMessageRoute route;
 
     protected AbstractEvent() {
     }
 
-    public AbstractEvent(CoordinatorMessageRoute route) {
+    public AbstractEvent(TriggerCoordinatorMessageRoute route) {
         this.createDate = LocalDateTime.now();
         this.route = route;
     }
@@ -42,7 +42,7 @@ public abstract class AbstractEvent implements MessageEvent<CoordinatorMessageRo
     }
 
     @Override
-    public CoordinatorMessageRoute getRoute() {
+    public TriggerCoordinatorMessageRoute getRoute() {
         return route;
     }
 }

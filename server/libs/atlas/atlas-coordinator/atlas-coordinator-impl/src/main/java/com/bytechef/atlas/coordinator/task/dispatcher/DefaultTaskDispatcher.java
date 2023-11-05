@@ -21,7 +21,7 @@ package com.bytechef.atlas.coordinator.task.dispatcher;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
-import com.bytechef.atlas.worker.message.route.WorkerMessageRoute;
+import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     private final ApplicationEventPublisher eventPublisher;
     private final List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors;
 
-    private static final WorkerMessageRoute DEFAULT_MESSAGE_ROUTE = WorkerMessageRoute.TASK_EXECUTION_EVENTS;
+    private static final TaskWorkerMessageRoute DEFAULT_MESSAGE_ROUTE = TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS;
 
     @SuppressFBWarnings("EI")
     public DefaultTaskDispatcher(
@@ -54,7 +54,7 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
     public void dispatch(TaskExecution taskExecution) {
         taskExecution = preProcess(taskExecution);
 
-        WorkerMessageRoute messageRoute = calculateQueueName(taskExecution);
+        TaskWorkerMessageRoute messageRoute = calculateQueueName(taskExecution);
 
         if (logger.isDebugEnabled()) {
             logger.debug(
@@ -74,11 +74,11 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
         return null;
     }
 
-    private WorkerMessageRoute calculateQueueName(Task task) {
+    private TaskWorkerMessageRoute calculateQueueName(Task task) {
         TaskExecution taskExecution = (TaskExecution) task;
 
         return taskExecution.getNode() != null
-            ? WorkerMessageRoute.ofTaskMessageRoute(taskExecution.getNode())
+            ? TaskWorkerMessageRoute.ofTaskMessageRoute(taskExecution.getNode())
             : DEFAULT_MESSAGE_ROUTE;
     }
 

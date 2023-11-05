@@ -16,7 +16,7 @@
 
 package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.Job.Status;
 import org.apache.commons.lang3.Validate;
 
@@ -34,7 +34,7 @@ public class JobStatusApplicationEvent extends AbstractEvent implements Applicat
     }
 
     public JobStatusApplicationEvent(long jobId, Status status) {
-        super(CoordinatorMessageRoute.APPLICATION_EVENTS);
+        super(TaskCoordinatorMessageRoute.APPLICATION_EVENTS);
 
         Validate.notNull(status, "'status' must not be null");
 

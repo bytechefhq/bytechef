@@ -17,7 +17,7 @@
 package com.bytechef.hermes.coordinator.event;
 
 import com.bytechef.error.ExecutionError;
-import com.bytechef.hermes.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.hermes.coordinator.message.route.TriggerCoordinatorMessageRoute;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
@@ -34,7 +34,7 @@ public class TriggerExecutionErrorEvent extends AbstractEvent implements ErrorEv
 
     @SuppressFBWarnings("EI")
     public TriggerExecutionErrorEvent(TriggerExecution triggerExecution) {
-        super(CoordinatorMessageRoute.ERROR_EVENTS);
+        super(TriggerCoordinatorMessageRoute.ERROR_EVENTS);
 
         Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
 

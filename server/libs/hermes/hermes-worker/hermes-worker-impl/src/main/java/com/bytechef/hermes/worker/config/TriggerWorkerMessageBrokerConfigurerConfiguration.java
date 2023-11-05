@@ -17,7 +17,7 @@
 package com.bytechef.hermes.worker.config;
 
 import com.bytechef.hermes.worker.TriggerWorker;
-import com.bytechef.hermes.worker.trigger.message.route.WorkerMessageRoute;
+import com.bytechef.hermes.worker.trigger.message.route.TriggerWorkerMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
@@ -34,11 +34,11 @@ public class TriggerWorkerMessageBrokerConfigurerConfiguration {
     MessageBrokerConfigurer<?> triggerWorkerMessageBrokerConfigurer(TriggerWorker triggerWorker) {
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, WorkerMessageRoute.CONTROL_EVENTS, 1, triggerWorker,
+                listenerEndpointRegistrar, TriggerWorkerMessageRoute.CONTROL_EVENTS, 1, triggerWorker,
                 "onCancelControlTriggerEvent");
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, WorkerMessageRoute.TRIGGER_EXECUTION_EVENTS, 1, triggerWorker,
+                listenerEndpointRegistrar, TriggerWorkerMessageRoute.TRIGGER_EXECUTION_EVENTS, 1, triggerWorker,
                 "onTriggerExecutionEvent");
         };
     }

@@ -28,7 +28,7 @@ import static com.bytechef.atlas.configuration.constant.WorkflowConstants.TYPE;
 import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
@@ -122,20 +122,20 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     public void test3() {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
-        syncMessageBroker.receive(CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS, t -> {
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS, t -> {
             TaskExecution taskExecution = ((TaskExecutionCompleteEvent) t).getTaskExecution();
 
             Assertions.assertNull(taskExecution.getOutput());
         });
 
         syncMessageBroker
-            .receive(CoordinatorMessageRoute.ERROR_EVENTS, t -> {
+            .receive(TaskCoordinatorMessageRoute.ERROR_EVENTS, t -> {
                 TaskExecution taskExecution = ((TaskExecutionErrorEvent) t).getTaskExecution();
 
                 Assertions.assertNull(taskExecution.getError());
             });
 
-        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS,
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
             t -> {});
 
         MapTaskDispatcherAdapterTaskHandler[] mapAdapterTaskHandlerRefs = new MapTaskDispatcherAdapterTaskHandler[1];

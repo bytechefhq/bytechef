@@ -18,7 +18,7 @@ package com.bytechef.hermes.coordinator.trigger.dispatcher;
 
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.worker.trigger.event.TriggerExecutionEvent;
-import com.bytechef.hermes.worker.trigger.message.route.WorkerMessageRoute;
+import com.bytechef.hermes.worker.trigger.message.route.TriggerWorkerMessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.slf4j.Logger;
@@ -52,7 +52,7 @@ public class TriggerDispatcher {
         if (logger.isDebugEnabled()) {
             logger.debug(
                 "Trigger id={}, type='{}' sent to route='{}'", triggerExecution.getId(), triggerExecution.getType(),
-                WorkerMessageRoute.TRIGGER_EXECUTION_EVENTS);
+                TriggerWorkerMessageRoute.TRIGGER_EXECUTION_EVENTS);
         }
 
         eventPublisher.publishEvent(new TriggerExecutionEvent(triggerExecution));

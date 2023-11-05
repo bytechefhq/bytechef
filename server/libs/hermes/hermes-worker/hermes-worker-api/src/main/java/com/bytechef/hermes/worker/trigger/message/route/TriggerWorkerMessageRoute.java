@@ -21,7 +21,7 @@ import com.bytechef.message.route.MessageRoute;
 /**
  * @author Ivica Cardic
  */
-public enum WorkerMessageRoute implements MessageRoute {
+public enum TriggerWorkerMessageRoute implements MessageRoute {
 
     CONTROL_EVENTS(Exchange.CONTROL, "trigger.control_events"),
     TRIGGER_EXECUTION_EVENTS(Exchange.MESSAGE, "trigger.trigger_execution_events");
@@ -29,10 +29,10 @@ public enum WorkerMessageRoute implements MessageRoute {
     private MessageRoute.Exchange exchange;
     private String routeName;
 
-    WorkerMessageRoute() {
+    TriggerWorkerMessageRoute() {
     }
 
-    WorkerMessageRoute(MessageRoute.Exchange exchange, String routeName) {
+    TriggerWorkerMessageRoute(MessageRoute.Exchange exchange, String routeName) {
         this.exchange = exchange;
         this.routeName = routeName;
     }

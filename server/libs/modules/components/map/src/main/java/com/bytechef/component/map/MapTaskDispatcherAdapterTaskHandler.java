@@ -20,7 +20,7 @@ package com.bytechef.component.map;
 
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
@@ -75,7 +75,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
             new Base64FileStorageService(), objectMapper);
 
-        syncMessageBroker.receive(CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS, message -> {
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS, message -> {
             TaskExecution completionTaskExecution = ((TaskExecutionCompleteEvent) message).getTaskExecution();
 
             result.add(taskFileStorage.readTaskExecutionOutput(completionTaskExecution.getOutput()));
@@ -84,7 +84,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
         List<ExecutionError> errors = Collections.synchronizedList(new ArrayList<>());
 
         syncMessageBroker.receive(
-            CoordinatorMessageRoute.ERROR_EVENTS, message -> {
+            TaskCoordinatorMessageRoute.ERROR_EVENTS, message -> {
                 TaskExecution erroredTaskExecution = ((TaskExecutionErrorEvent) message).getTaskExecution();
 
                 ExecutionError error = erroredTaskExecution.getError();
@@ -92,7 +92,7 @@ public class MapTaskDispatcherAdapterTaskHandler implements TaskHandler<List<?>>
                 errors.add(error);
             });
 
-        syncMessageBroker.receive(CoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
+        syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, e -> {});
 
         TaskExecutionService taskExecutionService =
             new TaskExecutionServiceImpl(new InMemoryTaskExecutionRepository());

@@ -16,7 +16,7 @@
 
 package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -32,7 +32,7 @@ public class TaskExecutionCompleteEvent extends AbstractEvent {
 
     @SuppressFBWarnings("EI")
     public TaskExecutionCompleteEvent(TaskExecution taskExecution) {
-        super(CoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS);
+        super(TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS);
 
         this.taskExecution = taskExecution;
     }

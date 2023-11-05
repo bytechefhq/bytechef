@@ -22,29 +22,29 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public class WorkerMessageRoute implements MessageRoute {
+public class TaskWorkerMessageRoute implements MessageRoute {
 
-    public static final WorkerMessageRoute CONTROL_EVENTS = new WorkerMessageRoute(
+    public static final TaskWorkerMessageRoute CONTROL_EVENTS = new TaskWorkerMessageRoute(
         Exchange.CONTROL, "task.control_events");
-    public static final WorkerMessageRoute TASK_EXECUTION_EVENTS = new WorkerMessageRoute(
+    public static final TaskWorkerMessageRoute TASK_EXECUTION_EVENTS = new TaskWorkerMessageRoute(
         Exchange.MESSAGE, "task.default_task_execution_events");
 
     protected Exchange exchange;
     protected String routeName;
 
-    private WorkerMessageRoute() {
+    private TaskWorkerMessageRoute() {
     }
 
-    private WorkerMessageRoute(Exchange exchange, String routeName) {
+    private TaskWorkerMessageRoute(Exchange exchange, String routeName) {
         this.exchange = exchange;
         this.routeName = routeName;
     }
 
-    public static WorkerMessageRoute ofTaskMessageRoute(String routName) {
+    public static TaskWorkerMessageRoute ofTaskMessageRoute(String routName) {
         if (Objects.equals(routName, "default")) {
             return TASK_EXECUTION_EVENTS;
         } else {
-            return new WorkerMessageRoute(Exchange.MESSAGE, "task." + routName + "_task_execution_events");
+            return new TaskWorkerMessageRoute(Exchange.MESSAGE, "task." + routName + "_task_execution_events");
         }
     }
 
@@ -64,7 +64,7 @@ public class WorkerMessageRoute implements MessageRoute {
             return true;
         }
 
-        if (!(o instanceof WorkerMessageRoute that)) {
+        if (!(o instanceof TaskWorkerMessageRoute that)) {
             return false;
         }
 

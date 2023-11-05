@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.coordinator.event;
 
-import com.bytechef.hermes.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.hermes.coordinator.message.route.TriggerCoordinatorMessageRoute;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.message.Prioritizable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,7 +34,7 @@ public class TriggerExecutionCompleteEvent extends AbstractEvent implements Prio
 
     @SuppressFBWarnings("EI")
     public TriggerExecutionCompleteEvent(TriggerExecution triggerExecution) {
-        super(CoordinatorMessageRoute.TRIGGER_EXECUTION_COMPLETE_EVENTS);
+        super(TriggerCoordinatorMessageRoute.TRIGGER_EXECUTION_COMPLETE_EVENTS);
 
         Validate.notNull(triggerExecution, "'triggerExecution' must not be null");
 

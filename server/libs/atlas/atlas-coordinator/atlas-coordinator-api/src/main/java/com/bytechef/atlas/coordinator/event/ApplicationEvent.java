@@ -16,11 +16,11 @@
 
 package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.message.event.MessageEvent;
 
 /**
  * @author Ivica Cardic
  */
-public interface ApplicationEvent extends MessageEvent<CoordinatorMessageRoute> {
+public interface ApplicationEvent extends MessageEvent<TaskCoordinatorMessageRoute> {
 }

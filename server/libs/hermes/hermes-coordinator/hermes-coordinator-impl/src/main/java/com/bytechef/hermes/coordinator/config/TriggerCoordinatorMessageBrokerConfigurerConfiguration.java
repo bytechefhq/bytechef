@@ -18,7 +18,7 @@ package com.bytechef.hermes.coordinator.config;
 
 import com.bytechef.hermes.coordinator.TriggerCoordinator;
 import com.bytechef.hermes.coordinator.config.TriggerCoordinatorProperties.TriggerCoordinatorSubscriptions;
-import com.bytechef.hermes.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.hermes.coordinator.message.route.TriggerCoordinatorMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
@@ -40,27 +40,27 @@ public class TriggerCoordinatorMessageBrokerConfigurerConfiguration {
 
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                CoordinatorMessageRoute.APPLICATION_EVENTS,
+                TriggerCoordinatorMessageRoute.APPLICATION_EVENTS,
                 subscriptions.getApplicationEvents(), triggerCoordinator, "onApplicationEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                CoordinatorMessageRoute.ERROR_EVENTS,
+                TriggerCoordinatorMessageRoute.ERROR_EVENTS,
                 subscriptions.getTriggerExecutionErrorEvents(), triggerCoordinator, "onErrorEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                CoordinatorMessageRoute.TRIGGER_EXECUTION_COMPLETE_EVENTS,
+                TriggerCoordinatorMessageRoute.TRIGGER_EXECUTION_COMPLETE_EVENTS,
                 subscriptions.getTriggerExecutionCompleteEvents(), triggerCoordinator,
                 "onTriggerExecutionCompleteEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                CoordinatorMessageRoute.TRIGGER_LISTENER_EVENTS,
+                TriggerCoordinatorMessageRoute.TRIGGER_LISTENER_EVENTS,
                 subscriptions.getTriggerListenerEvents(), triggerCoordinator, "onTriggerListenerEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar,
-                CoordinatorMessageRoute.TRIGGER_POLL_EVENTS,
+                TriggerCoordinatorMessageRoute.TRIGGER_POLL_EVENTS,
                 subscriptions.getTriggerPollEvents(), triggerCoordinator, "onTriggerPollEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
-                listenerEndpointRegistrar, CoordinatorMessageRoute.TRIGGER_WEBHOOK_EVENTS,
+                listenerEndpointRegistrar, TriggerCoordinatorMessageRoute.TRIGGER_WEBHOOK_EVENTS,
                 subscriptions.getTriggerWebhookEvents(), triggerCoordinator, "onTriggerWebhookEvent");
         };
     }

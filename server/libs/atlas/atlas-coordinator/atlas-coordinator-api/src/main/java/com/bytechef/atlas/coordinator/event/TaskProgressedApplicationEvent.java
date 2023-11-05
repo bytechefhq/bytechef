@@ -16,7 +16,7 @@
 
 package com.bytechef.atlas.coordinator.event;
 
-import com.bytechef.atlas.coordinator.message.route.CoordinatorMessageRoute;
+import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 
 /**
  * @author Ivica Cardic
@@ -30,7 +30,7 @@ public class TaskProgressedApplicationEvent extends AbstractEvent implements App
     }
 
     public TaskProgressedApplicationEvent(long taskExecutionId, int progress) {
-        super(CoordinatorMessageRoute.APPLICATION_EVENTS);
+        super(TaskCoordinatorMessageRoute.APPLICATION_EVENTS);
 
         this.progress = progress;
         this.taskExecutionId = taskExecutionId;
