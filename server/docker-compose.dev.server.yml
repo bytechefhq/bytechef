@@ -26,7 +26,7 @@ services:
     command: redis-server --save 20 1 --loglevel warning
     volumes:
       - cache:/data
-  bytechef-server-app:
+  server-app:
     build:
       context: ../
       dockerfile: ./server/apps/server-app/docker/Dockerfile_dev
