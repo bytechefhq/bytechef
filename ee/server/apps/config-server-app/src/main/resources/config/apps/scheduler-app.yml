@@ -18,7 +18,7 @@ spring:
   quartz:
     job-store-type: jdbc
     jdbc:
-      initialize-schema: always
+      initialize-schema: never
   task:
     execution:
       thread-name-prefix: scheduler-app-task-
