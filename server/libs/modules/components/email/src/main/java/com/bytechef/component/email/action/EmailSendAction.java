@@ -184,6 +184,10 @@ public class EmailSendAction {
             message.setContent(multipart);
 
             Transport.send(message);
+
+            context.logger(logger -> logger.debug(
+                "Message sent: from:{}, to:{}, subject:{}",
+                message.getFrom(), message.getRecipients(RecipientType.TO), message.getSubject()));
         } catch (MessagingException | IOException e) {
             throw new ComponentExecutionException(e.getMessage(), e);
         }
