@@ -1885,5 +1885,5 @@
   "version": 1,
   "title": "Data Storage",
   "triggers": null,
-  "filterCompatibleConnections": null
+  "compatibleConnections": null
 }

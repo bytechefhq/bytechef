@@ -62,7 +62,7 @@
   "description": "Allows you to run arbitrary Bash scripts.",
   "icon": "path:assets/bash.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
+  "compatibleConnections": null,
   "metadata": null,
   "name": "bash",
   "resources": null,

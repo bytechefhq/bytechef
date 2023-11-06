@@ -585,7 +585,7 @@ public final class ComponentDSL extends DefinitionDSL {
         private String description;
         private String icon;
         private List<String> tags;
-        private FilterCompatibleConnectionsFunction filterCompatibleConnectionsFunction;
+        private CompatibleConnectionsFunction compatibleConnectionsFunction;
         private Map<String, Object> metadata;
         private final String name;
         private Resources resources;
@@ -659,10 +659,10 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
-        public ModifiableComponentDefinition filterCompatibleConnections(
-            FilterCompatibleConnectionsFunction filterCompatibleConnections) {
+        public ModifiableComponentDefinition compatibleConnections(
+            CompatibleConnectionsFunction compatibleConnections) {
 
-            this.filterCompatibleConnectionsFunction = filterCompatibleConnections;
+            this.compatibleConnectionsFunction = compatibleConnections;
 
             return this;
         }
@@ -759,8 +759,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<FilterCompatibleConnectionsFunction> getFilterCompatibleConnections() {
-            return Optional.ofNullable(filterCompatibleConnectionsFunction);
+        public Optional<CompatibleConnectionsFunction> getCompatibleConnections() {
+            return Optional.ofNullable(compatibleConnectionsFunction);
         }
 
         @Override

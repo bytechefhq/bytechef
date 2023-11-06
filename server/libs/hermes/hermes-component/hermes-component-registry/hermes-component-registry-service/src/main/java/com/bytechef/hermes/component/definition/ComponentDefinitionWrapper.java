@@ -41,7 +41,7 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
     protected final String description;
     protected final String icon;
     protected final List<String> tags;
-    protected final FilterCompatibleConnectionsFunction filterCompatibleConnectionsFunction;
+    protected final CompatibleConnectionsFunction compatibleConnectionsFunction;
     protected final Map<String, Object> metadata;
     protected final String name;
     protected final Resources resources;
@@ -69,8 +69,8 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.orElse(componentDefinition.getIcon(), null);
         this.tags = OptionalUtils.orElse(componentDefinition.getTags(), null);
-        this.filterCompatibleConnectionsFunction =
-            OptionalUtils.orElse(componentDefinition.getFilterCompatibleConnections(), null);
+        this.compatibleConnectionsFunction =
+            OptionalUtils.orElse(componentDefinition.getCompatibleConnections(), null);
         this.metadata = OptionalUtils.orElse(componentDefinition.getMetadata(), null);
         this.name = componentDefinition.getName();
         this.resources = OptionalUtils.orElse(componentDefinition.getResources(), null);
@@ -80,8 +80,8 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
     }
 
     @Override
-    public Optional<FilterCompatibleConnectionsFunction> getFilterCompatibleConnections() {
-        return Optional.ofNullable(filterCompatibleConnectionsFunction);
+    public Optional<CompatibleConnectionsFunction> getCompatibleConnections() {
+        return Optional.ofNullable(compatibleConnectionsFunction);
     }
 
     @Override

@@ -408,5 +408,5 @@
   "version": 1,
   "title": "XML File",
   "triggers": null,
-  "filterCompatibleConnections": null
+  "compatibleConnections": null
 }

@@ -524,5 +524,5 @@
   "version": 1,
   "title": "Filesystem",
   "triggers": null,
-  "filterCompatibleConnections": null
+  "compatibleConnections": null
 }
