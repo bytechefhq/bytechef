@@ -39,15 +39,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 public class AirtableUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(AirtableUtils.class);
 
     private static final List<String> SKIP_FIELDS = List.of("singleCollaborator", "multipleCollaborators");
 
@@ -59,9 +55,9 @@ public class AirtableUtils {
                 .execute()
                 .getBody();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + response);
-            }
+            context
+                .logger(
+                    logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + response));
 
             return getOptions(response, "bases");
         };
@@ -81,9 +77,7 @@ public class AirtableUtils {
                     .getBody()),
                 new Context.TypeReference<>() {}));
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Response for url='%s': %s".formatted(url, tablesMap));
-            }
+            context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, tablesMap)));
 
             List<AirtableTable> tables = tablesMap.get("tables");
 
@@ -152,9 +146,7 @@ public class AirtableUtils {
                 .execute()
                 .getBody());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Response for url='%s': %s".formatted(url, response));
-            }
+            context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, response)));
 
             return getOptions(response, "tables");
         };

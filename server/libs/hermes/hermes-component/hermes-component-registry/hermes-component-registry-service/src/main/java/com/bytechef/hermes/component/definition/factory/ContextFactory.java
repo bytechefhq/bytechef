@@ -73,12 +73,13 @@ public class ContextFactory {
     }
 
     public Context createContext(@NonNull String componentName, @Nullable ComponentConnection connection) {
-        return new ContextImpl(componentName, connection, httpClientExecutor, objectMapper, xmlMapper);
+        return new ContextImpl(componentName, null, connection, httpClientExecutor, objectMapper, xmlMapper);
     }
 
     public TriggerContext createTriggerContext(
-        @NonNull String componentName, @Nullable ComponentConnection connection) {
+        @NonNull String componentName, @NonNull String triggerName, @Nullable ComponentConnection connection) {
 
-        return new TriggerContextImpl(componentName, connection, httpClientExecutor, objectMapper, xmlMapper);
+        return new TriggerContextImpl(
+            componentName, triggerName, connection, httpClientExecutor, objectMapper, xmlMapper);
     }
 }

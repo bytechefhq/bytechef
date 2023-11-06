@@ -47,11 +47,11 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper, XmlMapper xmlMapper) {
 
-        super(componentName, connection, httpClientExecutor, objectMapper, xmlMapper);
+        super(componentName, actionName, connection, httpClientExecutor, objectMapper, xmlMapper);
 
         this.data = new DataImpl(
-            componentName, componentVersion, actionName, dataStorageService, instanceId, type, taskExecutionId,
-            workflowId);
+            componentName, componentVersion, actionName, instanceId, type, workflowId, taskExecutionId,
+            dataStorageService);
         this.event = taskExecutionId == null ? null : new EventImpl(eventPublisher, taskExecutionId);
         this.file = new FileImpl(fileStorageService);
     }
@@ -80,8 +80,8 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
     }
 
     private record DataImpl(
-        String componentName, Integer componentVersion, String actionName, DataStorageService dataStorageService,
-        Long instanceId, int type, Long taskExecutionId, String workflowId) implements Data {
+        String componentName, Integer componentVersion, String actionName, Long instanceId, int type, String workflowId,
+        Long taskExecutionId, DataStorageService dataStorageService) implements Data {
 
         @Override
         public <T> Optional<T> fetchValue(Scope scope, String key) {

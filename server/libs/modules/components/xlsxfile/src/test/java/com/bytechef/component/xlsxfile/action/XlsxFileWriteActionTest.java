@@ -69,7 +69,7 @@ public class XlsxFileWriteActionTest {
                 file1 -> file1.storeContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture()));
 
         JSONAssert.assertEquals(
-            new JSONArray(jsonContent), new JSONArray(read(inputStreamArgumentCaptor.getValue())), true);
+            new JSONArray(jsonContent), new JSONArray(read(inputStreamArgumentCaptor.getValue(), context)), true);
         getEqualTo(filenameArgumentCaptor);
     }
 
@@ -97,9 +97,9 @@ public class XlsxFileWriteActionTest {
         return parameterMap;
     }
 
-    private static List<Map<String, ?>> read(InputStream inputStream) throws IOException {
+    private static List<Map<String, ?>> read(InputStream inputStream, Context context) throws IOException {
         return XlsxFileReadAction.read(
             XlsxFileConstants.FileFormat.XLSX, inputStream,
-            new ReadConfiguration(true, true, 0, Integer.MAX_VALUE, false, "Sheet"));
+            new ReadConfiguration(true, true, 0, Integer.MAX_VALUE, false, "Sheet"), context);
     }
 }
