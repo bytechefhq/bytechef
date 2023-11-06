@@ -1,12 +1,8 @@
+import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {
     useGetProjectTagsQuery,
     useGetProjectsQuery,
 } from '@/queries/projects.queries';
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-} from '@radix-ui/react-accordion';
 import {FolderIcon} from 'lucide-react';
 import ProjectListItem from 'pages/automation/projects/ProjectListItem';
 import {useSearchParams} from 'react-router-dom';
@@ -51,15 +47,14 @@ const ProjectList = () => {
                         title="No projects"
                     />
                 ) : (
-                    <Accordion type="multiple" className="mb-8">
+                    <div className="mb-8">
                         {projects.map((project) => {
                             const projectTagIds = project.tags?.map(
                                 (tag) => tag.id
                             );
 
                             return (
-                                <AccordionItem
-                                    value={project.id!.toString()}
+                                <Collapsible
                                     key={project.id}
                                     className="data-[state=closed]:border-b data-[state=closed]:border-b-gray-100"
                                 >
@@ -76,15 +71,15 @@ const ProjectList = () => {
                                         />
                                     </div>
 
-                                    <AccordionContent>
+                                    <CollapsibleContent>
                                         <ProjectWorkflowList
                                             project={project}
                                         />
-                                    </AccordionContent>
-                                </AccordionItem>
+                                    </CollapsibleContent>
+                                </Collapsible>
                             );
                         })}
-                    </Accordion>
+                    </div>
                 ))}
         </div>
     );

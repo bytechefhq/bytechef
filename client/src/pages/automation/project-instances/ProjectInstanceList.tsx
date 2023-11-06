@@ -1,10 +1,6 @@
+import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
 import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstances.queries';
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-} from '@radix-ui/react-accordion';
 import {
     ProjectInstanceModel,
     ProjectModel,
@@ -28,8 +24,8 @@ const ProjectInstanceList = ({
     return (
         <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
             {projectInstances.length > 0 && (
-                <Accordion type="multiple" className="mb-8">
-                    <h3 className="mb-1 px-2 text-xl font-semibold text-gray-900">
+                <div className="mb-8">
+                    <h3 className="mb-1 px-2 text-xl font-semibold">
                         {project.name}
                     </h3>
 
@@ -43,8 +39,7 @@ const ProjectInstanceList = ({
                         }
 
                         return (
-                            <AccordionItem
-                                value={projectInstance.id!.toString()}
+                            <Collapsible
                                 key={projectInstance.id}
                                 className="data-[state=closed]:border-b data-[state=closed]:border-b-gray-100"
                             >
@@ -60,7 +55,7 @@ const ProjectInstanceList = ({
                                     />
                                 </div>
 
-                                <AccordionContent>
+                                <CollapsibleContent>
                                     <ProjectInstanceWorkflowList
                                         projectId={project.id}
                                         projectInstanceId={projectInstance.id!}
@@ -77,11 +72,11 @@ const ProjectInstanceList = ({
                                             projectInstance.projectInstanceWorkflows
                                         }
                                     />
-                                </AccordionContent>
-                            </AccordionItem>
+                                </CollapsibleContent>
+                            </Collapsible>
                         );
                     })}
-                </Accordion>
+                </div>
             )}
         </div>
     );

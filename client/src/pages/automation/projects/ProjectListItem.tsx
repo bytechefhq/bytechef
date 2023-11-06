@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
+import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -35,7 +36,6 @@ import {
     useUpdateProjectTagsMutation,
 } from '@/mutations/projects.mutations';
 import {ProjectKeys} from '@/queries/projects.queries';
-import {AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';
@@ -147,7 +147,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                     <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
                         <div className="flex items-center">
-                            <AccordionTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
+                            <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
                                 <div className="mr-1">
                                     {project.workflowIds?.length === 1
                                         ? `${project.workflowIds?.length} workflow`
@@ -155,7 +155,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                 </div>
 
                                 <ChevronDownIcon className="duration-300 group-data-[state=open]:rotate-180" />
-                            </AccordionTrigger>
+                            </CollapsibleTrigger>
 
                             <div onClick={(event) => event.preventDefault()}>
                                 {project.tags && (
