@@ -68,7 +68,7 @@ const WorkflowNodesList = ({
     itemsDraggable = false,
     onItemClick,
 }: WorkflowNodesListProps) => (
-    <div className="w-full px-3">
+    <div className="mt-2 w-full px-3">
         <Tabs defaultValue="account" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="account">Components</TabsTrigger>
