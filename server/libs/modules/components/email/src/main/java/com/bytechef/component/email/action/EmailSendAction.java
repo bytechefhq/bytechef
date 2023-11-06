@@ -157,7 +157,9 @@ public class EmailSendAction {
                     String.join(",", inputParameters.getRequiredList(REPLY_TO, String.class))));
             }
 
-            message.setSubject(inputParameters.getString(SUBJECT));
+            if (inputParameters.containsKey(SUBJECT)) {
+                message.setSubject(inputParameters.getString(SUBJECT));
+            }
 
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
 
