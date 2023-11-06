@@ -1,6 +1,8 @@
+import {Button} from '@/components/ui/button';
 import {Cross1Icon} from '@radix-ui/react-icons';
-import Button from 'components/Button/Button';
+import {PencilIcon} from 'lucide-react';
 import {WorkflowExecutionModel} from 'middleware/helios/execution';
+import {useNavigate} from 'react-router-dom';
 
 const ReadOnlyWorkflow = ({
     execution,
@@ -13,8 +15,10 @@ const ReadOnlyWorkflow = ({
 }) => {
     const {instance, project, workflow} = execution;
 
+    const navigate = useNavigate();
+
     return (
-        <div className="flex w-full justify-between bg-gray-100 p-4">
+        <div className="flex w-full justify-between bg-gray-100 p-4 align-middle">
             <h3>
                 {workflow?.label
                     ? `${project?.name ? project.name + ' / ' : ''}${
@@ -23,27 +27,32 @@ const ReadOnlyWorkflow = ({
                     : 'No data to show'}
             </h3>
 
-            <div>
+            <div className="flex align-middle">
                 <Button
-                    label="Edit"
+                    size="sm"
                     className="ml-4"
-                    size="small"
-                    displayType="secondary"
-                />
+                    onClick={() =>
+                        navigate(
+                            `/automation/projects/${project?.id}/workflow/${workflow?.id}`
+                        )
+                    }
+                    variant="outline"
+                >
+                    <PencilIcon className="mr-1 h-4 w-4 cursor-pointer" /> Edit
+                </Button>
 
                 <Button
                     aria-label="Close panel"
                     className="ml-auto"
-                    displayType="icon"
-                    size="small"
-                    icon={
-                        <Cross1Icon
-                            className="h-3 w-3 cursor-pointer"
-                            aria-hidden="true"
-                        />
-                    }
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setWorkflowExecutionDetailsDialogOpen(false)}
-                />
+                >
+                    <Cross1Icon
+                        className="h-3 w-3 cursor-pointer"
+                        aria-hidden="true"
+                    />
+                </Button>
             </div>
         </div>
     );
