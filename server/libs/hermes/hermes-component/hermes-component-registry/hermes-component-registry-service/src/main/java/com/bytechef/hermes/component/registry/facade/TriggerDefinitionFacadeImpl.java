@@ -61,7 +61,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         return triggerDefinitionService.executeDynamicProperties(
             componentName, componentVersion, triggerName, triggerParameters, propertyName,
-            componentConnection, contextFactory.createTriggerContext(componentName, componentConnection));
+            componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
@@ -74,7 +74,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         triggerDefinitionService.executeDynamicWebhookDisable(
             componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, outputParameters,
-            componentConnection, contextFactory.createTriggerContext(componentName, componentConnection));
+            componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
@@ -88,7 +88,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         return triggerDefinitionService.executeDynamicWebhookEnable(
             componentName, componentVersion, triggerName, triggerParameters,
             createWebhookUrl(workflowExecutionId, webhookUrl), workflowExecutionId,
-            componentConnection, contextFactory.createTriggerContext(componentName, componentConnection));
+            componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
@@ -98,7 +98,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         return triggerDefinitionService.executeDynamicWebhookRefresh(
             componentName, componentVersion, triggerName, outputParameters,
-            contextFactory.createTriggerContext(componentName, null));
+            contextFactory.createTriggerContext(componentName, triggerName, null));
     }
 
     @Override
@@ -110,7 +110,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         return triggerDefinitionService.executeEditorDescription(
             componentName, componentVersion, triggerName, triggerParameters, componentConnection,
-            contextFactory.createTriggerContext(componentName, componentConnection));
+            contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
@@ -122,7 +122,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         triggerDefinitionService.executeListenerDisable(
             componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId,
-            componentConnection, contextFactory.createTriggerContext(componentName, componentConnection));
+            componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
@@ -134,7 +134,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         triggerDefinitionService.executeOnEnableListener(
             componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, componentConnection,
-            contextFactory.createTriggerContext(componentName, componentConnection));
+            contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
@@ -146,7 +146,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         return triggerDefinitionService.executeOptions(
             componentName, componentVersion, triggerName, triggerParameters, propertyName, searchText,
-            componentConnection, contextFactory.createTriggerContext(componentName, componentConnection));
+            componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
@@ -158,7 +158,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         return triggerDefinitionService.executeOutputSchema(
             componentName, componentVersion, triggerName, triggerParameters, componentConnection,
-            contextFactory.createTriggerContext(componentName, componentConnection));
+            contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
@@ -170,7 +170,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         return triggerDefinitionService.executeSampleOutput(
             componentName, componentVersion, triggerName, triggerParameters, componentConnection,
-            contextFactory.createTriggerContext(componentName, componentConnection));
+            contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
@@ -183,7 +183,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         return triggerDefinitionService.executeTrigger(
             componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
-            componentConnection, contextFactory.createTriggerContext(componentName, componentConnection));
+            componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
@@ -196,7 +196,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         return triggerDefinitionService.executeWebhookValidate(
             componentName, componentVersion, triggerName, inputParameters, webhookRequest,
-            componentConnection, contextFactory.createTriggerContext(componentName, componentConnection));
+            componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     private String createWebhookUrl(String workflowExecutionId, String webhookUrl) {

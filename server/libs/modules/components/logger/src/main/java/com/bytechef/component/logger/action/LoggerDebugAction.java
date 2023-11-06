@@ -24,15 +24,11 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 public class LoggerDebugAction {
-
-    private static final Logger logger = LoggerFactory.getLogger(LoggerDebugAction.class);
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(DEBUG)
         .title("Debug")
@@ -42,7 +38,7 @@ public class LoggerDebugAction {
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
-        logger.debug(inputParameters.getString(TEXT));
+        context.logger(logger -> logger.debug(inputParameters.getString(TEXT)));
 
         return null;
     }

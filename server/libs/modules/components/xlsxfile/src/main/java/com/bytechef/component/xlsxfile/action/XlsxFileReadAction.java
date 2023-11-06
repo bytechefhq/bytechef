@@ -35,6 +35,7 @@ import com.bytechef.component.xlsxfile.constant.XlsxFileConstants.FileFormat;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.IOException;
@@ -54,15 +55,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 public class XlsxFileReadAction {
-
-    private static final Logger logger = LoggerFactory.getLogger(XlsxFileReadAction.class);
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(XlsxFileConstants.READ)
         .title("Read from file")
@@ -136,19 +133,16 @@ public class XlsxFileReadAction {
                 fileFormat,
                 inputStream,
                 new ReadConfiguration(
-                    headerRow,
-                    includeEmptyCells,
-                    rangeStartRow == null ? 0 : rangeStartRow,
-                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
-                    readAsString,
-                    sheetName));
+                    headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
+                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString, sheetName),
+                context);
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to handle action " + inputParameters, ioException);
         }
     }
 
     protected static List<Map<String, ?>> read(
-        FileFormat fileFormat, InputStream inputStream, ReadConfiguration configuration)
+        FileFormat fileFormat, InputStream inputStream, ReadConfiguration configuration, Context context)
         throws IOException {
         List<Map<String, ?>> rows = new ArrayList<>();
 
@@ -201,7 +195,7 @@ public class XlsxFileReadAction {
                         map.computeIfAbsent(
                             headers.get(i),
                             key -> processValue(
-                                cell, configuration.includeEmptyCells(), configuration.readAsString()));
+                                cell, configuration.includeEmptyCells(), configuration.readAsString(), context));
                     }
 
                     rows.add(map);
@@ -213,7 +207,8 @@ public class XlsxFileReadAction {
 
                         map.put(
                             "column_" + (i + 1),
-                            processValue(cell, configuration.includeEmptyCells(), configuration.readAsString()));
+                            processValue(
+                                cell, configuration.includeEmptyCells(), configuration.readAsString(), context));
                     }
 
                     rows.add(map);
@@ -249,7 +244,7 @@ public class XlsxFileReadAction {
     }
 
     @SuppressWarnings("checkstyle:whitespaceafter")
-    private static Object processValue(Cell cell, boolean includeEmptyCells, boolean readAsString) {
+    private static Object processValue(Cell cell, boolean includeEmptyCells, boolean readAsString, Context context) {
         Object value = null;
 
         if (cell != null) {
@@ -264,7 +259,7 @@ public class XlsxFileReadAction {
 
                         numericValue = formatter.format(cell.getDateCellValue());
                     } else {
-                        numericValue = valueOF(NumberToTextConverter.toText(cell.getNumericCellValue()));
+                        numericValue = valueOF(NumberToTextConverter.toText(cell.getNumericCellValue()), context);
                     }
 
                     yield numericValue;
@@ -287,24 +282,20 @@ public class XlsxFileReadAction {
         return value;
     }
 
-    private static Object valueOF(String string) {
+    private static Object valueOF(String string, Context context) {
         Object value = null;
 
         try {
             value = Integer.parseInt(string);
         } catch (NumberFormatException nfe) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(nfe.getMessage(), nfe);
-            }
+            context.logger(logger -> logger.trace(nfe.getMessage(), nfe));
         }
 
         if (value == null) {
             try {
                 value = Long.parseLong(string);
             } catch (NumberFormatException nfe) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(nfe.getMessage(), nfe);
-                }
+                context.logger(logger -> logger.trace(nfe.getMessage(), nfe));
             }
         }
 
@@ -312,9 +303,7 @@ public class XlsxFileReadAction {
             try {
                 value = Double.parseDouble(string);
             } catch (NumberFormatException nfe) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(nfe.getMessage(), nfe);
-                }
+                context.logger(logger -> logger.trace(nfe.getMessage(), nfe));
             }
         }
 

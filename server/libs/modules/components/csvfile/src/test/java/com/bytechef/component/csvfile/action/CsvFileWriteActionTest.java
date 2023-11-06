@@ -20,6 +20,7 @@ import static com.bytechef.component.csvfile.constant.CsvFileConstants.ROWS;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.component.csvfile.CsvFileComponentHandlerTest;
+import com.bytechef.component.csvfile.action.CsvFileReadAction.ReadConfiguration;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
@@ -66,7 +67,8 @@ public class CsvFileWriteActionTest {
             .file(
                 file -> file.storeContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture()));
 
-        assertEquals(new JSONArray(jsonContent), new JSONArray(read(inputStreamArgumentCaptor.getValue())), true);
+        assertEquals(new JSONArray(jsonContent), new JSONArray(
+            read(inputStreamArgumentCaptor.getValue(), context)), true);
         Assertions.assertThat(filenameArgumentCaptor.getValue())
             .isEqualTo("file.csv");
     }
@@ -86,8 +88,8 @@ public class CsvFileWriteActionTest {
         return parameterMap;
     }
 
-    private List<Map<String, Object>> read(InputStream inputStream) throws IOException {
+    private List<Map<String, Object>> read(InputStream inputStream, Context context) throws IOException {
         return CsvFileReadAction.read(
-            inputStream, new CsvFileReadAction.ReadConfiguration(",", true, true, 0, Integer.MAX_VALUE, false));
+            inputStream, new ReadConfiguration(",", true, true, 0, Integer.MAX_VALUE, false), context);
     }
 }

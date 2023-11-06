@@ -26,9 +26,9 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 public class TriggerContextImpl extends ContextImpl implements TriggerDefinition.TriggerContext {
 
     public TriggerContextImpl(
-        String componentName, ComponentConnection connection, HttpClientExecutor httpClientExecutor,
+        String componentName, String triggerName, ComponentConnection connection, HttpClientExecutor httpClientExecutor,
         ObjectMapper objectMapper, XmlMapper xmlMapper) {
 
-        super(componentName, connection, httpClientExecutor, objectMapper, xmlMapper);
+        super(componentName, triggerName, connection, httpClientExecutor, objectMapper, xmlMapper);
     }
 }

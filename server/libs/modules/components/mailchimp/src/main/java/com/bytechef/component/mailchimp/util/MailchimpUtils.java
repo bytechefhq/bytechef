@@ -27,15 +27,11 @@ import com.bytechef.hermes.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 public class MailchimpUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(MailchimpUtils.class);
 
     public static String getMailChimpServer(String accessToken, Context context) {
         Map<?, ?> response = context.http(http -> http.get("https://login.mailchimp.com/oauth2/metadata")
@@ -64,9 +60,7 @@ public class MailchimpUtils {
                 .execute()
                 .getBody();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Response for url='%s': %s".formatted(url, response));
-            }
+            context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, response)));
 
             List<Option<?>> options = new ArrayList<>();
 

@@ -31,10 +31,10 @@ import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
-import com.bytechef.component.csvfile.CsvFileComponentHandler;
 import com.bytechef.component.csvfile.constant.CsvFileConstants;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.fasterxml.jackson.databind.MappingIterator;
@@ -50,15 +50,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.BooleanUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 public class CsvFileReadAction {
-
-    private static final Logger logger = LoggerFactory.getLogger(CsvFileComponentHandler.class);
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ)
         .title("Read from file")
@@ -129,14 +125,17 @@ public class CsvFileReadAction {
                 inputStream,
                 new ReadConfiguration(
                     delimiter, headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
-                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString));
+                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString),
+                context);
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to stream CSV file", ioException);
         }
     }
 
-    protected static List<Map<String, Object>> read(InputStream inputStream, ReadConfiguration configuration)
+    protected static List<Map<String, Object>> read(
+        InputStream inputStream, ReadConfiguration configuration, Context context)
         throws IOException {
+
         List<Map<String, Object>> rows = new ArrayList<>();
         int count = 0;
 
@@ -156,9 +155,7 @@ public class CsvFileReadAction {
                 while (iterator.hasNext()) {
                     Map<String, String> row = iterator.nextValue();
 
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("row: {}", row);
-                    }
+                    context.logger(logger -> logger.trace("row: {}", row));
 
                     if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
                         Map<String, Object> map = new LinkedHashMap<>();
@@ -167,7 +164,8 @@ public class CsvFileReadAction {
                             map.put(
                                 entry.getKey(),
                                 processValue(
-                                    entry.getValue(), configuration.includeEmptyCells(), configuration.readAsString()));
+                                    entry.getValue(), configuration.includeEmptyCells(), configuration.readAsString(),
+                                    context));
                         }
 
                         rows.add(map);
@@ -188,9 +186,7 @@ public class CsvFileReadAction {
                 while (iterator.hasNext()) {
                     List<String> row = iterator.nextValue();
 
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("row: {}", row);
-                    }
+                    context.logger(logger -> logger.trace("row: {}", row));
 
                     if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
                         Map<String, Object> map = new LinkedHashMap<>();
@@ -199,7 +195,8 @@ public class CsvFileReadAction {
                             map.put(
                                 "column_" + (i + 1),
                                 processValue(
-                                    row.get(i), configuration.includeEmptyCells(), configuration.readAsString()));
+                                    row.get(i), configuration.includeEmptyCells(), configuration.readAsString(),
+                                    context));
                         }
 
                         rows.add(map);
@@ -217,7 +214,9 @@ public class CsvFileReadAction {
         return rows;
     }
 
-    private static Object processValue(String valueString, boolean includeEmptyCells, boolean readAsString) {
+    private static Object processValue(
+        String valueString, boolean includeEmptyCells, boolean readAsString, Context context) {
+
         Object value = null;
 
         if (valueString == null || valueString.isEmpty()) {
@@ -228,31 +227,27 @@ public class CsvFileReadAction {
             if (readAsString) {
                 value = valueString;
             } else {
-                value = valueOF(valueString);
+                value = valueOF(valueString, context);
             }
         }
 
         return value;
     }
 
-    private static Object valueOF(String string) {
+    private static Object valueOF(String string, Context context) {
         Object value = null;
 
         try {
             value = Integer.parseInt(string);
         } catch (NumberFormatException nfe) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(nfe.getMessage(), nfe);
-            }
+            context.logger(logger -> logger.trace(nfe.getMessage(), nfe));
         }
 
         if (value == null) {
             try {
                 value = Long.parseLong(string);
             } catch (NumberFormatException nfe) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(nfe.getMessage(), nfe);
-                }
+                context.logger(logger -> logger.trace(nfe.getMessage(), nfe));
             }
         }
 
@@ -260,9 +255,7 @@ public class CsvFileReadAction {
             try {
                 value = Double.parseDouble(string);
             } catch (NumberFormatException nfe) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(nfe.getMessage(), nfe);
-                }
+                context.logger(logger -> logger.trace(nfe.getMessage(), nfe));
             }
         }
 

@@ -25,15 +25,11 @@ import com.bytechef.hermes.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 public class PipedriveUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(PipedriveUtils.class);
 
     public static String subscribeWebhook(
         String eventObject, String eventAction, String webhookUrl, Context context) {
@@ -73,9 +69,7 @@ public class PipedriveUtils {
                 .execute()
                 .getBody();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Response for path='%s': %s".formatted(path, response));
-            }
+            context.logger(logger -> logger.debug("Response for path='%s': %s".formatted(path, response)));
 
             List<Option<?>> options = new ArrayList<>();
 

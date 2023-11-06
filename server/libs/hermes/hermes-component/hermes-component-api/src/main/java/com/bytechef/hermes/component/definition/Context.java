@@ -50,6 +50,8 @@ public interface Context {
      */
     <R> R json(ContextFunction<Json, R> jsonFunction);
 
+    void logger(ContextConsumer<Logger> logFunction);
+
     /**
      *
      * @param xmlFunction
@@ -93,6 +95,12 @@ public interface Context {
          * @return
          */
         ActionDefinition.ActionContext.FileEntry storeContent(String fileName, String data) throws IOException;
+    }
+
+    @FunctionalInterface
+    interface ContextConsumer<T> {
+
+        void accept(T t) throws Exception;
     }
 
     @FunctionalInterface
@@ -882,6 +890,39 @@ public interface Context {
          * @return
          */
         String write(Object object);
+    }
+
+    interface Logger {
+
+        void debug(String message);
+
+        void debug(String format, Object... args);
+
+        void debug(String message, Exception exception);
+
+        void error(String message);
+
+        void error(String format, Object... args);
+
+        void error(String message, Exception exception);
+
+        void info(String message);
+
+        void info(String format, Object... args);
+
+        void info(String message, Exception exception);
+
+        void warn(String message);
+
+        void warn(String format, Object... args);
+
+        void warn(String message, Exception exception);
+
+        void trace(String message);
+
+        void trace(String format, Object... args);
+
+        void trace(String message, Exception exception);
     }
 
     /**

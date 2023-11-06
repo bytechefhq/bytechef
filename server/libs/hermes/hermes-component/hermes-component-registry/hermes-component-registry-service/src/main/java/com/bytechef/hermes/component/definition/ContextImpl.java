@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
@@ -38,15 +39,17 @@ public class ContextImpl implements TriggerContext {
 
     private final Http http;
     private final Json json;
+    private final Logger logger;
     private final Xml xml;
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        String componentName, ComponentConnection connection, HttpClientExecutor httpClientExecutor,
-        ObjectMapper objectMapper, XmlMapper xmlMapper) {
+        String componentName, String operationName, ComponentConnection connection,
+        HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper, XmlMapper xmlMapper) {
 
         this.http = new HttpImpl(componentName, connection, this, httpClientExecutor);
         this.json = new JsonImpl(objectMapper);
+        this.logger = new LoggerImpl(componentName, operationName);
         this.xml = new XmlImpl(xmlMapper);
     }
 
@@ -69,6 +72,15 @@ public class ContextImpl implements TriggerContext {
     }
 
     @Override
+    public void logger(ContextConsumer<Logger> loggerConsumer) {
+        try {
+            loggerConsumer.accept(logger);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e.getMessage(), e);
+        }
+    }
+
+    @Override
     public <R> R xml(ContextFunction<Xml, R> xmlFunction) {
         try {
             return xmlFunction.apply(xml);
@@ -83,40 +95,40 @@ public class ContextImpl implements TriggerContext {
 
         @Override
         public Executor delete(String url) {
-            return new ExecutorImpl(url, RequestMethod.DELETE, componentName, connection, context, httpClientExecutor);
+            return new ExecutorImpl(url, RequestMethod.DELETE, componentName, connection, httpClientExecutor, context);
         }
 
         @Override
         public Executor exchange(String url, RequestMethod requestMethod) {
-            return new ExecutorImpl(url, requestMethod, componentName, connection, context, httpClientExecutor);
+            return new ExecutorImpl(url, requestMethod, componentName, connection, httpClientExecutor, context);
         }
 
         @Override
         public Executor head(String url) {
             return new ExecutorImpl(
-                url, RequestMethod.HEAD, componentName, connection, context, httpClientExecutor);
+                url, RequestMethod.HEAD, componentName, connection, httpClientExecutor, context);
         }
 
         @Override
         public Executor get(String url) {
-            return new ExecutorImpl(url, RequestMethod.GET, componentName, connection, context, httpClientExecutor);
+            return new ExecutorImpl(url, RequestMethod.GET, componentName, connection, httpClientExecutor, context);
         }
 
         @Override
         public Executor patch(String url) {
             return new ExecutorImpl(
-                url, RequestMethod.PATCH, componentName, connection, context, httpClientExecutor);
+                url, RequestMethod.PATCH, componentName, connection, httpClientExecutor, context);
         }
 
         @Override
         public Executor post(String url) {
             return new ExecutorImpl(
-                url, RequestMethod.POST, componentName, connection, context, httpClientExecutor);
+                url, RequestMethod.POST, componentName, connection, httpClientExecutor, context);
         }
 
         @Override
         public Executor put(String url) {
-            return new ExecutorImpl(url, RequestMethod.PUT, componentName, connection, context, httpClientExecutor);
+            return new ExecutorImpl(url, RequestMethod.PUT, componentName, connection, httpClientExecutor, context);
         }
 
         private static class ExecutorImpl implements Executor {
@@ -134,7 +146,7 @@ public class ContextImpl implements TriggerContext {
 
             private ExecutorImpl(
                 String url, RequestMethod requestMethod, String componentName, ComponentConnection connection,
-                Context context, HttpClientExecutor httpClientExecutor) {
+                HttpClientExecutor httpClientExecutor, Context context) {
 
                 this.componentName = componentName;
                 this.connection = connection;
@@ -344,6 +356,120 @@ public class ContextImpl implements TriggerContext {
         @Override
         public String write(Object object) {
             return JsonUtils.write(object, objectMapper);
+        }
+    }
+
+    private static class LoggerImpl implements Logger {
+
+        private final org.slf4j.Logger logger;
+
+        public LoggerImpl(String componentName, String actionName) {
+            logger = LoggerFactory.getLogger(componentName + (actionName == null ? "" : "." + actionName));
+        }
+
+        @Override
+        public void debug(String message) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(message);
+            }
+        }
+
+        @Override
+        public void debug(String format, Object... args) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(format, args);
+            }
+        }
+
+        @Override
+        public void debug(String message, Exception exception) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(message, exception);
+            }
+        }
+
+        @Override
+        public void error(String message) {
+            if (logger.isErrorEnabled()) {
+                logger.error(message);
+            }
+        }
+
+        @Override
+        public void error(String format, Object... args) {
+            if (logger.isErrorEnabled()) {
+                logger.error(format, args);
+            }
+        }
+
+        @Override
+        public void error(String message, Exception exception) {
+            if (logger.isErrorEnabled()) {
+                logger.error(message, exception);
+            }
+        }
+
+        @Override
+        public void info(String message) {
+            if (logger.isInfoEnabled()) {
+                logger.info(message);
+            }
+        }
+
+        @Override
+        public void info(String format, Object... args) {
+            if (logger.isInfoEnabled()) {
+                logger.info(format, args);
+            }
+        }
+
+        @Override
+        public void info(String message, Exception exception) {
+            if (logger.isInfoEnabled()) {
+                logger.info(message, exception);
+            }
+        }
+
+        @Override
+        public void warn(String message) {
+            if (logger.isWarnEnabled()) {
+                logger.warn(message);
+            }
+        }
+
+        @Override
+        public void warn(String format, Object... args) {
+            if (logger.isWarnEnabled()) {
+                logger.warn(format, args);
+            }
+        }
+
+        @Override
+        public void warn(String message, Exception exception) {
+            if (logger.isWarnEnabled()) {
+                logger.warn(message, exception);
+            }
+        }
+
+        @Override
+        public void trace(String message) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(message);
+            }
+        }
+
+        @Override
+        public void trace(String format, Object... args) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(format, args);
+            }
+        }
+
+        @Override
+        public void trace(String message, Exception exception) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(message, exception);
+            }
         }
     }
 
