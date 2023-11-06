@@ -37145,5 +37145,6 @@
     "poll": null,
     "editorDescriptionDataSource": null
   } ],
-  "compatibleConnections": null
+  "allowedConnections": null,
+  "multipleConnections": null
 }

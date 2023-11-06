@@ -408,5 +408,6 @@
   "version": 1,
   "title": "XML File",
   "triggers": null,
-  "compatibleConnections": null
+  "allowedConnections": null,
+  "multipleConnections": null
 }

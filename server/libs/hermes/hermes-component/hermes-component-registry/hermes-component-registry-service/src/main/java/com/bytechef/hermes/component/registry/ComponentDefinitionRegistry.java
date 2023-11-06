@@ -168,7 +168,7 @@ public class ComponentDefinitionRegistry {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
         return CollectionUtils.concatDistinct(
-            applyFilterCompatibleConnectionDefinitions(componentDefinition, connectionDefinitions),
+            applyAllowedConnectionDefinitionsFunction(componentDefinition, connectionDefinitions),
             List.of(OptionalUtils.get(componentDefinition.getConnection())));
     }
 
@@ -214,12 +214,12 @@ public class ComponentDefinitionRegistry {
             .orElseThrow(IllegalStateException::new);
     }
 
-    private List<ConnectionDefinition> applyFilterCompatibleConnectionDefinitions(
+    private List<ConnectionDefinition> applyAllowedConnectionDefinitionsFunction(
         ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions) {
 
-        return componentDefinition.getCompatibleConnections()
-            .map(filterCompatibleConnectionsFunction -> filterCompatibleConnectionsFunction
-                .apply(componentDefinition, connectionDefinitions))
+        return componentDefinition.getAllowedConnections()
+            .map(allowedConnectionDefinitionsFunction -> allowedConnectionDefinitionsFunction.apply(
+                componentDefinition, connectionDefinitions))
             .orElse(Collections.emptyList());
     }
 

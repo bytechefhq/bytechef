@@ -439,5 +439,6 @@
   "version": 1,
   "title": "File Storage",
   "triggers": null,
-  "compatibleConnections": null
+  "allowedConnections": null,
+  "multipleConnections": null
 }

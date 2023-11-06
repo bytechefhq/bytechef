@@ -483,5 +483,6 @@
     "sampleOutputDataSource": null,
     "poll": { }
   } ],
-  "compatibleConnections": null
+  "allowedConnections": null,
+  "multipleConnections": null
 }

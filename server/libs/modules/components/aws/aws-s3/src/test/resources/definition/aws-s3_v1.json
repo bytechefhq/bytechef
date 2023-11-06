@@ -848,5 +848,6 @@
   "version": 1,
   "title": "AWS S3",
   "triggers": null,
-  "compatibleConnections": null
+  "allowedConnections": null,
+  "multipleConnections": null
 }

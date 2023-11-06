@@ -464,5 +464,6 @@
   "version": 1,
   "title": "JSON File",
   "triggers": null,
-  "compatibleConnections": null
+  "allowedConnections": null,
+  "multipleConnections": null
 }
