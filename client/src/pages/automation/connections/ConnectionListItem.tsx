@@ -1,3 +1,21 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {Badge} from '@/components/ui/badge';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {ConnectionModel, TagModel} from '@/middleware/helios/connection';
 import {
     useDeleteConnectionMutation,
@@ -8,17 +26,13 @@ import {
     useGetComponentDefinitionQuery,
 } from '@/queries/componentDefinitions.queries';
 import {ConnectionKeys} from '@/queries/connections.queries';
-import {Component1Icon} from '@radix-ui/react-icons';
+import {Component1Icon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
+import {twMerge} from 'tailwind-merge';
 
-import AlertDialog from '../../../components/AlertDialog/AlertDialog';
-import Badge from '../../../components/Badge/Badge';
-import DropdownMenu, {
-    IDropdownMenuItem,
-} from '../../../components/DropdownMenu/DropdownMenu';
 import TagList from '../../../components/TagList/TagList';
 import ConnectionDialog from './components/ConnectionDialog';
 
@@ -57,21 +71,6 @@ const ConnectionListItem = ({
         },
     });
 
-    const menuItems: IDropdownMenuItem[] = [
-        {
-            label: 'Edit',
-            onClick: () => setShowEditDialog(true),
-        },
-        {
-            separator: true,
-        },
-        {
-            danger: true,
-            label: 'Delete',
-            onClick: () => setShowDeleteDialog(true),
-        },
-    ];
-
     return (
         <>
             <div className="flex items-center">
@@ -89,18 +88,21 @@ const ConnectionListItem = ({
                                 <Component1Icon className="mr-1 h-6 w-6 flex-none" />
                             )}
 
-                            <span className="mr-2 text-base font-semibold text-gray-900">
+                            <span className="mr-2 text-base font-semibold">
                                 {connection.name}
                             </span>
                         </div>
 
                         <div className="ml-2 flex shrink-0">
                             <Badge
-                                color={connection.active ? 'green' : 'default'}
-                                text={
-                                    connection.active ? 'Active' : 'Not Active'
-                                }
-                            />
+                                variant="secondary"
+                                className={twMerge(
+                                    connection.active &&
+                                        'bg-success text-success-foreground hover:bg-success'
+                                )}
+                            >
+                                {connection.active ? 'Active' : 'Not Active'}
+                            </Badge>
                         </div>
                     </div>
 
@@ -131,7 +133,7 @@ const ConnectionListItem = ({
                             {connection.createdDate && (
                                 <>
                                     <CalendarIcon
-                                        className="mr-1 h-5 w-5 shrink-0 text-gray-400"
+                                        className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
                                         aria-hidden="true"
                                     />
 
@@ -145,23 +147,70 @@ const ConnectionListItem = ({
                 </div>
 
                 <div className="flex w-2/12 justify-end">
-                    <DropdownMenu id={connection.id} menuItems={menuItems} />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                className="cursor-pointer text-xs text-gray-700"
+                                onClick={() => setShowEditDialog(true)}
+                            >
+                                Edit
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+
+                            <DropdownMenuItem
+                                className="cursor-pointer text-xs text-red-600"
+                                onClick={() => setShowDeleteDialog(true)}
+                            >
+                                Delete
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
 
             {showDeleteDialog && (
-                <AlertDialog
-                    danger
-                    isOpen
-                    message="This action cannot be undone. This will permanently delete the connection."
-                    title="Are you absolutely sure?"
-                    setIsOpen={setShowDeleteDialog}
-                    onConfirmClick={() => {
-                        if (connection.id) {
-                            deleteConnectionMutation.mutate(connection.id);
-                        }
-                    }}
-                />
+                <AlertDialog open={showDeleteDialog}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Are you absolutely sure?
+                            </AlertDialogTitle>
+
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently delete the connection.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                            <AlertDialogCancel
+                                onClick={() => setShowDeleteDialog(false)}
+                            >
+                                Cancel
+                            </AlertDialogCancel>
+
+                            <AlertDialogAction
+                                className="bg-red-600"
+                                onClick={() => {
+                                    if (connection.id) {
+                                        deleteConnectionMutation.mutate(
+                                            connection.id
+                                        );
+
+                                        setShowDeleteDialog(false);
+                                    }
+                                }}
+                            >
+                                Delete
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             )}
 
             {showEditDialog && (

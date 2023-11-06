@@ -41,6 +41,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
+import {twMerge} from 'tailwind-merge';
 
 import TagList from '../../../components/TagList/TagList';
 import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
@@ -129,12 +130,12 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                         <div className="ml-2 flex shrink-0">
                             <Badge
-                                variant={
+                                className={twMerge(
                                     project.status ===
-                                    ProjectModelStatusEnum.Published
-                                        ? 'success'
-                                        : 'secondary'
-                                }
+                                        ProjectModelStatusEnum.Published &&
+                                        'border-transparent bg-success text-success-foreground hover:bg-success'
+                                )}
+                                variant="secondary"
                             >
                                 {project.status ===
                                 ProjectModelStatusEnum.Published

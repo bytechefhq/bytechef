@@ -1,4 +1,9 @@
-import DropdownMenu from '@/components/DropdownMenu/DropdownMenu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
@@ -9,6 +14,7 @@ import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/projectInstances.mutations';
 import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/ProjectInstanceEditWorkflowDialog';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
+import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -103,7 +109,7 @@ const ProjectInstanceWorkflowListItem = ({
                                 <TooltipTrigger>
                                     <div className="flex items-center text-sm text-gray-500">
                                         <CalendarIcon
-                                            className="mr-1 h-4 w-4 shrink-0 text-gray-400"
+                                            className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
                                             aria-hidden="true"
                                         />
 
@@ -149,15 +155,20 @@ const ProjectInstanceWorkflowListItem = ({
             </div>
 
             <div className="flex w-1/12 justify-end">
-                <DropdownMenu
-                    id={projectInstanceId}
-                    menuItems={[
-                        {
-                            label: 'Edit',
-                            onClick: () => setShowEditWorkflowDialog(true),
-                        },
-                    ]}
-                />
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                            className="cursor-pointer text-xs text-gray-700"
+                            onClick={() => setShowEditWorkflowDialog(true)}
+                        >
+                            Edit
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             {showEditWorkflowDialog && projectInstanceWorkflow && (

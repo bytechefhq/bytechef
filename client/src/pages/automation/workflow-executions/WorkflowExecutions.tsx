@@ -1,19 +1,24 @@
-import DatePicker from '@/components/DatePicker/DatePicker';
 import EmptyList from '@/components/EmptyList/EmptyList';
 import FilterableSelect, {
     ISelectOption,
 } from '@/components/FilterableSelect/FilterableSelect';
 import PageLoader from '@/components/PageLoader/PageLoader';
 import Pagination from '@/components/Pagination/Pagination';
+import {Button} from '@/components/ui/button';
+import {Calendar} from '@/components/ui/calendar';
+import {Label} from '@/components/ui/label';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import LayoutContainer from '@/layouts/LayoutContainer';
 import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
+import {cn} from '@/lib/utils';
 import {
     useGetWorkflowExecutionsQuery,
     useGetWorkflowsQuery,
 } from '@/queries/executions';
 import {useGetProjectInstancesQuery} from '@/queries/projectInstances.queries';
-import {ListEndIcon} from 'lucide-react';
+import {format} from 'date-fns';
+import {ActivityIcon, CalendarIcon} from 'lucide-react';
 import {
     GetWorkflowExecutionsJobStatusEnum,
     WorkflowExecutionModel,
@@ -50,8 +55,51 @@ const jobStatusOptions = [
         value: GetWorkflowExecutionsJobStatusEnum.Failed,
     },
 ];
+const DatePicker = ({
+    label,
+    onChange,
+}: {
+    label: string;
+    onChange: (date: Date | undefined) => void;
+}) => {
+    const [date, setDate] = useState<Date>();
 
-export const WorkflowExecutions = () => {
+    return (
+        <fieldset className="mb-3">
+            <Label>{label}</Label>
+
+            <Popover>
+                <PopoverTrigger asChild className="mt-1">
+                    <Button
+                        variant={'outline'}
+                        className={cn(
+                            'w-full justify-start text-left font-normal',
+                            !date && 'text-muted-foreground'
+                        )}
+                    >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+
+                        {date ? format(date, 'PPP') : <span>Pick a date</span>}
+                    </Button>
+                </PopoverTrigger>
+
+                <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={(date) => {
+                            setDate(date);
+                            onChange(date);
+                        }}
+                        initialFocus
+                    />
+                </PopoverContent>
+            </Popover>
+        </fieldset>
+    );
+};
+
+const WorkflowExecutions = () => {
     const [filterStatus, setFilterStatus] =
         useState<GetWorkflowExecutionsJobStatusEnum>();
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
@@ -162,15 +210,11 @@ export const WorkflowExecutions = () => {
 
                             <DatePicker
                                 label="Start date"
-                                name="jobStartDate"
-                                placeholder="Select..."
                                 onChange={setFilterStartDate}
                             />
 
                             <DatePicker
-                                label="End date"
-                                name="jobEndDate"
-                                placeholder="Select..."
+                                label="Start date"
                                 onChange={setFilterEndDate}
                             />
 
@@ -272,7 +316,7 @@ export const WorkflowExecutions = () => {
                             ) : (
                                 <EmptyList
                                     icon={
-                                        <ListEndIcon className="h-12 w-12 text-gray-400" />
+                                        <ActivityIcon className="h-12 w-12 text-gray-400" />
                                     }
                                     message={emptyListMessage}
                                     title="No executed workflows"

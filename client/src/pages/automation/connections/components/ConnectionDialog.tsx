@@ -1,5 +1,13 @@
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Checkbox} from '@/components/ui/checkbox';
+import {Label} from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -8,8 +16,6 @@ import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Dialog from 'components/Dialog/Dialog';
 import FilterableSelect from 'components/FilterableSelect/FilterableSelect';
 import Input from 'components/Input/Input';
-import Label from 'components/Label/Label';
-import NativeSelect from 'components/NativeSelect/NativeSelect';
 import Properties from 'components/Properties/Properties';
 import useCopyToClipboard from 'hooks/useCopyToClipboard';
 import {ClipboardIcon} from 'lucide-react';
@@ -191,7 +197,7 @@ const ConnectionDialog = ({
             connectionDefinition && connectionDefinition.authorizations
                 ? [
                       ...(connectionDefinition.authorizationRequired === false
-                          ? [{label: 'None', value: ''}]
+                          ? [{label: 'None', value: 'none'}]
                           : []),
                       ...connectionDefinition.authorizations.map(
                           (authorization) => ({
@@ -543,25 +549,41 @@ const ConnectionDialog = ({
                                 )}
 
                             {showAuthorizations && (
-                                <NativeSelect
-                                    error={
-                                        formState.touchedFields
-                                            .authorizationName &&
-                                        !!formState.errors.authorizationName
-                                    }
-                                    label="Authorization"
-                                    options={authorizationOptions}
-                                    placeholder="Select..."
-                                    value={authorizationName}
-                                    {...register('authorizationName', {
-                                        onChange: (event) => {
-                                            setAuthorizationName(
-                                                event.target.value
-                                            );
+                                <fieldset className="mb-3">
+                                    <Label>Authorization</Label>
+
+                                    <Select
+                                        onValueChange={(value) => {
+                                            setAuthorizationName(value);
                                             setUsePredefinedOAuthApp(false);
-                                        },
-                                    })}
-                                />
+                                        }}
+                                        value={authorizationName}
+                                        {...register('authorizationName')}
+                                    >
+                                        <SelectTrigger className="mt-1">
+                                            <SelectValue placeholder="Select..." />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            {authorizationOptions.map(
+                                                (authorizationOption) => (
+                                                    <SelectItem
+                                                        key={
+                                                            authorizationOption.value!
+                                                        }
+                                                        value={
+                                                            authorizationOption.value!
+                                                        }
+                                                    >
+                                                        {
+                                                            authorizationOption.label!
+                                                        }
+                                                    </SelectItem>
+                                                )
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </fieldset>
                             )}
 
                             {showRedirectUriInput &&
@@ -626,11 +648,7 @@ const ConnectionDialog = ({
                                             options={remainingTags!.map(
                                                 (tag: TagModel) => {
                                                     return {
-                                                        label: `${tag.name
-                                                            .charAt(0)
-                                                            .toUpperCase()}${tag.name.slice(
-                                                            1
-                                                        )}`,
+                                                        label: tag.name,
                                                         value: tag.name
                                                             .toLowerCase()
                                                             .replace(/\W/g, ''),
@@ -660,7 +678,7 @@ const ConnectionDialog = ({
                     {!oAuth2AuthorizationParametersLoading &&
                         wizardStep === 'oauth_step' && (
                             <div>
-                                <Alert variant="info">
+                                <Alert className="border-blue-50 bg-blue-50 text-blue-700">
                                     <RocketIcon className="h-4 w-4" />
 
                                     <AlertTitle>Heads up!</AlertTitle>
@@ -768,7 +786,7 @@ const ConnectionDialog = ({
                             <Button
                                 label="Save"
                                 type="submit"
-                                onClick={handleSubmit(saveConnection)}
+                                onClick={handleSubmit(() => saveConnection())}
                             />
                         )}
                     </footer>
@@ -839,7 +857,7 @@ const Scopes = ({scopes}: {scopes: string[]}) => (
                 <div className="flex items-center" key={scope}>
                     <Checkbox id={scope} disabled />
 
-                    <Label htmlFor={scope} value={scope} />
+                    <Label htmlFor={scope}>{scope}</Label>
                 </div>
             ))}
         </div>
