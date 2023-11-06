@@ -475,5 +475,6 @@
   "version": 1,
   "title": "Email",
   "triggers": null,
-  "compatibleConnections": null
+  "allowedConnections": null,
+  "multipleConnections": null
 }

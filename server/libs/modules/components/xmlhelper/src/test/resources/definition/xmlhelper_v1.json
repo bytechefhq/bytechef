@@ -177,5 +177,6 @@
   "version": 1,
   "title": "XML Helper",
   "triggers": null,
-  "compatibleConnections": null
+  "allowedConnections": null,
+  "multipleConnections": null
 }

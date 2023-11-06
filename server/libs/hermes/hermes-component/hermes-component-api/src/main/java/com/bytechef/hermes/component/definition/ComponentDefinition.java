@@ -33,12 +33,6 @@ public interface ComponentDefinition {
      *
      * @return
      */
-    Optional<CompatibleConnectionsFunction> getCompatibleConnections();
-
-    /**
-     *
-     * @return
-     */
     Optional<List<? extends ActionDefinition>> getActions();
 
     /**
@@ -53,6 +47,12 @@ public interface ComponentDefinition {
      * @return
      */
     Optional<ConnectionDefinition> getConnection();
+
+    /**
+     *
+     * @return
+     */
+    Optional<AllowedConnectionDefinitionsFunction> getAllowedConnections();
 
     /**
      *
@@ -83,6 +83,12 @@ public interface ComponentDefinition {
      * @return
      */
     Optional<Map<String, Object>> getMetadata();
+
+    /**
+     *
+     * @return
+     */
+    Optional<Boolean> getMultipleConnections();
 
     /**
      *
@@ -127,7 +133,7 @@ public interface ComponentDefinition {
      *
      */
     @FunctionalInterface
-    interface CompatibleConnectionsFunction {
+    interface AllowedConnectionDefinitionsFunction {
 
         /**
          *

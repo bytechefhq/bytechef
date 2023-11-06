@@ -585,8 +585,9 @@ public final class ComponentDSL extends DefinitionDSL {
         private String description;
         private String icon;
         private List<String> tags;
-        private CompatibleConnectionsFunction compatibleConnectionsFunction;
+        private AllowedConnectionDefinitionsFunction allowedConnectionDefinitionsFunction;
         private Map<String, Object> metadata;
+        private Boolean multipleConnections;
         private final String name;
         private Resources resources;
         private int version = VERSION_1;
@@ -641,6 +642,12 @@ public final class ComponentDSL extends DefinitionDSL {
             return this;
         }
 
+        public ModifiableComponentDefinition connections(AllowedConnectionDefinitionsFunction connectionDefinitions) {
+            this.allowedConnectionDefinitionsFunction = connectionDefinitions;
+
+            return this;
+        }
+
         public ModifiableComponentDefinition customAction(boolean customAction) {
             this.customAction = customAction;
 
@@ -655,14 +662,6 @@ public final class ComponentDSL extends DefinitionDSL {
 
         public ModifiableComponentDefinition description(String description) {
             this.description = description;
-
-            return this;
-        }
-
-        public ModifiableComponentDefinition compatibleConnections(
-            CompatibleConnectionsFunction compatibleConnections) {
-
-            this.compatibleConnectionsFunction = compatibleConnections;
 
             return this;
         }
@@ -686,6 +685,12 @@ public final class ComponentDSL extends DefinitionDSL {
         @SuppressFBWarnings("EI2")
         public ModifiableComponentDefinition metadata(Map<String, Object> metadata) {
             this.metadata = metadata;
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition multipleConnections(boolean multipleConnections) {
+            this.multipleConnections = multipleConnections;
 
             return this;
         }
@@ -759,8 +764,8 @@ public final class ComponentDSL extends DefinitionDSL {
         }
 
         @Override
-        public Optional<CompatibleConnectionsFunction> getCompatibleConnections() {
-            return Optional.ofNullable(compatibleConnectionsFunction);
+        public Optional<AllowedConnectionDefinitionsFunction> getAllowedConnections() {
+            return Optional.ofNullable(allowedConnectionDefinitionsFunction);
         }
 
         @Override
@@ -801,6 +806,11 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<Map<String, Object>> getMetadata() {
             return Optional.ofNullable(metadata == null ? null : new HashMap<>(metadata));
+        }
+
+        @Override
+        public Optional<Boolean> getMultipleConnections() {
+            return Optional.ofNullable(multipleConnections);
         }
 
         @Override
