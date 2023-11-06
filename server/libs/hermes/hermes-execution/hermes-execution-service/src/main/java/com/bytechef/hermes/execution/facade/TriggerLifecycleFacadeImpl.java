@@ -90,8 +90,9 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
         if (logger.isDebugEnabled()) {
             logger.debug(
-                "Trigger workflowExecutionId={}, type='{}', name='{}' disabled",
-                workflowExecutionId, workflowTriggerType, workflowTriggerName);
+                "Trigger type='{}', name='{}' instanceId={}, instanceType={} disabled",
+                workflowTriggerType, workflowTriggerName, workflowExecutionId.getInstanceId(),
+                workflowExecutionId.getType());
         }
     }
 
@@ -137,8 +138,9 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
         if (logger.isDebugEnabled()) {
             logger.debug(
-                "Trigger workflowExecutionId={}, type='{}', name='{}' enabled",
-                workflowExecutionId, workflowTriggerType, workflowTriggerName);
+                "Trigger type='{}', name='{}' instanceId={}, instanceType={} enabled",
+                workflowTriggerType, workflowTriggerName, workflowExecutionId.getInstanceId(),
+                workflowExecutionId.getType());
         }
     }
 }
