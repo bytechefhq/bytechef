@@ -11,7 +11,6 @@ const alertVariants = cva(
         default: "bg-background text-foreground",
         destructive:
           "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
-        info: "border-blue-50 text-blue-700 bg-blue-50"
       },
     },
     defaultVariants: {
