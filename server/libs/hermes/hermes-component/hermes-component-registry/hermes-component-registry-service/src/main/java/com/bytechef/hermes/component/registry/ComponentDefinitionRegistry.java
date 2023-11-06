@@ -217,7 +217,7 @@ public class ComponentDefinitionRegistry {
     private List<ConnectionDefinition> applyFilterCompatibleConnectionDefinitions(
         ComponentDefinition componentDefinition, List<ConnectionDefinition> connectionDefinitions) {
 
-        return componentDefinition.getFilterCompatibleConnections()
+        return componentDefinition.getCompatibleConnections()
             .map(filterCompatibleConnectionsFunction -> filterCompatibleConnectionsFunction
                 .apply(componentDefinition, connectionDefinitions))
             .orElse(Collections.emptyList());

@@ -4252,5 +4252,5 @@
   "version": 1,
   "title": "HTTP Client",
   "triggers": null,
-  "filterCompatibleConnections": null
+  "compatibleConnections": null
 }

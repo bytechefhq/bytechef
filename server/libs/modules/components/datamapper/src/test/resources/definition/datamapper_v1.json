@@ -2336,5 +2336,5 @@
   "version": 1,
   "title": "Data Mapper",
   "triggers": null,
-  "filterCompatibleConnections": null
+  "compatibleConnections": null
 }

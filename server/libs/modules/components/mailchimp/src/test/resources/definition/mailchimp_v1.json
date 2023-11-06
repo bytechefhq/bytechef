@@ -2259,5 +2259,5 @@
     "poll": null,
     "editorDescriptionDataSource": null
   } ],
-  "filterCompatibleConnections": null
+  "compatibleConnections": null
 }

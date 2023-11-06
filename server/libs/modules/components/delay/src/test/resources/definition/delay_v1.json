@@ -45,7 +45,7 @@
   "description": "Sets a value which can then be referenced in other tasks.",
   "icon": "path:assets/delay.svg",
   "tags": null,
-  "filterCompatibleConnections": null,
+  "compatibleConnections": null,
   "metadata": null,
   "name": "delay",
   "resources": null,

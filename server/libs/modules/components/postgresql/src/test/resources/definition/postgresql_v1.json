@@ -1745,5 +1745,5 @@
   "version": 1,
   "title": "PostgreSQL",
   "triggers": null,
-  "filterCompatibleConnections": null
+  "compatibleConnections": null
 }

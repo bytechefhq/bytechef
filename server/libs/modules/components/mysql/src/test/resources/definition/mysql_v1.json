@@ -1745,5 +1745,5 @@
   "version": 1,
   "title": "MySQL",
   "triggers": null,
-  "filterCompatibleConnections": null
+  "compatibleConnections": null
 }
