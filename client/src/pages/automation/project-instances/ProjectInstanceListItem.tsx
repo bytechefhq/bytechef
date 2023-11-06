@@ -1,3 +1,27 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {Badge} from '@/components/ui/badge';
+import {CollapsibleTrigger} from '@/components/ui/collapsible';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from '@/components/ui/hover-card';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
@@ -12,18 +36,12 @@ import {
 } from '@/mutations/projectInstances.mutations';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
-import {AccordionTrigger} from '@radix-ui/react-accordion';
-import {ChevronDownIcon} from '@radix-ui/react-icons';
+import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
-import AlertDialog from '../../../components/AlertDialog/AlertDialog';
-import Badge from '../../../components/Badge/Badge';
-import DropdownMenu, {
-    IDropdownMenuItem,
-} from '../../../components/DropdownMenu/DropdownMenu';
-import HoverCard from '../../../components/HoverCard/HoverCard';
 import TagList from '../../../components/TagList/TagList';
 import ProjectInstanceDialog from './ProjectInstanceDialog';
 
@@ -67,21 +85,6 @@ const ProjectInstanceListItem = ({
             },
         });
 
-    const dropdownItems: IDropdownMenuItem[] = [
-        {
-            label: 'Edit',
-            onClick: () => setShowEditDialog(true),
-        },
-        {
-            separator: true,
-        },
-        {
-            danger: true,
-            label: 'Delete',
-            onClick: () => setShowDeleteDialog(true),
-        },
-    ];
-
     const enableProjectInstanceMutation = useEnableProjectInstanceMutation({
         onSuccess: () => {
             queryClient.invalidateQueries(ProjectInstanceKeys.projectInstances);
@@ -95,13 +98,19 @@ const ProjectInstanceListItem = ({
                     <div className="flex items-center justify-between">
                         <div className="flex w-full items-center justify-between">
                             {projectInstance.description ? (
-                                <HoverCard text={projectInstance.description}>
-                                    <span className="mr-2 text-base font-semibold text-gray-900">
-                                        {projectInstance.name}
-                                    </span>
+                                <HoverCard>
+                                    <HoverCardTrigger>
+                                        {projectInstance.description}
+                                    </HoverCardTrigger>
+
+                                    <HoverCardContent>
+                                        <span className="mr-2 text-base font-semibold">
+                                            {projectInstance.name}
+                                        </span>
+                                    </HoverCardContent>
                                 </HoverCard>
                             ) : (
-                                <span className="mr-2 text-base font-semibold text-gray-900">
+                                <span className="mr-2 text-base font-semibold">
                                     {projectInstance.name}
                                 </span>
                             )}
@@ -109,23 +118,22 @@ const ProjectInstanceListItem = ({
 
                         <div className="ml-2 flex shrink-0">
                             <Badge
-                                color={
-                                    projectInstance.enabled
-                                        ? 'green'
-                                        : 'default'
-                                }
-                                text={
-                                    projectInstance.enabled
-                                        ? 'Enabled'
-                                        : 'Disabled'
-                                }
-                            />
+                                className={twMerge(
+                                    projectInstance.enabled &&
+                                        'bg-success text-success-foreground hover:bg-success'
+                                )}
+                                variant="secondary"
+                            >
+                                {projectInstance.enabled
+                                    ? 'Enabled'
+                                    : 'Disabled'}
+                            </Badge>
                         </div>
                     </div>
 
                     <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                         <div className="flex items-center">
-                            <AccordionTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
+                            <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
                                 <span className="mr-1">
                                     {project.workflowIds?.length === 1
                                         ? `1 workflow`
@@ -133,7 +141,7 @@ const ProjectInstanceListItem = ({
                                 </span>
 
                                 <ChevronDownIcon className="h-4 w-4 duration-300 group-data-[state=open]:rotate-180" />
-                            </AccordionTrigger>
+                            </CollapsibleTrigger>
 
                             <div onClick={(event) => event.preventDefault()}>
                                 {projectInstance.tags && (
@@ -207,28 +215,69 @@ const ProjectInstanceListItem = ({
                 </div>
 
                 <div className="flex w-1/12 justify-end">
-                    <DropdownMenu
-                        id={projectInstance.id}
-                        menuItems={dropdownItems}
-                    />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                className="cursor-pointer text-xs text-gray-700"
+                                onClick={() => setShowEditDialog(true)}
+                            >
+                                Edit
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+
+                            <DropdownMenuItem
+                                className="cursor-pointer text-xs text-red-600"
+                                onClick={() => setShowDeleteDialog(true)}
+                            >
+                                Delete
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
 
             {showDeleteDialog && (
-                <AlertDialog
-                    danger
-                    isOpen
-                    message="This action cannot be undone. This will permanently delete the project and workflows it contains."
-                    title="Are you absolutely sure?"
-                    setIsOpen={setShowDeleteDialog}
-                    onConfirmClick={() => {
-                        if (projectInstance.id) {
-                            deleteProjectInstanceMutation.mutate(
-                                projectInstance.id
-                            );
-                        }
-                    }}
-                />
+                <AlertDialog open={showDeleteDialog}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Are you absolutely sure?
+                            </AlertDialogTitle>
+
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently delete the project and workflows it
+                                contains.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                            <AlertDialogCancel
+                                onClick={() => setShowDeleteDialog(false)}
+                            >
+                                Cancel
+                            </AlertDialogCancel>
+
+                            <AlertDialogAction
+                                className="bg-red-600"
+                                onClick={() => {
+                                    if (projectInstance.id) {
+                                        deleteProjectInstanceMutation.mutate(
+                                            projectInstance.id
+                                        );
+                                    }
+                                }}
+                            >
+                                Delete
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             )}
 
             {showEditDialog && (

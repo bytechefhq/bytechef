@@ -417,8 +417,7 @@ const Project = () => {
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
-                                        variant="outline-success"
-                                        className="mr-1"
+                                        className="mr-1 border border-success bg-transparent text-success shadow-sm hover:border-success hover:bg-success hover:text-success-foreground"
                                         onClick={() => setLeftSidebarOpen(true)}
                                     >
                                         <PlayIcon className="h-5" /> Run

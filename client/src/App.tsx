@@ -1,3 +1,4 @@
+import {Toaster} from '@/components/ui/toaster';
 import {DesktopSidebar} from '@/layouts/DesktopSidebar';
 import {MobileSidebar} from '@/layouts/MobileSidebar';
 import {MobileTopNavigation} from '@/layouts/MobileTopNavigation';
@@ -80,6 +81,8 @@ function App() {
                     <Outlet />
                 </div>
             </TooltipProvider>
+
+            <Toaster />
         </div>
     );
 }

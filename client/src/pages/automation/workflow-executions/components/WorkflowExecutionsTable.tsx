@@ -1,3 +1,4 @@
+import {Badge} from '@/components/ui/badge';
 import {
     CellContext,
     createColumnHelper,
@@ -5,11 +6,11 @@ import {
     getCoreRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import Badge from 'components/Badge/Badge';
 import {
     JobBasicModel,
     WorkflowExecutionModel,
 } from 'middleware/helios/execution';
+import {twMerge} from 'tailwind-merge';
 
 import useWorkflowExecutionDetailsDialogStore from '../stores/useWorkflowExecutionDetailsDialogStore';
 
@@ -32,15 +33,18 @@ const columns = [
     columnHelper.accessor((row) => row.job, {
         cell: (info) => (
             <Badge
-                color={
+                className={twMerge(
+                    info.getValue()?.status === 'COMPLETED' &&
+                        'bg-success text-success-foreground hover:bg-success'
+                )}
+                variant={
                     info.getValue()?.status === 'COMPLETED'
-                        ? 'green'
-                        : info.getValue()?.status === 'FAILED'
-                        ? 'red'
+                        ? 'destructive'
                         : 'default'
                 }
-                text={info.getValue()?.status ?? ''}
-            />
+            >
+                {info.getValue()?.status ?? ''}
+            </Badge>
         ),
         header: 'Status',
     }),
