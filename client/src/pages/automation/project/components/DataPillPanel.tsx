@@ -54,12 +54,24 @@ const DataPillPanel = () => {
         !!componentActions?.length
     );
 
-    if (!actionData?.length) {
+    if (!previousComponents?.length || !actionData?.length) {
         return <></>;
     }
 
-    const previousActions = actionData.filter((action) =>
-        previousComponentNames.includes(action.componentName!)
+    const actionDataWithComponentAlias = actionData.map((action) => {
+        const componentAction = componentActions?.find(
+            (componentAction) =>
+                componentAction.componentName === action.componentName
+        );
+
+        return {
+            ...action,
+            workflowAlias: componentAction?.workflowAlias,
+        };
+    });
+
+    const previousActions = actionDataWithComponentAlias.filter((action) =>
+        previousComponentNames.includes(action.workflowAlias!)
     );
 
     const componentActionData = previousActions.map((action, index) => {
@@ -68,7 +80,7 @@ const DataPillPanel = () => {
                 component.name === normalizedPreviousComponentNames[index]
         );
 
-        if (previousComponentNames.includes(action.componentName!)) {
+        if (previousComponentNames.includes(action.workflowAlias!)) {
             return {
                 ...action,
                 component: componentData,

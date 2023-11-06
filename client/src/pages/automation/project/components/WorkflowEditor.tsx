@@ -66,8 +66,8 @@ const WorkflowEditor = ({components, flowControls}: WorkflowEditorProps) => {
 
     useEffect(() => {
         if (workflowComponent?.actions) {
-            let workflowAlias = workflowComponent.name;
-            let index = 1;
+            let workflowAlias = `${workflowComponent.name}-1`;
+            let index = 2;
 
             while (
                 componentActions.some(

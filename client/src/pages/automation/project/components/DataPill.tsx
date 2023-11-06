@@ -26,6 +26,7 @@ const DataPill = ({
     const mentionInput = focusedInput?.getEditor().getModule('mention');
 
     const addDataPillToInput = (
+        componentAlias: string,
         property: PropertyType,
         parentProperty?: PropertyType,
         arrayIndex?: number
@@ -42,7 +43,7 @@ const DataPill = ({
             {
                 componentIcon: component.icon,
                 id: property.name,
-                value: dataPillName,
+                value: `${componentAlias}/${dataPillName}`,
             },
             true,
             {blotName: 'property-mention'}
@@ -65,7 +66,12 @@ const DataPill = ({
                     event.dataTransfer.setData('name', property.name!)
                 }
                 onClick={() =>
-                    addDataPillToInput(property, parentProperty, arrayIndex)
+                    addDataPillToInput(
+                        componentAlias,
+                        property,
+                        parentProperty,
+                        arrayIndex
+                    )
                 }
             >
                 <span className="mr-2" title={property.type}>
@@ -75,7 +81,7 @@ const DataPill = ({
                 {property.name ? property.name : `[${arrayIndex}]`}
             </div>
 
-            {subProperties?.length ? (
+            {subProperties?.length && (
                 <ul className="mt-2 flex flex-col space-y-2 border-l border-gray-200 pl-4">
                     {subProperties?.map((subProperty, index) => (
                         <DataPill
@@ -88,8 +94,6 @@ const DataPill = ({
                         />
                     ))}
                 </ul>
-            ) : (
-                ''
             )}
         </li>
     );
