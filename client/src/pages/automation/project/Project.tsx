@@ -40,6 +40,7 @@ import {
     usePublishProjectMutation,
     useUpdateWorkflowMutation,
 } from '@/mutations/projects.mutations';
+import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
 import {useNodeDetailsPanelStore} from '@/pages/automation/project/stores/useNodeDetailsPanelStore';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
 import ProjectDialog from '@/pages/automation/projects/ProjectDialog';
@@ -62,7 +63,6 @@ import {useEffect, useState} from 'react';
 import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 
 import PageLoader from '../../../components/PageLoader/PageLoader';
-import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 import LayoutContainer from '../../../layouts/LayoutContainer';
 import WorkflowEditor from './ProjectWorkflow';
 import ComponentSidebar from './components/ComponentSidebar';
@@ -424,8 +424,10 @@ const Project = () => {
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
-                                        className="mr-1 border border-success bg-transparent text-success shadow-sm hover:border-success hover:bg-success hover:text-success-foreground"
+                                        className="mr-1 bg-success text-success-foreground hover:bg-success/80"
                                         onClick={() => setLeftSidebarOpen(true)}
+                                        size="sm"
+                                        variant="secondary"
                                     >
                                         <PlayIcon className="mr-0.5 h-5" /> Run
                                     </Button>
@@ -446,6 +448,7 @@ const Project = () => {
                                                 id: +projectId!,
                                             })
                                         }
+                                        size="sm"
                                     >
                                         <CircleDotDashedIcon className="mr-0.5 h-5" />{' '}
                                         Publish

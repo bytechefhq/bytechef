@@ -35,6 +35,7 @@ import {
     useDuplicateProjectMutation,
     useUpdateProjectTagsMutation,
 } from '@/mutations/projects.mutations';
+import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -44,7 +45,6 @@ import {Link, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 import TagList from '../../../components/TagList/TagList';
-import WorkflowDialog from '../../../components/WorkflowDialog/WorkflowDialog';
 import ProjectDialog from './ProjectDialog';
 
 interface ProjectItemProps {
