@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
 import com.bytechef.hermes.execution.dto.JobDTO;
+import com.bytechef.hermes.execution.dto.TriggerExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -27,5 +28,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 @SuppressFBWarnings("EI")
 public record WorkflowExecutionDTO(
-    long id, ProjectInstance instance, JobDTO job, Project project, Workflow workflow) {
+    long id, ProjectInstance instance, JobDTO job, Project project, TriggerExecutionDTO triggerExecution,
+    Workflow workflow) {
 }

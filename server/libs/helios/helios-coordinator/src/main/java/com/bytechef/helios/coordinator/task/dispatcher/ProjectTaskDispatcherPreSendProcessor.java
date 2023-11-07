@@ -26,6 +26,7 @@ import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
+import com.bytechef.hermes.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -40,14 +41,17 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
     implements TaskDispatcherPreSendProcessor {
 
     private final JobService jobService;
+    private final InstanceJobService instanceJobService;
 
     @SuppressFBWarnings("EI")
     public ProjectTaskDispatcherPreSendProcessor(
-        JobService jobService, ProjectInstanceWorkflowService projectInstanceWorkflowService) {
+        JobService jobService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        InstanceJobService instanceJobService) {
 
         super(projectInstanceWorkflowService);
 
         this.jobService = jobService;
+        this.instanceJobService = instanceJobService;
     }
 
     @Override
@@ -72,11 +76,9 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
 
         taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
 
-        Number projectInstanceId = (Number) job.getMetadata(MetadataConstants.INSTANCE_ID);
-
-        if (projectInstanceId != null) {
-            taskExecution.putMetadata(MetadataConstants.INSTANCE_ID, projectInstanceId.longValue());
-        }
+        instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), ProjectConstants.PROJECT_TYPE)
+            .ifPresent(projectInstanceId -> taskExecution.putMetadata(
+                MetadataConstants.INSTANCE_ID, projectInstanceId));
 
         taskExecution.putMetadata(MetadataConstants.TYPE, ProjectConstants.PROJECT_TYPE);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());

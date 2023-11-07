@@ -42,6 +42,11 @@ public class RemoteTriggerExecutionServiceClient implements TriggerExecutionServ
     }
 
     @Override
+    public TriggerExecution getJobTriggerExecution(long jobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public TriggerExecution getTriggerExecution(long id) {
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder

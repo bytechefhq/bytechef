@@ -17,6 +17,7 @@
 package com.bytechef.helios.configuration.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.hermes.domain.Instance;
 import com.bytechef.tag.domain.Tag;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -40,7 +41,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table("project_instance")
-public class ProjectInstance implements Persistable<Long> {
+public class ProjectInstance implements Instance, Persistable<Long> {
 
     @CreatedBy
     @Column("created_by")

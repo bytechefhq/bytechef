@@ -43,8 +43,8 @@ public class TriggerExecutionErrorEventListener implements ErrorEventListener {
 
     public void onErrorEvent(ErrorEvent errorEvent) {
         if (errorEvent instanceof TriggerExecutionErrorEvent triggerExecutionErrorEvent) {
+            ExecutionError error = Validate.notNull(triggerExecutionErrorEvent.getError(), "'error' must not be null");
             TriggerExecution triggerExecution = triggerExecutionErrorEvent.getTriggerExecution();
-            ExecutionError error = Validate.notNull(errorEvent.getError(), "'error' must not be null");
 
             logger.error(
                 "Trigger id={}: message={}\nstackTrace={}", triggerExecution.getId(), error.getMessage(),

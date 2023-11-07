@@ -23,11 +23,11 @@ import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,18 +42,19 @@ public class WebhookExecutorImpl implements WebhookExecutor {
 
     private final ApplicationEventPublisher eventPublisher;
     private final InstanceAccessorRegistry instanceAccessorRegistry;
+    private final InstanceJobFacade instanceJobFacade;
     private final JobSyncExecutor jobSyncExecutor;
     private final TriggerSyncExecutor triggerSyncExecutor;
     private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public WebhookExecutorImpl(
-        ApplicationEventPublisher eventPublisher,
-        InstanceAccessorRegistry instanceAccessorRegistry,
-        JobSyncExecutor jobSyncExecutor, TriggerSyncExecutor triggerSyncExecutor,
+        ApplicationEventPublisher eventPublisher, InstanceAccessorRegistry instanceAccessorRegistry,
+        InstanceJobFacade instanceJobFacade, JobSyncExecutor jobSyncExecutor, TriggerSyncExecutor triggerSyncExecutor,
         TaskFileStorage taskFileStorage) {
 
         this.instanceAccessorRegistry = instanceAccessorRegistry;
+        this.instanceJobFacade = instanceJobFacade;
         this.jobSyncExecutor = jobSyncExecutor;
         this.eventPublisher = eventPublisher;
         this.triggerSyncExecutor = triggerSyncExecutor;
@@ -67,24 +68,25 @@ public class WebhookExecutorImpl implements WebhookExecutor {
         TriggerOutput triggerOutput = triggerSyncExecutor.execute(workflowExecutionId, webhookRequest);
 
         Map<String, ?> inputMap = getInputMap(workflowExecutionId);
-        Map<String, ?> metadata = Map.of(
-            MetadataConstants.INSTANCE_ID, workflowExecutionId.getInstanceId(),
-            MetadataConstants.TYPE, workflowExecutionId.getType());
 
         if (!triggerOutput.batch() && triggerOutput.value() instanceof Collection<?> collectionOutput) {
             List<Map<String, ?>> outputsList = new ArrayList<>();
 
             for (Object outputItem : collectionOutput) {
                 Job job = jobSyncExecutor.execute(
-                    createJobParameters(workflowExecutionId, inputMap, outputItem, metadata));
+                    createJobParameters(workflowExecutionId, inputMap, outputItem),
+                    (jobParameters, workflow) -> instanceJobFacade.createJob(
+                        jobParameters, workflow, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
 
                 outputsList.add(taskFileStorage.readJobOutputs(job.getOutputs()));
             }
 
             return outputsList;
         } else {
-            Job job = jobSyncExecutor.execute(createJobParameters(
-                workflowExecutionId, inputMap, triggerOutput.value(), metadata));
+            Job job = jobSyncExecutor.execute(
+                createJobParameters(workflowExecutionId, inputMap, triggerOutput.value()),
+                (jobParameters, workflow) -> instanceJobFacade.createJob(
+                    jobParameters, workflow, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
 
             outputs = job.getOutputs() == null ? null : taskFileStorage.readJobOutputs(job.getOutputs());
         }
@@ -111,12 +113,11 @@ public class WebhookExecutorImpl implements WebhookExecutor {
 
     @SuppressWarnings("unchecked")
     private static JobParameters createJobParameters(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> inputMap, Object outputItem, Map<String, ?> metadata) {
+        WorkflowExecutionId workflowExecutionId, Map<String, ?> inputMap, Object outputItem) {
 
         return new JobParameters(
             workflowExecutionId.getWorkflowId(),
-            MapUtils.concat((Map<String, Object>) inputMap, Map.of(workflowExecutionId.getTriggerName(), outputItem)),
-            metadata);
+            MapUtils.concat((Map<String, Object>) inputMap, Map.of(workflowExecutionId.getTriggerName(), outputItem)));
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {

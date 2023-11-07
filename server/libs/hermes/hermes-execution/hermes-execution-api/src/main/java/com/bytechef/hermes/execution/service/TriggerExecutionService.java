@@ -25,6 +25,8 @@ public interface TriggerExecutionService {
 
     TriggerExecution create(TriggerExecution triggerExecution);
 
+    TriggerExecution getJobTriggerExecution(long jobId);
+
     TriggerExecution getTriggerExecution(long id);
 
     TriggerExecution update(TriggerExecution triggerExecution);

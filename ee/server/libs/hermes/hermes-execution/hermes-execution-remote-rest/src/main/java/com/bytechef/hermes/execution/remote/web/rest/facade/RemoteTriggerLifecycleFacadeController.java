@@ -44,7 +44,7 @@ public class RemoteTriggerLifecycleFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/trigger-lifecycle-facade/execute-trigger-enable")
+        value = "/execute-trigger-enable")
     public void executeTriggerEnable(TriggerRequest triggerRequest) {
         triggerLifecycleFacade.executeTriggerEnable(
             triggerRequest.workflowId, triggerRequest.type, triggerRequest.instanceId,

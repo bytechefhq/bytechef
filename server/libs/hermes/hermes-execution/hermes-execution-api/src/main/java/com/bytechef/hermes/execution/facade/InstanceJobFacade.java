@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.webhook.executor;
+package com.bytechef.hermes.execution.facade;
 
-import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.dto.JobParameters;
 
 /**
  * @author Ivica Cardic
  */
-public interface WebhookExecutor {
+public interface InstanceJobFacade {
 
-    Object execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    Job createJob(JobParameters jobParameters, long instanceId, int type);
 
-    void executeAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
-
-    boolean validateAndExecuteAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    Job createJob(JobParameters jobParameters, Workflow workflow, long instanceId, int type);
 }

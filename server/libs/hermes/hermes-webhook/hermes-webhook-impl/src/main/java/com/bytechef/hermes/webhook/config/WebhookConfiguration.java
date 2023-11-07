@@ -17,10 +17,8 @@
 package com.bytechef.hermes.webhook.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -34,6 +32,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import com.bytechef.hermes.webhook.executor.TriggerSyncExecutor;
 import com.bytechef.hermes.webhook.executor.WebhookExecutor;
 import com.bytechef.hermes.webhook.executor.WebhookExecutorImpl;
@@ -56,8 +55,6 @@ import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
-import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
-import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -75,7 +72,7 @@ public class WebhookConfiguration {
     WebhookExecutor webhookExecutor(
         ApplicationEventPublisher eventPublisher, ContextService contextService,
         CounterService counterService, InstanceAccessorRegistry instanceAccessorRegistry,
-        JobFacade jobFacade, JobService jobService, ObjectMapper objectMapper,
+        InstanceJobFacade instanceJobFacade, JobService jobService, ObjectMapper objectMapper,
         TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
         TriggerSyncExecutor triggerSyncExecutor,
         @Qualifier("workflowSyncTaskFileStorageFacade") TaskFileStorage taskFileStorage,
@@ -85,28 +82,16 @@ public class WebhookConfiguration {
 
         return new WebhookExecutorImpl(
             eventPublisher, instanceAccessorRegistry,
-            new JobSyncExecutor(
-                getApplicationEventListeners(
-                    jobService, syncMessageBroker, taskExecutionService, taskFileStorage),
-                contextService, jobService, syncMessageBroker,
+            instanceJobFacade, new JobSyncExecutor(
+                List.of(), contextService, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(objectMapper),
                 getTaskDispatcherResolverFactories(
-                    contextService, counterService, jobFacade, syncMessageBroker, taskExecutionService,
+                    contextService, counterService, syncMessageBroker, taskExecutionService,
                     taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
             triggerSyncExecutor, taskFileStorage);
-    }
-
-    private List<ApplicationEventListener> getApplicationEventListeners(
-        JobService jobService, SyncMessageBroker syncMessageBroker,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
-
-        SubflowJobStatusEventListener subflowJobStatusEventListener = new SubflowJobStatusEventListener(
-            getEventPublisher(syncMessageBroker), jobService, taskExecutionService, taskFileStorage);
-
-        return List.of(subflowJobStatusEventListener);
     }
 
     private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {
@@ -156,9 +141,8 @@ public class WebhookConfiguration {
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
-        ContextService contextService, CounterService counterService, JobFacade jobFacade,
-        SyncMessageBroker syncMessageBroker, TaskExecutionService taskExecutionService,
-        TaskFileStorage taskFileStorage) {
+        ContextService contextService, CounterService counterService, SyncMessageBroker syncMessageBroker,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
 
@@ -187,7 +171,6 @@ public class WebhookConfiguration {
                 taskFileStorage),
             (taskDispatcher) -> new SequenceTaskDispatcher(
                 eventPublisher, contextService, taskDispatcher, taskExecutionService,
-                taskFileStorage),
-            (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade));
+                taskFileStorage));
     }
 }

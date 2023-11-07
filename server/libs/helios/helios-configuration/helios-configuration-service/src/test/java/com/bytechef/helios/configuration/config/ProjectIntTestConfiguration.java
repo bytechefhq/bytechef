@@ -18,6 +18,7 @@ package com.bytechef.helios.configuration.config;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -43,6 +44,9 @@ public class ProjectIntTestConfiguration {
 
     @MockBean
     private ConnectionService connectionService;
+
+    @MockBean
+    private InstanceJobFacade instanceJobFacade;
 
     @MockBean
     private JobFacade jobFacade;

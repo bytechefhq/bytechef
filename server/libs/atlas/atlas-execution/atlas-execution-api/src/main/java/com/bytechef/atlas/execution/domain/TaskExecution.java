@@ -581,6 +581,11 @@ public final class TaskExecution
             return this;
         }
 
+        public Builder maxRetries(int maxRetries) {
+            this.maxRetries = maxRetries;
+            return this;
+        }
+
         public Builder metadata(Map<String, ?> metadata) {
             this.metadata = metadata;
             return this;
@@ -603,11 +608,6 @@ public final class TaskExecution
 
         public Builder progress(int progress) {
             this.progress = progress;
-            return this;
-        }
-
-        public Builder maxRetries(int maxRetries) {
-            this.maxRetries = maxRetries;
             return this;
         }
 
@@ -655,12 +655,12 @@ public final class TaskExecution
             taskExecution.setError(error);
             taskExecution.setId(id);
             taskExecution.setJobId(jobId);
+            taskExecution.setMaxRetries(maxRetries);
             taskExecution.setMetadata(metadata);
             taskExecution.setOutput(output);
             taskExecution.setParentId(parentId);
             taskExecution.setPriority(priority);
             taskExecution.setProgress(progress);
-            taskExecution.setMaxRetries(maxRetries);
             taskExecution.setRetryAttempts(retryAttempts);
             taskExecution.setRetryDelay(retryDelay);
             taskExecution.setRetryDelayFactor(retryDelayFactor);
