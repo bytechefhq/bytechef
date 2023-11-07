@@ -1,4 +1,5 @@
 dependencies {
+    api("org.springframework.data:spring-data-commons")
     api(project(":server:libs:core:category:category-api"))
     api(project(":server:libs:core:tag:tag-api"))
     api(project(":server:libs:hermes:hermes-configuration:hermes-configuration-api"))
