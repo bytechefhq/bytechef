@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-02T08:08:15.158214+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-08T14:03:36.313920+01:00[Europe/Zagreb]")
 public class WorkflowConnectionModel {
 
   private String componentName;
@@ -29,6 +29,8 @@ public class WorkflowConnectionModel {
 
   private String key;
 
+  private String operationName;
+
   public WorkflowConnectionModel() {
     super();
   }
@@ -36,10 +38,11 @@ public class WorkflowConnectionModel {
   /**
    * Constructor with only required parameters
    */
-  public WorkflowConnectionModel(String componentName, Integer componentVersion, String key) {
+  public WorkflowConnectionModel(String componentName, Integer componentVersion, String key, String operationName) {
     this.componentName = componentName;
     this.componentVersion = componentVersion;
     this.key = key;
+    this.operationName = operationName;
   }
 
   public WorkflowConnectionModel componentName(String componentName) {
@@ -102,6 +105,26 @@ public class WorkflowConnectionModel {
     this.key = key;
   }
 
+  public WorkflowConnectionModel operationName(String operationName) {
+    this.operationName = operationName;
+    return this;
+  }
+
+  /**
+   * Get operationName
+   * @return operationName
+  */
+  @NotNull 
+  @Schema(name = "operationName", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("operationName")
+  public String getOperationName() {
+    return operationName;
+  }
+
+  public void setOperationName(String operationName) {
+    this.operationName = operationName;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -113,12 +136,13 @@ public class WorkflowConnectionModel {
     WorkflowConnectionModel workflowConnection = (WorkflowConnectionModel) o;
     return Objects.equals(this.componentName, workflowConnection.componentName) &&
         Objects.equals(this.componentVersion, workflowConnection.componentVersion) &&
-        Objects.equals(this.key, workflowConnection.key);
+        Objects.equals(this.key, workflowConnection.key) &&
+        Objects.equals(this.operationName, workflowConnection.operationName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, key);
+    return Objects.hash(componentName, componentVersion, key, operationName);
   }
 
   @Override
@@ -128,6 +152,7 @@ public class WorkflowConnectionModel {
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
+    sb.append("    operationName: ").append(toIndentedString(operationName)).append("\n");
     sb.append("}");
     return sb.toString();
   }

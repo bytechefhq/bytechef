@@ -22,6 +22,7 @@ models/TagModel.ts
 models/TaskConnectionModel.ts
 models/TaskExecutionModel.ts
 models/TestParametersModel.ts
+models/TriggerExecutionModel.ts
 models/WebhookModel.ts
 models/WebhookRetryModel.ts
 models/WorkflowBasicModel.ts
@@ -29,5 +30,6 @@ models/WorkflowConnectionModel.ts
 models/WorkflowExecutionBasicModel.ts
 models/WorkflowExecutionModel.ts
 models/WorkflowTaskModel.ts
+models/WorkflowTriggerModel.ts
 models/index.ts
 runtime.ts
