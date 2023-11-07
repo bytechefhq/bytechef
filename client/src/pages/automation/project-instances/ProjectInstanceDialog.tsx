@@ -103,13 +103,13 @@ const ProjectInstanceDialog = ({
         {
             content: (
                 <ProjectInstanceDialogBasicStep
-                    control={control}
-                    errors={formState.errors}
-                    getValues={getValues}
                     projectInstance={projectInstance}
+                    control={control}
+                    touchedFields={formState.touchedFields}
                     register={register}
                     setValue={setValue}
-                    touchedFields={formState.touchedFields}
+                    getValues={getValues}
+                    errors={formState.errors}
                 />
             ),
             name: 'Basic',
@@ -173,37 +173,42 @@ const ProjectInstanceDialog = ({
                             <h2 className="font-semibold">
                                 {`${
                                     projectInstance?.id ? 'Edit' : 'New'
-                                } Instance - ${
-                                    projectInstanceDialogSteps[activeStepIndex]
-                                        .name
+                                } Instance ${!projectInstance?.id ? '-' : ''} ${
+                                    !projectInstance?.id
+                                        ? projectInstanceDialogSteps[
+                                              activeStepIndex
+                                          ].name
+                                        : ''
                                 }`}
                             </h2>
                         </header>
 
-                        <nav aria-label="Progress">
-                            <ol
-                                className="space-y-4 md:flex md:space-y-0"
-                                role="list"
-                            >
-                                {projectInstanceDialogSteps.map(
-                                    (step, index) => (
-                                        <li
-                                            className="md:flex-1"
-                                            key={step.name}
-                                        >
-                                            <div
-                                                className={twMerge(
-                                                    'group flex flex-col border-l-4 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4',
-                                                    index <= activeStepIndex
-                                                        ? 'border-gray-900 hover:border-gray-800'
-                                                        : 'border-gray-200 hover:border-gray-30'
-                                                )}
-                                            ></div>
-                                        </li>
-                                    )
-                                )}
-                            </ol>
-                        </nav>
+                        {!projectInstance?.id && (
+                            <nav aria-label="Progress">
+                                <ol
+                                    role="list"
+                                    className="space-y-4 md:flex md:space-y-0"
+                                >
+                                    {projectInstanceDialogSteps.map(
+                                        (step, index) => (
+                                            <li
+                                                key={step.name}
+                                                className="md:flex-1"
+                                            >
+                                                <div
+                                                    className={twMerge(
+                                                        'group flex flex-col border-l-4 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4',
+                                                        index <= activeStepIndex
+                                                            ? 'border-gray-900 hover:border-gray-800'
+                                                            : 'border-gray-200 hover:border-gray-30'
+                                                    )}
+                                                ></div>
+                                            </li>
+                                        )
+                                    )}
+                                </ol>
+                            </nav>
+                        )}
 
                         <main
                             className={twMerge(
@@ -257,7 +262,10 @@ const ProjectInstanceDialog = ({
                                     )}
 
                                     <Button
-                                        disabled={projectInstance?.enabled}
+                                        disabled={
+                                            projectInstance?.enabled &&
+                                            !projectInstance?.id
+                                        }
                                         label="Save"
                                         onClick={handleSubmit(
                                             saveProjectInstance
