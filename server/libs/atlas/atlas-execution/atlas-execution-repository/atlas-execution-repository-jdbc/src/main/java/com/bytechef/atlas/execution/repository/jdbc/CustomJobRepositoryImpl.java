@@ -18,7 +18,13 @@ package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.LocalDateTimeUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,10 +42,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class CustomJobRepositoryImpl implements CustomJobRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public CustomJobRepositoryImpl(JdbcTemplate jdbcTemplate) {
+    public CustomJobRepositoryImpl(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -55,7 +63,7 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
 
         Query query = buildQuery(status, startDate, endDate, workflowIds, null, false);
 
-        return jdbcTemplate.query(query.query, (rs, rowNum) -> new Job(rs), query.arguments);
+        return jdbcTemplate.query(query.query, (rs, rowNum) -> toJob(rs), query.arguments);
     }
 
     @Override
@@ -73,7 +81,7 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
         } else {
             query = buildQuery(status, startDate, endDate, workflowIds, pageable, false);
 
-            List<Job> jobs = jdbcTemplate.query(query.query, (rs, rowNum) -> new Job(rs), query.arguments);
+            List<Job> jobs = jdbcTemplate.query(query.query, (rs, rowNum) -> toJob(rs), query.arguments);
 
             page = new PageImpl<>(jobs, pageable, total);
         }
@@ -150,6 +158,34 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
         }
 
         return new Query(query, arguments.toArray());
+    }
+
+    private Job toJob(ResultSet rs) throws SQLException {
+        Job job = new Job();
+
+        job.setCurrentTask(rs.getInt("current_task"));
+
+        Timestamp endDateTimestamp = rs.getTimestamp("end_date");
+
+        if (endDateTimestamp != null) {
+            job.setEndDate(LocalDateTimeUtils.getLocalDateTime(endDateTimestamp));
+        }
+
+        job.setLabel(rs.getString("label"));
+        job.setId(rs.getLong("id"));
+        job.setMetadata(JsonUtils.readMap(rs.getString("metadata"), objectMapper));
+        job.setPriority(rs.getInt("priority"));
+
+        Timestamp startDateTimestamp = rs.getTimestamp("start_date");
+
+        if (startDateTimestamp != null) {
+            job.setStartDate(LocalDateTimeUtils.getLocalDateTime(startDateTimestamp));
+        }
+
+        job.setStatus(Job.Status.valueOf(rs.getInt("status")));
+        job.setWorkflowId(rs.getString("workflow_id"));
+
+        return job;
     }
 
     record Query(String query, Object[] arguments) {
