@@ -1,4 +1,5 @@
 dependencies {
+    api("org.springframework.data:spring-data-commons")
     api(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     api(project(":server:libs:core:error:error-api"))
     api(project(":server:libs:core:file-storage:file-storage-api"))
