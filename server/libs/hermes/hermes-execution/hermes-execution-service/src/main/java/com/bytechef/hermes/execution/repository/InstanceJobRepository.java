@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.webhook.executor;
+package com.bytechef.hermes.execution.repository;
 
-import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.execution.domain.InstanceJob;
+import java.util.Optional;
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Ivica Cardic
  */
-public interface WebhookExecutor {
+@Repository
+public interface InstanceJobRepository extends ListCrudRepository<InstanceJob, Long> {
 
-    Object execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
-
-    void executeAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
-
-    boolean validateAndExecuteAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    Optional<InstanceJob> findByJobIdAndType(Long jobId, int type);
 }

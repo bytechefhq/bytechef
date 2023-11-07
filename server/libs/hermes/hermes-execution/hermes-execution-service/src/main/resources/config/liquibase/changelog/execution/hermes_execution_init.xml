@@ -4,6 +4,21 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <changeSet id="202308070817" author="Ivica Cardic">
+        <createTable tableName="instance_job">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="job_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="instance_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
         <createTable tableName="trigger_execution">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -11,13 +26,22 @@
             <column name="status" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
-            <column name="workflow_id" type="VARCHAR(256)">
-                <constraints nullable="false"/>
-            </column>
             <column name="workflow_execution_id" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
             <column name="priority" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_retries" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retry_attempts" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retry_delay" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retry_delay_factor" type="INT">
                 <constraints nullable="false"/>
             </column>
             <column name="start_date" type="TIMESTAMP">
@@ -52,6 +76,18 @@
             </column>
         </createTable>
 
+        <createTable tableName="trigger_execution_job">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="trigger_execution_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="job_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
         <createTable tableName="trigger_state">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -78,5 +114,26 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="job_id"
+                baseTableName="instance_job"
+                constraintName="fk_instance_job_job"
+                referencedColumnNames="id"
+                referencedTableName="job"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="trigger_execution_id"
+                baseTableName="trigger_execution_job"
+                constraintName="fk_trigger_execution_job_trigger_execution"
+                referencedColumnNames="id"
+                referencedTableName="trigger_execution"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="job_id"
+                baseTableName="trigger_execution_job"
+                constraintName="fk_trigger_execution_job_job"
+                referencedColumnNames="id"
+                referencedTableName="job"/>
     </changeSet>
 </databaseChangeLog>

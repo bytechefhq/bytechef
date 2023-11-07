@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.webhook.executor;
+package com.bytechef.hermes.domain;
 
-import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
+import org.springframework.data.domain.Persistable;
 
 /**
  * @author Ivica Cardic
  */
-public interface WebhookExecutor {
+public interface Instance extends Persistable<Long> {
 
-    Object execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
-
-    void executeAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
-
-    boolean validateAndExecuteAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    @Override
+    Long getId();
 }

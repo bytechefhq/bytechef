@@ -18,8 +18,8 @@ package com.bytechef.helios.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
@@ -31,8 +31,8 @@ import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.hermes.configuration.connection.WorkflowConnection;
-import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
@@ -55,7 +55,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
-    private final JobFacade jobFacade;
+    private final InstanceJobFacade instanceJobFacade;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
@@ -66,12 +66,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
-        JobFacade jobFacade, ProjectInstanceService projectInstanceService,
+        InstanceJobFacade instanceJobFacade, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
         TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade,
         @Value("bytechef.webhookUrl") String webhookUrl, WorkflowService workflowService) {
 
-        this.jobFacade = jobFacade;
+        this.instanceJobFacade = instanceJobFacade;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectService = projectService;
@@ -126,12 +126,10 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
             id, workflowId);
 
-        return jobFacade.createJob(
-            new JobParameters(
-                workflowId, projectInstanceWorkflow.getInputs(),
-                Map.of(
-                    MetadataConstants.INSTANCE_ID, id, MetadataConstants.TYPE,
-                    ProjectConstants.PROJECT_TYPE)));
+        Job job = instanceJobFacade.createJob(
+            new JobParameters(workflowId, projectInstanceWorkflow.getInputs()), id, ProjectConstants.PROJECT_TYPE);
+
+        return Validate.notNull(job.getId(), "id");
     }
 
     @Override

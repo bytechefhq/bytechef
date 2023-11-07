@@ -16,15 +16,15 @@
 
 package com.bytechef.hermes.coordinator.trigger.completion;
 
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
+import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.file.storage.TriggerFileStorage;
@@ -45,19 +45,19 @@ public class TriggerCompletionHandler {
     private static final Logger logger = LoggerFactory.getLogger(TriggerCompletionHandler.class);
 
     private final InstanceAccessorRegistry instanceAccessorRegistry;
-    private final JobFacade jobFacade;
+    private final InstanceJobFacade instanceJobFacade;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerFileStorage triggerFileStorage;
     private final TriggerStateService triggerStateService;
 
     public TriggerCompletionHandler(
-        InstanceAccessorRegistry instanceAccessorRegistry, JobFacade jobFacade,
+        InstanceAccessorRegistry instanceAccessorRegistry, InstanceJobFacade instanceJobFacade,
         TriggerExecutionService triggerExecutionService,
         @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorage triggerFileStorage,
         TriggerStateService triggerStateService) {
 
         this.instanceAccessorRegistry = instanceAccessorRegistry;
-        this.jobFacade = jobFacade;
+        this.instanceJobFacade = instanceJobFacade;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerFileStorage = triggerFileStorage;
         this.triggerStateService = triggerStateService;
@@ -91,23 +91,25 @@ public class TriggerCompletionHandler {
 
         Map<String, Object> inputMap = (Map<String, Object>) instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
-        Map<String, ?> metadata = Map.of(
-            MetadataConstants.INSTANCE_ID, workflowExecutionId.getInstanceId(),
-            MetadataConstants.TYPE, workflowExecutionId.getType());
 
         Object output = triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput());
 
         if (!triggerExecution.isBatch() && output instanceof Collection<?> collectionOutput) {
             for (Object outputItem : collectionOutput) {
-                createJob(
-                    workflowExecutionId, MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), outputItem)),
-                    metadata);
+                triggerExecution.addJobId(
+                    createJob(
+                        workflowExecutionId, MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), outputItem)),
+                        workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
             }
         } else {
-            createJob(
-                workflowExecutionId,
-                MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)), metadata);
+            triggerExecution.addJobId(
+                createJob(
+                    workflowExecutionId,
+                    MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
+                    workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
         }
+
+        triggerExecutionService.update(triggerExecution);
 
         if (logger.isDebugEnabled()) {
             logger.debug(
@@ -116,7 +118,12 @@ public class TriggerCompletionHandler {
         }
     }
 
-    private void createJob(WorkflowExecutionId workflowExecutionId, Map<String, ?> inpputMap, Map<String, ?> metadata) {
-        jobFacade.createJob(new JobParameters(workflowExecutionId.getWorkflowId(), inpputMap, metadata));
+    private long createJob(
+        WorkflowExecutionId workflowExecutionId, Map<String, ?> inpputMap, long instanceId, int type) {
+
+        Job job = instanceJobFacade.createJob(
+            new JobParameters(workflowExecutionId.getWorkflowId(), inpputMap), instanceId, type);
+
+        return Validate.notNull(job.getId(), "id");
     }
 }

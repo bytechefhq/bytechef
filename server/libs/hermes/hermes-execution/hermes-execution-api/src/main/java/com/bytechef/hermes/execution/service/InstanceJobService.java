@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.webhook.executor;
+package com.bytechef.hermes.execution.service;
 
-import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.execution.domain.InstanceJob;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public interface WebhookExecutor {
+public interface InstanceJobService {
 
-    Object execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    InstanceJob create(long jobId, long instanceId, int type);
 
-    void executeAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
-
-    boolean validateAndExecuteAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    Optional<Long> fetchJobInstanceId(long jobId, int type);
 }

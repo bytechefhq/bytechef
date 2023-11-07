@@ -47,6 +47,12 @@ public class TriggerExecutionServiceImpl implements TriggerExecutionService {
 
     @Override
     @Transactional(readOnly = true)
+    public TriggerExecution getJobTriggerExecution(long jobId) {
+        return triggerExecutionRepository.findByJobId(jobId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public TriggerExecution getTriggerExecution(long id) {
         return OptionalUtils.get(triggerExecutionRepository.findById(id));
     }

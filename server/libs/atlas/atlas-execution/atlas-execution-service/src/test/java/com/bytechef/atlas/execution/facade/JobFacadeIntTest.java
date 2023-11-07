@@ -25,6 +25,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -80,6 +81,11 @@ public class JobFacadeIntTest {
         @Bean
         JobService jobService(JobRepository jobRepository) {
             return new JobServiceImpl(jobRepository);
+        }
+
+        @Bean
+        ObjectMapper objectMapper() {
+            return new ObjectMapper();
         }
     }
 }

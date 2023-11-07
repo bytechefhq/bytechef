@@ -33,4 +33,11 @@ public interface TriggerExecutionRepository
 
     @Query("SELECT * FROM trigger_execution WHERE id = :id FOR UPDATE")
     Optional<TriggerExecution> findByIdForUpdate(@Param("id") long id);
+
+    @Query("""
+        SELECT distinct trigger_execution.* FROM trigger_execution
+        JOIN trigger_execution_job ON trigger_execution_job.trigger_execution_id = trigger_execution.id
+        WHERE trigger_execution_job.job_id = :jobId
+        """)
+    TriggerExecution findByJobId(@Param("jobId") long jobId);
 }

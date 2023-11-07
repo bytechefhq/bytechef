@@ -17,6 +17,7 @@
 package com.bytechef.atlas.execution.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.atlas.execution.repository.CounterRepository;
@@ -48,7 +49,7 @@ public class WorkflowExecutionConfiguration {
     }
 
     @Bean
-    JobFacadeImpl jobFacade(
+    JobFacade jobFacade(
         ApplicationEventPublisher eventPublisher, ContextService contextService, JobService jobService,
         @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
@@ -58,7 +59,7 @@ public class WorkflowExecutionConfiguration {
     }
 
     @Bean
-    JobServiceImpl jobService(JobRepository jobRepository) {
+    JobService jobService(JobRepository jobRepository) {
         return new JobServiceImpl(jobRepository);
     }
 

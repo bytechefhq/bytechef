@@ -33,7 +33,6 @@ import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParameters;
@@ -53,7 +52,6 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,6 +74,10 @@ public class JobSyncExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
+    private final ContextService contextService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final TaskFileStorage taskFileStorage;
+    private final WorkflowService workflowService;
     private final JobFacade jobFacade;
     private final JobService jobService;
 
@@ -86,9 +88,8 @@ public class JobSyncExecutor {
         @NonNull WorkflowService workflowService) {
 
         this(
-            List.of(), contextService, jobService, new SyncMessageBroker(objectMapper), List.of(),
-            List.of(), List.of(), taskExecutionService, taskHandlerRegistry, taskFileStorage,
-            workflowService);
+            List.of(), contextService, jobService, new SyncMessageBroker(objectMapper), List.of(), List.of(), List.of(),
+            taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService);
     }
 
     @SuppressFBWarnings("EI")
@@ -101,10 +102,15 @@ public class JobSyncExecutor {
         @NonNull TaskExecutionService taskExecutionService, @NonNull TaskHandlerRegistry taskHandlerRegistry,
         @NonNull TaskFileStorage taskFileStorage, @NonNull WorkflowService workflowService) {
 
-        this.jobService = jobService;
+        this.contextService = contextService;
+        this.eventPublisher = createEventPublisher(syncMessageBroker);
+
         this.jobFacade = new JobFacadeImpl(
-            getEventPublisher(syncMessageBroker), new ContextServiceImpl(contextService),
-            new JobServiceImpl(jobService), taskFileStorage, workflowService);
+            eventPublisher, contextService, jobService, taskFileStorage, workflowService);
+
+        this.jobService = jobService;
+        this.taskFileStorage = taskFileStorage;
+        this.workflowService = workflowService;
 
         syncMessageBroker.receive(
             TaskCoordinatorMessageRoute.ERROR_EVENTS, event -> {
@@ -123,7 +129,7 @@ public class JobSyncExecutor {
                 new DefaultTaskHandlerResolver(taskHandlerRegistry)));
 
         TaskWorker worker = new TaskWorker(
-            getEventPublisher(syncMessageBroker), Executors.newCachedThreadPool(), taskHandlerResolverChain,
+            eventPublisher, Executors.newCachedThreadPool(), taskHandlerResolverChain,
             taskFileStorage);
 
         syncMessageBroker.receive(
@@ -134,13 +140,13 @@ public class JobSyncExecutor {
         taskDispatcherChain.setTaskDispatcherResolvers(
             CollectionUtils.concat(
                 getTaskDispatcherResolverStream(taskDispatcherResolverFactories, taskDispatcherChain),
-                Stream.of(new DefaultTaskDispatcher(getEventPublisher(syncMessageBroker), List.of()))));
+                Stream.of(new DefaultTaskDispatcher(eventPublisher, List.of()))));
 
         JobExecutor jobExecutor = new JobExecutor(
             contextService, taskDispatcherChain, taskExecutionService, taskFileStorage, workflowService);
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
-            contextService, getEventPublisher(syncMessageBroker), jobExecutor, jobService, taskExecutionService,
+            contextService, eventPublisher, jobExecutor, jobService, taskExecutionService,
             taskFileStorage,
             workflowService);
 
@@ -154,7 +160,7 @@ public class JobSyncExecutor {
                 Stream.of(defaultTaskCompletionHandler)));
 
         TaskCoordinator taskCoordinator = new TaskCoordinator(
-            applicationEventListeners, List.of(), getEventPublisher(syncMessageBroker), jobExecutor, jobService,
+            applicationEventListeners, List.of(), eventPublisher, jobExecutor, jobService,
             taskCompletionHandlerChain, taskDispatcherChain, taskExecutionService);
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
@@ -167,12 +173,18 @@ public class JobSyncExecutor {
     }
 
     public Job execute(JobParameters jobParameters) {
-        long jobId = jobFacade.createJob(jobParameters);
-
-        return jobService.getJob(jobId);
+        return jobService.getJob(jobFacade.createJob(jobParameters));
     }
 
-    private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {
+    public Job execute(JobParameters jobParameters, JobFactory jobFactory) {
+        JobFacade jobFacade = new JobFacadeImpl(
+            eventPublisher, contextService, new JobServiceWrapper(jobFactory),
+            taskFileStorage, workflowService);
+
+        return jobService.getJob(jobFacade.createJob(jobParameters));
+    }
+
+    private static ApplicationEventPublisher createEventPublisher(SyncMessageBroker syncMessageBroker) {
         return event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event);
     }
 
@@ -183,30 +195,14 @@ public class JobSyncExecutor {
             .map(taskDispatcherFactory -> taskDispatcherFactory.createTaskDispatcherResolver(taskDispatcherChain));
     }
 
-    private record ContextServiceImpl(ContextService contextService) implements ContextService {
+    @FunctionalInterface
+    public interface JobFactory {
 
-        @Override
-        public FileEntry peek(long stackId, Context.Classname classname) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public FileEntry peek(long stackId, int subStackId, Context.Classname classname) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void push(long stackId, Context.Classname classname, FileEntry value) {
-            contextService.push(stackId, classname, value);
-        }
-
-        @Override
-        public void push(long stackId, int subStackId, Context.Classname classname, FileEntry value) {
-            throw new UnsupportedOperationException();
-        }
+        Job create(JobParameters jobParameters, Workflow workflow);
     }
 
-    private record JobServiceImpl(JobService JobService) implements JobService {
+    private record JobServiceWrapper(JobFactory jobFactory)
+        implements JobService {
 
         @Override
         public Job getJob(long id) {
@@ -239,7 +235,7 @@ public class JobSyncExecutor {
 
         @Override
         public Job create(JobParameters jobParameters, Workflow workflow) {
-            return JobService.create(jobParameters, workflow);
+            return jobFactory.create(jobParameters, workflow);
         }
 
         @Override

@@ -16,6 +16,8 @@
 
 package com.bytechef.hermes.execution.domain;
 
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.error.Errorable;
 import com.bytechef.error.ExecutionError;
@@ -25,14 +27,19 @@ import com.bytechef.hermes.configuration.trigger.Trigger;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.message.Prioritizable;
+import com.bytechef.message.Retryable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -42,6 +49,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
@@ -49,7 +57,7 @@ import org.springframework.data.relational.core.mapping.Table;
  */
 @Table("trigger_execution")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>, Prioritizable, Trigger {
+public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>, Prioritizable, Retryable, Trigger {
 
     public enum Status {
         CREATED(false),
@@ -92,6 +100,10 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     @Id
     private Long id;
 
+    // TODO
+    @Column
+    private int maxRetries;
+
     @Column("last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
@@ -109,6 +121,18 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     @Column
     private int priority;
 
+    // TODO
+    @Column("retry_attempts")
+    private int retryAttempts;
+
+    // TODO
+    @Column("retry_delay")
+    private String retryDelay;
+
+    // TODO
+    @Column("retry_delay_factor")
+    private int retryDelayFactor;
+
     @Column("start_date")
     private LocalDateTime startDate;
 
@@ -118,11 +142,11 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     @Column
     private Status status;
 
+    @MappedCollection(idColumn = "trigger_execution_id")
+    private Set<TriggerExecutionJob> triggerExecutionJobs = new HashSet<>();
+
     @Column
     private WorkflowExecutionId workflowExecutionId;
-
-    @Column("workflow_id")
-    private String workflowId;
 
     @Column("workflow_trigger")
     private WorkflowTrigger workflowTrigger;
@@ -132,6 +156,10 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public void addJobId(long jobId) {
+        triggerExecutionJobs.add(new TriggerExecutionJob(jobId));
     }
 
     /**
@@ -222,6 +250,25 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         return this.id;
     }
 
+    public List<Long> getJobIds() {
+        return triggerExecutionJobs
+            .stream()
+            .map(TriggerExecutionJob::getJobId)
+            .toList();
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public LocalDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public int getMaxRetries() {
+        return maxRetries;
+    }
+
     public Map<String, ?> getMetadata() {
         return Collections.unmodifiableMap(metadata);
     }
@@ -248,6 +295,29 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     @Override
     public int getPriority() {
         return priority;
+    }
+
+    public int getRetryAttempts() {
+        return retryAttempts;
+    }
+
+    public String getRetryDelay() {
+        return retryDelay;
+    }
+
+    @Override
+    public long getRetryDelayMillis() {
+        Duration duration = Duration.parse("PT" + getRetryDelay());
+
+        long delay = duration.toMillis();
+        int retryAttempts = getRetryAttempts();
+        int retryDelayFactor = getRetryDelayFactor();
+
+        return delay * retryAttempts * retryDelayFactor;
+    }
+
+    public int getRetryDelayFactor() {
+        return retryDelayFactor;
     }
 
     /**
@@ -291,7 +361,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
     }
 
     public String getWorkflowId() {
-        return workflowId;
+        return workflowExecutionId.getWorkflowId();
     }
 
     public WorkflowTrigger getWorkflowTrigger() {
@@ -337,6 +407,26 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         this.id = id;
     }
 
+    public void setJobIds(List<Long> jobIds) {
+        this.triggerExecutionJobs = new HashSet<>();
+
+        if (!CollectionUtils.isEmpty(jobIds)) {
+            for (Long tagId : jobIds) {
+                triggerExecutionJobs.add(new TriggerExecutionJob(tagId));
+            }
+        }
+    }
+
+    public void setJobs(List<Job> jobs) {
+        if (!CollectionUtils.isEmpty(jobs)) {
+            setJobIds(CollectionUtils.map(jobs, Job::getId));
+        }
+    }
+
+    public void setMaxRetries(int maxRetries) {
+        this.maxRetries = maxRetries;
+    }
+
     private void setMetadata(Map<String, Object> metadata) {
         if (metadata == null) {
             this.metadata = new HashMap<>();
@@ -353,6 +443,18 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         this.priority = priority;
     }
 
+    public void setRetryAttempts(int retryAttempts) {
+        this.retryAttempts = retryAttempts;
+    }
+
+    public void setRetryDelay(String retryDelay) {
+        this.retryDelay = retryDelay;
+    }
+
+    public void setRetryDelayFactor(int retryDelayFactor) {
+        this.retryDelayFactor = retryDelayFactor;
+    }
+
     public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
@@ -367,8 +469,6 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
 
     public void setWorkflowExecutionId(WorkflowExecutionId workflowExecutionId) {
         this.workflowExecutionId = workflowExecutionId;
-
-        this.workflowId = workflowExecutionId.getWorkflowId();
     }
 
     public void setWorkflowTrigger(WorkflowTrigger workflowTrigger) {
@@ -386,7 +486,11 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
             + output + ", error="
             + error + ", priority="
             + priority + ", workflowExecutionId="
-            + workflowExecutionId + ", workflowTrigger="
+            + workflowExecutionId + ", maxRetries="
+            + maxRetries + ", retryAttempts="
+            + retryAttempts + ", retryDelay='"
+            + retryDelay + '\'' + ", retryDelayFactor="
+            + retryDelayFactor + ", workflowTrigger="
             + workflowTrigger + ", metadata="
             + metadata + ", createdBy='"
             + createdBy + '\'' + ", createdDate="
@@ -400,9 +504,13 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         private LocalDateTime endDate;
         private ExecutionError error;
         private Long id;
+        private int maxRetries;
         private Map<String, Object> metadata;
         private FileEntry output;
         private int priority;
+        private int retryAttempts;
+        private String retryDelay = "1s";
+        private int retryDelayFactor = 2;
         private LocalDateTime startDate;
         private Status status = Status.CREATED;
         private WorkflowExecutionId workflowExecutionId;
@@ -429,6 +537,11 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
             return this;
         }
 
+        public Builder maxRetries(int maxRetries) {
+            this.maxRetries = maxRetries;
+            return this;
+        }
+
         public Builder metadata(Map<String, Object> metadata) {
             this.metadata = metadata;
 
@@ -444,6 +557,21 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         public Builder priority(int priority) {
             this.priority = priority;
 
+            return this;
+        }
+
+        public Builder retryAttempts(int retryAttempts) {
+            this.retryAttempts = retryAttempts;
+            return this;
+        }
+
+        public Builder retryDelay(String retryDelay) {
+            this.retryDelay = retryDelay;
+            return this;
+        }
+
+        public Builder retryDelayFactor(int retryDelayFactor) {
+            this.retryDelayFactor = retryDelayFactor;
             return this;
         }
 
@@ -481,9 +609,13 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
             triggerExecution.setEndDate(endDate);
             triggerExecution.setError(error);
             triggerExecution.setId(id);
+            triggerExecution.setMaxRetries(maxRetries);
             triggerExecution.setMetadata(metadata);
             triggerExecution.setOutput(output);
             triggerExecution.setPriority(priority);
+            triggerExecution.setRetryAttempts(retryAttempts);
+            triggerExecution.setRetryDelay(retryDelay);
+            triggerExecution.setRetryDelayFactor(retryDelayFactor);
             triggerExecution.setStartDate(startDate);
             triggerExecution.setStatus(status);
             triggerExecution.setWorkflowExecutionId(workflowExecutionId);

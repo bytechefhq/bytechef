@@ -17,10 +17,8 @@
 package com.bytechef.hermes.test.executor.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
@@ -65,8 +63,6 @@ import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
-import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
-import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
@@ -81,8 +77,8 @@ public class TestExecutorConfiguration {
 
     @Bean
     JobTestExecutor jobTestExecutor(
-        ComponentDefinitionService componentDefinitionService, JobFacade jobFacade,
-        ObjectMapper objectMapper, TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
+        ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
+        TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
         CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
@@ -100,29 +96,14 @@ public class TestExecutorConfiguration {
         return new JobTestExecutorImpl(
             componentDefinitionService, contextService,
             new JobSyncExecutor(
-                getApplicationEventListeners(
-                    jobService, syncMessageBroker, taskExecutionService, taskFileStorage),
-                contextService, jobService, syncMessageBroker,
+                List.of(), contextService, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(objectMapper),
                 getTaskDispatcherResolverFactories(
-                    syncMessageBroker, contextService, counterService, jobFacade, taskExecutionService,
-                    taskFileStorage),
+                    syncMessageBroker, contextService, counterService, taskExecutionService, taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
             taskExecutionService, taskFileStorage);
-    }
-
-    private List<ApplicationEventListener> getApplicationEventListeners(
-        JobService jobService, SyncMessageBroker syncMessageBroker,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
-
-        ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
-
-        SubflowJobStatusEventListener subflowJobStatusEventListener = new SubflowJobStatusEventListener(
-            eventPublisher, jobService, taskExecutionService, taskFileStorage);
-
-        return List.of(subflowJobStatusEventListener);
     }
 
     private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {
@@ -172,8 +153,7 @@ public class TestExecutorConfiguration {
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         SyncMessageBroker syncMessageBroker, ContextService contextService,
-        CounterService counterService, JobFacade jobFacade, TaskExecutionService taskExecutionService,
-        TaskFileStorage taskFileStorage) {
+        CounterService counterService, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         ApplicationEventPublisher eventPublisher = getEventPublisher(syncMessageBroker);
 
@@ -198,7 +178,6 @@ public class TestExecutorConfiguration {
                 eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskDispatcher) -> new SequenceTaskDispatcher(
-                eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage),
-            (taskDispatcher) -> new SubflowTaskDispatcher(jobFacade));
+                eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage));
     }
 }
