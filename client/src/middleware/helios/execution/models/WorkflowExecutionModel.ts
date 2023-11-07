@@ -31,6 +31,12 @@ import {
     ProjectModelFromJSONTyped,
     ProjectModelToJSON,
 } from './ProjectModel';
+import type { TriggerExecutionModel } from './TriggerExecutionModel';
+import {
+    TriggerExecutionModelFromJSON,
+    TriggerExecutionModelFromJSONTyped,
+    TriggerExecutionModelToJSON,
+} from './TriggerExecutionModel';
 import type { WorkflowBasicModel } from './WorkflowBasicModel';
 import {
     WorkflowBasicModelFromJSON,
@@ -70,6 +76,12 @@ export interface WorkflowExecutionModel {
     project?: ProjectModel;
     /**
      * 
+     * @type {TriggerExecutionModel}
+     * @memberof WorkflowExecutionModel
+     */
+    triggerExecution?: TriggerExecutionModel;
+    /**
+     * 
      * @type {WorkflowBasicModel}
      * @memberof WorkflowExecutionModel
      */
@@ -99,6 +111,7 @@ export function WorkflowExecutionModelFromJSONTyped(json: any, ignoreDiscriminat
         'instance': !exists(json, 'instance') ? undefined : ProjectInstanceModelFromJSON(json['instance']),
         'job': !exists(json, 'job') ? undefined : JobModelFromJSON(json['job']),
         'project': !exists(json, 'project') ? undefined : ProjectModelFromJSON(json['project']),
+        'triggerExecution': !exists(json, 'triggerExecution') ? undefined : TriggerExecutionModelFromJSON(json['triggerExecution']),
         'workflow': !exists(json, 'workflow') ? undefined : WorkflowBasicModelFromJSON(json['workflow']),
     };
 }
@@ -115,6 +128,7 @@ export function WorkflowExecutionModelToJSON(value?: WorkflowExecutionModel | nu
         'instance': ProjectInstanceModelToJSON(value.instance),
         'job': JobModelToJSON(value.job),
         'project': ProjectModelToJSON(value.project),
+        'triggerExecution': TriggerExecutionModelToJSON(value.triggerExecution),
         'workflow': WorkflowBasicModelToJSON(value.workflow),
     };
 }

@@ -24,19 +24,19 @@ export interface ProjectInstanceWorkflowConnectionModel {
      * @type {number}
      * @memberof ProjectInstanceWorkflowConnectionModel
      */
-    connectionId?: number;
+    connectionId: number;
     /**
      * The connection key under which a connection is defined in a workflow definition.
      * @type {string}
      * @memberof ProjectInstanceWorkflowConnectionModel
      */
-    key?: string;
+    key: string;
     /**
      * The action/trigger name to which a connection belongs.
      * @type {string}
      * @memberof ProjectInstanceWorkflowConnectionModel
      */
-    operationName?: string;
+    operationName: string;
 }
 
 /**
@@ -44,6 +44,9 @@ export interface ProjectInstanceWorkflowConnectionModel {
  */
 export function instanceOfProjectInstanceWorkflowConnectionModel(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "connectionId" in value;
+    isInstance = isInstance && "key" in value;
+    isInstance = isInstance && "operationName" in value;
 
     return isInstance;
 }
@@ -58,9 +61,9 @@ export function ProjectInstanceWorkflowConnectionModelFromJSONTyped(json: any, i
     }
     return {
         
-        'connectionId': !exists(json, 'connectionId') ? undefined : json['connectionId'],
-        'key': !exists(json, 'key') ? undefined : json['key'],
-        'operationName': !exists(json, 'operationName') ? undefined : json['operationName'],
+        'connectionId': json['connectionId'],
+        'key': json['key'],
+        'operationName': json['operationName'],
     };
 }
 
