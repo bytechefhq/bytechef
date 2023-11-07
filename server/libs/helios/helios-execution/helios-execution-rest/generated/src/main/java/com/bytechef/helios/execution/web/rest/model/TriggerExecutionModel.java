@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.helios.execution.web.rest.model.ComponentDefinitionModel;
 import com.bytechef.helios.execution.web.rest.model.ExecutionErrorModel;
+import com.bytechef.helios.execution.web.rest.model.WorkflowTriggerModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -23,13 +24,15 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Adds execution semantics to a task.
+ * Adds execution semantics to a trigger.
  */
 
-@Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
-@JsonTypeName("TaskExecution")
+@Schema(name = "TriggerExecution", description = "Adds execution semantics to a trigger.")
+@JsonTypeName("TriggerExecution")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-08T14:03:36.313920+01:00[Europe/Zagreb]")
-public class TaskExecutionModel {
+public class TriggerExecutionModel {
+
+  private Boolean batch;
 
   private ComponentDefinitionModel componentDefinition;
 
@@ -50,8 +53,6 @@ public class TaskExecutionModel {
   @Valid
   private Map<String, Object> input = new HashMap<>();
 
-  private String jobId;
-
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -61,17 +62,15 @@ public class TaskExecutionModel {
 
   private Object output;
 
-  private String parentId;
-
   private Integer priority;
-
-  private Integer progress;
 
   private Integer retryAttempts;
 
   private String retryDelay;
 
   private Integer retryDelayFactor;
+
+  private Long retryDelayMillis;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime startDate;
@@ -119,29 +118,44 @@ public class TaskExecutionModel {
 
   private StatusEnum status;
 
-  private Integer taskNumber;
-
-  private Long retryDelayMillis;
-
-  private com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel workflowTask;
+  private WorkflowTriggerModel workflowTrigger;
 
   private String type;
 
-  public TaskExecutionModel() {
+  public TriggerExecutionModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public TaskExecutionModel(String jobId, Integer priority, LocalDateTime startDate, StatusEnum status) {
-    this.jobId = jobId;
+  public TriggerExecutionModel(Integer priority, LocalDateTime startDate, StatusEnum status) {
     this.priority = priority;
     this.startDate = startDate;
     this.status = status;
   }
 
-  public TaskExecutionModel componentDefinition(ComponentDefinitionModel componentDefinition) {
+  public TriggerExecutionModel batch(Boolean batch) {
+    this.batch = batch;
+    return this;
+  }
+
+  /**
+   * Get batch
+   * @return batch
+  */
+  
+  @Schema(name = "batch", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("batch")
+  public Boolean getBatch() {
+    return batch;
+  }
+
+  public void setBatch(Boolean batch) {
+    this.batch = batch;
+  }
+
+  public TriggerExecutionModel componentDefinition(ComponentDefinitionModel componentDefinition) {
     this.componentDefinition = componentDefinition;
     return this;
   }
@@ -161,7 +175,7 @@ public class TaskExecutionModel {
     this.componentDefinition = componentDefinition;
   }
 
-  public TaskExecutionModel createdBy(String createdBy) {
+  public TriggerExecutionModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -181,7 +195,7 @@ public class TaskExecutionModel {
     this.createdBy = createdBy;
   }
 
-  public TaskExecutionModel createdDate(LocalDateTime createdDate) {
+  public TriggerExecutionModel createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -201,7 +215,7 @@ public class TaskExecutionModel {
     this.createdDate = createdDate;
   }
 
-  public TaskExecutionModel endDate(LocalDateTime endDate) {
+  public TriggerExecutionModel endDate(LocalDateTime endDate) {
     this.endDate = endDate;
     return this;
   }
@@ -221,7 +235,7 @@ public class TaskExecutionModel {
     this.endDate = endDate;
   }
 
-  public TaskExecutionModel error(ExecutionErrorModel error) {
+  public TriggerExecutionModel error(ExecutionErrorModel error) {
     this.error = error;
     return this;
   }
@@ -241,7 +255,7 @@ public class TaskExecutionModel {
     this.error = error;
   }
 
-  public TaskExecutionModel executionTime(Long executionTime) {
+  public TriggerExecutionModel executionTime(Long executionTime) {
     this.executionTime = executionTime;
     return this;
   }
@@ -261,7 +275,7 @@ public class TaskExecutionModel {
     this.executionTime = executionTime;
   }
 
-  public TaskExecutionModel id(String id) {
+  public TriggerExecutionModel id(String id) {
     this.id = id;
     return this;
   }
@@ -281,12 +295,12 @@ public class TaskExecutionModel {
     this.id = id;
   }
 
-  public TaskExecutionModel input(Map<String, Object> input) {
+  public TriggerExecutionModel input(Map<String, Object> input) {
     this.input = input;
     return this;
   }
 
-  public TaskExecutionModel putInputItem(String key, Object inputItem) {
+  public TriggerExecutionModel putInputItem(String key, Object inputItem) {
     if (this.input == null) {
       this.input = new HashMap<>();
     }
@@ -309,27 +323,7 @@ public class TaskExecutionModel {
     this.input = input;
   }
 
-  public TaskExecutionModel jobId(String jobId) {
-    this.jobId = jobId;
-    return this;
-  }
-
-  /**
-   * The id of a job for which a task belongs to.
-   * @return jobId
-  */
-  
-  @Schema(name = "jobId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a job for which a task belongs to.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("jobId")
-  public String getJobId() {
-    return jobId;
-  }
-
-  public void setJobId(String jobId) {
-    this.jobId = jobId;
-  }
-
-  public TaskExecutionModel lastModifiedBy(String lastModifiedBy) {
+  public TriggerExecutionModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -349,7 +343,7 @@ public class TaskExecutionModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public TaskExecutionModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public TriggerExecutionModel lastModifiedDate(LocalDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -369,7 +363,7 @@ public class TaskExecutionModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public TaskExecutionModel maxRetries(Integer maxRetries) {
+  public TriggerExecutionModel maxRetries(Integer maxRetries) {
     this.maxRetries = maxRetries;
     return this;
   }
@@ -389,7 +383,7 @@ public class TaskExecutionModel {
     this.maxRetries = maxRetries;
   }
 
-  public TaskExecutionModel output(Object output) {
+  public TriggerExecutionModel output(Object output) {
     this.output = output;
     return this;
   }
@@ -409,27 +403,7 @@ public class TaskExecutionModel {
     this.output = output;
   }
 
-  public TaskExecutionModel parentId(String parentId) {
-    this.parentId = parentId;
-    return this;
-  }
-
-  /**
-   * The id of the parent task, if this is a sub-task.
-   * @return parentId
-  */
-  
-  @Schema(name = "parentId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of the parent task, if this is a sub-task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("parentId")
-  public String getParentId() {
-    return parentId;
-  }
-
-  public void setParentId(String parentId) {
-    this.parentId = parentId;
-  }
-
-  public TaskExecutionModel priority(Integer priority) {
+  public TriggerExecutionModel priority(Integer priority) {
     this.priority = priority;
     return this;
   }
@@ -449,27 +423,7 @@ public class TaskExecutionModel {
     this.priority = priority;
   }
 
-  public TaskExecutionModel progress(Integer progress) {
-    this.progress = progress;
-    return this;
-  }
-
-  /**
-   * The current progress value, a number between 0 and 100.
-   * @return progress
-  */
-  
-  @Schema(name = "progress", accessMode = Schema.AccessMode.READ_ONLY, description = "The current progress value, a number between 0 and 100.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("progress")
-  public Integer getProgress() {
-    return progress;
-  }
-
-  public void setProgress(Integer progress) {
-    this.progress = progress;
-  }
-
-  public TaskExecutionModel retryAttempts(Integer retryAttempts) {
+  public TriggerExecutionModel retryAttempts(Integer retryAttempts) {
     this.retryAttempts = retryAttempts;
     return this;
   }
@@ -489,7 +443,7 @@ public class TaskExecutionModel {
     this.retryAttempts = retryAttempts;
   }
 
-  public TaskExecutionModel retryDelay(String retryDelay) {
+  public TriggerExecutionModel retryDelay(String retryDelay) {
     this.retryDelay = retryDelay;
     return this;
   }
@@ -509,7 +463,7 @@ public class TaskExecutionModel {
     this.retryDelay = retryDelay;
   }
 
-  public TaskExecutionModel retryDelayFactor(Integer retryDelayFactor) {
+  public TriggerExecutionModel retryDelayFactor(Integer retryDelayFactor) {
     this.retryDelayFactor = retryDelayFactor;
     return this;
   }
@@ -529,67 +483,7 @@ public class TaskExecutionModel {
     this.retryDelayFactor = retryDelayFactor;
   }
 
-  public TaskExecutionModel startDate(LocalDateTime startDate) {
-    this.startDate = startDate;
-    return this;
-  }
-
-  /**
-   * The time when a task instance was started.
-   * @return startDate
-  */
-  @Valid 
-  @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when a task instance was started.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("startDate")
-  public LocalDateTime getStartDate() {
-    return startDate;
-  }
-
-  public void setStartDate(LocalDateTime startDate) {
-    this.startDate = startDate;
-  }
-
-  public TaskExecutionModel status(StatusEnum status) {
-    this.status = status;
-    return this;
-  }
-
-  /**
-   * The current status of a task.
-   * @return status
-  */
-  
-  @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "The current status of a task.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("status")
-  public StatusEnum getStatus() {
-    return status;
-  }
-
-  public void setStatus(StatusEnum status) {
-    this.status = status;
-  }
-
-  public TaskExecutionModel taskNumber(Integer taskNumber) {
-    this.taskNumber = taskNumber;
-    return this;
-  }
-
-  /**
-   * The numeric order of the task in the workflow.
-   * @return taskNumber
-  */
-  
-  @Schema(name = "taskNumber", accessMode = Schema.AccessMode.READ_ONLY, description = "The numeric order of the task in the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("taskNumber")
-  public Integer getTaskNumber() {
-    return taskNumber;
-  }
-
-  public void setTaskNumber(Integer taskNumber) {
-    this.taskNumber = taskNumber;
-  }
-
-  public TaskExecutionModel retryDelayMillis(Long retryDelayMillis) {
+  public TriggerExecutionModel retryDelayMillis(Long retryDelayMillis) {
     this.retryDelayMillis = retryDelayMillis;
     return this;
   }
@@ -609,27 +503,67 @@ public class TaskExecutionModel {
     this.retryDelayMillis = retryDelayMillis;
   }
 
-  public TaskExecutionModel workflowTask(com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
-    this.workflowTask = workflowTask;
+  public TriggerExecutionModel startDate(LocalDateTime startDate) {
+    this.startDate = startDate;
     return this;
   }
 
   /**
-   * Get workflowTask
-   * @return workflowTask
+   * The time when a task instance was started.
+   * @return startDate
   */
   @Valid 
-  @Schema(name = "workflowTask", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("workflowTask")
-  public com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel getWorkflowTask() {
-    return workflowTask;
+  @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when a task instance was started.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("startDate")
+  public LocalDateTime getStartDate() {
+    return startDate;
   }
 
-  public void setWorkflowTask(com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel workflowTask) {
-    this.workflowTask = workflowTask;
+  public void setStartDate(LocalDateTime startDate) {
+    this.startDate = startDate;
   }
 
-  public TaskExecutionModel type(String type) {
+  public TriggerExecutionModel status(StatusEnum status) {
+    this.status = status;
+    return this;
+  }
+
+  /**
+   * The current status of a task.
+   * @return status
+  */
+  
+  @Schema(name = "status", accessMode = Schema.AccessMode.READ_ONLY, description = "The current status of a task.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("status")
+  public StatusEnum getStatus() {
+    return status;
+  }
+
+  public void setStatus(StatusEnum status) {
+    this.status = status;
+  }
+
+  public TriggerExecutionModel workflowTrigger(WorkflowTriggerModel workflowTrigger) {
+    this.workflowTrigger = workflowTrigger;
+    return this;
+  }
+
+  /**
+   * Get workflowTrigger
+   * @return workflowTrigger
+  */
+  @Valid 
+  @Schema(name = "workflowTrigger", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("workflowTrigger")
+  public WorkflowTriggerModel getWorkflowTrigger() {
+    return workflowTrigger;
+  }
+
+  public void setWorkflowTrigger(WorkflowTriggerModel workflowTrigger) {
+    this.workflowTrigger = workflowTrigger;
+  }
+
+  public TriggerExecutionModel type(String type) {
     this.type = type;
     return this;
   }
@@ -657,43 +591,41 @@ public class TaskExecutionModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TaskExecutionModel taskExecution = (TaskExecutionModel) o;
-    return Objects.equals(this.componentDefinition, taskExecution.componentDefinition) &&
-        Objects.equals(this.createdBy, taskExecution.createdBy) &&
-        Objects.equals(this.createdDate, taskExecution.createdDate) &&
-        Objects.equals(this.endDate, taskExecution.endDate) &&
-        Objects.equals(this.error, taskExecution.error) &&
-        Objects.equals(this.executionTime, taskExecution.executionTime) &&
-        Objects.equals(this.id, taskExecution.id) &&
-        Objects.equals(this.input, taskExecution.input) &&
-        Objects.equals(this.jobId, taskExecution.jobId) &&
-        Objects.equals(this.lastModifiedBy, taskExecution.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, taskExecution.lastModifiedDate) &&
-        Objects.equals(this.maxRetries, taskExecution.maxRetries) &&
-        Objects.equals(this.output, taskExecution.output) &&
-        Objects.equals(this.parentId, taskExecution.parentId) &&
-        Objects.equals(this.priority, taskExecution.priority) &&
-        Objects.equals(this.progress, taskExecution.progress) &&
-        Objects.equals(this.retryAttempts, taskExecution.retryAttempts) &&
-        Objects.equals(this.retryDelay, taskExecution.retryDelay) &&
-        Objects.equals(this.retryDelayFactor, taskExecution.retryDelayFactor) &&
-        Objects.equals(this.startDate, taskExecution.startDate) &&
-        Objects.equals(this.status, taskExecution.status) &&
-        Objects.equals(this.taskNumber, taskExecution.taskNumber) &&
-        Objects.equals(this.retryDelayMillis, taskExecution.retryDelayMillis) &&
-        Objects.equals(this.workflowTask, taskExecution.workflowTask) &&
-        Objects.equals(this.type, taskExecution.type);
+    TriggerExecutionModel triggerExecution = (TriggerExecutionModel) o;
+    return Objects.equals(this.batch, triggerExecution.batch) &&
+        Objects.equals(this.componentDefinition, triggerExecution.componentDefinition) &&
+        Objects.equals(this.createdBy, triggerExecution.createdBy) &&
+        Objects.equals(this.createdDate, triggerExecution.createdDate) &&
+        Objects.equals(this.endDate, triggerExecution.endDate) &&
+        Objects.equals(this.error, triggerExecution.error) &&
+        Objects.equals(this.executionTime, triggerExecution.executionTime) &&
+        Objects.equals(this.id, triggerExecution.id) &&
+        Objects.equals(this.input, triggerExecution.input) &&
+        Objects.equals(this.lastModifiedBy, triggerExecution.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, triggerExecution.lastModifiedDate) &&
+        Objects.equals(this.maxRetries, triggerExecution.maxRetries) &&
+        Objects.equals(this.output, triggerExecution.output) &&
+        Objects.equals(this.priority, triggerExecution.priority) &&
+        Objects.equals(this.retryAttempts, triggerExecution.retryAttempts) &&
+        Objects.equals(this.retryDelay, triggerExecution.retryDelay) &&
+        Objects.equals(this.retryDelayFactor, triggerExecution.retryDelayFactor) &&
+        Objects.equals(this.retryDelayMillis, triggerExecution.retryDelayMillis) &&
+        Objects.equals(this.startDate, triggerExecution.startDate) &&
+        Objects.equals(this.status, triggerExecution.status) &&
+        Objects.equals(this.workflowTrigger, triggerExecution.workflowTrigger) &&
+        Objects.equals(this.type, triggerExecution.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentDefinition, createdBy, createdDate, endDate, error, executionTime, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, retryDelayMillis, workflowTask, type);
+    return Objects.hash(batch, componentDefinition, createdBy, createdDate, endDate, error, executionTime, id, input, lastModifiedBy, lastModifiedDate, maxRetries, output, priority, retryAttempts, retryDelay, retryDelayFactor, retryDelayMillis, startDate, status, workflowTrigger, type);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class TaskExecutionModel {\n");
+    sb.append("class TriggerExecutionModel {\n");
+    sb.append("    batch: ").append(toIndentedString(batch)).append("\n");
     sb.append("    componentDefinition: ").append(toIndentedString(componentDefinition)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
@@ -702,22 +634,18 @@ public class TaskExecutionModel {
     sb.append("    executionTime: ").append(toIndentedString(executionTime)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    input: ").append(toIndentedString(input)).append("\n");
-    sb.append("    jobId: ").append(toIndentedString(jobId)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    maxRetries: ").append(toIndentedString(maxRetries)).append("\n");
     sb.append("    output: ").append(toIndentedString(output)).append("\n");
-    sb.append("    parentId: ").append(toIndentedString(parentId)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
-    sb.append("    progress: ").append(toIndentedString(progress)).append("\n");
     sb.append("    retryAttempts: ").append(toIndentedString(retryAttempts)).append("\n");
     sb.append("    retryDelay: ").append(toIndentedString(retryDelay)).append("\n");
     sb.append("    retryDelayFactor: ").append(toIndentedString(retryDelayFactor)).append("\n");
+    sb.append("    retryDelayMillis: ").append(toIndentedString(retryDelayMillis)).append("\n");
     sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
-    sb.append("    taskNumber: ").append(toIndentedString(taskNumber)).append("\n");
-    sb.append("    retryDelayMillis: ").append(toIndentedString(retryDelayMillis)).append("\n");
-    sb.append("    workflowTask: ").append(toIndentedString(workflowTask)).append("\n");
+    sb.append("    workflowTrigger: ").append(toIndentedString(workflowTrigger)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -3,6 +3,7 @@ package com.bytechef.helios.execution.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.helios.execution.web.rest.model.JobModel;
+import com.bytechef.helios.execution.web.rest.model.TriggerExecutionModel;
 import com.bytechef.helios.execution.web.rest.model.WorkflowBasicModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a project workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-02T08:08:15.158214+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-08T14:03:36.313920+01:00[Europe/Zagreb]")
 public class WorkflowExecutionModel {
 
   private Long id;
@@ -33,6 +34,8 @@ public class WorkflowExecutionModel {
   private JobModel job;
 
   private com.bytechef.helios.configuration.web.rest.model.ProjectModel project;
+
+  private TriggerExecutionModel triggerExecution;
 
   private WorkflowBasicModel workflow;
 
@@ -116,6 +119,26 @@ public class WorkflowExecutionModel {
     this.project = project;
   }
 
+  public WorkflowExecutionModel triggerExecution(TriggerExecutionModel triggerExecution) {
+    this.triggerExecution = triggerExecution;
+    return this;
+  }
+
+  /**
+   * Get triggerExecution
+   * @return triggerExecution
+  */
+  @Valid 
+  @Schema(name = "triggerExecution", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("triggerExecution")
+  public TriggerExecutionModel getTriggerExecution() {
+    return triggerExecution;
+  }
+
+  public void setTriggerExecution(TriggerExecutionModel triggerExecution) {
+    this.triggerExecution = triggerExecution;
+  }
+
   public WorkflowExecutionModel workflow(WorkflowBasicModel workflow) {
     this.workflow = workflow;
     return this;
@@ -149,12 +172,13 @@ public class WorkflowExecutionModel {
         Objects.equals(this.instance, workflowExecution.instance) &&
         Objects.equals(this.job, workflowExecution.job) &&
         Objects.equals(this.project, workflowExecution.project) &&
+        Objects.equals(this.triggerExecution, workflowExecution.triggerExecution) &&
         Objects.equals(this.workflow, workflowExecution.workflow);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, instance, job, project, workflow);
+    return Objects.hash(id, instance, job, project, triggerExecution, workflow);
   }
 
   @Override
@@ -165,6 +189,7 @@ public class WorkflowExecutionModel {
     sb.append("    instance: ").append(toIndentedString(instance)).append("\n");
     sb.append("    job: ").append(toIndentedString(job)).append("\n");
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
+    sb.append("    triggerExecution: ").append(toIndentedString(triggerExecution)).append("\n");
     sb.append("    workflow: ").append(toIndentedString(workflow)).append("\n");
     sb.append("}");
     return sb.toString();
