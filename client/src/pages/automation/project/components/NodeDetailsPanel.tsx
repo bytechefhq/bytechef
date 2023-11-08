@@ -510,7 +510,9 @@ const NodeDetailsPanel = ({
                                         {activeTab === 'connection' &&
                                             currentComponent.connection && (
                                                 <ConnectionTab
-                                                    component={currentComponent}
+                                                    componentDefinition={
+                                                        currentComponent
+                                                    }
                                                 />
                                             )}
 

@@ -17,7 +17,7 @@ import {twMerge} from 'tailwind-merge';
 import ProjectInstanceDialogBasicStep from './ProjectInstanceDialogBasicStep';
 import ProjectInstanceDialogWorkflowsStep from './ProjectInstanceDialogWorkflowsStep';
 
-interface ProjectDialogProps {
+interface ProjectInstanceDialogProps {
     projectInstance?: ProjectInstanceModel;
     showTrigger?: boolean;
     visible?: boolean;
@@ -29,7 +29,7 @@ const ProjectInstanceDialog = ({
     projectInstance,
     showTrigger = true,
     visible = false,
-}: ProjectDialogProps) => {
+}: ProjectInstanceDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
     const [isOpen, setIsOpen] = useState(visible);
 

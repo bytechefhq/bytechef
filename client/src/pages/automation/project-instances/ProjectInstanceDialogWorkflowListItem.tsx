@@ -51,8 +51,9 @@ const Configuration = ({
 }: ConfigurationProps) => {
     return workflow.inputs?.length ? (
         <Properties
-            formState={formState}
             path={`projectInstanceWorkflows.${workflowIndex!}.inputs`}
+            register={register}
+            formState={formState}
             properties={workflow.inputs.map((input) => {
                 if (input.type === 'string') {
                     return {
@@ -73,7 +74,6 @@ const Configuration = ({
                     } as PropertyType;
                 }
             })}
-            register={register}
         />
     ) : (
         <p className="text-sm">No defined configuration inputs.</p>
@@ -96,7 +96,7 @@ const Connection = ({
     const [showEditConnectionDialog, setShowEditConnectionDialog] =
         useState(false);
 
-    const {data: component} = useGetComponentDefinitionQuery({
+    const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: workflowConnection.componentName,
         componentVersion: workflowConnection.componentVersion,
     });
@@ -105,7 +105,7 @@ const Connection = ({
             componentName: workflowConnection.componentName,
             connectionVersion: componentDefinition?.connection?.version,
         },
-        !!component
+        !!componentDefinition
     );
 
     return (
@@ -113,10 +113,11 @@ const Connection = ({
             <FormField
                 control={control}
                 name={`projectInstanceWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.connectionId`}
+                rules={{required: true}}
                 render={({field}) => (
                     <FormItem>
                         <FormLabel>
-                            {`${component?.title} `}
+                            {`${componentDefinition?.title} `}
 
                             <span className="text-xs text-gray-500">
                                 ({workflowConnection.key})
@@ -124,10 +125,10 @@ const Connection = ({
                         </FormLabel>
 
                         <Select
+                            onValueChange={field.onChange}
                             defaultValue={
                                 field.value ? field.value.toString() : undefined
                             }
-                            onValueChange={field.onChange}
                         >
                             <FormControl>
                                 <div className="flex space-x-2">
@@ -136,12 +137,12 @@ const Connection = ({
                                     </SelectTrigger>
 
                                     <Button
+                                        variant="outline"
                                         className="mt-auto p-2"
                                         onClick={() =>
                                             setShowEditConnectionDialog(true)
                                         }
                                         title="Create a new connection"
-                                        variant="outline"
                                     >
                                         <PlusIcon className="h-5 w-5" />
                                     </Button>
@@ -172,7 +173,7 @@ const Connection = ({
                         </Select>
 
                         <FormDescription>
-                            {`Choose connection for the ${component?.title}`}
+                            {`Choose connection for the ${componentDefinition?.title}`}
 
                             <span className="text-xs text-gray-500">
                                 ({workflowConnection.key})
@@ -184,7 +185,6 @@ const Connection = ({
                         <FormMessage />
                     </FormItem>
                 )}
-                rules={{required: true}}
             />
 
             <FormField
@@ -204,10 +204,10 @@ const Connection = ({
             {showEditConnectionDialog && (
                 <Portal.Root>
                     <ConnectionDialog
-                        component={component}
-                        onClose={() => setShowEditConnectionDialog(false)}
+                        componentDefinition={componentDefinition}
                         showTrigger={false}
                         visible
+                        onClose={() => setShowEditConnectionDialog(false)}
                     />
                 </Portal.Root>
             )}
