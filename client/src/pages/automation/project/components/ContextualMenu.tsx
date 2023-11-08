@@ -101,6 +101,24 @@ const ContextualMenu = ({
 
             setNodes((nodes) => {
                 if (!nodes.find((node) => node.type === 'contextualMenu')) {
+                    const previousWorkflowNode = nodes.find(
+                        (node) => node.id === clickedEdge.source
+                    );
+
+                    const previousComponentNameIndex = componentNames.findIndex(
+                        (name) => name === previousWorkflowNode?.data.name
+                    );
+
+                    const tempComponentNames = [...componentNames];
+
+                    tempComponentNames.splice(
+                        previousComponentNameIndex + 1,
+                        0,
+                        newWorkflowNode.data.name
+                    );
+
+                    setComponentNames(tempComponentNames);
+
                     return nodes.concat(newWorkflowNode);
                 } else {
                     return nodes;
