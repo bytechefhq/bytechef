@@ -1,3 +1,5 @@
+import {Accordion} from '@/components/ui/accordion';
+import WorkflowTriggerAccordion from '@/pages/automation/workflow-executions/components/dialog-content/WorkflowTriggerAccordion';
 import {useGetWorkflowExecutionQuery} from '@/queries/executions';
 import * as Dialog from '@radix-ui/react-dialog';
 import {CheckCircledIcon} from '@radix-ui/react-icons';
@@ -22,9 +24,12 @@ const WorkflowExecutionDetailsDialog = () => {
             workflowExecutionDetailsDialogOpen
         );
 
-    const allTasksCompleted = workflowExecution?.job?.taskExecutions?.every(
-        (taskExecution) => taskExecution.status === 'COMPLETED'
-    );
+    const taskExecutionsCompleted =
+        workflowExecution?.job?.taskExecutions?.every(
+            (taskExecution) => taskExecution.status === 'COMPLETED'
+        );
+    const triggerExecutionCompleted =
+        workflowExecution?.triggerExecution?.status === 'COMPLETED';
 
     const startTime = workflowExecution?.job?.startDate?.getTime();
     const endTime = workflowExecution?.job?.endDate?.getTime();
@@ -56,7 +61,8 @@ const WorkflowExecutionDetailsDialog = () => {
                         <Dialog.Title className="px-3 py-4">
                             <div className="mb-3 flex items-center justify-between">
                                 <span className="text-lg">
-                                    {allTasksCompleted
+                                    {taskExecutionsCompleted &&
+                                    triggerExecutionCompleted
                                         ? 'Workflow executed successfully'
                                         : 'Workflow failed'}
                                 </span>
@@ -64,7 +70,8 @@ const WorkflowExecutionDetailsDialog = () => {
                                 <CheckCircledIcon
                                     className={twMerge(
                                         'h-5 w-5',
-                                        allTasksCompleted
+                                        taskExecutionsCompleted &&
+                                            triggerExecutionCompleted
                                             ? 'text-green-500'
                                             : 'text-red-500'
                                     )}
@@ -89,12 +96,34 @@ const WorkflowExecutionDetailsDialog = () => {
 
                         {!!workflowExecution?.job?.taskExecutions?.length && (
                             <div className="overflow-y-auto">
-                                <WorkflowTaskListAccordion
-                                    allTasksCompleted={!!allTasksCompleted}
-                                    taskExecutions={
-                                        workflowExecution.job.taskExecutions
+                                <Accordion
+                                    collapsible
+                                    type="single"
+                                    defaultValue={
+                                        workflowExecution?.triggerExecution
+                                            ?.id || ''
                                     }
-                                />
+                                >
+                                    {workflowExecution?.triggerExecution && (
+                                        <WorkflowTriggerAccordion
+                                            triggerExecution={
+                                                workflowExecution?.triggerExecution
+                                            }
+                                            triggerExecutionCompleted={
+                                                triggerExecutionCompleted
+                                            }
+                                        />
+                                    )}
+
+                                    <WorkflowTaskListAccordion
+                                        taskExecutions={
+                                            workflowExecution.job.taskExecutions
+                                        }
+                                        taskExecutionsCompleted={
+                                            !!taskExecutionsCompleted
+                                        }
+                                    />
+                                </Accordion>
                             </div>
                         )}
                     </div>
