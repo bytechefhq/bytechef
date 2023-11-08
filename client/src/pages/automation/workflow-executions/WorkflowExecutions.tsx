@@ -1,7 +1,5 @@
+import ComboBox, {ComboBoxItem} from '@/components/CombBox';
 import EmptyList from '@/components/EmptyList/EmptyList';
-import FilterableSelect, {
-    ISelectOption,
-} from '@/components/FilterableSelect/FilterableSelect';
 import PageLoader from '@/components/PageLoader/PageLoader';
 import Pagination from '@/components/Pagination/Pagination';
 import {Button} from '@/components/ui/button';
@@ -26,7 +24,6 @@ import {
 } from 'middleware/helios/execution';
 import {useGetProjectsQuery} from 'queries/projects.queries';
 import {useState} from 'react';
-import {OnChangeValue} from 'react-select';
 import {twMerge} from 'tailwind-merge';
 
 import WorkflowExecutionDetailsDialog from './components/WorkflowExecutionDetailsDialog';
@@ -71,11 +68,11 @@ const DatePicker = ({
             <Popover>
                 <PopoverTrigger asChild className="mt-1">
                     <Button
+                        variant={'outline'}
                         className={cn(
                             'w-full justify-start text-left font-normal',
                             !date && 'text-muted-foreground'
                         )}
-                        variant={'outline'}
                     >
                         <CalendarIcon className="mr-2 h-4 w-4" />
 
@@ -83,15 +80,15 @@ const DatePicker = ({
                     </Button>
                 </PopoverTrigger>
 
-                <PopoverContent align="start" className="w-auto p-0">
+                <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
-                        initialFocus
                         mode="single"
+                        selected={date}
                         onSelect={(date) => {
                             setDate(date);
                             onChange(date);
                         }}
-                        selected={date}
+                        initialFocus
                     />
                 </PopoverContent>
             </Popover>
@@ -167,13 +164,13 @@ const WorkflowExecutions = () => {
                     WorkflowExecutionsPage.content.length > 0 && (
                         <PageFooter position="main">
                             <Pagination
-                                onClick={setFilterPageNumber}
                                 pageNumber={WorkflowExecutionsPage.number!}
                                 pageSize={WorkflowExecutionsPage.size!}
                                 totalElements={
                                     WorkflowExecutionsPage.totalElements!
                                 }
                                 totalPages={WorkflowExecutionsPage.totalPages!}
+                                onClick={setFilterPageNumber}
                             />
                         </PageFooter>
                     )
@@ -190,22 +187,20 @@ const WorkflowExecutions = () => {
                         <PageHeader position="sidebar" title="Executions" />
 
                         <div className="px-4">
-                            <FilterableSelect
-                                isClearable
-                                label="Status"
+                            <ComboBox
                                 name="jobStatus"
-                                onChange={(
-                                    value: OnChangeValue<ISelectOption, false>
-                                ) => {
-                                    if (value) {
+                                items={jobStatusOptions}
+                                label="Status"
+                                onChange={(item?: ComboBoxItem) => {
+                                    if (item) {
                                         setFilterStatus(
-                                            value.value as GetWorkflowExecutionsJobStatusEnum
+                                            item.value as GetWorkflowExecutionsJobStatusEnum
                                         );
                                     } else {
                                         setFilterStatus(undefined);
                                     }
                                 }}
-                                options={jobStatusOptions}
+                                value={filterStatus}
                             />
 
                             <DatePicker
@@ -219,16 +214,26 @@ const WorkflowExecutions = () => {
                             />
 
                             {projects?.length && (
-                                <FilterableSelect
-                                    isClearable
-                                    label="Projects"
+                                <ComboBox
+                                    items={projects?.map((project) => ({
+                                        label: (
+                                            <span className="flex items-center">
+                                                <span className="mr-1 ">
+                                                    {project.name}
+                                                </span>
+
+                                                <span className="text-xs text-gray-500">
+                                                    {project?.tags
+                                                        ?.map((tag) => tag.name)
+                                                        .join(', ')}
+                                                </span>
+                                            </span>
+                                        ),
+                                        value: project.id,
+                                    }))}
+                                    label="Project"
                                     name="project"
-                                    onChange={(
-                                        value: OnChangeValue<
-                                            ISelectOption,
-                                            false
-                                        >
-                                    ) => {
+                                    onChange={(value) => {
                                         if (value) {
                                             setFilterProjectId(
                                                 Number(value.value)
@@ -237,66 +242,69 @@ const WorkflowExecutions = () => {
                                             setFilterProjectId(undefined);
                                         }
                                     }}
-                                    options={projects?.map((project) => ({
-                                        label: project.name,
-                                        value: (project.id || 0).toString(),
-                                    }))}
-                                />
-                            )}
-
-                            {workflows?.length && (
-                                <FilterableSelect
-                                    isClearable
-                                    label="Workflows"
-                                    name="workflows"
-                                    onChange={(
-                                        value: OnChangeValue<
-                                            ISelectOption,
-                                            false
-                                        >
-                                    ) => {
-                                        if (value) {
-                                            setFilterWorkflowId(value.value);
-                                        } else {
-                                            setFilterWorkflowId(undefined);
-                                        }
-                                    }}
-                                    options={workflows?.map((workflow) => ({
-                                        label:
-                                            workflow.label || 'undefined label',
-                                        value: (workflow.id || 0).toString(),
-                                    }))}
+                                    value={filterProjectId}
                                 />
                             )}
 
                             {projectInstances &&
                                 projectInstances?.length > 0 && (
-                                    <FilterableSelect
-                                        isClearable
-                                        label="Instances"
-                                        name="instances"
-                                        onChange={(
-                                            value: OnChangeValue<
-                                                ISelectOption,
-                                                false
-                                            >
-                                        ) =>
+                                    <ComboBox
+                                        items={projectInstances?.map(
+                                            (projectInstance) => ({
+                                                label: (
+                                                    <span className="flex items-center">
+                                                        <span className="mr-1 ">
+                                                            {
+                                                                projectInstance.name
+                                                            }
+                                                        </span>
+
+                                                        <span className="text-xs text-gray-500">
+                                                            {projectInstance?.tags
+                                                                ?.map(
+                                                                    (tag) =>
+                                                                        tag.name
+                                                                )
+                                                                .join(', ')}
+                                                        </span>
+                                                    </span>
+                                                ),
+                                                value: projectInstance.id,
+                                            })
+                                        )}
+                                        label="Instance"
+                                        name="instance"
+                                        onChange={(value) =>
                                             value
                                                 ? setFilterInstanceId(
                                                       Number(value.value)
                                                   )
                                                 : setFilterInstanceId(undefined)
                                         }
-                                        options={projectInstances?.map(
-                                            (instance) => ({
-                                                label: instance.name,
-                                                value: (
-                                                    instance.id || 0
-                                                ).toString(),
-                                            })
-                                        )}
+                                        value={filterInstanceId}
                                     />
                                 )}
+
+                            {workflows?.length && (
+                                <ComboBox
+                                    items={workflows?.map((workflow) => ({
+                                        label:
+                                            workflow.label || 'undefined label',
+                                        value: workflow.id,
+                                    }))}
+                                    label="Workflow"
+                                    maxHeight={true}
+                                    name="workflow"
+                                    onChange={(value) => {
+                                        if (value) {
+                                            setFilterWorkflowId(value.value);
+                                        } else {
+                                            setFilterWorkflowId(undefined);
+                                        }
+                                    }}
+                                    value={filterWorkflowId}
+                                />
+                            )}
                         </div>
                     </>
                 }

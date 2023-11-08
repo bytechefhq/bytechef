@@ -1,4 +1,4 @@
-import Avatar from '@/components/Avatar/Avatar';
+import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Link} from 'react-router-dom';
 
@@ -61,7 +61,14 @@ export function DesktopSidebar({
 
                     <div className="flex shrink-0 justify-center py-4">
                         <Link className="flex" to="/settings">
-                            <Avatar size="small" />
+                            <Avatar>
+                                <AvatarImage
+                                    src="https://github.com/shadcn.png"
+                                    alt="@shadcn"
+                                />
+
+                                <AvatarFallback>CN</AvatarFallback>
+                            </Avatar>
                         </Link>
                     </div>
                 </div>

@@ -1,3 +1,4 @@
+import ComboBox, {ComboBoxItem} from '@/components/CombBox';
 import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstances.queries';
 import {useGetProjectsQuery} from '@/queries/projects.queries';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
@@ -12,10 +13,9 @@ import {
     UseFormSetValue,
 } from 'react-hook-form';
 
-import FilterableSelect from '../../../components/FilterableSelect/FilterableSelect';
 import TextArea from '../../../components/TextArea/TextArea';
 
-interface ProjectDialogProps {
+interface ProjectDialogBasicStepProps {
     control: Control<ProjectInstanceModel>;
     errors: UseFormReturn<ProjectInstanceModel>['formState']['errors'];
     getValues: UseFormGetValues<ProjectInstanceModel>;
@@ -32,7 +32,7 @@ const ProjectInstanceDialogBasicStep = ({
     register,
     setValue,
     touchedFields,
-}: ProjectDialogProps) => {
+}: ProjectDialogBasicStepProps) => {
     const {
         data: projects,
         error: projectsError,
@@ -64,36 +64,42 @@ const ProjectInstanceDialogBasicStep = ({
                     {!projectInstance?.id && (
                         <Controller
                             control={control}
-                            name="project"
+                            name="projectId"
+                            rules={{required: true}}
                             render={({field}) => (
-                                <FilterableSelect
-                                    autoFocus
-                                    error={
-                                        touchedFields.projectId &&
-                                        !getValues('projectId')
-                                    }
+                                <ComboBox
                                     field={field}
-                                    label="Project"
-                                    onChange={(selectedOption) => {
-                                        if (selectedOption) {
-                                            setValue(
-                                                'projectId',
-                                                parseInt(selectedOption.value)
-                                            );
+                                    items={projects.map(
+                                        (project) =>
+                                            ({
+                                                label: (
+                                                    <span className="flex items-center">
+                                                        <span className="mr-1 ">
+                                                            {project.name}
+                                                        </span>
 
-                                            setValue('project', selectedOption);
+                                                        <span className="text-xs text-gray-500">
+                                                            {project?.tags
+                                                                ?.map(
+                                                                    (tag) =>
+                                                                        tag.name
+                                                                )
+                                                                .join(', ')}
+                                                        </span>
+                                                    </span>
+                                                ),
+                                                value: project.id,
+                                            }) as ComboBoxItem
+                                    )}
+                                    label="Project"
+                                    name="project"
+                                    onChange={(item) => {
+                                        if (item) {
+                                            setValue('projectId', item.value);
                                         }
                                     }}
-                                    options={projects.map((project) => ({
-                                        label: project.name,
-                                        name: project.name,
-                                        value: project.id!.toString(),
-                                    }))}
-                                    placeholder="Select..."
-                                    required
                                 />
                             )}
-                            rules={{required: true}}
                             shouldUnregister={false}
                         />
                     )}
@@ -123,6 +129,15 @@ const ProjectInstanceDialogBasicStep = ({
                                     field={field}
                                     isMulti
                                     label="Tags"
+                                    options={remainingTags.map((tag) => {
+                                        return {
+                                            label: tag.name,
+                                            value: tag.name
+                                                .toLowerCase()
+                                                .replace(/\W/g, ''),
+                                            ...tag,
+                                        };
+                                    })}
                                     onCreateOption={(inputValue: string) => {
                                         setValue('tags', [
                                             ...getValues().tags!,
@@ -133,15 +148,6 @@ const ProjectInstanceDialogBasicStep = ({
                                             },
                                         ] as never[]);
                                     }}
-                                    options={remainingTags.map((tag) => {
-                                        return {
-                                            label: tag.name,
-                                            value: tag.name
-                                                .toLowerCase()
-                                                .replace(/\W/g, ''),
-                                            ...tag,
-                                        };
-                                    })}
                                 />
                             )}
                         />
