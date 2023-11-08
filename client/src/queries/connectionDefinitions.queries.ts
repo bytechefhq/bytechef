@@ -31,8 +31,7 @@ export const useGetConnectionDefinitionQuery = (
     );
 
 export const useGetConnectionDefinitionsQuery = (
-    request: GetComponentConnectionDefinitionsRequest,
-    enabledCondition?: boolean
+    request: GetComponentConnectionDefinitionsRequest
 ) =>
     useQuery<ConnectionDefinitionModel[], Error>(
         ConnectDefinitionKeys.filteredConnectionDefinitions(request),
@@ -40,5 +39,7 @@ export const useGetConnectionDefinitionsQuery = (
             new ConnectionDefinitionApi().getComponentConnectionDefinitions(
                 request
             ),
-        {enabled: false || enabledCondition}
+        {
+            enabled: !!request?.componentName,
+        }
     );
