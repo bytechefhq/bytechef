@@ -10,16 +10,20 @@ import {useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 
-const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
+const ConnectionTab = ({
+    componentDefinition,
+}: {
+    componentDefinition: ComponentDefinitionModel;
+}) => {
     const [showEditConnectionDialog, setShowEditConnectionDialog] =
         useState(false);
 
     const {data: connections} = useGetConnectionsQuery(
         {
-            componentName: component.name,
-            connectionVersion: component.connection?.version,
+            componentName: componentDefinition.name,
+            connectionVersion: componentDefinition.connection?.version,
         },
-        !!component.connection?.componentName
+        !!componentDefinition.connection?.componentName
     );
 
     const {setShowConnectionNote, showConnectionNote} =
@@ -41,8 +45,8 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
                     />
 
                     <Button
-                        className="mt-auto p-2"
                         displayType="secondary"
+                        className="mt-auto p-2"
                         icon={<PlusIcon className="h-5 w-5" />}
                         onClick={() => setShowEditConnectionDialog(true)}
                         title="Create a new connection"
@@ -61,8 +65,8 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
                             />
                         }
                         icon={<LinkIcon className="h-6 w-6 text-gray-400" />}
-                        message="You have not created any connections for this component yet."
                         title="No Connections"
+                        message="You have not created any connections for this component yet."
                     />
                 </div>
             )}
@@ -90,10 +94,10 @@ const ConnectionTab = ({component}: {component: ComponentDefinitionModel}) => {
 
             {showEditConnectionDialog && (
                 <ConnectionDialog
-                    component={component}
-                    onClose={() => setShowEditConnectionDialog(false)}
+                    componentDefinition={componentDefinition}
                     showTrigger={false}
                     visible
+                    onClose={() => setShowEditConnectionDialog(false)}
                 />
             )}
         </div>
