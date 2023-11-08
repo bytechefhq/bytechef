@@ -103,7 +103,7 @@ const Connection = ({
     const {data: connections} = useGetConnectionsQuery(
         {
             componentName: workflowConnection.componentName,
-            connectionVersion: 1,
+            connectionVersion: componentDefinition?.connection?.version,
         },
         !!component
     );
@@ -155,7 +155,17 @@ const Connection = ({
                                             key={connection.id}
                                             value={connection.id!.toString()}
                                         >
-                                            {connection.name}
+                                            <span className="flex items-center">
+                                                <span className="mr-1 ">
+                                                    {connection.name}
+                                                </span>
+
+                                                <span className="text-xs text-gray-500">
+                                                    {connection?.tags
+                                                        ?.map((tag) => tag.name)
+                                                        .join(', ')}
+                                                </span>
+                                            </span>
                                         </SelectItem>
                                     ))}
                             </SelectContent>
