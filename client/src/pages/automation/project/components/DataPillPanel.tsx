@@ -19,7 +19,7 @@ const DataPillPanel = () => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
     const {currentNode, nodeDetailsPanelOpen} = useNodeDetailsPanelStore();
-    const {componentNames} = useWorkflowDataStore();
+    const {componentActions, componentNames} = useWorkflowDataStore();
 
     const currentNodeIndex = componentNames.indexOf(currentNode.name);
 
@@ -41,8 +41,6 @@ const DataPillPanel = () => {
         },
         !!normalizedPreviousComponentNames.length
     );
-
-    const {componentActions} = useWorkflowDataStore();
 
     const taskTypes = componentActions?.map(
         (componentAction) =>
