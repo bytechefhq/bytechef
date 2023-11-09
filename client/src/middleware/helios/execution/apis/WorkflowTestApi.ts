@@ -15,14 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
-  JobModel,
   TestParametersModel,
+  WorkflowExecutionModel,
 } from '../models/index';
 import {
-    JobModelFromJSON,
-    JobModelToJSON,
     TestParametersModelFromJSON,
     TestParametersModelToJSON,
+    WorkflowExecutionModelFromJSON,
+    WorkflowExecutionModelToJSON,
 } from '../models/index';
 
 export interface TestWorkflowRequest {
@@ -38,7 +38,7 @@ export class WorkflowTestApi extends runtime.BaseAPI {
      * Execute a workflow synchronously for testing purposes.
      * Execute a workflow synchronously for testing purpose
      */
-    async testWorkflowRaw(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JobModel>> {
+    async testWorkflowRaw(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecutionModel>> {
         if (requestParameters.testParametersModel === null || requestParameters.testParametersModel === undefined) {
             throw new runtime.RequiredError('testParametersModel','Required parameter requestParameters.testParametersModel was null or undefined when calling testWorkflow.');
         }
@@ -57,14 +57,14 @@ export class WorkflowTestApi extends runtime.BaseAPI {
             body: TestParametersModelToJSON(requestParameters.testParametersModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => JobModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowExecutionModelFromJSON(jsonValue));
     }
 
     /**
      * Execute a workflow synchronously for testing purposes.
      * Execute a workflow synchronously for testing purpose
      */
-    async testWorkflow(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JobModel> {
+    async testWorkflow(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowExecutionModel> {
         const response = await this.testWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }

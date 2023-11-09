@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { TaskConnectionModel } from './TaskConnectionModel';
+import type { TestConnectionModel } from './TestConnectionModel';
 import {
-    TaskConnectionModelFromJSON,
-    TaskConnectionModelFromJSONTyped,
-    TaskConnectionModelToJSON,
-} from './TaskConnectionModel';
+    TestConnectionModelFromJSON,
+    TestConnectionModelFromJSONTyped,
+    TestConnectionModelToJSON,
+} from './TestConnectionModel';
 
 /**
  * Defines parameters used to test a workflow.
@@ -28,10 +28,10 @@ import {
 export interface TestParametersModel {
     /**
      * 
-     * @type {Array<TaskConnectionModel>}
+     * @type {Array<TestConnectionModel>}
      * @memberof TestParametersModel
      */
-    connections?: Array<TaskConnectionModel>;
+    connections?: Array<TestConnectionModel>;
     /**
      * The inputs expected by the workflow
      * @type {{ [key: string]: object; }}
@@ -65,7 +65,7 @@ export function TestParametersModelFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
-        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(TaskConnectionModelFromJSON)),
+        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(TestConnectionModelFromJSON)),
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
         'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
     };
@@ -80,7 +80,7 @@ export function TestParametersModelToJSON(value?: TestParametersModel | null): a
     }
     return {
         
-        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(TaskConnectionModelToJSON)),
+        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(TestConnectionModelToJSON)),
         'inputs': value.inputs,
         'workflowId': value.workflowId,
     };
