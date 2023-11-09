@@ -49,7 +49,7 @@ export interface TriggerExecutionModel {
      * @type {ComponentDefinitionModel}
      * @memberof TriggerExecutionModel
      */
-    componentDefinition?: ComponentDefinitionModel;
+    component?: ComponentDefinitionModel;
     /**
      * The created by.
      * @type {string}
@@ -209,7 +209,7 @@ export function TriggerExecutionModelFromJSONTyped(json: any, ignoreDiscriminato
     return {
         
         'batch': !exists(json, 'batch') ? undefined : json['batch'],
-        'componentDefinition': !exists(json, 'componentDefinition') ? undefined : ComponentDefinitionModelFromJSON(json['componentDefinition']),
+        'component': !exists(json, 'component') ? undefined : ComponentDefinitionModelFromJSON(json['component']),
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'endDate': !exists(json, 'endDate') ? undefined : (new Date(json['endDate'])),
@@ -243,7 +243,7 @@ export function TriggerExecutionModelToJSON(value?: TriggerExecutionModel | null
     return {
         
         'batch': value.batch,
-        'componentDefinition': ComponentDefinitionModelToJSON(value.componentDefinition),
+        'component': ComponentDefinitionModelToJSON(value.component),
         'error': ExecutionErrorModelToJSON(value.error),
         'workflowTrigger': WorkflowTriggerModelToJSON(value.workflowTrigger),
     };
