@@ -17,6 +17,7 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
+import com.bytechef.hermes.component.registry.domain.ConnectionDefinitionBasic;
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionModel;
@@ -28,6 +29,16 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 public class ConnectionDefinitionMapper {
+
+    @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
+        OptionalMapper.class
+    })
+    public interface ConnectionDefinitionBasicToConnectionDefinitionModelMapper
+        extends Converter<ConnectionDefinitionBasic, ConnectionDefinitionBasicModel> {
+
+        @Override
+        ConnectionDefinitionBasicModel convert(ConnectionDefinitionBasic connectionDefinition);
+    }
 
     @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
         OptionalMapper.class

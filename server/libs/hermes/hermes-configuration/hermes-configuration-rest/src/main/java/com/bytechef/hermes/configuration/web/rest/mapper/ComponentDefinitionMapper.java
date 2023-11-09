@@ -17,16 +17,11 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
-import com.bytechef.hermes.component.registry.domain.ConnectionDefinitionBasic;
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionModel;
-import com.bytechef.hermes.configuration.web.rest.model.ConnectionDefinitionBasicModel;
-import com.bytechef.hermes.configuration.web.rest.model.HelpModel;
-import com.bytechef.hermes.configuration.web.rest.model.ResourcesModel;
-import com.bytechef.hermes.registry.domain.Help;
-import com.bytechef.hermes.registry.domain.Resources;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 public class ComponentDefinitionMapper {
@@ -38,12 +33,6 @@ public class ComponentDefinitionMapper {
         extends Converter<ComponentDefinition, ComponentDefinitionModel> {
 
         ComponentDefinitionModel convert(ComponentDefinition componentDefinition);
-
-        ConnectionDefinitionBasicModel map(ConnectionDefinitionBasic connectionDefinitionBasic);
-
-        HelpModel map(Help help);
-
-        ResourcesModel map(Resources resources);
     }
 
     @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
@@ -52,8 +41,8 @@ public class ComponentDefinitionMapper {
     public interface ComponentDefinitionToComponentDefinitionBasicModelMapper
         extends Converter<ComponentDefinition, ComponentDefinitionBasicModel> {
 
+        @Mapping(target = "actionsCount", expression = "java(componentDefinition.getActions().size())")
+        @Mapping(target = "triggersCount", expression = "java(componentDefinition.getTriggers().size())")
         ComponentDefinitionBasicModel convert(ComponentDefinition componentDefinition);
-
-        ResourcesModel map(Resources resources);
     }
 }

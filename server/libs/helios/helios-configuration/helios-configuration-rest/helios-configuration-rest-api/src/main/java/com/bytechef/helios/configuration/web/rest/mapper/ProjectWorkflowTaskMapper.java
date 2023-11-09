@@ -16,19 +16,26 @@
 
 package com.bytechef.helios.configuration.web.rest.mapper;
 
-import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
-import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowModel;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel;
+import java.util.List;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
 @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
-public interface ProjectInstanceWorkflowModelMapper
-    extends Converter<ProjectInstanceWorkflowModel, ProjectInstanceWorkflow> {
+public interface ProjectWorkflowTaskMapper extends Converter<WorkflowTask, WorkflowTaskModel> {
 
-    @Override
-    ProjectInstanceWorkflow convert(ProjectInstanceWorkflowModel projectInstanceWorkflowModel);
+    @Named(value = "workflowTaskToWorkflowTaskModelMapper")
+    @Mapping(target = "connections", ignore = true)
+    WorkflowTaskModel convert(WorkflowTask workflowTask);
+
+    @IterableMapping(qualifiedByName = "workflowTaskToWorkflowTaskModelMapper")
+    List<WorkflowTaskModel> map(List<WorkflowTask> workflowTasks);
 }

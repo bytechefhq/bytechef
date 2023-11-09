@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.web.rest.mapper;
+package com.bytechef.helios.configuration.web.rest.mapper;
 
-import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
-import com.bytechef.helios.execution.web.rest.model.TaskExecutionModel;
-import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
+import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowConnectionModel;
+import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import java.util.Optional;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
@@ -26,13 +26,17 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ProjectExecutionMapperSpringConfig.class)
-public interface ProjectTaskExecutionMapper extends Converter<TaskExecutionDTO, TaskExecutionModel> {
+@Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+public interface WorkflowConnectionMapper extends Converter<WorkflowConnection, WorkflowConnectionModel> {
 
     @Override
-    TaskExecutionModel convert(TaskExecutionDTO taskExecutionDTO);
+    WorkflowConnectionModel convert(WorkflowConnection workflowConnection);
 
-    default String map(Optional<String> optional) {
+    default Integer mapTointeger(Optional<Integer> optional) {
+        return optional.orElse(null);
+    }
+
+    default String mapToString(Optional<String> optional) {
         return optional.orElse(null);
     }
 }

@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.web.rest.mapper;
+package com.bytechef.hermes.configuration.web.rest.mapper;
 
-import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
-import com.bytechef.helios.execution.web.rest.model.TaskExecutionModel;
-import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
-import java.util.Optional;
+import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
+import com.bytechef.hermes.configuration.web.rest.model.HelpModel;
+import com.bytechef.hermes.registry.domain.Help;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ProjectExecutionMapperSpringConfig.class)
-public interface ProjectTaskExecutionMapper extends Converter<TaskExecutionDTO, TaskExecutionModel> {
+@Mapper(config = ConfigurationMapperSpringConfig.class)
+public interface HelpMapper extends Converter<Help, HelpModel> {
 
     @Override
-    TaskExecutionModel convert(TaskExecutionDTO taskExecutionDTO);
-
-    default String map(Optional<String> optional) {
-        return optional.orElse(null);
-    }
+    HelpModel convert(Help help);
 }

@@ -75,7 +75,7 @@ public class ProjectApiControllerIntTest {
     private ProjectFacade projectFacade;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectMapper.ProjectDTOToProjectModelMapper projectMapper;
 
     private WebTestClient webTestClient;
 

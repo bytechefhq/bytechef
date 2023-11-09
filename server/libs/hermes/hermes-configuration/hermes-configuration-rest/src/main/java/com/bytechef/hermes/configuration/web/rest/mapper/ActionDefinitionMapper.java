@@ -20,8 +20,6 @@ import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
-import com.bytechef.hermes.configuration.web.rest.model.HelpModel;
-import com.bytechef.hermes.registry.domain.Help;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -38,8 +36,6 @@ public class ActionDefinitionMapper {
 
         @Override
         ActionDefinitionModel convert(ActionDefinition actionDefinition);
-
-        HelpModel map(Help help);
     }
 
     @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
@@ -50,7 +46,5 @@ public class ActionDefinitionMapper {
 
         @Override
         ActionDefinitionBasicModel convert(ActionDefinition actionDefinition);
-
-        HelpModel map(Help help);
     }
 }
