@@ -18,11 +18,14 @@ import {useNodeDetailsPanelStore} from '../stores/useNodeDetailsPanelStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 
 export type WorkflowEditorProps = {
-    components: ComponentDefinitionBasicModel[];
-    flowControls: TaskDispatcherDefinitionBasicModel[];
+    componentDefinitions: ComponentDefinitionBasicModel[];
+    taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
 };
 
-const WorkflowEditor = ({components, flowControls}: WorkflowEditorProps) => {
+const WorkflowEditor = ({
+    componentDefinitions,
+    taskDispatcherDefinitions,
+}: WorkflowEditorProps) => {
     const [nodeNames, setNodeNames] = useState<Array<string>>([]);
     const [viewportWidth, setViewportWidth] = useState(0);
 
@@ -104,9 +107,10 @@ const WorkflowEditor = ({components, flowControls}: WorkflowEditorProps) => {
             'application/reactflow'
         );
 
-        const droppedNode = [...components, ...flowControls].find(
-            (node) => node.name === droppedNodeName
-        );
+        const droppedNode = [
+            ...componentDefinitions,
+            ...taskDispatcherDefinitions,
+        ].find((node) => node.name === droppedNodeName);
 
         if (!droppedNode) {
             return;

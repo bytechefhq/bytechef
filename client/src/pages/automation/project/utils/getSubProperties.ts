@@ -2,11 +2,11 @@ import {ComponentDefinitionModel} from '@/middleware/helios/execution/models';
 import {PropertyType} from '@/types/projectTypes';
 
 export default function getSubProperties({
-    component,
+    componentDefinition,
     properties,
     propertyName,
 }: {
-    component: ComponentDefinitionModel;
+    componentDefinition: ComponentDefinitionModel;
     properties: PropertyType[];
     propertyName?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -16,20 +16,20 @@ export default function getSubProperties({
 
         if (subProperty.properties?.length) {
             return getSubProperties({
-                component,
+                componentDefinition,
                 properties: subProperty.properties,
                 propertyName: subPropertyLabel,
             });
         } else if (subProperty.items?.length) {
             return getSubProperties({
-                component,
+                componentDefinition,
                 properties: subProperty.items,
                 propertyName: subPropertyLabel,
             });
         }
 
         return {
-            component: JSON.stringify(component),
+            component: JSON.stringify(componentDefinition),
             id: subProperty.name,
             value: propertyName
                 ? `${propertyName}/${subPropertyLabel}`

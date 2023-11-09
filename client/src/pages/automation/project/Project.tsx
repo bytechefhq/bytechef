@@ -127,15 +127,18 @@ const Project = () => {
     );
 
     const {
-        data: components,
+        data: componentDefinitions,
         error: componentsError,
         isLoading: componentsLoading,
-    } = useGetComponentDefinitionsQuery({actionDefinitions: true});
+    } = useGetComponentDefinitionsQuery({
+        actionDefinitions: true,
+        triggerDefinitions: true,
+    });
 
     const {
-        data: flowControls,
-        error: flowControlsError,
-        isLoading: flowControlsLoading,
+        data: taskDispatcherDefinitions,
+        error: taskDispatcherDefinitionsError,
+        isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
     const {
@@ -233,10 +236,10 @@ const Project = () => {
 
     return (
         <PageLoader
-            errors={[componentsError, flowControlsError, projectWorkflowsError]}
+            errors={[componentsError, taskDispatcherDefinitionsError, projectWorkflowsError]}
             loading={
                 componentsLoading ||
-                flowControlsLoading ||
+                taskDispatcherDefinitionsLoading ||
                 projectWorkflowsLoading
             }
         >
@@ -571,9 +574,9 @@ const Project = () => {
                 leftSidebarWidth="96"
                 rightSidebarBody={
                     <>
-                        {components && !!flowControls && (
+                        {componentDefinitions && !!taskDispatcherDefinitions && (
                             <ComponentSidebar
-                                data={{components, flowControls}}
+                                data={{componentDefinitions: componentDefinitions, taskDispatcherDefinitions: taskDispatcherDefinitions}}
                                 filter={filter}
                             />
                         )}
@@ -597,10 +600,10 @@ const Project = () => {
                 }
                 rightToolbarOpen={true}
             >
-                {components && !!flowControls && (
+                {componentDefinitions && !!taskDispatcherDefinitions && (
                     <WorkflowEditor
-                        components={components}
-                        flowControls={flowControls}
+                        componentDefinitions={componentDefinitions}
+                        taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
                 )}
             </LayoutContainer>

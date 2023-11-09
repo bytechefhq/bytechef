@@ -12,8 +12,8 @@ import DataPillPanel from './components/DataPillPanel';
 import WorkflowEditor, {WorkflowEditorProps} from './components/WorkflowEditor';
 import {useNodeDetailsPanelStore} from './stores/useNodeDetailsPanelStore';
 
-const ProjectWorkflow = ({components, flowControls}: WorkflowEditorProps) => {
-    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
+const ProjectWorkflow = ({componentDefinitions, taskDispatcherDefinitions}: WorkflowEditorProps) => {
+    const {data: connectionComponentDefinitions} = useGetComponentDefinitionsQuery({
         connectionDefinitions: true,
     });
 
@@ -22,12 +22,14 @@ const ProjectWorkflow = ({components, flowControls}: WorkflowEditorProps) => {
     return (
         <ReactFlowProvider>
             <WorkflowEditor
-                components={components}
-                flowControls={flowControls}
+                componentDefinitions={componentDefinitions}
+                taskDispatcherDefinitions={taskDispatcherDefinitions}
             />
 
-            {componentDefinitions && currentNode.name && (
-                <NodeDetailsPanel componentDefinitions={componentDefinitions} />
+            {connectionComponentDefinitions && currentNode.name && (
+                <WorkflowNodeDetailsPanel
+                    componentDefinitions={connectionComponentDefinitions}
+                />
             )}
 
             <DataPillPanel />

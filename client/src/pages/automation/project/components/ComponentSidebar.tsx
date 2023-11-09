@@ -8,37 +8,40 @@ import WorkflowNodesList from './WorkflowNodesList';
 
 interface ComponentSidebarProps {
     data: {
-        components: Array<ComponentDefinitionBasicModel>;
-        flowControls: Array<TaskDispatcherDefinitionModel>;
+        componentDefinitions: Array<ComponentDefinitionBasicModel>;
+        taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
     };
     filter: string;
 }
 
 const ComponentSidebar = ({data, filter}: ComponentSidebarProps) => {
-    const [filteredComponents, setFilteredComponents] = useState<
+    const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
         Array<ComponentDefinitionBasicModel>
     >([]);
-    const [filteredFlowControls, setFilteredFlowControls] = useState<
+    const [filteredTaskDispatcherDefinitions, setFilteredTaskDispatcherDefinitions] = useState<
         Array<TaskDispatcherDefinitionModel>
     >([]);
+    const [filteredTriggerComponentDefinitions, setFilteredTriggerComponentDefinitions] = useState<
+        Array<ComponentDefinitionBasicModel>
+    >([]);
 
-    const {components, flowControls} = data;
+    const {componentDefinitions, taskDispatcherDefinitions} = data;
 
     useEffect(() => {
-        setFilteredComponents(
-            components.filter(
-                (component) =>
-                    component.name
+        setFilteredActionComponentDefinitions(
+                (componentDefinition) =>
+                    componentDefinition?.actionsCount &&
+                    (componentDefinition.name
                         ?.toLowerCase()
                         .includes(filter.toLowerCase()) ||
-                    component?.title
-                        ?.toLowerCase()
-                        .includes(filter.toLowerCase())
+                        componentDefinition?.title
+                            ?.toLowerCase()
+                            .includes(filter.toLowerCase()))
             )
         );
 
-        setFilteredFlowControls(
-            flowControls.filter(
+        setFilteredTaskDispatcherDefinitions(
+            taskDispatcherDefinitions.filter(
                 (flowControl) =>
                     flowControl.name
                         ?.toLowerCase()
@@ -48,13 +51,27 @@ const ComponentSidebar = ({data, filter}: ComponentSidebarProps) => {
                         .includes(filter.toLowerCase())
             )
         );
-    }, [components, filter, flowControls]);
+
+        setFilteredTriggerComponentDefinitions(
+            componentDefinitions.filter(
+                (componentDefinition) =>
+                    componentDefinition?.triggersCount &&
+                    (componentDefinition.name
+                        ?.toLowerCase()
+                        .includes(filter.toLowerCase()) ||
+                        componentDefinition?.title
+                            ?.toLowerCase()
+                            .includes(filter.toLowerCase()))
+            )
+        );
+    }, [componentDefinitions, filter, taskDispatcherDefinitions]);
 
     return (
-        <WorkflowNodesList
-            components={filteredComponents}
-            flowControls={filteredFlowControls}
+        <WorkflowNodesTabs
+            actionComponentDefinitions={filteredActionComponentDefinitions}
             itemsDraggable
+            taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
+            triggerComponentDefinitions={filteredTriggerComponentDefinitions}
         />
     );
 };

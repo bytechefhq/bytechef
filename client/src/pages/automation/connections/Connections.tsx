@@ -46,7 +46,7 @@ const Connections = () => {
         (connection) => connection.componentName
     );
 
-    const {data: components, isLoading: componentsLoading} =
+    const {data: componentDefinitions, isLoading: componentsLoading} =
         useGetComponentDefinitionsQuery(
             {include: allComponentNames},
             allComponentNames !== undefined
@@ -74,8 +74,8 @@ const Connections = () => {
     let pageTitle: string | undefined;
 
     if (filterData.type === Type.Component) {
-        pageTitle = components?.find(
-            (component) => component.name === filterData.id
+        pageTitle = componentDefinitions?.find(
+            (componentDefinition) => componentDefinition.name === filterData.id
         )?.title;
     } else {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
@@ -149,7 +149,7 @@ const Connections = () => {
                             />
 
                             {!componentsLoading &&
-                                components?.map((item) => (
+                                componentDefinitions?.map((item) => (
                                     <LeftSidebarNavItem
                                         item={{
                                             filterData:

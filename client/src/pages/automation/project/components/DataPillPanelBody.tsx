@@ -15,7 +15,7 @@ import {ChevronDownIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
 export type ComponentActionData = {
-    component: ComponentDefinitionBasicModel;
+    componentDefinition: ComponentDefinitionBasicModel;
     workflowAlias: string;
 } & ActionDefinitionModel;
 
@@ -33,7 +33,8 @@ const DataPillPanelBody = ({
             <Accordion className="h-full" collapsible type="single">
                 {componentData.map(
                     (componentAction: ComponentActionData, index: number) => {
-                        const {icon, title} = componentAction.component;
+                        const {icon, title} =
+                            componentAction.componentDefinition;
 
                         const outputSchema: PropertyType | undefined =
                             componentData[index]?.outputSchema;
@@ -96,8 +97,8 @@ const DataPillPanelBody = ({
                                                 {filteredProperties?.map(
                                                     (property) => (
                                                         <DataPill
-                                                            component={
-                                                                componentAction.component
+                                                            componentDefinition={
+                                                                componentAction.componentDefinition
                                                             }
                                                             componentAlias={
                                                                 componentAction.workflowAlias
