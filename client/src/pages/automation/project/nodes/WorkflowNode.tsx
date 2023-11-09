@@ -79,9 +79,9 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                 <div className="absolute left-[80px] pr-4">
                     {data.type === 'trigger' ? (
                         <WorkflowNodesPopoverMenu
-                            id={id}
                             hideActionComponents
                             hideTaskDispatchers
+                            id={id}
                         >
                             <Button
                                 className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"

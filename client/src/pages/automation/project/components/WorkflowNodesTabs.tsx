@@ -31,8 +31,8 @@ const WorkflowNodesTabsItem = ({
             className="mb-2 flex h-[72px] cursor-pointer items-center rounded-md bg-white p-2 hover:bg-gray-50"
             draggable={draggable}
             id={node?.title}
-            onDragStart={(event) => onDragStart(event, node.name!)}
             onClick={handleClick}
+            onDragStart={(event) => onDragStart(event, node.name!)}
         >
             {node.icon ? (
                 <InlineSVG className="mr-2 h-7 w-7 flex-none" src={node.icon} />
@@ -78,24 +78,24 @@ const WorkflowNodesTabs = ({
 }: WorkflowNodesTabsProps) => (
     <div className="mt-2 w-full px-3">
         <Tabs
-            defaultValue={hideActionComponents ? 'triggers' : 'actions'}
             className="w-full"
+            defaultValue={hideActionComponents ? 'triggers' : 'actions'}
         >
             <TabsList className="flex w-full justify-between">
                 {!hideTriggerComponents && (
-                    <TabsTrigger value="triggers" className="w-full">
+                    <TabsTrigger className="w-full" value="triggers">
                         Triggers
                     </TabsTrigger>
                 )}
 
                 {!hideActionComponents && (
-                    <TabsTrigger value="actions" className="w-full">
+                    <TabsTrigger className="w-full" value="actions">
                         Actions
                     </TabsTrigger>
                 )}
 
                 {!hideTaskDispatchers && (
-                    <TabsTrigger value="taskDispatchers" className="w-full">
+                    <TabsTrigger className="w-full" value="taskDispatchers">
                         Flows
                     </TabsTrigger>
                 )}
@@ -103,7 +103,7 @@ const WorkflowNodesTabs = ({
 
             {!hideTriggerComponents && (
                 <TabsContent value="triggers">
-                    <ul role="list" className="mb-2">
+                    <ul className="mb-2" role="list">
                         {triggerComponentDefinitions.length ? (
                             triggerComponentDefinitions.map(
                                 (
@@ -131,7 +131,7 @@ const WorkflowNodesTabs = ({
 
             {!hideActionComponents && (
                 <TabsContent value="actions">
-                    <ul role="list" className="mb-2">
+                    <ul className="mb-2" role="list">
                         {actionComponentDefinitions.length ? (
                             actionComponentDefinitions.map(
                                 (
@@ -159,7 +159,7 @@ const WorkflowNodesTabs = ({
 
             {!hideTaskDispatchers && (
                 <TabsContent value="taskDispatchers">
-                    <ul role="list" className="mb-2">
+                    <ul className="mb-2" role="list">
                         {taskDispatcherDefinitions.length ? (
                             taskDispatcherDefinitions.map(
                                 (
