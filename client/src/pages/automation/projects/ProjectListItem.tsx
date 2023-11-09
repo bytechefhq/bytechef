@@ -65,7 +65,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
         useCreateProjectWorkflowRequestMutation({
             onSuccess: (workflow) => {
                 navigate(
-                    `/automation/projects/${project.id}/workflow/${workflow?.id}`
+                    `/automation/projects/${project.id}/workflows/${workflow?.id}`
                 );
 
                 setShowWorkflowDialog(false);
@@ -100,7 +100,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                     <div className="flex items-center justify-between">
                         <div className="relative flex items-center">
                             <Link
-                                to={`/automation/projects/${project?.id}/workflow/${project?.workflowIds![0]}`}
+                                to={`/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`}
                             >
                                 {project.description ? (
                                     <HoverCard>

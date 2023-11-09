@@ -42,7 +42,7 @@ export const router = createBrowserRouter([
                                         id: parseInt(params.projectId!),
                                     })
                             ),
-                        path: 'projects/:projectId/workflow/:workflowId',
+                        path: 'projects/:projectId/workflows/:workflowId',
                     },
                     {
                         element: <Projects />,

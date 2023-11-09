@@ -86,7 +86,7 @@ const ProjectWorkflowListItem = ({
             <div className="w-10/12">
                 <Link
                     className="flex items-center"
-                    to={`/automation/projects/${project.id}/workflow/${workflow.id}`}
+                    to={`/automation/projects/${project.id}/workflows/${workflow.id}`}
                 >
                     <div className="w-6/12 text-sm font-semibold">
                         {workflow.label}

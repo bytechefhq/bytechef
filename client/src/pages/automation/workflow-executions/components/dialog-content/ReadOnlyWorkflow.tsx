@@ -32,7 +32,7 @@ const ReadOnlyWorkflow = ({
                     className="ml-4"
                     onClick={() =>
                         navigate(
-                            `/automation/projects/${project?.id}/workflow/${workflow?.id}`
+                            `/automation/projects/${project?.id}/workflows/${workflow?.id}`
                         )
                     }
                     size="sm"
