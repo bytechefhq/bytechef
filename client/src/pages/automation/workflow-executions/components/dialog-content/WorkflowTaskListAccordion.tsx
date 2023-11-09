@@ -77,8 +77,8 @@ const WorkflowTaskListAccordion = ({
 
                                     {input && typeof input === 'object' ? (
                                         <ReactJson
-                                            src={input as object}
                                             enableClipboard={false}
+                                            src={input as object}
                                         />
                                     ) : (
                                         <pre className="mt-2 text-xs">
@@ -102,8 +102,8 @@ const WorkflowTaskListAccordion = ({
                                         {output &&
                                         typeof output === 'object' ? (
                                             <ReactJson
-                                                src={output as object}
                                                 enableClipboard={false}
+                                                src={output as object}
                                             />
                                         ) : (
                                             <pre className="mt-2 text-xs">

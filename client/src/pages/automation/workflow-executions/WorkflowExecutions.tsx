@@ -68,11 +68,11 @@ const DatePicker = ({
             <Popover>
                 <PopoverTrigger asChild className="mt-1">
                     <Button
-                        variant={'outline'}
                         className={cn(
                             'w-full justify-start text-left font-normal',
                             !date && 'text-muted-foreground'
                         )}
+                        variant={'outline'}
                     >
                         <CalendarIcon className="mr-2 h-4 w-4" />
 
@@ -80,15 +80,15 @@ const DatePicker = ({
                     </Button>
                 </PopoverTrigger>
 
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent align="start" className="w-auto p-0">
                     <Calendar
+                        initialFocus
                         mode="single"
-                        selected={date}
                         onSelect={(date) => {
                             setDate(date);
                             onChange(date);
                         }}
-                        initialFocus
+                        selected={date}
                     />
                 </PopoverContent>
             </Popover>
@@ -164,13 +164,13 @@ const WorkflowExecutions = () => {
                     WorkflowExecutionsPage.content.length > 0 && (
                         <PageFooter position="main">
                             <Pagination
+                                onClick={setFilterPageNumber}
                                 pageNumber={WorkflowExecutionsPage.number!}
                                 pageSize={WorkflowExecutionsPage.size!}
                                 totalElements={
                                     WorkflowExecutionsPage.totalElements!
                                 }
                                 totalPages={WorkflowExecutionsPage.totalPages!}
-                                onClick={setFilterPageNumber}
                             />
                         </PageFooter>
                     )
@@ -188,9 +188,9 @@ const WorkflowExecutions = () => {
 
                         <div className="px-4">
                             <ComboBox
-                                name="jobStatus"
                                 items={jobStatusOptions}
                                 label="Status"
+                                name="jobStatus"
                                 onChange={(item?: ComboBoxItem) => {
                                     if (item) {
                                         setFilterStatus(

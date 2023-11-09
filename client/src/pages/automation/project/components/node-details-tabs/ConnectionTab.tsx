@@ -45,8 +45,8 @@ const ConnectionTab = ({
                     />
 
                     <Button
-                        displayType="secondary"
                         className="mt-auto p-2"
+                        displayType="secondary"
                         icon={<PlusIcon className="h-5 w-5" />}
                         onClick={() => setShowEditConnectionDialog(true)}
                         title="Create a new connection"
@@ -65,8 +65,8 @@ const ConnectionTab = ({
                             />
                         }
                         icon={<LinkIcon className="h-6 w-6 text-gray-400" />}
-                        title="No Connections"
                         message="You have not created any connections for this component yet."
+                        title="No Connections"
                     />
                 </div>
             )}
@@ -95,9 +95,9 @@ const ConnectionTab = ({
             {showEditConnectionDialog && (
                 <ConnectionDialog
                     componentDefinition={componentDefinition}
+                    onClose={() => setShowEditConnectionDialog(false)}
                     showTrigger={false}
                     visible
-                    onClose={() => setShowEditConnectionDialog(false)}
                 />
             )}
         </div>
