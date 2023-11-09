@@ -2,7 +2,7 @@ package com.bytechef.helios.execution.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.helios.execution.web.rest.model.TaskConnectionModel;
+import com.bytechef.helios.execution.web.rest.model.TestConnectionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,23 +27,23 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TestParameters", description = "Defines parameters used to test a workflow.")
 @JsonTypeName("TestParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-09T12:05:32.884690+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-10T13:27:34.788965+01:00[Europe/Zagreb]")
 public class TestParametersModel {
 
   @Valid
-  private List<@Valid TaskConnectionModel> connections;
+  private List<@Valid TestConnectionModel> connections;
 
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
   private String workflowId;
 
-  public TestParametersModel connections(List<@Valid TaskConnectionModel> connections) {
+  public TestParametersModel connections(List<@Valid TestConnectionModel> connections) {
     this.connections = connections;
     return this;
   }
 
-  public TestParametersModel addConnectionsItem(TaskConnectionModel connectionsItem) {
+  public TestParametersModel addConnectionsItem(TestConnectionModel connectionsItem) {
     if (this.connections == null) {
       this.connections = new ArrayList<>();
     }
@@ -58,11 +58,11 @@ public class TestParametersModel {
   @Valid 
   @Schema(name = "connections", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
-  public List<@Valid TaskConnectionModel> getConnections() {
+  public List<@Valid TestConnectionModel> getConnections() {
     return connections;
   }
 
-  public void setConnections(List<@Valid TaskConnectionModel> connections) {
+  public void setConnections(List<@Valid TestConnectionModel> connections) {
     this.connections = connections;
   }
 

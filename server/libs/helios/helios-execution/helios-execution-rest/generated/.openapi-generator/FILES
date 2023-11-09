@@ -14,6 +14,7 @@ src/main/java/com/bytechef/helios/execution/web/rest/model/JobParametersModel.ja
 src/main/java/com/bytechef/helios/execution/web/rest/model/TagModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/TaskConnectionModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/TaskExecutionModel.java
+src/main/java/com/bytechef/helios/execution/web/rest/model/TestConnectionModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/TestParametersModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/TriggerExecutionModel.java
 src/main/java/com/bytechef/helios/execution/web/rest/model/WebhookModel.java

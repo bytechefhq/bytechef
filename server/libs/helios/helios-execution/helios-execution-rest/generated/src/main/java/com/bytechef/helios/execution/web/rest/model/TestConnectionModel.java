@@ -19,18 +19,18 @@ import jakarta.annotation.Generated;
  * The connection used in a particular task.
  */
 
-@Schema(name = "TaskConnection", description = "The connection used in a particular task.")
-@JsonTypeName("TaskConnection")
+@Schema(name = "TestConnection", description = "The connection used in a particular task.")
+@JsonTypeName("TestConnection")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-10T13:27:34.788965+01:00[Europe/Zagreb]")
-public class TaskConnectionModel {
+public class TestConnectionModel {
 
   private Long id;
 
   private String key;
 
-  private String taskName;
+  private String operationName;
 
-  public TaskConnectionModel id(Long id) {
+  public TestConnectionModel id(Long id) {
     this.id = id;
     return this;
   }
@@ -50,7 +50,7 @@ public class TaskConnectionModel {
     this.id = id;
   }
 
-  public TaskConnectionModel key(String key) {
+  public TestConnectionModel key(String key) {
     this.key = key;
     return this;
   }
@@ -70,24 +70,24 @@ public class TaskConnectionModel {
     this.key = key;
   }
 
-  public TaskConnectionModel taskName(String taskName) {
-    this.taskName = taskName;
+  public TestConnectionModel operationName(String operationName) {
+    this.operationName = operationName;
     return this;
   }
 
   /**
-   * The task name to which a connection belongs.
-   * @return taskName
+   * The operation(task/trigger) name to which a connection belongs.
+   * @return operationName
   */
   
-  @Schema(name = "taskName", description = "The task name to which a connection belongs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("taskName")
-  public String getTaskName() {
-    return taskName;
+  @Schema(name = "operationName", description = "The operation(task/trigger) name to which a connection belongs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("operationName")
+  public String getOperationName() {
+    return operationName;
   }
 
-  public void setTaskName(String taskName) {
-    this.taskName = taskName;
+  public void setOperationName(String operationName) {
+    this.operationName = operationName;
   }
 
   @Override
@@ -98,24 +98,24 @@ public class TaskConnectionModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TaskConnectionModel taskConnection = (TaskConnectionModel) o;
-    return Objects.equals(this.id, taskConnection.id) &&
-        Objects.equals(this.key, taskConnection.key) &&
-        Objects.equals(this.taskName, taskConnection.taskName);
+    TestConnectionModel testConnection = (TestConnectionModel) o;
+    return Objects.equals(this.id, testConnection.id) &&
+        Objects.equals(this.key, testConnection.key) &&
+        Objects.equals(this.operationName, testConnection.operationName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, key, taskName);
+    return Objects.hash(id, key, operationName);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class TaskConnectionModel {\n");
+    sb.append("class TestConnectionModel {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
-    sb.append("    taskName: ").append(toIndentedString(taskName)).append("\n");
+    sb.append("    operationName: ").append(toIndentedString(operationName)).append("\n");
     sb.append("}");
     return sb.toString();
   }
