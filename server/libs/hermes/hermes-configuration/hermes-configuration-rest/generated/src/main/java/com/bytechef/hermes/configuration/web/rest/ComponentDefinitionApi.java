@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-02T11:55:59.714736+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-09T06:57:32.183101+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "component-definition", description = "The Core Component Definition API")
 public interface ComponentDefinitionApi {
@@ -113,7 +113,7 @@ public interface ComponentDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"category\" : \"category\", \"title\" : \"title\", \"tags\" : [ \"tags\", \"tags\" ] }, { \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"category\" : \"category\", \"title\" : \"title\", \"tags\" : [ \"tags\", \"tags\" ] } ]";
+                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"category\" : \"category\", \"title\" : \"title\", \"tags\" : [ \"tags\", \"tags\" ], \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"category\" : \"category\", \"title\" : \"title\", \"tags\" : [ \"tags\", \"tags\" ], \"triggersCount\" : 6 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -159,7 +159,7 @@ public interface ComponentDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"category\" : \"category\", \"title\" : \"title\", \"tags\" : [ \"tags\", \"tags\" ] }, { \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"category\" : \"category\", \"title\" : \"title\", \"tags\" : [ \"tags\", \"tags\" ] } ]";
+                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"category\" : \"category\", \"title\" : \"title\", \"tags\" : [ \"tags\", \"tags\" ], \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"category\" : \"category\", \"title\" : \"title\", \"tags\" : [ \"tags\", \"tags\" ], \"triggersCount\" : 6 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

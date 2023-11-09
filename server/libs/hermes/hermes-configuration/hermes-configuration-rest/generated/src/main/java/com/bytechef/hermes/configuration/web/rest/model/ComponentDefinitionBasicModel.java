@@ -25,8 +25,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-02T11:55:59.714736+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-09T06:57:32.183101+01:00[Europe/Zagreb]")
 public class ComponentDefinitionBasicModel {
+
+  private Integer actionsCount;
 
   private String category;
 
@@ -43,6 +45,8 @@ public class ComponentDefinitionBasicModel {
 
   private String title;
 
+  private Integer triggersCount;
+
   public ComponentDefinitionBasicModel() {
     super();
   }
@@ -52,6 +56,26 @@ public class ComponentDefinitionBasicModel {
    */
   public ComponentDefinitionBasicModel(String name) {
     this.name = name;
+  }
+
+  public ComponentDefinitionBasicModel actionsCount(Integer actionsCount) {
+    this.actionsCount = actionsCount;
+    return this;
+  }
+
+  /**
+   * Get actionsCount
+   * @return actionsCount
+  */
+  
+  @Schema(name = "actionsCount", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("actionsCount")
+  public Integer getActionsCount() {
+    return actionsCount;
+  }
+
+  public void setActionsCount(Integer actionsCount) {
+    this.actionsCount = actionsCount;
   }
 
   public ComponentDefinitionBasicModel category(String category) {
@@ -202,6 +226,26 @@ public class ComponentDefinitionBasicModel {
     this.title = title;
   }
 
+  public ComponentDefinitionBasicModel triggersCount(Integer triggersCount) {
+    this.triggersCount = triggersCount;
+    return this;
+  }
+
+  /**
+   * Get triggersCount
+   * @return triggersCount
+  */
+  
+  @Schema(name = "triggersCount", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("triggersCount")
+  public Integer getTriggersCount() {
+    return triggersCount;
+  }
+
+  public void setTriggersCount(Integer triggersCount) {
+    this.triggersCount = triggersCount;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -211,24 +255,27 @@ public class ComponentDefinitionBasicModel {
       return false;
     }
     ComponentDefinitionBasicModel componentDefinitionBasic = (ComponentDefinitionBasicModel) o;
-    return Objects.equals(this.category, componentDefinitionBasic.category) &&
+    return Objects.equals(this.actionsCount, componentDefinitionBasic.actionsCount) &&
+        Objects.equals(this.category, componentDefinitionBasic.category) &&
         Objects.equals(this.description, componentDefinitionBasic.description) &&
         Objects.equals(this.icon, componentDefinitionBasic.icon) &&
         Objects.equals(this.name, componentDefinitionBasic.name) &&
         Objects.equals(this.resources, componentDefinitionBasic.resources) &&
         Objects.equals(this.tags, componentDefinitionBasic.tags) &&
-        Objects.equals(this.title, componentDefinitionBasic.title);
+        Objects.equals(this.title, componentDefinitionBasic.title) &&
+        Objects.equals(this.triggersCount, componentDefinitionBasic.triggersCount);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(category, description, icon, name, resources, tags, title);
+    return Objects.hash(actionsCount, category, description, icon, name, resources, tags, title, triggersCount);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ComponentDefinitionBasicModel {\n");
+    sb.append("    actionsCount: ").append(toIndentedString(actionsCount)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
@@ -236,6 +283,7 @@ public class ComponentDefinitionBasicModel {
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    triggersCount: ").append(toIndentedString(triggersCount)).append("\n");
     sb.append("}");
     return sb.toString();
   }
