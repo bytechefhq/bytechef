@@ -10,7 +10,7 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
 import TextArea from 'components/TextArea/TextArea';
 import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
-import {ChangeEvent, useRef, useState} from 'react';
+import {ChangeEvent, useEffect, useRef, useState} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import {TYPE_ICONS} from 'shared/typeIcons';
@@ -40,7 +40,7 @@ interface PropertyProps {
     dataPills?: DataPillType[];
     defaultValue?: string;
     formState?: FormState<FieldValues>;
-    mention?: boolean;
+    mention: boolean;
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     path?: string;
     property: PropertyType;
@@ -60,8 +60,12 @@ const Property = ({
     property,
     register,
 }: PropertyProps) => {
-    const [mentionInput, setMentionInput] = useState(mention);
+    const [mentionInput, setMentionInput] = useState(true);
     const [integerValue, setIntegerValue] = useState('');
+
+    useEffect(() => {
+        setMentionInput(mention);
+    }, [mention]);
 
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
