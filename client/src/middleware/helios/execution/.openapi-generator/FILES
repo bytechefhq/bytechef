@@ -21,6 +21,7 @@ models/ProjectModel.ts
 models/TagModel.ts
 models/TaskConnectionModel.ts
 models/TaskExecutionModel.ts
+models/TestConnectionModel.ts
 models/TestParametersModel.ts
 models/TriggerExecutionModel.ts
 models/WebhookModel.ts

@@ -18,6 +18,7 @@ export * from './ProjectModel';
 export * from './TagModel';
 export * from './TaskConnectionModel';
 export * from './TaskExecutionModel';
+export * from './TestConnectionModel';
 export * from './TestParametersModel';
 export * from './TriggerExecutionModel';
 export * from './WebhookModel';
