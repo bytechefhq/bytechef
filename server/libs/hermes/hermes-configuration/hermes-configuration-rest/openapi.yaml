@@ -1103,6 +1103,9 @@ components:
       required:
       - "name"
       properties:
+        actionsCount:
+          default: "The number of actions a component has"
+          type: "integer"
         category:
           description: "The category."
           type: "string"
@@ -1125,6 +1128,9 @@ components:
         title:
           description: "The title"
           type: "string"
+        triggersCount:
+          default: "The number of triggers a component has"
+          type: "integer"
     ComponentOperationRequest:
       type: "object"
       required:
