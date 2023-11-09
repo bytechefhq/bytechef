@@ -29,12 +29,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerExecution", description = "Adds execution semantics to a trigger.")
 @JsonTypeName("TriggerExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-08T14:03:36.313920+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-09T12:05:32.884690+01:00[Europe/Zagreb]")
 public class TriggerExecutionModel {
 
   private Boolean batch;
 
-  private ComponentDefinitionModel componentDefinition;
+  private ComponentDefinitionModel component;
 
   private String createdBy;
 
@@ -155,24 +155,24 @@ public class TriggerExecutionModel {
     this.batch = batch;
   }
 
-  public TriggerExecutionModel componentDefinition(ComponentDefinitionModel componentDefinition) {
-    this.componentDefinition = componentDefinition;
+  public TriggerExecutionModel component(ComponentDefinitionModel component) {
+    this.component = component;
     return this;
   }
 
   /**
-   * Get componentDefinition
-   * @return componentDefinition
+   * Get component
+   * @return component
   */
   @Valid 
-  @Schema(name = "componentDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("componentDefinition")
-  public ComponentDefinitionModel getComponentDefinition() {
-    return componentDefinition;
+  @Schema(name = "component", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("component")
+  public ComponentDefinitionModel getComponent() {
+    return component;
   }
 
-  public void setComponentDefinition(ComponentDefinitionModel componentDefinition) {
-    this.componentDefinition = componentDefinition;
+  public void setComponent(ComponentDefinitionModel component) {
+    this.component = component;
   }
 
   public TriggerExecutionModel createdBy(String createdBy) {
@@ -593,7 +593,7 @@ public class TriggerExecutionModel {
     }
     TriggerExecutionModel triggerExecution = (TriggerExecutionModel) o;
     return Objects.equals(this.batch, triggerExecution.batch) &&
-        Objects.equals(this.componentDefinition, triggerExecution.componentDefinition) &&
+        Objects.equals(this.component, triggerExecution.component) &&
         Objects.equals(this.createdBy, triggerExecution.createdBy) &&
         Objects.equals(this.createdDate, triggerExecution.createdDate) &&
         Objects.equals(this.endDate, triggerExecution.endDate) &&
@@ -618,7 +618,7 @@ public class TriggerExecutionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(batch, componentDefinition, createdBy, createdDate, endDate, error, executionTime, id, input, lastModifiedBy, lastModifiedDate, maxRetries, output, priority, retryAttempts, retryDelay, retryDelayFactor, retryDelayMillis, startDate, status, workflowTrigger, type);
+    return Objects.hash(batch, component, createdBy, createdDate, endDate, error, executionTime, id, input, lastModifiedBy, lastModifiedDate, maxRetries, output, priority, retryAttempts, retryDelay, retryDelayFactor, retryDelayMillis, startDate, status, workflowTrigger, type);
   }
 
   @Override
@@ -626,7 +626,7 @@ public class TriggerExecutionModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class TriggerExecutionModel {\n");
     sb.append("    batch: ").append(toIndentedString(batch)).append("\n");
-    sb.append("    componentDefinition: ").append(toIndentedString(componentDefinition)).append("\n");
+    sb.append("    component: ").append(toIndentedString(component)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");

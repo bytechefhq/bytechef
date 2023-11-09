@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DynamicPropertiesProperty", description = "A dynamic properties property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-02T11:55:59.714736+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-09T06:57:32.183101+01:00[Europe/Zagreb]")
 public class DynamicPropertiesPropertyModel extends PropertyModel {
 
   private PropertiesDataSourceModel propertiesDataSource;

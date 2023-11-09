@@ -28,10 +28,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-08T14:03:36.313920+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-09T12:05:32.884690+01:00[Europe/Zagreb]")
 public class TaskExecutionModel {
 
-  private ComponentDefinitionModel componentDefinition;
+  private ComponentDefinitionModel component;
 
   private String createdBy;
 
@@ -141,24 +141,24 @@ public class TaskExecutionModel {
     this.status = status;
   }
 
-  public TaskExecutionModel componentDefinition(ComponentDefinitionModel componentDefinition) {
-    this.componentDefinition = componentDefinition;
+  public TaskExecutionModel component(ComponentDefinitionModel component) {
+    this.component = component;
     return this;
   }
 
   /**
-   * Get componentDefinition
-   * @return componentDefinition
+   * Get component
+   * @return component
   */
   @Valid 
-  @Schema(name = "componentDefinition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("componentDefinition")
-  public ComponentDefinitionModel getComponentDefinition() {
-    return componentDefinition;
+  @Schema(name = "component", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("component")
+  public ComponentDefinitionModel getComponent() {
+    return component;
   }
 
-  public void setComponentDefinition(ComponentDefinitionModel componentDefinition) {
-    this.componentDefinition = componentDefinition;
+  public void setComponent(ComponentDefinitionModel component) {
+    this.component = component;
   }
 
   public TaskExecutionModel createdBy(String createdBy) {
@@ -658,7 +658,7 @@ public class TaskExecutionModel {
       return false;
     }
     TaskExecutionModel taskExecution = (TaskExecutionModel) o;
-    return Objects.equals(this.componentDefinition, taskExecution.componentDefinition) &&
+    return Objects.equals(this.component, taskExecution.component) &&
         Objects.equals(this.createdBy, taskExecution.createdBy) &&
         Objects.equals(this.createdDate, taskExecution.createdDate) &&
         Objects.equals(this.endDate, taskExecution.endDate) &&
@@ -687,14 +687,14 @@ public class TaskExecutionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentDefinition, createdBy, createdDate, endDate, error, executionTime, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, retryDelayMillis, workflowTask, type);
+    return Objects.hash(component, createdBy, createdDate, endDate, error, executionTime, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, retryDelayMillis, workflowTask, type);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TaskExecutionModel {\n");
-    sb.append("    componentDefinition: ").append(toIndentedString(componentDefinition)).append("\n");
+    sb.append("    component: ").append(toIndentedString(component)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");
