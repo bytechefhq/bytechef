@@ -22,6 +22,11 @@ const WorkflowTaskListAccordion = ({
                 const {endDate, id, input, output, startDate, workflowTask} =
                     taskExecution;
 
+                const duration =
+                    startDate &&
+                    endDate &&
+                    Math.round(endDate?.getTime() - startDate.getTime());
+
                 return (
                     workflowTask?.label && (
                         <AccordionItem key={id} value={id || ''}>
@@ -38,15 +43,9 @@ const WorkflowTaskListAccordion = ({
                                 </div>
 
                                 <div className="flex items-center">
-                                    {startDate && endDate && (
-                                        <span className="ml-auto mr-2 text-xs">
-                                            {Math.round(
-                                                endDate?.getTime() -
-                                                    startDate.getTime()
-                                            )}
-                                            ms
-                                        </span>
-                                    )}
+                                    <span className="ml-auto mr-2 text-xs">
+                                        {duration}ms
+                                    </span>
 
                                     <CheckCircledIcon
                                         className={twMerge(

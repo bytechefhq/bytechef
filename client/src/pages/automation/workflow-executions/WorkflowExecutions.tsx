@@ -1,4 +1,4 @@
-import ComboBox, {ComboBoxItem} from '@/components/CombBox';
+import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
 import EmptyList from '@/components/EmptyList/EmptyList';
 import PageLoader from '@/components/PageLoader/PageLoader';
 import Pagination from '@/components/Pagination/Pagination';
@@ -10,6 +10,7 @@ import LayoutContainer from '@/layouts/LayoutContainer';
 import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
 import {cn} from '@/lib/utils';
+import {ProjectModel} from '@/middleware/helios/configuration';
 import {
     useGetWorkflowExecutionsQuery,
     useGetWorkflowsQuery,
@@ -95,6 +96,16 @@ const DatePicker = ({
         </fieldset>
     );
 };
+
+const ProjectLabel = ({project}: {project: ProjectModel}) => (
+    <div className="flex items-center">
+        <span className="mr-1 ">{project.name}</span>
+
+        <span className="text-xs text-gray-500">
+            {project?.tags?.map((tag) => tag.name).join(', ')}
+        </span>
+    </div>
+);
 
 const WorkflowExecutions = () => {
     const [filterStatus, setFilterStatus] =
@@ -191,7 +202,7 @@ const WorkflowExecutions = () => {
                                 items={jobStatusOptions}
                                 label="Status"
                                 name="jobStatus"
-                                onChange={(item?: ComboBoxItem) => {
+                                onChange={(item?: ComboBoxItemType) => {
                                     if (item) {
                                         setFilterStatus(
                                             item.value as GetWorkflowExecutionsJobStatusEnum
@@ -217,17 +228,7 @@ const WorkflowExecutions = () => {
                                 <ComboBox
                                     items={projects?.map((project) => ({
                                         label: (
-                                            <span className="flex items-center">
-                                                <span className="mr-1 ">
-                                                    {project.name}
-                                                </span>
-
-                                                <span className="text-xs text-gray-500">
-                                                    {project?.tags
-                                                        ?.map((tag) => tag.name)
-                                                        .join(', ')}
-                                                </span>
-                                            </span>
+                                            <ProjectLabel project={project} />
                                         ),
                                         value: project.id,
                                     }))}
@@ -293,7 +294,7 @@ const WorkflowExecutions = () => {
                                         value: workflow.id,
                                     }))}
                                     label="Workflow"
-                                    maxHeight={true}
+                                    maxHeight
                                     name="workflow"
                                     onChange={(value) => {
                                         if (value) {
