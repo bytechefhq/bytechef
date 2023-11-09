@@ -64,7 +64,9 @@ const Property = ({
     const [integerValue, setIntegerValue] = useState('');
 
     useEffect(() => {
-        setMentionInput(mention);
+        if (mention !== undefined) {
+            setMentionInput(mention);
+        }
     }, [mention]);
 
     const editorRef = useRef<ReactQuill>(null);
@@ -116,7 +118,11 @@ const Property = ({
         !!dataPills?.length;
 
     const showInputTypeSwitchButton =
-        type !== 'OBJECT' && type !== 'ARRAY' && !!dataPills?.length && !!name;
+        type !== 'OBJECT' &&
+        type !== 'ARRAY' &&
+        type !== 'STRING' &&
+        !!dataPills?.length &&
+        !!name;
 
     if (!name) {
         return <></>;
