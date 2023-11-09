@@ -65,7 +65,7 @@ import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 import PageLoader from '../../../components/PageLoader/PageLoader';
 import LayoutContainer from '../../../layouts/LayoutContainer';
 import WorkflowEditor from './ProjectWorkflow';
-import ComponentSidebar from './components/ComponentSidebar';
+import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
 
 const Project = () => {
@@ -236,7 +236,11 @@ const Project = () => {
 
     return (
         <PageLoader
-            errors={[componentsError, taskDispatcherDefinitionsError, projectWorkflowsError]}
+            errors={[
+                componentsError,
+                taskDispatcherDefinitionsError,
+                projectWorkflowsError,
+            ]}
             loading={
                 componentsLoading ||
                 taskDispatcherDefinitionsLoading ||
@@ -574,12 +578,18 @@ const Project = () => {
                 leftSidebarWidth="96"
                 rightSidebarBody={
                     <>
-                        {componentDefinitions && !!taskDispatcherDefinitions && (
-                            <ComponentSidebar
-                                data={{componentDefinitions: componentDefinitions, taskDispatcherDefinitions: taskDispatcherDefinitions}}
-                                filter={filter}
-                            />
-                        )}
+                        {componentDefinitions &&
+                            !!taskDispatcherDefinitions && (
+                                <WorkflowNodesSidebar
+                                    data={{
+                                        componentDefinitions:
+                                            componentDefinitions,
+                                        taskDispatcherDefinitions:
+                                            taskDispatcherDefinitions,
+                                    }}
+                                    filter={filter}
+                                />
+                            )}
                     </>
                 }
                 rightSidebarHeader={

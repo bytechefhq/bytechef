@@ -58,7 +58,7 @@ type CurrentComponentType =
       } & ComponentDefinitionModel)
     | undefined;
 
-const NodeDetailsPanel = ({
+const WorkflowNodeDetailsPanel = ({
     componentDefinitions,
 }: {
     componentDefinitions: Array<ComponentDefinitionBasicModel>;
@@ -125,7 +125,7 @@ const NodeDetailsPanel = ({
     );
 
     const componentDefinitionNames = componentDefinitions.map(
-        (component) => component.name
+        (componentDefinition) => componentDefinition.name
     );
 
     const taskTypes = componentActions?.map(
@@ -160,7 +160,7 @@ const NodeDetailsPanel = ({
     );
 
     const previousComponentProperties = previousComponents?.map(
-        (component, index) => {
+        (componentDefinition, index) => {
             if (!actionData?.length) {
                 return;
             }
@@ -173,7 +173,7 @@ const NodeDetailsPanel = ({
                 : outputSchema?.items;
 
             return {
-                component,
+                componentDefinition,
                 properties,
             };
         }
@@ -207,18 +207,22 @@ const NodeDetailsPanel = ({
             (property) => {
                 if (property.properties) {
                     return getSubProperties({
-                        component: componentProperty.component!,
+                        componentDefinition:
+                            componentProperty.componentDefinition!,
                         properties: property.properties,
                     });
                 } else if (property.items) {
                     return getSubProperties({
-                        component: componentProperty.component!,
+                        componentDefinition:
+                            componentProperty.componentDefinition!,
                         properties: property.items,
                     });
                 }
 
                 return {
-                    component: JSON.stringify(componentProperty.component),
+                    componentDefinition: JSON.stringify(
+                        componentProperty.componentDefinition
+                    ),
                     id: property.name,
                     value: property.label || property.name,
                 };
@@ -497,7 +501,9 @@ const NodeDetailsPanel = ({
                                     <div className="absolute left-0 top-0 h-full w-full">
                                         {activeTab === 'description' && (
                                             <DescriptionTab
-                                                component={currentComponent}
+                                                componentDefinition={
+                                                    currentComponent
+                                                }
                                                 currentComponentData={
                                                     currentComponentData
                                                 }
@@ -576,4 +582,4 @@ const NodeDetailsPanel = ({
     );
 };
 
-export default NodeDetailsPanel;
+export default WorkflowNodeDetailsPanel;

@@ -1,5 +1,6 @@
-import Button from 'components/Button/Button';
-import {TrashIcon} from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import WorkflowNodesPopoverMenu from '@/pages/automation/project/components/WorkflowNodesPopoverMenu';
+import {PencilIcon, TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
 import {
     Handle,
@@ -23,7 +24,9 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     const {getEdges, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
-    const handleDeleteNodeClick = () => {
+    const isSelected = currentNode.name === data.name;
+
+    const handleDeleteActionNodeClick = () => {
         const nodes = getNodes();
         const node = getNode(id);
 
@@ -66,47 +69,52 @@ const WorkflowNode = ({data, id}: NodeProps) => {
         }
     };
 
-    const nodes = getNodes();
-
-    let isFirstNode;
-
-    if (nodes[0].id === id) {
-        isFirstNode = true;
-    }
-
-    const isSelected = currentNode.name === data.name;
-
     return (
         <div
             className="relative flex min-w-[240px] cursor-pointer items-center justify-center"
             onMouseOut={() => setIsHovered(false)}
             onMouseOver={() => setIsHovered(true)}
         >
-            {!isFirstNode && !!isHovered && (
-                <div className="absolute left-[-46px] pr-4">
-                    {
+            {!!isHovered && (
+                <div className="absolute left-[80px] pr-4">
+                    {data.type === 'trigger' ? (
+                        <WorkflowNodesPopoverMenu
+                            id={id}
+                            hideActionComponents
+                            hideTaskDispatchers
+                        >
+                            <Button
+                                className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
+                                title="Edit a trigger"
+                                variant="outline"
+                            >
+                                <PencilIcon className="h-4 w-4" />
+                            </Button>
+                        </WorkflowNodesPopoverMenu>
+                    ) : (
                         <Button
                             className="bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
-                            displayType="icon"
-                            icon={<TrashIcon className="h-4 w-4" />}
-                            onClick={handleDeleteNodeClick}
+                            onClick={handleDeleteActionNodeClick}
                             title="Delete a node"
-                        />
-                    }
+                            variant="outline"
+                        >
+                            <TrashIcon className="h-4 w-4" />
+                        </Button>
+                    )}
                 </div>
             )}
 
             <Button
                 className={twMerge(
-                    'rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none',
+                    'h-18 w-18 rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none',
                     isSelected &&
                         nodeDetailsPanelOpen &&
                         'border-blue-300 bg-blue-100 shadow-none'
                 )}
-                displayType="icon"
-                icon={data.icon}
                 onClick={handleNodeClick}
-            />
+            >
+                {data.icon}
+            </Button>
 
             <div className="ml-2 flex w-full min-w-max flex-col items-start">
                 <span className="text-sm">{data.label}</span>

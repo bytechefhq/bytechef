@@ -25,13 +25,10 @@ const WorkflowTriggerAccordion = ({
                 <AccordionItem key={id} value={id || ''}>
                     <AccordionTrigger className="flex w-full items-center justify-between border-gray-100 bg-white px-2 py-3 data-[state=closed]:border-b">
                         <div className="flex items-center text-sm">
-                            {triggerExecution?.componentDefinition?.icon && (
+                            {triggerExecution?.component?.icon && (
                                 <InlineSVG
                                     className="mr-1 h-6 w-6"
-                                    src={
-                                        triggerExecution?.componentDefinition
-                                            ?.icon
-                                    }
+                                    src={triggerExecution?.component?.icon}
                                 />
                             )}
 

@@ -4,9 +4,9 @@ import {
 } from '@/middleware/hermes/configuration';
 import {useEffect, useState} from 'react';
 
-import WorkflowNodesList from './WorkflowNodesList';
+import WorkflowNodesTabs from './WorkflowNodesTabs';
 
-interface ComponentSidebarProps {
+interface WorkflowNodesSidebarProps {
     data: {
         componentDefinitions: Array<ComponentDefinitionBasicModel>;
         taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
@@ -14,21 +14,25 @@ interface ComponentSidebarProps {
     filter: string;
 }
 
-const ComponentSidebar = ({data, filter}: ComponentSidebarProps) => {
-    const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
-        Array<ComponentDefinitionBasicModel>
-    >([]);
-    const [filteredTaskDispatcherDefinitions, setFilteredTaskDispatcherDefinitions] = useState<
-        Array<TaskDispatcherDefinitionModel>
-    >([]);
-    const [filteredTriggerComponentDefinitions, setFilteredTriggerComponentDefinitions] = useState<
-        Array<ComponentDefinitionBasicModel>
-    >([]);
+const WorkflowNodesSidebar = ({data, filter}: WorkflowNodesSidebarProps) => {
+    const [
+        filteredActionComponentDefinitions,
+        setFilteredActionComponentDefinitions,
+    ] = useState<Array<ComponentDefinitionBasicModel>>([]);
+    const [
+        filteredTaskDispatcherDefinitions,
+        setFilteredTaskDispatcherDefinitions,
+    ] = useState<Array<TaskDispatcherDefinitionModel>>([]);
+    const [
+        filteredTriggerComponentDefinitions,
+        setFilteredTriggerComponentDefinitions,
+    ] = useState<Array<ComponentDefinitionBasicModel>>([]);
 
     const {componentDefinitions, taskDispatcherDefinitions} = data;
 
     useEffect(() => {
         setFilteredActionComponentDefinitions(
+            componentDefinitions.filter(
                 (componentDefinition) =>
                     componentDefinition?.actionsCount &&
                     (componentDefinition.name
@@ -42,11 +46,11 @@ const ComponentSidebar = ({data, filter}: ComponentSidebarProps) => {
 
         setFilteredTaskDispatcherDefinitions(
             taskDispatcherDefinitions.filter(
-                (flowControl) =>
-                    flowControl.name
+                (taskDispatcherDefinition) =>
+                    taskDispatcherDefinition.name
                         ?.toLowerCase()
                         .includes(filter.toLowerCase()) ||
-                    flowControl?.title
+                    taskDispatcherDefinition?.title
                         ?.toLowerCase()
                         .includes(filter.toLowerCase())
             )
@@ -76,4 +80,4 @@ const ComponentSidebar = ({data, filter}: ComponentSidebarProps) => {
     );
 };
 
-export default ComponentSidebar;
+export default WorkflowNodesSidebar;

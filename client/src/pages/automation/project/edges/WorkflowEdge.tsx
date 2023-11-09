@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {EdgeProps, getBezierPath} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
-import PopoverMenu from '../components/PopoverMenu';
+import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
 
 export default function WorkflowEdge({
     id,
@@ -29,20 +29,20 @@ export default function WorkflowEdge({
     return (
         <>
             <path
+                id={id}
+                style={style}
                 className="fill-none stroke-gray-400 stroke-1"
                 d={edgePath}
-                id={id}
                 markerEnd={markerEnd}
-                style={style}
             />
 
-            <PopoverMenu edge id={id}>
+            <WorkflowNodesPopoverMenu id={id} edge hideTriggerComponents>
                 <g
+                    transform={`translate(${edgeCenterX}, ${edgeCenterY})`}
+                    onDrop={() => setDropzoneActive(false)}
+                    onDragOver={(event) => event.preventDefault()}
                     onDragEnter={() => setDropzoneActive(true)}
                     onDragLeave={() => setDropzoneActive(false)}
-                    onDragOver={(event) => event.preventDefault()}
-                    onDrop={() => setDropzoneActive(false)}
-                    transform={`translate(${edgeCenterX}, ${edgeCenterY})`}
                 >
                     <rect
                         className={twMerge(
@@ -50,8 +50,8 @@ export default function WorkflowEdge({
                             isDropzoneActive &&
                                 'scale-150 fill-blue-100 stroke-blue-100 z-40'
                         )}
-                        height={isDropzoneActive ? 72 : 24}
                         id={id}
+                        height={isDropzoneActive ? 72 : 24}
                         rx={4}
                         ry={4}
                         width={isDropzoneActive ? 72 : 24}
@@ -63,13 +63,13 @@ export default function WorkflowEdge({
                         className={twMerge(
                             'pointer-events-none select-none fill-gray-500'
                         )}
-                        x={-5}
                         y={5}
+                        x={-5}
                     >
                         +
                     </text>
                 </g>
-            </PopoverMenu>
+            </WorkflowNodesPopoverMenu>
         </>
     );
 }
