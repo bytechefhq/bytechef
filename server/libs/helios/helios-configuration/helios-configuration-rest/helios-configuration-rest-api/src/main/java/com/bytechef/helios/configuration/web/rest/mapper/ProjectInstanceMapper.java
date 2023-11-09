@@ -16,11 +16,11 @@
 
 package com.bytechef.helios.configuration.web.rest.mapper;
 
-import com.bytechef.helios.configuration.domain.Project;
+import com.bytechef.helios.configuration.domain.ProjectInstance;
 import com.bytechef.helios.configuration.dto.ProjectInstanceDTO;
 import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
+import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel;
-import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
@@ -28,13 +28,34 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ProjectConfigurationMapperSpringConfig.class)
-public interface ProjectInstanceMapper extends Converter<ProjectInstanceDTO, ProjectInstanceModel> {
+public class ProjectInstanceMapper {
 
-    @Override
-    ProjectInstanceModel convert(ProjectInstanceDTO projectInstanceDTO);
+    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    public interface ProjectInstanceBasicToProjectInstanceModelMapper
+        extends Converter<ProjectInstance, ProjectInstanceBasicModel> {
 
-    @Mapping(target = "category", ignore = true)
-    @Mapping(target = "tags", ignore = true)
-    ProjectModel map(Project project);
+        @Mapping(target = "lastExecutionDate", ignore = true)
+        @Override
+        ProjectInstanceBasicModel convert(ProjectInstance projectInstanc);
+    }
+
+    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    public interface ProjectInstanceToProjectInstanceModelMapper
+        extends Converter<ProjectInstance, ProjectInstanceModel> {
+
+        @Mapping(target = "lastExecutionDate", ignore = true)
+        @Mapping(target = "project", ignore = true)
+        @Mapping(target = "projectInstanceWorkflows", ignore = true)
+        @Mapping(target = "tags", ignore = true)
+        @Override
+        ProjectInstanceModel convert(ProjectInstance projectInstance);
+    }
+
+    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    public interface ProjectInstanceDTOToProjectInstanceModelMapper
+        extends Converter<ProjectInstanceDTO, ProjectInstanceModel> {
+
+        @Override
+        ProjectInstanceModel convert(ProjectInstanceDTO projectInstanceDTO);
+    }
 }

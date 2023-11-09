@@ -18,22 +18,30 @@ package com.bytechef.helios.execution.web.rest.mapper;
 
 import com.bytechef.helios.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
+import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionModel;
-import java.util.Optional;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ProjectExecutionMapperSpringConfig.class)
-public interface ProjectWorkflowExecutionMapper
-    extends Converter<WorkflowExecutionDTO, WorkflowExecutionModel> {
+public class ProjectWorkflowExecutionMapper {
 
-    @Override
-    WorkflowExecutionModel convert(WorkflowExecutionDTO workflowExecutionDTO);
+    @Mapper(config = ProjectExecutionMapperSpringConfig.class)
+    public interface ProjectWorkflowExecutionDTOToWorkflowExecutionModelMapper
+        extends Converter<WorkflowExecutionDTO, WorkflowExecutionModel> {
 
-    default String map(Optional<String> optional) {
-        return optional.orElse(null);
+        @Override
+        WorkflowExecutionModel convert(WorkflowExecutionDTO workflowExecutionDTO);
     }
+
+    @Mapper(config = ProjectExecutionMapperSpringConfig.class)
+    public interface ProjectWorkflowExecutionDTOToWorkflowExecutionBasicModelMapper
+        extends Converter<WorkflowExecutionDTO, WorkflowExecutionBasicModel> {
+
+        @Override
+        WorkflowExecutionBasicModel convert(WorkflowExecutionDTO workflowExecutionDTO);
+    }
+
 }

@@ -16,14 +16,11 @@
 
 package com.bytechef.helios.execution.web.rest.mapper;
 
-import com.bytechef.helios.configuration.web.rest.model.WorkflowTriggerModel;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
 import com.bytechef.helios.execution.web.rest.model.TriggerExecutionModel;
-import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.dto.TriggerExecutionDTO;
 import java.util.Optional;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -34,9 +31,6 @@ public interface ProjectTriggerExecutionMapper extends Converter<TriggerExecutio
 
     @Override
     TriggerExecutionModel convert(TriggerExecutionDTO triggerExecutionDTO);
-
-    @Mapping(target = "connections", ignore = true)
-    WorkflowTriggerModel map(WorkflowTrigger workflowTrigger);
 
     default String map(Optional<String> optional) {
         return optional.orElse(null);

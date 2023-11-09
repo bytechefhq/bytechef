@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.web.rest.mapper;
+package com.bytechef.helios.configuration.web.rest.mapper;
 
-import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
-import com.bytechef.helios.execution.web.rest.model.TaskExecutionModel;
-import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
-import java.util.Optional;
+import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowTriggerModel;
+import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ProjectExecutionMapperSpringConfig.class)
-public interface ProjectTaskExecutionMapper extends Converter<TaskExecutionDTO, TaskExecutionModel> {
+@Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+public interface ProjectWorkflowTriggerMapper extends Converter<WorkflowTrigger, WorkflowTriggerModel> {
 
-    @Override
-    TaskExecutionModel convert(TaskExecutionDTO taskExecutionDTO);
-
-    default String map(Optional<String> optional) {
-        return optional.orElse(null);
-    }
+    @Mapping(target = "connections", ignore = true)
+    WorkflowTriggerModel convert(WorkflowTrigger workflowTrigger);
 }

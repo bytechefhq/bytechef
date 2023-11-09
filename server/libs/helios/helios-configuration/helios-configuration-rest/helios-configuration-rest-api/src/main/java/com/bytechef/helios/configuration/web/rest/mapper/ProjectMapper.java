@@ -16,18 +16,40 @@
 
 package com.bytechef.helios.configuration.web.rest.mapper;
 
+import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
+import com.bytechef.helios.configuration.web.rest.model.ProjectBasicModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ProjectConfigurationMapperSpringConfig.class)
-public interface ProjectMapper extends Converter<ProjectDTO, ProjectModel> {
+public class ProjectMapper {
 
-    @Override
-    ProjectModel convert(ProjectDTO projectDTO);
+    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    public interface ProjectToProjectBasicModelMapper extends Converter<Project, ProjectBasicModel> {
+
+        @Override
+        ProjectBasicModel convert(Project project);
+    }
+
+    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    public interface ProjectToProjectModelMapper extends Converter<Project, ProjectModel> {
+
+        @Mapping(target = "category", ignore = true)
+        @Mapping(target = "tags", ignore = true)
+        @Override
+        ProjectModel convert(Project project);
+    }
+
+    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    public interface ProjectDTOToProjectModelMapper extends Converter<ProjectDTO, ProjectModel> {
+
+        @Override
+        ProjectModel convert(ProjectDTO projectDTO);
+    }
 }
