@@ -56,11 +56,11 @@ const ComboBox = <
     const commandItems = items.map((item) => (
         <CommandItem
             key={item.value}
-            value={item.value}
             onSelect={() => {
                 setOpen(false);
                 onChange(item);
             }}
+            value={item.value}
         >
             {item.icon && (
                 <InlineSVG className="mr-2 h-6 w-6 flex-none" src={item.icon} />
@@ -85,7 +85,7 @@ const ComboBox = <
         <fieldset className="mb-3">
             <Label htmlFor={name || field?.value}>{label}</Label>
 
-            <Popover open={open} onOpenChange={setOpen}>
+            <Popover onOpenChange={setOpen} open={open}>
                 <PopoverTrigger asChild>
                     <Button
                         aria-expanded={open}
@@ -119,7 +119,7 @@ const ComboBox = <
                     className="min-w-[var(--radix-popper-anchor-width)) p-0"
                 >
                     <Command>
-                        <CommandInput placeholder="Search..." className="h-9" />
+                        <CommandInput className="h-9" placeholder="Search..." />
 
                         <CommandEmpty>No item found.</CommandEmpty>
 

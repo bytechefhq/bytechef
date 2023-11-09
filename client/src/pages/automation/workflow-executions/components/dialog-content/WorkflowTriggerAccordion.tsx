@@ -73,8 +73,8 @@ const WorkflowTriggerAccordion = ({
 
                             {input && typeof input === 'object' ? (
                                 <ReactJson
-                                    src={input as object}
                                     enableClipboard={false}
+                                    src={input as object}
                                 />
                             ) : (
                                 <pre className="mt-2 text-xs">{input}</pre>
@@ -95,8 +95,8 @@ const WorkflowTriggerAccordion = ({
                             <pre className="mt-2 text-sm">
                                 {output && typeof output === 'object' ? (
                                     <ReactJson
-                                        src={output as object}
                                         enableClipboard={false}
+                                        src={output as object}
                                     />
                                 ) : (
                                     <pre className="mt-2 text-xs">

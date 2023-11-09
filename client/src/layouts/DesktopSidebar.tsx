@@ -63,8 +63,8 @@ export function DesktopSidebar({
                         <Link className="flex" to="/settings">
                             <Avatar>
                                 <AvatarImage
-                                    src="https://github.com/shadcn.png"
                                     alt="@shadcn"
+                                    src="https://github.com/shadcn.png"
                                 />
 
                                 <AvatarFallback>CN</AvatarFallback>

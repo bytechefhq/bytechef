@@ -98,11 +98,11 @@ const WorkflowExecutionDetailsDialog = () => {
                             <div className="overflow-y-auto">
                                 <Accordion
                                     collapsible
-                                    type="single"
                                     defaultValue={
                                         workflowExecution?.triggerExecution
                                             ?.id || ''
                                     }
+                                    type="single"
                                 >
                                     {workflowExecution?.triggerExecution && (
                                         <WorkflowTriggerAccordion
