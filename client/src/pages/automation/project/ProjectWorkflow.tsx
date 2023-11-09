@@ -1,6 +1,6 @@
 import {ReactFlowProvider} from 'reactflow';
 
-import NodeDetailsPanel from './components/NodeDetailsPanel';
+import WorkflowNodeDetailsPanel from './components/WorkflowNodeDetailsPanel';
 
 import 'reactflow/dist/base.css';
 
@@ -12,10 +12,14 @@ import DataPillPanel from './components/DataPillPanel';
 import WorkflowEditor, {WorkflowEditorProps} from './components/WorkflowEditor';
 import {useNodeDetailsPanelStore} from './stores/useNodeDetailsPanelStore';
 
-const ProjectWorkflow = ({componentDefinitions, taskDispatcherDefinitions}: WorkflowEditorProps) => {
-    const {data: connectionComponentDefinitions} = useGetComponentDefinitionsQuery({
-        connectionDefinitions: true,
-    });
+const ProjectWorkflow = ({
+    componentDefinitions,
+    taskDispatcherDefinitions,
+}: WorkflowEditorProps) => {
+    const {data: connectionComponentDefinitions} =
+        useGetComponentDefinitionsQuery({
+            connectionDefinitions: true,
+        });
 
     const {currentNode} = useNodeDetailsPanelStore();
 
