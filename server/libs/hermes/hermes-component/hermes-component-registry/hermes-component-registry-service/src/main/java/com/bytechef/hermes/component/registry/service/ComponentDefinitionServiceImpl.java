@@ -87,23 +87,23 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
 
         return componentDefinition -> {
-            if (include != null && !include.contains(componentDefinition.getName())) {
-                return false;
+            if (include != null && include.contains(componentDefinition.getName())) {
+                return true;
             }
 
-            if (actionDefinitions != null && CollectionUtils.isEmpty(componentDefinition.getActions())) {
-                return false;
+            if (actionDefinitions != null && !CollectionUtils.isEmpty(componentDefinition.getActions())) {
+                return true;
             }
 
-            if (connectionDefinitions != null && !OptionalUtils.isPresent(componentDefinition.getConnection())) {
-                return false;
+            if (connectionDefinitions != null && OptionalUtils.isPresent(componentDefinition.getConnection())) {
+                return true;
             }
 
-            if (triggerDefinitions != null && CollectionUtils.isEmpty(componentDefinition.getTriggers())) {
-                return false;
+            if (triggerDefinitions != null && !CollectionUtils.isEmpty(componentDefinition.getTriggers())) {
+                return true;
             }
 
-            return true;
+            return false;
         };
     }
 }
