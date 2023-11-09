@@ -35,12 +35,13 @@ const DataPillPanel = () => {
                 : name
     );
 
-    const {data: previousComponents} = useGetComponentDefinitionsQuery(
-        {
-            include: normalizedPreviousComponentNames,
-        },
-        !!normalizedPreviousComponentNames.length
-    );
+    const {data: previouscomponentDefinitions} =
+        useGetComponentDefinitionsQuery(
+            {
+                include: normalizedPreviousComponentNames,
+            },
+            !!normalizedPreviousComponentNames.length
+        );
 
     const taskTypes = componentActions?.map(
         (componentAction) =>
@@ -52,7 +53,7 @@ const DataPillPanel = () => {
         !!componentActions?.length
     );
 
-    if (!previousComponents?.length || !actionData?.length) {
+    if (!previouscomponentDefinitions?.length || !actionData?.length) {
         return <></>;
     }
 
@@ -73,15 +74,16 @@ const DataPillPanel = () => {
     );
 
     const componentActionData = previousActions.map((action, index) => {
-        const componentData = previousComponents?.find(
-            (component) =>
-                component.name === normalizedPreviousComponentNames[index]
+        const componentDefinition = previouscomponentDefinitions?.find(
+            (curComponentDefinition) =>
+                curComponentDefinition.name ===
+                normalizedPreviousComponentNames[index]
         );
 
         if (previousComponentNames.includes(action.workflowAlias!)) {
             return {
                 ...action,
-                component: componentData,
+                componentDefinition,
                 workflowAlias: componentNames[index],
             };
         }
@@ -90,7 +92,7 @@ const DataPillPanel = () => {
     const dataPillComponentData = componentActionData.filter(
         (action) =>
             action!.workflowAlias !== currentNode.name &&
-            action!.component &&
+            action!.componentDefinition &&
             (action!.outputSchema as PropertyType)?.properties
     );
 
@@ -106,7 +108,7 @@ const DataPillPanel = () => {
                 nodeDetailsPanelOpen &&
                 dataPillPanelOpen &&
                 !!previousComponentNames.length &&
-                !!previousComponents
+                !!previouscomponentDefinitions
             }
         >
             <Dialog.Portal>

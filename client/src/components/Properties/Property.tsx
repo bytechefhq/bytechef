@@ -163,7 +163,7 @@ const Property = ({
                 {showMentionInput && (
                     <MentionsInput
                         controlType={controlType || getInputType(controlType)}
-                        data={dataPills}
+                        dataPills={dataPills}
                         defaultValue={defaultValue}
                         description={description}
                         label={label}

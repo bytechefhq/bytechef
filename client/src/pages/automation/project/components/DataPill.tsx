@@ -7,13 +7,13 @@ import {twMerge} from 'tailwind-merge';
 
 const DataPill = ({
     arrayIndex,
-    component,
     componentAlias,
+    componentDefinition,
     parentProperty,
     property,
 }: {
     arrayIndex?: number;
-    component: ComponentDefinitionModel;
+    componentDefinition: ComponentDefinitionModel;
     componentAlias: string;
     onClick?: (event: MouseEvent<HTMLDivElement>) => void;
     parentProperty?: PropertyType;
@@ -41,7 +41,7 @@ const DataPill = ({
 
         mentionInput.insertItem(
             {
-                componentIcon: component.icon,
+                componentIcon: componentDefinition.icon,
                 id: property.name,
                 value: `${componentAlias}/${dataPillName}`,
             },
@@ -86,7 +86,7 @@ const DataPill = ({
                     {subProperties?.map((subProperty, index) => (
                         <DataPill
                             arrayIndex={index}
-                            component={component}
+                            componentDefinition={componentDefinition}
                             componentAlias={componentAlias}
                             key={`${componentAlias}-${subProperty.name}-${index}`}
                             parentProperty={property}

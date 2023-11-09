@@ -42,7 +42,7 @@ const MentionInputListItem = (item: DataPillType) => {
 
 type MentionsInputProps = {
     controlType?: string;
-    data: Array<DataPillType>;
+    dataPills: Array<DataPillType>;
     defaultValue?: string;
     description?: string;
     fieldsetClassName?: string;
@@ -59,7 +59,7 @@ const MentionsInput = forwardRef(
     (
         {
             controlType,
-            data,
+            dataPills,
             defaultValue,
             description,
             fieldsetClassName,
@@ -134,11 +134,12 @@ const MentionsInput = forwardRef(
                     searchTerm: string,
                     renderList: (arg1: Array<object>, arg2: string) => void
                 ) => {
-                    const formattedData = data.map((datum) => ({
-                        componentIcon: JSON.parse(datum.component as string)
-                            .icon,
-                        id: datum.id,
-                        value: datum.value,
+                    const formattedData = dataPills.map((dataPill) => ({
+                        componentIcon: JSON.parse(
+                            dataPill.componentDefinition as string
+                        ).icon,
+                        id: dataPill.id,
+                        value: dataPill.value,
                     }));
 
                     if (searchTerm.length === 0) {
