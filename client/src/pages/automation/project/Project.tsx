@@ -183,7 +183,7 @@ const Project = () => {
             queryClient.invalidateQueries(ProjectKeys.projects);
 
             navigate(
-                `/automation/projects/${project?.id}/workflow/${project?.workflowIds![0]}`
+                `/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`
             );
         },
     });
@@ -229,7 +229,7 @@ const Project = () => {
     useEffect(() => {
         if (currentWorkflow?.id) {
             navigate(
-                `/automation/projects/${projectId}/workflow/${currentWorkflow.id}`
+                `/automation/projects/${projectId}/workflows/${currentWorkflow.id}`
             );
         }
     }, [currentWorkflow, navigate, projectId, setNodeDetailsPanelOpen]);
@@ -312,7 +312,7 @@ const Project = () => {
                                         );
 
                                         navigate(
-                                            `/automation/projects/${projectId}/workflow/${value}`
+                                            `/automation/projects/${projectId}/workflows/${value}`
                                         );
                                     }}
                                     value={currentWorkflow.id || workflowId}
