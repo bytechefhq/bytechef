@@ -43,7 +43,7 @@ export interface TaskExecutionModel {
      * @type {ComponentDefinitionModel}
      * @memberof TaskExecutionModel
      */
-    componentDefinition?: ComponentDefinitionModel;
+    component?: ComponentDefinitionModel;
     /**
      * The created by.
      * @type {string}
@@ -227,7 +227,7 @@ export function TaskExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'componentDefinition': !exists(json, 'componentDefinition') ? undefined : ComponentDefinitionModelFromJSON(json['componentDefinition']),
+        'component': !exists(json, 'component') ? undefined : ComponentDefinitionModelFromJSON(json['component']),
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'endDate': !exists(json, 'endDate') ? undefined : (new Date(json['endDate'])),
@@ -264,7 +264,7 @@ export function TaskExecutionModelToJSON(value?: TaskExecutionModel | null): any
     }
     return {
         
-        'componentDefinition': ComponentDefinitionModelToJSON(value.componentDefinition),
+        'component': ComponentDefinitionModelToJSON(value.component),
         'error': ExecutionErrorModelToJSON(value.error),
         'workflowTask': WorkflowTaskModelToJSON(value.workflowTask),
     };

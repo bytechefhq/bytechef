@@ -27,6 +27,12 @@ import {
  */
 export interface ComponentDefinitionBasicModel {
     /**
+     * 
+     * @type {number}
+     * @memberof ComponentDefinitionBasicModel
+     */
+    actionsCount?: number;
+    /**
      * The category.
      * @type {string}
      * @memberof ComponentDefinitionBasicModel
@@ -68,6 +74,12 @@ export interface ComponentDefinitionBasicModel {
      * @memberof ComponentDefinitionBasicModel
      */
     title?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ComponentDefinitionBasicModel
+     */
+    triggersCount?: number;
 }
 
 /**
@@ -90,6 +102,7 @@ export function ComponentDefinitionBasicModelFromJSONTyped(json: any, ignoreDisc
     }
     return {
         
+        'actionsCount': !exists(json, 'actionsCount') ? undefined : json['actionsCount'],
         'category': !exists(json, 'category') ? undefined : json['category'],
         'description': !exists(json, 'description') ? undefined : json['description'],
         'icon': !exists(json, 'icon') ? undefined : json['icon'],
@@ -97,6 +110,7 @@ export function ComponentDefinitionBasicModelFromJSONTyped(json: any, ignoreDisc
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
         'tags': !exists(json, 'tags') ? undefined : json['tags'],
         'title': !exists(json, 'title') ? undefined : json['title'],
+        'triggersCount': !exists(json, 'triggersCount') ? undefined : json['triggersCount'],
     };
 }
 
@@ -109,6 +123,7 @@ export function ComponentDefinitionBasicModelToJSON(value?: ComponentDefinitionB
     }
     return {
         
+        'actionsCount': value.actionsCount,
         'category': value.category,
         'description': value.description,
         'icon': value.icon,
@@ -116,6 +131,7 @@ export function ComponentDefinitionBasicModelToJSON(value?: ComponentDefinitionB
         'resources': ResourcesModelToJSON(value.resources),
         'tags': value.tags,
         'title': value.title,
+        'triggersCount': value.triggersCount,
     };
 }
 
