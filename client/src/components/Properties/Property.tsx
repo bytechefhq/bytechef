@@ -1,5 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
+import {useNodeDetailsPanelStore} from '@/pages/automation/project/stores/useNodeDetailsPanelStore';
 import getInputType from '@/pages/automation/project/utils/getInputType';
 import {PropertyType} from '@/types/projectTypes';
 import {DataPillType} from '@/types/types';
@@ -8,8 +10,9 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
 import TextArea from 'components/TextArea/TextArea';
 import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
-import {ChangeEvent, useState} from 'react';
+import {ChangeEvent, useRef, useState} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
+import ReactQuill from 'react-quill';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 
@@ -59,6 +62,12 @@ const Property = ({
 }: PropertyProps) => {
     const [mentionInput, setMentionInput] = useState(mention);
     const [integerValue, setIntegerValue] = useState('');
+
+    const editorRef = useRef<ReactQuill>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const {setFocusedInput} = useNodeDetailsPanelStore();
+    const {setDataPillPanelOpen} = useDataPillPanelStore();
 
     const {
         controlType,
@@ -124,10 +133,24 @@ const Property = ({
                 {showInputTypeSwitchButton && (
                     <Button
                         className="absolute right-0 top-0 h-auto w-auto p-0.5"
-                        onClick={() => setMentionInput(!mentionInput)}
+                        onClick={() => {
+                            setMentionInput(!mentionInput);
+
+                            if (!mentionInput) {
+                                setTimeout(() => {
+                                    setFocusedInput(editorRef.current);
+
+                                    editorRef.current?.focus();
+
+                                    setDataPillPanelOpen(true);
+                                }, 50);
+                            } else {
+                                setTimeout(() => inputRef.current?.focus(), 50);
+                            }
+                        }}
                         size="icon"
-                        variant="ghost"
                         title="Switch input type"
+                        variant="ghost"
                     >
                         {mentionInput ? (
                             <FormInputIcon className="h-5 w-5 text-gray-800" />
@@ -140,9 +163,9 @@ const Property = ({
                 {showMentionInput && (
                     <MentionsInput
                         controlType={controlType || getInputType(controlType)}
+                        data={dataPills}
                         defaultValue={defaultValue}
                         description={description}
-                        data={dataPills}
                         label={label}
                         leadingIcon={typeIcon}
                         name={name}
@@ -152,6 +175,7 @@ const Property = ({
                                 event.key !== '{' && event.preventDefault();
                             }
                         }}
+                        ref={editorRef}
                         singleMention={controlType !== 'TEXT'}
                     />
                 )}
@@ -241,6 +265,7 @@ const Property = ({
                                         }
                                     }
                                 }}
+                                ref={inputRef}
                                 required={required}
                                 title={type}
                                 type={
@@ -298,9 +323,9 @@ const Property = ({
                                 description={description}
                                 fieldsetClassName="w-full"
                                 key={name}
-                                required={required}
                                 label={label}
                                 name={name!}
+                                required={required}
                             />
                         )}
 
