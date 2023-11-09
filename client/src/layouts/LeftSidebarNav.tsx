@@ -28,8 +28,8 @@ const LeftSidebarNav = ({
     <div className={twMerge('px-2', className)}>
         {topBody && (
             <div
-                className="mb-4 flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1"
                 aria-label={topTitle}
+                className="mb-4 flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1"
             >
                 {topTitle && <SidebarSubtitle title={topTitle} />}
 
@@ -39,8 +39,8 @@ const LeftSidebarNav = ({
 
         {bottomBody && (
             <div
-                className="mb-4 flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1"
                 aria-label={bottomTitle}
+                className="mb-4 flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1"
             >
                 {bottomTitle && <SidebarSubtitle title={bottomTitle} />}
 
@@ -67,7 +67,7 @@ const LeftSidebarNavItem = ({
     toLink = '',
 }: LeftSidebarNavItemProps) => (
     <Link
-        to={toLink}
+        aria-current={filterData ? 'page' : undefined}
         className={cn(
             buttonVariants({variant: 'ghost'}),
             filterData
@@ -75,8 +75,8 @@ const LeftSidebarNavItem = ({
                 : 'hover:bg-transparent hover:underline',
             'justify-start'
         )}
-        aria-current={filterData ? 'page' : undefined}
         onClick={() => (onItemClick ? onItemClick(id) : null)}
+        to={toLink}
     >
         {icon}
 

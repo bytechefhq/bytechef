@@ -412,9 +412,9 @@ const NodeDetailsPanel = ({
 
     return (
         <Dialog.Root
-            open={nodeDetailsPanelOpen}
-            onOpenChange={() => setNodeDetailsPanelOpen(!nodeDetailsPanelOpen)}
             modal={false}
+            onOpenChange={() => setNodeDetailsPanelOpen(!nodeDetailsPanelOpen)}
+            open={nodeDetailsPanelOpen}
         >
             <Dialog.Portal>
                 <Dialog.Content
@@ -451,8 +451,8 @@ const NodeDetailsPanel = ({
                                     displayType="icon"
                                     icon={
                                         <Cross1Icon
-                                            className="h-3 w-3 cursor-pointer"
                                             aria-hidden="true"
+                                            className="h-3 w-3 cursor-pointer"
                                         />
                                     }
                                     onClick={() =>
@@ -525,14 +525,14 @@ const NodeDetailsPanel = ({
                                                     }
                                                     customClassName="p-4"
                                                     dataPills={dataPills}
-                                                    properties={
-                                                        currentActionProperties
-                                                    }
                                                     mention={
                                                         !!dataPills?.length
                                                     }
                                                     onChange={
                                                         handlePropertyChange
+                                                    }
+                                                    properties={
+                                                        currentActionProperties
                                                     }
                                                 />
                                             )}

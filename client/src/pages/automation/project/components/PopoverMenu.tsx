@@ -25,15 +25,15 @@ const PopoverMenu = ({children, edge = false, id}: PopoverMenuProps) => {
             <PopoverContent
                 align="start"
                 className="w-[500px] p-0 will-change-auto"
-                sideOffset={4}
                 side="right"
+                sideOffset={4}
             >
                 {id && (
                     <ContextualMenu
-                        id={id}
                         components={components}
-                        flowControls={flowControls}
                         edge={edge}
+                        flowControls={flowControls}
+                        id={id}
                     />
                 )}
             </PopoverContent>

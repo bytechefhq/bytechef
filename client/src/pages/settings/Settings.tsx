@@ -20,22 +20,22 @@ export default function Settings() {
     return (
         <LayoutContainer
             header={<PageHeader title="Account" />}
-            leftSidebarHeader={
-                <PageHeader position="sidebar" title="Settings" />
-            }
             leftSidebarBody={
                 <LeftSidebarNav
                     topBody={sidebarNavItems.map((item) => (
                         <LeftSidebarNavItem
-                            key={item.href}
                             item={{
                                 filterData: location.pathname === item.href,
                                 name: item.title,
                             }}
+                            key={item.href}
                             toLink={item.href}
                         />
                     ))}
                 />
+            }
+            leftSidebarHeader={
+                <PageHeader position="sidebar" title="Settings" />
             }
         >
             <div className="px-4">

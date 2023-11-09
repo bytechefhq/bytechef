@@ -103,13 +103,13 @@ const ProjectInstanceDialog = ({
         {
             content: (
                 <ProjectInstanceDialogBasicStep
-                    projectInstance={projectInstance}
                     control={control}
-                    touchedFields={formState.touchedFields}
+                    errors={formState.errors}
+                    getValues={getValues}
+                    projectInstance={projectInstance}
                     register={register}
                     setValue={setValue}
-                    getValues={getValues}
-                    errors={formState.errors}
+                    touchedFields={formState.touchedFields}
                 />
             ),
             name: 'Basic',
@@ -182,14 +182,14 @@ const ProjectInstanceDialog = ({
 
                         <nav aria-label="Progress">
                             <ol
-                                role="list"
                                 className="space-y-4 md:flex md:space-y-0"
+                                role="list"
                             >
                                 {projectInstanceDialogSteps.map(
                                     (step, index) => (
                                         <li
-                                            key={step.name}
                                             className="md:flex-1"
+                                            key={step.name}
                                         >
                                             <div
                                                 className={twMerge(

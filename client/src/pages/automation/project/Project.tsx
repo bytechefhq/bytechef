@@ -249,7 +249,7 @@ const Project = () => {
 
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon">
+                                    <Button size="icon" variant="ghost">
                                         <ChevronDownIcon />
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -336,9 +336,9 @@ const Project = () => {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button
-                                        variant="outline"
-                                        size="icon"
                                         className="border-0 bg-white shadow-none"
+                                        size="icon"
+                                        variant="outline"
                                     >
                                         <DotsVerticalIcon />
                                     </Button>
@@ -415,8 +415,8 @@ const Project = () => {
                                 onValueChange={() =>
                                     setLeftSidebarOpen(!leftSidebarOpen)
                                 }
-                                value={leftSidebarOpen ? 'debug' : 'build'}
                                 toggleItems={headerToggleItems}
+                                value={leftSidebarOpen ? 'debug' : 'build'}
                             />
                         </div>
 
@@ -548,9 +548,6 @@ const Project = () => {
 
                         {showEditProjectDialog && project && (
                             <ProjectDialog
-                                project={project}
-                                showTrigger={false}
-                                visible
                                 onClose={() => {
                                     setShowEditProjectDialog(false);
 
@@ -558,12 +555,15 @@ const Project = () => {
                                         ProjectKeys.project(project.id!)
                                     );
                                 }}
+                                project={project}
+                                showTrigger={false}
+                                visible
                             />
                         )}
                     </header>
                 }
-                leftSidebarHeader={<></>}
                 leftSidebarBody={<></>}
+                leftSidebarHeader={<></>}
                 leftSidebarOpen={leftSidebarOpen}
                 leftSidebarWidth="96"
                 rightSidebarBody={

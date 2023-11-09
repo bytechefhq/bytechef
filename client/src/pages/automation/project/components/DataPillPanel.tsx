@@ -100,14 +100,14 @@ const DataPillPanel = () => {
 
     return (
         <Dialog.Root
+            modal={false}
+            onOpenChange={() => setDataPillPanelOpen(!dataPillPanelOpen)}
             open={
                 nodeDetailsPanelOpen &&
                 dataPillPanelOpen &&
                 !!previousComponentNames.length &&
                 !!previousComponents
             }
-            onOpenChange={() => setDataPillPanelOpen(!dataPillPanelOpen)}
-            modal={false}
         >
             <Dialog.Portal>
                 <Dialog.Content
@@ -137,8 +137,8 @@ const DataPillPanel = () => {
                                 displayType="icon"
                                 icon={
                                     <Cross1Icon
-                                        className="h-3 w-3 cursor-pointer"
                                         aria-hidden="true"
+                                        className="h-3 w-3 cursor-pointer"
                                     />
                                 }
                                 onClick={() => setDataPillPanelOpen(false)}

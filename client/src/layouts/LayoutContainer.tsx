@@ -50,7 +50,7 @@ const LayoutContainer = ({
 
     return (
         <>
-            <Transition.Root show={sidebarOpen} as={Fragment}>
+            <Transition.Root as={Fragment} show={sidebarOpen}>
                 <Dialog
                     as="div"
                     className="relative z-40 md:hidden"
@@ -90,15 +90,15 @@ const LayoutContainer = ({
                                 >
                                     <div className="absolute right-0 top-0 -mr-14 p-1">
                                         <button
-                                            type="button"
                                             className="flex h-12 w-12 items-center justify-center rounded-full focus:bg-gray-600 focus:outline-none"
                                             onClick={() =>
                                                 setSidebarOpen(false)
                                             }
+                                            type="button"
                                         >
                                             <Cross1Icon
-                                                className="h-6 w-6 text-white"
                                                 aria-hidden="true"
+                                                className="h-6 w-6 text-white"
                                             />
 
                                             <span className="sr-only">
@@ -118,7 +118,7 @@ const LayoutContainer = ({
                             </Dialog.Panel>
                         </Transition.Child>
 
-                        <div className="w-14 shrink-0" aria-hidden="true">
+                        <div aria-hidden="true" className="w-14 shrink-0">
                             {/* Dummy element to force sidebar to shrink to fit close icon */}
                         </div>
                     </div>

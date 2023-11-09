@@ -65,7 +65,6 @@ const ProjectInstanceDialogBasicStep = ({
                         <Controller
                             control={control}
                             name="project"
-                            rules={{required: true}}
                             render={({field}) => (
                                 <FilterableSelect
                                     autoFocus
@@ -94,6 +93,7 @@ const ProjectInstanceDialogBasicStep = ({
                                     required
                                 />
                             )}
+                            rules={{required: true}}
                             shouldUnregister={false}
                         />
                     )}
@@ -123,15 +123,6 @@ const ProjectInstanceDialogBasicStep = ({
                                     field={field}
                                     isMulti
                                     label="Tags"
-                                    options={remainingTags.map((tag) => {
-                                        return {
-                                            label: tag.name,
-                                            value: tag.name
-                                                .toLowerCase()
-                                                .replace(/\W/g, ''),
-                                            ...tag,
-                                        };
-                                    })}
                                     onCreateOption={(inputValue: string) => {
                                         setValue('tags', [
                                             ...getValues().tags!,
@@ -142,6 +133,15 @@ const ProjectInstanceDialogBasicStep = ({
                                             },
                                         ] as never[]);
                                     }}
+                                    options={remainingTags.map((tag) => {
+                                        return {
+                                            label: tag.name,
+                                            value: tag.name
+                                                .toLowerCase()
+                                                .replace(/\W/g, ''),
+                                            ...tag,
+                                        };
+                                    })}
                                 />
                             )}
                         />

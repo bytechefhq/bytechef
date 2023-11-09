@@ -95,11 +95,11 @@ const ConnectionListItem = ({
 
                         <div className="ml-2 flex shrink-0">
                             <Badge
-                                variant="secondary"
                                 className={twMerge(
                                     connection.active &&
                                         'bg-success text-success-foreground hover:bg-success'
                                 )}
+                                variant="secondary"
                             >
                                 {connection.active ? 'Active' : 'Not Active'}
                             </Badge>
@@ -113,18 +113,18 @@ const ConnectionListItem = ({
                         >
                             {connection.tags && (
                                 <TagList
-                                    id={connection.id!}
-                                    remainingTags={remainingTags}
-                                    tags={connection.tags}
-                                    updateTagsMutation={
-                                        updateConnectionTagsMutation
-                                    }
                                     getRequest={(id, tags) => ({
                                         id: id!,
                                         updateTagsRequestModel: {
                                             tags: tags || [],
                                         },
                                     })}
+                                    id={connection.id!}
+                                    remainingTags={remainingTags}
+                                    tags={connection.tags}
+                                    updateTagsMutation={
+                                        updateConnectionTagsMutation
+                                    }
                                 />
                             )}
                         </div>
@@ -133,8 +133,8 @@ const ConnectionListItem = ({
                             {connection.createdDate && (
                                 <>
                                     <CalendarIcon
-                                        className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
                                         aria-hidden="true"
+                                        className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
                                     />
 
                                     <span>
@@ -216,9 +216,9 @@ const ConnectionListItem = ({
             {showEditDialog && (
                 <ConnectionDialog
                     connection={connection}
+                    onClose={() => setShowEditDialog(false)}
                     showTrigger={false}
                     visible
-                    onClose={() => setShowEditDialog(false)}
                 />
             )}
         </>

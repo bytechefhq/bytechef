@@ -104,6 +104,17 @@ const WorkflowDialog = ({
 
     return (
         <Dialog
+            customTrigger={
+                showTrigger && (
+                    <Button
+                        className={twMerge('bg-white', triggerClassName)}
+                        size="icon"
+                        variant="outline"
+                    >
+                        <PlusIcon className="mx-1 h-5 w-5" />
+                    </Button>
+                )
+            }
             description="Use this to create a workflow. Creating a workflow will redirect you to the page where you can edit it."
             isOpen={isOpen}
             onOpenChange={(isOpen) => {
@@ -114,17 +125,6 @@ const WorkflowDialog = ({
                 }
             }}
             title="Create Workflow"
-            customTrigger={
-                showTrigger && (
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        className={twMerge('bg-white', triggerClassName)}
-                    >
-                        <PlusIcon className="mx-1 h-5 w-5" />
-                    </Button>
-                )
-            }
         >
             <Input
                 error={touchedFields.label && !!errors.label}
@@ -133,22 +133,22 @@ const WorkflowDialog = ({
             />
 
             <TextArea
-                style={{height: '120px'}}
                 label="Description"
+                style={{height: '120px'}}
                 {...register('description')}
             />
 
             <div className="mt-8 flex justify-end space-x-1">
                 <Close asChild>
-                    <Button variant="outline" type="button">
+                    <Button type="button" variant="outline">
                         Cancel
                     </Button>
                 </Close>
 
                 <Button
+                    disabled={isLoading}
                     onClick={handleSubmit(saveWorkflow)}
                     type="submit"
-                    disabled={isLoading}
                 >
                     {isLoading ? 'Saving...' : 'Save'}
                 </Button>

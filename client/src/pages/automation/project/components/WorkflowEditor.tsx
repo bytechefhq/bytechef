@@ -167,11 +167,11 @@ const WorkflowEditor = ({components, flowControls}: WorkflowEditorProps) => {
                 }}
                 deleteKeyCode={null}
                 edgeTypes={edgeTypes}
-                minZoom={0.6}
                 maxZoom={1.5}
+                minZoom={0.6}
                 nodeTypes={nodeTypes}
-                nodesDraggable={false}
                 nodesConnectable={false}
+                nodesDraggable={false}
                 onDrop={onDrop}
                 panOnDrag
                 panOnScroll

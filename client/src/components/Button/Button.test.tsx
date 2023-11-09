@@ -35,9 +35,9 @@ describe('Button', async () => {
 
                 <Button displayType="icon" label="Icon" />
 
-                <Button size="small" label="Small" />
+                <Button label="Small" size="small" />
 
-                <Button size="large" label="Large" />
+                <Button label="Large" size="large" />
             </div>
         );
 

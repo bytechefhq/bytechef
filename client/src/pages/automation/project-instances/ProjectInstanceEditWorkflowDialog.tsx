@@ -91,8 +91,8 @@ const ProjectInstanceEditWorkflowDialog = ({
                         <ProjectInstanceDialogWorkflowListItem
                             control={control}
                             formState={formState}
-                            label="Enable"
                             key={workflow.id!}
+                            label="Enable"
                             register={register}
                             switchHidden={true}
                             workflow={workflow}

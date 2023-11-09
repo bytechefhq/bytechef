@@ -70,17 +70,17 @@ const TagList = ({
     return (
         <div className="mr-4 flex items-center space-x-1">
             {tags.slice(0, 3).map((tag) => (
-                <Tag key={tag.id} tag={tag} onDeleteTag={handleOnDeleteTag} />
+                <Tag key={tag.id} onDeleteTag={handleOnDeleteTag} tag={tag} />
             ))}
 
             {tags.length > 3 && (
                 <div className="relative flex">
                     <Button
                         className="mr-2"
-                        size="small"
                         displayType="unstyled"
                         icon={<ChevronDownIcon />}
                         onClick={() => setShowAllTags(!showAllTags)}
+                        size="small"
                     />
 
                     {showAllTags && (
@@ -91,8 +91,8 @@ const TagList = ({
                             {tags.slice(3).map((tag) => (
                                 <Tag
                                     key={tag.id}
-                                    tag={tag}
                                     onDeleteTag={handleOnDeleteTag}
+                                    tag={tag}
                                 />
                             ))}
                         </div>
@@ -104,18 +104,6 @@ const TagList = ({
                 <CreatableSelect
                     className="w-40 text-start"
                     name="newTag"
-                    options={remainingTags!.map((tag: TagModel) => ({
-                        label: `${tag.name}`,
-                        tag,
-                        value: tag.name.toLowerCase().replace(/\W/g, ''),
-                    }))}
-                    onCreateOption={(inputValue: string) => {
-                        handleOnAddTag({
-                            name: inputValue,
-                        });
-
-                        setIsNewTagWindowVisible(false);
-                    }}
                     onChange={(
                         selectedOption: OnChangeValue<ISelectOption, false>
                     ) => {
@@ -125,6 +113,18 @@ const TagList = ({
 
                         setIsNewTagWindowVisible(false);
                     }}
+                    onCreateOption={(inputValue: string) => {
+                        handleOnAddTag({
+                            name: inputValue,
+                        });
+
+                        setIsNewTagWindowVisible(false);
+                    }}
+                    options={remainingTags!.map((tag: TagModel) => ({
+                        label: `${tag.name}`,
+                        tag,
+                        value: tag.name.toLowerCase().replace(/\W/g, ''),
+                    }))}
                 />
             ) : (
                 <div

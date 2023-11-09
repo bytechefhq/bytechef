@@ -36,12 +36,12 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
             {label && (
                 <div className="flex items-center">
                     <label
-                        htmlFor={name}
                         className={twMerge(
                             'block text-sm font-medium capitalize text-gray-700',
                             description && 'mr-1',
                             labelClassName
                         )}
+                        htmlFor={name}
                     >
                         {label}
                     </label>
@@ -80,8 +80,8 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
                 {error && (
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                         <ExclamationTriangleIcon
-                            className="h-5 w-5 text-red-500"
                             aria-hidden="true"
+                            className="h-5 w-5 text-red-500"
                         />
                     </div>
                 )}
@@ -89,9 +89,9 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 
             {error && (
                 <p
-                    role="alert"
                     className="mt-2 text-sm text-red-600"
                     id={`${name}-error`}
+                    role="alert"
                 >
                     This field is required
                 </p>

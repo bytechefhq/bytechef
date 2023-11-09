@@ -103,12 +103,46 @@ const ProjectInstances = () => {
                     }: ${pageTitle || 'All'}`}
                 />
             }
-            leftSidebarHeader={
-                <PageHeader position="sidebar" title="Instances" />
-            }
             leftSidebarBody={
                 <LeftSidebarNav
-                    topTitle="Projects"
+                    bottomBody={
+                        <>
+                            {!tagsLoading &&
+                                (tags && !!tags.length ? (
+                                    tags?.map((item) => (
+                                        <LeftSidebarNavItem
+                                            icon={
+                                                <TagIcon className="mr-1 h-4 w-4" />
+                                            }
+                                            item={{
+                                                filterData:
+                                                    filterData?.id ===
+                                                        item.id &&
+                                                    filterData.type ===
+                                                        Type.Tag,
+                                                id: item.id!,
+                                                name: item.name,
+                                                onItemClick: (
+                                                    id?: number | string
+                                                ) => {
+                                                    setFilterData({
+                                                        id: id as number,
+                                                        type: Type.Tag,
+                                                    });
+                                                },
+                                            }}
+                                            key={item.id}
+                                            toLink={`?tagId=${item.id}`}
+                                        />
+                                    ))
+                                ) : (
+                                    <span className="px-3 text-xs">
+                                        You have not created any tags yet.
+                                    </span>
+                                ))}
+                        </>
+                    }
+                    bottomTitle="Tags"
                     topBody={
                         <>
                             <LeftSidebarNavItem
@@ -129,7 +163,6 @@ const ProjectInstances = () => {
                             {projects &&
                                 projects?.map((item) => (
                                     <LeftSidebarNavItem
-                                        key={item.name}
                                         item={{
                                             filterData:
                                                 filterData?.id === item.id &&
@@ -146,50 +179,17 @@ const ProjectInstances = () => {
                                                 });
                                             },
                                         }}
+                                        key={item.name}
                                         toLink={`?projectId=${item.id}`}
                                     />
                                 ))}
                         </>
                     }
-                    bottomTitle="Tags"
-                    bottomBody={
-                        <>
-                            {!tagsLoading &&
-                                (tags && !!tags.length ? (
-                                    tags?.map((item) => (
-                                        <LeftSidebarNavItem
-                                            key={item.id}
-                                            item={{
-                                                filterData:
-                                                    filterData?.id ===
-                                                        item.id &&
-                                                    filterData.type ===
-                                                        Type.Tag,
-                                                id: item.id!,
-                                                name: item.name,
-                                                onItemClick: (
-                                                    id?: number | string
-                                                ) => {
-                                                    setFilterData({
-                                                        id: id as number,
-                                                        type: Type.Tag,
-                                                    });
-                                                },
-                                            }}
-                                            icon={
-                                                <TagIcon className="mr-1 h-4 w-4" />
-                                            }
-                                            toLink={`?tagId=${item.id}`}
-                                        />
-                                    ))
-                                ) : (
-                                    <span className="px-3 text-xs">
-                                        You have not created any tags yet.
-                                    </span>
-                                ))}
-                        </>
-                    }
+                    topTitle="Projects"
                 />
+            }
+            leftSidebarHeader={
+                <PageHeader position="sidebar" title="Instances" />
             }
         >
             <div

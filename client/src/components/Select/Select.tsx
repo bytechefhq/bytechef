@@ -85,11 +85,11 @@ const Select = ({
 
         <Root
             defaultValue={defaultValue}
+            name={name}
             onValueChange={onValueChange}
             value={value || defaultValue}
-            name={name}
         >
-            <Trigger asChild aria-label="Select">
+            <Trigger aria-label="Select" asChild>
                 <Button
                     className={twMerge(
                         'mt-1',
@@ -130,13 +130,13 @@ const Select = ({
                         <Group>
                             {options.map((option) => (
                                 <Item
-                                    key={option.value}
-                                    value={option.value}
                                     className={twMerge(
                                         'radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none',
                                         option.value ===
                                             (value || defaultValue) && 'px-2'
                                     )}
+                                    key={option.value}
+                                    value={option.value}
                                 >
                                     <ItemIndicator className="inline-flex items-center pl-0 pr-2">
                                         <CheckIcon />

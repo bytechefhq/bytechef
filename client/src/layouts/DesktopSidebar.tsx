@@ -23,9 +23,9 @@ export function DesktopSidebar({
                         <Link to="">
                             <div className="flex items-center justify-center py-4">
                                 <img
+                                    alt="ByteChef"
                                     className="h-8 w-auto"
                                     src={reactLogo}
-                                    alt="ByteChef"
                                 />
                             </div>
                         </Link>
@@ -36,15 +36,15 @@ export function DesktopSidebar({
                         >
                             {navigation.map((item) => (
                                 <Link
+                                    className="flex items-center rounded-lg p-4 hover:text-blue-600"
                                     key={item.name}
                                     to={item.href}
-                                    className="flex items-center rounded-lg p-4 hover:text-blue-600"
                                 >
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <item.icon
-                                                className="h-7 w-7"
                                                 aria-hidden="true"
+                                                className="h-7 w-7"
                                             />
                                         </TooltipTrigger>
 

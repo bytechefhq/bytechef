@@ -23,8 +23,8 @@ const PageLoader = ({
                     {errorExists ? (
                         <div className="flex items-center text-red-700">
                             <CrossCircledIcon
-                                className="mr-1 h-5 w-5 text-red-400"
                                 aria-hidden="true"
+                                className="mr-1 h-5 w-5 text-red-400"
                             />
 
                             <h1>Some error occurred.</h1>

@@ -56,14 +56,14 @@ const DataPillPanelBody = ({
                         return (
                             <AccordionItem
                                 className="group"
-                                value={componentAction.workflowAlias}
                                 key={`accordion-item-${componentAction.workflowAlias}`}
+                                value={componentAction.workflowAlias}
                             >
                                 {!!filteredProperties?.length && (
                                     <>
                                         <AccordionTrigger
-                                            key={`accordion-trigger-${componentAction.workflowAlias}`}
                                             className="group flex w-full items-center justify-between border-gray-100 bg-white p-4 group-data-[state=closed]:border-b"
+                                            key={`accordion-trigger-${componentAction.workflowAlias}`}
                                         >
                                             <div className="flex items-center space-x-4">
                                                 {icon && (

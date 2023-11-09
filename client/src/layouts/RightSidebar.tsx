@@ -30,8 +30,8 @@ export function RightSidebar({
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <item.icon
-                                                className="h-7 w-7"
                                                 aria-hidden="true"
+                                                className="h-7 w-7"
                                             />
                                         </TooltipTrigger>
 

@@ -17,26 +17,26 @@ const PlaceholderNode = ({data, id}: NodeProps) => {
                         ? 'scale-150 cursor-pointer bg-blue-100 h-16 w-16 mx-1.5'
                         : 'h-7 w-7 bg-gray-300'
                 )}
-                title="Click to add a node"
-                onDrop={() => setDropzoneActive(false)}
-                onDragOver={(event) => event.preventDefault()}
                 onDragEnter={() => setDropzoneActive(true)}
                 onDragLeave={() => setDropzoneActive(false)}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={() => setDropzoneActive(false)}
+                title="Click to add a node"
             >
                 {data.label}
 
                 <Handle
                     className={styles.handle}
-                    type="target"
-                    position={Position.Top}
                     isConnectable={false}
+                    position={Position.Top}
+                    type="target"
                 />
 
                 <Handle
                     className={styles.handle}
-                    type="source"
-                    position={Position.Bottom}
                     isConnectable={false}
+                    position={Position.Bottom}
+                    type="source"
                 />
             </div>
         </PopoverMenu>

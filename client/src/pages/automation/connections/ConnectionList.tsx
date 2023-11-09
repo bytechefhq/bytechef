@@ -38,8 +38,8 @@ const ConnectionList = ({
                             <li key={connection.id}>
                                 <div className="group rounded-md border-b border-b-gray-100 bg-white p-2 py-3 hover:bg-gray-50">
                                     <ConnectionListItem
-                                        key={connection.id}
                                         connection={connection}
+                                        key={connection.id}
                                         remainingTags={tags?.filter(
                                             (tag) =>
                                                 !connectionTagIds?.includes(

@@ -23,8 +23,8 @@ const SchemaProperties = ({properties}: {properties: PropertyType[]}) => (
 
                 {property.properties && !!property.properties.length && (
                     <div
-                        key={property.name}
                         className="ml-3 flex flex-col overflow-y-scroll border-l border-gray-200 pl-1"
+                        key={property.name}
                     >
                         <SchemaProperties properties={property.properties} />
                     </div>

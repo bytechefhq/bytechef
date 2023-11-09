@@ -25,9 +25,9 @@ const ToggleGroup = ({
         aria-label="Items"
         className={twMerge('flex shadow-sm', containerClassName)}
         defaultValue={defaultValue}
+        onValueChange={onValueChange}
         type="single"
         value={value}
-        onValueChange={onValueChange}
     >
         {toggleItems.map(({label, value}) => (
             <ToggleGroupPrimitive.Item

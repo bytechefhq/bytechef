@@ -105,8 +105,8 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
                     <tr key={headerGroup.id}>
                         {headerGroup.headers.map((header) => (
                             <th
-                                key={header.id}
                                 className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                                key={header.id}
                             >
                                 {!header.isPlaceholder &&
                                     flexRender(
@@ -128,8 +128,8 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
                     >
                         {row.getVisibleCells().map((cell) => (
                             <td
-                                key={cell.id}
                                 className="whitespace-nowrap px-3 py-4 text-sm"
+                                key={cell.id}
                             >
                                 {flexRender(
                                     cell.column.columnDef.cell,

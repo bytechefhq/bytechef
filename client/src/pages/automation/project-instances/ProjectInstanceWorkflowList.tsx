@@ -79,15 +79,15 @@ const ProjectInstanceWorkflowList = ({
 
                     return (
                         <li
-                            key={workflow.id}
                             className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
+                            key={workflow.id}
                         >
                             {projectInstanceWorkflow && (
                                 <ProjectInstanceWorkflowListItem
-                                    key={workflow.id}
                                     filteredDefinitionNames={
                                         filteredDefinitionNames
                                     }
+                                    key={workflow.id}
                                     projectId={projectId}
                                     projectInstanceEnabled={
                                         projectInstanceEnabled

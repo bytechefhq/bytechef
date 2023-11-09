@@ -28,9 +28,9 @@ const ProjectInstanceDialogWorkflowsStep = ({
                     control={control}
                     formState={formState}
                     key={workflow.id!}
-                    workflow={workflow}
                     label={workflow.label!}
                     register={register}
+                    workflow={workflow}
                     workflowIndex={workflowIndex}
                 />
             ))}

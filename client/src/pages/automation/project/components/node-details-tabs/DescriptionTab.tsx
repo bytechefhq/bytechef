@@ -56,8 +56,8 @@ const DescriptionTab = ({
                 label="Notes"
                 labelClassName="px-2"
                 name="nodeNotes"
-                placeholder="Write some notes for yourself..."
                 onChange={handleNotesChange}
+                placeholder="Write some notes for yourself..."
                 value={currentComponentData?.notes || ''}
             />
         </div>

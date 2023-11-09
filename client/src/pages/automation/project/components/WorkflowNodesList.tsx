@@ -31,8 +31,8 @@ const WorkflowNodesListItem = ({
             className="mb-2 flex h-[72px] cursor-pointer items-center rounded-md bg-white p-2 hover:bg-gray-50"
             draggable={draggable}
             id={node?.title}
-            onDragStart={(event) => onDragStart(event, node.name!)}
             onClick={handleClick}
+            onDragStart={(event) => onDragStart(event, node.name!)}
         >
             {node.icon ? (
                 <InlineSVG className="mr-2 h-7 w-7 flex-none" src={node.icon} />
@@ -69,7 +69,7 @@ const WorkflowNodesList = ({
     onItemClick,
 }: WorkflowNodesListProps) => (
     <div className="mt-2 w-full px-3">
-        <Tabs defaultValue="account" className="w-full">
+        <Tabs className="w-full" defaultValue="account">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="account">Components</TabsTrigger>
 
@@ -77,7 +77,7 @@ const WorkflowNodesList = ({
             </TabsList>
 
             <TabsContent value="account">
-                <ul role="list" className="mb-2">
+                <ul className="mb-2" role="list">
                     {components.length ? (
                         components.map(
                             (component: ComponentDefinitionBasicModel) => (
@@ -100,7 +100,7 @@ const WorkflowNodesList = ({
             </TabsContent>
 
             <TabsContent value="password">
-                <ul role="list" className="mb-2">
+                <ul className="mb-2" role="list">
                     {flowControls.length ? (
                         flowControls.map(
                             (flowControl: TaskDispatcherDefinitionModel) => (

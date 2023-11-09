@@ -55,8 +55,8 @@ const ProjectList = () => {
 
                             return (
                                 <Collapsible
-                                    key={project.id}
                                     className="data-[state=closed]:border-b data-[state=closed]:border-b-gray-100"
+                                    key={project.id}
                                 >
                                     <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
                                         <ProjectListItem

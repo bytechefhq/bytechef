@@ -50,8 +50,8 @@ const CreatableSelect = <
     <fieldset className={twMerge(label && 'mb-3', fieldsetClassName)}>
         {label && (
             <label
-                htmlFor={name || field?.name}
                 className="text-sm font-medium text-gray-700"
+                htmlFor={name || field?.name}
             >
                 {label}
             </label>
@@ -68,8 +68,8 @@ const CreatableSelect = <
             {error && (
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                     <ExclamationTriangleIcon
-                        className="h-5 w-5 text-red-500"
                         aria-hidden="true"
+                        className="h-5 w-5 text-red-500"
                     />
                 </div>
             )}
@@ -77,9 +77,9 @@ const CreatableSelect = <
 
         {error && (
             <p
-                role="alert"
                 className="mt-2 text-sm text-red-600"
                 id={`${name}-error`}
+                role="alert"
             >
                 This field is required
             </p>

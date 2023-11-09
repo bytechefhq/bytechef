@@ -40,13 +40,13 @@ const WorkflowExecutionDetailsDialog = () => {
 
     return (
         <Dialog.Root
-            open={workflowExecutionDetailsDialogOpen}
+            modal={false}
             onOpenChange={() =>
                 setWorkflowExecutionDetailsDialogOpen(
                     !workflowExecutionDetailsDialogOpen
                 )
             }
-            modal={false}
+            open={workflowExecutionDetailsDialogOpen}
         >
             <Dialog.Portal>
                 <Dialog.Content className="fixed inset-y-0 right-0 z-10 flex w-full max-w-7xl overflow-hidden border-l border-gray-100 shadow-lg">
