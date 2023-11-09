@@ -31,7 +31,7 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record TriggerExecutionDTO(
-    boolean batch, ComponentDefinition componentDefinition, String createdBy, LocalDateTime createdDate,
+    boolean batch, ComponentDefinition component, String createdBy, LocalDateTime createdDate,
     LocalDateTime endDate, ExecutionError error, long executionTime, Long id, Map<String, ?> input,
     String lastModifiedBy, LocalDateTime lastModifiedDate, int maxRetries, Object output, int priority,
     int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis, LocalDateTime startDate,
@@ -39,11 +39,10 @@ public record TriggerExecutionDTO(
     WorkflowTrigger workflowTrigger) {
 
     public TriggerExecutionDTO(
-        ComponentDefinition componentDefinition, Map<String, ?> input, Object output,
-        TriggerExecution triggerExecution) {
+        ComponentDefinition component, Map<String, ?> input, Object output, TriggerExecution triggerExecution) {
 
         this(
-            triggerExecution.isBatch(), componentDefinition, triggerExecution.getCreatedBy(),
+            triggerExecution.isBatch(), component, triggerExecution.getCreatedBy(),
             triggerExecution.getCreatedDate(), triggerExecution.getEndDate(), triggerExecution.getError(),
             triggerExecution.getExecutionTime(), triggerExecution.getId(), input, triggerExecution.getLastModifiedBy(),
             triggerExecution.getLastModifiedDate(), triggerExecution.getMaxRetries(), output,
