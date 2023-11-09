@@ -86,8 +86,8 @@ const DataPill = ({
                     {subProperties?.map((subProperty, index) => (
                         <DataPill
                             arrayIndex={index}
-                            componentDefinition={componentDefinition}
                             componentAlias={componentAlias}
+                            componentDefinition={componentDefinition}
                             key={`${componentAlias}-${subProperty.name}-${index}`}
                             parentProperty={property}
                             property={subProperty}

@@ -120,9 +120,11 @@ const WorkflowNodes = memo(
                             (node) => node.id === clickedEdge.source
                         );
 
-                        const previousComponentNameIndex = componentNames.findIndex(
-                            (name) => name === previousWorkflowNode?.data.name
-                        );
+                        const previousComponentNameIndex =
+                            componentNames.findIndex(
+                                (name) =>
+                                    name === previousWorkflowNode?.data.name
+                            );
 
                         const tempComponentNames = [...componentNames];
 
@@ -286,9 +288,9 @@ const WorkflowNodes = memo(
                 <header className="border-b border-gray-200 px-3 pt-3 text-center text-gray-600">
                     <Input
                         name="contextualMenuFilter"
+                        onChange={(event) => setFilter(event.target.value)}
                         placeholder="Filter workflow nodes"
                         value={filter}
-                        onChange={(event) => setFilter(event.target.value)}
                     />
                 </header>
 
@@ -297,13 +299,13 @@ const WorkflowNodes = memo(
                         actionComponentDefinitions={
                             filteredActionComponentDefinitions
                         }
+                        hideActionComponents={hideActionComponents}
+                        hideTaskDispatchers={hideTaskDispatchers}
+                        hideTriggerComponents={hideTriggerComponents}
+                        onItemClick={handleItemClick}
                         taskDispatcherDefinitions={
                             filteredTaskDispatcherDefinitions
                         }
-                        onItemClick={handleItemClick}
-                        hideActionComponents={hideActionComponents}
-                        hideTriggerComponents={hideTriggerComponents}
-                        hideTaskDispatchers={hideTaskDispatchers}
                         triggerComponentDefinitions={
                             filteredTriggerComponentDefinitions
                         }
@@ -347,18 +349,18 @@ const WorkflowNodesPopoverMenu = ({
             <PopoverContent
                 align="start"
                 className="w-[500px] p-0 will-change-auto"
-                sideOffset={4}
                 side="right"
+                sideOffset={4}
             >
                 {id && (
                     <WorkflowNodes
-                        id={id}
                         componentDefinitions={componentDefinitions}
                         edge={edge}
-                        taskDispatcherDefinitions={taskDispatcherDefinitions}
                         hideActionComponents={hideActionComponents}
-                        hideTriggerComponents={hideTriggerComponents}
                         hideTaskDispatchers={hideTaskDispatchers}
+                        hideTriggerComponents={hideTriggerComponents}
+                        id={id}
+                        taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
                 )}
             </PopoverContent>

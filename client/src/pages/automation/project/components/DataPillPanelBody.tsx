@@ -97,11 +97,11 @@ const DataPillPanelBody = ({
                                                 {filteredProperties?.map(
                                                     (property) => (
                                                         <DataPill
-                                                            componentDefinition={
-                                                                componentAction.componentDefinition
-                                                            }
                                                             componentAlias={
                                                                 componentAction.workflowAlias
+                                                            }
+                                                            componentDefinition={
+                                                                componentAction.componentDefinition
                                                             }
                                                             key={property.name}
                                                             property={property}
