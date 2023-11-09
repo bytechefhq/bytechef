@@ -29,17 +29,17 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record TaskExecutionDTO(
-    ComponentDefinition componentDefinition, String createdBy, LocalDateTime createdDate, LocalDateTime endDate,
+    ComponentDefinition component, String createdBy, LocalDateTime createdDate, LocalDateTime endDate,
     ExecutionError error, long executionTime, Long id, Map<String, ?> input, Long jobId, String lastModifiedBy,
     LocalDateTime lastModifiedDate, int maxRetries, Object output, Long parentId, int priority, int progress,
     int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis, LocalDateTime startDate,
     TaskExecution.Status status, int taskNumber, String type, WorkflowTask workflowTask) {
 
     public TaskExecutionDTO(
-        ComponentDefinition componentDefinition, Map<String, ?> input, Object output, TaskExecution taskExecution) {
+        ComponentDefinition component, Map<String, ?> input, Object output, TaskExecution taskExecution) {
 
         this(
-            componentDefinition, taskExecution.getCreatedBy(), taskExecution.getCreatedDate(),
+            component, taskExecution.getCreatedBy(), taskExecution.getCreatedDate(),
             taskExecution.getEndDate(), taskExecution.getError(), taskExecution.getExecutionTime(),
             taskExecution.getId(), input, taskExecution.getJobId(), taskExecution.getLastModifiedBy(),
             taskExecution.getLastModifiedDate(), taskExecution.getMaxRetries(), output,
