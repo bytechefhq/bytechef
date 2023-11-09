@@ -246,7 +246,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Job"
+                $ref: "#/components/schemas/WorkflowExecution"
 components:
   schemas:
     ComponentDefinition:
@@ -620,6 +620,21 @@ components:
           description: "The type of the task."
           type: "string"
           readOnly: true
+    TestConnection:
+      description: "The connection used in a particular task."
+      type: "object"
+      properties:
+        id:
+          description: "The connection id"
+          type: "integer"
+          format: "int64"
+        key:
+          description: "The connection key under which a connection is defined in\
+            \ a workflow definition."
+          type: "string"
+        operationName:
+          description: "The operation(task/trigger) name to which a connection belongs."
+          type: "string"
     TestParameters:
       description: "Defines parameters used to test a workflow."
       type: "object"
@@ -627,7 +642,7 @@ components:
         connections:
           type: "array"
           items:
-            $ref: "#/components/schemas/TaskConnection"
+            $ref: "#/components/schemas/TestConnection"
         inputs:
           description: "The inputs expected by the workflow"
           type: "object"
