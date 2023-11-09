@@ -79,8 +79,8 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     return (
         <div
             className="relative flex min-w-[240px] cursor-pointer items-center justify-center"
-            onMouseOver={() => setIsHovered(true)}
             onMouseOut={() => setIsHovered(false)}
+            onMouseOver={() => setIsHovered(true)}
         >
             {!isFirstNode && !!isHovered && (
                 <div className="absolute left-[-46px] pr-4">

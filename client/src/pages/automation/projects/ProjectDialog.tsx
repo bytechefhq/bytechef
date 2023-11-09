@@ -191,6 +191,14 @@ const ProjectDialog = ({
                             field={field}
                             isMulti={false}
                             label="Category"
+                            onCreateOption={(inputValue: string) => {
+                                setValue('category', {
+                                    label: inputValue,
+                                    name: inputValue,
+                                    value: inputValue,
+                                    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                                } as any);
+                            }}
                             options={categories!.map(
                                 (category: CategoryModel) => ({
                                     label: category.name,
@@ -201,14 +209,6 @@ const ProjectDialog = ({
                                 })
                             )}
                             placeholder="Marketing, Sales, Social Media..."
-                            onCreateOption={(inputValue: string) => {
-                                setValue('category', {
-                                    label: inputValue,
-                                    name: inputValue,
-                                    value: inputValue,
-                                    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                                } as any);
-                            }}
                         />
                     )}
                 />
@@ -223,15 +223,6 @@ const ProjectDialog = ({
                             field={field}
                             isMulti
                             label="Tags"
-                            options={remainingTags!.map((tag: TagModel) => {
-                                return {
-                                    label: tag.name,
-                                    value: tag.name
-                                        .toLowerCase()
-                                        .replace(/\W/g, ''),
-                                    ...tag,
-                                };
-                            })}
                             onCreateOption={(inputValue: string) => {
                                 setValue('tags', [
                                     ...getValues().tags!,
@@ -242,6 +233,15 @@ const ProjectDialog = ({
                                     },
                                 ] as never[]);
                             }}
+                            options={remainingTags!.map((tag: TagModel) => {
+                                return {
+                                    label: tag.name,
+                                    value: tag.name
+                                        .toLowerCase()
+                                        .replace(/\W/g, ''),
+                                    ...tag,
+                                };
+                            })}
                         />
                     )}
                 />
@@ -258,8 +258,8 @@ const ProjectDialog = ({
 
                 <Button
                     label="Save"
-                    type="submit"
                     onClick={handleSubmit(saveProject)}
+                    type="submit"
                 />
             </div>
         </Dialog>

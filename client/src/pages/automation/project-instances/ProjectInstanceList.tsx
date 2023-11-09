@@ -40,25 +40,24 @@ const ProjectInstanceList = ({
 
                         return (
                             <Collapsible
-                                key={projectInstance.id}
                                 className="data-[state=closed]:border-b data-[state=closed]:border-b-gray-100"
+                                key={projectInstance.id}
                             >
                                 <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
                                     <ProjectInstanceListItem
-                                        projectInstance={projectInstance}
                                         key={projectInstance.id}
+                                        project={project}
+                                        projectInstance={projectInstance}
                                         remainingTags={tags?.filter(
                                             (tag) =>
                                                 !projectTagIds?.includes(tag.id)
                                         )}
-                                        project={project}
                                     />
                                 </div>
 
                                 <CollapsibleContent>
                                     <ProjectInstanceWorkflowList
                                         projectId={project.id}
-                                        projectInstanceId={projectInstance.id!}
                                         projectInstanceEnabled={
                                             projectInstanceMap.has(
                                                 projectInstance.id!
@@ -68,6 +67,7 @@ const ProjectInstanceList = ({
                                                   )!
                                                 : projectInstance.enabled!
                                         }
+                                        projectInstanceId={projectInstance.id!}
                                         projectInstanceWorkflows={
                                             projectInstance.projectInstanceWorkflows
                                         }

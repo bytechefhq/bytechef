@@ -93,12 +93,44 @@ const Connections = () => {
                     }: ${pageTitle || 'All'}`}
                 />
             }
-            leftSidebarHeader={
-                <PageHeader position="sidebar" title="Connections" />
-            }
             leftSidebarBody={
                 <LeftSidebarNav
-                    topTitle="Components"
+                    bottomBody={
+                        <>
+                            {!tagsLoading &&
+                                (!tags?.length ? (
+                                    <p className="px-3 text-xs">No tags.</p>
+                                ) : (
+                                    tags?.map((item) => (
+                                        <LeftSidebarNavItem
+                                            icon={
+                                                <TagIcon className="mr-1 h-4 w-4" />
+                                            }
+                                            item={{
+                                                filterData:
+                                                    filterData?.id ===
+                                                        item.id &&
+                                                    filterData.type ===
+                                                        Type.Tag,
+                                                id: item.id!,
+                                                name: item.name,
+                                                onItemClick: (
+                                                    id?: number | string
+                                                ) => {
+                                                    setFilterData({
+                                                        id,
+                                                        type: Type.Tag,
+                                                    });
+                                                },
+                                            }}
+                                            key={item.id}
+                                            toLink={`?tagId=${item.id}`}
+                                        />
+                                    ))
+                                ))}
+                        </>
+                    }
+                    bottomTitle="Tags"
                     topBody={
                         <>
                             <LeftSidebarNavItem
@@ -119,7 +151,6 @@ const Connections = () => {
                             {!componentsLoading &&
                                 components?.map((item) => (
                                     <LeftSidebarNavItem
-                                        key={item.name}
                                         item={{
                                             filterData:
                                                 filterData?.id === item.name &&
@@ -135,48 +166,17 @@ const Connections = () => {
                                                     type: Type.Component,
                                                 }),
                                         }}
+                                        key={item.name}
                                         toLink={`?componentName=${item.name}`}
                                     />
                                 ))}
                         </>
                     }
-                    bottomTitle="Tags"
-                    bottomBody={
-                        <>
-                            {!tagsLoading &&
-                                (!tags?.length ? (
-                                    <p className="px-3 text-xs">No tags.</p>
-                                ) : (
-                                    tags?.map((item) => (
-                                        <LeftSidebarNavItem
-                                            key={item.id}
-                                            item={{
-                                                filterData:
-                                                    filterData?.id ===
-                                                        item.id &&
-                                                    filterData.type ===
-                                                        Type.Tag,
-                                                id: item.id!,
-                                                name: item.name,
-                                                onItemClick: (
-                                                    id?: number | string
-                                                ) => {
-                                                    setFilterData({
-                                                        id,
-                                                        type: Type.Tag,
-                                                    });
-                                                },
-                                            }}
-                                            icon={
-                                                <TagIcon className="mr-1 h-4 w-4" />
-                                            }
-                                            toLink={`?tagId=${item.id}`}
-                                        />
-                                    ))
-                                ))}
-                        </>
-                    }
+                    topTitle="Components"
                 />
+            }
+            leftSidebarHeader={
+                <PageHeader position="sidebar" title="Connections" />
             }
         >
             <PageLoader

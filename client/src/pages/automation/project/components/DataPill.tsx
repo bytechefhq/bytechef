@@ -62,9 +62,6 @@ const DataPill = ({
                 className="mr-auto flex cursor-pointer items-center rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50"
                 data-name={property.name}
                 draggable
-                onDragStart={(event) =>
-                    event.dataTransfer.setData('name', property.name!)
-                }
                 onClick={() =>
                     addDataPillToInput(
                         componentAlias,
@@ -72,6 +69,9 @@ const DataPill = ({
                         parentProperty,
                         arrayIndex
                     )
+                }
+                onDragStart={(event) =>
+                    event.dataTransfer.setData('name', property.name!)
                 }
             >
                 <span className="mr-2" title={property.type}>
@@ -89,8 +89,8 @@ const DataPill = ({
                             component={component}
                             componentAlias={componentAlias}
                             key={`${componentAlias}-${subProperty.name}-${index}`}
-                            property={subProperty}
                             parentProperty={property}
+                            property={subProperty}
                         />
                     ))}
                 </ul>

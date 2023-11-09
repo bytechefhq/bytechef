@@ -72,9 +72,9 @@ const Pagination = ({
         return pageIndices.map((pageIndexToMap) => (
             <Button
                 key={`paginator_button_${pageIndexToMap}`}
+                onClick={onClick}
                 pageIndexToMap={pageIndexToMap}
                 pageNumber={pageNumber}
-                onClick={onClick}
             />
         ));
     }, [pageNumber, totalPages, onClick]);
@@ -131,8 +131,8 @@ const Pagination = ({
 
                 <div>
                     <nav
-                        className="isolate inline-flex -space-x-px rounded-md"
                         aria-label="Pagination"
+                        className="isolate inline-flex -space-x-px rounded-md"
                     >
                         <button
                             className="relative inline-flex items-center rounded-l-md p-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
@@ -146,8 +146,8 @@ const Pagination = ({
                             <span className="sr-only">Previous</span>
 
                             <ChevronLeftIcon
-                                className="h-5 w-5"
                                 aria-hidden="true"
+                                className="h-5 w-5"
                             />
                         </button>
 
@@ -165,8 +165,8 @@ const Pagination = ({
                             <span className="sr-only">Next</span>
 
                             <ChevronRightIcon
-                                className="h-5 w-5"
                                 aria-hidden="true"
+                                className="h-5 w-5"
                             />
                         </button>
                     </nav>

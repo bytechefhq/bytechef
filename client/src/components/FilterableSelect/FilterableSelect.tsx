@@ -48,8 +48,8 @@ const FilterableSelect = <
     <fieldset className={twMerge(label && 'mb-3', fieldsetClassName)}>
         {label && (
             <label
-                htmlFor={name || field?.name}
                 className="block text-sm font-medium text-gray-700"
+                htmlFor={name || field?.name}
             >
                 {label}
             </label>
@@ -80,9 +80,9 @@ const FilterableSelect = <
 
         {error && (
             <p
-                role="alert"
                 className="mt-2 text-sm text-rose-600"
                 id={`${name}-error`}
+                role="alert"
             >
                 This field is required
             </p>

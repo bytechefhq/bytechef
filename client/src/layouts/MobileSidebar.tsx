@@ -25,7 +25,7 @@ export function MobileSidebar({
     user,
 }: Props) {
     return (
-        <Transition.Root show={mobileMenuOpen} as={Fragment}>
+        <Transition.Root as={Fragment} show={mobileMenuOpen}>
             <Dialog
                 as="div"
                 className="relative z-40 lg:hidden"
@@ -69,8 +69,8 @@ export function MobileSidebar({
                                         displayType="icon"
                                         icon={
                                             <Cross1Icon
-                                                className="h-6 w-6 text-white"
                                                 aria-hidden="true"
+                                                className="h-6 w-6 text-white"
                                             />
                                         }
                                         onClick={() => setMobileMenuOpen(false)}
@@ -85,9 +85,9 @@ export function MobileSidebar({
                             <div className="pb-4 pt-5">
                                 <div className="flex shrink-0 items-center px-4">
                                     <img
+                                        alt="ByteChef"
                                         className="h-8 w-auto"
                                         src={reactLogo}
-                                        alt="ByteChef"
                                     />
                                 </div>
 
@@ -95,13 +95,13 @@ export function MobileSidebar({
                                     <div className="space-y-1 px-2">
                                         {navigation.map((item) => (
                                             <a
-                                                key={item.name}
-                                                href={item.href}
                                                 className="group flex items-center rounded-md p-2 text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                                                href={item.href}
+                                                key={item.name}
                                             >
                                                 <item.icon
-                                                    className="mr-4 h-6 w-6 text-gray-400 group-hover:text-gray-500"
                                                     aria-hidden="true"
+                                                    className="mr-4 h-6 w-6 text-gray-400 group-hover:text-gray-500"
                                                 />
 
                                                 {item.name}
@@ -112,13 +112,13 @@ export function MobileSidebar({
                             </div>
 
                             <div className="flex shrink-0 border-t border-gray-200 p-4">
-                                <a href="#" className="group block shrink-0">
+                                <a className="group block shrink-0" href="#">
                                     <div className="flex items-center">
                                         <div>
                                             <img
+                                                alt=""
                                                 className="inline-block h-10 w-10 rounded-full"
                                                 src={user.imageUrl}
-                                                alt=""
                                             />
                                         </div>
 
@@ -137,7 +137,7 @@ export function MobileSidebar({
                         </Dialog.Panel>
                     </Transition.Child>
 
-                    <div className="w-14 shrink-0" aria-hidden="true" />
+                    <div aria-hidden="true" className="w-14 shrink-0" />
                 </div>
             </Dialog>
         </Transition.Root>

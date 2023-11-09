@@ -26,8 +26,8 @@ const ContextualDialog = ({
             <Button
                 displayType="icon"
                 icon={<Cross1Icon />}
-                size="small"
                 onClick={handleCancelClick}
+                size="small"
             />
         </header>
 

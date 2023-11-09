@@ -8,12 +8,12 @@ describe('Input', async () => {
     it('should render the input', () => {
         render(
             <Input
-                name="email"
-                type="email"
-                error={undefined}
-                placeholder="Email"
-                label="Email Address"
                 aria-label="Email Address"
+                error={undefined}
+                label="Email Address"
+                name="email"
+                placeholder="Email"
+                type="email"
             />
         );
         expect(screen.getByText('Email Address')).toBeInTheDocument();
@@ -26,11 +26,11 @@ describe('Input', async () => {
     it('should change input value', async () => {
         render(
             <Input
-                name="email"
-                type="email"
-                placeholder="Email"
-                label="Email Address"
                 aria-label="Email Address"
+                label="Email Address"
+                name="email"
+                placeholder="Email"
+                type="email"
             />
         );
 
@@ -49,12 +49,12 @@ describe('Input', async () => {
     it('should render the input with error', () => {
         render(
             <Input
-                name="email"
-                type="email"
-                placeholder="Email"
-                label="Email Address"
                 aria-label="Email Address"
                 error
+                label="Email Address"
+                name="email"
+                placeholder="Email"
+                type="email"
             />
         );
         expect(
@@ -69,13 +69,13 @@ describe('Input', async () => {
     it('should render the asterisk if input is required', () => {
         render(
             <Input
-                name="email"
-                type="email"
+                aria-label="Email Address"
                 error={undefined}
+                label="Email Address"
+                name="email"
                 placeholder="Email"
                 required
-                label="Email Address"
-                aria-label="Email Address"
+                type="email"
             />
         );
         expect(screen.getByText('Email Address')).toBeInTheDocument();

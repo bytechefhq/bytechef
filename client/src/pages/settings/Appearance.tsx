@@ -39,7 +39,7 @@ export default function Appearance() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
                 <FormField
                     control={form.control}
                     name="theme"
@@ -54,18 +54,18 @@ export default function Appearance() {
                             <FormMessage />
 
                             <RadioGroup
+                                className="grid max-w-xl grid-cols-3 gap-8 pt-2"
+                                defaultValue={field.value}
                                 onValueChange={(
                                     e: 'light' | 'dark' | 'system'
                                 ) => field.onChange(e)}
-                                defaultValue={field.value}
-                                className="grid max-w-xl grid-cols-3 gap-8 pt-2"
                             >
                                 <FormItem>
                                     <FormLabel className="[&:has([data-state=checked])>div]:border-primary">
                                         <FormControl>
                                             <RadioGroupItem
-                                                value="light"
                                                 className="sr-only"
+                                                value="light"
                                             />
                                         </FormControl>
 
@@ -101,8 +101,8 @@ export default function Appearance() {
                                     <FormLabel className="[&:has([data-state=checked])>div]:border-primary">
                                         <FormControl>
                                             <RadioGroupItem
-                                                value="dark"
                                                 className="sr-only"
+                                                value="dark"
                                             />
                                         </FormControl>
 
@@ -138,8 +138,8 @@ export default function Appearance() {
                                     <FormLabel className="[&:has([data-state=checked])>div]:border-primary">
                                         <FormControl>
                                             <RadioGroupItem
-                                                value="system"
                                                 className="sr-only"
+                                                value="system"
                                             />
                                         </FormControl>
 

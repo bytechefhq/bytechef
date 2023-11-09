@@ -37,7 +37,7 @@ const Dialog = ({
     triggerLabel,
     wizard = false,
 }: DialogProps) => (
-    <Root open={isOpen} onOpenChange={onOpenChange}>
+    <Root onOpenChange={onOpenChange} open={isOpen}>
         {customTrigger && <Trigger asChild>{customTrigger}</Trigger>}
 
         {!customTrigger && !!triggerLabel && (
@@ -58,8 +58,8 @@ const Dialog = ({
                     leaveTo="opacity-0"
                 >
                     <Overlay
-                        forceMount
                         className="fixed inset-0 z-20 bg-black/50"
+                        forceMount
                     />
                 </Transition.Child>
 
@@ -73,12 +73,12 @@ const Dialog = ({
                     leaveTo="opacity-0 scale-95"
                 >
                     <Content
-                        forceMount
                         className={twMerge(
                             'fixed left-[50%] top-[50%] z-50 max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white focus:outline-none focus-visible:ring focus-visible:ring-blue-500/75 md:w-full',
                             !wizard && 'p-4',
                             className
                         )}
+                        forceMount
                     >
                         <Title className="text-base font-medium">{title}</Title>
 

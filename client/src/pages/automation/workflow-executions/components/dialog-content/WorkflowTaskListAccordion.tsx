@@ -19,8 +19,8 @@ const WorkflowTaskListAccordion = ({
 }) => (
     <Accordion
         collapsible
-        type="single"
         defaultValue={taskExecutions[0].id || ''}
+        type="single"
     >
         {taskExecutions.map((taskExecution) => {
             const {endDate, id, input, output, startDate, workflowTask} =
@@ -80,8 +80,8 @@ const WorkflowTaskListAccordion = ({
 
                                 {input && typeof input === 'object' ? (
                                     <ReactJson
-                                        src={input as object}
                                         enableClipboard={false}
+                                        src={input as object}
                                     />
                                 ) : (
                                     <pre className="mt-2 text-xs">{input}</pre>
@@ -102,8 +102,8 @@ const WorkflowTaskListAccordion = ({
                                 <pre className="mt-2 text-sm">
                                     {output && typeof output === 'object' ? (
                                         <ReactJson
-                                            src={output as object}
                                             enableClipboard={false}
+                                            src={output as object}
                                         />
                                     ) : (
                                         <pre className="mt-2 text-xs">

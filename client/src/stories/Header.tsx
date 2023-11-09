@@ -23,9 +23,9 @@ export const Header = ({
         <div className="wrapper">
             <div>
                 <svg
-                    width="32"
                     height="32"
                     viewBox="0 0 32 32"
+                    width="32"
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <g fill="none" fillRule="evenodd">
@@ -56,16 +56,16 @@ export const Header = ({
                             Welcome, <b>{user.name}</b>!
                         </span>
 
-                        <Button size="sm" onClick={onLogout}>
+                        <Button onClick={onLogout} size="sm">
                             Log out
                         </Button>
                     </>
                 ) : (
                     <>
-                        <Button size="sm" onClick={onLogin}>
+                        <Button onClick={onLogin} size="sm">
                             Log in
                         </Button>
-                        <Button size="sm" onClick={onCreateAccount}>
+                        <Button onClick={onCreateAccount} size="sm">
                             Sign up
                         </Button>
                     </>

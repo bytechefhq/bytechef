@@ -71,11 +71,11 @@ const DatePicker = ({
             <Popover>
                 <PopoverTrigger asChild className="mt-1">
                     <Button
-                        variant={'outline'}
                         className={cn(
                             'w-full justify-start text-left font-normal',
                             !date && 'text-muted-foreground'
                         )}
+                        variant={'outline'}
                     >
                         <CalendarIcon className="mr-2 h-4 w-4" />
 
@@ -83,15 +83,15 @@ const DatePicker = ({
                     </Button>
                 </PopoverTrigger>
 
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent align="start" className="w-auto p-0">
                     <Calendar
+                        initialFocus
                         mode="single"
-                        selected={date}
                         onSelect={(date) => {
                             setDate(date);
                             onChange(date);
                         }}
-                        initialFocus
+                        selected={date}
                     />
                 </PopoverContent>
             </Popover>
@@ -167,13 +167,13 @@ const WorkflowExecutions = () => {
                     WorkflowExecutionsPage.content.length > 0 && (
                         <PageFooter position="main">
                             <Pagination
+                                onClick={setFilterPageNumber}
                                 pageNumber={WorkflowExecutionsPage.number!}
                                 pageSize={WorkflowExecutionsPage.size!}
                                 totalElements={
                                     WorkflowExecutionsPage.totalElements!
                                 }
                                 totalPages={WorkflowExecutionsPage.totalPages!}
-                                onClick={setFilterPageNumber}
                             />
                         </PageFooter>
                     )
@@ -194,7 +194,6 @@ const WorkflowExecutions = () => {
                                 isClearable
                                 label="Status"
                                 name="jobStatus"
-                                options={jobStatusOptions}
                                 onChange={(
                                     value: OnChangeValue<ISelectOption, false>
                                 ) => {
@@ -206,6 +205,7 @@ const WorkflowExecutions = () => {
                                         setFilterStatus(undefined);
                                     }
                                 }}
+                                options={jobStatusOptions}
                             />
 
                             <DatePicker
@@ -223,10 +223,6 @@ const WorkflowExecutions = () => {
                                     isClearable
                                     label="Projects"
                                     name="project"
-                                    options={projects?.map((project) => ({
-                                        label: project.name,
-                                        value: (project.id || 0).toString(),
-                                    }))}
                                     onChange={(
                                         value: OnChangeValue<
                                             ISelectOption,
@@ -241,6 +237,10 @@ const WorkflowExecutions = () => {
                                             setFilterProjectId(undefined);
                                         }
                                     }}
+                                    options={projects?.map((project) => ({
+                                        label: project.name,
+                                        value: (project.id || 0).toString(),
+                                    }))}
                                 />
                             )}
 
@@ -249,11 +249,6 @@ const WorkflowExecutions = () => {
                                     isClearable
                                     label="Workflows"
                                     name="workflows"
-                                    options={workflows?.map((workflow) => ({
-                                        label:
-                                            workflow.label || 'undefined label',
-                                        value: (workflow.id || 0).toString(),
-                                    }))}
                                     onChange={(
                                         value: OnChangeValue<
                                             ISelectOption,
@@ -266,6 +261,11 @@ const WorkflowExecutions = () => {
                                             setFilterWorkflowId(undefined);
                                         }
                                     }}
+                                    options={workflows?.map((workflow) => ({
+                                        label:
+                                            workflow.label || 'undefined label',
+                                        value: (workflow.id || 0).toString(),
+                                    }))}
                                 />
                             )}
 
@@ -275,14 +275,6 @@ const WorkflowExecutions = () => {
                                         isClearable
                                         label="Instances"
                                         name="instances"
-                                        options={projectInstances?.map(
-                                            (instance) => ({
-                                                label: instance.name,
-                                                value: (
-                                                    instance.id || 0
-                                                ).toString(),
-                                            })
-                                        )}
                                         onChange={(
                                             value: OnChangeValue<
                                                 ISelectOption,
@@ -295,6 +287,14 @@ const WorkflowExecutions = () => {
                                                   )
                                                 : setFilterInstanceId(undefined)
                                         }
+                                        options={projectInstances?.map(
+                                            (instance) => ({
+                                                label: instance.name,
+                                                value: (
+                                                    instance.id || 0
+                                                ).toString(),
+                                            })
+                                        )}
                                     />
                                 )}
                         </div>

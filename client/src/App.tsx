@@ -65,10 +65,10 @@ function App() {
         <div className="flex h-full">
             <TooltipProvider>
                 <MobileSidebar
-                    user={user}
-                    navigation={navigation}
                     mobileMenuOpen={mobileMenuOpen}
+                    navigation={navigation}
                     setMobileMenuOpen={setMobileMenuOpen}
+                    user={user}
                 />
 
                 <DesktopSidebar navigation={navigation} />

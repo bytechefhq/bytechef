@@ -16,11 +16,11 @@ const sizes: Record<Size, string> = {
 
 const EmptyAvatar = ({size = 'medium'}: Pick<AvatarProps, 'size'>) => (
     <span
-        data-testid="empty-avatar"
         className={twMerge(
             'inline-block overflow-hidden rounded-full bg-gray-200',
             sizes[size]
         )}
+        data-testid="empty-avatar"
     >
         <svg
             className="h-full w-full text-gray-300"
@@ -39,12 +39,12 @@ export default function Avatar({alt, size = 'medium', src}: AvatarProps) {
 
     return (
         <img
+            alt={alt}
             className={twMerge(
                 'mx-auto block h-10 w-10 rounded-full',
                 sizes[size]
             )}
             src={src}
-            alt={alt}
         />
     );
 }

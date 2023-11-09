@@ -29,13 +29,13 @@ const ReadOnlyWorkflow = ({
 
             <div className="flex align-middle">
                 <Button
-                    size="sm"
                     className="ml-4"
                     onClick={() =>
                         navigate(
                             `/automation/projects/${project?.id}/workflow/${workflow?.id}`
                         )
                     }
+                    size="sm"
                     variant="outline"
                 >
                     <PencilIcon className="mr-1 h-4 w-4 cursor-pointer" /> Edit
@@ -44,13 +44,13 @@ const ReadOnlyWorkflow = ({
                 <Button
                     aria-label="Close panel"
                     className="ml-auto"
-                    variant="ghost"
-                    size="icon"
                     onClick={() => setWorkflowExecutionDetailsDialogOpen(false)}
+                    size="icon"
+                    variant="ghost"
                 >
                     <Cross1Icon
-                        className="h-3 w-3 cursor-pointer"
                         aria-hidden="true"
+                        className="h-3 w-3 cursor-pointer"
                     />
                 </Button>
             </div>

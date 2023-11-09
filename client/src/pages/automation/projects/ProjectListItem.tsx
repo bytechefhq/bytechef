@@ -160,18 +160,18 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                             <div onClick={(event) => event.preventDefault()}>
                                 {project.tags && (
                                     <TagList
-                                        id={project.id!}
-                                        remainingTags={remainingTags}
-                                        tags={project.tags}
-                                        updateTagsMutation={
-                                            updateProjectTagsMutation
-                                        }
                                         getRequest={(id, tags) => ({
                                             id: id!,
                                             updateTagsRequestModel: {
                                                 tags: tags || [],
                                             },
                                         })}
+                                        id={project.id!}
+                                        remainingTags={remainingTags}
+                                        tags={project.tags}
+                                        updateTagsMutation={
+                                            updateProjectTagsMutation
+                                        }
                                     />
                                 )}
                             </div>
@@ -184,8 +184,8 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                     ProjectModelStatusEnum.Published ? (
                                         <div className="flex items-center text-sm text-gray-500">
                                             <CalendarIcon
-                                                className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
                                                 aria-hidden="true"
+                                                className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
                                             />
 
                                             <span>
@@ -206,7 +206,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                 <div className="flex w-2/12 justify-end">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
+                            <Button size="icon" variant="ghost">
                                 <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
                             </Button>
                         </DropdownMenuTrigger>
@@ -284,22 +284,22 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
             {showEditDialog && (
                 <ProjectDialog
+                    onClose={() => setShowEditDialog(false)}
                     project={project}
                     showTrigger={false}
                     visible
-                    onClose={() => setShowEditDialog(false)}
                 />
             )}
 
             {showWorkflowDialog && !!project.id && (
                 <WorkflowDialog
-                    parentId={project.id}
-                    showTrigger={false}
-                    visible
                     createWorkflowRequestMutation={
                         createProjectWorkflowRequestMutation
                     }
                     onClose={() => setShowWorkflowDialog(false)}
+                    parentId={project.id}
+                    showTrigger={false}
+                    visible
                 />
             )}
         </>

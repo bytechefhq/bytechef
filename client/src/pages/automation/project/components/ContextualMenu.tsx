@@ -256,9 +256,9 @@ const ContextualMenu = ({
             <header className="border-b border-gray-200 px-3 pt-3 text-center text-gray-600">
                 <Input
                     name="contextualMenuFilter"
+                    onChange={(event) => setFilter(event.target.value)}
                     placeholder="Filter workflow nodes"
                     value={filter}
-                    onChange={(event) => setFilter(event.target.value)}
                 />
             </header>
 

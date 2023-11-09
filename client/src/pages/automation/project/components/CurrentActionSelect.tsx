@@ -48,8 +48,8 @@ const CurrentActionSelect = ({
                     label: action.title || action.name,
                     value: action.name,
                 }))}
-                value={value}
                 triggerClassName="w-full bg-gray-100 border-none"
+                value={value}
             />
         )}
     </div>

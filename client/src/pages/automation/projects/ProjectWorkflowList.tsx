@@ -64,14 +64,14 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
 
                     return (
                         <li
-                            key={workflow.id}
                             className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
+                            key={workflow.id}
                         >
                             <ProjectWorkflowListItem
-                                key={workflow.id}
                                 filteredDefinitionNames={
                                     filteredDefinitionNames
                                 }
+                                key={workflow.id}
                                 project={project}
                                 workflow={workflow}
                                 workflowComponentDefinitions={

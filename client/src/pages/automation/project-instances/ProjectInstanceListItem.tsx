@@ -146,18 +146,18 @@ const ProjectInstanceListItem = ({
                             <div onClick={(event) => event.preventDefault()}>
                                 {projectInstance.tags && (
                                     <TagList
-                                        id={projectInstance.id!}
-                                        remainingTags={remainingTags}
-                                        tags={projectInstance.tags}
-                                        updateTagsMutation={
-                                            updateProjectInstanceTagsMutation
-                                        }
                                         getRequest={(id, tags) => ({
                                             id: id!,
                                             updateTagsRequestModel: {
                                                 tags: tags || [],
                                             },
                                         })}
+                                        id={projectInstance.id!}
+                                        remainingTags={remainingTags}
+                                        tags={projectInstance.tags}
+                                        updateTagsMutation={
+                                            updateProjectInstanceTagsMutation
+                                        }
                                     />
                                 )}
                             </div>
@@ -169,8 +169,8 @@ const ProjectInstanceListItem = ({
                                     {projectInstance.lastExecutionDate ? (
                                         <div className="flex text-sm text-gray-500">
                                             <CalendarIcon
-                                                className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
                                                 aria-hidden="true"
+                                                className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
                                             />
 
                                             <span>
@@ -282,10 +282,10 @@ const ProjectInstanceListItem = ({
 
             {showEditDialog && (
                 <ProjectInstanceDialog
+                    onClose={() => setShowEditDialog(false)}
                     projectInstance={projectInstance}
                     showTrigger={false}
                     visible
-                    onClose={() => setShowEditDialog(false)}
                 />
             )}
         </>

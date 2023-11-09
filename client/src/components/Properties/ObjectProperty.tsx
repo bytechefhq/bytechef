@@ -57,13 +57,13 @@ const ObjectProperty = ({
                     )}
                 >
                     <Button
-                        displayType="unstyled"
-                        label="Add property"
-                        size="small"
                         className="rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
-                        onClick={() => setAdditionalPropertiesDialogOpen(true)}
-                        iconPosition="left"
+                        displayType="unstyled"
                         icon={<PlusIcon className="h-4 w-4" />}
+                        iconPosition="left"
+                        label="Add property"
+                        onClick={() => setAdditionalPropertiesDialogOpen(true)}
+                        size="small"
                     />
 
                     {additionalPropertiesDialogOpen && (
@@ -77,9 +77,9 @@ const ObjectProperty = ({
                                 title="Add property"
                             >
                                 <Input
-                                    placeholder="Name for the additional property"
-                                    name="additionalPropertyName"
                                     label="Name"
+                                    name="additionalPropertyName"
+                                    placeholder="Name for the additional property"
                                 />
 
                                 {(additionalProperties as PropertyType[])

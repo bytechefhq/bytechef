@@ -102,8 +102,8 @@ const ProjectWorkflowListItem = ({
 
                             return (
                                 <div
-                                    key={name}
                                     className="mr-0.5 flex items-center justify-center rounded-full border p-1"
+                                    key={name}
                                 >
                                     <Tooltip>
                                         <TooltipTrigger>
@@ -133,8 +133,8 @@ const ProjectWorkflowListItem = ({
                             <TooltipTrigger>
                                 <div className="flex items-center text-sm text-gray-500">
                                     <CalendarIcon
-                                        className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
                                         aria-hidden="true"
+                                        className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
                                     />
 
                                     <span>{`${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}</span>
@@ -150,7 +150,7 @@ const ProjectWorkflowListItem = ({
             <div className="flex w-2/12 justify-end">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button size="icon" variant="ghost">
                             <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
                         </Button>
                     </DropdownMenuTrigger>
