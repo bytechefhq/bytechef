@@ -74,6 +74,8 @@ module.exports = {
             },
             minWidth: {
                 'select-trigger-width': 'var(--radix-select-trigger-width)',
+                'combo-box-popper-anchor-width':
+                    'var(--radix-popper-anchor-width)',
             },
             maxWidth: {
                 'select-trigger-width': 'var(--radix-select-trigger-width)',

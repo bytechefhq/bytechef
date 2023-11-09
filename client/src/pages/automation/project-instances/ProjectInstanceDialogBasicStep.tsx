@@ -1,9 +1,12 @@
-import ComboBox, {ComboBoxItem} from '@/components/CombBox';
+import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
 import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstances.queries';
 import {useGetProjectsQuery} from '@/queries/projects.queries';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Input from 'components/Input/Input';
-import {ProjectInstanceModel} from 'middleware/helios/configuration';
+import {
+    ProjectInstanceModel,
+    ProjectModel,
+} from 'middleware/helios/configuration';
 import {
     Control,
     Controller,
@@ -24,6 +27,16 @@ interface ProjectDialogBasicStepProps {
     setValue: UseFormSetValue<ProjectInstanceModel>;
     touchedFields: UseFormReturn<ProjectInstanceModel>['formState']['touchedFields'];
 }
+
+const ProjectLabel = ({project}: {project: ProjectModel}) => (
+    <div className="flex items-center">
+        <span className="mr-1 ">{project.name}</span>
+
+        <span className="text-xs text-gray-500">
+            {project?.tags?.map((tag) => tag.name).join(', ')}
+        </span>
+    </div>
+);
 
 const ProjectInstanceDialogBasicStep = ({
     control,
@@ -72,23 +85,12 @@ const ProjectInstanceDialogBasicStep = ({
                                         (project) =>
                                             ({
                                                 label: (
-                                                    <span className="flex items-center">
-                                                        <span className="mr-1 ">
-                                                            {project.name}
-                                                        </span>
-
-                                                        <span className="text-xs text-gray-500">
-                                                            {project?.tags
-                                                                ?.map(
-                                                                    (tag) =>
-                                                                        tag.name
-                                                                )
-                                                                .join(', ')}
-                                                        </span>
-                                                    </span>
+                                                    <ProjectLabel
+                                                        project={project}
+                                                    />
                                                 ),
                                                 value: project.id,
-                                            }) as ComboBoxItem
+                                            }) as ComboBoxItemType
                                     )}
                                     label="Project"
                                     name="project"

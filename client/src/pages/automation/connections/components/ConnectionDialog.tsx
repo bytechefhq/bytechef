@@ -1,4 +1,4 @@
-import ComboBox, {ComboBoxItem} from '@/components/CombBox';
+import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Checkbox} from '@/components/ui/checkbox';
@@ -475,7 +475,7 @@ const ConnectionDialog = ({
                                                                     ? connectionDefinition.componentTitle
                                                                     : undefined,
                                                                 value: connectionDefinition.componentName,
-                                                            }) as ComboBoxItem
+                                                            }) as ComboBoxItemType
                                                     )}
                                                     label="Component"
                                                     onChange={(item) =>

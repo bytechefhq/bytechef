@@ -19,6 +19,11 @@ const WorkflowTriggerAccordion = ({
     const {endDate, id, input, output, startDate, workflowTrigger} =
         triggerExecution;
 
+    const duration =
+        startDate &&
+        endDate &&
+        Math.round(endDate?.getTime() - startDate.getTime());
+
     return (
         <>
             {workflowTrigger?.label && (
@@ -36,14 +41,9 @@ const WorkflowTriggerAccordion = ({
                         </div>
 
                         <div className="flex items-center">
-                            {startDate && endDate && (
-                                <span className="ml-auto mr-2 text-xs">
-                                    {Math.round(
-                                        endDate?.getTime() - startDate.getTime()
-                                    )}
-                                    ms
-                                </span>
-                            )}
+                            <span className="ml-auto mr-2 text-xs">
+                                {duration}ms
+                            </span>
 
                             <CheckCircledIcon
                                 className={twMerge(

@@ -17,7 +17,7 @@ import {FieldPath} from 'react-hook-form/dist/types';
 import {ControllerRenderProps} from 'react-hook-form/dist/types/controller';
 import InlineSVG from 'react-inlinesvg';
 
-export type ComboBoxItem = {
+export type ComboBoxItemType = {
     icon?: string;
     label: string | ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -30,11 +30,11 @@ export type ComboBoxProps<
     TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
     field?: ControllerRenderProps<TFieldValues, TName>;
-    items: ComboBoxItem[];
+    items: ComboBoxItemType[];
     label?: string | ReactNode;
     maxHeight?: boolean;
     name?: string;
-    onChange: (item?: ComboBoxItem) => void;
+    onChange: (item?: ComboBoxItemType) => void;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     value?: any;
 };
@@ -53,25 +53,28 @@ const ComboBox = <
 }: ComboBoxProps<TFieldValues, TName>) => {
     const [open, setOpen] = useState(false);
 
-    const commandItems = items.map((item) => (
+    const commandItems = items.map((comboBoxItem) => (
         <CommandItem
-            key={item.value}
+            key={comboBoxItem.value}
             onSelect={() => {
                 setOpen(false);
-                onChange(item);
+                onChange(comboBoxItem);
             }}
-            value={item.value}
+            value={comboBoxItem.value}
         >
-            {item.icon && (
-                <InlineSVG className="mr-2 h-6 w-6 flex-none" src={item.icon} />
+            {comboBoxItem.icon && (
+                <InlineSVG
+                    className="mr-2 h-6 w-6 flex-none"
+                    src={comboBoxItem.icon}
+                />
             )}
 
-            {item.label}
+            {comboBoxItem.label}
 
             <CheckIcon
                 className={cn(
                     'ml-auto h-4 w-4',
-                    item.value === (value || field?.value)
+                    comboBoxItem.value === (value || field?.value)
                         ? 'opacity-100'
                         : 'opacity-0'
                 )}
@@ -115,8 +118,7 @@ const ComboBox = <
 
                 <PopoverContent
                     align="start"
-                    /* eslint-disable tailwindcss/no-custom-classname */
-                    className="min-w-[var(--radix-popper-anchor-width)) p-0"
+                    className="min-w-combo-box-popper-anchor-width p-0"
                 >
                     <Command>
                         <CommandInput className="h-9" placeholder="Search..." />
