@@ -32,10 +32,12 @@ public interface ProjectInstanceWorkflowConnectionRepository
     @Query("""
             SELECT project_instance_workflow_connection.* FROM project_instance_workflow_connection
             JOIN project_instance_workflow ON project_instance_workflow_connection.project_instance_workflow_id = project_instance_workflow.id
-            WHERE project_instance_workflow.workflow_id = :workflowId
+            WHERE project_instance_workflow.project_instance_id = :projectInstanceId
+            AND project_instance_workflow.workflow_id = :workflowId
             AND project_instance_workflow_connection.operation_name = :operationName
             AND project_instance_workflow_connection.key = :key
         """)
-    Optional<ProjectInstanceWorkflowConnection> findByWorkflowIdAndOperationNameAndKey(
-        @Param("workflowId") String workflowId, @Param("operationName") String operationName, @Param("key") String key);
+    Optional<ProjectInstanceWorkflowConnection> findByProjectInstanceIdAndWorkflowIdAndOperationNameAndKey(
+        @Param("projectInstanceId") long projectInstanceId, @Param("workflowId") String workflowId,
+        @Param("operationName") String operationName, @Param("key") String key);
 }

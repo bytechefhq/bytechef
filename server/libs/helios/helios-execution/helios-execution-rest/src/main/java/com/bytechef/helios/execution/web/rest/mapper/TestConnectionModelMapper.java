@@ -16,32 +16,18 @@
 
 package com.bytechef.helios.execution.web.rest.mapper;
 
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.helios.execution.dto.TestConnection;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
-import com.bytechef.helios.execution.web.rest.mapper.util.MetadataUtils;
-import com.bytechef.helios.execution.web.rest.model.TestParametersModel;
-import java.util.Map;
+import com.bytechef.helios.execution.web.rest.model.TestConnectionModel;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
 @Mapper(config = ProjectExecutionMapperSpringConfig.class)
-public interface ProjectTestParametersModelMapper extends Converter<TestParametersModel, JobParameters> {
+public interface TestConnectionModelMapper extends Converter<TestConnectionModel, TestConnection> {
 
     @Override
-    @Mapping(target = "label", ignore = true)
-    @Mapping(target = "metadata", qualifiedByName = "metadata", source = ".")
-    @Mapping(target = "priority", ignore = true)
-    @Mapping(target = "parentTaskExecutionId", ignore = true)
-    @Mapping(target = "webhooks", ignore = true)
-    JobParameters convert(TestParametersModel testParametersModel);
-
-    @Named("metadata")
-    default Map<String, Object> getMetadata(TestParametersModel testParametersModel) {
-        return MetadataUtils.getMetadata(testParametersModel.getConnections());
-    }
+    TestConnection convert(TestConnectionModel testConnectionModel);
 }

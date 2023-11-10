@@ -18,8 +18,11 @@ package com.bytechef.helios.execution.web.rest.mapper;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
-import com.bytechef.helios.execution.web.rest.mapper.util.MetadataUtils;
 import com.bytechef.helios.execution.web.rest.model.JobParametersModel;
+import com.bytechef.helios.execution.web.rest.model.TaskConnectionModel;
+import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -38,6 +41,22 @@ public interface ProjectJobParametersModelMapper extends Converter<JobParameters
 
     @Named("metadata")
     default Map<String, Object> getMetadata(JobParametersModel jobParametersModel) {
-        return MetadataUtils.getMetadata(jobParametersModel.getConnections());
+        return getMetadata(jobParametersModel.getConnections());
+    }
+
+    private static Map<String, Object> getMetadata(List<TaskConnectionModel> taskConnectionModels) {
+        Map<String, Map<String, Map<String, Long>>> connectionMap = new HashMap<>();
+
+        if (taskConnectionModels != null) {
+            for (TaskConnectionModel taskConnectionModel : taskConnectionModels) {
+                Map<String, Map<String, Long>> connection = connectionMap.computeIfAbsent(
+                    taskConnectionModel.getTaskName(), key -> new HashMap<>());
+
+                connection.put(
+                    taskConnectionModel.getKey(), Map.of(WorkflowConnection.ID, taskConnectionModel.getId()));
+            }
+        }
+
+        return Map.of(WorkflowConnection.CONNECTIONS, connectionMap);
     }
 }

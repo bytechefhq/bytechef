@@ -31,17 +31,20 @@ public interface ProjectInstanceWorkflowService {
     void delete(Long id);
 
     Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey);
+        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
+        String workflowConnectionKey);
 
     boolean isProjectInstanceWorkflowEnabled(long projectInstanceId, String workflowId);
 
     ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId);
 
     ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey);
+        long projectInstanceOd, String workflowId, String workflowConnectionOperationName,
+        String workflowConnectionKey);
 
     long getProjectInstanceWorkflowConnectionId(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey);
+        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
+        String workflowConnectionKey);
 
     List<ProjectInstanceWorkflow> getProjectInstanceWorkflows(long projectInstanceId);
 

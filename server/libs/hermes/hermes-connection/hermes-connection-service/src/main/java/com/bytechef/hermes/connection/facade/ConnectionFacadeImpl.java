@@ -201,12 +201,18 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
 
-    private boolean isConnectionUsed(long id, int type) {
+    private static boolean containsTag(Connection connection, Tag tag) {
+        List<Long> curTagIds = connection.getTagIds();
+
+        return curTagIds.contains(tag.getId());
+    }
+
+    private boolean isConnectionUsed(long connectionId, int type) {
         List<Workflow> workflows = workflowService.getWorkflows(type);
 
         for (Workflow workflow : workflows) {
             for (WorkflowTask workflowTask : workflow.getTasks()) {
-                if (containsConnection(workflow.getId(), workflowTask, id, type)) {
+                if (isConnectionUsed(workflow.getId(), workflowTask, connectionId, type)) {
                     return true;
                 }
             }
@@ -215,41 +221,34 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return false;
     }
 
-    private boolean containsConnection(
-        String workflowId, WorkflowConnection workflowConnection, long id, int type) {
+    private boolean isConnectionUsed(
+        String workflowId, WorkflowConnection workflowConnection, long connectionId, int type) {
 
         return workflowConnection.getId()
-            .map(connectionId -> id == connectionId)
-            .orElseGet(() -> connectionIdExists(
-                workflowId, workflowConnection.getOperationName(), workflowConnection.getKey(), id, type));
+            .map(curConnectionId -> connectionId == curConnectionId)
+            .orElseGet(() -> isConnectionUsed(
+                workflowId, workflowConnection.getOperationName(), workflowConnection.getKey(),
+                connectionId, type));
     }
 
-    private boolean containsConnection(
+    private boolean isConnectionUsed(
         String workflowId, WorkflowTask workflowTask, long id, int type) {
 
         return WorkflowConnection.of(workflowTask)
             .stream()
-            .map(workflowConnection -> containsConnection(workflowId, workflowConnection, id, type))
+            .map(workflowConnection -> isConnectionUsed(workflowId, workflowConnection, id, type))
             .findFirst()
             .orElse(false);
     }
 
-    private static boolean containsTag(Connection connection, Tag tag) {
-        List<Long> curTagIds = connection.getTagIds();
-
-        return curTagIds.contains(tag.getId());
-    }
-
-    private boolean connectionIdExists(
+    private boolean isConnectionUsed(
         String workflowId, String workflowConnectionOperationName, String workflowConnectionKey, long connectionId,
         int type) {
 
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(type);
 
-        return instanceAccessor.fetchInstanceWorkflowConnectionId(
-            workflowId, workflowConnectionOperationName, workflowConnectionKey)
-            .map(curConnectionId -> Objects.equals(curConnectionId, connectionId))
-            .orElse(false);
+        return instanceAccessor.isConnectionUsed(
+            connectionId, workflowId, workflowConnectionOperationName, workflowConnectionKey);
     }
 
     private List<Tag> filterTags(List<Tag> tags, Connection connection) {

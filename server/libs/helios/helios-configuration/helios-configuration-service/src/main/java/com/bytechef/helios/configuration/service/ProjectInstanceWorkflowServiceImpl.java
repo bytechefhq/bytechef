@@ -61,10 +61,11 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     @Override
     @Transactional(readOnly = true)
     public Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
+        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
+        String workflowConnectionKey) {
 
-        return projectInstanceWorkflowConnectionRepository.findByWorkflowIdAndOperationNameAndKey(
-            workflowId, workflowConnectionOperationName, workflowConnectionKey);
+        return projectInstanceWorkflowConnectionRepository.findByProjectInstanceIdAndWorkflowIdAndOperationNameAndKey(
+            projectInstanceId, workflowId, workflowConnectionOperationName, workflowConnectionKey);
     }
 
     @Override
@@ -78,19 +79,22 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     @Override
     @Transactional(readOnly = true)
     public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
+        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
+        String workflowConnectionKey) {
 
-        return OptionalUtils.get(projectInstanceWorkflowConnectionRepository.findByWorkflowIdAndOperationNameAndKey(
-            workflowId, workflowConnectionKey, workflowConnectionOperationName));
+        return OptionalUtils.get(
+            projectInstanceWorkflowConnectionRepository.findByProjectInstanceIdAndWorkflowIdAndOperationNameAndKey(
+                projectInstanceId, workflowId, workflowConnectionKey, workflowConnectionOperationName));
     }
 
     @Override
     @Transactional(readOnly = true)
     public long getProjectInstanceWorkflowConnectionId(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
+        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
+        String workflowConnectionKey) {
 
         ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection = getProjectInstanceWorkflowConnection(
-            workflowId, workflowConnectionOperationName, workflowConnectionKey);
+            projectInstanceId, workflowId, workflowConnectionOperationName, workflowConnectionKey);
 
         return projectInstanceWorkflowConnection.getConnectionId();
     }

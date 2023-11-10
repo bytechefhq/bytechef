@@ -17,14 +17,17 @@
 package com.bytechef.helios.configuration.instance.accessor;
 
 import com.bytechef.helios.configuration.constant.ProjectConstants;
+import com.bytechef.helios.configuration.domain.ProjectInstance;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,12 +48,24 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
     }
 
     @Override
-    public Optional<Long> fetchInstanceWorkflowConnectionId(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
+    public boolean isConnectionUsed(
+        long connectionId, String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
 
-        return projectInstanceWorkflowService.fetchProjectInstanceWorkflowConnection(
-            workflowId, workflowConnectionOperationName, workflowConnectionKey)
-            .map(ProjectInstanceWorkflowConnection::getConnectionId);
+        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances();
+
+        for (ProjectInstance projectInstance : projectInstances) {
+            if (projectInstanceWorkflowService.fetchProjectInstanceWorkflowConnection(
+                Validate.notNull(projectInstance.getId(), "id"), workflowId, workflowConnectionOperationName,
+                workflowConnectionKey)
+                .map(ProjectInstanceWorkflowConnection::getConnectionId)
+                .map(curConnectionId -> Objects.equals(curConnectionId, connectionId))
+                .orElse(false)) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override

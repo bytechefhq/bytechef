@@ -22,12 +22,13 @@ import com.bytechef.helios.configuration.domain.ProjectInstance;
 import com.bytechef.hermes.execution.dto.JobDTO;
 import com.bytechef.hermes.execution.dto.TriggerExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record WorkflowExecutionDTO(
-    long id, ProjectInstance instance, JobDTO job, Project project, TriggerExecutionDTO triggerExecution,
-    Workflow workflow) {
+public record WorkflowExecution(
+    long id, Project project, ProjectInstance instance, @NonNull Workflow workflow, @NonNull JobDTO job,
+    TriggerExecutionDTO triggerExecution) {
 }

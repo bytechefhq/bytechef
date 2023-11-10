@@ -14,21 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.instance.accessor;
-
-import java.util.Map;
+package com.bytechef.helios.execution.dto;
 
 /**
  * @author Ivica Cardic
  */
-public interface InstanceAccessor {
-
-    boolean isConnectionUsed(
-        long connectionId, String workflowId, String workflowConnectionOperationName, String workflowConnectionKey);
-
-    boolean isWorkflowEnabled(long instanceId, String workflowId);
-
-    Map<String, ?> getInputMap(long instanceId, String workflowId);
-
-    int getType();
+public record TestConnection(Long id, String key, String operationName) {
 }

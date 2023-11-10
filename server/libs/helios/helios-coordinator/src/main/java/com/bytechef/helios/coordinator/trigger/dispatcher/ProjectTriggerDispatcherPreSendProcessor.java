@@ -21,6 +21,7 @@ import com.bytechef.helios.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
+import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -41,10 +42,11 @@ public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcher
 
     @Override
     public TriggerExecution process(TriggerExecution triggerExecution) {
+        WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
+
         triggerExecution.putMetadata(
             MetadataConstants.CONNECTION_IDS,
-            getConnectionIdMap(
-                triggerExecution.getWorkflowId(),
+            getConnectionIdMap(workflowExecutionId.getInstanceId(), triggerExecution.getWorkflowId(),
                 WorkflowConnection.of(triggerExecution.getWorkflowTrigger())));
 
         return triggerExecution;

@@ -48,6 +48,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProjectFacadeImpl implements ProjectFacade {
 
+    private static final String WORKFLOW_DEFINITION = """
+        {
+            "label": "New Workflow",
+            "description": "",
+            "inputs": [
+            ],
+            "triggers": [
+            ],
+            "tasks": [
+            ]
+        }
+        """;
+
     private final CategoryService categoryService;
     private final ProjectService projectService;
     private final ProjectInstanceService projectInstanceService;
@@ -90,8 +103,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         if (CollectionUtils.isEmpty(projectDTO.workflowIds())) {
             Workflow workflow = workflowService.create(
-                "{\"label\": \"New Workflow\", \"tasks\": []}", Format.JSON, SourceType.JDBC,
-                ProjectConstants.PROJECT_TYPE);
+                WORKFLOW_DEFINITION, Format.JSON, SourceType.JDBC, ProjectConstants.PROJECT_TYPE);
 
             project.setWorkflowIds(List.of(Validate.notNull(workflow.getId(), "id")));
         }

@@ -56,6 +56,10 @@ public class WorkflowConnection {
         this.operationName = operationName;
     }
 
+    public static WorkflowConnection of(String operationName, String key, Long id) {
+        return new WorkflowConnection(null, null, operationName, key, id);
+    }
+
     @SuppressWarnings("unchecked")
     public static List<WorkflowConnection> of(WorkflowTask workflowTask) {
         return toList(workflowTask.getExtension(CONNECTIONS, Map.class, Map.of()), workflowTask.getName());
