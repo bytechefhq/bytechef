@@ -1,4 +1,4 @@
-import {ComponentDefinitionModel} from '@/middleware/helios/execution/models';
+import {ComponentDefinitionModel} from '@/middleware/hermes/configuration';
 
 export type DataPillType = {
     componentDefinition?: ComponentDefinitionModel | string;
@@ -17,3 +17,10 @@ export type ComponentDataType = {
     version?: number;
     workflowAlias?: string;
 };
+
+export type CurrentComponentType = {
+    connection?: object;
+    notes?: string;
+    properties?: object;
+    workflowAlias?: string;
+} & ComponentDefinitionModel;

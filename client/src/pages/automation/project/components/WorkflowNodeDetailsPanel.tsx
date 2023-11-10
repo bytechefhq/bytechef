@@ -1,10 +1,11 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {
-    ComponentDefinitionBasicModel,
-    ComponentDefinitionModel,
-} from '@/middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {PropertyType} from '@/types/projectTypes';
-import {ComponentDataType, DataPillType} from '@/types/types';
+import {
+    ComponentDataType,
+    CurrentComponentType,
+    DataPillType,
+} from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
@@ -17,7 +18,7 @@ import {
     useGetComponentDefinitionQuery,
     useGetComponentDefinitionsQuery,
 } from 'queries/componentDefinitions.queries';
-import {ChangeEvent, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Select from '../../../../components/Select/Select';
@@ -83,7 +84,7 @@ const WorkflowNodeDetailsPanel = ({
         setDataPills,
     } = useWorkflowDataStore();
 
-    let currentComponent: CurrentComponentType;
+    let currentComponent: CurrentComponentType | undefined;
 
     if (currentComponentDefinition) {
         currentComponent = currentComponentDefinition;
@@ -398,22 +399,6 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentAction, currentComponent]);
 
-    const handlePropertyChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (currentComponentData) {
-            setComponentData([
-                ...otherComponentData,
-                {
-                    ...currentComponentData,
-                    name: currentComponentData.name as string,
-                    properties: {
-                        ...currentComponentData.properties,
-                        [event.target.name]: event.target.value,
-                    },
-                },
-            ]);
-        }
-    };
-
     return (
         <Dialog.Root
             modal={false}
@@ -528,6 +513,9 @@ const WorkflowNodeDetailsPanel = ({
                                                     actionName={
                                                         currentActionName
                                                     }
+                                                    currentComponent={
+                                                        currentComponent
+                                                    }
                                                     currentComponentData={
                                                         currentComponentData
                                                     }
@@ -535,9 +523,6 @@ const WorkflowNodeDetailsPanel = ({
                                                     dataPills={dataPills}
                                                     mention={
                                                         !!dataPills?.length
-                                                    }
-                                                    onChange={
-                                                        handlePropertyChange
                                                     }
                                                     properties={
                                                         currentActionProperties

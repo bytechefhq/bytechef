@@ -1,4 +1,8 @@
-import {ComponentDataType, DataPillType} from '@/types/types';
+import {
+    ComponentDataType,
+    CurrentComponentType,
+    DataPillType,
+} from '@/types/types';
 import {ChangeEvent} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';
@@ -9,6 +13,7 @@ import Property from './Property';
 
 interface PropertiesProps {
     actionName?: string;
+    currentComponent?: CurrentComponentType;
     currentComponentData?: ComponentDataType;
     customClassName?: string;
     dataPills?: DataPillType[];
@@ -23,12 +28,12 @@ interface PropertiesProps {
 
 const Properties = ({
     actionName,
+    currentComponent,
     currentComponentData,
     customClassName,
     dataPills,
     formState,
     mention,
-    onChange,
     path,
     properties,
     register,
@@ -43,12 +48,13 @@ const Properties = ({
             return (
                 <Property
                     actionName={actionName}
+                    currentComponent={currentComponent}
+                    currentComponentData={currentComponentData}
                     dataPills={dataPills}
                     defaultValue={defaultValue || ''}
                     formState={formState}
                     key={`${property.name}_${index}`}
                     mention={mention}
-                    onChange={onChange}
                     path={path}
                     property={property}
                     register={register}

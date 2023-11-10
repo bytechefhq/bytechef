@@ -2,9 +2,14 @@ import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import {useNodeDetailsPanelStore} from '@/pages/automation/project/stores/useNodeDetailsPanelStore';
+import useWorkflowDefinitionStore from '@/pages/automation/project/stores/useWorkflowDefinitionStore';
 import getInputType from '@/pages/automation/project/utils/getInputType';
 import {PropertyType} from '@/types/projectTypes';
-import {DataPillType} from '@/types/types';
+import {
+    ComponentDataType,
+    CurrentComponentType,
+    DataPillType,
+} from '@/types/types';
 import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
@@ -36,12 +41,13 @@ const inputPropertyControlTypes = [
 
 interface PropertyProps {
     actionName?: string;
+    currentComponent?: CurrentComponentType;
+    currentComponentData?: ComponentDataType;
     customClassName?: string;
     dataPills?: DataPillType[];
     defaultValue?: string;
     formState?: FormState<FieldValues>;
     mention?: boolean;
-    onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     path?: string;
     property: PropertyType;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -50,12 +56,13 @@ interface PropertyProps {
 
 const Property = ({
     actionName,
+    currentComponent,
+    currentComponentData,
     customClassName,
     dataPills,
     defaultValue,
     formState,
     mention,
-    onChange,
     path = 'parameters',
     property,
     register,
@@ -74,6 +81,7 @@ const Property = ({
 
     const {setFocusedInput} = useNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
+    const {componentData, setComponentData} = useWorkflowDefinitionStore();
 
     const {
         controlType,
@@ -123,6 +131,32 @@ const Property = ({
         type !== 'STRING' &&
         !!dataPills?.length &&
         !!name;
+
+    const otherComponentData = componentData.filter((component) => {
+        if (component.name !== currentComponent?.name) {
+            return true;
+        } else {
+            currentComponentData = component;
+
+            return false;
+        }
+    });
+
+    const handlePropertyChange = (event: ChangeEvent<HTMLInputElement>) => {
+        if (currentComponentData) {
+            setComponentData([
+                ...otherComponentData,
+                {
+                    ...currentComponentData,
+                    name: currentComponentData.name as string,
+                    properties: {
+                        ...currentComponentData.properties,
+                        [event.target.name]: event.target.value,
+                    },
+                },
+            ]);
+        }
+    };
 
     if (!name) {
         return <></>;
@@ -179,7 +213,7 @@ const Property = ({
                         label={label}
                         leadingIcon={typeIcon}
                         name={name}
-                        onChange={onChange}
+                        onChange={handlePropertyChange}
                         onKeyPress={(event: KeyboardEvent) => {
                             if (isNumericalInput) {
                                 event.key !== '{' && event.preventDefault();
@@ -259,9 +293,7 @@ const Property = ({
                                 leadingIcon={typeIcon}
                                 name={name!}
                                 onChange={(event) => {
-                                    if (onChange) {
-                                        onChange(event);
-                                    }
+                                    handlePropertyChange(event);
 
                                     if (isNumericalInput) {
                                         const {value} = event.target;
