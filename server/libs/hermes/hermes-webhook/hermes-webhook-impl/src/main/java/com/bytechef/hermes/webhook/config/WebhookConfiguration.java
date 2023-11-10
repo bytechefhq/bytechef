@@ -83,7 +83,7 @@ public class WebhookConfiguration {
         return new WebhookExecutorImpl(
             eventPublisher, instanceAccessorRegistry,
             instanceJobFacade, new JobSyncExecutor(
-                List.of(), contextService, jobService, syncMessageBroker,
+                contextService, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(objectMapper),

@@ -50,6 +50,7 @@ public class TaskStartedApplicationEventListener implements ApplicationEventList
     public TaskStartedApplicationEventListener(
         TaskExecutionService taskExecutionService, TaskDispatcher<? super Task> taskDispatcher,
         JobService jobService) {
+
         this.taskExecutionService = taskExecutionService;
         this.taskDispatcher = taskDispatcher;
         this.jobService = jobService;

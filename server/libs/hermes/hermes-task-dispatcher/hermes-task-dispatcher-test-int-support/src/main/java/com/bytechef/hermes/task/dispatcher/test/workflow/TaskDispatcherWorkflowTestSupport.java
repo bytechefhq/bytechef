@@ -80,7 +80,7 @@ public class TaskDispatcherWorkflowTestSupport {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            List.of(), contextService, jobService, syncMessageBroker,
+            contextService, jobService, syncMessageBroker,
             taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(
                 event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),

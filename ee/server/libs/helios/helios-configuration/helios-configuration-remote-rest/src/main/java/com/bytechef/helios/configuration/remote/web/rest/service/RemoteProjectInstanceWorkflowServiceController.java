@@ -39,18 +39,18 @@ public class RemoteProjectInstanceWorkflowServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/fetch-project-instance-workflow-connection/{workflowId}/{workflowConnectionOperationName}/" +
-            "{workflowConnectionKey}",
+        value = "/fetch-project-instance-workflow-connection/{projectInstanceId}/{workflowId}/" +
+            "{workflowConnectionOperationName}/{workflowConnectionKey}",
         produces = {
             "application/json"
         })
     public ResponseEntity<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        @PathVariable String workflowId, @PathVariable String workflowConnectionOperationName,
-        @PathVariable String workflowConnectionKey) {
+        @PathVariable long projectInstanceId, @PathVariable String workflowId,
+        @PathVariable String workflowConnectionOperationName, @PathVariable String workflowConnectionKey) {
 
         return ResponseEntity.ok(
             projectInstanceWorkflowService.fetchProjectInstanceWorkflowConnection(
-                workflowId, workflowConnectionOperationName, workflowConnectionKey)
+                projectInstanceId, workflowId, workflowConnectionOperationName, workflowConnectionKey)
                 .orElse(null));
     }
 
@@ -69,33 +69,33 @@ public class RemoteProjectInstanceWorkflowServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/get-project-instance-workflow-connection/{workflowId}/{workflowConnectionOperationName}/" +
-            "{workflowConnectionKey}",
+        value = "/get-project-instance-workflow-connection/{projectInstanceId}/{workflowId}/" +
+            "{workflowConnectionOperationName}/{workflowConnectionKey}",
         produces = {
             "application/json"
         })
     public ResponseEntity<ProjectInstanceWorkflowConnection> getProjectInstanceWorkflowConnection(
-        @PathVariable String workflowId, @PathVariable String workflowConnectionOperationName,
-        @PathVariable String workflowConnectionKey) {
+        @PathVariable long projectInstanceId, @PathVariable String workflowId,
+        @PathVariable String workflowConnectionOperationName, @PathVariable String workflowConnectionKey) {
 
         return ResponseEntity.ok(
             projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(
-                workflowId, workflowConnectionOperationName, workflowConnectionKey));
+                projectInstanceId, workflowId, workflowConnectionOperationName, workflowConnectionKey));
     }
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/get-project-instance-workflow-connection-id/{workflowId}/{workflowConnectionOperationName}/" +
-            "{workflowConnectionKey}",
+        value = "/get-project-instance-workflow-connection-id/{projectInstanceId}/{workflowId}/" +
+            "{workflowConnectionOperationName}/{workflowConnectionKey}",
         produces = {
             "application/json"
         })
     public ResponseEntity<Long> getProjectInstanceWorkflowConnectionId(
-        @PathVariable String workflowId, @PathVariable String workflowConnectionOperationName,
-        @PathVariable String workflowConnectionKey) {
+        @PathVariable long projectInstanceId, @PathVariable String workflowId,
+        @PathVariable String workflowConnectionOperationName, @PathVariable String workflowConnectionKey) {
 
         return ResponseEntity.ok(
             projectInstanceWorkflowService.getProjectInstanceWorkflowConnectionId(
-                workflowId, workflowConnectionOperationName, workflowConnectionKey));
+                projectInstanceId, workflowId, workflowConnectionOperationName, workflowConnectionKey));
     }
 }

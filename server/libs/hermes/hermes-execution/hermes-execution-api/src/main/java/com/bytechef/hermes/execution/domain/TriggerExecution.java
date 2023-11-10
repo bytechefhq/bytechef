@@ -240,6 +240,11 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         return executionTime;
     }
 
+    @JsonIgnore
+    public long getInstanceId() {
+        return workflowExecutionId.getInstanceId();
+    }
+
     /**
      * Get the unique id of the task instance.
      *
@@ -360,6 +365,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
         return workflowExecutionId;
     }
 
+    @JsonIgnore
     public String getWorkflowId() {
         return workflowExecutionId.getWorkflowId();
     }

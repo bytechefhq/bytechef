@@ -34,21 +34,23 @@ public interface ProjectInstanceRepository
     @Query("SELECT project_instance.project_id FROM project_instance")
     List<Long> findAllProjectId();
 
-    List<ProjectInstance> findAllByProjectIdOrderByName(long projectId);
+    List<ProjectInstance> findAllByProjectIdOrderByNameAscEnabledDesc(long projectId);
 
     @Query("""
             SELECT project_instance.* FROM project_instance
             JOIN project_instance_tag ON project_instance.id = project_instance_tag.project_instance_id
             WHERE project_instance.project_id = :projectId
             AND project_instance_tag.tag_id = :tagId
+            ORDER BY project_instance.name ASC, project_instance.enabled DESC
         """)
-    List<ProjectInstance> findAllByProjectIdAndTagIdOrderByName(
+    List<ProjectInstance> findAllByProjectIdAndTagIdOrderByNameAscEnabledDesc(
         @Param("projectId") long projectId, @Param("tagId") long tagId);
 
     @Query("""
             SELECT project_instance.* FROM project_instance
             JOIN project_instance_tag ON project_instance.id = project_instance_tag.project_instance_id
             WHERE project_instance_tag.tag_id = :tagId
+            ORDER BY project_instance.name ASC, project_instance.enabled DESC
         """)
-    List<ProjectInstance> findAllByTagIdOrderByName(@Param("tagId") long tagId);
+    List<ProjectInstance> findAllByTagIdOrderByNameAscEnabledDesc(@Param("tagId") long tagId);
 }

@@ -45,7 +45,8 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
 
     @Override
     public Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
+        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
+        String workflowConnectionKey) {
 
         return Optional.ofNullable(
             loadBalancedWebClient.get(
@@ -78,7 +79,8 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
 
     @Override
     public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
+        long projectInstanceOd, String workflowId, String workflowConnectionOperationName,
+        String workflowConnectionKey) {
 
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder
@@ -93,7 +95,8 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
 
     @Override
     public long getProjectInstanceWorkflowConnectionId(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
+        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
+        String workflowConnectionKey) {
 
         return loadBalancedWebClient.get(
             uriBuilder -> uriBuilder

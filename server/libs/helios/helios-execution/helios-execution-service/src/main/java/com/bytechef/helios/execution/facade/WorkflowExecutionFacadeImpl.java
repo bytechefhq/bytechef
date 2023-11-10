@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -30,7 +31,8 @@ import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectService;
-import com.bytechef.helios.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.helios.execution.dto.TestConnection;
+import com.bytechef.helios.execution.dto.WorkflowExecution;
 import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
@@ -43,6 +45,7 @@ import com.bytechef.hermes.execution.dto.TriggerExecutionDTO;
 import com.bytechef.hermes.execution.service.InstanceJobService;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.file.storage.TriggerFileStorage;
+import com.bytechef.hermes.test.executor.JobTestExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -70,6 +73,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     private final ContextService contextService;
     private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final JobService jobService;
+    private final JobTestExecutor jobTestExecutor;
     private final InstanceJobService instanceJobService;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectService projectService;
@@ -82,9 +86,9 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     @SuppressFBWarnings("EI")
     public WorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
-        InstanceAccessorRegistry instanceAccessorRegistry, JobService jobService, InstanceJobService instanceJobService,
-        ProjectInstanceService projectInstanceService, ProjectService projectService,
-        TaskExecutionService taskExecutionService,
+        InstanceAccessorRegistry instanceAccessorRegistry, JobService jobService, JobTestExecutor jobTestExecutor,
+        InstanceJobService instanceJobService, ProjectInstanceService projectInstanceService,
+        ProjectService projectService, TaskExecutionService taskExecutionService,
         @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage,
         @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorage triggerFileStorage,
         TriggerExecutionService triggerExecutionService, WorkflowService workflowService) {
@@ -93,6 +97,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         this.contextService = contextService;
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.jobService = jobService;
+        this.jobTestExecutor = jobTestExecutor;
         this.instanceJobService = instanceJobService;
         this.projectInstanceService = projectInstanceService;
         this.projectService = projectService;
@@ -105,7 +110,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public WorkflowExecutionDTO getWorkflowExecution(long id) {
+    public WorkflowExecution getWorkflowExecution(long id) {
         Job job = jobService.getJob(id);
 
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(ProjectConstants.PROJECT_TYPE);
@@ -114,23 +119,22 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         Optional<Long> projectInstanceIdOptional = instanceJobService.fetchJobInstanceId(
             Validate.notNull(job.getId(), ""), ProjectConstants.PROJECT_TYPE);
 
-        return new WorkflowExecutionDTO(
+        return new WorkflowExecution(
             Validate.notNull(jobDTO.id(), "id"),
-            OptionalUtils.mapOrElse(
+            projectService.getWorkflowProject(jobDTO.workflowId()), OptionalUtils.mapOrElse(
                 projectInstanceIdOptional,
                 projectInstanceService::getProjectInstance, null),
-            jobDTO, projectService.getWorkflowProject(jobDTO.workflowId()),
+            workflowService.getWorkflow(jobDTO.workflowId()), jobDTO,
             getTriggerExecutionDTO(
                 OptionalUtils.orElse(projectInstanceIdOptional, null),
                 triggerExecutionService.getJobTriggerExecution(
                     Validate.notNull(job.getId(), "id")),
-                instanceAccessor, job),
-            workflowService.getWorkflow(jobDTO.workflowId()));
+                instanceAccessor, job));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<WorkflowExecutionDTO> getWorkflowExecutions(
+    public Page<WorkflowExecution> getWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
 
@@ -183,19 +187,31 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         List<Workflow> workflows = workflowService.getWorkflows(
             CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
-        return jobsPage.map(job -> new WorkflowExecutionDTO(
+        return jobsPage.map(job -> new WorkflowExecution(
             Validate.notNull(job.getId(), "id"),
+            CollectionUtils.findFirstOrElse(
+                projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId()), null),
             OptionalUtils.mapOrElse(
                 instanceJobService.fetchJobInstanceId(job.getId(), ProjectConstants.PROJECT_TYPE),
                 projectInstanceService::getProjectInstance, null),
+            CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),
             new JobDTO(job, Map.of(), List.of()),
-            CollectionUtils.findFirstOrElse(
-                projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId()), null),
             getTriggerExecutionDTO(
                 projectInstanceId,
                 triggerExecutionService.getJobTriggerExecution(Validate.notNull(job.getId(), "id")),
-                instanceAccessor, job),
-            CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()))));
+                instanceAccessor, job)));
+    }
+
+    @Override
+    public WorkflowExecution testWorkflow(
+        String workflowId, Map<String, Object> inputs, List<TestConnection> connections) {
+
+//        TODO triggerTestExecutor
+
+        JobDTO job = jobTestExecutor.execute(new JobParameters(workflowId, inputs));
+
+        return new WorkflowExecution(
+            job.id(), null, null, workflowService.getWorkflow(workflowId), job, null);
     }
 
     private ComponentDefinition getComponentDefinition(String type) {

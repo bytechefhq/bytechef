@@ -24,6 +24,7 @@ import com.bytechef.atlas.coordinator.event.JobStartEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.TaskStartedApplicationEventListener;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
@@ -88,14 +89,14 @@ public class JobSyncExecutor {
         @NonNull WorkflowService workflowService) {
 
         this(
-            List.of(), contextService, jobService, new SyncMessageBroker(objectMapper), List.of(), List.of(), List.of(),
+            contextService, jobService, new SyncMessageBroker(objectMapper), List.of(), List.of(), List.of(),
             taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService);
     }
 
     @SuppressFBWarnings("EI")
     public JobSyncExecutor(
-        @NonNull List<ApplicationEventListener> applicationEventListeners, @NonNull ContextService contextService,
-        @NonNull JobService jobService, @NonNull SyncMessageBroker syncMessageBroker,
+        @NonNull ContextService contextService, @NonNull JobService jobService,
+        @NonNull SyncMessageBroker syncMessageBroker,
         @NonNull List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         @NonNull List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
         @NonNull List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories,
@@ -160,8 +161,8 @@ public class JobSyncExecutor {
                 Stream.of(defaultTaskCompletionHandler)));
 
         TaskCoordinator taskCoordinator = new TaskCoordinator(
-            applicationEventListeners, List.of(), eventPublisher, jobExecutor, jobService,
-            taskCompletionHandlerChain, taskDispatcherChain, taskExecutionService);
+            getApplicationEventListeners(taskExecutionService, jobService), List.of(), eventPublisher, jobExecutor,
+            jobService, taskCompletionHandlerChain, taskDispatcherChain, taskExecutionService);
 
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.APPLICATION_EVENTS,
             event -> taskCoordinator.onApplicationEvent((ApplicationEvent) event));
@@ -176,9 +177,9 @@ public class JobSyncExecutor {
         return jobService.getJob(jobFacade.createJob(jobParameters));
     }
 
-    public Job execute(JobParameters jobParameters, JobFactory jobFactory) {
+    public Job execute(JobParameters jobParameters, JobFactoryFunction jobFactoryFunction) {
         JobFacade jobFacade = new JobFacadeImpl(
-            eventPublisher, contextService, new JobServiceWrapper(jobFactory),
+            eventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction),
             taskFileStorage, workflowService);
 
         return jobService.getJob(jobFacade.createJob(jobParameters));
@@ -186,6 +187,12 @@ public class JobSyncExecutor {
 
     private static ApplicationEventPublisher createEventPublisher(SyncMessageBroker syncMessageBroker) {
         return event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event);
+    }
+
+    private List<ApplicationEventListener> getApplicationEventListeners(
+        TaskExecutionService taskExecutionService, JobService jobService) {
+
+        return List.of(new TaskStartedApplicationEventListener(taskExecutionService, task -> {}, jobService));
     }
 
     private static Stream<TaskDispatcherResolver> getTaskDispatcherResolverStream(
@@ -196,12 +203,12 @@ public class JobSyncExecutor {
     }
 
     @FunctionalInterface
-    public interface JobFactory {
+    public interface JobFactoryFunction {
 
         Job create(JobParameters jobParameters, Workflow workflow);
     }
 
-    private record JobServiceWrapper(JobFactory jobFactory)
+    private record JobServiceWrapper(JobFactoryFunction jobFactoryFunction)
         implements JobService {
 
         @Override
@@ -235,7 +242,7 @@ public class JobSyncExecutor {
 
         @Override
         public Job create(JobParameters jobParameters, Workflow workflow) {
-            return jobFactory.create(jobParameters, workflow);
+            return jobFactoryFunction.create(jobParameters, workflow);
         }
 
         @Override

@@ -16,10 +16,13 @@
 
 package com.bytechef.helios.execution.web.rest;
 
-import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.helios.execution.web.rest.model.JobModel;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.helios.execution.dto.TestConnection;
+import com.bytechef.helios.execution.facade.WorkflowExecutionFacade;
+import com.bytechef.helios.execution.web.rest.model.TestConnectionModel;
 import com.bytechef.helios.execution.web.rest.model.TestParametersModel;
-import com.bytechef.hermes.test.executor.JobTestExecutor;
+import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionModel;
+import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,18 +36,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkflowTestApiController implements WorkflowTestApi {
 
     private final ConversionService conversionService;
-    private final JobTestExecutor jobTestExecutor;
+    private final WorkflowExecutionFacade workflowExecutionFacade;
 
-    public WorkflowTestApiController(ConversionService conversionService, JobTestExecutor jobTestExecutor) {
+    public WorkflowTestApiController(
+        ConversionService conversionService, WorkflowExecutionFacade workflowExecutionFacade) {
+
         this.conversionService = conversionService;
-        this.jobTestExecutor = jobTestExecutor;
+        this.workflowExecutionFacade = workflowExecutionFacade;
     }
 
     @Override
-    public ResponseEntity<JobModel> testWorkflow(TestParametersModel testParametersModel) {
+    public ResponseEntity<WorkflowExecutionModel> testWorkflow(TestParametersModel testParametersModel) {
+        List<TestConnectionModel> testConnectionModels = testParametersModel.getConnections();
+
+        List<TestConnection> testConnections = testConnectionModels == null
+            ? List.of()
+            : CollectionUtils.map(
+                testParametersModel.getConnections(),
+                testConnectionModel -> conversionService.convert(testConnectionModel, TestConnection.class));
+
         return ResponseEntity.ok(
             conversionService.convert(
-                jobTestExecutor.execute(conversionService.convert(testParametersModel, JobParameters.class)),
-                JobModel.class));
+                workflowExecutionFacade.testWorkflow(
+                    testParametersModel.getWorkflowId(), testParametersModel.getInputs(), testConnections),
+                WorkflowExecutionModel.class));
     }
 }

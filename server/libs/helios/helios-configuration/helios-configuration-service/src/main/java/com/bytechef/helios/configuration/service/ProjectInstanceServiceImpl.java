@@ -22,6 +22,7 @@ import com.bytechef.helios.configuration.repository.ProjectInstanceRepository;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,13 +88,16 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
         Iterable<ProjectInstance> projectInstanceIterable;
 
         if (projectId == null && tagId == null) {
-            projectInstanceIterable = projectInstanceRepository.findAll(Sort.by("name"));
+            projectInstanceIterable = projectInstanceRepository.findAll(
+                Sort.by(Order.asc("name"), Order.desc("enabled")));
         } else if (projectId != null && tagId == null) {
-            projectInstanceIterable = projectInstanceRepository.findAllByProjectIdOrderByName(projectId);
+            projectInstanceIterable = projectInstanceRepository.findAllByProjectIdOrderByNameAscEnabledDesc(
+                projectId);
         } else if (projectId == null) {
-            projectInstanceIterable = projectInstanceRepository.findAllByTagIdOrderByName(tagId);
+            projectInstanceIterable = projectInstanceRepository.findAllByTagIdOrderByNameAscEnabledDesc(tagId);
         } else {
-            projectInstanceIterable = projectInstanceRepository.findAllByProjectIdAndTagIdOrderByName(projectId, tagId);
+            projectInstanceIterable = projectInstanceRepository.findAllByProjectIdAndTagIdOrderByNameAscEnabledDesc(
+                projectId, tagId);
         }
 
         return com.bytechef.commons.util.CollectionUtils.toList(projectInstanceIterable);

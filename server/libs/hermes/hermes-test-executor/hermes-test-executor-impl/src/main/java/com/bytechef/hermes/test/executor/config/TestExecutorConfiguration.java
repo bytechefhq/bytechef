@@ -96,7 +96,7 @@ public class TestExecutorConfiguration {
         return new JobTestExecutorImpl(
             componentDefinitionService, contextService,
             new JobSyncExecutor(
-                List.of(), contextService, jobService, syncMessageBroker,
+                contextService, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(objectMapper),

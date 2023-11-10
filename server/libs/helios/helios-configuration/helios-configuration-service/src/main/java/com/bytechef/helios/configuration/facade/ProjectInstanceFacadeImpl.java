@@ -165,9 +165,9 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             }
 
             if (enable) {
-                enableWorkflowTrigger(projectInstanceWorkflow);
+                enableWorkflowTriggers(projectInstanceWorkflow);
             } else {
-                disableWorkflowTrigger(projectInstanceWorkflow);
+                disableWorkflowTriggers(projectInstanceWorkflow);
             }
         }
 
@@ -179,10 +179,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
             projectInstanceId, workflowId);
 
-        if (enable) {
-            enableWorkflowTrigger(projectInstanceWorkflow);
-        } else {
-            disableWorkflowTrigger(projectInstanceWorkflow);
+        ProjectInstance projectInstance = projectInstanceService.getProjectInstance(
+            projectInstanceWorkflow.getProjectInstanceId());
+
+        if (projectInstance.isEnabled()) {
+            if (enable) {
+                enableWorkflowTriggers(projectInstanceWorkflow);
+            } else {
+                disableWorkflowTriggers(projectInstanceWorkflow);
+            }
         }
 
         projectInstanceWorkflowService.updateEnabled(projectInstanceWorkflow.getId(), enable);
@@ -315,7 +320,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     //
 
-    private void disableWorkflowTrigger(ProjectInstanceWorkflow projectInstanceWorkflow) {
+    private void disableWorkflowTriggers(ProjectInstanceWorkflow projectInstanceWorkflow) {
         Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
@@ -324,11 +329,11 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             triggerLifecycleFacade.executeTriggerDisable(
                 workflow.getId(), ProjectConstants.PROJECT_TYPE, projectInstanceWorkflow.getProjectInstanceId(),
                 workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
-                getConnectionId(workflow.getId(), workflowTrigger));
+                getConnectionId(projectInstanceWorkflow.getProjectInstanceId(), workflow.getId(), workflowTrigger));
         }
     }
 
-    private void enableWorkflowTrigger(ProjectInstanceWorkflow projectInstanceWorkflow) {
+    private void enableWorkflowTriggers(ProjectInstanceWorkflow projectInstanceWorkflow) {
         Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
 
         validate(projectInstanceWorkflow.getInputs(), workflow);
@@ -339,30 +344,33 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             triggerLifecycleFacade.executeTriggerEnable(
                 workflow.getId(), ProjectConstants.PROJECT_TYPE, projectInstanceWorkflow.getProjectInstanceId(),
                 workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
-                getConnectionId(workflow.getId(), workflowTrigger), webhookUrl);
+                getConnectionId(
+                    projectInstanceWorkflow.getProjectInstanceId(), workflow.getId(), workflowTrigger),
+                webhookUrl);
         }
     }
 
-    private Long getConnectionId(String workflowId, WorkflowConnection workflowConnection) {
+    private Long getConnectionId(long projectInstanceId, String workflowId, WorkflowConnection workflowConnection) {
         return workflowConnection.getId()
             .orElseGet(() -> getConnectionId(
-                workflowId, workflowConnection.getOperationName(), workflowConnection.getKey()));
+                projectInstanceId, workflowId, workflowConnection.getOperationName(), workflowConnection.getKey()));
     }
 
-    private Long getConnectionId(String workflowId, WorkflowTrigger workflowTrigger) {
+    private Long getConnectionId(long projectInstanceId, String workflowId, WorkflowTrigger workflowTrigger) {
         return WorkflowConnection.of(workflowTrigger)
             .stream()
             .findFirst()
-            .map(workflowConnection -> getConnectionId(workflowId, workflowConnection))
+            .map(workflowConnection -> getConnectionId(projectInstanceId, workflowId, workflowConnection))
             .orElse(null);
     }
 
     private Long getConnectionId(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
+        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
+        String workflowConnectionKey) {
 
         ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
             projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(
-                workflowId, workflowConnectionOperationName, workflowConnectionKey);
+                projectInstanceId, workflowId, workflowConnectionOperationName, workflowConnectionKey);
 
         return projectInstanceWorkflowConnection.getConnectionId();
     }
