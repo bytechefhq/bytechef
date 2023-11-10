@@ -576,7 +576,8 @@ const Project = () => {
                 leftSidebarBody={
                     <div className="py-1.5">
                         <WorkflowExecutionsDetailsAccordion
-                            workflowExecution={undefined}
+                            /* eslint-disable @typescript-eslint/no-explicit-any*/
+                            workflowExecution={{} as any}
                         />
                     </div>
                 }
