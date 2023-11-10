@@ -52,6 +52,7 @@ type MentionsInputProps = {
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     onKeyPress?: (event: KeyboardEvent) => void;
     placeholder?: string;
+    required?: boolean;
     singleMention?: boolean;
 };
 
@@ -69,6 +70,7 @@ const MentionsInput = forwardRef(
             onChange,
             onKeyPress,
             placeholder = "Show data pills using '{'",
+            required,
             singleMention,
         }: MentionsInputProps,
         ref: Ref<ReactQuill>
@@ -186,6 +188,12 @@ const MentionsInput = forwardRef(
                         >
                             {label}
                         </label>
+
+                        {required && (
+                            <span className="px-1 leading-3 text-red-500">
+                                *
+                            </span>
+                        )}
 
                         {description && (
                             <Tooltip>
