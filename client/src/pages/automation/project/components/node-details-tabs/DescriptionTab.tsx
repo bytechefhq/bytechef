@@ -15,7 +15,7 @@ const DescriptionTab = ({
     currentComponentData: ComponentDataType | undefined;
     otherComponentData: Array<ComponentDataType>;
 }) => {
-    const {name} = componentDefinition;
+    const {name, title} = componentDefinition;
     const {setComponentData} = useWorkflowDefinitionStore();
 
     const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) =>
@@ -43,9 +43,7 @@ const DescriptionTab = ({
     return (
         <div className="h-full flex-[1_1_1px] overflow-auto p-4">
             <Input
-                defaultValue={
-                    currentComponentData?.title || componentDefinition.title
-                }
+                defaultValue={currentComponentData?.title || title}
                 key={`${name}_nodeTitle`}
                 label="Title"
                 labelClassName="px-2"

@@ -35,7 +35,7 @@ const DataPillPanel = () => {
                 : name
     );
 
-    const {data: previouscomponentDefinitions} =
+    const {data: previousComponentDefinitions} =
         useGetComponentDefinitionsQuery(
             {
                 include: normalizedPreviousComponentNames,
@@ -53,7 +53,7 @@ const DataPillPanel = () => {
         !!componentActions?.length
     );
 
-    if (!previouscomponentDefinitions?.length || !actionData?.length) {
+    if (!previousComponentDefinitions?.length || !actionData?.length) {
         return <></>;
     }
 
@@ -74,7 +74,7 @@ const DataPillPanel = () => {
     );
 
     const componentActionData = previousActions.map((action, index) => {
-        const componentDefinition = previouscomponentDefinitions?.find(
+        const componentDefinition = previousComponentDefinitions?.find(
             (curComponentDefinition) =>
                 curComponentDefinition.name ===
                 normalizedPreviousComponentNames[index]
@@ -108,7 +108,7 @@ const DataPillPanel = () => {
                 nodeDetailsPanelOpen &&
                 dataPillPanelOpen &&
                 !!previousComponentNames.length &&
-                !!previouscomponentDefinitions
+                !!previousComponentDefinitions
             }
         >
             <Dialog.Portal>
