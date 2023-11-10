@@ -40,7 +40,7 @@ interface PropertyProps {
     dataPills?: DataPillType[];
     defaultValue?: string;
     formState?: FormState<FieldValues>;
-    mention: boolean;
+    mention?: boolean;
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     path?: string;
     property: PropertyType;
@@ -186,6 +186,7 @@ const Property = ({
                             }
                         }}
                         ref={editorRef}
+                        required={required}
                         singleMention={controlType !== 'TEXT'}
                     />
                 )}
