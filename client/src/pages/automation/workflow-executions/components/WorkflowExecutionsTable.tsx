@@ -40,7 +40,7 @@ const columns = [
                 variant={
                     info.getValue()?.status === 'COMPLETED'
                         ? 'destructive'
-                        : 'default'
+                        : 'secondary'
                 }
             >
                 {info.getValue()?.status ?? ''}

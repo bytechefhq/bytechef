@@ -44,6 +44,7 @@ import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog
 import {useNodeDetailsPanelStore} from '@/pages/automation/project/stores/useNodeDetailsPanelStore';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
 import ProjectDialog from '@/pages/automation/projects/ProjectDialog';
+import WorkflowExecutionsDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionsDetailsAccordion';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {
     ProjectKeys,
@@ -572,8 +573,13 @@ const Project = () => {
                         )}
                     </header>
                 }
-                leftSidebarBody={<></>}
-                leftSidebarHeader={<></>}
+                leftSidebarBody={
+                    <div className="py-1.5">
+                        <WorkflowExecutionsDetailsAccordion
+                            workflowExecution={undefined}
+                        />
+                    </div>
+                }
                 leftSidebarOpen={leftSidebarOpen}
                 leftSidebarWidth="96"
                 rightSidebarBody={

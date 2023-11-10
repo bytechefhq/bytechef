@@ -27,9 +27,8 @@ import {useGetProjectsQuery} from 'queries/projects.queries';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import WorkflowExecutionDetailsDialog from './components/WorkflowExecutionDetailsDialog';
+import WorkflowExecutionDetailsSheet from './components/WorkflowExecutionDetailsSheet';
 import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
-import useWorkflowExecutionDetailsDialogStore from './stores/useWorkflowExecutionDetailsDialogStore';
 
 const jobStatusOptions = [
     {
@@ -144,9 +143,6 @@ const WorkflowExecutions = () => {
     });
 
     const {data: workflows, error: workflowsError} = useGetWorkflowsQuery();
-
-    const {workflowExecutionDetailsDialogOpen} =
-        useWorkflowExecutionDetailsDialogStore();
 
     const emptyListMessage =
         !filterStatus &&
@@ -334,9 +330,7 @@ const WorkflowExecutions = () => {
                         </div>
                     )}
 
-                {workflowExecutionDetailsDialogOpen && (
-                    <WorkflowExecutionDetailsDialog />
-                )}
+                <WorkflowExecutionDetailsSheet />
             </LayoutContainer>
         </PageLoader>
     );

@@ -9,7 +9,7 @@ import InlineSVG from 'react-inlinesvg';
 import ReactJson from 'react-json-view';
 import {twMerge} from 'tailwind-merge';
 
-const WorkflowTaskListAccordion = ({
+const WorkflowExecutionsTasksAccordionItem = ({
     taskExecutions,
     taskExecutionsCompleted,
 }: {
@@ -116,4 +116,4 @@ const WorkflowTaskListAccordion = ({
     );
 };
 
-export default WorkflowTaskListAccordion;
+export default WorkflowExecutionsTasksAccordionItem;

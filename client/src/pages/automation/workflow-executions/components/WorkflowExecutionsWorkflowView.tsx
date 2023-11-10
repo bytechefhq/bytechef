@@ -1,19 +1,14 @@
 import {Button} from '@/components/ui/button';
-import {Cross1Icon} from '@radix-ui/react-icons';
 import {PencilIcon} from 'lucide-react';
 import {WorkflowExecutionModel} from 'middleware/helios/execution';
 import {useNavigate} from 'react-router-dom';
 
-const ReadOnlyWorkflow = ({
-    execution,
-    setWorkflowExecutionDetailsDialogOpen,
+const WorkflowExecutionsWorkflowView = ({
+    workflowExecution,
 }: {
-    execution: WorkflowExecutionModel;
-    setWorkflowExecutionDetailsDialogOpen: (
-        workflowExecutionDetailsDialogOpen: boolean
-    ) => void;
+    workflowExecution: WorkflowExecutionModel;
 }) => {
-    const {instance, project, workflow} = execution;
+    const {instance, project, workflow} = workflowExecution;
 
     const navigate = useNavigate();
 
@@ -29,7 +24,7 @@ const ReadOnlyWorkflow = ({
 
             <div className="flex align-middle">
                 <Button
-                    className="ml-4"
+                    className="mr-6"
                     onClick={() =>
                         navigate(
                             `/automation/projects/${project?.id}/workflows/${workflow?.id}`
@@ -40,22 +35,9 @@ const ReadOnlyWorkflow = ({
                 >
                     <PencilIcon className="mr-1 h-4 w-4 cursor-pointer" /> Edit
                 </Button>
-
-                <Button
-                    aria-label="Close panel"
-                    className="ml-auto"
-                    onClick={() => setWorkflowExecutionDetailsDialogOpen(false)}
-                    size="icon"
-                    variant="ghost"
-                >
-                    <Cross1Icon
-                        aria-hidden="true"
-                        className="h-3 w-3 cursor-pointer"
-                    />
-                </Button>
             </div>
         </div>
     );
 };
 
-export default ReadOnlyWorkflow;
+export default WorkflowExecutionsWorkflowView;
