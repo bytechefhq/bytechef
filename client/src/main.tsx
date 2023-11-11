@@ -28,8 +28,8 @@ function renderApp() {
                 <RouterProvider router={router} />
 
                 <ReactQueryDevtools
+                    buttonPosition="bottom-right"
                     initialIsOpen={false}
-                    position="bottom-right"
                 />
             </QueryClientProvider>
         </React.StrictMode>
