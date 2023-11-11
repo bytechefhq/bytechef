@@ -185,8 +185,8 @@ This section doesn't provide instructions to install Java and Gradle because the
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/)
-- [Java - GraalVM for JDK 20+](https://www.graalvm.org/downloads/)
-- Gradle - V8.3+. - Comes as part of the project as [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html)
+- [Java - GraalVM for JDK 21+](https://www.graalvm.org/downloads/)
+- Gradle - V8.5+. - Comes as part of the project as [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html)
 - A PostgreSQL database - Refer to the [Setting up local development infrastructure](#setting-up-local-development-infrastructure-using-docker).
 - A Redis instance - Refer to the [Setting up local development infrastructure](#setting-up-local-development-infrastructure-using-docker).
 

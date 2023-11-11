@@ -16,13 +16,6 @@ RUN gradle bootJar --no-daemon
 
 FROM ghcr.io/graalvm/graalvm-community:20.0.2-ol9
 
-#USER root
-
-#RUN gu install js
-#RUN gu install python
-#RUN gu install r
-#RUN gu install ruby
-
 WORKDIR /opt
 
 COPY --from=build /build/server/apps/server-app/build/libs/*app.jar application.jar
