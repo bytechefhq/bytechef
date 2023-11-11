@@ -60,7 +60,7 @@ This section explains how you can setup a development environment for ByteChef c
 
 ### Prerequisites
 
-- [Node v18+](https://nodejs.org/en/download/)
+- [Node v20+](https://nodejs.org/en/download/)
 - [Docker](https://docs.docker.com/get-docker/)
 
 ### Steps for setup
