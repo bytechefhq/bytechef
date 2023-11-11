@@ -155,11 +155,6 @@
         </createTable>
 
         <addUniqueConstraint
-            tableName="project_instance"
-            columnNames="name"
-            constraintName="uk_project_instance_name" />
-
-        <addUniqueConstraint
             tableName="project_workflow"
             columnNames="workflow_id"
             constraintName="uk_project_workflow_workflow_id" />
