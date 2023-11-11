@@ -2,10 +2,11 @@
 ch-qos-logback = "1.4.11"
 checkstyle = "10.12.4"
 com-google-auto-service = "1.1.1"
+graalvm="23.1.1"
 gradle-git-properties = "2.4.1"
 info-picocli = "4.7.5"
 jacoco = "0.8.10"
-java = "20"
+java = "21"
 jib-gradle-plugin="3.4.0"
 org-mapstruct = "1.5.5.Final"
 org-mapstruct-extensions-spring = "1.1.0"
@@ -35,7 +36,11 @@ jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validati
 org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.31.2"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.4"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.7.0.202309050840-r"
-org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:23.1.1"
+org-graalvm-polyglot-polyglot = { module = "org.graalvm.polyglot:polyglot", version.ref = "graalvm" }
+org-graalvm-polyglot-java = { module = "org.graalvm.polyglot:java", version.ref = "graalvm" }
+org-graalvm-polyglot-js = { module = "org.graalvm.polyglot:js", version.ref = "graalvm" }
+org-graalvm-polyglot-python = { module = "org.graalvm.polyglot:python", version.ref = "graalvm" }
+org-graalvm-polyglot-ruby = { module = "org.graalvm.polyglot:ruby", version.ref = "graalvm" }
 org-json = "org.json:json:20231013"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
 org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.mapstruct.extensions.spring:mapstruct-spring-annotations", version.ref = "org-mapstruct-extensions-spring" }
