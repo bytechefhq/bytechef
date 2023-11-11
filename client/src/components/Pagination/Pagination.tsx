@@ -115,7 +115,7 @@ const Pagination = ({
                             {pageNumber * pageSize + 1}
                         </span>
                         to
-                        <span className="pr-2 font-medium">
+                        <span className="px-2 font-medium">
                             {Math.min(
                                 totalElements,
                                 (pageNumber + 1) * pageSize
