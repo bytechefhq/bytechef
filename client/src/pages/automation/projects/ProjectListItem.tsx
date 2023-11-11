@@ -18,11 +18,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-    HoverCard,
-    HoverCardContent,
-    HoverCardTrigger,
-} from '@/components/ui/hover-card';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     ProjectModel,
@@ -111,17 +106,17 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                 to={`/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`}
                             >
                                 {project.description ? (
-                                    <HoverCard>
-                                        <HoverCardTrigger asChild>
+                                    <Tooltip>
+                                        <TooltipTrigger>
                                             <span className="mr-2 text-base font-semibold">
                                                 {project.name}
                                             </span>
-                                        </HoverCardTrigger>
+                                        </TooltipTrigger>
 
-                                        <HoverCardContent className="w-80">
+                                        <TooltipContent>
                                             {project.description}
-                                        </HoverCardContent>
-                                    </HoverCard>
+                                        </TooltipContent>
+                                    </Tooltip>
                                 ) : (
                                     <span className="mr-2 text-base font-semibold">
                                         {project.name}
