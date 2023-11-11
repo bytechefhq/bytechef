@@ -5,6 +5,6 @@ tasks:
   type: "print"
   text: "Hello rogue"
 - label: "Rogue task"
-  type: "random/v1/randomFloat"
+  type: "randomHelper/v1/randomFloat"
   parameters:
     probability: 0.75
