@@ -1,6 +1,7 @@
 /* eslint-disable sort-keys */
 import {ReactNode} from 'react';
 import {create} from 'zustand';
+import {devtools} from 'zustand/middleware';
 
 interface Node {
     name: string;
@@ -25,19 +26,26 @@ interface WorkflowNodeDetailsPanelState {
 }
 
 export const useWorkflowNodeDetailsPanelStore =
-    create<WorkflowNodeDetailsPanelState>()((set) => ({
-        nodeDetailsPanelOpen: false,
-        setNodeDetailsPanelOpen: (nodeDetailsDialogOpen) =>
-            set((state) => ({
-                ...state,
-                nodeDetailsPanelOpen: nodeDetailsDialogOpen,
-            })),
+    create<WorkflowNodeDetailsPanelState>()(
+        devtools(
+            (set) => ({
+                nodeDetailsPanelOpen: false,
+                setNodeDetailsPanelOpen: (nodeDetailsDialogOpen) =>
+                    set((state) => ({
+                        ...state,
+                        nodeDetailsPanelOpen: nodeDetailsDialogOpen,
+                    })),
 
-        currentNode: {name: '', type: 'component', version: 1},
-        setCurrentNode: (currentNode) =>
-            set((state) => ({...state, currentNode})),
+                currentNode: {name: '', type: 'component', version: 1},
+                setCurrentNode: (currentNode) =>
+                    set((state) => ({...state, currentNode})),
 
-        focusedInput: null,
-        setFocusedInput: (focusedInput) =>
-            set((state) => ({...state, focusedInput})),
-    }));
+                focusedInput: null,
+                setFocusedInput: (focusedInput) =>
+                    set((state) => ({...state, focusedInput})),
+            }),
+            {
+                name: 'workflow-node-details-panel',
+            }
+        )
+    );
