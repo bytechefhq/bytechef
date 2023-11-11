@@ -1,11 +1,11 @@
 import {Accordion} from '@/components/ui/accordion';
 import {WorkflowExecutionModel} from '@/middleware/helios/execution';
-import WorkflowExecutionsTasksAccordionItem from '@/pages/automation/workflow-executions/components/WorkflowExecutionsTasksAccordionItem';
-import WorkflowExecutionsTriggerAccordionItem from '@/pages/automation/workflow-executions/components/WorkflowExecutionsTriggerAccordionItem';
+import WorkflowExecutionDetailsTaskAccordionItem from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsTaskAccordionItem';
+import WorkflowExecutionDetailsTriggerAccordionItem from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsTriggerAccordionItem';
 import {CheckCircledIcon} from '@radix-ui/react-icons';
 import {twMerge} from 'tailwind-merge';
 
-const WorkflowExecutionsDetailsAccordion = ({
+const WorkflowExecutionDetailsAccordion = ({
     workflowExecution,
 }: {
     workflowExecution: WorkflowExecutionModel;
@@ -18,6 +18,7 @@ const WorkflowExecutionsDetailsAccordion = ({
             (taskExecution) => taskExecution.status === 'COMPLETED'
         );
     const triggerExecutionCompleted =
+        !workflowExecution?.triggerExecution ||
         workflowExecution?.triggerExecution?.status === 'COMPLETED';
 
     let duration;
@@ -33,7 +34,7 @@ const WorkflowExecutionsDetailsAccordion = ({
         <>
             <div className="px-3 py-4">
                 <div className="mb-3 flex items-center justify-between">
-                    <span className="text-lg">
+                    <span>
                         {taskExecutionsCompleted && triggerExecutionCompleted
                             ? 'Workflow executed successfully'
                             : 'Workflow failed'}
@@ -72,7 +73,7 @@ const WorkflowExecutionsDetailsAccordion = ({
                     type="single"
                 >
                     {workflowExecution.triggerExecution && (
-                        <WorkflowExecutionsTriggerAccordionItem
+                        <WorkflowExecutionDetailsTriggerAccordionItem
                             triggerExecution={
                                 workflowExecution.triggerExecution
                             }
@@ -83,7 +84,7 @@ const WorkflowExecutionsDetailsAccordion = ({
                     )}
 
                     {workflowExecution.job?.taskExecutions && (
-                        <WorkflowExecutionsTasksAccordionItem
+                        <WorkflowExecutionDetailsTaskAccordionItem
                             taskExecutions={
                                 workflowExecution.job.taskExecutions
                             }
@@ -96,4 +97,4 @@ const WorkflowExecutionsDetailsAccordion = ({
     );
 };
 
-export default WorkflowExecutionsDetailsAccordion;
+export default WorkflowExecutionDetailsAccordion;

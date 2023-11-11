@@ -9,7 +9,7 @@ import InlineSVG from 'react-inlinesvg';
 import ReactJson from 'react-json-view';
 import {twMerge} from 'tailwind-merge';
 
-const WorkflowExecutionsTriggerAccordionItem = ({
+const WorkflowExecutionDetailsTriggerAccordionItem = ({
     triggerExecution,
     triggerExecutionCompleted,
 }: {
@@ -109,4 +109,4 @@ const WorkflowExecutionsTriggerAccordionItem = ({
     );
 };
 
-export default WorkflowExecutionsTriggerAccordionItem;
+export default WorkflowExecutionDetailsTriggerAccordionItem;

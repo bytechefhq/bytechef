@@ -1,9 +1,8 @@
 import {Sheet, SheetContent} from '@/components/ui/sheet';
-import WorkflowExecutionsDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionsDetailsAccordion';
+import WorkflowExecutionDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordion';
+import WorkflowExecutionDetailsSheetWorkflowView from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsSheetWorkflowView';
+import useWorkflowExecutionDetailsDialogStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionDetailsDialogStore';
 import {useGetWorkflowExecutionQuery} from '@/queries/workflowExecutions.queries';
-
-import useWorkflowExecutionDetailsDialogStore from '..//stores/useWorkflowExecutionDetailsDialogStore';
-import WorkflowExecutionsWorkflowView from './WorkflowExecutionsWorkflowView';
 
 const WorkflowExecutionDetailsSheet = () => {
     const {
@@ -29,19 +28,19 @@ const WorkflowExecutionDetailsSheet = () => {
             }
             open={workflowExecutionDetailsDialogOpen}
         >
-            <SheetContent className="flex w-11/12 p-0 sm:max-w-[1280px]">
+            <SheetContent className="flex w-11/12 gap-0 p-0 sm:max-w-[1280px]">
                 {workflowExecutionLoading && <span>Loading...</span>}
 
                 <div className="flex w-7/12 flex-col border-r border-gray-100 bg-white">
                     {workflowExecution && (
-                        <WorkflowExecutionsDetailsAccordion
+                        <WorkflowExecutionDetailsAccordion
                             workflowExecution={workflowExecution}
                         />
                     )}
                 </div>
 
                 {workflowExecution && (
-                    <WorkflowExecutionsWorkflowView
+                    <WorkflowExecutionDetailsSheetWorkflowView
                         workflowExecution={workflowExecution}
                     />
                 )}

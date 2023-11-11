@@ -1,9 +1,11 @@
 import {Button} from '@/components/ui/button';
+import * as SheetPrimitive from '@radix-ui/react-dialog';
+import {Cross2Icon} from '@radix-ui/react-icons';
 import {PencilIcon} from 'lucide-react';
 import {WorkflowExecutionModel} from 'middleware/helios/execution';
 import {useNavigate} from 'react-router-dom';
 
-const WorkflowExecutionsWorkflowView = ({
+const WorkflowExecutionDetailsSheetWorkflowView = ({
     workflowExecution,
 }: {
     workflowExecution: WorkflowExecutionModel;
@@ -24,7 +26,7 @@ const WorkflowExecutionsWorkflowView = ({
 
             <div className="flex align-middle">
                 <Button
-                    className="mr-6"
+                    className="mr-1"
                     onClick={() =>
                         navigate(
                             `/automation/projects/${project?.id}/workflows/${workflow?.id}`
@@ -35,9 +37,15 @@ const WorkflowExecutionsWorkflowView = ({
                 >
                     <PencilIcon className="mr-1 h-4 w-4 cursor-pointer" /> Edit
                 </Button>
+
+                <SheetPrimitive.Close asChild>
+                    <Button size="icon" variant="ghost">
+                        <Cross2Icon className="h-4 w-4 opacity-70" />
+                    </Button>
+                </SheetPrimitive.Close>
             </div>
         </div>
     );
 };
 
-export default WorkflowExecutionsWorkflowView;
+export default WorkflowExecutionDetailsSheetWorkflowView;
