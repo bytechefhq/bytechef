@@ -1,20 +1,20 @@
 [versions]
 ch-qos-logback = "1.4.11"
-checkstyle = "10.12.3"
+checkstyle = "10.12.4"
 com-google-auto-service = "1.1.1"
 gradle-git-properties = "2.4.1"
 info-picocli = "4.7.5"
 jacoco = "0.8.10"
 java = "20"
-jib-gradle-plugin="3.3.2"
+jib-gradle-plugin="3.4.0"
 org-mapstruct = "1.5.5.Final"
 org-mapstruct-extensions-spring = "1.1.0"
 org-springdoc = "2.2.0"
 org-springframework-cloud-dependencies = "2022.0.4"
 pmd = "6.55.0"
-spotbugs = "4.7.3"
-spotless-plugin-gradle = "6.21.0"
-spotbugs-gradle-plugin = "6.0.0-beta.3"
+spotbugs = "4.8.1"
+spotless-plugin-gradle = "6.22.0"
+spotbugs-gradle-plugin = "6.0.0-rc.2"
 spring-boot = "3.1.5"
 
 [libraries]
@@ -22,21 +22,21 @@ ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", ve
 ch-qos-logback-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "ch-qos-logback" }
 com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.6.4"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
-com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.8.0"
+com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.8.1"
 com-github-tomakehurst-wiremock = "com.github.tomakehurst:wiremock:3.0.1"
 com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-service", version.ref = "com-google-auto-service" }
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
 com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 info-picocli = { module = "info.picocli:picocli", version.ref = "info-picocli" }
 info-picocli-picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "info-picocli" }
-io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.16"
-io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.16"
+io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.19"
+io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.18"
 jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.0.2"
-org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.31.0"
+org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.31.2"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.4"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:6.7.0.202309050840-r"
-org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:23.0.1"
-org-json = "org.json:json:20230618"
+org-graalvm-sdk-graal-sdk = "org.graalvm.sdk:graal-sdk:23.1.1"
+org-json = "org.json:json:20231013"
 org-mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "org-mapstruct" }
 org-mapstruct-extensions-spring-mapstruct-spring-annotations = { module = "org.mapstruct.extensions.spring:mapstruct-spring-annotations", version.ref = "org-mapstruct-extensions-spring" }
 org-mapstruct-extensions-spring-mapstruct-spring-extensions = { module = "org.mapstruct.extensions.spring:mapstruct-spring-extensions", version.ref = "org-mapstruct-extensions-spring" }
@@ -45,7 +45,7 @@ org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.20.162"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.21.21"
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.49.0"
