@@ -5,6 +5,7 @@ import {
 } from '@/middleware/hermes/configuration';
 import {DataPillType} from '@/types/types';
 import {create} from 'zustand';
+import {devtools} from 'zustand/middleware';
 
 type ComponentActionsType = Array<{
     componentName: string;
@@ -33,25 +34,31 @@ interface WorkflowDefinitionState {
     ) => void;
 }
 
-const useWorkflowDataStore = create<WorkflowDefinitionState>((set) => ({
-    componentDefinitions: [],
-    setComponentDefinitions: (componentDefinitions) =>
-        set((state) => ({...state, componentDefinitions})),
+const useWorkflowDataStore = create<WorkflowDefinitionState>()(
+    devtools(
+        (set) => ({
+            componentDefinitions: [],
+            setComponentDefinitions: (componentDefinitions) =>
+                set((state) => ({...state, componentDefinitions})),
 
-    componentNames: [],
-    setComponentNames: (componentNames) =>
-        set((state) => ({...state, componentNames})),
+            componentNames: [],
+            setComponentNames: (componentNames) =>
+                set((state) => ({...state, componentNames})),
 
-    componentActions: [],
-    setComponentActions: (componentActions) =>
-        set((state) => ({...state, componentActions})),
+            componentActions: [],
+            setComponentActions: (componentActions) =>
+                set((state) => ({...state, componentActions})),
 
-    dataPills: [],
-    setDataPills: (dataPills) => set((state) => ({...state, dataPills})),
+            dataPills: [],
+            setDataPills: (dataPills) =>
+                set((state) => ({...state, dataPills})),
 
-    taskDispatcherDefinitions: [],
-    setTaskDispatcherDefinitions: (taskDispatcherDefinitions) =>
-        set((state) => ({...state, taskDispatcherDefinitions})),
-}));
+            taskDispatcherDefinitions: [],
+            setTaskDispatcherDefinitions: (taskDispatcherDefinitions) =>
+                set((state) => ({...state, taskDispatcherDefinitions})),
+        }),
+        {name: 'workflow-data'}
+    )
+);
 
 export default useWorkflowDataStore;
