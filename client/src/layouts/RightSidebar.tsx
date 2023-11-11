@@ -19,7 +19,7 @@ export function RightSidebar({
                     <div className="flex-1">
                         <nav
                             aria-label="Sidebar"
-                            className="flex flex-col items-center py-1"
+                            className="flex flex-col items-center py-2"
                         >
                             {navigation.map((item) => (
                                 <a
@@ -31,7 +31,7 @@ export function RightSidebar({
                                         <TooltipTrigger>
                                             <item.icon
                                                 aria-hidden="true"
-                                                className="h-7 w-7"
+                                                className="h-6 w-6"
                                             />
                                         </TooltipTrigger>
 
