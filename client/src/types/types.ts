@@ -12,7 +12,11 @@ export type ComponentDataType = {
     name: string;
     connection?: object;
     notes?: string;
-    properties?: object;
+    properties?: {
+        [key: string]: {
+            [key: string]: string;
+        };
+    };
     title?: string;
     version?: number;
     workflowAlias?: string;

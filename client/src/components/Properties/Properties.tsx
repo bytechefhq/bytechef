@@ -39,28 +39,20 @@ const Properties = ({
     register,
 }: PropertiesProps) => (
     <ul className={twMerge('h-full', customClassName)}>
-        {properties.map((property, index) => {
-            const defaultValue =
-                currentComponentData?.properties?.[
-                    property.name as keyof (typeof currentComponentData)['properties']
-                ];
-
-            return (
-                <Property
-                    actionName={actionName}
-                    currentComponent={currentComponent}
-                    currentComponentData={currentComponentData}
-                    dataPills={dataPills}
-                    defaultValue={defaultValue || ''}
-                    formState={formState}
-                    key={`${property.name}_${index}`}
-                    mention={mention}
-                    path={path}
-                    property={property}
-                    register={register}
-                />
-            );
-        })}
+        {properties.map((property, index) => (
+            <Property
+                actionName={actionName}
+                currentComponent={currentComponent}
+                currentComponentData={currentComponentData}
+                dataPills={dataPills}
+                formState={formState}
+                key={`${property.name}_${index}`}
+                mention={mention}
+                path={path}
+                property={property}
+                register={register}
+            />
+        ))}
     </ul>
 );
 
