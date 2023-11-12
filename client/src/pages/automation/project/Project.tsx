@@ -46,6 +46,7 @@ import {
     useDuplicateWorkflowMutation,
     useUpdateWorkflowMutation,
 } from '@/mutations/workflows.mutations';
+import WorkflowCodeEditorSheet from '@/pages/automation/project/components/WorkflowCodeEditorSheet';
 import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
 import WorkflowTestConfigurationDialog from '@/pages/automation/project/components/WorkflowTestConfigurationDialog';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
@@ -115,6 +116,8 @@ const Project = () => {
         showWorkflowTestConfigurationDialog,
         setShowWorkflowTestConfigurationDialog,
     ] = useState(false);
+    const [showWorkflowCodeEditorSheet, setShowWorkflowCodeEditorSheet] =
+        useState(false);
     const [workflowExecution, setWorkflowExecution] =
         useState<WorkflowExecutionModel>();
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
@@ -146,6 +149,9 @@ const Project = () => {
         {
             icon: Code2Icon,
             name: 'Workflow Code Editor',
+            onClick: () => {
+                setShowWorkflowCodeEditorSheet(true);
+            },
         },
     ];
 
@@ -360,6 +366,19 @@ const Project = () => {
         );
 
         navigate(`/automation/projects/${projectId}/workflows/${id}`);
+    };
+
+    const handleWorkflowCodeEditorSheetSave = (definition: string) => {
+        setShowWorkflowCodeEditorSheet(false);
+
+        if (currentWorkflow && currentWorkflow.id) {
+            updateWorkflowMutation.mutate({
+                id: currentWorkflow.id,
+                workflowRequestModel: {
+                    definition,
+                },
+            });
+        }
     };
 
     return (
@@ -778,6 +797,18 @@ const Project = () => {
                                 handleWorkflowTestConfigurationDialogRunWorkflowClick
                             }
                             workflow={currentWorkflow}
+                        />
+                    )}
+
+                    {showWorkflowCodeEditorSheet && (
+                        <WorkflowCodeEditorSheet
+                            onClose={() => {
+                                setShowWorkflowCodeEditorSheet(false);
+                            }}
+                            onSave={handleWorkflowCodeEditorSheetSave}
+                            onWorkflowRunClick={handleRunWorkflowClick}
+                            workflow={currentWorkflow}
+                            workflowIsRunning={workflowIsRunning}
                         />
                     )}
 
