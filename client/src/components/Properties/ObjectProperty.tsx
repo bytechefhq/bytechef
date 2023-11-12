@@ -1,4 +1,8 @@
-import {DataPillType} from '@/types/types';
+import {
+    ComponentDataType,
+    CurrentComponentType,
+    DataPillType,
+} from '@/types/types';
 import {PlusIcon} from '@radix-ui/react-icons';
 import Button from 'components/Button/Button';
 import ContextualDialog from 'components/ContextualDialog/ContextualDialog';
@@ -10,13 +14,21 @@ import {PropertyType} from 'types/projectTypes';
 
 import Property from './Property';
 
+interface ObjectPropertyProps {
+    actionName?: string;
+    currentComponent?: CurrentComponentType;
+    currentComponentData?: ComponentDataType;
+    dataPills?: DataPillType[];
+    property: PropertyType;
+}
+
 const ObjectProperty = ({
+    actionName,
+    currentComponent,
+    currentComponentData,
     dataPills,
     property,
-}: {
-    dataPills?: Array<DataPillType>;
-    property: PropertyType;
-}) => {
+}: ObjectPropertyProps) => {
     const [additionalPropertiesDialogOpen, setAdditionalPropertiesDialogOpen] =
         useState(false);
 
@@ -36,6 +48,9 @@ const ObjectProperty = ({
 
                     return (
                         <Property
+                            actionName={actionName}
+                            currentComponent={currentComponent}
+                            currentComponentData={currentComponentData}
                             customClassName={twMerge(
                                 'last-of-type:pb-0',
                                 label && 'mb-0 pb-4 pl-2'
