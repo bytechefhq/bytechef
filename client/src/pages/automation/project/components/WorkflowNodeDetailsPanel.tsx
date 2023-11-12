@@ -50,15 +50,6 @@ const TABS = [
     },
 ];
 
-type CurrentComponentType =
-    | ({
-          connection?: object;
-          notes?: string;
-          properties?: object;
-          workflowAlias?: string;
-      } & ComponentDefinitionModel)
-    | undefined;
-
 const WorkflowNodeDetailsPanel = ({
     componentDefinitions,
 }: {
