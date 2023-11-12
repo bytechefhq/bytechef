@@ -98,11 +98,7 @@ const WorkflowDialog = ({
             mutate({
                 id: parentId,
                 workflowRequestModel: {
-                    definition: JSON.stringify({
-                        description: formData.description,
-                        label: formData.label,
-                        tasks: [],
-                    }),
+                    definition: `{\n\t"label": "${formData.label}",\n\t"description": "${formData.description}",\n\t"inputs": [],\n\t"triggers": [],\n\t"tasks": []\n}`,
                 },
             });
         }
