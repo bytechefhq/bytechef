@@ -45,7 +45,6 @@ interface PropertyProps {
     currentComponentData?: ComponentDataType;
     customClassName?: string;
     dataPills?: DataPillType[];
-    defaultValue?: string;
     formState?: FormState<FieldValues>;
     mention?: boolean;
     path?: string;
@@ -60,7 +59,6 @@ const Property = ({
     currentComponentData,
     customClassName,
     dataPills,
-    defaultValue,
     formState,
     mention,
     path = 'parameters',
@@ -93,6 +91,10 @@ const Property = ({
         required,
         type,
     } = property;
+
+    if (!name) {
+        return <></>;
+    }
 
     const hasError = (propertyName: string): boolean =>
         formState?.touchedFields[path] &&
@@ -142,25 +144,61 @@ const Property = ({
         }
     });
 
+    let defaultValue = '';
+
+    if (
+        actionName &&
+        property.name &&
+        currentComponentData?.properties?.[actionName]
+    ) {
+        defaultValue =
+            currentComponentData?.properties?.[actionName][property.name];
+    }
+
     const handlePropertyChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (currentComponentData) {
-            setComponentData([
-                ...otherComponentData,
-                {
-                    ...currentComponentData,
-                    name: currentComponentData.name as string,
-                    properties: {
-                        ...currentComponentData.properties,
-                        [event.target.name]: event.target.value,
+            const {action, name, properties} = currentComponentData;
+
+            if (action && properties) {
+                setComponentData([
+                    ...otherComponentData,
+                    {
+                        ...currentComponentData,
+                        name,
+                        properties: {
+                            ...properties,
+                            [action]: {
+                                ...properties[action],
+                                [event.target.name]: event.target.value,
+                            },
+                        },
                     },
-                },
-            ]);
+                ]);
+            }
         }
     };
 
-    if (!name) {
-        return <></>;
-    }
+    const handleInputTypeSwitchButtonClick = () => {
+        setMentionInput(!mentionInput);
+
+        if (mentionInput) {
+            setTimeout(() => {
+                if (inputRef.current) {
+                    inputRef.current.value = '';
+
+                    inputRef.current.focus();
+                }
+            }, 50);
+        } else {
+            setTimeout(() => {
+                setFocusedInput(editorRef.current);
+
+                editorRef.current?.focus();
+
+                setDataPillPanelOpen(true);
+            }, 50);
+        }
+    };
 
     return (
         <li
@@ -177,21 +215,7 @@ const Property = ({
                 {showInputTypeSwitchButton && (
                     <Button
                         className="absolute right-0 top-0 h-auto w-auto p-0.5"
-                        onClick={() => {
-                            setMentionInput(!mentionInput);
-
-                            if (!mentionInput) {
-                                setTimeout(() => {
-                                    setFocusedInput(editorRef.current);
-
-                                    editorRef.current?.focus();
-
-                                    setDataPillPanelOpen(true);
-                                }, 50);
-                            } else {
-                                setTimeout(() => inputRef.current?.focus(), 50);
-                            }
-                        }}
+                        onClick={handleInputTypeSwitchButtonClick}
                         size="icon"
                         title="Switch input type"
                         variant="ghost"
@@ -261,6 +285,9 @@ const Property = ({
 
                         {type === 'OBJECT' && (
                             <ObjectProperty
+                                actionName={actionName}
+                                currentComponent={currentComponent}
+                                currentComponentData={currentComponentData}
                                 dataPills={dataPills}
                                 property={property}
                             />
@@ -268,7 +295,7 @@ const Property = ({
 
                         {register && isValidPropertyType && (
                             <Input
-                                defaultValue={defaultValue as string}
+                                defaultValue={defaultValue}
                                 description={description}
                                 error={hasError(name!)}
                                 fieldsetClassName="flex-1 mb-0"

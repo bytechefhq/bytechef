@@ -389,6 +389,9 @@ const WorkflowNodeDetailsPanel = ({
                         action: currentAction.name,
                         connection: currentComponent.connection,
                         name: currentComponent.name,
+                        properties: {
+                            [currentAction.name]: {},
+                        },
                         title: currentComponent.title,
                         version: currentComponent.version,
                         workflowAlias: currentComponent.workflowAlias,
