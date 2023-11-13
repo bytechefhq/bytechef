@@ -10,6 +10,7 @@ export default function useNodeClick(
 ) {
     const {setCurrentNode, setNodeDetailsPanelOpen} =
         useNodeDetailsPanelStore();
+
     const {setRightSidebarOpen} = useRightSidebarStore();
 
     const {getNode} = useReactFlow();

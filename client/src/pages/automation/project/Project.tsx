@@ -65,9 +65,10 @@ import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 
 import PageLoader from '../../../components/PageLoader/PageLoader';
 import LayoutContainer from '../../../layouts/LayoutContainer';
-import WorkflowEditor from './ProjectWorkflow';
+import ProjectWorkflow from './ProjectWorkflow';
 import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
+import useWorkflowDataStore from './stores/useWorkflowDataStore';
 
 const Project = () => {
     const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>({});
@@ -99,13 +100,7 @@ const Project = () => {
         },
     ];
 
-    const rightSidebarNavigation: {
-        name: string;
-        icon: React.ForwardRefExoticComponent<
-            Omit<React.SVGProps<SVGSVGElement>, 'ref'>
-        >;
-        onClick?: () => void;
-    }[] = [
+    const rightSidebarNavigation = [
         {
             icon: PuzzleIcon,
             name: 'Components & Control Flows',
@@ -147,6 +142,23 @@ const Project = () => {
         error: projectWorkflowsError,
         isLoading: projectWorkflowsLoading,
     } = useGetProjectWorkflowsQuery(project?.id as number);
+
+    const {setComponentDefinitions, setTaskDispatcherDefinitions} =
+        useWorkflowDataStore();
+
+    useEffect(() => {
+        if (componentDefinitions) {
+            setComponentDefinitions(componentDefinitions);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [componentDefinitions?.length]);
+
+    useEffect(() => {
+        if (taskDispatcherDefinitions) {
+            setTaskDispatcherDefinitions(taskDispatcherDefinitions);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [taskDispatcherDefinitions?.length]);
 
     const createProjectWorkflowRequestMutation =
         useCreateProjectWorkflowRequestMutation({
@@ -589,10 +601,8 @@ const Project = () => {
                             !!taskDispatcherDefinitions && (
                                 <WorkflowNodesSidebar
                                     data={{
-                                        componentDefinitions:
-                                            componentDefinitions,
-                                        taskDispatcherDefinitions:
-                                            taskDispatcherDefinitions,
+                                        componentDefinitions,
+                                        taskDispatcherDefinitions,
                                     }}
                                     filter={filter}
                                 />
@@ -618,7 +628,7 @@ const Project = () => {
                 rightToolbarOpen={true}
             >
                 {componentDefinitions && !!taskDispatcherDefinitions && (
-                    <WorkflowEditor
+                    <ProjectWorkflow
                         componentDefinitions={componentDefinitions}
                         taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
