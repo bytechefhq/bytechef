@@ -1,20 +1,3 @@
-import Properties from '@/components/Properties/Properties';
-import {Button} from '@/components/ui/button';
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import {Switch} from '@/components/ui/switch';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {
@@ -22,196 +5,13 @@ import {
     WorkflowConnectionModel,
     WorkflowModel,
 } from '@/middleware/helios/configuration';
-import ConnectionDialog from '@/pages/automation/connections/components/ConnectionDialog';
+import ProjectInstanceDialogWorkflowsStepItemConfiguration from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowsStepItemConfiguration';
+import ProjectInstanceDialogWorkflowsStepItemConnection from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowsStepItemConnection';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
-import {useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
-import {useGetConnectionsQuery} from '@/queries/connections.queries';
-import {PropertyType} from '@/types/projectTypes';
-import * as Portal from '@radix-ui/react-portal';
-import {PlusIcon} from 'lucide-react';
-import {useState} from 'react';
 import {Control, UseFormRegister} from 'react-hook-form';
-import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
-
-interface ConfigurationProps {
-    formState: FormState<FieldValues>;
-    register: UseFormRegister<ProjectInstanceModel>;
-    workflow: WorkflowModel;
-    workflowIndex: number;
-}
-
-const Configuration = ({
-    formState,
-    register,
-    workflow,
-    workflowIndex,
-}: ConfigurationProps) => {
-    return workflow.inputs?.length ? (
-        <Properties
-            formState={formState}
-            path={`projectInstanceWorkflows.${workflowIndex!}.inputs`}
-            properties={workflow.inputs.map((input) => {
-                if (input.type === 'string') {
-                    return {
-                        controlType: 'TEXT',
-                        type: 'STRING',
-                        ...input,
-                    } as PropertyType;
-                } else if (input.type === 'number') {
-                    return {
-                        type: 'NUMBER',
-                        ...input,
-                    } as PropertyType;
-                } else {
-                    return {
-                        controlType: 'SELECT',
-                        type: 'BOOLEAN',
-                        ...input,
-                    } as PropertyType;
-                }
-            })}
-            register={register}
-        />
-    ) : (
-        <p className="text-sm">No defined configuration inputs.</p>
-    );
-};
-
-interface ConnectionProps {
-    control: Control<ProjectInstanceModel>;
-    workflowConnection: WorkflowConnectionModel;
-    workflowConnectionIndex: number;
-    workflowIndex: number;
-}
-
-const Connection = ({
-    control,
-    workflowConnection,
-    workflowConnectionIndex,
-    workflowIndex,
-}: ConnectionProps) => {
-    const [showEditConnectionDialog, setShowEditConnectionDialog] =
-        useState(false);
-
-    const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: workflowConnection.componentName,
-        componentVersion: workflowConnection.componentVersion,
-    });
-    const {data: connections} = useGetConnectionsQuery(
-        {
-            componentName: workflowConnection.componentName,
-            connectionVersion: componentDefinition?.connection?.version,
-        },
-        !!componentDefinition
-    );
-
-    return (
-        <>
-            <FormField
-                control={control}
-                name={`projectInstanceWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.connectionId`}
-                render={({field}) => (
-                    <FormItem>
-                        <FormLabel>
-                            {`${componentDefinition?.title} `}
-
-                            <span className="text-xs text-gray-500">
-                                ({workflowConnection.key})
-                            </span>
-                        </FormLabel>
-
-                        <Select
-                            defaultValue={
-                                field.value ? field.value.toString() : undefined
-                            }
-                            onValueChange={field.onChange}
-                        >
-                            <FormControl>
-                                <div className="flex space-x-2">
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Choose Connection..." />
-                                    </SelectTrigger>
-
-                                    <Button
-                                        className="mt-auto p-2"
-                                        onClick={() =>
-                                            setShowEditConnectionDialog(true)
-                                        }
-                                        title="Create a new connection"
-                                        variant="outline"
-                                    >
-                                        <PlusIcon className="h-5 w-5" />
-                                    </Button>
-                                </div>
-                            </FormControl>
-
-                            <SelectContent>
-                                {connections &&
-                                    connections.map((connection) => (
-                                        <SelectItem
-                                            key={connection.id}
-                                            value={connection.id!.toString()}
-                                        >
-                                            <span className="flex items-center">
-                                                <span className="mr-1 ">
-                                                    {connection.name}
-                                                </span>
-
-                                                <span className="text-xs text-gray-500">
-                                                    {connection?.tags
-                                                        ?.map((tag) => tag.name)
-                                                        .join(', ')}
-                                                </span>
-                                            </span>
-                                        </SelectItem>
-                                    ))}
-                            </SelectContent>
-                        </Select>
-
-                        <FormDescription>
-                            {`Choose connection for the ${componentDefinition?.title}`}
-
-                            <span className="text-xs text-gray-500">
-                                ({workflowConnection.key})
-                            </span>
-
-                            {` component.`}
-                        </FormDescription>
-
-                        <FormMessage />
-                    </FormItem>
-                )}
-                rules={{required: true}}
-            />
-
-            <FormField
-                control={control}
-                defaultValue={workflowConnection.key}
-                name={`projectInstanceWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.key`}
-                render={({field}) => <input type="hidden" {...field} />}
-            />
-
-            <FormField
-                control={control}
-                defaultValue={workflowConnection.operationName}
-                name={`projectInstanceWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.operationName`}
-                render={({field}) => <input type="hidden" {...field} />}
-            />
-
-            {showEditConnectionDialog && (
-                <Portal.Root>
-                    <ConnectionDialog
-                        componentDefinition={componentDefinition}
-                        onClose={() => setShowEditConnectionDialog(false)}
-                    />
-                </Portal.Root>
-            )}
-        </>
-    );
-};
 
 export interface ProjectInstanceDialogWorkflowListItemProps {
     control: Control<ProjectInstanceModel>;
@@ -322,7 +122,7 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                         </TabsList>
 
                         <TabsContent value="configuration">
-                            <Configuration
+                            <ProjectInstanceDialogWorkflowsStepItemConfiguration
                                 formState={formState}
                                 register={register}
                                 workflow={workflow}
@@ -337,7 +137,7 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                                         workflowConnection,
                                         workflowConnectionConnectionIndex
                                     ) => (
-                                        <Connection
+                                        <ProjectInstanceDialogWorkflowsStepItemConnection
                                             control={control}
                                             key={workflowConnection.key}
                                             workflowConnection={
