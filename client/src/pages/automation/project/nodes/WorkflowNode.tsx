@@ -12,13 +12,14 @@ import {
 import {twMerge} from 'tailwind-merge';
 
 import useNodeClickHandler from '../hooks/useNodeClick';
-import {useNodeDetailsPanelStore} from '../stores/useNodeDetailsPanelStore';
+import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 import styles from './NodeTypes.module.css';
 
 const WorkflowNode = ({data, id}: NodeProps) => {
     const [isHovered, setIsHovered] = useState(false);
 
-    const {currentNode, nodeDetailsPanelOpen} = useNodeDetailsPanelStore();
+    const {currentNode, nodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore();
 
     const handleNodeClick = useNodeClickHandler(data, id);
 

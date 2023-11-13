@@ -22,9 +22,9 @@ import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Select from '../../../../components/Select/Select';
-import {useNodeDetailsPanelStore} from '../stores/useNodeDetailsPanelStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
+import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 import getSubProperties from '../utils/getSubProperties';
 import CurrentActionSelect from './CurrentActionSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
@@ -62,7 +62,7 @@ const WorkflowNodeDetailsPanel = ({
     const [currentActionName, setCurrentActionName] = useState('');
 
     const {currentNode, nodeDetailsPanelOpen, setNodeDetailsPanelOpen} =
-        useNodeDetailsPanelStore();
+        useWorkflowNodeDetailsPanelStore();
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery({
         componentName: currentNode.originNodeName || currentNode.name,

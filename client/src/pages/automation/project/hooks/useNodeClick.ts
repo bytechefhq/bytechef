@@ -2,14 +2,14 @@ import useRightSidebarStore from '@/pages/automation/project/stores/useRightSide
 import {useCallback} from 'react';
 import {NodeProps, useReactFlow} from 'reactflow';
 
-import {useNodeDetailsPanelStore} from '../stores/useNodeDetailsPanelStore';
+import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 
 export default function useNodeClick(
     data: NodeProps['data'],
     id: NodeProps['id']
 ) {
     const {setCurrentNode, setNodeDetailsPanelOpen} =
-        useNodeDetailsPanelStore();
+        useWorkflowNodeDetailsPanelStore();
 
     const {setRightSidebarOpen} = useRightSidebarStore();
 

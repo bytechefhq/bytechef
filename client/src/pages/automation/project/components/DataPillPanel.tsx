@@ -12,13 +12,14 @@ import Input from 'components/Input/Input';
 import {useState} from 'react';
 
 import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
-import {useNodeDetailsPanelStore} from '../stores/useNodeDetailsPanelStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 
 const DataPillPanel = () => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
-    const {currentNode, nodeDetailsPanelOpen} = useNodeDetailsPanelStore();
+    const {currentNode, nodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore();
     const {componentActions, componentNames} = useWorkflowDataStore();
 
     const currentNodeIndex = componentNames.indexOf(currentNode.name);

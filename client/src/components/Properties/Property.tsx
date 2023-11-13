@@ -1,8 +1,8 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
-import {useNodeDetailsPanelStore} from '@/pages/automation/project/stores/useNodeDetailsPanelStore';
 import useWorkflowDefinitionStore from '@/pages/automation/project/stores/useWorkflowDefinitionStore';
+import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import getInputType from '@/pages/automation/project/utils/getInputType';
 import {PropertyType} from '@/types/projectTypes';
 import {
@@ -77,7 +77,7 @@ const Property = ({
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const {setFocusedInput} = useNodeDetailsPanelStore();
+    const {setFocusedInput} = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentData, setComponentData} = useWorkflowDefinitionStore();
 
