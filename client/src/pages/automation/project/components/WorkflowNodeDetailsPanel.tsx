@@ -103,7 +103,7 @@ const WorkflowNodeDetailsPanel = ({
                 componentName: currentComponent?.name as string,
                 componentVersion: currentComponent?.version as number,
             },
-            !!currentComponent?.actions
+            !!currentComponent?.actions && !!getActionName()
         );
 
     const currentActionProperties = currentAction?.properties?.filter(
