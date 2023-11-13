@@ -41,8 +41,8 @@ import {
     useUpdateWorkflowMutation,
 } from '@/mutations/projects.mutations';
 import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
-import {useNodeDetailsPanelStore} from '@/pages/automation/project/stores/useNodeDetailsPanelStore';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
+import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import ProjectDialog from '@/pages/automation/projects/ProjectDialog';
 import WorkflowExecutionsDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionsDetailsAccordion';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
@@ -82,7 +82,7 @@ const Project = () => {
 
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
-    const {setNodeDetailsPanelOpen} = useNodeDetailsPanelStore();
+    const {setNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
     const {toast} = useToast();
 

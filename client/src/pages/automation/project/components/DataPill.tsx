@@ -1,5 +1,5 @@
 import {ComponentDefinitionModel} from '@/middleware/helios/execution';
-import {useNodeDetailsPanelStore} from '@/pages/automation/project/stores/useNodeDetailsPanelStore';
+import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {PropertyType} from '@/types/projectTypes';
 import {MouseEvent} from 'react';
@@ -21,7 +21,7 @@ const DataPill = ({
 }) => {
     const subProperties = property.properties || property.items;
 
-    const {focusedInput} = useNodeDetailsPanelStore();
+    const {focusedInput} = useWorkflowNodeDetailsPanelStore();
 
     const mentionInput = focusedInput?.getEditor().getModule('mention');
 

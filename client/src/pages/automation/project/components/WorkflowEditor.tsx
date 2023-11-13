@@ -14,8 +14,8 @@ import useLayout from '../hooks/useLayout';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import defaultNodes from '../nodes/defaultNodes';
-import {useNodeDetailsPanelStore} from '../stores/useNodeDetailsPanelStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 
 export type WorkflowEditorProps = {
     componentDefinitions: ComponentDefinitionBasicModel[];
@@ -29,7 +29,7 @@ const WorkflowEditor = ({
     const [nodeNames, setNodeNames] = useState<Array<string>>([]);
     const [viewportWidth, setViewportWidth] = useState(0);
 
-    const {nodeDetailsPanelOpen} = useNodeDetailsPanelStore();
+    const {nodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
     const nodeTypes = useMemo(
         () => ({

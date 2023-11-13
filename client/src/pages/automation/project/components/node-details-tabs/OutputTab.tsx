@@ -3,7 +3,7 @@
 import {TYPE_ICONS} from 'shared/typeIcons';
 
 import {PropertyType} from '../../../../../types/projectTypes';
-import {useNodeDetailsPanelStore} from '../../stores/useNodeDetailsPanelStore';
+import {useWorkflowNodeDetailsPanelStore} from '../../stores/useWorkflowNodeDetailsPanelStore';
 
 const PropertyField = ({data, label}: {data: PropertyType; label: string}) => (
     <div className="inline-flex items-center rounded-md p-1 text-sm hover:bg-gray-100">
@@ -35,7 +35,7 @@ const SchemaProperties = ({properties}: {properties: PropertyType[]}) => (
 );
 
 const OutputTab = ({outputSchema}: {outputSchema: PropertyType}) => {
-    const {currentNode} = useNodeDetailsPanelStore();
+    const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     return (
         <div className="max-h-full flex-[1_1_1px] p-4">
