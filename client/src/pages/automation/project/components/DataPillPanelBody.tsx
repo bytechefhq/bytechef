@@ -90,7 +90,7 @@ const DataPillPanelBody = ({
                                         </AccordionTrigger>
 
                                         <AccordionContent
-                                            className="h-full w-full space-y-4 border-b border-gray-100 p-4"
+                                            className="h-full w-full space-y-4 border-b border-gray-100 px-4 pb-4"
                                             key={`accordion-content-${componentAction.workflowAlias}`}
                                         >
                                             <ul className="flex w-full flex-col space-y-2 group-data-[state=open]:h-full">
