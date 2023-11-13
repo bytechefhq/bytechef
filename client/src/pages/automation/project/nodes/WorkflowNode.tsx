@@ -12,6 +12,7 @@ import {
 import {twMerge} from 'tailwind-merge';
 
 import useNodeClickHandler from '../hooks/useNodeClick';
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 import styles from './NodeTypes.module.css';
 
@@ -20,6 +21,8 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     const {currentNode, nodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
+
+    const {componentNames, setComponentNames} = useWorkflowDataStore();
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
@@ -68,6 +71,12 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                 ];
             });
         }
+
+        setComponentNames(
+            componentNames.filter(
+                (componentName) => componentName !== data.name
+            )
+        );
     };
 
     return (

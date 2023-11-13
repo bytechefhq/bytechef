@@ -405,6 +405,12 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentAction?.name, currentComponent?.name]);
 
+    useEffect(() => {
+        if (!componentNames.includes(currentNode.name)) {
+            setNodeDetailsPanelOpen(false);
+        }
+    }, [componentNames, currentNode.name, setNodeDetailsPanelOpen]);
+
     return (
         <Dialog.Root
             modal={false}
