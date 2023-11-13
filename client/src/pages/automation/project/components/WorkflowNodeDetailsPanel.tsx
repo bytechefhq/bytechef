@@ -56,6 +56,9 @@ const WorkflowNodeDetailsPanel = ({
     componentDefinitions: Array<ComponentDefinitionBasicModel>;
 }) => {
     const [activeTab, setActiveTab] = useState('description');
+    const [componentDefinitionNames, setComponentDefinitionNames] = useState<
+        Array<string>
+    >([]);
     const [currentActionName, setCurrentActionName] = useState('');
 
     const {currentNode, nodeDetailsPanelOpen, setNodeDetailsPanelOpen} =
@@ -114,10 +117,6 @@ const WorkflowNodeDetailsPanel = ({
                 return true;
             }
         }
-    );
-
-    const componentDefinitionNames = componentDefinitions.map(
-        (componentDefinition) => componentDefinition.name
     );
 
     const taskTypes = componentActions?.map(
@@ -258,6 +257,17 @@ const WorkflowNodeDetailsPanel = ({
     });
 
     useEffect(() => {
+        if (componentDefinitions?.length) {
+            setComponentDefinitionNames(
+                componentDefinitions.map(
+                    (componentDefinition) => componentDefinition.name
+                )
+            );
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [componentDefinitions?.length]);
+
+    useEffect(() => {
         if (availableDataPills) {
             setDataPills(availableDataPills.flat(Infinity));
         }
@@ -271,7 +281,7 @@ const WorkflowNodeDetailsPanel = ({
             setCurrentActionName(currentComponent.actions[0].name);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentComponent]);
+    }, [currentComponent?.actions?.length, currentComponentData?.action]);
 
     useEffect(() => {
         if (currentActionFetched) {
@@ -295,12 +305,13 @@ const WorkflowNodeDetailsPanel = ({
         if (activeTab === 'properties' && !currentActionProperties) {
             setActiveTab('description');
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         activeTab,
         componentDefinitionNames,
-        currentAction,
+        currentAction?.outputSchema,
         currentActionFetched,
-        currentActionProperties,
+        currentActionProperties?.length,
         currentComponent?.name,
     ]);
 
@@ -318,19 +329,20 @@ const WorkflowNodeDetailsPanel = ({
             }
 
             if (componentActions && currentComponent) {
+                const {name, workflowAlias} = currentComponent;
+
                 const duplicateComponentActionIndex =
                     componentActions.findIndex(
                         (action) =>
                             action.workflowAlias?.match(new RegExp(/-\d$/)) &&
-                            action.workflowAlias ===
-                                currentComponent?.workflowAlias
+                            action.workflowAlias === workflowAlias
                     );
 
                 if (duplicateComponentActionIndex !== -1) {
                     componentActions.splice(duplicateComponentActionIndex, 1, {
                         actionName: currentAction.name,
-                        componentName: currentComponent.name,
-                        workflowAlias: currentComponent.workflowAlias,
+                        componentName: name,
+                        workflowAlias,
                     });
 
                     setComponentActions(componentActions);
@@ -352,8 +364,8 @@ const WorkflowNodeDetailsPanel = ({
                         ...orderedComponentActions.slice(0, currentNodeIndex),
                         {
                             actionName: currentAction.name,
-                            componentName: currentComponent.name,
-                            workflowAlias: currentComponent.workflowAlias,
+                            componentName: name,
+                            workflowAlias,
                         },
                         ...orderedComponentActions.slice(currentNodeIndex + 1),
                     ];
@@ -363,10 +375,10 @@ const WorkflowNodeDetailsPanel = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentComponent, currentAction, currentActionFetched]);
+    }, [currentComponent?.name, currentAction?.name, currentActionFetched]);
 
     useEffect(() => {
-        if (currentAction) {
+        if (currentAction?.name) {
             const componentDataIndex = componentData.findIndex(
                 (component) => component.name === currentComponent?.name
             );
@@ -391,7 +403,7 @@ const WorkflowNodeDetailsPanel = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentAction, currentComponent]);
+    }, [currentAction?.name, currentComponent?.name]);
 
     return (
         <Dialog.Root
