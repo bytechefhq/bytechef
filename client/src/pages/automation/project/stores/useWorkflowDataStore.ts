@@ -1,4 +1,8 @@
 /* eslint-disable sort-keys */
+import {
+    ComponentDefinitionBasicModel,
+    TaskDispatcherDefinitionModel,
+} from '@/middleware/hermes/configuration';
 import {DataPillType} from '@/types/types';
 import {create} from 'zustand';
 
@@ -9,6 +13,11 @@ type ComponentActionsType = Array<{
 }>;
 
 interface WorkflowDefinitionState {
+    componentDefinitions: Array<ComponentDefinitionBasicModel>;
+    setComponentDefinitions: (
+        componentDefinitions: Array<ComponentDefinitionBasicModel>
+    ) => void;
+
     componentNames: string[];
     setComponentNames: (componentNames: string[]) => void;
 
@@ -17,9 +26,18 @@ interface WorkflowDefinitionState {
 
     dataPills: Array<DataPillType>;
     setDataPills: (dataPills: Array<DataPillType>) => void;
+
+    taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
+    setTaskDispatcherDefinitions: (
+        taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>
+    ) => void;
 }
 
 const useWorkflowDataStore = create<WorkflowDefinitionState>((set) => ({
+    componentDefinitions: [],
+    setComponentDefinitions: (componentDefinitions) =>
+        set((state) => ({...state, componentDefinitions})),
+
     componentNames: [],
     setComponentNames: (componentNames) =>
         set((state) => ({...state, componentNames})),
@@ -30,6 +48,10 @@ const useWorkflowDataStore = create<WorkflowDefinitionState>((set) => ({
 
     dataPills: [],
     setDataPills: (dataPills) => set((state) => ({...state, dataPills})),
+
+    taskDispatcherDefinitions: [],
+    setTaskDispatcherDefinitions: (taskDispatcherDefinitions) =>
+        set((state) => ({...state, taskDispatcherDefinitions})),
 }));
 
 export default useWorkflowDataStore;
