@@ -106,6 +106,7 @@ const Project = () => {
             name: 'Components & Control Flows',
             onClick: () => {
                 setNodeDetailsPanelOpen(false);
+
                 setRightSidebarOpen(!rightSidebarOpen);
             },
         },
@@ -233,7 +234,9 @@ const Project = () => {
                 )!
             );
         }
+
         setLeftSidebarOpen(false);
+
         setNodeDetailsPanelOpen(false);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
