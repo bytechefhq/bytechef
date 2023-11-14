@@ -162,7 +162,6 @@ const ProjectInstanceWorkflowListItem = ({
 
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                            className="cursor-pointer text-xs text-gray-700"
                             onClick={() => setShowEditWorkflowDialog(true)}
                         >
                             Edit

@@ -38,7 +38,7 @@ const ArrayProperty = ({
                     <DropdownMenu
                         customTriggerComponent={
                             <Button
-                                className="rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
+                                className="rounded-sm bg-gray-100 text-sm font-medium hover:bg-gray-200"
                                 displayType="unstyled"
                                 icon={<PlusIcon className="h-4 w-4" />}
                                 iconPosition="left"

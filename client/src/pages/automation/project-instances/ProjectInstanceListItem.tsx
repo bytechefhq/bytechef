@@ -222,7 +222,6 @@ const ProjectInstanceListItem = ({
 
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                                className="cursor-pointer text-xs text-gray-700"
                                 onClick={() => setShowEditDialog(true)}
                             >
                                 Edit
@@ -231,7 +230,7 @@ const ProjectInstanceListItem = ({
                             <DropdownMenuSeparator />
 
                             <DropdownMenuItem
-                                className="cursor-pointer text-xs text-red-600"
+                                className="text-red-600"
                                 onClick={() => setShowDeleteDialog(true)}
                             >
                                 Delete
