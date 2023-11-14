@@ -31,6 +31,10 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import {RightSidebar} from '@/layouts/RightSidebar';
 import {ProjectModel, WorkflowModel} from '@/middleware/helios/configuration';
+import {
+    WorkflowExecutionModel,
+    WorkflowTestApi,
+} from '@/middleware/helios/execution';
 import {useCreateProjectWorkflowMutation} from '@/mutations/projectWorkflows.mutations';
 import {
     useDeleteProjectMutation,
@@ -43,27 +47,36 @@ import {
     useUpdateWorkflowMutation,
 } from '@/mutations/workflows.mutations';
 import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
+import WorkflowTestConfigurationDialog from '@/pages/automation/project/components/WorkflowTestConfigurationDialog';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import ProjectDialog from '@/pages/automation/projects/ProjectDialog';
-import WorkflowExecutionsDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionsDetailsAccordion';
+import WorkflowExecutionDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordion';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {ProjectCategoryKeys} from '@/queries/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/projectTags.quries';
-import {ProjectKeys, useGetProjectQuery} from '@/queries/projects.queries';
+import {
+    ProjectKeys,
+    useGetProjectQuery,
+    useGetProjectWorkflowsQuery,
+} from '@/queries/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
 import {
-    WorkflowKeys,
-    useGetProjectWorkflowsQuery,
-} from '@/queries/workflows.queries';
-import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
+    ChevronDownIcon,
+    DotsVerticalIcon,
+    PlusIcon,
+} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     CircleDotDashedIcon,
     Code2Icon,
     PlayIcon,
     PuzzleIcon,
+    RefreshCwIcon,
+    RefreshCwOffIcon,
+    SlidersIcon,
+    SquareIcon,
 } from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
@@ -73,17 +86,38 @@ import LayoutContainer from '../../../layouts/LayoutContainer';
 import ProjectWorkflow from './ProjectWorkflow';
 import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
-import useWorkflowDataStore from './stores/useWorkflowDataStore';
+
+const workflowTestApi = new WorkflowTestApi();
+
+const headerToggleItems: IToggleItem[] = [
+    {
+        label: 'Build',
+        value: 'build',
+    },
+    {
+        label: 'Debug',
+        value: 'debug',
+    },
+];
 
 const Project = () => {
-    const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel>({});
+    const [currentWorkflow, setCurrentWorkflow] = useState<
+        WorkflowModel | undefined
+    >();
     const [filter, setFilter] = useState('');
-    const [showDeleteProjectDialog, setShowDeleteProjectDialog] =
+    const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] =
         useState(false);
-    const [showDeleteWorkflowDialog, setShowDeleteWorkflowDialog] =
+    const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] =
         useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
+    const [
+        showWorkflowTestConfigurationDialog,
+        setShowWorkflowTestConfigurationDialog,
+    ] = useState(false);
+    const [workflowExecution, setWorkflowExecution] =
+        useState<WorkflowExecutionModel>();
+    const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
 
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
@@ -94,24 +128,18 @@ const Project = () => {
     const {projectId, workflowId} = useParams();
     const navigate = useNavigate();
 
-    const headerToggleItems: IToggleItem[] = [
-        {
-            label: 'Build',
-            value: 'build',
-        },
-        {
-            label: 'Debug',
-            value: 'debug',
-        },
-    ];
-
-    const rightSidebarNavigation = [
+    const rightSidebarNavigation: {
+        name: string;
+        icon: React.ForwardRefExoticComponent<
+            Omit<React.SVGProps<SVGSVGElement>, 'ref'>
+        >;
+        onClick?: () => void;
+    }[] = [
         {
             icon: PuzzleIcon,
             name: 'Components & Control Flows',
             onClick: () => {
                 setNodeDetailsPanelOpen(false);
-
                 setRightSidebarOpen(!rightSidebarOpen);
             },
         },
@@ -121,8 +149,6 @@ const Project = () => {
         },
     ];
 
-    const queryClient = useQueryClient();
-
     const {data: project} = useGetProjectQuery(
         parseInt(projectId!),
         useLoaderData() as ProjectModel
@@ -131,7 +157,7 @@ const Project = () => {
     const {
         data: componentDefinitions,
         error: componentsError,
-        isLoading: componentsLoading,
+        isLoading: componentsIsLoading,
     } = useGetComponentDefinitionsQuery({
         actionDefinitions: true,
         triggerDefinitions: true,
@@ -142,12 +168,6 @@ const Project = () => {
         error: taskDispatcherDefinitionsError,
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
-
-    const {
-        data: projectWorkflows,
-        error: projectWorkflowsError,
-        isLoading: projectWorkflowsLoading,
-    } = useGetProjectWorkflowsQuery(project?.id as number);
 
     const {setComponentDefinitions, setTaskDispatcherDefinitions} =
         useWorkflowDataStore();
@@ -166,18 +186,21 @@ const Project = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [taskDispatcherDefinitions?.length]);
 
-    const createProjectWorkflowRequestMutation =
-        useCreateProjectWorkflowMutation({
-            onSuccess: (workflow) => {
-                queryClient.invalidateQueries({
-                    queryKey: WorkflowKeys.projectWorkflows(
-                        parseInt(projectId!)
-                    ),
-                });
+    const {
+        data: projectWorkflows,
+        error: projectWorkflowsError,
+        isLoading: projectWorkflowsLoading,
+    } = useGetProjectWorkflowsQuery(project?.id as number);
 
-                setCurrentWorkflow(workflow);
-            },
-        });
+    const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
+        onSuccess: (workflow) => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.projectWorkflows(parseInt(projectId!)),
+            });
+
+            setCurrentWorkflow(workflow);
+        },
+    });
 
     const deleteProjectMutation = useDeleteProjectMutation({
         onSuccess: () => {
@@ -195,7 +218,7 @@ const Project = () => {
 
     const deleteWorkflowMutationMutation = useDeleteWorkflowMutation({
         onSuccess: () => {
-            setShowDeleteWorkflowDialog(false);
+            setShowDeleteWorkflowAlertDialog(false);
 
             navigate('/automation/projects');
 
@@ -229,19 +252,17 @@ const Project = () => {
         },
     });
 
-    const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
+    const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.projectWorkflows(+projectId!),
+            });
 
             setShowEditWorkflowDialog(false);
         },
     });
 
-    const testWorkflowMutation = useTestWorkflowMutation({
-        onSuccess: (workflowExecution) => {
-            setWorkflowExecution(workflowExecution);
-        },
-    });
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         if (projectWorkflows) {
@@ -253,11 +274,10 @@ const Project = () => {
         }
 
         setLeftSidebarOpen(false);
-
         setNodeDetailsPanelOpen(false);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowId]);
+    }, [projectWorkflows, workflowId]);
 
     useEffect(() => {
         if (currentWorkflow?.id) {
@@ -267,6 +287,81 @@ const Project = () => {
         }
     }, [currentWorkflow, navigate, projectId, setNodeDetailsPanelOpen]);
 
+    useEffect(() => {
+        setWorkflowIsRunning(false);
+    }, [setWorkflowIsRunning, workflowExecution, setWorkflowExecution]);
+
+    const handleDeleteProjectAlertDialogClick = () => {
+        if (project?.id) {
+            deleteProjectMutation.mutate(project.id);
+        }
+    };
+
+    const handleDeleteWorkflowAlertDialogClick = () => {
+        if (project?.id && currentWorkflow?.id) {
+            deleteWorkflowMutationMutation.mutate({
+                id: project?.id,
+                workflowId: currentWorkflow?.id,
+            });
+        }
+    };
+
+    const handleProjectDialogCloseClick = () => {
+        setShowEditProjectDialog(false);
+
+        if (project) {
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.project(project.id!),
+            });
+        }
+    };
+
+    const handleRunWorkflowClick = () => {
+        if (currentWorkflow?.inputs && currentWorkflow?.inputs?.length > 0) {
+            setShowWorkflowTestConfigurationDialog(true);
+        } else {
+            setWorkflowIsRunning(true);
+            setLeftSidebarOpen(true);
+
+            workflowTestApi
+                .testWorkflow({
+                    testParametersModel: {
+                        workflowId: currentWorkflow?.id,
+                    },
+                })
+                .then(setWorkflowExecution)
+                .catch(() => setWorkflowIsRunning(false));
+        }
+    };
+
+    const handleWorkflowTestConfigurationDialogRunWorkflowClick = (inputs?: {
+        [key: string]: object;
+    }) => {
+        setWorkflowIsRunning(true);
+        setLeftSidebarOpen(true);
+        setShowWorkflowTestConfigurationDialog(false);
+
+        workflowTestApi
+            .testWorkflow({
+                testParametersModel: {
+                    inputs,
+                    workflowId: currentWorkflow?.id,
+                },
+            })
+            .then(setWorkflowExecution)
+            .catch(() => setWorkflowIsRunning(false));
+    };
+
+    const handleProjectWorkflowValueChange = (id: string) => {
+        setCurrentWorkflow(
+            projectWorkflows!.find(
+                (workflow: WorkflowModel) => workflow.id === id
+            )!
+        );
+
+        navigate(`/automation/projects/${projectId}/workflows/${id}`);
+    };
+
     return (
         <PageLoader
             errors={[
@@ -275,7 +370,7 @@ const Project = () => {
                 projectWorkflowsError,
             ]}
             loading={
-                componentsLoading ||
+                componentsIsLoading ||
                 taskDispatcherDefinitionsLoading ||
                 projectWorkflowsLoading
             }
@@ -283,170 +378,159 @@ const Project = () => {
             <LayoutContainer
                 className="bg-muted dark:bg-background"
                 header={
-                    <header className="ml-4 flex items-center">
-                        <div className="mr-4 flex items-center">
-                            <h1>{project?.name}</h1>
+                    <header className="my-4 ml-4 flex items-center">
+                        <div className="flex">
+                            <div className="mr-2 flex items-center">
+                                <h1>{project?.name}</h1>
 
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button size="icon" variant="ghost">
-                                        <ChevronDownIcon />
-                                    </Button>
-                                </DropdownMenuTrigger>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button size="icon" variant="ghost">
+                                            <ChevronDownIcon />
+                                        </Button>
+                                    </DropdownMenuTrigger>
 
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem
-                                        className="text-xs"
-                                        onClick={() =>
-                                            setShowEditProjectDialog(true)
-                                        }
-                                    >
-                                        Edit
-                                    </DropdownMenuItem>
-
-                                    {project && (
+                                    <DropdownMenuContent>
                                         <DropdownMenuItem
-                                            className="text-xs"
                                             onClick={() =>
-                                                duplicateProjectMutation.mutate(
-                                                    project.id!
+                                                setShowEditProjectDialog(true)
+                                            }
+                                        >
+                                            Edit
+                                        </DropdownMenuItem>
+
+                                        {project && (
+                                            <DropdownMenuItem
+                                                onClick={() =>
+                                                    duplicateProjectMutation.mutate(
+                                                        project.id!
+                                                    )
+                                                }
+                                            >
+                                                Duplicate
+                                            </DropdownMenuItem>
+                                        )}
+
+                                        <DropdownMenuSeparator />
+
+                                        <DropdownMenuItem
+                                            className="text-red-600"
+                                            onClick={() =>
+                                                setShowDeleteProjectAlertDialog(
+                                                    true
                                                 )
                                             }
                                         >
-                                            Duplicate
+                                            Delete
                                         </DropdownMenuItem>
-                                    )}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
 
-                                    <DropdownMenuSeparator />
-
-                                    <DropdownMenuItem
-                                        className="text-xs text-red-600"
-                                        onClick={() =>
-                                            setShowDeleteProjectDialog(true)
+                            <div className="mr-2 flex rounded-md border border-input bg-white shadow-sm">
+                                {currentWorkflow && !!projectWorkflows && (
+                                    <Select
+                                        defaultValue={workflowId}
+                                        name="projectWorkflowSelect"
+                                        onValueChange={
+                                            handleProjectWorkflowValueChange
                                         }
+                                        value={currentWorkflow.id || workflowId}
                                     >
-                                        Delete
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
+                                        <SelectTrigger className="mr-0.5 border-0 bg-white shadow-none">
+                                            <SelectValue placeholder="Select a workflow" />
+                                        </SelectTrigger>
 
-                        <div className="mx-2 my-4 flex rounded-md border border-input bg-white shadow-sm">
-                            {currentWorkflow && !!projectWorkflows && (
-                                <Select
-                                    defaultValue={workflowId}
-                                    name="projectWorkflowSelect"
-                                    onValueChange={(value) => {
-                                        setCurrentWorkflow(
-                                            projectWorkflows.find(
-                                                (workflow: WorkflowModel) =>
-                                                    workflow.id === value
-                                            )!
-                                        );
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>
+                                                    Workflows
+                                                </SelectLabel>
 
-                                        navigate(
-                                            `/automation/projects/${projectId}/workflows/${value}`
-                                        );
-                                    }}
-                                    value={currentWorkflow.id || workflowId}
-                                >
-                                    <SelectTrigger className="mr-0.5 border-0 bg-white shadow-none">
-                                        <SelectValue placeholder="Select a workflow" />
-                                    </SelectTrigger>
+                                                {projectWorkflows.map(
+                                                    (workflow) => (
+                                                        <SelectItem
+                                                            key={workflow.id!}
+                                                            value={workflow.id!}
+                                                        >
+                                                            {workflow.label!}
+                                                        </SelectItem>
+                                                    )
+                                                )}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                )}
 
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectLabel>Workflows</SelectLabel>
-
-                                            {projectWorkflows.map(
-                                                (workflow) => (
-                                                    <SelectItem
-                                                        key={workflow.id!}
-                                                        value={workflow.id!}
-                                                    >
-                                                        {workflow.label!}
-                                                    </SelectItem>
-                                                )
-                                            )}
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
-                            )}
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        className="border-0 bg-white shadow-none"
-                                        size="icon"
-                                        variant="outline"
-                                    >
-                                        <DotsVerticalIcon />
-                                    </Button>
-                                </DropdownMenuTrigger>
-
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem
-                                        className="text-xs"
-                                        onClick={() => {
-                                            setShowEditWorkflowDialog(true);
-                                        }}
-                                    >
-                                        Edit
-                                    </DropdownMenuItem>
-
-                                    {project && currentWorkflow && (
-                                        <DropdownMenuItem
-                                            className="text-xs"
-                                            onClick={() =>
-                                                duplicateWorkflowMutationMutation.mutate(
-                                                    {
-                                                        id: project.id!,
-                                                        workflowId:
-                                                            currentWorkflow.id!,
-                                                    }
-                                                )
-                                            }
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            className="border-0 bg-white shadow-none"
+                                            size="icon"
+                                            variant="outline"
                                         >
-                                            Duplicate
+                                            <DotsVerticalIcon />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                setShowEditWorkflowDialog(true);
+                                            }}
+                                        >
+                                            Edit
                                         </DropdownMenuItem>
-                                    )}
 
-                                    <DropdownMenuSeparator />
+                                        {project && currentWorkflow && (
+                                            <DropdownMenuItem
+                                                onClick={() =>
+                                                    duplicateWorkflowMutationMutation.mutate(
+                                                        {
+                                                            id: project.id!,
+                                                            workflowId:
+                                                                currentWorkflow.id!,
+                                                        }
+                                                    )
+                                                }
+                                            >
+                                                Duplicate
+                                            </DropdownMenuItem>
+                                        )}
 
-                                    <DropdownMenuItem
-                                        className="text-xs text-red-600"
-                                        onClick={() => {
-                                            setShowDeleteWorkflowDialog(true);
-                                        }}
-                                    >
-                                        Delete
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                        <DropdownMenuSeparator />
 
-                            {!!projectId && (
-                                <WorkflowDialog
-                                    createWorkflowRequestMutation={
-                                        createProjectWorkflowRequestMutation
-                                    }
-                                    parentId={+projectId}
-                                    triggerClassName="border-0 shadow-none"
-                                />
-                            )}
+                                        <DropdownMenuItem
+                                            className="text-red-600"
+                                            onClick={() => {
+                                                setShowDeleteWorkflowAlertDialog(
+                                                    true
+                                                );
+                                            }}
+                                        >
+                                            Delete
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
 
-                            {showEditWorkflowDialog && (
-                                <WorkflowDialog
-                                    onClose={() =>
-                                        setShowEditWorkflowDialog(false)
-                                    }
-                                    showTrigger={false}
-                                    updateWorkflowMutationMutation={
-                                        updateWorkflowMutationMutation
-                                    }
-                                    visible
-                                    workflow={currentWorkflow}
-                                />
-                            )}
+                                {!!projectId && (
+                                    <WorkflowDialog
+                                        createWorkflowRequestMutation={
+                                            createProjectWorkflowMutation
+                                        }
+                                        parentId={+projectId}
+                                        triggerNode={
+                                            <Button
+                                                className="border-0 bg-white shadow-none"
+                                                size="icon"
+                                                variant="outline"
+                                            >
+                                                <PlusIcon className="mx-2 h-5 w-5" />
+                                            </Button>
+                                        }
+                                    />
+                                )}
+                            </div>
                         </div>
 
                         <div className="flex flex-1 justify-center">
@@ -460,26 +544,36 @@ const Project = () => {
                             />
                         </div>
 
-                        <div className="flex justify-end">
+                        <div>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
-                                        className="mr-1 bg-success text-success-foreground hover:bg-success/80"
-                                        onClick={() => {
-                                            setLeftSidebarOpen(true);
-                                            setWorkflowExecution(undefined);
+                                    <>
+                                        {!workflowIsRunning && (
+                                            <Button
+                                                className="mr-1 bg-success text-success-foreground hover:bg-success/80"
+                                                onClick={handleRunWorkflowClick}
+                                                size="sm"
+                                                variant="secondary"
+                                            >
+                                                <PlayIcon className="mr-0.5 h-5" />{' '}
+                                                Run
+                                            </Button>
+                                        )}
 
-                                            testWorkflowMutation.mutate({
-                                                workflowId:
-                                                    currentWorkflow.id ||
-                                                    workflowId,
-                                            });
-                                        }}
-                                        size="sm"
-                                        variant="secondary"
-                                    >
-                                        <PlayIcon className="mr-0.5 h-5" /> Run
-                                    </Button>
+                                        {workflowIsRunning && (
+                                            <Button
+                                                className="mr-1"
+                                                onClick={() => {
+                                                    // TODO
+                                                }}
+                                                size="sm"
+                                                variant="destructive"
+                                            >
+                                                <SquareIcon className="mr-0.5 h-5" />{' '}
+                                                Running
+                                            </Button>
+                                        )}
+                                    </>
                                 </TooltipTrigger>
 
                                 <TooltipContent>
@@ -513,115 +607,40 @@ const Project = () => {
                                 </TooltipContent>
                             </Tooltip>
                         </div>
-
-                        <AlertDialog open={showDeleteProjectDialog}>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                        Are you absolutely sure?
-                                    </AlertDialogTitle>
-
-                                    <AlertDialogDescription>
-                                        This action cannot be undone. This will
-                                        permanently delete the project and
-                                        workflows it contains.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel
-                                        onClick={() =>
-                                            setShowDeleteProjectDialog(false)
-                                        }
-                                    >
-                                        Cancel
-                                    </AlertDialogCancel>
-
-                                    <AlertDialogAction
-                                        className="bg-red-600"
-                                        onClick={() => {
-                                            if (project?.id) {
-                                                deleteProjectMutation.mutate(
-                                                    project.id
-                                                );
-                                            }
-                                        }}
-                                    >
-                                        Delete
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-
-                        <AlertDialog open={showDeleteWorkflowDialog}>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                        Are you absolutely sure?
-                                    </AlertDialogTitle>
-
-                                    <AlertDialogDescription>
-                                        This action cannot be undone. This will
-                                        permanently delete the workflow.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel
-                                        onClick={() =>
-                                            setShowDeleteWorkflowDialog(false)
-                                        }
-                                    >
-                                        Cancel
-                                    </AlertDialogCancel>
-
-                                    <AlertDialogAction
-                                        className="bg-red-600"
-                                        onClick={() => {
-                                            if (
-                                                project?.id &&
-                                                currentWorkflow?.id
-                                            ) {
-                                                deleteWorkflowMutationMutation.mutate(
-                                                    {
-                                                        id: project?.id,
-                                                        workflowId:
-                                                            currentWorkflow?.id,
-                                                    }
-                                                );
-                                            }
-                                        }}
-                                    >
-                                        Delete
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-
-                        {showEditProjectDialog && project && (
-                            <ProjectDialog
-                                onClose={() => {
-                                    setShowEditProjectDialog(false);
-
-                                    queryClient.invalidateQueries({
-                                        queryKey: ProjectKeys.project(
-                                            project.id!
-                                        ),
-                                    });
-                                }}
-                                project={project}
-                                showTrigger={false}
-                                visible
-                            />
-                        )}
                     </header>
                 }
                 leftSidebarBody={
                     <div className="py-1.5">
-                        {workflowExecution && (
-                            <WorkflowExecutionsDetailsAccordion
-                                workflowExecution={workflowExecution}
-                            />
+                        {!workflowIsRunning ? (
+                            workflowExecution ? (
+                                <WorkflowExecutionDetailsAccordion
+                                    workflowExecution={workflowExecution}
+                                />
+                            ) : (
+                                <div className="absolute inset-x-0 bottom-0 top-2/4">
+                                    <div className="flex w-full flex-col items-center text-gray-500">
+                                        <div className="text-gray-400">
+                                            <RefreshCwOffIcon className="h-16 w-16" />
+                                        </div>
+
+                                        <div>
+                                            Workflow has not yet been executed.
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        ) : (
+                            <div className="absolute inset-x-0 bottom-0 top-2/4">
+                                <div className="flex w-full flex-col items-center">
+                                    <div className="flex animate-spin space-x-2 text-gray-400">
+                                        <RefreshCwIcon className="h-16 w-16" />
+                                    </div>
+
+                                    <div className="text-gray-500">
+                                        Workflow is running...
+                                    </div>
+                                </div>
+                            </div>
                         )}
                     </div>
                 }
@@ -633,8 +652,10 @@ const Project = () => {
                             !!taskDispatcherDefinitions && (
                                 <WorkflowNodesSidebar
                                     data={{
-                                        componentDefinitions,
-                                        taskDispatcherDefinitions,
+                                        componentDefinitions:
+                                            componentDefinitions,
+                                        taskDispatcherDefinitions:
+                                            taskDispatcherDefinitions,
                                     }}
                                     filter={filter}
                                 />
@@ -666,6 +687,102 @@ const Project = () => {
                     />
                 )}
             </LayoutContainer>
+
+            <AlertDialog open={showDeleteProjectAlertDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Are you absolutely sure?
+                        </AlertDialogTitle>
+
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete the project and workflows it contains.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            onClick={() =>
+                                setShowDeleteProjectAlertDialog(false)
+                            }
+                        >
+                            Cancel
+                        </AlertDialogCancel>
+
+                        <AlertDialogAction
+                            className="bg-red-600"
+                            onClick={handleDeleteProjectAlertDialogClick}
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog open={showDeleteWorkflowAlertDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Are you absolutely sure?
+                        </AlertDialogTitle>
+
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete the workflow.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            onClick={() =>
+                                setShowDeleteWorkflowAlertDialog(false)
+                            }
+                        >
+                            Cancel
+                        </AlertDialogCancel>
+
+                        <AlertDialogAction
+                            className="bg-red-600"
+                            onClick={handleDeleteWorkflowAlertDialogClick}
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {showEditProjectDialog && project && (
+                <ProjectDialog
+                    onClose={handleProjectDialogCloseClick}
+                    project={project}
+                />
+            )}
+
+            {showEditWorkflowDialog && (
+                <WorkflowDialog
+                    onClose={() => setShowEditWorkflowDialog(false)}
+                    updateWorkflowMutationMutation={updateWorkflowMutation}
+                    workflow={currentWorkflow}
+                />
+            )}
+
+            {currentWorkflow && (
+                <>
+                    {showWorkflowTestConfigurationDialog && (
+                        <WorkflowTestConfigurationDialog
+                            onClose={() =>
+                                setShowWorkflowTestConfigurationDialog(false)
+                            }
+                            onWorkflowRun={
+                                handleWorkflowTestConfigurationDialogRunWorkflowClick
+                            }
+                            workflow={currentWorkflow}
+                        />
+                    )}
+
+                </>
+            )}
         </PageLoader>
     );
 };
