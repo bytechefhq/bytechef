@@ -23,10 +23,19 @@ const SchemaProperties = ({properties}: {properties: Array<PropertyType>}) => (
 
                 {property.properties && !!property.properties.length && (
                     <div
-                        className="ml-3 flex flex-col overflow-y-scroll border-l border-gray-200 pl-1"
+                        className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1"
                         key={property.name}
                     >
                         <SchemaProperties properties={property.properties} />
+                    </div>
+                )}
+
+                {property.items && !!property.items.length && (
+                    <div
+                        className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1"
+                        key={property.name}
+                    >
+                        <SchemaProperties properties={property.items} />
                     </div>
                 )}
             </li>
