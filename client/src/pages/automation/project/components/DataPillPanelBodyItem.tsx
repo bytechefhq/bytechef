@@ -4,6 +4,7 @@ import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {ComponentActionData} from './DataPillPanelBody';
 
 const DataPillPanelBodyItem = ({
@@ -14,6 +15,12 @@ const DataPillPanelBodyItem = ({
     filteredProperties: Array<PropertyType>;
 }) => {
     const {icon, title} = componentAction.componentDefinition;
+
+    const {componentActions} = useWorkflowDataStore();
+
+    const currentComponentAction = componentActions.find(
+        (action) => action.workflowAlias === componentAction.workflowAlias
+    );
 
     return (
         <>
@@ -36,6 +43,10 @@ const DataPillPanelBodyItem = ({
                         </span>
                     </span>
                 </div>
+
+                <span className="rounded bg-muted px-2 py-1 text-xs">
+                    {currentComponentAction?.actionName}
+                </span>
 
                 <ChevronDownIcon className="h-5 w-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
             </AccordionTrigger>
