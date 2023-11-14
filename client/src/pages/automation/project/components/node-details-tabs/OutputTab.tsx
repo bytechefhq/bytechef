@@ -15,7 +15,7 @@ const PropertyField = ({data, label}: {data: PropertyType; label: string}) => (
     </div>
 );
 
-const SchemaProperties = ({properties}: {properties: PropertyType[]}) => (
+const SchemaProperties = ({properties}: {properties: Array<PropertyType>}) => (
     <ul className="ml-2 h-full">
         {properties.map((property, index) => (
             <li className="flex flex-col" key={`${property.name}_${index}`}>

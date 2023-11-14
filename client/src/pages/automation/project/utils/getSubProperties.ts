@@ -7,7 +7,7 @@ export default function getSubProperties({
     propertyName,
 }: {
     componentDefinition: ComponentDefinitionModel;
-    properties: PropertyType[];
+    properties: Array<PropertyType>;
     propertyName?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): any {
