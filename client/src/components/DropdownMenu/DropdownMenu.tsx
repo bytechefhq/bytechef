@@ -58,7 +58,7 @@ const DropdownMenu = ({
                             ) : (
                                 <Item
                                     className={twMerge(
-                                        'flex cursor-default select-none items-center rounded-md px-4 py-2 text-xs text-gray-700 outline-none hover:cursor-pointer hover:bg-gray-50',
+                                        'flex cursor-default select-none items-center rounded-md px-4 py-2 text-sm text-gray-700 outline-none hover:cursor-pointer hover:bg-gray-50',
                                         danger &&
                                             'text-red-600 hover:bg-red-600 hover:text-white'
                                     )}

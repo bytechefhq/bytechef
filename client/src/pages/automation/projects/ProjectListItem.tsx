@@ -216,14 +216,12 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                                className="text-xs"
                                 onClick={() => setShowEditDialog(true)}
                             >
                                 Edit
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
-                                className="text-xs"
                                 onClick={() =>
                                     duplicateProjectMutation.mutate(project.id!)
                                 }
@@ -232,7 +230,6 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
-                                className="text-xs"
                                 onClick={() => setShowWorkflowDialog(true)}
                             >
                                 New Workflow
@@ -241,7 +238,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                             <DropdownMenuSeparator />
 
                             <DropdownMenuItem
-                                className="text-xs text-red-600"
+                                className="text-red-600"
                                 onClick={() => setShowDeleteDialog(true)}
                             >
                                 Delete

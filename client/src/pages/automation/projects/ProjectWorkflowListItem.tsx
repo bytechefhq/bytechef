@@ -157,7 +157,6 @@ const ProjectWorkflowListItem = ({
 
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                            className="text-xs"
                             onClick={() => {
                                 setSelectedWorkflow(workflow);
                                 setShowEditDialog(true);
@@ -168,7 +167,6 @@ const ProjectWorkflowListItem = ({
 
                         {project && workflow && (
                             <DropdownMenuItem
-                                className="text-xs"
                                 onClick={() =>
                                     duplicateWorkflowMutationMutation.mutate({
                                         id: project.id!,
@@ -183,7 +181,7 @@ const ProjectWorkflowListItem = ({
                         <DropdownMenuSeparator />
 
                         <DropdownMenuItem
-                            className="text-xs text-red-600"
+                            className="text-red-600"
                             onClick={() => {
                                 setSelectedWorkflow(workflow);
                                 setShowDeleteDialog(true);
