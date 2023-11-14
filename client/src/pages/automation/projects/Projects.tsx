@@ -22,8 +22,8 @@ const Projects = () => {
         id: searchParams.get('categoryId')
             ? parseInt(searchParams.get('categoryId')!)
             : searchParams.get('tagId')
-            ? parseInt(searchParams.get('tagId')!)
-            : undefined,
+              ? parseInt(searchParams.get('tagId')!)
+              : undefined,
         type: searchParams.get('tagId') ? Type.Tag : Type.Category,
     };
 
