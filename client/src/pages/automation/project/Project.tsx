@@ -48,6 +48,7 @@ import {
 } from '@/mutations/workflows.mutations';
 import WorkflowCodeEditorSheet from '@/pages/automation/project/components/WorkflowCodeEditorSheet';
 import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
+import WorkflowInputsSheet from '@/pages/automation/project/components/WorkflowInputsSheet';
 import WorkflowTestConfigurationDialog from '@/pages/automation/project/components/WorkflowTestConfigurationDialog';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
@@ -118,6 +119,8 @@ const Project = () => {
     ] = useState(false);
     const [showWorkflowCodeEditorSheet, setShowWorkflowCodeEditorSheet] =
         useState(false);
+    const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] =
+        useState(false);
     const [workflowExecution, setWorkflowExecution] =
         useState<WorkflowExecutionModel>();
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
@@ -144,6 +147,13 @@ const Project = () => {
             onClick: () => {
                 setNodeDetailsPanelOpen(false);
                 setRightSidebarOpen(!rightSidebarOpen);
+            },
+        },
+        {
+            icon: SlidersIcon,
+            name: 'Workflow Inputs',
+            onClick: () => {
+                setShowWorkflowInputsSheet(true);
             },
         },
         {
@@ -812,6 +822,13 @@ const Project = () => {
                         />
                     )}
 
+                    {showWorkflowInputsSheet && (
+                        <WorkflowInputsSheet
+                            onClose={() => setShowWorkflowInputsSheet(false)}
+                            projectId={+projectId!}
+                            workflow={currentWorkflow}
+                        />
+                    )}
                 </>
             )}
         </PageLoader>
