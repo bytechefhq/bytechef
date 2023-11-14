@@ -60,6 +60,21 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                     (edge) => !connectedEdgeIds.includes(edge.id)
                 );
 
+                if (
+                    previousNode.type === 'workflow' &&
+                    nextNode.type === 'placeholder'
+                ) {
+                    return [
+                        ...leftoverEdges,
+                        {
+                            id: `${previousNode.id}=>${nextNode.id}`,
+                            source: previousNode.id,
+                            target: nextNode.id,
+                            type: 'placeholder',
+                        },
+                    ];
+                }
+
                 return [
                     ...leftoverEdges,
                     {
