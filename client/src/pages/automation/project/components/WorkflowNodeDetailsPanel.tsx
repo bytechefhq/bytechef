@@ -171,8 +171,8 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const getExistingProperties = (
-        properties: PropertyType[]
-    ): PropertyType[] =>
+        properties: Array<PropertyType>
+    ): Array<PropertyType> =>
         properties.filter((property) => {
             if (property.properties) {
                 return getExistingProperties(property.properties);
