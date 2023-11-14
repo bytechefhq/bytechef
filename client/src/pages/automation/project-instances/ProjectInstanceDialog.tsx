@@ -12,6 +12,7 @@ import {Form} from '@/components/ui/form';
 import {ProjectInstanceTagKeys} from '@/queries/projectInstanceTags.queries';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
 import {ProjectKeys} from '@/queries/projects.queries';
+import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ProjectInstanceModel} from 'middleware/helios/configuration';
 import {
@@ -182,17 +183,25 @@ const ProjectInstanceDialog = ({
             >
                 <Form {...form}>
                     <DialogHeader>
-                        <DialogTitle>
-                            {`${
-                                projectInstance?.id ? 'Edit' : 'New'
-                            } Instance ${!projectInstance?.id ? '-' : ''} ${
-                                !projectInstance?.id
-                                    ? projectInstanceDialogSteps[
-                                          activeStepIndex
-                                      ].name
-                                    : ''
-                            }`}
-                        </DialogTitle>
+                        <div className="flex items-center justify-between">
+                            <DialogTitle>
+                                {`${
+                                    projectInstance?.id ? 'Edit' : 'New'
+                                } Instance ${!projectInstance?.id ? '-' : ''} ${
+                                    !projectInstance?.id
+                                        ? projectInstanceDialogSteps[
+                                              activeStepIndex
+                                          ].name
+                                        : ''
+                                }`}
+                            </DialogTitle>
+
+                            <DialogClose asChild>
+                                <Button size="icon" variant="ghost">
+                                    <Cross2Icon className="h-4 w-4 opacity-70" />
+                                </Button>
+                            </DialogClose>
+                        </div>
 
                         {!projectInstance?.id && (
                             <nav aria-label="Progress">
