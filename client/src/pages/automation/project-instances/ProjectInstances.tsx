@@ -26,8 +26,8 @@ const ProjectInstances = () => {
         id: searchParams.get('projectId')
             ? parseInt(searchParams.get('projectId')!)
             : searchParams.get('tagId')
-            ? parseInt(searchParams.get('tagId')!)
-            : undefined,
+              ? parseInt(searchParams.get('tagId')!)
+              : undefined,
         type: searchParams.get('tagId') ? Type.Tag : Type.Project,
     };
 

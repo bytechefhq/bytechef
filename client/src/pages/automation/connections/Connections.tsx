@@ -26,8 +26,8 @@ const Connections = () => {
         id: searchParams.get('componentName')
             ? searchParams.get('componentName')!
             : searchParams.get('tagId')
-            ? parseInt(searchParams.get('tagId')!)
-            : undefined,
+              ? parseInt(searchParams.get('tagId')!)
+              : undefined,
         type: searchParams.get('tagId') ? Type.Tag : Type.Component,
     };
 
