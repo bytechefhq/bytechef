@@ -54,6 +54,21 @@ const WorkflowEditor = ({
         !!nodeNames.length
     );
 
+    const workflowComponentWithAlias = useMemo(() => {
+        if (!workflowComponent) {
+            return undefined;
+        }
+
+        const workflowNodes = nodeNames.filter(
+            (nodeName) => nodeName === workflowComponent.name
+        );
+
+        return {
+            ...workflowComponent,
+            workflowAlias: `${workflowComponent.name}-${workflowNodes.length}`,
+        };
+    }, [nodeNames, workflowComponent]);
+
     const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
 
     const nodes = getNodes();
@@ -68,16 +83,18 @@ const WorkflowEditor = ({
     const {componentActions, setComponentActions} = useWorkflowDataStore();
 
     useEffect(() => {
-        if (workflowComponent?.actions) {
-            let workflowAlias = `${workflowComponent.name}-1`;
+        if (workflowComponentWithAlias?.actions) {
+            const {actions, name} = workflowComponentWithAlias;
+
+            let workflowAlias = `${name}-1`;
             let index = 2;
 
             while (
                 componentActions.some(
-                    (action) => action.componentName === workflowAlias
+                    (action) => action.workflowAlias === workflowAlias
                 )
             ) {
-                workflowAlias = `${workflowComponent.name}-${index}`;
+                workflowAlias = `${name}-${index}`;
 
                 index++;
             }
@@ -85,14 +102,14 @@ const WorkflowEditor = ({
             setComponentActions([
                 ...componentActions,
                 {
-                    actionName: workflowComponent.actions[0].name,
-                    componentName: workflowComponent.name,
+                    actionName: actions[0].name,
+                    componentName: name,
                     workflowAlias,
                 },
             ]);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowComponent?.name]);
+    }, [workflowComponentWithAlias?.workflowAlias]);
 
     const {width} = useStore((store) => ({
         height: store.height,
