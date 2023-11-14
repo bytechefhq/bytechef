@@ -4,6 +4,7 @@ import {Button} from '@/components/ui/button';
 import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -33,7 +34,11 @@ import {
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
 } from '@/queries/oauth2.queries';
-import {QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
+import {
+    Cross2Icon,
+    QuestionMarkCircledIcon,
+    RocketIcon,
+} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Properties from 'components/Properties/Properties';
@@ -443,7 +448,15 @@ const ConnectionDialog = ({
                 <DialogContent>
                     <Form {...form}>
                         <DialogHeader>
-                            <DialogTitle>Create Connection</DialogTitle>
+                            <div className="flex items-center justify-between">
+                                <DialogTitle>Create Connection</DialogTitle>
+
+                                <DialogClose asChild>
+                                    <Button size="icon" variant="ghost">
+                                        <Cross2Icon className="h-4 w-4 opacity-70" />
+                                    </Button>
+                                </DialogClose>
+                            </div>
 
                             <DialogDescription>
                                 Create your connection to connect to the chosen

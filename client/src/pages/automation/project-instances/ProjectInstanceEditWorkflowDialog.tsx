@@ -16,6 +16,7 @@ import {
 import {useUpdateProjectInstanceWorkflowMutation} from '@/mutations/projectInstanceWorkflows.mutations';
 import ProjectInstanceDialogWorkflowListItem from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowListItem';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
+import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -90,7 +91,15 @@ const ProjectInstanceEditWorkflowDialog = ({
             <DialogContent>
                 <Form {...form}>
                     <DialogHeader>
-                        <DialogTitle>{`Edit ${workflow?.label} Workflow`}</DialogTitle>
+                        <div className="flex items-center justify-between">
+                            <DialogTitle>{`Edit ${workflow?.label} Workflow`}</DialogTitle>
+
+                            <DialogClose asChild>
+                                <Button size="icon" variant="ghost">
+                                    <Cross2Icon className="h-4 w-4 opacity-70" />
+                                </Button>
+                            </DialogClose>
+                        </div>
                     </DialogHeader>
 
                     <ProjectInstanceDialogWorkflowListItem

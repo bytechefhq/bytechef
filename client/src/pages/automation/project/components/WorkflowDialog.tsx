@@ -20,6 +20,7 @@ import {
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {WorkflowModel} from '@/middleware/helios/configuration';
+import {Cross2Icon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -127,7 +128,15 @@ const WorkflowDialog = ({
             <DialogContent>
                 <Form {...form}>
                     <DialogHeader>
-                        <DialogTitle>Create Workflow</DialogTitle>
+                        <div className="flex items-center justify-between">
+                            <DialogTitle>Create Workflow</DialogTitle>
+
+                            <DialogClose asChild>
+                                <Button size="icon" variant="ghost">
+                                    <Cross2Icon className="h-4 w-4 opacity-70" />
+                                </Button>
+                            </DialogClose>
+                        </div>
 
                         <DialogDescription>
                             Use this to create a workflow. Creating a workflow

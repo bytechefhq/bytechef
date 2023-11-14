@@ -37,6 +37,7 @@ import {
     useGetProjectTagsQuery,
 } from '@/queries/projectTags.quries';
 import {ProjectKeys} from '@/queries/projects.queries';
+import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import {ReactNode, useState} from 'react';
@@ -175,9 +176,17 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
             <DialogContent>
                 <Form {...form}>
                     <DialogHeader>
-                        <DialogTitle>{`${
-                            project?.id ? 'Edit' : 'Create'
-                        } Project`}</DialogTitle>
+                        <div className="flex items-center justify-between">
+                            <DialogTitle>{`${
+                                project?.id ? 'Edit' : 'Create'
+                            } Project`}</DialogTitle>
+
+                            <DialogClose asChild>
+                                <Button size="icon" variant="ghost">
+                                    <Cross2Icon className="h-4 w-4 opacity-70" />
+                                </Button>
+                            </DialogClose>
+                        </div>
 
                         <DialogDescription>
                             {`Use this to ${
