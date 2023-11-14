@@ -43,14 +43,10 @@ const WorkflowNode = ({data, id}: NodeProps) => {
         setNodes((nodes) => nodes.filter((node) => node.id !== id));
 
         const connectedEdges = getConnectedEdges([node], edges);
+        const currentNodeIndex = nodes.findIndex((node) => node.id === id);
 
-        const previousNode = nodes.find(
-            (node) => node.id === connectedEdges[0].source
-        );
-
-        const nextNode = nodes.find(
-            (node) => node.id === connectedEdges[1].target
-        );
+        const previousNode = nodes[currentNodeIndex - 1];
+        const nextNode = nodes[currentNodeIndex + 1];
 
         if (previousNode && nextNode) {
             const connectedEdgeIds = connectedEdges.map((edge) => edge.id);
