@@ -54,7 +54,7 @@ const DataPill = ({
         <li
             className={twMerge(
                 'mr-auto',
-                subProperties &&
+                subProperties?.length &&
                     'flex flex-col space-y-2 border-0 bg-transparent p-0 hover:cursor-default hover:bg-transparent'
             )}
         >
@@ -81,7 +81,7 @@ const DataPill = ({
                 {property.name ? property.name : `[${arrayIndex}]`}
             </div>
 
-            {subProperties?.length && (
+            {!!subProperties?.length && (
                 <ul className="mt-2 flex flex-col space-y-2 border-l border-gray-200 pl-4">
                     {subProperties?.map((subProperty, index) => (
                         <DataPill
