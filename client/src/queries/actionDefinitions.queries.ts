@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
 import {
     ActionDefinitionApi,
@@ -22,18 +23,19 @@ export const useGetActionDefinitionQuery = (
     request: GetComponentActionDefinitionRequest,
     enabledCondition?: boolean
 ) =>
-    useQuery<ActionDefinitionModel, Error>(
-        ActionDefinitionKeys.actionDefinition(request),
-        () => new ActionDefinitionApi().getComponentActionDefinition(request),
-        {enabled: false || enabledCondition}
-    );
+    useQuery<ActionDefinitionModel, Error>({
+        queryKey: ActionDefinitionKeys.actionDefinition(request),
+        queryFn: () =>
+            new ActionDefinitionApi().getComponentActionDefinition(request),
+        enabled: false || enabledCondition,
+    });
 
 export const useGetActionDefinitionsQuery = (
     request: GetActionDefinitionsRequest,
     enabledCondition?: boolean
 ) =>
-    useQuery<ActionDefinitionModel[], Error>(
-        ActionDefinitionKeys.filteredActionDefinitions(request),
-        () => new ActionDefinitionApi().getActionDefinitions(request),
-        {enabled: false || enabledCondition}
-    );
+    useQuery<ActionDefinitionModel[], Error>({
+        queryKey: ActionDefinitionKeys.filteredActionDefinitions(request),
+        queryFn: () => new ActionDefinitionApi().getActionDefinitions(request),
+        enabled: false || enabledCondition,
+    });

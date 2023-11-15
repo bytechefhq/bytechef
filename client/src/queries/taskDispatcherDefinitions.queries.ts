@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys */
 import {
     TaskDispatcherDefinitionApi,
     TaskDispatcherDefinitionModel,
@@ -9,7 +10,8 @@ export const TaskDispatcherKeys = {
 };
 
 export const useGetTaskDispatcherDefinitionsQuery = () =>
-    useQuery<TaskDispatcherDefinitionModel[], Error>(
-        TaskDispatcherKeys.taskDispatcherDefinitions,
-        () => new TaskDispatcherDefinitionApi().getTaskDispatcherDefinitions()
-    );
+    useQuery<TaskDispatcherDefinitionModel[], Error>({
+        queryKey: TaskDispatcherKeys.taskDispatcherDefinitions,
+        queryFn: () =>
+            new TaskDispatcherDefinitionApi().getTaskDispatcherDefinitions(),
+    });
