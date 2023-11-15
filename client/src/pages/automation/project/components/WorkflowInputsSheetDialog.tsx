@@ -186,7 +186,7 @@ const WorkflowInputsSheetDialog = ({
                                         onValueChange={field.onChange}
                                     >
                                         <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select an inpute type" />
+                                            <SelectValue placeholder="Select an input type" />
                                         </SelectTrigger>
 
                                         <SelectContent>

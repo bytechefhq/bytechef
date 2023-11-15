@@ -34,7 +34,7 @@ const WorkflowInputsSheetTable = ({
     projectId: number;
     workflow: WorkflowModel;
 }) => {
-    const [currentInputIndex, setCurrentWInputIndex] = useState<number>(-1);
+    const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -144,9 +144,7 @@ const WorkflowInputsSheetTable = ({
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuItem
                                                 onClick={() => {
-                                                    setCurrentWInputIndex(
-                                                        index
-                                                    );
+                                                    setCurrentInputIndex(index);
                                                     setShowEditDialog(true);
                                                 }}
                                             >
@@ -158,9 +156,7 @@ const WorkflowInputsSheetTable = ({
                                             <DropdownMenuItem
                                                 className="text-red-600"
                                                 onClick={() => {
-                                                    setCurrentWInputIndex(
-                                                        index
-                                                    );
+                                                    setCurrentInputIndex(index);
                                                     setShowDeleteDialog(true);
                                                 }}
                                             >

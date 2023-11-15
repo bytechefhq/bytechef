@@ -822,10 +822,10 @@ const Project = () => {
                         />
                     )}
 
-                    {showWorkflowInputsSheet && (
+                    {projectId && showWorkflowInputsSheet && (
                         <WorkflowInputsSheet
                             onClose={() => setShowWorkflowInputsSheet(false)}
-                            projectId={+projectId!}
+                            projectId={+projectId}
                             workflow={currentWorkflow}
                         />
                     )}
