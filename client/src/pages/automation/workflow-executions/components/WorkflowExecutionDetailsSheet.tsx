@@ -1,8 +1,9 @@
 import {Sheet, SheetContent} from '@/components/ui/sheet';
+import {useGetWorkflowExecutionQuery} from '@/queries/workflowExecutions.queries';
+
+import useWorkflowExecutionDetailsDialogStore from '../stores/useWorkflowExecutionDetailsDialogStore';
 import WorkflowExecutionDetailsAccordion from './WorkflowExecutionDetailsAccordion';
 import WorkflowExecutionDetailsSheetWorkflowView from './WorkflowExecutionDetailsSheetWorkflowView';
-import useWorkflowExecutionDetailsDialogStore from '../stores/useWorkflowExecutionDetailsDialogStore';
-import {useGetWorkflowExecutionQuery} from '@/queries/workflowExecutions.queries';
 
 const WorkflowExecutionDetailsSheet = () => {
     const {
