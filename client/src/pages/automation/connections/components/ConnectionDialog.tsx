@@ -308,7 +308,7 @@ const ConnectionDialog = ({
         }, 300);
     }
 
-    async function handleOnCodeSuccess(code: string) {
+    async function handleCodeSuccess(code: string) {
         if (code) {
             await saveConnection({code: code});
         }
@@ -861,7 +861,7 @@ const ConnectionDialog = ({
                                                     getAuth();
                                                 }}
                                                 onCodeSuccess={
-                                                    handleOnCodeSuccess
+                                                    handleCodeSuccess
                                                 }
                                                 onError={(error: string) =>
                                                     setOAuth2Error(error)

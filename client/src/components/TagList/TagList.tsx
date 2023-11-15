@@ -53,7 +53,7 @@ const TagList = ({
     const [showAllTags, setShowAllTags] = useState(false);
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
 
-    const handleOnAddTag = (newTag: TagModel) => {
+    const handleAddTag = (newTag: TagModel) => {
         const newTags = (tags && [...tags]) || [];
 
         newTags.push(newTag);
@@ -61,7 +61,7 @@ const TagList = ({
         updateTagsMutation.mutate(getRequest(id, newTags));
     };
 
-    const handleOnDeleteTag = (deletedTag: TagModel) => {
+    const handleDeleteTag = (deletedTag: TagModel) => {
         const newTags = tags?.filter((tag) => tag.id !== deletedTag.id) || [];
 
         updateTagsMutation.mutate(getRequest(id, newTags));
@@ -70,7 +70,7 @@ const TagList = ({
     return (
         <div className="mr-4 flex items-center space-x-1">
             {tags.slice(0, 3).map((tag) => (
-                <Tag key={tag.id} onDeleteTag={handleOnDeleteTag} tag={tag} />
+                <Tag key={tag.id} onDeleteTag={handleDeleteTag} tag={tag} />
             ))}
 
             {tags.length > 3 && (
@@ -91,7 +91,7 @@ const TagList = ({
                             {tags.slice(3).map((tag) => (
                                 <Tag
                                     key={tag.id}
-                                    onDeleteTag={handleOnDeleteTag}
+                                    onDeleteTag={handleDeleteTag}
                                     tag={tag}
                                 />
                             ))}
@@ -108,13 +108,13 @@ const TagList = ({
                         selectedOption: OnChangeValue<ISelectOption, false>
                     ) => {
                         if (selectedOption) {
-                            handleOnAddTag(selectedOption.tag);
+                            handleAddTag(selectedOption.tag);
                         }
 
                         setIsNewTagWindowVisible(false);
                     }}
                     onCreateOption={(inputValue: string) => {
-                        handleOnAddTag({
+                        handleAddTag({
                             name: inputValue,
                         });
 
