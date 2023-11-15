@@ -96,8 +96,6 @@ const ConnectionTab = ({
                 <ConnectionDialog
                     componentDefinition={componentDefinition}
                     onClose={() => setShowEditConnectionDialog(false)}
-                    showTrigger={false}
-                    visible
                 />
             )}
         </div>

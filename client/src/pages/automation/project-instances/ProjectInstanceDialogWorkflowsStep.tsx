@@ -22,7 +22,7 @@ const ProjectInstanceDialogWorkflowsStep = ({
     );
 
     return (
-        <ul className="space-y-4">
+        <ul className="h-full space-y-4">
             {workflows?.map((workflow, workflowIndex) => (
                 <ProjectInstanceDialogWorkflowListItem
                     control={control}

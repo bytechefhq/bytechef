@@ -38,7 +38,7 @@ const Properties = ({
     properties,
     register,
 }: PropertiesProps) => (
-    <ul className={twMerge('h-full', customClassName)}>
+    <ul className={twMerge('space-y-4', customClassName)}>
         {properties.map((property, index) => (
             <Property
                 actionName={actionName}

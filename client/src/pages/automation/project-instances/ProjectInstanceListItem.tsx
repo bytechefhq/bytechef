@@ -283,8 +283,6 @@ const ProjectInstanceListItem = ({
                 <ProjectInstanceDialog
                     onClose={() => setShowEditDialog(false)}
                     projectInstance={projectInstance}
-                    showTrigger={false}
-                    visible
                 />
             )}
         </>

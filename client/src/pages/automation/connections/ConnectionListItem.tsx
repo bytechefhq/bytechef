@@ -222,8 +222,6 @@ const ConnectionListItem = ({
                 <ConnectionDialog
                     connection={connection}
                     onClose={() => setShowEditDialog(false)}
-                    showTrigger={false}
-                    visible
                 />
             )}
         </>

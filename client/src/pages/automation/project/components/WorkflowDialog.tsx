@@ -1,14 +1,28 @@
 import {Button} from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
+import {Input} from '@/components/ui/input';
+import {Textarea} from '@/components/ui/textarea';
 import {WorkflowModel} from '@/middleware/helios/configuration';
-import {Close} from '@radix-ui/react-dialog';
-import {PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
-import Dialog from 'components/Dialog/Dialog';
-import Input from 'components/Input/Input';
-import TextArea from 'components/TextArea/TextArea';
-import {useState} from 'react';
+import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {twMerge} from 'tailwind-merge';
 
 type WorkflowDialogProps = {
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -20,7 +34,7 @@ type WorkflowDialogProps = {
     >;
     onClose?: () => void;
     parentId?: number;
-    showTrigger?: boolean;
+    triggerNode?: ReactNode;
     triggerClassName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     updateWorkflowMutationMutation?: UseMutationResult<
@@ -29,7 +43,6 @@ type WorkflowDialogProps = {
         any,
         unknown
     >;
-    visible?: boolean;
     workflow?: WorkflowModel;
 };
 
@@ -37,26 +50,20 @@ const WorkflowDialog = ({
     createWorkflowRequestMutation,
     onClose,
     parentId,
-    showTrigger = true,
-    triggerClassName,
+    triggerNode,
     updateWorkflowMutationMutation,
-    visible = false,
     workflow,
 }: WorkflowDialogProps) => {
-    const [isOpen, setIsOpen] = useState(visible);
+    const [isOpen, setIsOpen] = useState(!triggerNode);
 
-    const {
-        formState: {errors, touchedFields},
-        getValues,
-        handleSubmit,
-        register,
-        reset,
-    } = useForm({
+    const form = useForm({
         defaultValues: {
             description: workflow?.description || '',
             label: workflow?.label || '',
         } as WorkflowModel,
     });
+
+    const {control, getValues, handleSubmit, reset} = form;
 
     const {isPending, mutate} = createWorkflowRequestMutation
         ? createWorkflowRequestMutation!
@@ -104,19 +111,6 @@ const WorkflowDialog = ({
 
     return (
         <Dialog
-            customTrigger={
-                showTrigger && (
-                    <Button
-                        className={twMerge('bg-white', triggerClassName)}
-                        size="icon"
-                        variant="outline"
-                    >
-                        <PlusIcon className="mx-2 h-5 w-5" />
-                    </Button>
-                )
-            }
-            description="Use this to create a workflow. Creating a workflow will redirect you to the page where you can edit it."
-            isOpen={isOpen}
             onOpenChange={(isOpen) => {
                 if (isOpen) {
                     setIsOpen(isOpen);
@@ -124,35 +118,76 @@ const WorkflowDialog = ({
                     closeDialog();
                 }
             }}
-            title="Create Workflow"
+            open={isOpen}
         >
-            <Input
-                error={touchedFields.label && !!errors.label}
-                label="Label"
-                {...register('label', {required: true})}
-            />
+            {triggerNode && (
+                <DialogTrigger asChild>{triggerNode}</DialogTrigger>
+            )}
 
-            <TextArea
-                label="Description"
-                style={{height: '120px'}}
-                {...register('description')}
-            />
+            <DialogContent>
+                <Form {...form}>
+                    <DialogHeader>
+                        <DialogTitle>Create Workflow</DialogTitle>
 
-            <div className="mt-8 flex justify-end space-x-1">
-                <Close asChild>
-                    <Button type="button" variant="outline">
-                        Cancel
-                    </Button>
-                </Close>
+                        <DialogDescription>
+                            Use this to create a workflow. Creating a workflow
+                            will redirect you to the page where you can edit it.
+                        </DialogDescription>
+                    </DialogHeader>
 
-                <Button
-                    disabled={isPending}
-                    onClick={handleSubmit(saveWorkflow)}
-                    type="submit"
-                >
-                    Save
-                </Button>
-            </div>
+                    <FormField
+                        control={control}
+                        name="label"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Label</FormLabel>
+
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                        rules={{required: true}}
+                    />
+
+                    <FormField
+                        control={control}
+                        name="description"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Description</FormLabel>
+
+                                <FormControl>
+                                    <Textarea
+                                        placeholder="Cute description of your project instance"
+                                        {...field}
+                                    />
+                                </FormControl>
+
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button type="button" variant="outline">
+                                Cancel
+                            </Button>
+                        </DialogClose>
+
+                        <Button
+                            disabled={isPending}
+                            onClick={handleSubmit(saveWorkflow)}
+                            type="submit"
+                        >
+                            Save
+                        </Button>
+                    </DialogFooter>
+                </Form>
+            </DialogContent>
         </Dialog>
     );
 };

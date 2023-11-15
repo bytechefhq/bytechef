@@ -1,3 +1,4 @@
+import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {useGetProjectCategoriesQuery} from '@/queries/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/queries/projectTags.quries';
@@ -64,6 +65,7 @@ const Projects = () => {
                                 }
                             }}
                             project={undefined}
+                            triggerNode={<Button>Create Project</Button>}
                         />
                     }
                     title={`${

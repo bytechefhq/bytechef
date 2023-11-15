@@ -206,8 +206,6 @@ const Connection = ({
                     <ConnectionDialog
                         componentDefinition={componentDefinition}
                         onClose={() => setShowEditConnectionDialog(false)}
-                        showTrigger={false}
-                        visible
                     />
                 </Portal.Root>
             )}

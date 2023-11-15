@@ -1,17 +1,24 @@
+import {Button} from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
 import {ProjectInstanceTagKeys} from '@/queries/projectInstanceTags.queries';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
 import {ProjectKeys} from '@/queries/projects.queries';
-import {Close} from '@radix-ui/react-dialog';
 import {useQueryClient} from '@tanstack/react-query';
-import Button from 'components/Button/Button';
-import Dialog from 'components/Dialog/Dialog';
 import {ProjectInstanceModel} from 'middleware/helios/configuration';
 import {
     useCreateProjectInstanceMutation,
     useUpdateProjectInstanceMutation,
 } from 'mutations/projectInstances.mutations';
-import {useState} from 'react';
+import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
@@ -19,20 +26,18 @@ import ProjectInstanceDialogBasicStep from './ProjectInstanceDialogBasicStep';
 import ProjectInstanceDialogWorkflowsStep from './ProjectInstanceDialogWorkflowsStep';
 
 interface ProjectInstanceDialogProps {
-    projectInstance?: ProjectInstanceModel;
-    showTrigger?: boolean;
-    visible?: boolean;
     onClose?: () => void;
+    projectInstance?: ProjectInstanceModel;
+    triggerNode?: ReactNode;
 }
 
 const ProjectInstanceDialog = ({
     onClose,
     projectInstance,
-    showTrigger = true,
-    visible = false,
+    triggerNode,
 }: ProjectInstanceDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
-    const [isOpen, setIsOpen] = useState(visible);
+    const [isOpen, setIsOpen] = useState(!triggerNode);
 
     const form = useForm<ProjectInstanceModel>({
         defaultValues: {
@@ -40,7 +45,7 @@ const ProjectInstanceDialog = ({
             enabled: projectInstance?.enabled || false,
             name: projectInstance?.name || '',
             project: projectInstance?.project || null,
-            projectId: projectInstance?.id || 0,
+            projectId: projectInstance?.id || undefined,
             projectInstanceWorkflows: [],
             tags:
                 projectInstance?.tags?.map((tag) => ({
@@ -48,7 +53,6 @@ const ProjectInstanceDialog = ({
                     label: tag.name,
                 })) || [],
         } as ProjectInstanceModel,
-        mode: 'onBlur',
     });
 
     const {
@@ -59,6 +63,7 @@ const ProjectInstanceDialog = ({
         register,
         reset,
         setValue,
+        trigger,
     } = form;
 
     const queryClient = useQueryClient();
@@ -156,7 +161,6 @@ const ProjectInstanceDialog = ({
 
     return (
         <Dialog
-            isOpen={isOpen}
             onOpenChange={(isOpen) => {
                 if (isOpen) {
                     setIsOpen(isOpen);
@@ -164,33 +168,31 @@ const ProjectInstanceDialog = ({
                     closeDialog();
                 }
             }}
-            triggerLabel={
-                showTrigger
-                    ? `${projectInstance?.id ? 'Edit' : 'Create'} Instance`
-                    : undefined
-            }
+            open={isOpen}
         >
-            <Form {...form}>
-                <div
-                    className={twMerge(
-                        'flex h-full w-full rounded-l-lg',
-                        activeStepIndex === 1 && 'h-[500px] max-h-[800px]'
-                    )}
-                >
-                    <div className="flex w-full flex-col">
-                        <header className="flex items-center py-2">
-                            <h2 className="font-semibold">
-                                {`${
-                                    projectInstance?.id ? 'Edit' : 'New'
-                                } Instance ${!projectInstance?.id ? '-' : ''} ${
-                                    !projectInstance?.id
-                                        ? projectInstanceDialogSteps[
-                                              activeStepIndex
-                                          ].name
-                                        : ''
-                                }`}
-                            </h2>
-                        </header>
+            {triggerNode && (
+                <DialogTrigger asChild>{triggerNode}</DialogTrigger>
+            )}
+
+            <DialogContent
+                className={twMerge(
+                    'flex flex-col',
+                    activeStepIndex === 1 && 'h-[500px] max-h-[800px]'
+                )}
+            >
+                <Form {...form}>
+                    <DialogHeader>
+                        <DialogTitle>
+                            {`${
+                                projectInstance?.id ? 'Edit' : 'New'
+                            } Instance ${!projectInstance?.id ? '-' : ''} ${
+                                !projectInstance?.id
+                                    ? projectInstanceDialogSteps[
+                                          activeStepIndex
+                                      ].name
+                                    : ''
+                            }`}
+                        </DialogTitle>
 
                         {!projectInstance?.id && (
                             <nav aria-label="Progress">
@@ -218,74 +220,66 @@ const ProjectInstanceDialog = ({
                                 </ol>
                             </nav>
                         )}
+                    </DialogHeader>
 
-                        <main
-                            className={twMerge(
-                                'h-full',
-                                activeStepIndex === 1 &&
-                                    'overflow-y-scroll px-1'
-                            )}
-                        >
-                            {
-                                projectInstanceDialogSteps[activeStepIndex]
-                                    .content
-                            }
-                        </main>
+                    {projectInstanceDialogSteps[activeStepIndex].content}
 
-                        <footer className="flex w-full justify-end space-x-2 self-end pt-4">
-                            {activeStepIndex === 0 && (
-                                <>
-                                    <Close asChild>
-                                        <Button
-                                            displayType="lightBorder"
-                                            label="Cancel"
-                                        />
-                                    </Close>
+                    <DialogFooter>
+                        {activeStepIndex === 0 && (
+                            <>
+                                <DialogClose asChild>
+                                    <Button variant="outline">Cancel</Button>
+                                </DialogClose>
 
-                                    {!projectInstance?.id && (
-                                        <Button
-                                            disabled={!formState.isValid}
-                                            label="Next"
-                                            onClick={() => {
+                                {!projectInstance?.id && (
+                                    <Button
+                                        onClick={(e) => {
+                                            trigger();
+
+                                            if (!formState.isValid) {
+                                                e.preventDefault();
+                                            } else {
                                                 setActiveStepIndex(
                                                     activeStepIndex + 1
                                                 );
-                                            }}
-                                        />
-                                    )}
-                                </>
-                            )}
-
-                            {(activeStepIndex === 1 || projectInstance?.id) && (
-                                <>
-                                    {!projectInstance?.id && (
-                                        <Button
-                                            displayType="lightBorder"
-                                            label="Previous"
-                                            onClick={() =>
-                                                setActiveStepIndex(
-                                                    activeStepIndex - 1
-                                                )
                                             }
-                                        />
-                                    )}
+                                        }}
+                                    >
+                                        Next
+                                    </Button>
+                                )}
+                            </>
+                        )}
 
+                        {(activeStepIndex === 1 || projectInstance?.id) && (
+                            <>
+                                {!projectInstance?.id && (
                                     <Button
-                                        disabled={
-                                            projectInstance?.enabled &&
-                                            !projectInstance?.id
+                                        onClick={() =>
+                                            setActiveStepIndex(
+                                                activeStepIndex - 1
+                                            )
                                         }
-                                        label="Save"
-                                        onClick={handleSubmit(
-                                            saveProjectInstance
-                                        )}
-                                    />
-                                </>
-                            )}
-                        </footer>
-                    </div>
-                </div>
-            </Form>
+                                        variant="outline"
+                                    >
+                                        Previous
+                                    </Button>
+                                )}
+
+                                <Button
+                                    disabled={
+                                        projectInstance?.enabled &&
+                                        !projectInstance?.id
+                                    }
+                                    onClick={handleSubmit(saveProjectInstance)}
+                                >
+                                    Save
+                                </Button>
+                            </>
+                        )}
+                    </DialogFooter>
+                </Form>
+            </DialogContent>
         </Dialog>
     );
 };
