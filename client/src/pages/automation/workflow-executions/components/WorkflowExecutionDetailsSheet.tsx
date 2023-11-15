@@ -1,7 +1,7 @@
 import {Sheet, SheetContent} from '@/components/ui/sheet';
-import WorkflowExecutionDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordion';
-import WorkflowExecutionDetailsSheetWorkflowView from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsSheetWorkflowView';
-import useWorkflowExecutionDetailsDialogStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionDetailsDialogStore';
+import WorkflowExecutionDetailsAccordion from './WorkflowExecutionDetailsAccordion';
+import WorkflowExecutionDetailsSheetWorkflowView from './WorkflowExecutionDetailsSheetWorkflowView';
+import useWorkflowExecutionDetailsDialogStore from '../stores/useWorkflowExecutionDetailsDialogStore';
 import {useGetWorkflowExecutionQuery} from '@/queries/workflowExecutions.queries';
 
 const WorkflowExecutionDetailsSheet = () => {
