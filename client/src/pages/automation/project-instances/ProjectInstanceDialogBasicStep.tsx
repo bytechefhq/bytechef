@@ -1,22 +1,27 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
+import {
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
+import {Input} from '@/components/ui/input';
+import {Textarea} from '@/components/ui/textarea';
 import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstanceTags.queries';
 import {useGetProjectsQuery} from '@/queries/projects.queries';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
-import Input from 'components/Input/Input';
 import {
     ProjectInstanceModel,
     ProjectModel,
 } from 'middleware/helios/configuration';
 import {
     Control,
-    Controller,
     UseFormGetValues,
     UseFormRegister,
     UseFormReturn,
     UseFormSetValue,
 } from 'react-hook-form';
-
-import TextArea from '../../../components/TextArea/TextArea';
 
 interface ProjectDialogBasicStepProps {
     control: Control<ProjectInstanceModel>;
@@ -42,9 +47,7 @@ const ProjectInstanceDialogBasicStep = ({
     control,
     getValues,
     projectInstance,
-    register,
     setValue,
-    touchedFields,
 }: ProjectDialogBasicStepProps) => {
     const {
         data: projects,
@@ -63,7 +66,7 @@ const ProjectInstanceDialogBasicStep = ({
     const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
 
     return (
-        <div>
+        <>
             {projectsError && !projectsLoading && (
                 <span>An error has occurred: {projectsError.message}</span>
             )}
@@ -75,82 +78,125 @@ const ProjectInstanceDialogBasicStep = ({
             {projects ? (
                 <>
                     {!projectInstance?.id && (
-                        <Controller
+                        <FormField
                             control={control}
                             name="projectId"
                             render={({field}) => (
-                                <ComboBox
-                                    field={field}
-                                    items={projects.map(
-                                        (project) =>
-                                            ({
-                                                label: (
-                                                    <ProjectLabel
-                                                        project={project}
-                                                    />
-                                                ),
-                                                value: project.id,
-                                            }) as ComboBoxItemType
-                                    )}
-                                    label="Project"
-                                    name="project"
-                                    onChange={(item) => {
-                                        if (item) {
-                                            setValue('projectId', item.value);
-                                        }
-                                    }}
-                                />
+                                <FormItem>
+                                    <FormLabel>Project</FormLabel>
+
+                                    <FormControl>
+                                        <ComboBox
+                                            items={projects.map(
+                                                (project) =>
+                                                    ({
+                                                        label: (
+                                                            <ProjectLabel
+                                                                project={
+                                                                    project
+                                                                }
+                                                            />
+                                                        ),
+                                                        value: project.id,
+                                                    }) as ComboBoxItemType
+                                            )}
+                                            name="projectId"
+                                            onBlur={field.onBlur}
+                                            onChange={(item) => {
+                                                if (item) {
+                                                    setValue(
+                                                        'projectId',
+                                                        item.value
+                                                    );
+                                                }
+                                            }}
+                                            value={field.value}
+                                        />
+                                    </FormControl>
+
+                                    <FormMessage />
+                                </FormItem>
                             )}
                             rules={{required: true}}
                             shouldUnregister={false}
                         />
                     )}
 
-                    <Input
-                        error={touchedFields.name && !getValues('name')}
-                        label="Name"
-                        placeholder="My CRM Project - Production"
-                        required
-                        {...register('name', {
-                            required: true,
-                        })}
+                    <FormField
+                        control={control}
+                        name="name"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Name</FormLabel>
+
+                                <FormControl>
+                                    <Input
+                                        placeholder="My CRM Project - Production"
+                                        {...field}
+                                    />
+                                </FormControl>
+
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                        rules={{required: true}}
                     />
 
-                    <TextArea
-                        label="Description"
-                        placeholder="Cute description of your project instance"
-                        {...register('description')}
+                    <FormField
+                        control={control}
+                        name="description"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Description</FormLabel>
+
+                                <FormControl>
+                                    <Textarea
+                                        placeholder="Cute description of your project instance"
+                                        {...field}
+                                    />
+                                </FormControl>
+
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
 
                     {remainingTags && (
-                        <Controller
+                        <FormField
                             control={control}
                             name="tags"
                             render={({field}) => (
-                                <CreatableSelect
-                                    field={field}
-                                    isMulti
-                                    label="Tags"
-                                    onCreateOption={(inputValue: string) => {
-                                        setValue('tags', [
-                                            ...getValues().tags!,
-                                            {
-                                                label: inputValue,
-                                                name: inputValue,
-                                                value: inputValue,
-                                            },
-                                        ] as never[]);
-                                    }}
-                                    options={remainingTags.map((tag) => {
-                                        return {
-                                            label: tag.name,
-                                            value: tag.name
-                                                .toLowerCase()
-                                                .replace(/\W/g, ''),
-                                            ...tag,
-                                        };
-                                    })}
-                                />
+                                <FormItem>
+                                    <FormLabel>Tags</FormLabel>
+
+                                    <CreatableSelect
+                                        field={field}
+                                        isMulti
+                                        onCreateOption={(
+                                            inputValue: string
+                                        ) => {
+                                            setValue('tags', [
+                                                ...getValues().tags!,
+                                                {
+                                                    label: inputValue,
+                                                    name: inputValue,
+                                                    value: inputValue,
+                                                },
+                                            ] as never[]);
+                                        }}
+                                        options={remainingTags.map((tag) => {
+                                            return {
+                                                label: tag.name,
+                                                value: tag.name
+                                                    .toLowerCase()
+                                                    .replace(/\W/g, ''),
+                                                ...tag,
+                                            };
+                                        })}
+                                    />
+
+                                    <FormMessage />
+                                </FormItem>
                             )}
                         />
                     )}
@@ -158,7 +204,7 @@ const ProjectInstanceDialogBasicStep = ({
             ) : (
                 <span className="px-2">Loading...</span>
             )}
-        </div>
+        </>
     );
 };
 

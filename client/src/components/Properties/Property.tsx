@@ -203,7 +203,6 @@ const Property = ({
     return (
         <li
             className={twMerge(
-                'mb-4 flex',
                 controlType === 'CODE_EDITOR' && 'h-5/6',
                 hidden && 'mb-0',
                 type === 'OBJECT' && 'flex-col',

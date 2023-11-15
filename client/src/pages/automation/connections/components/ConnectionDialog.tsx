@@ -2,6 +2,24 @@ import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Checkbox} from '@/components/ui/checkbox';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
+import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {
     Select,
@@ -18,8 +36,6 @@ import {
 import {QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
-import Dialog from 'components/Dialog/Dialog';
-import Input from 'components/Input/Input';
 import Properties from 'components/Properties/Properties';
 import useCopyToClipboard from 'hooks/useCopyToClipboard';
 import {ClipboardIcon} from 'lucide-react';
@@ -45,8 +61,8 @@ import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
 } from 'queries/connections.queries';
-import {useEffect, useMemo, useState} from 'react';
-import {Controller, useForm} from 'react-hook-form';
+import {ReactNode, useEffect, useMemo, useState} from 'react';
+import {useForm} from 'react-hook-form';
 
 import {AuthTokenPayload} from '../oauth2/useOAuth2';
 import OAuth2Button from './OAuth2Button';
@@ -54,8 +70,7 @@ import OAuth2Button from './OAuth2Button';
 interface ConnectionDialogProps {
     componentDefinition?: ComponentDefinitionModel;
     connection?: ConnectionModel | undefined;
-    showTrigger?: boolean;
-    visible?: boolean;
+    triggerNode?: ReactNode;
     onClose?: () => void;
 }
 
@@ -71,11 +86,10 @@ const ConnectionDialog = ({
     componentDefinition,
     connection,
     onClose,
-    showTrigger = true,
-    visible = false,
+    triggerNode,
 }: ConnectionDialogProps) => {
     const [authorizationName, setAuthorizationName] = useState<string>();
-    const [isOpen, setIsOpen] = useState(visible);
+    const [isOpen, setIsOpen] = useState(!triggerNode);
     const [oAuth2Error, setOAuth2Error] = useState<string>();
     const [wizardStep, setWizardStep] = useState<
         'configuration_step' | 'oauth_step'
@@ -88,15 +102,7 @@ const ConnectionDialog = ({
 
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
-    const {
-        control,
-        formState,
-        getValues,
-        handleSubmit,
-        register,
-        reset: formReset,
-        setValue,
-    } = useForm<ConnectionDialogFormProps>({
+    const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
             authorizationName: '',
             componentName: undefined,
@@ -108,6 +114,16 @@ const ConnectionDialog = ({
                 })) || [],
         },
     });
+
+    const {
+        control,
+        formState,
+        getValues,
+        handleSubmit,
+        register,
+        reset: formReset,
+        setValue,
+    } = form;
 
     const {
         data: componentDefinitions,
@@ -410,8 +426,6 @@ const ConnectionDialog = ({
 
     return (
         <Dialog
-            description="Create your connection to connect to the chosen service"
-            isOpen={isOpen}
             onOpenChange={(isOpen) => {
                 if (isOpen) {
                     setIsOpen(isOpen);
@@ -419,112 +433,172 @@ const ConnectionDialog = ({
                     closeDialog();
                 }
             }}
-            title="Create Connection"
-            triggerLabel={
-                showTrigger
-                    ? `${connection?.id ? 'Edit' : 'Create'} Connection`
-                    : undefined
-            }
+            open={isOpen}
         >
-            {!componentDefinitionsLoading && (
-                <div>
-                    {errors && <Errors errors={errors} />}
+            {triggerNode && (
+                <DialogTrigger asChild>{triggerNode}</DialogTrigger>
+            )}
 
-                    {(wizardStep === 'configuration_step' ||
-                        oAuth2AuthorizationParametersLoading) && (
-                        <>
-                            {!connection?.id && (
-                                <Controller
-                                    control={control}
-                                    name="componentName"
-                                    render={({field}) => {
-                                        if (
-                                            !componentDefinition &&
-                                            componentDefinitions
-                                        ) {
-                                            return (
-                                                <ComboBox
-                                                    field={field}
-                                                    items={componentDefinitions.map(
-                                                        (
-                                                            componentDefinition
-                                                        ) => ({
-                                                            componentDefinition,
-                                                            icon: componentDefinition.icon,
-                                                            label: componentDefinition.title!,
-                                                            value: componentDefinition.name,
-                                                        })
-                                                    )}
-                                                    label="Component"
-                                                    name="component"
-                                                    onChange={(item) =>
-                                                        handleComponentDefinitionChange(
-                                                            item?.componentDefinition as ComponentDefinitionBasicModel
-                                                        )
-                                                    }
-                                                />
-                                            );
-                                        } else if (
-                                            connectionDefinitions &&
-                                            connectionDefinitions?.length > 1
-                                        ) {
-                                            return (
-                                                <ComboBox
-                                                    field={field}
-                                                    items={connectionDefinitions.map(
-                                                        (
-                                                            connectionDefinition
-                                                        ) =>
-                                                            ({
-                                                                componentDefinition:
-                                                                    selectedComponentDefinition,
-                                                                icon: selectedComponentDefinition?.icon
-                                                                    ? selectedComponentDefinition?.icon
-                                                                    : undefined,
-                                                                label: connectionDefinition.componentTitle
-                                                                    ? connectionDefinition.componentTitle
-                                                                    : undefined,
-                                                                value: connectionDefinition.componentName,
-                                                            }) as ComboBoxItemType
-                                                    )}
-                                                    label="Component"
-                                                    onChange={(item) =>
-                                                        handleComponentDefinitionChange(
-                                                            item?.componentDefinition as ComponentDefinitionBasicModel
-                                                        )
-                                                    }
-                                                />
-                                            );
-                                        } else {
-                                            return (
+            {!componentDefinitionsLoading && (
+                <DialogContent>
+                    <Form {...form}>
+                        <DialogHeader>
+                            <DialogTitle>Create Connection</DialogTitle>
+
+                            <DialogDescription>
+                                Create your connection to connect to the chosen
+                                service
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        {errors?.length > 0 && <Errors errors={errors} />}
+
+                        {(wizardStep === 'configuration_step' ||
+                            oAuth2AuthorizationParametersLoading) && (
+                            <>
+                                {!connection?.id && (
+                                    <FormField
+                                        control={control}
+                                        name="componentName"
+                                        render={({field}) => {
+                                            if (
+                                                !componentDefinition &&
+                                                componentDefinitions
+                                            ) {
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Component
+                                                        </FormLabel>
+
+                                                        <FormControl>
+                                                            <ComboBox
+                                                                items={componentDefinitions.map(
+                                                                    (
+                                                                        componentDefinition
+                                                                    ) => ({
+                                                                        componentDefinition,
+                                                                        icon: componentDefinition.icon,
+                                                                        label: componentDefinition.title!,
+                                                                        value: componentDefinition.name,
+                                                                    })
+                                                                )}
+                                                                name="component"
+                                                                onBlur={
+                                                                    field.onBlur
+                                                                }
+                                                                onChange={(
+                                                                    item
+                                                                ) =>
+                                                                    handleComponentDefinitionChange(
+                                                                        item?.componentDefinition as ComponentDefinitionBasicModel
+                                                                    )
+                                                                }
+                                                                value={
+                                                                    field.value
+                                                                }
+                                                            />
+                                                        </FormControl>
+
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                );
+                                            } else if (
+                                                connectionDefinitions &&
+                                                connectionDefinitions?.length >
+                                                    1
+                                            ) {
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Component
+                                                        </FormLabel>
+
+                                                        <FormControl>
+                                                            <ComboBox
+                                                                items={connectionDefinitions.map(
+                                                                    (
+                                                                        connectionDefinition
+                                                                    ) =>
+                                                                        ({
+                                                                            componentDefinition:
+                                                                                selectedComponentDefinition,
+                                                                            icon: selectedComponentDefinition?.icon
+                                                                                ? selectedComponentDefinition?.icon
+                                                                                : undefined,
+                                                                            label: connectionDefinition.componentTitle
+                                                                                ? connectionDefinition.componentTitle
+                                                                                : undefined,
+                                                                            value: connectionDefinition.componentName,
+                                                                        }) as ComboBoxItemType
+                                                                )}
+                                                                onBlur={
+                                                                    field.onBlur
+                                                                }
+                                                                onChange={(
+                                                                    item
+                                                                ) =>
+                                                                    handleComponentDefinitionChange(
+                                                                        item?.componentDefinition as ComponentDefinitionBasicModel
+                                                                    )
+                                                                }
+                                                                value={
+                                                                    field.value
+                                                                }
+                                                            />
+                                                        </FormControl>
+
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                );
+                                            } else {
+                                                return (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Component
+                                                        </FormLabel>
+
+                                                        <FormControl>
+                                                            <Input
+                                                                defaultValue={
+                                                                    componentDefinition?.title
+                                                                }
+                                                                disabled
+                                                                name="defaultComponentName"
+                                                            />
+                                                        </FormControl>
+
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                );
+                                            }
+                                        }}
+                                        rules={{required: true}}
+                                    />
+                                )}
+
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
+
+                                            <FormControl>
                                                 <Input
-                                                    defaultValue={
-                                                        componentDefinition?.title
-                                                    }
-                                                    disabled
-                                                    label="Component"
-                                                    name="defaultComponentName"
+                                                    placeholder="My Connection"
+                                                    {...field}
                                                 />
-                                            );
-                                        }
-                                    }}
+                                            </FormControl>
+
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
                                     rules={{required: true}}
                                 />
-                            )}
 
-                            <Input
-                                error={
-                                    formState.touchedFields.name &&
-                                    !!formState.errors.name
-                                }
-                                label="Name"
-                                placeholder="My Connection"
-                                {...register('name', {required: true})}
-                            />
-
-                            {showConnectionProperties &&
-                                !!connectionDefinition.properties && (
-                                    <fieldset className="mb-3">
+                                {showConnectionProperties &&
+                                    !!connectionDefinition.properties && (
                                         <Properties
                                             formState={formState}
                                             properties={
@@ -532,256 +606,292 @@ const ConnectionDialog = ({
                                             }
                                             register={register}
                                         />
-                                    </fieldset>
-                                )}
-
-                            {showAuthorizations && (
-                                <fieldset className="mb-3">
-                                    <Label>Authorization</Label>
-
-                                    <Select
-                                        onValueChange={(value) => {
-                                            setAuthorizationName(value);
-                                            setUsePredefinedOAuthApp(false);
-                                        }}
-                                        value={authorizationName}
-                                        {...register('authorizationName')}
-                                    >
-                                        <SelectTrigger className="mt-1">
-                                            <SelectValue placeholder="Select..." />
-                                        </SelectTrigger>
-
-                                        <SelectContent>
-                                            {authorizationOptions.map(
-                                                (authorizationOption) => (
-                                                    <SelectItem
-                                                        key={
-                                                            authorizationOption.value!
-                                                        }
-                                                        value={
-                                                            authorizationOption.value!
-                                                        }
-                                                    >
-                                                        {
-                                                            authorizationOption.label!
-                                                        }
-                                                    </SelectItem>
-                                                )
-                                            )}
-                                        </SelectContent>
-                                    </Select>
-                                </fieldset>
-                            )}
-
-                            {showRedirectUriInput &&
-                                oAuth2Properties?.redirectUri && (
-                                    <RedirectUriInput
-                                        redirectUri={
-                                            oAuth2Properties.redirectUri
-                                        }
-                                    />
-                                )}
-
-                            {showAuthorizationProperties &&
-                                !!authorizations?.length &&
-                                authorizations[0]?.properties && (
-                                    <Properties
-                                        formState={formState}
-                                        properties={
-                                            authorizations[0]?.properties
-                                        }
-                                        register={register}
-                                    />
-                                )}
-
-                            {showOAuth2AppPredefined && (
-                                <div className="mb-3">
-                                    <a
-                                        className="text-sm text-blue-600"
-                                        href="#"
-                                        onClick={() =>
-                                            setUsePredefinedOAuthApp(
-                                                !usePredefinedOAuthApp
-                                            )
-                                        }
-                                    >
-                                        {usePredefinedOAuthApp && (
-                                            <span>
-                                                I want to use my own app
-                                                credentials
-                                            </span>
-                                        )}
-
-                                        {!usePredefinedOAuthApp && (
-                                            <span>
-                                                I want to use predefined app
-                                                credentials
-                                            </span>
-                                        )}
-                                    </a>
-                                </div>
-                            )}
-
-                            {!tagsLoading && (
-                                <Controller
-                                    control={control}
-                                    name="tags"
-                                    render={({field}) => (
-                                        <CreatableSelect
-                                            field={field}
-                                            fieldsetClassName="mb-0"
-                                            isMulti={true}
-                                            label="Tags"
-                                            onCreateOption={(
-                                                inputValue: string
-                                            ) => {
-                                                setValue('tags', [
-                                                    ...getValues().tags!,
-                                                    {
-                                                        label: inputValue,
-                                                        name: inputValue,
-                                                        value: inputValue,
-                                                    },
-                                                ]);
-                                            }}
-                                            options={remainingTags!.map(
-                                                (tag: TagModel) => {
-                                                    return {
-                                                        label: tag.name,
-                                                        value: tag.name
-                                                            .toLowerCase()
-                                                            .replace(/\W/g, ''),
-                                                        ...tag,
-                                                    };
-                                                }
-                                            )}
-                                        />
                                     )}
-                                />
-                            )}
-                        </>
-                    )}
 
-                    {!oAuth2AuthorizationParametersLoading &&
-                        wizardStep === 'oauth_step' && (
-                            <div>
-                                <Alert className="border-blue-50 bg-blue-50 text-blue-700">
-                                    <RocketIcon className="h-4 w-4" />
+                                {showAuthorizations && (
+                                    <FormField
+                                        control={control}
+                                        name="authorizationName"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Authorization
+                                                </FormLabel>
 
-                                    <AlertTitle>Heads up!</AlertTitle>
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        setAuthorizationName(
+                                                            value
+                                                        );
+                                                        setUsePredefinedOAuthApp(
+                                                            false
+                                                        );
+                                                    }}
+                                                    {...field}
+                                                >
+                                                    <SelectTrigger className="mt-1">
+                                                        <FormControl>
+                                                            <SelectValue placeholder="Select..." />
+                                                        </FormControl>
+                                                    </SelectTrigger>
 
-                                    <AlertDescription>
-                                        Excellent! You can connect and create
-                                        the
-                                        <span className="mx-0.5 font-semibold">
-                                            {selectedComponentDefinition?.title}
-                                        </span>
-                                        connection under name
-                                        <span className="mx-0.5 font-semibold">{`'${getValues()
-                                            ?.name}'`}</span>
-                                        .
-                                    </AlertDescription>
-                                </Alert>
+                                                    <SelectContent>
+                                                        {authorizationOptions.map(
+                                                            (
+                                                                authorizationOption
+                                                            ) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        authorizationOption.value!
+                                                                    }
+                                                                    value={
+                                                                        authorizationOption.value!
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        authorizationOption.label!
+                                                                    }
+                                                                </SelectItem>
+                                                            )
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
 
-                                {scopes && scopes.length > 0 && (
-                                    <Scopes scopes={scopes} />
-                                )}
-                            </div>
-                        )}
-
-                    <footer className="mt-8 flex justify-end space-x-1">
-                        {wizardStep === 'oauth_step' && (
-                            <Button
-                                onClick={() => {
-                                    createConnectionMutation.reset();
-
-                                    setOAuth2Error(undefined);
-
-                                    setWizardStep('configuration_step');
-                                }}
-                                type="button"
-                                variant="outline"
-                            >
-                                Previous
-                            </Button>
-                        )}
-
-                        {wizardStep === 'configuration_step' && (
-                            <Button
-                                onClick={closeDialog}
-                                type="button"
-                                variant="outline"
-                            >
-                                Cancel
-                            </Button>
-                        )}
-
-                        {showOAuth2Step && (
-                            <>
-                                {wizardStep === 'configuration_step' && (
-                                    <Button
-                                        onClick={handleSubmit(() => {
-                                            setWizardStep('oauth_step');
-                                        })}
-                                        type="submit"
-                                    >
-                                        Next
-                                    </Button>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                 )}
 
-                                {wizardStep === 'oauth_step' &&
-                                    oAuth2AuthorizationParameters?.authorizationUrl &&
-                                    oAuth2AuthorizationParameters?.clientId && (
-                                        <OAuth2Button
-                                            authorizationUrl={
-                                                oAuth2AuthorizationParameters.authorizationUrl
-                                            }
-                                            clientId={
-                                                oAuth2AuthorizationParameters.clientId
-                                            }
-                                            onClick={(getAuth: () => void) => {
-                                                getAuth();
-                                            }}
-                                            onCodeSuccess={handleOnCodeSuccess}
-                                            onError={(error: string) =>
-                                                setOAuth2Error(error)
-                                            }
-                                            onTokenSuccess={(
-                                                payload: AuthTokenPayload
-                                            ) => {
-                                                if (payload.access_token) {
-                                                    return saveConnection(
-                                                        payload
-                                                    );
-                                                }
-                                            }}
+                                {showRedirectUriInput &&
+                                    oAuth2Properties?.redirectUri && (
+                                        <RedirectUriInput
                                             redirectUri={
-                                                oAuth2Properties?.redirectUri ??
-                                                ''
+                                                oAuth2Properties.redirectUri
                                             }
-                                            responseType={
-                                                isOAuth2AuthorizationType
-                                                    ? 'code'
-                                                    : 'token'
-                                            }
-                                            scope={oAuth2AuthorizationParameters?.scopes?.join(
-                                                '_'
-                                            )}
                                         />
                                     )}
+
+                                {showAuthorizationProperties &&
+                                    !!authorizations?.length &&
+                                    authorizations[0]?.properties && (
+                                        <Properties
+                                            formState={formState}
+                                            properties={
+                                                authorizations[0]?.properties
+                                            }
+                                            register={register}
+                                        />
+                                    )}
+
+                                {showOAuth2AppPredefined && (
+                                    <div>
+                                        <a
+                                            className="text-sm text-blue-600"
+                                            href="#"
+                                            onClick={() =>
+                                                setUsePredefinedOAuthApp(
+                                                    !usePredefinedOAuthApp
+                                                )
+                                            }
+                                        >
+                                            {usePredefinedOAuthApp && (
+                                                <span>
+                                                    I want to use my own app
+                                                    credentials
+                                                </span>
+                                            )}
+
+                                            {!usePredefinedOAuthApp && (
+                                                <span>
+                                                    I want to use predefined app
+                                                    credentials
+                                                </span>
+                                            )}
+                                        </a>
+                                    </div>
+                                )}
+
+                                {!tagsLoading && (
+                                    <FormField
+                                        control={control}
+                                        name="tags"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Tags</FormLabel>
+
+                                                <FormControl>
+                                                    <CreatableSelect
+                                                        field={field}
+                                                        fieldsetClassName="mb-0"
+                                                        isMulti={true}
+                                                        onCreateOption={(
+                                                            inputValue: string
+                                                        ) => {
+                                                            setValue('tags', [
+                                                                ...getValues()
+                                                                    .tags!,
+                                                                {
+                                                                    label: inputValue,
+                                                                    name: inputValue,
+                                                                    value: inputValue,
+                                                                },
+                                                            ]);
+                                                        }}
+                                                        options={remainingTags!.map(
+                                                            (tag: TagModel) => {
+                                                                return {
+                                                                    label: tag.name,
+                                                                    value: tag.name
+                                                                        .toLowerCase()
+                                                                        .replace(
+                                                                            /\W/g,
+                                                                            ''
+                                                                        ),
+                                                                    ...tag,
+                                                                };
+                                                            }
+                                                        )}
+                                                    />
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
                             </>
                         )}
 
-                        {!showOAuth2Step && (
-                            <Button
-                                onClick={handleSubmit(() => saveConnection())}
-                                type="submit"
-                            >
-                                Save
-                            </Button>
-                        )}
-                    </footer>
-                </div>
+                        {!oAuth2AuthorizationParametersLoading &&
+                            wizardStep === 'oauth_step' && (
+                                <div>
+                                    <Alert className="border-blue-50 bg-blue-50 text-blue-700">
+                                        <RocketIcon className="h-4 w-4" />
+
+                                        <AlertTitle>Heads up!</AlertTitle>
+
+                                        <AlertDescription>
+                                            Excellent! You can connect and
+                                            create the
+                                            <span className="mx-0.5 font-semibold">
+                                                {
+                                                    selectedComponentDefinition?.title
+                                                }
+                                            </span>
+                                            connection under name
+                                            <span className="mx-0.5 font-semibold">{`'${getValues()
+                                                ?.name}'`}</span>
+                                            .
+                                        </AlertDescription>
+                                    </Alert>
+
+                                    {scopes && scopes.length > 0 && (
+                                        <Scopes scopes={scopes} />
+                                    )}
+                                </div>
+                            )}
+
+                        <DialogFooter>
+                            {wizardStep === 'oauth_step' && (
+                                <Button
+                                    onClick={() => {
+                                        createConnectionMutation.reset();
+
+                                        setOAuth2Error(undefined);
+
+                                        setWizardStep('configuration_step');
+                                    }}
+                                    type="button"
+                                    variant="outline"
+                                >
+                                    Previous
+                                </Button>
+                            )}
+
+                            {wizardStep === 'configuration_step' && (
+                                <Button
+                                    onClick={closeDialog}
+                                    type="button"
+                                    variant="outline"
+                                >
+                                    Cancel
+                                </Button>
+                            )}
+
+                            {showOAuth2Step && (
+                                <>
+                                    {wizardStep === 'configuration_step' && (
+                                        <Button
+                                            onClick={handleSubmit(() => {
+                                                setWizardStep('oauth_step');
+                                            })}
+                                            type="submit"
+                                        >
+                                            Next
+                                        </Button>
+                                    )}
+
+                                    {wizardStep === 'oauth_step' &&
+                                        oAuth2AuthorizationParameters?.authorizationUrl &&
+                                        oAuth2AuthorizationParameters?.clientId && (
+                                            <OAuth2Button
+                                                authorizationUrl={
+                                                    oAuth2AuthorizationParameters.authorizationUrl
+                                                }
+                                                clientId={
+                                                    oAuth2AuthorizationParameters.clientId
+                                                }
+                                                onClick={(
+                                                    getAuth: () => void
+                                                ) => {
+                                                    getAuth();
+                                                }}
+                                                onCodeSuccess={
+                                                    handleOnCodeSuccess
+                                                }
+                                                onError={(error: string) =>
+                                                    setOAuth2Error(error)
+                                                }
+                                                onTokenSuccess={(
+                                                    payload: AuthTokenPayload
+                                                ) => {
+                                                    if (payload.access_token) {
+                                                        return saveConnection(
+                                                            payload
+                                                        );
+                                                    }
+                                                }}
+                                                redirectUri={
+                                                    oAuth2Properties?.redirectUri ??
+                                                    ''
+                                                }
+                                                responseType={
+                                                    isOAuth2AuthorizationType
+                                                        ? 'code'
+                                                        : 'token'
+                                                }
+                                                scope={oAuth2AuthorizationParameters?.scopes?.join(
+                                                    '_'
+                                                )}
+                                            />
+                                        )}
+                                </>
+                            )}
+
+                            {!showOAuth2Step && (
+                                <Button
+                                    onClick={handleSubmit(() =>
+                                        saveConnection()
+                                    )}
+                                    type="submit"
+                                >
+                                    Save
+                                </Button>
+                            )}
+                        </DialogFooter>
+                    </Form>
+                </DialogContent>
             )}
         </Dialog>
     );
@@ -800,30 +910,33 @@ const Errors = ({errors}: {errors: string[]}) => (
     </ul>
 );
 
-const RedirectUriInput = ({redirectUri}: {redirectUri: string}) => {
+const RedirectUriInput = ({redirectUri}: {redirectUri?: string}) => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
 
     return (
-        <Input
-            label="Redirect URI"
-            name="redirectUri"
-            readOnly
-            trailing={
-                <Button
-                    className="-ml-px rounded-l-none rounded-r-md border-gray-300 px-3 py-2 hover:bg-gray-50"
-                    onClick={() => copyToClipboard(redirectUri ?? '')}
-                    size="icon"
-                    variant="ghost"
-                >
-                    <ClipboardIcon
-                        aria-hidden="true"
-                        className="h-5 w-5 text-gray-400"
-                    />
-                </Button>
-            }
-            value={redirectUri}
-        />
+        <div className="flex">
+            <div className="relative flex grow items-stretch focus-within:z-10">
+                <Input
+                    className="rounded-r-none"
+                    name="redirectUri"
+                    readOnly
+                    value={redirectUri}
+                />
+            </div>
+
+            <Button
+                className="-ml-px rounded-l-none rounded-r-md border border-gray-200 bg-gray-50 shadow-sm hover:bg-gray-100"
+                onClick={() => copyToClipboard(redirectUri ?? '')}
+                size="icon"
+                variant="ghost"
+            >
+                <ClipboardIcon
+                    aria-hidden="true"
+                    className="h-4 w-4 text-gray-400"
+                />
+            </Button>
+        </div>
     );
 };
 

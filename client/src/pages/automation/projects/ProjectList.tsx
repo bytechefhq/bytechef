@@ -1,3 +1,4 @@
+import {Button} from '@/components/ui/button';
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {useGetProjectTagsQuery} from '@/queries/projectTags.quries';
 import {useGetProjectsQuery} from '@/queries/projects.queries';
@@ -37,7 +38,12 @@ const ProjectList = () => {
                 !error &&
                 (!projects?.length ? (
                     <EmptyList
-                        button={<ProjectDialog project={undefined} />}
+                        button={
+                            <ProjectDialog
+                                project={undefined}
+                                triggerNode={<Button>Create Project</Button>}
+                            />
+                        }
                         icon={
                             <FolderIcon className="h-12 w-12 text-gray-400" />
                         }

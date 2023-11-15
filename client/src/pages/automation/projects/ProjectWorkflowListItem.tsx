@@ -233,11 +233,9 @@ const ProjectWorkflowListItem = ({
             {showEditDialog && (
                 <WorkflowDialog
                     onClose={() => setShowEditDialog(false)}
-                    showTrigger={false}
                     updateWorkflowMutationMutation={
                         updateWorkflowMutationMutation
                     }
-                    visible
                     workflow={selectedWorkflow!}
                 />
             )}

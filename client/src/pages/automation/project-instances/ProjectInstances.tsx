@@ -1,4 +1,5 @@
 import EmptyList from '@/components/EmptyList/EmptyList';
+import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {ProjectInstanceModel} from '@/middleware/helios/configuration';
 import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstanceTags.queries';
@@ -95,7 +96,11 @@ const ProjectInstances = () => {
                 <PageHeader
                     centerTitle={true}
                     position="main"
-                    right={<ProjectInstanceDialog />}
+                    right={
+                        <ProjectInstanceDialog
+                            triggerNode={<Button>Create Instance</Button>}
+                        />
+                    }
                     title={`${
                         searchParams.get('tagId') ? 'Tags' : 'Projects'
                     }: ${pageTitle || 'All'}`}
@@ -201,7 +206,11 @@ const ProjectInstances = () => {
                 !projectsLoading &&
                 (!projects?.length || !projectInstances?.length) ? (
                     <EmptyList
-                        button={<ProjectInstanceDialog />}
+                        button={
+                            <ProjectInstanceDialog
+                                triggerNode={<Button>Create Instance</Button>}
+                            />
+                        }
                         icon={
                             <Layers3Icon className="h-12 w-12 text-gray-400" />
                         }

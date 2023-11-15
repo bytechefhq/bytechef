@@ -1,4 +1,5 @@
 import PageLoader from '@/components/PageLoader/PageLoader';
+import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {
@@ -87,7 +88,11 @@ const Connections = () => {
                 <PageHeader
                     centerTitle={true}
                     position="main"
-                    right={<ConnectionDialog />}
+                    right={
+                        <ConnectionDialog
+                            triggerNode={<Button>Create Connection</Button>}
+                        />
+                    }
                     title={`${
                         searchParams.get('tagId') ? 'Tags' : 'Components'
                     }: ${pageTitle || 'All'}`}

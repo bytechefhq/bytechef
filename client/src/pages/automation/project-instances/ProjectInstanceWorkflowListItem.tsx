@@ -175,7 +175,6 @@ const ProjectInstanceWorkflowListItem = ({
                     onClose={() => setShowEditWorkflowDialog(false)}
                     projectInstanceEnabled={projectInstanceEnabled}
                     projectInstanceWorkflow={projectInstanceWorkflow}
-                    visible
                     workflow={workflow}
                 />
             )}

@@ -286,8 +286,6 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                 <ProjectDialog
                     onClose={() => setShowEditDialog(false)}
                     project={project}
-                    showTrigger={false}
-                    visible
                 />
             )}
 
@@ -298,8 +296,6 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                     }
                     onClose={() => setShowWorkflowDialog(false)}
                     parentId={project.id}
-                    showTrigger={false}
-                    visible
                 />
             )}
         </>
