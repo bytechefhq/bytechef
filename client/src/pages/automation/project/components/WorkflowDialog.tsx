@@ -111,7 +111,7 @@ const WorkflowDialog = ({
                         size="icon"
                         variant="outline"
                     >
-                        <PlusIcon className="mx-1 h-5 w-5" />
+                        <PlusIcon className="mx-2 h-5 w-5" />
                     </Button>
                 )
             }
@@ -150,7 +150,7 @@ const WorkflowDialog = ({
                     onClick={handleSubmit(saveWorkflow)}
                     type="submit"
                 >
-                    {isPending ? 'Saving...' : 'Save'}
+                    Save
                 </Button>
             </div>
         </Dialog>
