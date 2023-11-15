@@ -19,7 +19,7 @@ import {
     useCreateProjectInstanceMutation,
     useUpdateProjectInstanceMutation,
 } from 'mutations/projectInstances.mutations';
-import {ReactNode, useState} from 'react';
+import {MouseEvent, ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
@@ -160,6 +160,16 @@ const ProjectInstanceDialog = ({
         }
     }
 
+    const handleNextClick = (event: MouseEvent) => {
+        trigger();
+
+        if (!formState.isValid) {
+            event.preventDefault();
+        } else {
+            setActiveStepIndex(activeStepIndex + 1);
+        }
+    };
+
     return (
         <Dialog
             onOpenChange={(isOpen) => {
@@ -241,19 +251,7 @@ const ProjectInstanceDialog = ({
                                 </DialogClose>
 
                                 {!projectInstance?.id && (
-                                    <Button
-                                        onClick={(e) => {
-                                            trigger();
-
-                                            if (!formState.isValid) {
-                                                e.preventDefault();
-                                            } else {
-                                                setActiveStepIndex(
-                                                    activeStepIndex + 1
-                                                );
-                                            }
-                                        }}
-                                    >
+                                    <Button onClick={handleNextClick}>
                                         Next
                                     </Button>
                                 )}
