@@ -20,7 +20,7 @@ type WorkflowNodesListProps = {
     id: string;
 };
 
-const WorkflowNodesList = memo(
+const WorkflowNodesPopoverMenuList = memo(
     ({
         edge,
         hideActionComponents = false,
@@ -316,6 +316,6 @@ const WorkflowNodesList = memo(
     }
 );
 
-WorkflowNodesList.displayName = 'WorkflowNodesList';
+WorkflowNodesPopoverMenuList.displayName = 'WorkflowNodesPopoverMenuList';
 
-export default WorkflowNodesList;
+export default WorkflowNodesPopoverMenuList;

@@ -1,7 +1,7 @@
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {PropsWithChildren} from 'react';
 
-import WorkflowNodesList from './WorkflowNodesList';
+import WorkflowNodesPopoverMenuList from './WorkflowNodesPopoverMenuList';
 
 type WorkflowNodesPopoverMenuProps = {
     id?: string;
@@ -29,7 +29,7 @@ const WorkflowNodesPopoverMenu = ({
             sideOffset={4}
         >
             {id && (
-                <WorkflowNodesList
+                <WorkflowNodesPopoverMenuList
                     edge={edge}
                     hideActionComponents={hideActionComponents}
                     hideTaskDispatchers={hideTaskDispatchers}
