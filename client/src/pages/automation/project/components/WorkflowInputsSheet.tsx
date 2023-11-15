@@ -11,7 +11,7 @@ import WorkflowInputsSheetTable from '@/pages/automation/project/components/Work
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
 
-interface WorkflowExecutionDetailsSheetProps {
+interface WorkflowInputsSheetProps {
     onClose: () => void;
     projectId: number;
     workflow: WorkflowModel;
@@ -21,7 +21,7 @@ const WorkflowInputsSheet = ({
     onClose,
     projectId,
     workflow,
-}: WorkflowExecutionDetailsSheetProps) => {
+}: WorkflowInputsSheetProps) => {
     return (
         <Sheet modal={false} onOpenChange={onClose} open={true}>
             <SheetContent className="flex flex-col p-4 sm:max-w-[500px]">
