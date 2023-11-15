@@ -15,12 +15,6 @@ subprojects {
     apply(plugin = "com.bytechef.java-common-conventions")
 
     dependencies {
-        compileOnly(rootProject.libs.org.graalvm.polyglot.polyglot)
-        compileOnly(rootProject.libs.org.graalvm.polyglot.java)
-        compileOnly(rootProject.libs.org.graalvm.polyglot.js)
-        compileOnly(rootProject.libs.org.graalvm.polyglot.python)
-        compileOnly(rootProject.libs.org.graalvm.polyglot.ruby)
-
         implementation(rootProject.libs.com.github.spotbugs.spotbugs.annotations)
     }
 }
