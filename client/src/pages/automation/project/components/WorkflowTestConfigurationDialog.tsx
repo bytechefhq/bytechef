@@ -60,7 +60,7 @@ const WorkflowTestConfigurationDialog = ({
                             {workflow.inputs && (
                                 <Properties
                                     formState={formState}
-                                    path={'inputs'}
+                                    path="inputs"
                                     properties={workflow.inputs.map((input) => {
                                         if (input.type === 'string') {
                                             return {
