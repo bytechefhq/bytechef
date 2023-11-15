@@ -1,6 +1,6 @@
 import ProjectInstanceDialogWorkflowListItem from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowListItem';
+import {useGetProjectWorkflowsQuery} from '@/queries/projects.queries';
 import {ProjectInstanceModel} from 'middleware/helios/configuration';
-import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 import {Control, UseFormGetValues, UseFormRegister} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
 

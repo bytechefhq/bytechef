@@ -1,8 +1,6 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {
-    useGetProjectTagsQuery,
-    useGetProjectsQuery,
-} from '@/queries/projects.queries';
+import {useGetProjectTagsQuery} from '@/queries/projectTags.quries';
+import {useGetProjectsQuery} from '@/queries/projects.queries';
 import {FolderIcon} from 'lucide-react';
 import ProjectListItem from 'pages/automation/projects/ProjectListItem';
 import {useSearchParams} from 'react-router-dom';

@@ -11,7 +11,7 @@ import {
     WorkflowModel,
 } from '@/middleware/helios/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
-import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/projectInstances.mutations';
+import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/projectInstanceWorkflows.mutations';
 import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/ProjectInstanceEditWorkflowDialog';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
@@ -51,9 +51,9 @@ const ProjectInstanceWorkflowListItem = ({
     const enableProjectInstanceWorkflowMutation =
         useEnableProjectInstanceWorkflowMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries(
-                    ProjectInstanceKeys.projectInstances
-                );
+                queryClient.invalidateQueries({
+                    queryKey: ProjectInstanceKeys.projectInstances,
+                });
             },
         });
 

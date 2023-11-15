@@ -1,4 +1,5 @@
 import {Form} from '@/components/ui/form';
+import {ProjectInstanceTagKeys} from '@/queries/projectInstanceTags.queries';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {Close} from '@radix-ui/react-dialog';
@@ -64,11 +65,15 @@ const ProjectInstanceDialog = ({
 
     const createProjectInstanceMutation = useCreateProjectInstanceMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectInstanceKeys.projectInstances);
-            queryClient.invalidateQueries(
-                ProjectInstanceKeys.projectInstanceTags
-            );
-            queryClient.invalidateQueries(ProjectKeys.filteredProjects({}));
+            queryClient.invalidateQueries({
+                queryKey: ProjectInstanceKeys.projectInstances,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ProjectInstanceTagKeys.projectInstanceTags,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.filteredProjects({}),
+            });
 
             closeDialog();
             setActiveStepIndex(0);
@@ -77,11 +82,15 @@ const ProjectInstanceDialog = ({
 
     const updateProjectInstanceMutation = useUpdateProjectInstanceMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectInstanceKeys.projectInstances);
-            queryClient.invalidateQueries(
-                ProjectInstanceKeys.projectInstanceTags
-            );
-            queryClient.invalidateQueries(ProjectKeys.filteredProjects({}));
+            queryClient.invalidateQueries({
+                queryKey: ProjectInstanceKeys.projectInstances,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ProjectInstanceTagKeys.projectInstanceTags,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.filteredProjects({}),
+            });
 
             closeDialog();
             setActiveStepIndex(0);

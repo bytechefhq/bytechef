@@ -29,13 +29,15 @@ import {
     ProjectModelStatusEnum,
     TagModel,
 } from '@/middleware/helios/configuration';
+import {useUpdateProjectTagsMutation} from '@/mutations/projectTags.mutations';
+import {useCreateProjectWorkflowMutation} from '@/mutations/projectWorkflows.mutations';
 import {
-    useCreateProjectWorkflowRequestMutation,
     useDeleteProjectMutation,
     useDuplicateProjectMutation,
-    useUpdateProjectTagsMutation,
 } from '@/mutations/projects.mutations';
 import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
+import {ProjectCategoryKeys} from '@/queries/projectCategories.queries';
+import {ProjectTagKeys} from '@/queries/projectTags.quries';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -62,7 +64,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
     const queryClient = useQueryClient();
 
     const createProjectWorkflowRequestMutation =
-        useCreateProjectWorkflowRequestMutation({
+        useCreateProjectWorkflowMutation({
             onSuccess: (workflow) => {
                 navigate(
                     `/automation/projects/${project.id}/workflows/${workflow?.id}`
@@ -74,22 +76,28 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     const deleteProjectMutation = useDeleteProjectMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projects);
-            queryClient.invalidateQueries(ProjectKeys.projectCategories);
-            queryClient.invalidateQueries(ProjectKeys.projectTags);
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            queryClient.invalidateQueries({
+                queryKey: ProjectCategoryKeys.projectCategories,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ProjectTagKeys.projectTags,
+            });
         },
     });
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projects);
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
     });
 
     const updateProjectTagsMutation = useUpdateProjectTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projects);
-            queryClient.invalidateQueries(ProjectKeys.projectTags);
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            queryClient.invalidateQueries({
+                queryKey: ProjectTagKeys.projectTags,
+            });
         },
     });
 

@@ -17,10 +17,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {ConnectionModel, TagModel} from '@/middleware/helios/connection';
-import {
-    useDeleteConnectionMutation,
-    useUpdateConnectionTagsMutation,
-} from '@/mutations/connections.mutations';
+import {useUpdateConnectionTagsMutation} from '@/mutations/connectionTags.mutations';
+import {useDeleteConnectionMutation} from '@/mutations/connections.mutations';
 import {
     ComponentDefinitionKeys,
     useGetComponentDefinitionQuery,
@@ -56,18 +54,26 @@ const ConnectionListItem = ({
 
     const deleteConnectionMutation = useDeleteConnectionMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(
-                ComponentDefinitionKeys.componentDefinitions
-            );
-            queryClient.invalidateQueries(ConnectionKeys.connections);
-            queryClient.invalidateQueries(ConnectionKeys.connectionTags);
+            queryClient.invalidateQueries({
+                queryKey: ComponentDefinitionKeys.componentDefinitions,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ConnectionKeys.connections,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ConnectionKeys.connectionTags,
+            });
         },
     });
 
     const updateConnectionTagsMutation = useUpdateConnectionTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ConnectionKeys.connections);
-            queryClient.invalidateQueries(ConnectionKeys.connectionTags);
+            queryClient.invalidateQueries({
+                queryKey: ConnectionKeys.connections,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ConnectionKeys.connectionTags,
+            });
         },
     });
 

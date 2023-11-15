@@ -1,5 +1,5 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
-import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstances.queries';
+import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstanceTags.queries';
 import {useGetProjectsQuery} from '@/queries/projects.queries';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Input from 'components/Input/Input';

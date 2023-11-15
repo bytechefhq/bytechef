@@ -1,8 +1,6 @@
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
-import {
-    useGetProjectCategoriesQuery,
-    useGetProjectTagsQuery,
-} from '@/queries/projects.queries';
+import {useGetProjectCategoriesQuery} from '@/queries/projectCategories.queries';
+import {useGetProjectTagsQuery} from '@/queries/projectTags.quries';
 import {TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';

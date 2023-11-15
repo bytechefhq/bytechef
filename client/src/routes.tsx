@@ -33,15 +33,15 @@ export const router = createBrowserRouter([
                     {
                         element: <Project />,
                         loader: async ({params}) =>
-                            queryClient.ensureQueryData(
-                                ProjectKeys.project(
-                                    parseInt(params.projectId!)
-                                ),
-                                () =>
+                            queryClient.ensureQueryData({
+                                queryFn: () =>
                                     new ProjectApi().getProject({
                                         id: parseInt(params.projectId!),
-                                    })
-                            ),
+                                    }),
+                                queryKey: ProjectKeys.project(
+                                    parseInt(params.projectId!)
+                                ),
+                            }),
                         path: 'projects/:projectId/workflows/:workflowId',
                     },
                     {
