@@ -17,6 +17,7 @@
 package com.bytechef.encryption.filesystem;
 
 import com.bytechef.encryption.AbstractEncryptionKey;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -27,6 +28,7 @@ public class FileSystemEncryptionKey extends AbstractEncryptionKey {
 
     private final String key;
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public FileSystemEncryptionKey() {
         Path userHome = Path.of(System.getProperty("user.home"));
 

@@ -933,6 +933,7 @@ public interface Context {
 
         protected final Type type;
 
+        @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         protected TypeReference() {
             Type superClass = getClass().getGenericSuperclass();
 

@@ -33,6 +33,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.ZoneId;
 import java.util.Map;
 
@@ -71,6 +72,7 @@ public class ScheduleIntervalTrigger {
 
     private final TriggerScheduler triggerScheduler;
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public ScheduleIntervalTrigger(TriggerScheduler triggerScheduler) {
         this.triggerScheduler = triggerScheduler;
     }

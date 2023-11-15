@@ -1520,6 +1520,7 @@ public abstract class DefinitionDSL {
         private final List<String> loadPropertiesDependsOn;
         private final PropertiesFunction propertiesFunction;
 
+        @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         private PropertiesDataSourceImpl(List<String> loadPropertiesDependOn, PropertiesFunction propertiesFunction) {
             if (loadPropertiesDependOn == null || loadPropertiesDependOn.isEmpty()) {
                 throw new IllegalStateException("loadPropertiesDependsOn is not defined.");
