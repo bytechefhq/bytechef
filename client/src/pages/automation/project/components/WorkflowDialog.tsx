@@ -87,18 +87,33 @@ const WorkflowDialog = ({
             mutate({
                 id: workflow.id,
                 workflowRequestModel: {
-                    definition: JSON.stringify({
-                        ...JSON.parse(workflow.definition!),
-                        description: formData.description,
-                        label: formData.label,
-                    }),
+                    definition: JSON.stringify(
+                        {
+                            ...JSON.parse(workflow.definition!),
+                            description: formData.description,
+                            label: formData.label,
+                        },
+                        null,
+                        4
+                    ),
                 },
             });
         } else {
             mutate({
                 id: parentId,
                 workflowRequestModel: {
-                    definition: `{\n\t"label": "${formData.label}",\n\t"description": "${formData.description}",\n\t"inputs": [],\n\t"triggers": [],\n\t"tasks": []\n}`,
+                    /* eslint-disable sort-keys */
+                    definition: JSON.stringify(
+                        {
+                            label: formData.label,
+                            description: formData.description,
+                            inputs: [],
+                            triggers: [],
+                            tasks: [],
+                        },
+                        null,
+                        4
+                    ),
                 },
             });
         }
