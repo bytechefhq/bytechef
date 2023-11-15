@@ -23,7 +23,7 @@ import {
     useDeleteWorkflowMutation,
     useDuplicateWorkflowMutation,
     useUpdateWorkflowMutation,
-} from '@/mutations/projects.mutations';
+} from '@/mutations/workflows.mutations';
 import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
@@ -61,7 +61,7 @@ const ProjectWorkflowListItem = ({
 
     const deleteWorkflowMutationMutation = useDeleteWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projects);
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             setShowDeleteDialog(false);
         },
@@ -69,13 +69,13 @@ const ProjectWorkflowListItem = ({
 
     const duplicateWorkflowMutationMutation = useDuplicateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projects);
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
     });
 
     const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projects);
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             setShowEditDialog(false);
         },

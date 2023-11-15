@@ -58,7 +58,7 @@ const WorkflowDialog = ({
         } as WorkflowModel,
     });
 
-    const {isLoading, mutate} = createWorkflowRequestMutation
+    const {isPending, mutate} = createWorkflowRequestMutation
         ? createWorkflowRequestMutation!
         : updateWorkflowMutationMutation!;
 
@@ -146,11 +146,11 @@ const WorkflowDialog = ({
                 </Close>
 
                 <Button
-                    disabled={isLoading}
+                    disabled={isPending}
                     onClick={handleSubmit(saveWorkflow)}
                     type="submit"
                 >
-                    {isLoading ? 'Saving...' : 'Save'}
+                    {isPending ? 'Saving...' : 'Save'}
                 </Button>
             </div>
         </Dialog>

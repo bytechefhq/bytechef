@@ -1,9 +1,9 @@
 import {ProjectInstanceWorkflowModel} from '@/middleware/helios/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import ProjectInstanceWorkflowListItem from '@/pages/automation/project-instances/ProjectInstanceWorkflowListItem';
+import {useGetProjectWorkflowsQuery} from '@/queries/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
-import {useGetProjectWorkflowsQuery} from 'queries/projects.queries';
 
 const ProjectInstanceWorkflowList = ({
     projectId,

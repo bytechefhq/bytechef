@@ -8,10 +8,14 @@ import {
     useUpdateProjectMutation,
 } from '@/mutations/projects.mutations';
 import {
-    ProjectKeys,
+    ProjectCategoryKeys,
     useGetProjectCategoriesQuery,
+} from '@/queries/projectCategories.queries';
+import {
+    ProjectTagKeys,
     useGetProjectTagsQuery,
-} from '@/queries/projects.queries';
+} from '@/queries/projectTags.quries';
+import {ProjectKeys} from '@/queries/projects.queries';
 import {Close} from '@radix-ui/react-dialog';
 import {useQueryClient} from '@tanstack/react-query';
 import Button from 'components/Button/Button';
@@ -79,9 +83,13 @@ const ProjectDialog = ({
 
     const createProjectMutation = useCreateProjectMutation({
         onSuccess: (project: ProjectModel) => {
-            queryClient.invalidateQueries(ProjectKeys.projectCategories);
-            queryClient.invalidateQueries(ProjectKeys.projects);
-            queryClient.invalidateQueries(ProjectKeys.projectTags);
+            queryClient.invalidateQueries({
+                queryKey: ProjectCategoryKeys.projectCategories,
+            });
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            queryClient.invalidateQueries({
+                queryKey: ProjectTagKeys.projectTags,
+            });
 
             closeDialog(project);
         },
@@ -89,9 +97,13 @@ const ProjectDialog = ({
 
     const updateProjectMutation = useUpdateProjectMutation({
         onSuccess: (project: ProjectModel) => {
-            queryClient.invalidateQueries(ProjectKeys.projectCategories);
-            queryClient.invalidateQueries(ProjectKeys.projects);
-            queryClient.invalidateQueries(ProjectKeys.projectTags);
+            queryClient.invalidateQueries({
+                queryKey: ProjectCategoryKeys.projectCategories,
+            });
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            queryClient.invalidateQueries({
+                queryKey: ProjectTagKeys.projectTags,
+            });
 
             closeDialog(project);
         },

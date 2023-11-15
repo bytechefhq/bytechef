@@ -1,10 +1,8 @@
 import EmptyList from '@/components/EmptyList/EmptyList';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {ProjectInstanceModel} from '@/middleware/helios/configuration';
-import {
-    useGetProjectInstanceTagsQuery,
-    useGetProjectInstancesQuery,
-} from '@/queries/projectInstances.queries';
+import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstanceTags.queries';
+import {useGetProjectInstancesQuery} from '@/queries/projectInstances.queries';
 import {useGetProjectsQuery} from '@/queries/projects.queries';
 import {Layers3Icon, TagIcon} from 'lucide-react';
 import {useState} from 'react';

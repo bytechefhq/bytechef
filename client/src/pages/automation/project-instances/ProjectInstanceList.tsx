@@ -1,6 +1,6 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
-import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstances.queries';
+import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstanceTags.queries';
 import {
     ProjectInstanceModel,
     ProjectModel,

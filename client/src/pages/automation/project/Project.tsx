@@ -31,27 +31,32 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import {RightSidebar} from '@/layouts/RightSidebar';
 import {ProjectModel, WorkflowModel} from '@/middleware/helios/configuration';
+import {useCreateProjectWorkflowMutation} from '@/mutations/projectWorkflows.mutations';
 import {
-    useCreateProjectWorkflowRequestMutation,
     useDeleteProjectMutation,
-    useDeleteWorkflowMutation,
     useDuplicateProjectMutation,
-    useDuplicateWorkflowMutation,
     usePublishProjectMutation,
-    useUpdateWorkflowMutation,
 } from '@/mutations/projects.mutations';
+import {
+    useDeleteWorkflowMutation,
+    useDuplicateWorkflowMutation,
+    useUpdateWorkflowMutation,
+} from '@/mutations/workflows.mutations';
 import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
+import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import ProjectDialog from '@/pages/automation/projects/ProjectDialog';
 import WorkflowExecutionsDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionsDetailsAccordion';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
-import {
-    ProjectKeys,
-    useGetProjectQuery,
-    useGetProjectWorkflowsQuery,
-} from '@/queries/projects.queries';
+import {ProjectCategoryKeys} from '@/queries/projectCategories.queries';
+import {ProjectTagKeys} from '@/queries/projectTags.quries';
+import {ProjectKeys, useGetProjectQuery} from '@/queries/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
+import {
+    WorkflowKeys,
+    useGetProjectWorkflowsQuery,
+} from '@/queries/workflows.queries';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {
@@ -162,11 +167,13 @@ const Project = () => {
     }, [taskDispatcherDefinitions?.length]);
 
     const createProjectWorkflowRequestMutation =
-        useCreateProjectWorkflowRequestMutation({
+        useCreateProjectWorkflowMutation({
             onSuccess: (workflow) => {
-                queryClient.invalidateQueries(
-                    ProjectKeys.projectWorkflows(parseInt(projectId!))
-                );
+                queryClient.invalidateQueries({
+                    queryKey: WorkflowKeys.projectWorkflows(
+                        parseInt(projectId!)
+                    ),
+                });
 
                 setCurrentWorkflow(workflow);
             },
@@ -176,9 +183,13 @@ const Project = () => {
         onSuccess: () => {
             navigate('/automation/projects');
 
-            queryClient.invalidateQueries(ProjectKeys.projects);
-            queryClient.invalidateQueries(ProjectKeys.projectCategories);
-            queryClient.invalidateQueries(ProjectKeys.projectTags);
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            queryClient.invalidateQueries({
+                queryKey: ProjectCategoryKeys.projectCategories,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ProjectTagKeys.projectTags,
+            });
         },
     });
 
@@ -188,13 +199,13 @@ const Project = () => {
 
             navigate('/automation/projects');
 
-            queryClient.invalidateQueries(ProjectKeys.projects);
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
     });
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projects);
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             navigate(
                 `/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`
@@ -204,13 +215,13 @@ const Project = () => {
 
     const duplicateWorkflowMutationMutation = useDuplicateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projects);
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
     });
 
     const publishProjectMutation = usePublishProjectMutation({
         onSuccess: (project) => {
-            queryClient.invalidateQueries(ProjectKeys.projects);
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             toast({
                 description: `The project ${project.name} is published.`,
@@ -220,9 +231,15 @@ const Project = () => {
 
     const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectKeys.projects);
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             setShowEditWorkflowDialog(false);
+        },
+    });
+
+    const testWorkflowMutation = useTestWorkflowMutation({
+        onSuccess: (workflowExecution) => {
+            setWorkflowExecution(workflowExecution);
         },
     });
 
@@ -448,7 +465,16 @@ const Project = () => {
                                 <TooltipTrigger asChild>
                                     <Button
                                         className="mr-1 bg-success text-success-foreground hover:bg-success/80"
-                                        onClick={() => setLeftSidebarOpen(true)}
+                                        onClick={() => {
+                                            setLeftSidebarOpen(true);
+                                            setWorkflowExecution(undefined);
+
+                                            testWorkflowMutation.mutate({
+                                                workflowId:
+                                                    currentWorkflow.id ||
+                                                    workflowId,
+                                            });
+                                        }}
                                         size="sm"
                                         variant="secondary"
                                     >
@@ -577,9 +603,11 @@ const Project = () => {
                                 onClose={() => {
                                     setShowEditProjectDialog(false);
 
-                                    queryClient.invalidateQueries(
-                                        ProjectKeys.project(project.id!)
-                                    );
+                                    queryClient.invalidateQueries({
+                                        queryKey: ProjectKeys.project(
+                                            project.id!
+                                        ),
+                                    });
                                 }}
                                 project={project}
                                 showTrigger={false}
@@ -590,10 +618,11 @@ const Project = () => {
                 }
                 leftSidebarBody={
                     <div className="py-1.5">
-                        <WorkflowExecutionsDetailsAccordion
-                            /* eslint-disable @typescript-eslint/no-explicit-any*/
-                            workflowExecution={{} as any}
-                        />
+                        {workflowExecution && (
+                            <WorkflowExecutionsDetailsAccordion
+                                workflowExecution={workflowExecution}
+                            />
+                        )}
                     </div>
                 }
                 leftSidebarOpen={leftSidebarOpen}

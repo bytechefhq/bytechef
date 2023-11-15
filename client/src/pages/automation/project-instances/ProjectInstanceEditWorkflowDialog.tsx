@@ -6,7 +6,7 @@ import {
     ProjectInstanceWorkflowModel,
     WorkflowModel,
 } from '@/middleware/helios/configuration';
-import {useUpdateProjectInstanceWorkflowMutation} from '@/mutations/projectInstances.mutations';
+import {useUpdateProjectInstanceWorkflowMutation} from '@/mutations/projectInstanceWorkflows.mutations';
 import ProjectInstanceDialogWorkflowListItem from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowListItem';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
 import {Close} from '@radix-ui/react-dialog';
@@ -45,9 +45,9 @@ const ProjectInstanceEditWorkflowDialog = ({
     const updateProjectInstanceWorkflowMutation =
         useUpdateProjectInstanceWorkflowMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries(
-                    ProjectInstanceKeys.projectInstances
-                );
+                queryClient.invalidateQueries({
+                    queryKey: ProjectInstanceKeys.projectInstances,
+                });
 
                 closeDialog();
             },

@@ -17,11 +17,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-    HoverCard,
-    HoverCardContent,
-    HoverCardTrigger,
-} from '@/components/ui/hover-card';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
@@ -29,12 +24,13 @@ import {
     ProjectModel,
     TagModel,
 } from '@/middleware/helios/configuration';
+import {useUpdateProjectInstanceTagsMutation} from '@/mutations/projectInstanceTags.mutations';
 import {
     useDeleteProjectInstanceMutation,
     useEnableProjectInstanceMutation,
-    useUpdateProjectInstanceTagsMutation,
 } from '@/mutations/projectInstances.mutations';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
+import {ProjectInstanceTagKeys} from '@/queries/projectInstanceTags.queries';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -66,28 +62,32 @@ const ProjectInstanceListItem = ({
 
     const deleteProjectInstanceMutation = useDeleteProjectInstanceMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectInstanceKeys.projectInstances);
-            queryClient.invalidateQueries(
-                ProjectInstanceKeys.projectInstanceTags
-            );
+            queryClient.invalidateQueries({
+                queryKey: ProjectInstanceKeys.projectInstances,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ProjectInstanceTagKeys.projectInstanceTags,
+            });
         },
     });
 
     const updateProjectInstanceTagsMutation =
         useUpdateProjectInstanceTagsMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries(
-                    ProjectInstanceKeys.projectInstances
-                );
-                queryClient.invalidateQueries(
-                    ProjectInstanceKeys.projectInstanceTags
-                );
+                queryClient.invalidateQueries({
+                    queryKey: ProjectInstanceKeys.projectInstances,
+                });
+                queryClient.invalidateQueries({
+                    queryKey: ProjectInstanceTagKeys.projectInstanceTags,
+                });
             },
         });
 
     const enableProjectInstanceMutation = useEnableProjectInstanceMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(ProjectInstanceKeys.projectInstances);
+            queryClient.invalidateQueries({
+                queryKey: ProjectInstanceKeys.projectInstances,
+            });
         },
     });
 
@@ -98,17 +98,17 @@ const ProjectInstanceListItem = ({
                     <div className="flex items-center justify-between">
                         <div className="flex w-full items-center justify-between">
                             {projectInstance.description ? (
-                                <HoverCard>
-                                    <HoverCardTrigger>
-                                        {projectInstance.description}
-                                    </HoverCardTrigger>
-
-                                    <HoverCardContent>
+                                <Tooltip>
+                                    <TooltipTrigger>
                                         <span className="mr-2 text-base font-semibold">
                                             {projectInstance.name}
                                         </span>
-                                    </HoverCardContent>
-                                </HoverCard>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>
+                                        {projectInstance.description}
+                                    </TooltipContent>
+                                </Tooltip>
                             ) : (
                                 <span className="mr-2 text-base font-semibold">
                                     {projectInstance.name}

@@ -11,11 +11,9 @@ import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
 import {cn} from '@/lib/utils';
 import {ProjectModel} from '@/middleware/helios/configuration';
-import {
-    useGetWorkflowExecutionsQuery,
-    useGetWorkflowsQuery,
-} from '@/queries/executions';
 import {useGetProjectInstancesQuery} from '@/queries/projectInstances.queries';
+import {useGetWorkflowExecutionsQuery} from '@/queries/workflowExecutions.queries';
+import {useGetWorkflowsQuery} from '@/queries/workflows.queries';
 import {format} from 'date-fns';
 import {ActivityIcon, CalendarIcon} from 'lucide-react';
 import {

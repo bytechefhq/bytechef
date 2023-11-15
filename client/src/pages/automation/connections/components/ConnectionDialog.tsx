@@ -11,6 +11,10 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {
+    useGetOAuth2AuthorizationParametersQuery,
+    useGetOAuth2PropertiesQuery,
+} from '@/queries/oauth2.queries';
 import {QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
@@ -40,9 +44,7 @@ import {
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
-    useGetOAuth2AuthorizationParametersQuery,
 } from 'queries/connections.queries';
-import {useGetOAuth2PropertiesQuery} from 'queries/oauth2Properties.queries';
 import {useEffect, useMemo, useState} from 'react';
 import {Controller, useForm} from 'react-hook-form';
 
@@ -152,11 +154,15 @@ const ConnectionDialog = ({
 
     const createConnectionMutation = useCreateConnectionMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(
-                ComponentDefinitionKeys.componentDefinitions
-            );
-            queryClient.invalidateQueries(ConnectionKeys.connections);
-            queryClient.invalidateQueries(ConnectionKeys.connectionTags);
+            queryClient.invalidateQueries({
+                queryKey: ComponentDefinitionKeys.componentDefinitions,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ConnectionKeys.connections,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ConnectionKeys.connectionTags,
+            });
 
             closeDialog();
         },
@@ -164,11 +170,15 @@ const ConnectionDialog = ({
 
     const updateConnectionMutation = useUpdateConnectionMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries(
-                ComponentDefinitionKeys.componentDefinitions
-            );
-            queryClient.invalidateQueries(ConnectionKeys.connections);
-            queryClient.invalidateQueries(ConnectionKeys.connectionTags);
+            queryClient.invalidateQueries({
+                queryKey: ComponentDefinitionKeys.componentDefinitions,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ConnectionKeys.connections,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ConnectionKeys.connectionTags,
+            });
 
             closeDialog();
         },
@@ -342,7 +352,7 @@ const ConnectionDialog = ({
 
         if (
             createConnectionMutation.error &&
-            !createConnectionMutation.isLoading
+            !createConnectionMutation.isPending
         ) {
             errors.push(createConnectionMutation.error?.message);
         }
