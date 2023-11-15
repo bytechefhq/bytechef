@@ -5,7 +5,13 @@ import {TYPE_ICONS} from 'shared/typeIcons';
 import {PropertyType} from '../../../../../types/projectTypes';
 import {useWorkflowNodeDetailsPanelStore} from '../../stores/useWorkflowNodeDetailsPanelStore';
 
-const PropertyField = ({data, label}: {data: PropertyType; label: string}) => (
+const PropertyField = ({
+    data,
+    label = 'item',
+}: {
+    data: PropertyType;
+    label: string;
+}) => (
     <div className="inline-flex items-center rounded-md p-1 text-sm hover:bg-gray-100">
         <span title={data.type}>
             {TYPE_ICONS[data.type as keyof typeof TYPE_ICONS]}
