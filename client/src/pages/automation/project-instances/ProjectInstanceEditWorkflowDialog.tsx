@@ -14,7 +14,7 @@ import {
     WorkflowModel,
 } from '@/middleware/helios/configuration';
 import {useUpdateProjectInstanceWorkflowMutation} from '@/mutations/projectInstanceWorkflows.mutations';
-import ProjectInstanceDialogWorkflowListItem from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowListItem';
+import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowsStepItem';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -102,7 +102,7 @@ const ProjectInstanceEditWorkflowDialog = ({
                         </div>
                     </DialogHeader>
 
-                    <ProjectInstanceDialogWorkflowListItem
+                    <ProjectInstanceDialogWorkflowsStepItem
                         control={control}
                         formState={formState}
                         key={workflow.id!}

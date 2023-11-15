@@ -223,7 +223,7 @@ export interface ProjectInstanceDialogWorkflowListItemProps {
     workflowIndex: number;
 }
 
-const ProjectInstanceDialogWorkflowListItem = ({
+const ProjectInstanceDialogWorkflowsStepItem = ({
     control,
     formState,
     label,
@@ -361,4 +361,4 @@ const ProjectInstanceDialogWorkflowListItem = ({
     );
 };
 
-export default ProjectInstanceDialogWorkflowListItem;
+export default ProjectInstanceDialogWorkflowsStepItem;

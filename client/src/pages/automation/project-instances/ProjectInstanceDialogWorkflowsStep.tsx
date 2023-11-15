@@ -1,4 +1,4 @@
-import ProjectInstanceDialogWorkflowListItem from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowListItem';
+import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowsStepItem';
 import {useGetProjectWorkflowsQuery} from '@/queries/projects.queries';
 import {ProjectInstanceModel} from 'middleware/helios/configuration';
 import {Control, UseFormGetValues, UseFormRegister} from 'react-hook-form';
@@ -24,7 +24,7 @@ const ProjectInstanceDialogWorkflowsStep = ({
     return (
         <ul className="h-full space-y-4">
             {workflows?.map((workflow, workflowIndex) => (
-                <ProjectInstanceDialogWorkflowListItem
+                <ProjectInstanceDialogWorkflowsStepItem
                     control={control}
                     formState={formState}
                     key={workflow.id!}
