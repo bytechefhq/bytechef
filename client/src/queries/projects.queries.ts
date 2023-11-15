@@ -1,11 +1,8 @@
+/* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
 import {
-    CategoryApi,
-    CategoryModel,
     ProjectApi,
     ProjectModel,
-    ProjectTagApi,
-    TagModel,
     WorkflowApi,
     WorkflowModel,
 } from 'middleware/helios/configuration';
@@ -15,34 +12,20 @@ export const ProjectKeys = {
         filters: {categoryId?: number; tagId?: number} | undefined
     ) => [...ProjectKeys.projects, filters],
     project: (id: number) => [...ProjectKeys.projects, id],
-    projectCategories: ['projectCategories'] as const,
-    projectTags: ['projectTags'] as const,
-    projectWorkflows: (id: number) => [
+    projectWorkflows: (projectId: number) => [
         ...ProjectKeys.projects,
-        id,
+        projectId,
         'projectWorkflows',
     ],
     projects: ['projects'] as const,
 };
 
-export const useGetProjectCategoriesQuery = () =>
-    useQuery<CategoryModel[], Error>(ProjectKeys.projectCategories, () =>
-        new CategoryApi().getProjectCategories()
-    );
-
-export const useGetProjectTagsQuery = () =>
-    useQuery<TagModel[], Error>(ProjectKeys.projectTags, () =>
-        new ProjectTagApi().getProjectTags()
-    );
-
 export const useGetProjectQuery = (id: number, initialData?: ProjectModel) =>
-    useQuery<ProjectModel, Error>(
-        ProjectKeys.project(id),
-        () => new ProjectApi().getProject({id}),
-        {
-            initialData,
-        }
-    );
+    useQuery<ProjectModel, Error>({
+        queryKey: ProjectKeys.project(id),
+        queryFn: () => new ProjectApi().getProject({id}),
+        initialData,
+    });
 
 export const useGetProjectsQuery = (filters?: {
     categoryId?: number;
@@ -50,11 +33,13 @@ export const useGetProjectsQuery = (filters?: {
     tagId?: number;
     published?: boolean;
 }) =>
-    useQuery<ProjectModel[], Error>(ProjectKeys.filteredProjects(filters), () =>
-        new ProjectApi().getProjects(filters)
-    );
+    useQuery<ProjectModel[], Error>({
+        queryKey: ProjectKeys.filteredProjects(filters),
+        queryFn: () => new ProjectApi().getProjects(filters),
+    });
 
 export const useGetProjectWorkflowsQuery = (id: number) =>
-    useQuery<WorkflowModel[], Error>(ProjectKeys.projectWorkflows(id), () =>
-        new WorkflowApi().getProjectWorkflows({id})
-    );
+    useQuery<WorkflowModel[], Error>({
+        queryKey: ProjectKeys.projectWorkflows(id),
+        queryFn: () => new WorkflowApi().getProjectWorkflows({id}),
+    });

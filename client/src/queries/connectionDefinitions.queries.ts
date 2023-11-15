@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys */
 import {
     ConnectionDefinitionApi,
     ConnectionDefinitionModel,
@@ -19,27 +20,23 @@ export const ConnectDefinitionKeys = {
 export const useGetConnectionDefinitionQuery = (
     request?: GetComponentConnectionDefinitionRequest
 ) =>
-    useQuery<ConnectionDefinitionModel, Error>(
-        ConnectDefinitionKeys.connectionDefinition(request),
-        () =>
+    useQuery<ConnectionDefinitionModel, Error>({
+        queryKey: ConnectDefinitionKeys.connectionDefinition(request),
+        queryFn: () =>
             new ConnectionDefinitionApi().getComponentConnectionDefinition(
                 request!
             ),
-        {
-            enabled: !!request?.componentName,
-        }
-    );
+        enabled: !!request?.componentName,
+    });
 
 export const useGetConnectionDefinitionsQuery = (
     request: GetComponentConnectionDefinitionsRequest
 ) =>
-    useQuery<ConnectionDefinitionModel[], Error>(
-        ConnectDefinitionKeys.filteredConnectionDefinitions(request),
-        () =>
+    useQuery<ConnectionDefinitionModel[], Error>({
+        queryKey: ConnectDefinitionKeys.filteredConnectionDefinitions(request),
+        queryFn: () =>
             new ConnectionDefinitionApi().getComponentConnectionDefinitions(
                 request
             ),
-        {
-            enabled: !!request?.componentName,
-        }
-    );
+        enabled: !!request?.componentName,
+    });

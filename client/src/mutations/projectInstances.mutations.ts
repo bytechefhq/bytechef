@@ -1,12 +1,7 @@
 import {
     EnableProjectInstanceRequest,
-    EnableProjectInstanceWorkflowRequest,
     ProjectInstanceApi,
     ProjectInstanceModel,
-    ProjectInstanceTagApi,
-    ProjectInstanceWorkflowModel,
-    UpdateProjectInstanceTagsRequest,
-    UpdateProjectTagsRequest,
 } from '@/middleware/helios/configuration';
 import {useMutation} from '@tanstack/react-query';
 
@@ -65,30 +60,6 @@ export const useEnableProjectInstanceMutation = (
         onSuccess: mutationProps?.onSuccess,
     });
 
-type EnableProjectInstanceWorkflowMutationProps = {
-    onSuccess?: (
-        result: void,
-        variables: EnableProjectInstanceWorkflowRequest
-    ) => void;
-    onError?: (
-        error: object,
-        variables: EnableProjectInstanceWorkflowRequest
-    ) => void;
-};
-
-export const useEnableProjectInstanceWorkflowMutation = (
-    mutationProps: EnableProjectInstanceWorkflowMutationProps
-) =>
-    useMutation({
-        mutationFn: (request: EnableProjectInstanceWorkflowRequest) => {
-            return new ProjectInstanceApi().enableProjectInstanceWorkflow(
-                request
-            );
-        },
-        onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
-    });
-
 type UpdateProjectInstanceMutationProps = {
     onSuccess?: (
         result: ProjectInstanceModel,
@@ -106,55 +77,6 @@ export const useUpdateProjectInstanceMutation = (
                 id: projectInstanceModel.id!,
                 projectInstanceModel,
             });
-        },
-        onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
-    });
-
-export const useUpdateProjectInstanceWorkflowMutation = (
-    mutationProps?: UpdateProjectInstanceWorkflowMutationProps
-) =>
-    useMutation({
-        mutationFn: (
-            projectInstanceWorkflowModel: ProjectInstanceWorkflowModel
-        ) => {
-            return new ProjectInstanceApi().updateProjectInstanceWorkflow({
-                id: projectInstanceWorkflowModel.projectInstanceId!,
-                projectInstanceWorkflowId: projectInstanceWorkflowModel.id!,
-                projectInstanceWorkflowModel,
-            });
-        },
-        onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
-    });
-
-type UpdateProjectInstanceWorkflowMutationProps = {
-    onSuccess?: (
-        result: ProjectInstanceWorkflowModel,
-        variables: ProjectInstanceWorkflowModel
-    ) => void;
-    onError?: (error: object, variables: ProjectInstanceWorkflowModel) => void;
-};
-
-type UpdateProjectInstanceTagsMutationProps = {
-    onSuccess?: (
-        result: void,
-        variables: UpdateProjectInstanceTagsRequest
-    ) => void;
-    onError?: (
-        error: object,
-        variables: UpdateProjectInstanceTagsRequest
-    ) => void;
-};
-
-export const useUpdateProjectInstanceTagsMutation = (
-    mutationProps?: UpdateProjectInstanceTagsMutationProps
-) =>
-    useMutation({
-        mutationFn: (request: UpdateProjectTagsRequest) => {
-            return new ProjectInstanceTagApi().updateProjectInstanceTags(
-                request
-            );
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

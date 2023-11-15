@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys */
 import {
     ComponentDefinitionApi,
     ComponentDefinitionBasicModel,
@@ -22,22 +23,20 @@ export const useGetComponentDefinitionQuery = (
     request: GetComponentDefinitionRequest,
     enabledCondition?: boolean
 ) =>
-    useQuery<ComponentDefinitionModel, Error>(
-        ComponentDefinitionKeys.componentDefinition(request),
-        () => new ComponentDefinitionApi().getComponentDefinition(request),
-        {
-            enabled: false || enabledCondition,
-        }
-    );
+    useQuery<ComponentDefinitionModel, Error>({
+        queryKey: ComponentDefinitionKeys.componentDefinition(request),
+        queryFn: () =>
+            new ComponentDefinitionApi().getComponentDefinition(request),
+        enabled: false || enabledCondition,
+    });
 
 export const useGetComponentDefinitionsQuery = (
     request?: GetComponentDefinitionsRequest,
     enabledCondition?: boolean
 ) =>
-    useQuery<ComponentDefinitionBasicModel[], Error>(
-        ComponentDefinitionKeys.filteredComponentDefinitions(request),
-        () => new ComponentDefinitionApi().getComponentDefinitions(request),
-        {
-            enabled: false || enabledCondition,
-        }
-    );
+    useQuery<ComponentDefinitionBasicModel[], Error>({
+        queryKey: ComponentDefinitionKeys.filteredComponentDefinitions(request),
+        queryFn: () =>
+            new ComponentDefinitionApi().getComponentDefinitions(request),
+        enabled: false || enabledCondition,
+    });
