@@ -27,6 +27,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -81,6 +82,7 @@ public class FilesystemLsAction {
 
         private final long size;
 
+        @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
         public FileInfo(Path root, Path path) {
             Validate.notNull(root, "Root path is required");
             Validate.notNull(path, "File path is required");

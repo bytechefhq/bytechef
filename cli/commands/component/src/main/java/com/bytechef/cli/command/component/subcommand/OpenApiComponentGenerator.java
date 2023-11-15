@@ -36,6 +36,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.WildcardTypeName;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -126,6 +127,7 @@ public class OpenApiComponentGenerator {
     private final int version;
     private final Set<String> oAuth2Scopes = new HashSet<>();
 
+    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public OpenApiComponentGenerator(
         String basePackageName, String componentName, int version, boolean internalComponent, String openApiPath,
         String outputPath) throws IOException {

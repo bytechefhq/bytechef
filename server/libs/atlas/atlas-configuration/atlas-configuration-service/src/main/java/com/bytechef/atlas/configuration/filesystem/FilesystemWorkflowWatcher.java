@@ -59,7 +59,9 @@ public class FilesystemWorkflowWatcher {
     private final TaskExecutor taskExecutor;
     private final WatchService watchService;
 
-    @SuppressFBWarnings("EI")
+    @SuppressFBWarnings({
+        "EI", "CT_CONSTRUCTOR_THROW"
+    })
     public FilesystemWorkflowWatcher(
         String locationPattern, TaskExecutor taskExecutor, WorkflowService workflowService) throws IOException {
 
