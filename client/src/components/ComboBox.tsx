@@ -25,7 +25,7 @@ export type ComboBoxProps = {
     items: ComboBoxItemType[];
     maxHeight?: boolean;
     name?: string;
-    onBlur?: FocusEventHandler | undefined;
+    onBlur?: FocusEventHandler;
     onChange: (item?: ComboBoxItemType) => void;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     value?: any;

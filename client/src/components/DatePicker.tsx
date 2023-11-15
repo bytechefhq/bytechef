@@ -23,7 +23,7 @@ const DatePicker = ({
                         'w-full justify-start text-left font-normal',
                         !date && 'text-muted-foreground'
                     )}
-                    variant={'outline'}
+                    variant="outline"
                 >
                     <CalendarIcon className="mr-2 h-4 w-4" />
 
