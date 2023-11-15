@@ -94,10 +94,14 @@ const WorkflowInputsSheetDialog = ({
         updateWorkflowMutation.mutate({
             id: workflow.id!,
             workflowRequestModel: {
-                definition: JSON.stringify({
-                    ...definitionObject,
-                    inputs,
-                }),
+                definition: JSON.stringify(
+                    {
+                        ...definitionObject,
+                        inputs,
+                    },
+                    null,
+                    4
+                ),
             },
         });
 
