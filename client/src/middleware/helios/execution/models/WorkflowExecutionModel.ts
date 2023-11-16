@@ -58,12 +58,6 @@ export interface WorkflowExecutionModel {
     readonly id?: number;
     /**
      * 
-     * @type {ProjectInstanceModel}
-     * @memberof WorkflowExecutionModel
-     */
-    instance?: ProjectInstanceModel;
-    /**
-     * 
      * @type {JobModel}
      * @memberof WorkflowExecutionModel
      */
@@ -74,6 +68,12 @@ export interface WorkflowExecutionModel {
      * @memberof WorkflowExecutionModel
      */
     project?: ProjectModel;
+    /**
+     * 
+     * @type {ProjectInstanceModel}
+     * @memberof WorkflowExecutionModel
+     */
+    projectInstance?: ProjectInstanceModel;
     /**
      * 
      * @type {TriggerExecutionModel}
@@ -108,9 +108,9 @@ export function WorkflowExecutionModelFromJSONTyped(json: any, ignoreDiscriminat
     return {
         
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'instance': !exists(json, 'instance') ? undefined : ProjectInstanceModelFromJSON(json['instance']),
         'job': !exists(json, 'job') ? undefined : JobModelFromJSON(json['job']),
         'project': !exists(json, 'project') ? undefined : ProjectModelFromJSON(json['project']),
+        'projectInstance': !exists(json, 'projectInstance') ? undefined : ProjectInstanceModelFromJSON(json['projectInstance']),
         'triggerExecution': !exists(json, 'triggerExecution') ? undefined : TriggerExecutionModelFromJSON(json['triggerExecution']),
         'workflow': !exists(json, 'workflow') ? undefined : WorkflowBasicModelFromJSON(json['workflow']),
     };
@@ -125,9 +125,9 @@ export function WorkflowExecutionModelToJSON(value?: WorkflowExecutionModel | nu
     }
     return {
         
-        'instance': ProjectInstanceModelToJSON(value.instance),
         'job': JobModelToJSON(value.job),
         'project': ProjectModelToJSON(value.project),
+        'projectInstance': ProjectInstanceModelToJSON(value.projectInstance),
         'triggerExecution': TriggerExecutionModelToJSON(value.triggerExecution),
         'workflow': WorkflowBasicModelToJSON(value.workflow),
     };
