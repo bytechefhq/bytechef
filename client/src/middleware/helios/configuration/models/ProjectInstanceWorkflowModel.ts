@@ -27,6 +27,18 @@ import {
  */
 export interface ProjectInstanceWorkflowModel {
     /**
+     * The created by.
+     * @type {string}
+     * @memberof ProjectInstanceWorkflowModel
+     */
+    readonly createdBy?: string;
+    /**
+     * The created date.
+     * @type {Date}
+     * @memberof ProjectInstanceWorkflowModel
+     */
+    readonly createdDate?: Date;
+    /**
      * The input parameters of an project instance used as workflow input values.
      * @type {{ [key: string]: object; }}
      * @memberof ProjectInstanceWorkflowModel
@@ -56,6 +68,18 @@ export interface ProjectInstanceWorkflowModel {
      * @memberof ProjectInstanceWorkflowModel
      */
     lastExecutionDate?: Date;
+    /**
+     * The last modified by.
+     * @type {string}
+     * @memberof ProjectInstanceWorkflowModel
+     */
+    readonly lastModifiedBy?: string;
+    /**
+     * The last modified date.
+     * @type {Date}
+     * @memberof ProjectInstanceWorkflowModel
+     */
+    readonly lastModifiedDate?: Date;
     /**
      * The id of a project instance.
      * @type {number}
@@ -95,11 +119,15 @@ export function ProjectInstanceWorkflowModelFromJSONTyped(json: any, ignoreDiscr
     }
     return {
         
+        'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
+        'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
         'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(ProjectInstanceWorkflowConnectionModelFromJSON)),
         'enabled': !exists(json, 'enabled') ? undefined : json['enabled'],
         'id': !exists(json, 'id') ? undefined : json['id'],
         'lastExecutionDate': !exists(json, 'lastExecutionDate') ? undefined : (new Date(json['lastExecutionDate'])),
+        'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'projectInstanceId': !exists(json, 'projectInstanceId') ? undefined : json['projectInstanceId'],
         'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
         'version': !exists(json, '__version') ? undefined : json['__version'],

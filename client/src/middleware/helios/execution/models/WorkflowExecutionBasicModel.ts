@@ -55,7 +55,7 @@ export interface WorkflowExecutionBasicModel {
      * @type {ProjectInstanceBasicModel}
      * @memberof WorkflowExecutionBasicModel
      */
-    instance?: ProjectInstanceBasicModel;
+    projectInstance?: ProjectInstanceBasicModel;
     /**
      * 
      * @type {JobBasicModel}
@@ -96,7 +96,7 @@ export function WorkflowExecutionBasicModelFromJSONTyped(json: any, ignoreDiscri
     return {
         
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'instance': !exists(json, 'instance') ? undefined : ProjectInstanceBasicModelFromJSON(json['instance']),
+        'projectInstance': !exists(json, 'projectInstance') ? undefined : ProjectInstanceBasicModelFromJSON(json['projectInstance']),
         'job': !exists(json, 'job') ? undefined : JobBasicModelFromJSON(json['job']),
         'project': !exists(json, 'project') ? undefined : ProjectBasicModelFromJSON(json['project']),
         'workflow': !exists(json, 'workflow') ? undefined : WorkflowBasicModelFromJSON(json['workflow']),
@@ -112,7 +112,7 @@ export function WorkflowExecutionBasicModelToJSON(value?: WorkflowExecutionBasic
     }
     return {
         
-        'instance': ProjectInstanceBasicModelToJSON(value.instance),
+        'projectInstance': ProjectInstanceBasicModelToJSON(value.projectInstance),
         'job': JobBasicModelToJSON(value.job),
         'project': ProjectBasicModelToJSON(value.project),
         'workflow': WorkflowBasicModelToJSON(value.workflow),
