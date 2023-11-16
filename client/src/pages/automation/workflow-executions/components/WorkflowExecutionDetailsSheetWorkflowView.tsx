@@ -10,7 +10,7 @@ const WorkflowExecutionDetailsSheetWorkflowView = ({
 }: {
     workflowExecution: WorkflowExecutionModel;
 }) => {
-    const {instance, project, workflow} = workflowExecution;
+    const {project, projectInstance, workflow} = workflowExecution;
 
     const navigate = useNavigate();
 
@@ -19,7 +19,9 @@ const WorkflowExecutionDetailsSheetWorkflowView = ({
             <h3>
                 {workflow?.label
                     ? `${project?.name ? project.name + ' / ' : ''}${
-                          instance?.name ? instance.name + ' / ' : ''
+                          projectInstance?.name
+                              ? projectInstance.name + ' / '
+                              : ''
                       }${workflow?.label}`
                     : 'No data to show'}
             </h3>
