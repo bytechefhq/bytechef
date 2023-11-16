@@ -56,7 +56,7 @@ const columns = [
         cell: (info) => info.getValue()?.name,
         header: 'Project',
     }),
-    columnHelper.accessor('instance', {
+    columnHelper.accessor('projectInstance', {
         cell: (info) => info.getValue()?.name,
         header: 'Instance',
     }),
