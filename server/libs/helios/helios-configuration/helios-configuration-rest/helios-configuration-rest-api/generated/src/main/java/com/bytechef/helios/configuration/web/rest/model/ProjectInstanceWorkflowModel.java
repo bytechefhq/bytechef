@@ -29,8 +29,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-05T15:46:04.098445+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-21T21:27:13.496994+01:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowModel {
+
+  private String createdBy;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private LocalDateTime createdDate;
 
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
@@ -45,11 +50,56 @@ public class ProjectInstanceWorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime lastExecutionDate;
 
+  private String lastModifiedBy;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private LocalDateTime lastModifiedDate;
+
   private Long projectInstanceId;
 
   private String workflowId;
 
   private Integer version;
+
+  public ProjectInstanceWorkflowModel createdBy(String createdBy) {
+    this.createdBy = createdBy;
+    return this;
+  }
+
+  /**
+   * The created by.
+   * @return createdBy
+  */
+  
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdBy")
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  public ProjectInstanceWorkflowModel createdDate(LocalDateTime createdDate) {
+    this.createdDate = createdDate;
+    return this;
+  }
+
+  /**
+   * The created date.
+   * @return createdDate
+  */
+  @Valid 
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdDate")
+  public LocalDateTime getCreatedDate() {
+    return createdDate;
+  }
+
+  public void setCreatedDate(LocalDateTime createdDate) {
+    this.createdDate = createdDate;
+  }
 
   public ProjectInstanceWorkflowModel inputs(Map<String, Object> inputs) {
     this.inputs = inputs;
@@ -167,6 +217,46 @@ public class ProjectInstanceWorkflowModel {
     this.lastExecutionDate = lastExecutionDate;
   }
 
+  public ProjectInstanceWorkflowModel lastModifiedBy(String lastModifiedBy) {
+    this.lastModifiedBy = lastModifiedBy;
+    return this;
+  }
+
+  /**
+   * The last modified by.
+   * @return lastModifiedBy
+  */
+  
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedBy")
+  public String getLastModifiedBy() {
+    return lastModifiedBy;
+  }
+
+  public void setLastModifiedBy(String lastModifiedBy) {
+    this.lastModifiedBy = lastModifiedBy;
+  }
+
+  public ProjectInstanceWorkflowModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+    this.lastModifiedDate = lastModifiedDate;
+    return this;
+  }
+
+  /**
+   * The last modified date.
+   * @return lastModifiedDate
+  */
+  @Valid 
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedDate")
+  public LocalDateTime getLastModifiedDate() {
+    return lastModifiedDate;
+  }
+
+  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+    this.lastModifiedDate = lastModifiedDate;
+  }
+
   public ProjectInstanceWorkflowModel projectInstanceId(Long projectInstanceId) {
     this.projectInstanceId = projectInstanceId;
     return this;
@@ -236,11 +326,15 @@ public class ProjectInstanceWorkflowModel {
       return false;
     }
     ProjectInstanceWorkflowModel projectInstanceWorkflow = (ProjectInstanceWorkflowModel) o;
-    return Objects.equals(this.inputs, projectInstanceWorkflow.inputs) &&
+    return Objects.equals(this.createdBy, projectInstanceWorkflow.createdBy) &&
+        Objects.equals(this.createdDate, projectInstanceWorkflow.createdDate) &&
+        Objects.equals(this.inputs, projectInstanceWorkflow.inputs) &&
         Objects.equals(this.connections, projectInstanceWorkflow.connections) &&
         Objects.equals(this.enabled, projectInstanceWorkflow.enabled) &&
         Objects.equals(this.id, projectInstanceWorkflow.id) &&
         Objects.equals(this.lastExecutionDate, projectInstanceWorkflow.lastExecutionDate) &&
+        Objects.equals(this.lastModifiedBy, projectInstanceWorkflow.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, projectInstanceWorkflow.lastModifiedDate) &&
         Objects.equals(this.projectInstanceId, projectInstanceWorkflow.projectInstanceId) &&
         Objects.equals(this.workflowId, projectInstanceWorkflow.workflowId) &&
         Objects.equals(this.version, projectInstanceWorkflow.version);
@@ -248,18 +342,22 @@ public class ProjectInstanceWorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(inputs, connections, enabled, id, lastExecutionDate, projectInstanceId, workflowId, version);
+    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectInstanceId, workflowId, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ProjectInstanceWorkflowModel {\n");
+    sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
+    sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
+    sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
+    sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    projectInstanceId: ").append(toIndentedString(projectInstanceId)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
