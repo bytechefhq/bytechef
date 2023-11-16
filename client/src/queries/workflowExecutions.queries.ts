@@ -1,11 +1,12 @@
-/* eslint-disable sort-keys */
-import {PageModel} from '@/middleware/helios/configuration';
 import {
     GetWorkflowExecutionRequest,
     GetWorkflowExecutionsRequest,
+    PageModel,
     WorkflowExecutionApi,
     WorkflowExecutionModel,
 } from '@/middleware/helios/execution';
+
+/* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowExecutionKeys = {
