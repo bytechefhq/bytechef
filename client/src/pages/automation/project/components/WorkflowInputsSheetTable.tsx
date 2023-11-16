@@ -205,39 +205,41 @@ const WorkflowInputsSheetTable = ({
                 </div>
             )}
 
-            <AlertDialog open={showDeleteDialog}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            Are you absolutely sure?
-                        </AlertDialogTitle>
+            {showDeleteDialog && (
+                <AlertDialog open={showDeleteDialog}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Are you absolutely sure?
+                            </AlertDialogTitle>
 
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete the input.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently delete the input.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
 
-                    <AlertDialogFooter>
-                        <AlertDialogCancel
-                            onClick={() => setShowDeleteDialog(false)}
-                        >
-                            Cancel
-                        </AlertDialogCancel>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel
+                                onClick={() => setShowDeleteDialog(false)}
+                            >
+                                Cancel
+                            </AlertDialogCancel>
 
-                        <AlertDialogAction
-                            className="bg-red-600"
-                            onClick={() =>
-                                handleDelete(
-                                    workflow.inputs![currentInputIndex]!
-                                )
-                            }
-                        >
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+                            <AlertDialogAction
+                                className="bg-red-600"
+                                onClick={() =>
+                                    handleDelete(
+                                        workflow.inputs![currentInputIndex]!
+                                    )
+                                }
+                            >
+                                Delete
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
 
             {showEditDialog && (
                 <WorkflowInputsSheetDialog
