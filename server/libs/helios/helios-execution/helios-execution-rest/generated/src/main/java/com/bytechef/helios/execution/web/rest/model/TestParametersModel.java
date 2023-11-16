@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TestParameters", description = "Defines parameters used to test a workflow.")
 @JsonTypeName("TestParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-10T13:27:34.788965+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-21T21:27:08.772308+01:00[Europe/Zagreb]")
 public class TestParametersModel {
 
   @Valid
