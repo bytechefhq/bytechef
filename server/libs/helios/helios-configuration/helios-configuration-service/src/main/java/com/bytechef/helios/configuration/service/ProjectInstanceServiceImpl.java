@@ -42,10 +42,10 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
 
     @Override
     public ProjectInstance create(ProjectInstance projectInstance) {
-        Validate.notNull(projectInstance, "'projectInstance' must not be notNull");
-        Validate.isTrue(projectInstance.getId() == null, "'id' must be notNull");
-        Validate.notNull(projectInstance.getProjectId(), "'projectId' must not be notNull");
-        Validate.notNull(projectInstance.getName(), "'projectId' must not be notNull");
+        Validate.notNull(projectInstance, "'projectInstance' must not be null");
+        Validate.isTrue(projectInstance.getId() == null, "'id' must be null");
+        Validate.notNull(projectInstance.getProjectId(), "'projectId' must not be null");
+        Validate.notNull(projectInstance.getName(), "'projectId' must not be null");
 
         projectInstance.setEnabled(false);
 
@@ -54,7 +54,7 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
 
     @Override
     public void delete(long id) {
-        projectInstanceRepository.delete(getProjectInstance(id));
+        projectInstanceRepository.deleteById(id);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class ProjectInstanceServiceImpl implements ProjectInstanceService {
 
     @Override
     public ProjectInstance update(ProjectInstance projectInstance) {
-        Validate.notNull(projectInstance, "'projectInstance' must not be notNull");
+        Validate.notNull(projectInstance, "'projectInstance' must not be null");
         Validate.notNull(projectInstance.getProjectId(), "'projectId' must not be null");
         Validate.notNull(projectInstance.getName(), "'projectId' must not be null");
 
