@@ -52,7 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void delete(long id) {
-        categoryRepository.delete(getCategory(id));
+        categoryRepository.deleteById(id);
     }
 
     @Override
