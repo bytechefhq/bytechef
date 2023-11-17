@@ -69,7 +69,8 @@
                     "bg-muted",
                     "bg-background",
                     "max-w-tooltip-sm",
-                    "max-w-tooltip-lg"
+                    "max-w-tooltip-lg",
+                    "w-workflow-nodes-popover-menu-width"
                 ]
             }
         ],
