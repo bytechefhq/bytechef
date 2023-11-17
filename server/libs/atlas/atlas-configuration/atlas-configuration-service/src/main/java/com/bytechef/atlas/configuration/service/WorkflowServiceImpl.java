@@ -189,7 +189,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         } else {
             Cache.ValueWrapper valueWrapper = Validate.notNull(cacheAll.get(CACHE_ALL), "valueWrapper");
 
-            workflows = (List<Workflow>) valueWrapper.get();
+            workflows = CollectionUtils.filter(
+                (List<Workflow>) valueWrapper.get(), workflow -> workflow.getType() == type);
         }
 
         return workflows;

@@ -29,6 +29,6 @@ import org.springframework.lang.NonNull;
  */
 @SuppressFBWarnings("EI")
 public record WorkflowExecutionDTO(
-    long id, Project project, ProjectInstance projectInstance, @NonNull Workflow workflow, @NonNull JobDTO job,
+    long id, Project project, ProjectInstance projectInstance, @NonNull JobDTO job, @NonNull Workflow workflow,
     TriggerExecutionDTO triggerExecution) {
 }

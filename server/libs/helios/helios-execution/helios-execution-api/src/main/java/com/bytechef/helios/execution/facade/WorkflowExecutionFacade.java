@@ -32,7 +32,7 @@ public interface WorkflowExecutionFacade {
 
     Page<WorkflowExecutionDTO> getWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
-        String workflowId, Integer pageNumber);
+        String workflowId, int pageNumber);
 
     WorkflowExecutionDTO testWorkflow(
         String workflowId, Map<String, Object> inputs, List<TestConnectionDTO> testConnectionDTOs);

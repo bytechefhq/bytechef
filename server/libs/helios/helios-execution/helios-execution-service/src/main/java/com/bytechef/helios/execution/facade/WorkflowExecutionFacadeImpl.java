@@ -49,17 +49,13 @@ import com.bytechef.hermes.test.executor.JobTestExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,8 +75,8 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     private final ProjectService projectService;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
-    private final TriggerFileStorage triggerFileStorage;
     private final TriggerExecutionService triggerExecutionService;
+    private final TriggerFileStorage triggerFileStorage;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -90,8 +86,9 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         InstanceJobService instanceJobService, ProjectInstanceService projectInstanceService,
         ProjectService projectService, TaskExecutionService taskExecutionService,
         @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage,
+        TriggerExecutionService triggerExecutionService,
         @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorage triggerFileStorage,
-        TriggerExecutionService triggerExecutionService, WorkflowService workflowService) {
+        WorkflowService workflowService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
@@ -103,8 +100,8 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         this.projectService = projectService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
-        this.triggerFileStorage = triggerFileStorage;
         this.triggerExecutionService = triggerExecutionService;
+        this.triggerFileStorage = triggerFileStorage;
         this.workflowService = workflowService;
     }
 
@@ -121,10 +118,9 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
         return new WorkflowExecutionDTO(
             Validate.notNull(jobDTO.id(), "id"),
-            projectService.getWorkflowProject(jobDTO.workflowId()), OptionalUtils.mapOrElse(
-                projectInstanceIdOptional,
-                projectInstanceService::getProjectInstance, null),
-            workflowService.getWorkflow(jobDTO.workflowId()), jobDTO,
+            projectService.getWorkflowProject(jobDTO.workflowId()),
+            OptionalUtils.mapOrElse(projectInstanceIdOptional, projectInstanceService::getProjectInstance, null),
+            jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
             getTriggerExecutionDTO(
                 OptionalUtils.orElse(projectInstanceIdOptional, null),
                 triggerExecutionService.getJobTriggerExecution(
@@ -136,19 +132,19 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     @Transactional(readOnly = true)
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
-        String workflowId, Integer pageNumber) {
+        String workflowId, int pageNumber) {
 
-        List<Project> projects;
-        Set<String> workflowIds = new HashSet<>();
+        List<String> workflowIds = new ArrayList<>();
 
-        if (projectId == null) {
-            projects = projectService.getProjects();
-        } else {
+        if (workflowId != null) {
+            workflowIds.add(workflowId);
+        } else if (projectId != null) {
             Project project = projectService.getProject(projectId);
 
             workflowIds.addAll(project.getWorkflowIds());
-
-            projects = List.of(project);
+        } else {
+            workflowIds.addAll(
+                CollectionUtils.map(workflowService.getWorkflows(ProjectConstants.PROJECT_TYPE), Workflow::getId));
         }
 
         Page<Job> jobsPage;
@@ -156,40 +152,22 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         if (workflowIds.isEmpty()) {
             jobsPage = Page.empty();
         } else {
-            if (projectInstanceId == null) {
-                jobsPage = jobService.getJobsPage(
-                    jobStatus, jobStartDate, jobEndDate, new ArrayList<>(workflowIds), pageNumber);
-            } else {
-                Project project = projectService.getProjectInstanceProject(projectInstanceId);
-
-                workflowIds.addAll(project.getWorkflowIds());
-
-                List<Job> jobs = jobService.getJobs(jobStatus, jobStartDate, jobEndDate, new ArrayList<>(workflowIds));
-
-                jobs = CollectionUtils.filter(jobs, job -> {
-                    Optional<Long> jobInstanceIdOptional = instanceJobService.fetchJobInstanceId(
-                        job.getId(), ProjectConstants.PROJECT_TYPE);
-
-                    return jobInstanceIdOptional.isEmpty()
-                        || Objects.equals(jobInstanceIdOptional.get(), projectInstanceId);
-                });
-
-                if (jobs.size() > JobService.DEFAULT_PAGE_SIZE * (pageNumber + 1)) {
-                    jobs = jobs.subList(
-                        JobService.DEFAULT_PAGE_SIZE * pageNumber, JobService.DEFAULT_PAGE_SIZE * (pageNumber + 1));
-                }
-
-                long total = jobService.countJobs(jobStatus, jobStartDate, jobEndDate, new ArrayList<>(workflowIds));
-
-                PageRequest pageRequest = PageRequest.of(pageNumber, JobService.DEFAULT_PAGE_SIZE);
-
-                jobsPage = new PageImpl<>(jobs, pageRequest, total);
-            }
+            jobsPage = jobService.getJobsPage(
+                jobStatus, jobStartDate, jobEndDate, projectInstanceId, ProjectConstants.PROJECT_TYPE, workflowIds,
+                pageNumber);
         }
 
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(ProjectConstants.PROJECT_TYPE);
+        List<Project> projects = new ArrayList<>();
+
+        if (projectId == null) {
+            projects.addAll(projectService.getProjects());
+        } else {
+            projects.add(projectService.getProject(projectId));
+        }
+
         List<Workflow> workflows = workflowService.getWorkflows(
             CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(ProjectConstants.PROJECT_TYPE);
 
         return jobsPage.map(job -> new WorkflowExecutionDTO(
             Validate.notNull(job.getId(), "id"),
@@ -198,8 +176,8 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             OptionalUtils.mapOrElse(
                 instanceJobService.fetchJobInstanceId(job.getId(), ProjectConstants.PROJECT_TYPE),
                 projectInstanceService::getProjectInstance, null),
-            CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),
             new JobDTO(job, Map.of(), List.of()),
+            CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),
             getTriggerExecutionDTO(
                 projectInstanceId,
                 triggerExecutionService.getJobTriggerExecution(Validate.notNull(job.getId(), "id")),
@@ -215,7 +193,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         JobDTO job = jobTestExecutor.execute(new JobParameters(workflowId, inputs));
 
         return new WorkflowExecutionDTO(
-            job.id(), null, null, workflowService.getWorkflow(workflowId), job, null);
+            job.id(), null, null, job, workflowService.getWorkflow(workflowId), null);
     }
 
     private ComponentDefinition getComponentDefinition(String type) {
