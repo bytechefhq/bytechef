@@ -29,11 +29,6 @@ import org.springframework.data.domain.Page;
  */
 public interface JobService {
 
-    int DEFAULT_PAGE_SIZE = 20;
-
-    long countJobs(
-        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, List<String> projectWorkflowIds);
-
     Job create(JobParameters jobParameters, Workflow workflow);
 
     Optional<Job> fetchLatestJob();
@@ -42,12 +37,9 @@ public interface JobService {
 
     Page<Job> getJobsPage(int pageNumber);
 
-    List<Job> getJobs(
-        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds);
-
     Page<Job> getJobsPage(
-        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds,
-        Integer pageNumber);
+        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        List<String> workflowIds, int pageNumber);
 
     Job getTaskExecutionJob(long taskExecutionId);
 
@@ -58,5 +50,4 @@ public interface JobService {
     Job setStatusToStopped(long id);
 
     Job update(Job job);
-
 }

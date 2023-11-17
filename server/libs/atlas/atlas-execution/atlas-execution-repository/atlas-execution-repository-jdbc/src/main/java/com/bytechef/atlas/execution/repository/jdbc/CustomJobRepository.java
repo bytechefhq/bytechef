@@ -21,17 +21,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface CustomJobRepository {
 
-    long count(String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds);
-
-    List<Job> findAll(String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds);
-
     Page<Job> findAll(
-        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds,
-        Pageable pageable);
+        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        @NonNull List<String> workflowIds, Pageable pageable);
 }

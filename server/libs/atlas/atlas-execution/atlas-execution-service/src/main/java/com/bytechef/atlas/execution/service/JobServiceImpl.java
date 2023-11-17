@@ -46,13 +46,6 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public long countJobs(
-        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, List<String> projectWorkflowIds) {
-
-        return jobRepository.count(jobStatus, jobStartDate, jobEndDate, projectWorkflowIds);
-    }
-
-    @Override
     public Job create(@NonNull JobParameters jobParameters, Workflow workflow) {
         Validate.notNull(jobParameters, "'jobParameters' must not be null");
 
@@ -84,24 +77,17 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional(readOnly = true)
     public Page<Job> getJobsPage(int pageNumber) {
-        return jobRepository.findAll(PageRequest.of(pageNumber, JobService.DEFAULT_PAGE_SIZE));
-    }
-
-    @Override
-    public List<Job> getJobs(
-        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds) {
-
-        return jobRepository.findAll(status, startDate, endDate, workflowIds);
+        return jobRepository.findAll(PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
     }
 
     @Override
     public Page<Job> getJobsPage(
-        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds,
-        Integer pageNumber) {
+        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        List<String> workflowIds, int pageNumber) {
 
-        PageRequest pageRequest = PageRequest.of(pageNumber, JobService.DEFAULT_PAGE_SIZE);
+        PageRequest pageRequest = PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE);
 
-        return jobRepository.findAll(status, startDate, endDate, workflowIds, pageRequest);
+        return jobRepository.findAll(status, startDate, endDate, instanceId, type, workflowIds, pageRequest);
     }
 
     @Override

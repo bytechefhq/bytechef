@@ -21,8 +21,8 @@ package com.bytechef.atlas.execution.repository.jdbc;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
-import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Instant;
@@ -57,12 +57,12 @@ public class JdbcJobRepositoryIntTest {
     @Test
     public void test1FindAll() {
         int pageTotal = jobRepository
-            .findAll(PageRequest.of(0, JobService.DEFAULT_PAGE_SIZE))
+            .findAll(PageRequest.of(0, JobRepository.DEFAULT_PAGE_SIZE))
             .getNumberOfElements();
 
         Job job = jobRepository.save(getJob(Job.Status.STARTED));
 
-        Page<Job> page = jobRepository.findAll(PageRequest.of(0, JobService.DEFAULT_PAGE_SIZE));
+        Page<Job> page = jobRepository.findAll(PageRequest.of(0, JobRepository.DEFAULT_PAGE_SIZE));
 
         Assertions.assertEquals(pageTotal + 1, page.getNumberOfElements());
 

@@ -30,11 +30,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -51,35 +51,19 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
     }
 
     @Override
-    public long count(String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds) {
-        Query query = buildQuery(status, startDate, endDate, workflowIds, null, true);
-
-        return Validate.notNull(jdbcTemplate.queryForObject(query.query, Long.class, query.arguments), "count");
-    }
-
-    @Override
-    public List<Job> findAll(
-        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds) {
-
-        Query query = buildQuery(status, startDate, endDate, workflowIds, null, false);
-
-        return jdbcTemplate.query(query.query, (rs, rowNum) -> toJob(rs), query.arguments);
-    }
-
-    @Override
     public Page<Job> findAll(
-        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds,
-        Pageable pageable) {
+        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        @NonNull List<String> workflowIds, Pageable pageable) {
 
         Page<Job> page;
-        Query query = buildQuery(status, startDate, endDate, workflowIds, pageable, true);
+        Query query = buildQuery(status, startDate, endDate, instanceId, type, workflowIds, pageable, true);
 
         Long total = jdbcTemplate.queryForObject(query.query, Long.class, query.arguments);
 
         if (total == null || total == 0) {
             page = Page.empty();
         } else {
-            query = buildQuery(status, startDate, endDate, workflowIds, pageable, false);
+            query = buildQuery(status, startDate, endDate, instanceId, type, workflowIds, pageable, false);
 
             List<Job> jobs = jdbcTemplate.query(query.query, (rs, rowNum) -> toJob(rs), query.arguments);
 
@@ -90,8 +74,8 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
     }
 
     private Query buildQuery(
-        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds, Pageable pageable,
-        boolean countQuery) {
+        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        List<String> workflowIds, Pageable pageable, boolean countQuery) {
 
         String query;
 
@@ -101,9 +85,13 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
             query = "SELECT job.* FROM job ";
         }
 
+        if (instanceId != null) {
+            query += "JOIN instance_job ON instance_job.job_id = job.id ";
+        }
+
         List<Object> arguments = new ArrayList<>();
 
-        if (StringUtils.isNotBlank(status) || startDate != null || endDate != null ||
+        if (StringUtils.isNotBlank(status) || startDate != null || endDate != null || instanceId != null ||
             !CollectionUtils.isEmpty(workflowIds)) {
 
             query += "WHERE ";
@@ -137,8 +125,19 @@ public class CustomJobRepositoryImpl implements CustomJobRepository {
             arguments.add(endDate);
         }
 
+        if (instanceId != null && (StringUtils.isNotBlank(status) || startDate != null || endDate != null)) {
+            query += "AND ";
+        }
+
+        if (instanceId != null) {
+            query += "instance_id = ? AND type = ? ";
+
+            arguments.add(instanceId);
+            arguments.add(type);
+        }
+
         if (!CollectionUtils.isEmpty(workflowIds) &&
-            (StringUtils.isNotBlank(status) || startDate != null || endDate != null)) {
+            (StringUtils.isNotBlank(status) || startDate != null || endDate != null || instanceId != null)) {
 
             query += "AND ";
         }

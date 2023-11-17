@@ -53,11 +53,6 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
-    public long count(String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public int countCompletedJobsToday() {
         throw new UnsupportedOperationException();
     }
@@ -88,15 +83,9 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
-    public List<Job> findAll(
-        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Page<Job> findAll(
-        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds,
+        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        List<String> workflowIds,
         Pageable pageable) {
 
         throw new UnsupportedOperationException();

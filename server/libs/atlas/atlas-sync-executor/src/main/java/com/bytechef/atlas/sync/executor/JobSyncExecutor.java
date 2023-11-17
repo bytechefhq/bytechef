@@ -216,26 +216,12 @@ public class JobSyncExecutor {
         }
 
         @Override
-        public List<Job> getJobs(
-            String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds) {
-
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
         public Page<Job> getJobsPage(int pageNumber) {
             throw new UnsupportedOperationException();
         }
 
         @Override
         public Job getTaskExecutionJob(long taskExecutionId) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public long countJobs(
-            String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, List<String> projectWorkflowIds) {
-
             throw new UnsupportedOperationException();
         }
 
@@ -251,8 +237,9 @@ public class JobSyncExecutor {
 
         @Override
         public Page<Job> getJobsPage(
-            String status, LocalDateTime startDate, LocalDateTime endDate,
-            List<String> workflowIds, Integer pageNumber) {
+            String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+            List<String> workflowIds,
+            int pageNumber) {
 
             throw new UnsupportedOperationException();
         }
