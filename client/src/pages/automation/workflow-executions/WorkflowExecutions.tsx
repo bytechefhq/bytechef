@@ -112,11 +112,7 @@ const WorkflowExecutions = () => {
         isLoading: projectsLoading,
     } = useGetProjectsQuery({});
 
-    const {
-        data: workflowExecutionsPage,
-        error: workflowExecutionsError,
-        isLoading: workflowExecutionsLoading,
-    } = useGetWorkflowExecutionsQuery({
+    const {data: workflowExecutionPage} = useGetWorkflowExecutionsQuery({
         jobEndDate: filterEndDate,
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,
@@ -139,7 +135,7 @@ const WorkflowExecutions = () => {
             ? "You don't have any executed workflows yet."
             : 'There is no executed workflows for the current criteria.';
 
-    const tableData = workflowExecutionsPage?.content?.map(
+    const workflowExecutions = workflowExecutionPage?.content?.map(
         (workflowExecutionModel: WorkflowExecutionModel) =>
             WorkflowExecutionModelFromJSON(workflowExecutionModel)
     );
@@ -166,6 +162,122 @@ const WorkflowExecutions = () => {
         );
     }
 
+    const handleEndDateChange = (date?: Date) => {
+        search(
+            filterStatus,
+            filterProjectId,
+            filterProjectInstanceId,
+            filterWorkflowId,
+            filterStartDate,
+            date,
+            filterPageNumber
+        );
+        setFilterEndDate(date);
+    };
+
+    const handlePaginationClick = (pageNumber: number) => {
+        setFilterPageNumber(pageNumber);
+
+        search(
+            filterStatus,
+            filterProjectId,
+            filterProjectInstanceId,
+            filterWorkflowId,
+            filterStartDate,
+            filterEndDate,
+            pageNumber
+        );
+    };
+
+    const handleProjectChange = (item?: ComboBoxItemType) => {
+        let projectId;
+
+        if (item) {
+            projectId = Number(item.value);
+        }
+
+        setFilterProjectId(projectId);
+        search(
+            filterStatus,
+            projectId,
+            filterProjectInstanceId,
+            filterWorkflowId,
+            filterStartDate,
+            filterEndDate,
+            filterPageNumber
+        );
+    };
+
+    const handleProjectInstanceChange = (item?: ComboBoxItemType) => {
+        let projectInstanceId;
+
+        if (item) {
+            projectInstanceId = Number(item.value);
+        }
+
+        setFilterProjectInstanceId(projectInstanceId);
+        search(
+            filterStatus,
+            filterProjectId,
+            projectInstanceId,
+            filterWorkflowId,
+            filterStartDate,
+            filterEndDate,
+            filterPageNumber
+        );
+    };
+
+    const handleStatusChange = (item?: ComboBoxItemType) => {
+        let status;
+
+        if (item) {
+            status = item.value as GetWorkflowExecutionsJobStatusEnum;
+        }
+
+        setFilterStatus(status);
+        search(
+            status,
+            filterProjectId,
+            filterProjectInstanceId,
+            filterWorkflowId,
+            filterStartDate,
+            filterEndDate,
+            filterPageNumber
+        );
+    };
+
+    const handleStartDateChange = (date?: Date) => {
+        search(
+            filterStatus,
+            filterProjectId,
+            filterProjectInstanceId,
+            filterWorkflowId,
+            date,
+            filterEndDate,
+            filterPageNumber
+        );
+        setFilterStartDate(date);
+    };
+
+    const handleWorkflowChange = (item?: ComboBoxItemType) => {
+        let workflowId;
+
+        if (item) {
+            workflowId = item.value;
+        }
+
+        setFilterWorkflowId(workflowId);
+        search(
+            filterStatus,
+            filterProjectId,
+            filterProjectInstanceId,
+            workflowId,
+            filterStartDate,
+            filterEndDate,
+            filterPageNumber
+        );
+    };
+
     return (
         <PageLoader
             errors={[projectsError, workflowsError]}
@@ -173,32 +285,19 @@ const WorkflowExecutions = () => {
         >
             <LayoutContainer
                 footer={
-                    !workflowExecutionsLoading &&
-                    workflowExecutionsPage?.content &&
-                    workflowExecutionsPage.content.length > 0 && (
+                    workflowExecutionPage?.content &&
+                    workflowExecutionPage.content.length > 0 && (
                         <PageFooter position="main">
                             <Pagination
-                                onClick={(pageNumber) => {
-                                    setFilterPageNumber(pageNumber);
-
-                                    search(
-                                        filterStatus,
-                                        filterProjectId,
-                                        filterProjectInstanceId,
-                                        filterWorkflowId,
-                                        filterStartDate,
-                                        filterEndDate,
-                                        pageNumber
-                                    );
-                                }}
+                                onClick={handlePaginationClick}
                                 pageNumber={
                                     filterPageNumber ? filterPageNumber : 0
                                 }
-                                pageSize={workflowExecutionsPage.size!}
+                                pageSize={workflowExecutionPage.size!}
                                 totalElements={
-                                    workflowExecutionsPage.totalElements!
+                                    workflowExecutionPage.totalElements!
                                 }
-                                totalPages={workflowExecutionsPage.totalPages!}
+                                totalPages={workflowExecutionPage.totalPages!}
                             />
                         </PageFooter>
                     )
@@ -220,26 +319,7 @@ const WorkflowExecutions = () => {
 
                                 <ComboBox
                                     items={jobStatusOptions}
-                                    name="jobStatus"
-                                    onChange={(item?: ComboBoxItemType) => {
-                                        let status;
-
-                                        if (item) {
-                                            status =
-                                                item.value as GetWorkflowExecutionsJobStatusEnum;
-                                        }
-
-                                        setFilterStatus(status);
-                                        search(
-                                            status,
-                                            filterProjectId,
-                                            filterProjectInstanceId,
-                                            filterWorkflowId,
-                                            filterStartDate,
-                                            filterEndDate,
-                                            filterPageNumber
-                                        );
-                                    }}
+                                    onChange={handleStatusChange}
                                     value={filterStatus}
                                 />
                             </div>
@@ -248,18 +328,7 @@ const WorkflowExecutions = () => {
                                 <Label>Start date</Label>
 
                                 <DatePicker
-                                    onChange={(date) => {
-                                        search(
-                                            filterStatus,
-                                            filterProjectId,
-                                            filterProjectInstanceId,
-                                            filterWorkflowId,
-                                            date,
-                                            filterEndDate,
-                                            filterPageNumber
-                                        );
-                                        setFilterStartDate(date);
-                                    }}
+                                    onChange={handleStartDateChange}
                                     value={filterStartDate}
                                 />
                             </div>
@@ -268,178 +337,117 @@ const WorkflowExecutions = () => {
                                 <Label>End date</Label>
 
                                 <DatePicker
-                                    onChange={(date) => {
-                                        search(
-                                            filterStatus,
-                                            filterProjectId,
-                                            filterProjectInstanceId,
-                                            filterWorkflowId,
-                                            filterStartDate,
-                                            date,
-                                            filterPageNumber
-                                        );
-                                        setFilterEndDate(date);
-                                    }}
+                                    onChange={handleEndDateChange}
                                     value={filterEndDate}
                                 />
                             </div>
 
-                            {projects?.length && (
-                                <div className="flex flex-col space-y-2">
-                                    <Label>Project</Label>
+                            <div className="flex flex-col space-y-2">
+                                <Label>Project</Label>
 
-                                    <ComboBox
-                                        items={projects?.map((project) => ({
-                                            label: (
-                                                <ProjectLabel
-                                                    project={project}
-                                                />
-                                            ),
-                                            value: project.id,
-                                        }))}
-                                        name="projectId"
-                                        onChange={(item) => {
-                                            let projectId;
+                                <ComboBox
+                                    items={
+                                        projects?.length
+                                            ? projects?.map((project) => ({
+                                                  label: (
+                                                      <ProjectLabel
+                                                          project={project}
+                                                      />
+                                                  ),
+                                                  value: project.id,
+                                              }))
+                                            : []
+                                    }
+                                    onChange={handleProjectChange}
+                                    value={filterProjectId}
+                                />
+                            </div>
 
-                                            if (item) {
-                                                projectId = Number(item.value);
-                                            }
+                            <div className="flex flex-col space-y-2">
+                                <Label>Instance</Label>
 
-                                            setFilterProjectId(projectId);
-                                            search(
-                                                filterStatus,
-                                                projectId,
-                                                filterProjectInstanceId,
-                                                filterWorkflowId,
-                                                filterStartDate,
-                                                filterEndDate,
-                                                filterPageNumber
-                                            );
-                                        }}
-                                        value={filterProjectId}
-                                    />
-                                </div>
-                            )}
+                                <ComboBox
+                                    items={
+                                        projectInstances?.length
+                                            ? projectInstances?.map(
+                                                  (projectInstance) => ({
+                                                      label: (
+                                                          <span className="flex items-center">
+                                                              <span className="mr-1 ">
+                                                                  {
+                                                                      projectInstance.name
+                                                                  }
+                                                              </span>
 
-                            {projectInstances &&
-                                projectInstances?.length > 0 && (
-                                    <div className="flex flex-col space-y-2">
-                                        <Label>Instance</Label>
+                                                              <span className="text-xs text-gray-500">
+                                                                  {projectInstance?.tags
+                                                                      ?.map(
+                                                                          (
+                                                                              tag
+                                                                          ) =>
+                                                                              tag.name
+                                                                      )
+                                                                      .join(
+                                                                          ', '
+                                                                      )}
+                                                              </span>
+                                                          </span>
+                                                      ),
+                                                      value: projectInstance.id,
+                                                  })
+                                              )
+                                            : []
+                                    }
+                                    onChange={handleProjectInstanceChange}
+                                    value={filterProjectInstanceId}
+                                />
+                            </div>
 
-                                        <ComboBox
-                                            items={projectInstances?.map(
-                                                (projectInstance) => ({
-                                                    label: (
-                                                        <span className="flex items-center">
-                                                            <span className="mr-1 ">
-                                                                {
-                                                                    projectInstance.name
-                                                                }
-                                                            </span>
+                            <div className="flex flex-col space-y-2">
+                                <Label>Workflow</Label>
 
-                                                            <span className="text-xs text-gray-500">
-                                                                {projectInstance?.tags
-                                                                    ?.map(
-                                                                        (tag) =>
-                                                                            tag.name
-                                                                    )
-                                                                    .join(', ')}
-                                                            </span>
-                                                        </span>
-                                                    ),
-                                                    value: projectInstance.id,
-                                                })
-                                            )}
-                                            name="instanceId"
-                                            onChange={(item) => {
-                                                let projectInstanceId;
-
-                                                if (item) {
-                                                    projectInstanceId = Number(
-                                                        item.value
-                                                    );
-                                                }
-
-                                                setFilterProjectInstanceId(
-                                                    projectInstanceId
-                                                );
-                                                search(
-                                                    filterStatus,
-                                                    filterProjectId,
-                                                    projectInstanceId,
-                                                    filterWorkflowId,
-                                                    filterStartDate,
-                                                    filterEndDate,
-                                                    filterPageNumber
-                                                );
-                                            }}
-                                            value={filterProjectInstanceId}
-                                        />
-                                    </div>
-                                )}
-
-                            {workflows?.length && (
-                                <div className="flex flex-col space-y-2">
-                                    <Label>Workflow</Label>
-
-                                    <ComboBox
-                                        items={workflows?.map((workflow) => ({
-                                            label:
-                                                workflow.label ||
-                                                'undefined label',
-                                            value: workflow.id,
-                                        }))}
-                                        maxHeight
-                                        name="workflow"
-                                        onChange={(item) => {
-                                            let workflowId;
-
-                                            if (item) {
-                                                workflowId = item.value;
-                                            }
-
-                                            setFilterWorkflowId(undefined);
-                                            search(
-                                                filterStatus,
-                                                filterProjectId,
-                                                filterProjectInstanceId,
-                                                workflowId,
-                                                filterStartDate,
-                                                filterEndDate,
-                                                filterPageNumber
-                                            );
-                                        }}
-                                        value={filterWorkflowId}
-                                    />
-                                </div>
-                            )}
+                                <ComboBox
+                                    items={
+                                        workflows?.length
+                                            ? workflows?.map((workflow) => ({
+                                                  label:
+                                                      workflow.label ||
+                                                      'undefined label',
+                                                  value: workflow.id,
+                                              }))
+                                            : []
+                                    }
+                                    maxHeight
+                                    onChange={handleWorkflowChange}
+                                    value={filterWorkflowId}
+                                />
+                            </div>
                         </div>
                     </>
                 }
             >
-                {!workflowExecutionsLoading &&
-                    !workflowExecutionsError &&
-                    workflowExecutionsPage?.content && (
-                        <div
-                            className={twMerge(
-                                'w-full px-4 2xl:mx-auto 2xl:w-4/5',
-                                !workflowExecutionsPage.content.length &&
-                                    'place-self-center'
-                            )}
-                        >
-                            {tableData && tableData.length > 0 ? (
-                                <WorkflowExecutionsTable data={tableData} />
-                            ) : (
-                                <EmptyList
-                                    icon={
-                                        <ActivityIcon className="h-12 w-12 text-gray-400" />
-                                    }
-                                    message={emptyListMessage}
-                                    title="No executed workflows"
-                                />
-                            )}
-                        </div>
-                    )}
+                {workflowExecutions && (
+                    <div
+                        className={twMerge(
+                            'w-full px-4 2xl:mx-auto 2xl:w-4/5',
+                            !workflowExecutions.length && 'place-self-center'
+                        )}
+                    >
+                        {workflowExecutions.length > 0 ? (
+                            <WorkflowExecutionsTable
+                                data={workflowExecutions}
+                            />
+                        ) : (
+                            <EmptyList
+                                icon={
+                                    <ActivityIcon className="h-12 w-12 text-gray-400" />
+                                }
+                                message={emptyListMessage}
+                                title="No executed workflows"
+                            />
+                        )}
+                    </div>
+                )}
             </LayoutContainer>
 
             <WorkflowExecutionDetailsSheet />
