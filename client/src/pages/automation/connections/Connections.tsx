@@ -1,3 +1,4 @@
+import EmptyList from '@/components/EmptyList/EmptyList';
 import PageLoader from '@/components/PageLoader/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
@@ -6,14 +7,14 @@ import {
     useGetConnectionTagsQuery,
     useGetConnectionsQuery,
 } from '@/queries/connections.queries';
-import {TagIcon} from 'lucide-react';
+import {Link2Icon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import LayoutContainer from '../../../layouts/LayoutContainer';
 import PageHeader from '../../../layouts/PageHeader';
-import ConnectionList from './ConnectionList';
 import ConnectionDialog from './components/ConnectionDialog';
+import ConnectionList from './components/ConnectionList';
 
 export enum Type {
     Component,
@@ -69,7 +70,7 @@ const Connections = () => {
     const {
         data: tags,
         error: tagsError,
-        isLoading: tagsLoading,
+        isLoading: tagsIsLoading,
     } = useGetConnectionTagsQuery();
 
     let pageTitle: string | undefined;
@@ -102,7 +103,7 @@ const Connections = () => {
                 <LeftSidebarNav
                     bottomBody={
                         <>
-                            {!tagsLoading &&
+                            {!tagsIsLoading &&
                                 (!tags?.length ? (
                                     <p className="px-3 text-xs">No tags.</p>
                                 ) : (
@@ -189,11 +190,25 @@ const Connections = () => {
                 loading={
                     allConnectionsIsLoading ||
                     connectionsIsLoading ||
-                    tagsLoading
+                    tagsIsLoading
                 }
             >
-                {connections && tags && (
-                    <ConnectionList connections={connections} tags={tags} />
+                {connections && connections?.length > 0 ? (
+                    connections &&
+                    tags && (
+                        <ConnectionList connections={connections} tags={tags} />
+                    )
+                ) : (
+                    <EmptyList
+                        button={
+                            <ConnectionDialog
+                                triggerNode={<Button>Create Connection</Button>}
+                            />
+                        }
+                        icon={<Link2Icon className="h-12 w-12 text-gray-400" />}
+                        message="You do not have any Connections created yet."
+                        title="No Connections"
+                    />
                 )}
             </PageLoader>
         </LayoutContainer>

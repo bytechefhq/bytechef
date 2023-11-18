@@ -52,7 +52,7 @@ import WorkflowTestConfigurationDialog from '@/pages/automation/project/componen
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
-import ProjectDialog from '@/pages/automation/projects/ProjectDialog';
+import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import WorkflowExecutionDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordion';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {ProjectCategoryKeys} from '@/queries/projectCategories.queries';
@@ -84,7 +84,7 @@ import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 
 import PageLoader from '../../../components/PageLoader/PageLoader';
 import LayoutContainer from '../../../layouts/LayoutContainer';
-import ProjectWorkflow from './ProjectWorkflow';
+import ProjectWorkflow from './components/ProjectWorkflow';
 import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
 
@@ -389,18 +389,7 @@ const Project = () => {
     };
 
     return (
-        <PageLoader
-            errors={[
-                componentsError,
-                taskDispatcherDefinitionsError,
-                projectWorkflowsError,
-            ]}
-            loading={
-                componentsIsLoading ||
-                taskDispatcherDefinitionsLoading ||
-                projectWorkflowsLoading
-            }
-        >
+        <>
             <LayoutContainer
                 className="bg-muted dark:bg-background"
                 header={
@@ -690,12 +679,27 @@ const Project = () => {
                 }
                 rightToolbarOpen={true}
             >
-                {componentDefinitions && !!taskDispatcherDefinitions && (
-                    <ProjectWorkflow
-                        componentDefinitions={componentDefinitions}
-                        taskDispatcherDefinitions={taskDispatcherDefinitions}
-                    />
-                )}
+                <PageLoader
+                    errors={[
+                        componentsError,
+                        taskDispatcherDefinitionsError,
+                        projectWorkflowsError,
+                    ]}
+                    loading={
+                        componentsIsLoading ||
+                        taskDispatcherDefinitionsLoading ||
+                        projectWorkflowsLoading
+                    }
+                >
+                    {componentDefinitions && !!taskDispatcherDefinitions && (
+                        <ProjectWorkflow
+                            componentDefinitions={componentDefinitions}
+                            taskDispatcherDefinitions={
+                                taskDispatcherDefinitions
+                            }
+                        />
+                    )}
+                </PageLoader>
             </LayoutContainer>
 
             <AlertDialog open={showDeleteProjectAlertDialog}>
@@ -812,7 +816,7 @@ const Project = () => {
                     )}
                 </>
             )}
-        </PageLoader>
+        </>
     );
 };
 

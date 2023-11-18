@@ -1,9 +1,9 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
-import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstanceTags.queries';
 import {
     ProjectInstanceModel,
     ProjectModel,
+    TagModel,
 } from 'middleware/helios/configuration';
 
 import ProjectInstanceListItem from './ProjectInstanceListItem';
@@ -12,11 +12,12 @@ import ProjectInstanceWorkflowList from './ProjectInstanceWorkflowList';
 const ProjectInstanceList = ({
     project,
     projectInstances,
+    tags,
 }: {
     project: ProjectModel;
     projectInstances: ProjectInstanceModel[];
+    tags: TagModel[];
 }) => {
-    const {data: tags} = useGetProjectInstanceTagsQuery();
     const projectInstanceMap = useProjectInstancesEnabledStore(
         ({projectInstanceMap}) => projectInstanceMap
     );
@@ -24,7 +25,7 @@ const ProjectInstanceList = ({
     return (
         <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
             {projectInstances.length > 0 && (
-                <div className="mb-8">
+                <>
                     <h3 className="mb-1 px-2 text-xl font-semibold">
                         {project.name}
                     </h3>
@@ -76,7 +77,7 @@ const ProjectInstanceList = ({
                             </Collapsible>
                         );
                     })}
-                </div>
+                </>
             )}
         </div>
     );

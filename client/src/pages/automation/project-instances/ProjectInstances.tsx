@@ -1,4 +1,5 @@
 import EmptyList from '@/components/EmptyList/EmptyList';
+import PageLoader from '@/components/PageLoader/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {ProjectInstanceModel} from '@/middleware/helios/configuration';
@@ -8,12 +9,11 @@ import {useGetProjectsQuery} from '@/queries/projects.queries';
 import {Layers3Icon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
-import {twMerge} from 'tailwind-merge';
 
 import LayoutContainer from '../../../layouts/LayoutContainer';
 import PageHeader from '../../../layouts/PageHeader';
-import ProjectInstanceDialog from './ProjectInstanceDialog';
-import ProjectInstanceList from './ProjectInstanceList';
+import ProjectInstanceDialog from './components/ProjectInstanceDialog';
+import ProjectInstanceList from './components/ProjectInstanceList';
 
 export enum Type {
     Project,
@@ -36,19 +36,26 @@ const ProjectInstances = () => {
         defaultCurrentState
     );
 
-    const {data: projects, isLoading: projectsLoading} = useGetProjectsQuery({
+    const {
+        data: projects,
+        error: projectsError,
+        isLoading: projectsIsLoading,
+    } = useGetProjectsQuery({
         projectInstances: true,
     });
 
-    const {data: projectInstances, isLoading: projectInstancesLoading} =
-        useGetProjectInstancesQuery({
-            projectId: searchParams.get('projectId')
-                ? parseInt(searchParams.get('projectId')!)
-                : undefined,
-            tagId: searchParams.get('tagId')
-                ? parseInt(searchParams.get('tagId')!)
-                : undefined,
-        });
+    const {
+        data: projectInstances,
+        error: projectInstancesError,
+        isLoading: projectInstancesIsLoading,
+    } = useGetProjectInstancesQuery({
+        projectId: searchParams.get('projectId')
+            ? parseInt(searchParams.get('projectId')!)
+            : undefined,
+        tagId: searchParams.get('tagId')
+            ? parseInt(searchParams.get('tagId')!)
+            : undefined,
+    });
 
     const projectInstanceMap: Map<number, ProjectInstanceModel[]> = new Map<
         number,
@@ -78,8 +85,11 @@ const ProjectInstances = () => {
         }
     }
 
-    const {data: tags, isLoading: tagsLoading} =
-        useGetProjectInstanceTagsQuery();
+    const {
+        data: tags,
+        error: tagsError,
+        isLoading: tagsIsLoading,
+    } = useGetProjectInstanceTagsQuery();
 
     let pageTitle: string | undefined;
 
@@ -110,7 +120,7 @@ const ProjectInstances = () => {
                 <LeftSidebarNav
                     bottomBody={
                         <>
-                            {!tagsLoading &&
+                            {!tagsIsLoading &&
                                 (tags && !!tags.length ? (
                                     tags?.map((item) => (
                                         <LeftSidebarNavItem
@@ -195,16 +205,35 @@ const ProjectInstances = () => {
                 <PageHeader position="sidebar" title="Instances" />
             }
         >
-            <div
-                className={twMerge(
-                    'w-full',
-                    !projects?.length &&
-                        'place-self-center px-2 2xl:mx-auto 2xl:w-4/5'
-                )}
+            <PageLoader
+                errors={[projectsError, projectInstancesError, tagsError]}
+                loading={
+                    projectsIsLoading ||
+                    projectInstancesIsLoading ||
+                    tagsIsLoading
+                }
             >
-                {!projectInstancesLoading &&
-                !projectsLoading &&
-                (!projects?.length || !projectInstances?.length) ? (
+                {projectInstances && projectInstances?.length > 0 ? (
+                    Array.from(projectInstanceMap.keys())?.map(
+                        (projectId) =>
+                            projects &&
+                            tags && (
+                                <ProjectInstanceList
+                                    key={projectId}
+                                    project={
+                                        projects.find(
+                                            (currentProject) =>
+                                                currentProject.id === projectId
+                                        )!
+                                    }
+                                    projectInstances={
+                                        projectInstanceMap.get(projectId)!
+                                    }
+                                    tags={tags}
+                                />
+                            )
+                    )
+                ) : (
                     <EmptyList
                         button={
                             <ProjectInstanceDialog
@@ -217,26 +246,8 @@ const ProjectInstances = () => {
                         message="Get started by creating a new project instance."
                         title="No instances of projects"
                     />
-                ) : (
-                    Array.from(projectInstanceMap.keys())?.map(
-                        (projectId) =>
-                            projects && (
-                                <ProjectInstanceList
-                                    key={projectId}
-                                    project={
-                                        projects.find(
-                                            (currentProject) =>
-                                                currentProject.id === projectId
-                                        )!
-                                    }
-                                    projectInstances={
-                                        projectInstanceMap.get(projectId)!
-                                    }
-                                />
-                            )
-                    )
                 )}
-            </div>
+            </PageLoader>
         </LayoutContainer>
     );
 };
