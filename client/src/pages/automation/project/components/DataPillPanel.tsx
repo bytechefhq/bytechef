@@ -59,14 +59,15 @@ const DataPillPanel = () => {
     }
 
     const actionDataWithComponentAlias = actionData.map((action) => {
-        const componentAction = componentActions?.find(
-            (componentAction) =>
-                componentAction.componentName === action.componentName
+        const sameNameActions = actionData.filter(
+            (actionDatum) => actionDatum.componentName === action.componentName
         );
+
+        const sameNameIndex = sameNameActions.indexOf(action);
 
         return {
             ...action,
-            workflowAlias: componentAction?.workflowAlias,
+            workflowAlias: `${action.componentName}-${sameNameIndex + 1}`,
         };
     });
 
@@ -90,12 +91,21 @@ const DataPillPanel = () => {
         }
     });
 
-    const dataPillComponentData = componentActionData.filter(
-        (action) =>
-            action!.workflowAlias !== currentNode.name &&
-            action!.componentDefinition &&
-            (action!.outputSchema as PropertyType)?.properties
-    );
+    const dataPillComponentData = componentActionData.filter((action) => {
+        if (!action) {
+            return false;
+        }
+
+        const outputSchemaContent =
+            (action.outputSchema as PropertyType)?.properties ||
+            (action.outputSchema as PropertyType)?.items;
+
+        return (
+            action.workflowAlias !== currentNode.name &&
+            action.componentDefinition &&
+            outputSchemaContent
+        );
+    });
 
     if (!dataPillComponentData?.length) {
         return <></>;
