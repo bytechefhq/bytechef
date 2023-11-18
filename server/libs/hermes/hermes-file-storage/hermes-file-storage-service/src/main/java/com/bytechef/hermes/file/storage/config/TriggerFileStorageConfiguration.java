@@ -27,7 +27,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,43 +48,24 @@ public class TriggerFileStorageConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty("bytechef.workflow.async.output-storage.provider")
-    TriggerFileStorage workflowAsyncTriggerFileStorageFacade(
+    TriggerFileStorage workflowTriggerFileStorageFacade(
         ObjectMapper objectMapper,
-        @Value("${bytechef.workflow.async.output-storage.provider}") String workflowAsyncOutputStorageProvider) {
+        @Value("${bytechef.workflow.output-storage.provider}") String workflowOutputStorageProvider) {
 
         if (logger.isInfoEnabled()) {
             logger.info(
-                "Workflow async trigger output storage provider type enabled: %s".formatted(
-                    workflowAsyncOutputStorageProvider));
+                "Workflow trigger output storage provider type enabled: %s".formatted(workflowOutputStorageProvider));
         }
 
-        return new TriggerFileStorageImpl(
-            getFileStorageService(workflowAsyncOutputStorageProvider), objectMapper);
+        return new TriggerFileStorageImpl(getFileStorageService(workflowOutputStorageProvider), objectMapper);
     }
 
-    @Bean
-    @ConditionalOnProperty("bytechef.workflow.sync.output-storage.provider")
-    TriggerFileStorage workflowSyncTriggerFileStorageFacade(
-        ObjectMapper objectMapper,
-        @Value("${bytechef.workflow.sync.output-storage.provider}") String workflowSyncOutputStorageProvider) {
-
-        if (logger.isInfoEnabled()) {
-            logger.info(
-                "Workflow sync trigger output storage provider type enabled: %s".formatted(
-                    workflowSyncOutputStorageProvider));
-        }
-
-        return new TriggerFileStorageImpl(
-            getFileStorageService(workflowSyncOutputStorageProvider), objectMapper);
-    }
-
-    private FileStorageService getFileStorageService(String workflowAsyncOutputStorageProvider) {
-        return switch (workflowAsyncOutputStorageProvider) {
+    private FileStorageService getFileStorageService(String workflowOutputStorageProvider) {
+        return switch (workflowOutputStorageProvider) {
             case "base64" -> new Base64FileStorageService();
             case "filesystem" -> new FilesystemFileStorageService(filesystemFileStorageProperties.getBasedir());
             default -> throw new IllegalArgumentException(
-                "Output storage %s does not exist".formatted(workflowAsyncOutputStorageProvider));
+                "Output storage %s does not exist".formatted(workflowOutputStorageProvider));
         };
     }
 }

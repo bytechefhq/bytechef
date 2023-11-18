@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -63,7 +62,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
     public LoopTaskDispatcher(
         ApplicationEventPublisher eventPublisher, ContextService contextService,
         TaskDispatcher<? super Task> taskDispatcher, TaskExecutionService taskExecutionService,
-        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage) {
+        TaskFileStorage taskFileStorage) {
 
         this.eventPublisher = eventPublisher;
         this.contextService = contextService;

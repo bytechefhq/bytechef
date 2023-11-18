@@ -52,7 +52,6 @@ import java.util.concurrent.TimeoutException;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -83,8 +82,7 @@ public class TaskWorker {
 
     public TaskWorker(
         ApplicationEventPublisher eventPublisher, ExecutorService executorService,
-        TaskHandlerResolver taskHandlerResolver,
-        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage) {
+        TaskHandlerResolver taskHandlerResolver, TaskFileStorage taskFileStorage) {
 
         this.eventPublisher = eventPublisher;
         this.executorService = executorService;

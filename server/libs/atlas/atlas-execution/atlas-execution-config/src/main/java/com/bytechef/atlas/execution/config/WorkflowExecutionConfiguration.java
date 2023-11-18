@@ -32,7 +32,6 @@ import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,8 +50,7 @@ public class WorkflowExecutionConfiguration {
     @Bean
     JobFacade jobFacade(
         ApplicationEventPublisher eventPublisher, ContextService contextService, JobService jobService,
-        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         return new JobFacadeImpl(
             eventPublisher, contextService, jobService, taskFileStorage, workflowService);

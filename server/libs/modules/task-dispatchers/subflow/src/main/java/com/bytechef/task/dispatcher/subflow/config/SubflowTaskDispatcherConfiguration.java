@@ -23,7 +23,6 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -48,8 +47,7 @@ public class SubflowTaskDispatcherConfiguration {
         @Bean
         SubflowJobStatusEventListener subflowJobStatusEventListener(
             ApplicationEventPublisher eventPublisher, JobService jobService,
-            TaskExecutionService taskExecutionService,
-            @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage) {
+            TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
             return new SubflowJobStatusEventListener(
                 eventPublisher, jobService, taskExecutionService, taskFileStorage);

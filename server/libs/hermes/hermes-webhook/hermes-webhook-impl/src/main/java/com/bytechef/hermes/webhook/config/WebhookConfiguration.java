@@ -57,7 +57,6 @@ import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,9 +73,7 @@ public class WebhookConfiguration {
         CounterService counterService, InstanceAccessorRegistry instanceAccessorRegistry,
         InstanceJobFacade instanceJobFacade, JobService jobService, ObjectMapper objectMapper,
         TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
-        TriggerSyncExecutor triggerSyncExecutor,
-        @Qualifier("workflowSyncTaskFileStorageFacade") TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        TriggerSyncExecutor triggerSyncExecutor, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker(objectMapper);
 

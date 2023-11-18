@@ -156,14 +156,9 @@ bytechef:
       subscriptions:
         default: "10"
   workflow:
-    async:
-      output-storage:
-        # Output storage provider for sync workflow output data (base64 | filesystem) default: base64
-        provider: base64
-    sync:
-      output-storage:
-        # Output storage provider for async workflow output data (base64 | filesystem) default: base64
-        provider: base64
+    output-storage:
+      # Output storage provider for workflow output data (base64 | filesystem) default: base64
+      provider: base64
     repository:
       classpath:
         # Enable classpath based workflow repository

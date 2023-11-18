@@ -36,7 +36,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
@@ -95,8 +94,7 @@ public class TaskWorkerConfiguration {
     @Bean
     TaskWorker taskWorker(
         ApplicationEventPublisher eventPublisher, TaskWorkerExecutor taskWorkerExecutor,
-        TaskHandlerResolver taskHandlerResolver,
-        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage) {
+        TaskHandlerResolver taskHandlerResolver, TaskFileStorage taskFileStorage) {
 
         return new TaskWorker(
             eventPublisher, new ExecutorServiceWrapper(taskWorkerExecutor), taskHandlerResolver,

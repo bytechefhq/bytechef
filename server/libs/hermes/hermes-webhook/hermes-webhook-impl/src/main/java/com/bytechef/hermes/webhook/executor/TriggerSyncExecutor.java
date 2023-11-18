@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -62,8 +61,8 @@ public class TriggerSyncExecutor {
         InstanceAccessorRegistry instanceAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerExecutionService triggerExecutionService,
         List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors,
-        @Qualifier("workflowSyncTriggerFileStorageFacade") TriggerFileStorage triggerFileStorage,
-        TriggerStateService triggerStateService, WorkflowService workflowService) {
+        TriggerFileStorage triggerFileStorage, TriggerStateService triggerStateService,
+        WorkflowService workflowService) {
 
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
