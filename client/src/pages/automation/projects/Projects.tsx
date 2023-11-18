@@ -1,15 +1,18 @@
+import EmptyList from '@/components/EmptyList/EmptyList';
+import PageLoader from '@/components/PageLoader/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {useGetProjectCategoriesQuery} from '@/queries/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/queries/projectTags.quries';
-import {TagIcon} from 'lucide-react';
+import {useGetProjectsQuery} from '@/queries/projects.queries';
+import {FolderIcon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
 import LayoutContainer from '../../../layouts/LayoutContainer';
 import PageHeader from '../../../layouts/PageHeader';
-import ProjectDialog from './ProjectDialog';
-import ProjectList from './ProjectList';
+import ProjectDialog from './components/ProjectDialog';
+import ProjectList from './components/ProjectList';
 
 export enum Type {
     Category,
@@ -34,10 +37,30 @@ const Projects = () => {
 
     const navigate = useNavigate();
 
-    const {data: categories, isLoading: categoriesLoading} =
-        useGetProjectCategoriesQuery();
+    const {
+        data: categories,
+        error: categoriesError,
+        isLoading: categoriesIsLoading,
+    } = useGetProjectCategoriesQuery();
 
-    const {data: tags, isLoading: tagsLoading} = useGetProjectTagsQuery();
+    const {
+        data: projects,
+        error: projectsError,
+        isLoading: projectsIsLoading,
+    } = useGetProjectsQuery({
+        categoryId: searchParams.get('categoryId')
+            ? parseInt(searchParams.get('categoryId')!)
+            : undefined,
+        tagId: searchParams.get('tagId')
+            ? parseInt(searchParams.get('tagId')!)
+            : undefined,
+    });
+
+    const {
+        data: tags,
+        error: tagsError,
+        isLoading: tagsIsLoading,
+    } = useGetProjectTagsQuery();
 
     let pageTitle: string | undefined;
 
@@ -77,7 +100,7 @@ const Projects = () => {
                 <LeftSidebarNav
                     bottomBody={
                         <>
-                            {!tagsLoading &&
+                            {!tagsIsLoading &&
                                 (tags?.length ? (
                                     tags?.map((item) => (
                                         <LeftSidebarNavItem
@@ -130,7 +153,7 @@ const Projects = () => {
                                 }}
                             />
 
-                            {!categoriesLoading &&
+                            {!categoriesIsLoading &&
                                 categories?.map((item) => (
                                     <LeftSidebarNavItem
                                         item={{
@@ -162,7 +185,31 @@ const Projects = () => {
                 <PageHeader position="sidebar" title="Projects" />
             }
         >
-            <ProjectList />
+            <PageLoader
+                errors={[categoriesError, projectsError, tagsError]}
+                loading={
+                    categoriesIsLoading || projectsIsLoading || tagsIsLoading
+                }
+            >
+                {projects && projects?.length > 0 ? (
+                    projects &&
+                    tags && <ProjectList projects={projects} tags={projects} />
+                ) : (
+                    <EmptyList
+                        button={
+                            <ProjectDialog
+                                project={undefined}
+                                triggerNode={<Button>Create Project</Button>}
+                            />
+                        }
+                        icon={
+                            <FolderIcon className="h-12 w-12 text-gray-400" />
+                        }
+                        message="Get started by creating a new project."
+                        title="No projects"
+                    />
+                )}
+            </PageLoader>
         </LayoutContainer>
     );
 };

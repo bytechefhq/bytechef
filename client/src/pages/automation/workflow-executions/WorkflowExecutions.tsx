@@ -20,7 +20,6 @@ import {
 import {useGetProjectsQuery} from 'queries/projects.queries';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
-import {twMerge} from 'tailwind-merge';
 
 import WorkflowExecutionDetailsSheet from './components/WorkflowExecutionDetailsSheet';
 import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
@@ -106,13 +105,13 @@ const WorkflowExecutions = () => {
 
     const {data: projectInstances} = useGetProjectInstancesQuery({});
 
-    const {
-        data: projects,
-        error: projectsError,
-        isLoading: projectsLoading,
-    } = useGetProjectsQuery({});
+    const {data: projects} = useGetProjectsQuery({});
 
-    const {data: workflowExecutionPage} = useGetWorkflowExecutionsQuery({
+    const {
+        data: workflowExecutionPage,
+        error: workflowExecutionsError,
+        isLoading: workflowExecutionsIsLoading,
+    } = useGetWorkflowExecutionsQuery({
         jobEndDate: filterEndDate,
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,
@@ -122,7 +121,7 @@ const WorkflowExecutions = () => {
         workflowId: filterWorkflowId,
     });
 
-    const {data: workflows, error: workflowsError} = useGetWorkflowsQuery();
+    const {data: workflows} = useGetWorkflowsQuery();
 
     const emptyListMessage =
         !filterStatus &&
@@ -279,179 +278,160 @@ const WorkflowExecutions = () => {
     };
 
     return (
-        <PageLoader
-            errors={[projectsError, workflowsError]}
-            loading={projectsLoading}
-        >
-            <LayoutContainer
-                footer={
-                    workflowExecutionPage?.content &&
-                    workflowExecutionPage.content.length > 0 && (
-                        <PageFooter position="main">
-                            <Pagination
-                                onClick={handlePaginationClick}
-                                pageNumber={
-                                    filterPageNumber ? filterPageNumber : 0
-                                }
-                                pageSize={workflowExecutionPage.size!}
-                                totalElements={
-                                    workflowExecutionPage.totalElements!
-                                }
-                                totalPages={workflowExecutionPage.totalPages!}
+        <LayoutContainer
+            footer={
+                workflowExecutionPage?.content &&
+                workflowExecutionPage.content.length > 0 && (
+                    <PageFooter position="main">
+                        <Pagination
+                            onClick={handlePaginationClick}
+                            pageNumber={filterPageNumber ? filterPageNumber : 0}
+                            pageSize={workflowExecutionPage.size!}
+                            totalElements={workflowExecutionPage.totalElements!}
+                            totalPages={workflowExecutionPage.totalPages!}
+                        />
+                    </PageFooter>
+                )
+            }
+            header={
+                <PageHeader
+                    centerTitle={true}
+                    position="main"
+                    title="All Workflow Executions"
+                />
+            }
+            leftSidebarHeader={
+                <>
+                    <PageHeader position="sidebar" title="Executions" />
+
+                    <div className="space-y-4 px-4">
+                        <div className="flex flex-col space-y-2">
+                            <Label>Status</Label>
+
+                            <ComboBox
+                                items={jobStatusOptions}
+                                onChange={handleStatusChange}
+                                value={filterStatus}
                             />
-                        </PageFooter>
-                    )
-                }
-                header={
-                    <PageHeader
-                        centerTitle={true}
-                        position="main"
-                        title="All Workflow Executions"
-                    />
-                }
-                leftSidebarHeader={
-                    <>
-                        <PageHeader position="sidebar" title="Executions" />
-
-                        <div className="space-y-4 px-4">
-                            <div className="flex flex-col space-y-2">
-                                <Label>Status</Label>
-
-                                <ComboBox
-                                    items={jobStatusOptions}
-                                    onChange={handleStatusChange}
-                                    value={filterStatus}
-                                />
-                            </div>
-
-                            <div className="flex flex-col space-y-2">
-                                <Label>Start date</Label>
-
-                                <DatePicker
-                                    onChange={handleStartDateChange}
-                                    value={filterStartDate}
-                                />
-                            </div>
-
-                            <div className="flex flex-col space-y-2">
-                                <Label>End date</Label>
-
-                                <DatePicker
-                                    onChange={handleEndDateChange}
-                                    value={filterEndDate}
-                                />
-                            </div>
-
-                            <div className="flex flex-col space-y-2">
-                                <Label>Project</Label>
-
-                                <ComboBox
-                                    items={
-                                        projects?.length
-                                            ? projects?.map((project) => ({
-                                                  label: (
-                                                      <ProjectLabel
-                                                          project={project}
-                                                      />
-                                                  ),
-                                                  value: project.id,
-                                              }))
-                                            : []
-                                    }
-                                    onChange={handleProjectChange}
-                                    value={filterProjectId}
-                                />
-                            </div>
-
-                            <div className="flex flex-col space-y-2">
-                                <Label>Instance</Label>
-
-                                <ComboBox
-                                    items={
-                                        projectInstances?.length
-                                            ? projectInstances?.map(
-                                                  (projectInstance) => ({
-                                                      label: (
-                                                          <span className="flex items-center">
-                                                              <span className="mr-1 ">
-                                                                  {
-                                                                      projectInstance.name
-                                                                  }
-                                                              </span>
-
-                                                              <span className="text-xs text-gray-500">
-                                                                  {projectInstance?.tags
-                                                                      ?.map(
-                                                                          (
-                                                                              tag
-                                                                          ) =>
-                                                                              tag.name
-                                                                      )
-                                                                      .join(
-                                                                          ', '
-                                                                      )}
-                                                              </span>
-                                                          </span>
-                                                      ),
-                                                      value: projectInstance.id,
-                                                  })
-                                              )
-                                            : []
-                                    }
-                                    onChange={handleProjectInstanceChange}
-                                    value={filterProjectInstanceId}
-                                />
-                            </div>
-
-                            <div className="flex flex-col space-y-2">
-                                <Label>Workflow</Label>
-
-                                <ComboBox
-                                    items={
-                                        workflows?.length
-                                            ? workflows?.map((workflow) => ({
-                                                  label:
-                                                      workflow.label ||
-                                                      'undefined label',
-                                                  value: workflow.id,
-                                              }))
-                                            : []
-                                    }
-                                    maxHeight
-                                    onChange={handleWorkflowChange}
-                                    value={filterWorkflowId}
-                                />
-                            </div>
                         </div>
-                    </>
-                }
-            >
-                {workflowExecutions && (
-                    <div
-                        className={twMerge(
-                            'w-full px-4 2xl:mx-auto 2xl:w-4/5',
-                            !workflowExecutions.length && 'place-self-center'
-                        )}
-                    >
-                        {workflowExecutions.length > 0 ? (
-                            <WorkflowExecutionsTable
-                                data={workflowExecutions}
+
+                        <div className="flex flex-col space-y-2">
+                            <Label>Start date</Label>
+
+                            <DatePicker
+                                onChange={handleStartDateChange}
+                                value={filterStartDate}
                             />
-                        ) : (
-                            <EmptyList
-                                icon={
-                                    <ActivityIcon className="h-12 w-12 text-gray-400" />
+                        </div>
+
+                        <div className="flex flex-col space-y-2">
+                            <Label>End date</Label>
+
+                            <DatePicker
+                                onChange={handleEndDateChange}
+                                value={filterEndDate}
+                            />
+                        </div>
+
+                        <div className="flex flex-col space-y-2">
+                            <Label>Project</Label>
+
+                            <ComboBox
+                                items={
+                                    projects?.length
+                                        ? projects?.map((project) => ({
+                                              label: (
+                                                  <ProjectLabel
+                                                      project={project}
+                                                  />
+                                              ),
+                                              value: project.id,
+                                          }))
+                                        : []
                                 }
-                                message={emptyListMessage}
-                                title="No executed workflows"
+                                onChange={handleProjectChange}
+                                value={filterProjectId}
                             />
-                        )}
+                        </div>
+
+                        <div className="flex flex-col space-y-2">
+                            <Label>Instance</Label>
+
+                            <ComboBox
+                                items={
+                                    projectInstances?.length
+                                        ? projectInstances?.map(
+                                              (projectInstance) => ({
+                                                  label: (
+                                                      <span className="flex items-center">
+                                                          <span className="mr-1 ">
+                                                              {
+                                                                  projectInstance.name
+                                                              }
+                                                          </span>
+
+                                                          <span className="text-xs text-gray-500">
+                                                              {projectInstance?.tags
+                                                                  ?.map(
+                                                                      (tag) =>
+                                                                          tag.name
+                                                                  )
+                                                                  .join(', ')}
+                                                          </span>
+                                                      </span>
+                                                  ),
+                                                  value: projectInstance.id,
+                                              })
+                                          )
+                                        : []
+                                }
+                                onChange={handleProjectInstanceChange}
+                                value={filterProjectInstanceId}
+                            />
+                        </div>
+
+                        <div className="flex flex-col space-y-2">
+                            <Label>Workflow</Label>
+
+                            <ComboBox
+                                items={
+                                    workflows?.length
+                                        ? workflows?.map((workflow) => ({
+                                              label:
+                                                  workflow.label ||
+                                                  'undefined label',
+                                              value: workflow.id,
+                                          }))
+                                        : []
+                                }
+                                maxHeight
+                                onChange={handleWorkflowChange}
+                                value={filterWorkflowId}
+                            />
+                        </div>
                     </div>
+                </>
+            }
+        >
+            <PageLoader
+                errors={[workflowExecutionsError]}
+                loading={workflowExecutionsIsLoading}
+            >
+                {workflowExecutions && workflowExecutions.length > 0 ? (
+                    <WorkflowExecutionsTable data={workflowExecutions} />
+                ) : (
+                    <EmptyList
+                        icon={
+                            <ActivityIcon className="h-12 w-12 text-gray-400" />
+                        }
+                        message={emptyListMessage}
+                        title="No executed workflows"
+                    />
                 )}
-            </LayoutContainer>
+            </PageLoader>
 
             <WorkflowExecutionDetailsSheet />
-        </PageLoader>
+        </LayoutContainer>
     );
 };
 

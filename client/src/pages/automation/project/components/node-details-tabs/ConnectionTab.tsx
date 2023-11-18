@@ -53,22 +53,18 @@ const ConnectionTab = ({
                     />
                 </div>
             ) : (
-                <div className="p-4">
-                    <EmptyList
-                        button={
-                            <Button
-                                label="Create a connection"
-                                onClick={() =>
-                                    setShowEditConnectionDialog(true)
-                                }
-                                title="Create a new connection"
-                            />
-                        }
-                        icon={<LinkIcon className="h-6 w-6 text-gray-400" />}
-                        message="You have not created any connections for this component yet."
-                        title="No Connections"
-                    />
-                </div>
+                <EmptyList
+                    button={
+                        <Button
+                            label="Create a connection"
+                            onClick={() => setShowEditConnectionDialog(true)}
+                            title="Create a new connection"
+                        />
+                    }
+                    icon={<LinkIcon className="h-6 w-6 text-gray-400" />}
+                    message="You have not created any connections for this component yet."
+                    title="No Connections"
+                />
             )}
 
             {showConnectionNote && (
