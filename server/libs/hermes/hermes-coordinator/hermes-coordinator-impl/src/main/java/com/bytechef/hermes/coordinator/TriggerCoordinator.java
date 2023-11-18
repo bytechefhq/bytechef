@@ -50,7 +50,6 @@ import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -78,8 +77,7 @@ public class TriggerCoordinator {
         List<ApplicationEventListener> applicationEventListeners, List<ErrorEventListener> errorEventListeners,
         ApplicationEventPublisher eventPublisher, InstanceAccessorRegistry instanceAccessorRegistry,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
-        TriggerExecutionService triggerExecutionService,
-        @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorage triggerFileStorage,
+        TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
         TriggerStateService triggerStateService, WorkflowService workflowService) {
 
         this.applicationEventListeners = applicationEventListeners;

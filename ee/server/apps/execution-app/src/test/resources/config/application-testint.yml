@@ -16,9 +16,5 @@ bytechef:
   message-broker:
     provider: jms
   workflow:
-    async:
-      output-storage:
-        provider: base64
-    sync:
-      output-storage:
-        provider: base64
+    output-storage:
+      provider: base64

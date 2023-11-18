@@ -54,7 +54,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,10 +84,8 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         InstanceAccessorRegistry instanceAccessorRegistry, JobService jobService, JobTestExecutor jobTestExecutor,
         InstanceJobService instanceJobService, ProjectInstanceService projectInstanceService,
         ProjectService projectService, TaskExecutionService taskExecutionService,
-        @Qualifier("workflowAsyncTaskFileStorageFacade") TaskFileStorage taskFileStorage,
-        TriggerExecutionService triggerExecutionService,
-        @Qualifier("workflowAsyncTriggerFileStorageFacade") TriggerFileStorage triggerFileStorage,
-        WorkflowService workflowService) {
+        TaskFileStorage taskFileStorage, TriggerExecutionService triggerExecutionService,
+        TriggerFileStorage triggerFileStorage, WorkflowService workflowService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;

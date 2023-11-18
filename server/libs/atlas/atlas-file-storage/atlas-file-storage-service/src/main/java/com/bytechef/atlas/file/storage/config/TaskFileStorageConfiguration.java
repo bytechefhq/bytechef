@@ -27,7 +27,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,43 +48,24 @@ public class TaskFileStorageConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty("bytechef.workflow.async.output-storage.provider")
-    TaskFileStorage workflowAsyncTaskFileStorageFacade(
+    TaskFileStorage workflowTaskFileStorageFacade(
         ObjectMapper objectMapper,
-        @Value("${bytechef.workflow.async.output-storage.provider}") String workflowAsyncOutputStorageProvider) {
+        @Value("${bytechef.workflow.output-storage.provider}") String workflowOutputStorageProvider) {
 
         if (logger.isInfoEnabled()) {
             logger.info(
-                "Workflow async task output storage provider type enabled: %s".formatted(
-                    workflowAsyncOutputStorageProvider));
+                "Workflow task output storage provider type enabled: %s".formatted(workflowOutputStorageProvider));
         }
 
-        return new TaskFileStorageImpl(
-            getFileStorageService(workflowAsyncOutputStorageProvider), objectMapper);
+        return new TaskFileStorageImpl(getFileStorageService(workflowOutputStorageProvider), objectMapper);
     }
 
-    @Bean
-    @ConditionalOnProperty("bytechef.workflow.sync.output-storage.provider")
-    TaskFileStorage workflowSyncTaskFileStorageFacade(
-        ObjectMapper objectMapper,
-        @Value("${bytechef.workflow.sync.output-storage.provider}") String workflowSyncOutputStorageProvider) {
-
-        if (logger.isInfoEnabled()) {
-            logger.info(
-                "Workflow sync task output storage provider type enabled: %s".formatted(
-                    workflowSyncOutputStorageProvider));
-        }
-
-        return new TaskFileStorageImpl(
-            getFileStorageService(workflowSyncOutputStorageProvider), objectMapper);
-    }
-
-    private FileStorageService getFileStorageService(String workflowAsyncOutputStorageProvider) {
-        return switch (workflowAsyncOutputStorageProvider) {
+    private FileStorageService getFileStorageService(String workflowOutputStorageProvider) {
+        return switch (workflowOutputStorageProvider) {
             case "base64" -> new Base64FileStorageService();
             case "filesystem" -> new FilesystemFileStorageService(filesystemFileStorageProperties.getBasedir());
             default -> throw new IllegalArgumentException(
-                "Output storage %s does not exist".formatted(workflowAsyncOutputStorageProvider));
+                "Output storage %s does not exist".formatted(workflowOutputStorageProvider));
         };
     }
 }

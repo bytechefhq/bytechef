@@ -49,7 +49,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
@@ -88,7 +87,6 @@ public class TaskCoordinatorConfiguration {
     private TaskExecutionService taskExecutionService;
 
     @Autowired
-    @Qualifier("workflowAsyncTaskFileStorageFacade")
     private TaskFileStorage taskFileStorage;
 
     @Autowired
