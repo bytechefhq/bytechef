@@ -137,13 +137,23 @@ const MentionsInput = forwardRef(
                     searchTerm: string,
                     renderList: (arg1: Array<object>, arg2: string) => void
                 ) => {
-                    const formattedData = dataPills.map((dataPill) => ({
-                        componentIcon: JSON.parse(
-                            dataPill.componentDefinition as string
-                        ).icon,
-                        id: dataPill.id,
-                        value: dataPill.value,
-                    }));
+                    const formattedData = dataPills.map((dataPill) => {
+                        if (!dataPill.componentDefinition) {
+                            return {
+                                componentIcon: '📄',
+                                id: dataPill.id,
+                                value: dataPill.value,
+                            };
+                        }
+
+                        return {
+                            componentIcon: JSON.parse(
+                                dataPill.componentDefinition as string
+                            ).icon,
+                            id: dataPill.id,
+                            value: dataPill.value,
+                        };
+                    });
 
                     if (searchTerm.length === 0) {
                         renderList(formattedData, searchTerm);
