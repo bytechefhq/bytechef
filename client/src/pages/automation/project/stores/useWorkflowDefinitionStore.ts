@@ -2,7 +2,7 @@
 
 import {ComponentDataType} from '@/types/types';
 import {create} from 'zustand';
-import {devtools} from 'zustand/middleware';
+import {createJSONStorage, devtools, persist} from 'zustand/middleware';
 
 interface WorkflowDefinitionState {
     componentData: Array<ComponentDataType>;
@@ -11,13 +11,17 @@ interface WorkflowDefinitionState {
 
 const useWorkflowDefinitionStore = create<WorkflowDefinitionState>()(
     devtools(
-        (set) => ({
-            componentData: [],
-            setComponentData: (componentData) => set(() => ({componentData})),
-        }),
-        {
-            name: 'workflow-definition',
-        }
+        persist(
+            (set) => ({
+                componentData: [],
+                setComponentData: (componentData) =>
+                    set(() => ({componentData})),
+            }),
+            {
+                name: 'workflow-definition',
+                storage: createJSONStorage(() => sessionStorage),
+            }
+        )
     )
 );
 
