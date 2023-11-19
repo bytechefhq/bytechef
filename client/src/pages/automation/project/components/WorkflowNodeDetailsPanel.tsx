@@ -361,7 +361,11 @@ const WorkflowNodeDetailsPanel = ({
             setActiveTab('description');
         }
 
-        if (activeTab === 'properties' && !currentActionProperties) {
+        if (
+            activeTab === 'properties' &&
+            currentActionFetched &&
+            !currentActionProperties
+        ) {
             setActiveTab('description');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -589,7 +593,7 @@ const WorkflowNodeDetailsPanel = ({
                                             )}
 
                                         {activeTab === 'properties' &&
-                                            !!currentActionProperties?.length && (
+                                            (currentActionProperties?.length ? (
                                                 <Properties
                                                     actionName={
                                                         currentActionName
@@ -609,7 +613,11 @@ const WorkflowNodeDetailsPanel = ({
                                                         currentActionProperties
                                                     }
                                                 />
-                                            )}
+                                            ) : (
+                                                <div className="flex h-full items-center justify-center text-xl">
+                                                    Loading...
+                                                </div>
+                                            ))}
 
                                         {activeTab === 'output' &&
                                             currentAction?.outputSchema && (
