@@ -52,15 +52,20 @@ const DataPillPanelBodyItem = ({
             </AccordionTrigger>
 
             <AccordionContent
-                className="h-full w-full space-y-4 border-b border-gray-100 px-4 pb-4"
+                className="h-full w-full space-y-2 border-b border-gray-100 px-4 pb-4"
                 key={`accordion-content-${componentAction.workflowAlias}`}
             >
-                <ul className="flex w-full flex-col space-y-2 group-data-[state=open]:h-full">
+                <DataPill
+                    componentAlias={componentAction.workflowAlias}
+                    componentIcon={componentAction.componentDefinition.icon}
+                />
+
+                <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">
                     {filteredProperties?.map((property) => (
                         <DataPill
                             componentAlias={componentAction.workflowAlias}
-                            componentDefinition={
-                                componentAction.componentDefinition
+                            componentIcon={
+                                componentAction.componentDefinition.icon
                             }
                             key={property.name}
                             property={property}

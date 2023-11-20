@@ -1,33 +1,31 @@
-import {ComponentDefinitionModel} from '@/middleware/helios/execution';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {PropertyType} from '@/types/projectTypes';
 import {MouseEvent} from 'react';
+import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 const DataPill = ({
     arrayIndex,
     componentAlias,
-    componentDefinition,
+    componentIcon,
     parentProperty,
     property,
 }: {
     arrayIndex?: number;
-    componentDefinition: ComponentDefinitionModel;
+    componentIcon?: string;
     componentAlias: string;
     onClick?: (event: MouseEvent<HTMLDivElement>) => void;
     parentProperty?: PropertyType;
-    property: PropertyType;
+    property?: PropertyType;
 }) => {
-    const subProperties = property.properties || property.items;
-
     const {focusedInput} = useWorkflowNodeDetailsPanelStore();
 
     const mentionInput = focusedInput?.getEditor().getModule('mention');
 
     const addDataPillToInput = (
         componentAlias: string,
-        property: PropertyType,
+        propertyName?: string,
         parentProperty?: PropertyType,
         arrayIndex?: number
     ) => {
@@ -35,20 +33,37 @@ const DataPill = ({
 
         const dataPillName = parentPropertyName
             ? `${parentPropertyName}/${
-                  property.name ? property.name : `[${arrayIndex}]`
+                  propertyName ? propertyName : `[${arrayIndex}]`
               }`
-            : `${property.name}`;
+            : `${propertyName || componentAlias}`;
 
         mentionInput.insertItem(
             {
-                componentIcon: componentDefinition.icon,
-                id: property.name,
-                value: `${componentAlias}/${dataPillName}`,
+                componentIcon: componentIcon,
+                id: propertyName || componentAlias,
+                value: propertyName
+                    ? `${componentAlias}/${dataPillName}`
+                    : componentAlias,
             },
             true,
             {blotName: 'property-mention'}
         );
     };
+
+    if (!property && componentIcon) {
+        return (
+            <div
+                className="flex cursor-pointer items-center space-x-2 rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50"
+                onClick={() => addDataPillToInput(componentAlias)}
+            >
+                <InlineSVG className="h-6 w-6" src={componentIcon} />
+
+                <span>{componentAlias}</span>
+            </div>
+        );
+    }
+
+    const subProperties = property?.properties || property?.items;
 
     return (
         <li
@@ -60,25 +75,30 @@ const DataPill = ({
         >
             <div
                 className="mr-auto flex cursor-pointer items-center rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50"
-                data-name={property.name}
+                data-name={property?.name || componentAlias}
                 draggable
                 onClick={() =>
                     addDataPillToInput(
                         componentAlias,
-                        property,
+                        property?.name,
                         parentProperty,
                         arrayIndex
                     )
                 }
                 onDragStart={(event) =>
-                    event.dataTransfer.setData('name', property.name!)
+                    event.dataTransfer.setData(
+                        'name',
+                        property?.name || componentAlias
+                    )
                 }
             >
-                <span className="mr-2" title={property.type}>
-                    {TYPE_ICONS[property.type as keyof typeof TYPE_ICONS]}
+                <span className="mr-2" title={property?.type}>
+                    {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
                 </span>
 
-                {property.name ? property.name : `[${arrayIndex}]`}
+                {property?.name
+                    ? property?.name
+                    : `[${arrayIndex}]` || componentAlias}
             </div>
 
             {!!subProperties?.length && (
@@ -87,7 +107,7 @@ const DataPill = ({
                         <DataPill
                             arrayIndex={index}
                             componentAlias={componentAlias}
-                            componentDefinition={componentDefinition}
+                            componentIcon={componentIcon}
                             key={`${componentAlias}-${subProperty.name}-${index}`}
                             parentProperty={property}
                             property={subProperty}
