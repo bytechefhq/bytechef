@@ -28,6 +28,7 @@ import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class HttpClientGetAction {
 
@@ -42,7 +43,7 @@ public class HttpClientGetAction {
 
                 HttpClientConstants.COMMON_PROPERTIES))
         .outputSchema(HttpClientConstants.OUTPUT_PROPERTIES)
-        .perform(HttpClientDeleteAction::perform);
+        .perform(HttpClientGetAction::perform);
 
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionDefinition.ActionContext context) {
