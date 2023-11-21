@@ -10,7 +10,7 @@ type CreateProjectInstanceMutationProps = {
         result: ProjectInstanceModel,
         variables: ProjectInstanceModel
     ) => void;
-    onError?: (error: object, variables: ProjectInstanceModel) => void;
+    onError?: (error: Error, variables: ProjectInstanceModel) => void;
 };
 
 export const useCreateProjectInstanceMutation = (
@@ -28,7 +28,7 @@ export const useCreateProjectInstanceMutation = (
 
 type DeleteProjectInstanceMutationProps = {
     onSuccess?: (result: void, variables: number) => void;
-    onError?: (error: object, variables: number) => void;
+    onError?: (error: Error, variables: number) => void;
 };
 
 export const useDeleteProjectInstanceMutation = (
@@ -46,7 +46,7 @@ export const useDeleteProjectInstanceMutation = (
 
 type EnableProjectInstanceMutationProps = {
     onSuccess?: (result: void, variables: EnableProjectInstanceRequest) => void;
-    onError?: (error: object, variables: EnableProjectInstanceRequest) => void;
+    onError?: (error: Error, variables: EnableProjectInstanceRequest) => void;
 };
 
 export const useEnableProjectInstanceMutation = (
@@ -65,7 +65,7 @@ type UpdateProjectInstanceMutationProps = {
         result: ProjectInstanceModel,
         variables: ProjectInstanceModel
     ) => void;
-    onError?: (error: object, variables: ProjectInstanceModel) => void;
+    onError?: (error: Error, variables: ProjectInstanceModel) => void;
 };
 
 export const useUpdateProjectInstanceMutation = (

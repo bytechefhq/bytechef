@@ -7,7 +7,7 @@ import {
 
 type CreateProjectMutationProps = {
     onSuccess?: (result: ProjectModel, variables: ProjectModel) => void;
-    onError?: (error: object, variables: ProjectModel) => void;
+    onError?: (error: Error, variables: ProjectModel) => void;
 };
 
 export const useCreateProjectMutation = (
@@ -25,7 +25,7 @@ export const useCreateProjectMutation = (
 
 type DeleteProjectMutationProps = {
     onSuccess?: (result: void, variables: number) => void;
-    onError?: (error: object, variables: number) => void;
+    onError?: (error: Error, variables: number) => void;
 };
 
 export const useDeleteProjectMutation = (
@@ -41,7 +41,7 @@ export const useDeleteProjectMutation = (
 
 type DuplicateProjectMutationProps = {
     onSuccess?: (result: ProjectModel, variables: number) => void;
-    onError?: (error: object, variables: number) => void;
+    onError?: (error: Error, variables: number) => void;
 };
 
 export const useDuplicateProjectMutation = (
@@ -62,7 +62,7 @@ type PublishProjectMutationProps = {
         result: ProjectModel,
         variables: PublishProjectRequest
     ) => void;
-    onError?: (error: object, variables: PublishProjectRequest) => void;
+    onError?: (error: Error, variables: PublishProjectRequest) => void;
 };
 
 export const usePublishProjectMutation = (
@@ -78,7 +78,7 @@ export const usePublishProjectMutation = (
 
 type UpdateProjectMutationProps = {
     onSuccess?: (result: ProjectModel, variables: ProjectModel) => void;
-    onError?: (error: object, variables: ProjectModel) => void;
+    onError?: (error: Error, variables: ProjectModel) => void;
 };
 
 export const useUpdateProjectMutation = (

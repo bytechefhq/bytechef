@@ -11,7 +11,7 @@ type EnableProjectInstanceWorkflowMutationProps = {
         variables: EnableProjectInstanceWorkflowRequest
     ) => void;
     onError?: (
-        error: object,
+        error: Error,
         variables: EnableProjectInstanceWorkflowRequest
     ) => void;
 };
@@ -34,7 +34,7 @@ type UpdateProjectInstanceWorkflowMutationProps = {
         result: ProjectInstanceWorkflowModel,
         variables: ProjectInstanceWorkflowModel
     ) => void;
-    onError?: (error: object, variables: ProjectInstanceWorkflowModel) => void;
+    onError?: (error: Error, variables: ProjectInstanceWorkflowModel) => void;
 };
 
 export const useUpdateProjectInstanceWorkflowMutation = (

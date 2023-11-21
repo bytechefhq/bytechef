@@ -9,7 +9,7 @@ import {useMutation} from '@tanstack/react-query';
 
 type DeleteWorkflowMutationProps = {
     onSuccess?: (result: void, variables: DeleteProjectWorkflowRequest) => void;
-    onError?: (error: object, variables: DeleteProjectWorkflowRequest) => void;
+    onError?: (error: Error, variables: DeleteProjectWorkflowRequest) => void;
 };
 
 export const useDeleteWorkflowMutation = (
@@ -28,7 +28,7 @@ type DuplicateWorkflowMutationProps = {
         result: WorkflowModel,
         variables: DuplicateWorkflowRequest
     ) => void;
-    onError?: (error: object, variables: DuplicateWorkflowRequest) => void;
+    onError?: (error: Error, variables: DuplicateWorkflowRequest) => void;
 };
 
 export const useDuplicateWorkflowMutation = (
@@ -47,7 +47,7 @@ type UpdateWorkflowMutationProps = {
         result: WorkflowModel,
         variables: UpdateWorkflowRequest
     ) => void;
-    onError?: (error: object, variables: UpdateWorkflowRequest) => void;
+    onError?: (error: Error, variables: UpdateWorkflowRequest) => void;
 };
 
 export const useUpdateWorkflowMutation = (
