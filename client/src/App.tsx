@@ -58,7 +58,7 @@ function App() {
     const location = useLocation();
 
     useEffect(() => {
-        document.title = titles[location.pathname] ?? 'Bytechef';
+        document.title = titles[location.pathname] ?? 'ByteChef';
     }, [location]);
 
     return (
