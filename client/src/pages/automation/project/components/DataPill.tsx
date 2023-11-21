@@ -10,6 +10,7 @@ const DataPill = ({
     componentAlias,
     componentIcon,
     parentProperty,
+    path,
     property,
 }: {
     arrayIndex?: number;
@@ -18,23 +19,23 @@ const DataPill = ({
     onClick?: (event: MouseEvent<HTMLDivElement>) => void;
     parentProperty?: PropertyType;
     property?: PropertyType;
+    path?: string;
 }) => {
     const {focusedInput} = useWorkflowNodeDetailsPanelStore();
 
     const mentionInput = focusedInput?.getEditor().getModule('mention');
 
+    const subProperties = property?.properties || property?.items;
+
     const addDataPillToInput = (
         componentAlias: string,
         propertyName?: string,
-        parentProperty?: PropertyType,
+        parentPropertyName?: string,
+        path?: string,
         arrayIndex?: number
     ) => {
-        const parentPropertyName = parentProperty?.name;
-
         const dataPillName = parentPropertyName
-            ? `${parentPropertyName}/${
-                  propertyName ? propertyName : `[${arrayIndex}]`
-              }`
+            ? `${parentPropertyName}/${propertyName || `[${arrayIndex}]`}`
             : `${propertyName || componentAlias}`;
 
         mentionInput.insertItem(
@@ -42,13 +43,18 @@ const DataPill = ({
                 componentIcon: componentIcon,
                 id: propertyName || componentAlias,
                 value: propertyName
-                    ? `${componentAlias}/${dataPillName}`
+                    ? `${componentAlias}/${path || dataPillName}`
                     : componentAlias,
             },
             true,
             {blotName: 'property-mention'}
         );
     };
+
+    const getSubPropertyPath = (subPropertyName = '[0]') =>
+        path
+            ? `${path}/${subPropertyName}`
+            : `${property?.name || `[${arrayIndex}]`}/${subPropertyName}`;
 
     if (!property && componentIcon) {
         return (
@@ -62,8 +68,6 @@ const DataPill = ({
             </div>
         );
     }
-
-    const subProperties = property?.properties || property?.items;
 
     return (
         <li
@@ -81,7 +85,8 @@ const DataPill = ({
                     addDataPillToInput(
                         componentAlias,
                         property?.name,
-                        parentProperty,
+                        parentProperty?.name,
+                        path,
                         arrayIndex
                     )
                 }
@@ -110,6 +115,7 @@ const DataPill = ({
                             componentIcon={componentIcon}
                             key={`${componentAlias}-${subProperty.name}-${index}`}
                             parentProperty={property}
+                            path={getSubPropertyPath(subProperty.name)}
                             property={subProperty}
                         />
                     ))}
