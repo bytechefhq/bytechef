@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.execution.repository.jdbc;
+package com.bytechef.hermes.execution.repository;
 
-import com.bytechef.atlas.execution.domain.Job;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -26,9 +25,9 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-public interface CustomJobRepository {
+public interface CustomInstanceJobRepository {
 
-    Page<Job> findAll(
+    Page<Long> findAllJobIds(
         String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
         @NonNull List<String> workflowIds, Pageable pageable);
 }

@@ -19,8 +19,6 @@
 package com.bytechef.atlas.execution.repository;
 
 import com.bytechef.atlas.execution.domain.Job;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,15 +43,13 @@ public interface JobRepository {
 
     Page<Job> findAll(Pageable pageable);
 
-    Page<Job> findAll(
-        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
-        List<String> workflowIds, Pageable pageable);
-
     Optional<Job> findById(Long id);
 
     Job findByTaskExecutionId(Long taskExecutionId);
 
-    Optional<Job> findLatestJob();
+    Optional<Job> findLastJob();
+
+    Optional<Job> findTop1ByWorkflowIdOrderById(String workflowId);
 
     Job save(Job job);
 }

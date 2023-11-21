@@ -30,8 +30,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface JdbcJobRepository
-    extends ListPagingAndSortingRepository<Job, Long>, ListCrudRepository<Job, Long>, JobRepository,
-    CustomJobRepository {
+    extends ListPagingAndSortingRepository<Job, Long>, ListCrudRepository<Job, Long>, JobRepository {
 
     @Override
     Optional<Job> findById(Long id);
@@ -50,7 +49,10 @@ public interface JdbcJobRepository
 
     @Override
     @Query("SELECT * FROM job ORDER BY create_date DESC LIMIT 1")
-    Optional<Job> findLatestJob();
+    Optional<Job> findLastJob();
+
+    @Override
+    Optional<Job> findTop1ByWorkflowIdOrderById(String workflowId);
 
     @Override
     @Query("SELECT * FROM job j WHERE j.id = (SELECT job_id FROM task_execution te WHERE te.id=:taskExecutionId)")

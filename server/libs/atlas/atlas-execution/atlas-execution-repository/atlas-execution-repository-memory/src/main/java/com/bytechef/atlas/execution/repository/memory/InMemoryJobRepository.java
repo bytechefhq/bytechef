@@ -24,9 +24,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -83,21 +81,17 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
-    public Page<Job> findAll(
-        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
-        List<String> workflowIds,
-        Pageable pageable) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Optional<Job> findById(Long id) {
         return Optional.ofNullable(jobs.get(id));
     }
 
     @Override
-    public Optional<Job> findLatestJob() {
+    public Optional<Job> findLastJob() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<Job> findTop1ByWorkflowIdOrderById(String workflowId) {
         throw new UnsupportedOperationException();
     }
 

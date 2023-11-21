@@ -11,7 +11,10 @@ import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import com.bytechef.hermes.execution.domain.InstanceJob;
 import com.bytechef.hermes.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,6 +41,17 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
     }
 
     @Override
+    public Optional<Long> fetchLastJobId(long instanceId, int type) {
+        return Optional.ofNullable(
+            loadBalancedWebClient.get(
+                uriBuilder -> uriBuilder
+                    .host(EXECUTION_APP)
+                    .path(INSTANCE_JOB_SERVICE + "/fetch-last-job-id/{instanceId}/{type}")
+                    .build(instanceId, type),
+                Long.class));
+    }
+
+    @Override
     public Optional<Long> fetchJobInstanceId(long jobId, int type) {
         return Optional.ofNullable(
             loadBalancedWebClient.get(
@@ -46,5 +60,13 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
                     .path(INSTANCE_JOB_SERVICE + "/fetch-job-instance-id/{jobId}/{type}")
                     .build(jobId, type),
                 Long.class));
+    }
+
+    @Override
+    public Page<Long> getJobIds(
+        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        List<String> workflowIds, int pageNumber) {
+
+        throw new UnsupportedOperationException();
     }
 }
