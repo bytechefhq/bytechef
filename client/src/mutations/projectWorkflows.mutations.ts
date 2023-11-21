@@ -10,7 +10,7 @@ type CreateProjectWorkflowMutationProps = {
         result: WorkflowModel,
         variables: CreateProjectWorkflowRequest
     ) => void;
-    onError?: (error: object, variables: CreateProjectWorkflowRequest) => void;
+    onError?: (error: Error, variables: CreateProjectWorkflowRequest) => void;
 };
 
 export const useCreateProjectWorkflowMutation = (

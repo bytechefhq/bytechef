@@ -11,7 +11,7 @@ type UpdateProjectInstanceTagsMutationProps = {
         variables: UpdateProjectInstanceTagsRequest
     ) => void;
     onError?: (
-        error: object,
+        error: Error,
         variables: UpdateProjectInstanceTagsRequest
     ) => void;
 };
