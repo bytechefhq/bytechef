@@ -25,7 +25,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
  */
 public interface InstanceJobFacade {
 
-    Job createJob(JobParameters jobParameters, long instanceId, int type);
+    Job createAsyncJob(JobParameters jobParameters, long instanceId, int type);
 
-    Job createJob(JobParameters jobParameters, Workflow workflow, long instanceId, int type);
+    Job createSyncJob(JobParameters jobParameters, Workflow workflow, long instanceId, int type);
 }

@@ -22,10 +22,10 @@ import com.bytechef.atlas.configuration.task.CancelControlTask;
 import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.ErrorEvent;
-import com.bytechef.atlas.coordinator.event.JobResumeEvent;
-import com.bytechef.atlas.coordinator.event.JobStartEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
-import com.bytechef.atlas.coordinator.event.JobStopEvent;
+import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
+import com.bytechef.atlas.coordinator.event.StartJobEvent;
+import com.bytechef.atlas.coordinator.event.StopJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
@@ -112,35 +112,35 @@ public class TaskCoordinator {
     /**
      * Resume a stopped or failed job.
      *
-     * @param jobResumeEvent The job resume vent.
+     * @param resumeJobEvent The job resume vent.
      */
 // TODO @Transactional
-    public void onJobResumeEvent(JobResumeEvent jobResumeEvent) {
+    public void onResumeJobEvent(ResumeJobEvent resumeJobEvent) {
         if (logger.isDebugEnabled()) {
-            logger.debug("onJobResumeEvent: jobResumeEvent={}", jobResumeEvent);
+            logger.debug("onResumeJobEvent: resumeJobEvent={}", resumeJobEvent);
         }
 
-        Job job = jobService.resumeToStatusStarted(jobResumeEvent.getJobId());
+        Job job = jobService.resumeToStatusStarted(resumeJobEvent.getJobId());
 
         jobExecutor.execute(job);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Job id={} resumed", jobResumeEvent.getJobId());
+            logger.debug("Job id={} resumed", resumeJobEvent.getJobId());
         }
     }
 
     /**
      * Start a running job.
      *
-     * @param jobStartEvent The job start event
+     * @param startJobEvent The job start event
      */
 // TODO @Transactional
-    public void onJobStartEvent(JobStartEvent jobStartEvent) {
+    public void onStartJobEvent(StartJobEvent startJobEvent) {
         if (logger.isDebugEnabled()) {
-            logger.debug("onJobStartEvent: jobStartEvent={}", jobStartEvent);
+            logger.debug("onStartJobEvent: startJobEvent={}", startJobEvent);
         }
 
-        Job job = jobService.setStatusToStarted(jobStartEvent.getJobId());
+        Job job = jobService.setStatusToStarted(startJobEvent.getJobId());
 
         jobExecutor.execute(job);
 
@@ -148,27 +148,27 @@ public class TaskCoordinator {
             new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Job id={} started", jobStartEvent.getJobId());
+            logger.debug("Job id={} started", startJobEvent.getJobId());
         }
     }
 
     /**
      * Stop a running job.
      *
-     * @param jobStopEvent The job stop event
+     * @param stopJobEvent The job stop event
      */
 // TODO @Transactional
-    public void onJobStopEvent(JobStopEvent jobStopEvent) {
+    public void onStopJobEvent(StopJobEvent stopJobEvent) {
         if (logger.isDebugEnabled()) {
-            logger.debug("onJobStopEvent: jobStopEvent={}", jobStopEvent);
+            logger.debug("onStopJobEvent: stopJobEvent={}", stopJobEvent);
         }
 
-        Job job = jobService.setStatusToStopped(jobStopEvent.getJobId());
+        Job job = jobService.setStatusToStopped(stopJobEvent.getJobId());
 
         eventPublisher.publishEvent(
             new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
 
-        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobStopEvent.getJobId());
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(stopJobEvent.getJobId());
 
         if (!taskExecutions.isEmpty()) {
             TaskExecution currentTaskExecution = taskExecutions.get(taskExecutions.size() - 1);
@@ -185,7 +185,7 @@ public class TaskCoordinator {
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Job id={} stopped", jobStopEvent.getJobId());
+            logger.debug("Job id={} stopped", stopJobEvent.getJobId());
         }
     }
 

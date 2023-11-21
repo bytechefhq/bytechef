@@ -46,16 +46,16 @@ public class TaskCoordinatorMessageBrokerConfigurerConfiguration {
                 subscriptions.getTaskExecutionErrorEvents(), taskCoordinator, "onErrorEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskCoordinatorMessageRoute.JOB_RESUME_EVENTS,
-                subscriptions.getJobResumeEvents(),
-                taskCoordinator, "onJobResumeEvent");
+                subscriptions.getResumeJobEvents(),
+                taskCoordinator, "onResumeJobEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskCoordinatorMessageRoute.JOB_START_EVENTS,
-                subscriptions.getJobStartEvents(),
-                taskCoordinator, "onJobStartEvent");
+                subscriptions.getStartJobEvents(),
+                taskCoordinator, "onStartJobEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskCoordinatorMessageRoute.JOB_STOP_EVENTS,
-                subscriptions.getJobStopEvents(),
-                taskCoordinator, "onJobStopEvent");
+                subscriptions.getStopJobEvents(),
+                taskCoordinator, "onStopJobEvent");
             messageBrokerListenerRegistrar.registerListenerEndpoint(
                 listenerEndpointRegistrar, TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
                 subscriptions.getTaskExecutionCompleteEvents(), taskCoordinator, "onTaskExecutionCompleteEvent");

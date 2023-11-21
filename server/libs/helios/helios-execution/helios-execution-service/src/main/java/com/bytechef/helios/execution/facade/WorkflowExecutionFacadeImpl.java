@@ -149,9 +149,11 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         if (workflowIds.isEmpty()) {
             jobsPage = Page.empty();
         } else {
-            jobsPage = jobService.getJobsPage(
-                jobStatus, jobStartDate, jobEndDate, projectInstanceId, ProjectConstants.PROJECT_TYPE, workflowIds,
-                pageNumber);
+            jobsPage = instanceJobService
+                .getJobIds(
+                    jobStatus, jobStartDate, jobEndDate, projectInstanceId, ProjectConstants.PROJECT_TYPE, workflowIds,
+                    pageNumber)
+                .map(jobService::getJob);
         }
 
         List<Project> projects = new ArrayList<>();

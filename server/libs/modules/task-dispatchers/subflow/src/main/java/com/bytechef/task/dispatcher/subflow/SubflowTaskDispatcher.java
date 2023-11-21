@@ -55,7 +55,7 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
             taskExecution.getId(),
             MapUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
 
-        jobFacade.createJob(jobParameters);
+        jobFacade.createAsyncJob(jobParameters);
     }
 
     @Override

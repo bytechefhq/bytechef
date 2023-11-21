@@ -20,7 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
-import com.bytechef.atlas.coordinator.event.JobStartEvent;
+import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
@@ -169,11 +169,11 @@ public class JobSyncExecutor {
             TaskCoordinatorMessageRoute.TASK_EXECUTION_COMPLETE_EVENTS,
             e -> taskCoordinator.onTaskExecutionCompleteEvent((TaskExecutionCompleteEvent) e));
         syncMessageBroker.receive(TaskCoordinatorMessageRoute.JOB_START_EVENTS,
-            e -> taskCoordinator.onJobStartEvent((JobStartEvent) e));
+            e -> taskCoordinator.onStartJobEvent((StartJobEvent) e));
     }
 
     public Job execute(JobParameters jobParameters) {
-        return jobService.getJob(jobFacade.createJob(jobParameters));
+        return jobService.getJob(jobFacade.createAsyncJob(jobParameters));
     }
 
     public Job execute(JobParameters jobParameters, JobFactoryFunction jobFactoryFunction) {
@@ -181,7 +181,7 @@ public class JobSyncExecutor {
             eventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction),
             taskFileStorage, workflowService);
 
-        return jobService.getJob(jobFacade.createJob(jobParameters));
+        return jobService.getJob(jobFacade.createAsyncJob(jobParameters));
     }
 
     private static ApplicationEventPublisher createEventPublisher(SyncMessageBroker syncMessageBroker) {
@@ -204,7 +204,7 @@ public class JobSyncExecutor {
     @FunctionalInterface
     public interface JobFactoryFunction {
 
-        Job create(JobParameters jobParameters, Workflow workflow);
+        Job apply(JobParameters jobParameters, Workflow workflow);
     }
 
     private record JobServiceWrapper(JobFactoryFunction jobFactoryFunction)
@@ -227,20 +227,16 @@ public class JobSyncExecutor {
 
         @Override
         public Job create(JobParameters jobParameters, Workflow workflow) {
-            return jobFactoryFunction.create(jobParameters, workflow);
+            return jobFactoryFunction.apply(jobParameters, workflow);
         }
 
         @Override
-        public Optional<Job> fetchLatestJob() {
+        public Optional<Job> fetchLastJob() {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public Page<Job> getJobsPage(
-            String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
-            List<String> workflowIds,
-            int pageNumber) {
-
+        public Optional<Job> fetchLastWorkflowJob(String workflowId) {
             throw new UnsupportedOperationException();
         }
 

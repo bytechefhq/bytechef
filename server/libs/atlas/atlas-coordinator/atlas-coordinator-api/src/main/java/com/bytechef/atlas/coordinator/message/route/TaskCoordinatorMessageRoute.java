@@ -28,11 +28,11 @@ public class TaskCoordinatorMessageRoute implements MessageRoute {
     public static final TaskCoordinatorMessageRoute ERROR_EVENTS = new TaskCoordinatorMessageRoute(
         Exchange.MESSAGE, "task.error_events");
     public static final TaskCoordinatorMessageRoute JOB_RESUME_EVENTS =
-        new TaskCoordinatorMessageRoute(Exchange.MESSAGE, "task.job_resume_events");
+        new TaskCoordinatorMessageRoute(Exchange.MESSAGE, "task.resume_job_events");
     public static final TaskCoordinatorMessageRoute JOB_START_EVENTS =
-        new TaskCoordinatorMessageRoute(Exchange.MESSAGE, "task.job_start_events");
+        new TaskCoordinatorMessageRoute(Exchange.MESSAGE, "task.start_job_events");
     public static final TaskCoordinatorMessageRoute JOB_STOP_EVENTS =
-        new TaskCoordinatorMessageRoute(Exchange.MESSAGE, "task.job_stop_events");
+        new TaskCoordinatorMessageRoute(Exchange.MESSAGE, "task.stop_job_events");
     public static final TaskCoordinatorMessageRoute TASK_EXECUTION_COMPLETE_EVENTS =
         new TaskCoordinatorMessageRoute(Exchange.MESSAGE, "task.task_execution_complete_events");
     protected MessageRoute.Exchange exchange;

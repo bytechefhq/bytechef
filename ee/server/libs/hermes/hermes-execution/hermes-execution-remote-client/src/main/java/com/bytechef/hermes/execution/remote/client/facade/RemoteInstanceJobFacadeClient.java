@@ -34,12 +34,12 @@ public class RemoteInstanceJobFacadeClient implements InstanceJobFacade {
     }
 
     @Override
-    public Job createJob(JobParameters jobParameters, long instanceId, int type) {
+    public Job createAsyncJob(JobParameters jobParameters, long instanceId, int type) {
         return post(new CreateJobRequest(jobParameters, null, instanceId, type));
     }
 
     @Override
-    public Job createJob(JobParameters jobParameters, Workflow workflow, long instanceId, int type) {
+    public Job createSyncJob(JobParameters jobParameters, Workflow workflow, long instanceId, int type) {
         return post(new CreateJobRequest(jobParameters, workflow, instanceId, type));
     }
 

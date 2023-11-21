@@ -44,10 +44,10 @@ public class RemoteInstanceJobFacadeController {
         Job job;
 
         if (createJobRequest.workflow == null) {
-            job = instanceJobFacade.createJob(
+            job = instanceJobFacade.createAsyncJob(
                 createJobRequest.jobParameters, createJobRequest.instanceId, createJobRequest.type);
         } else {
-            job = instanceJobFacade.createJob(
+            job = instanceJobFacade.createSyncJob(
                 createJobRequest.jobParameters, createJobRequest.workflow, createJobRequest.instanceId,
                 createJobRequest.type);
         }

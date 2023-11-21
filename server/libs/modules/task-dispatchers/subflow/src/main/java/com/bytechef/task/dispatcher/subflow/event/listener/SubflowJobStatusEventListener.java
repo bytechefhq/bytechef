@@ -20,7 +20,7 @@ package com.bytechef.task.dispatcher.subflow.event.listener;
 
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
-import com.bytechef.atlas.coordinator.event.JobStopEvent;
+import com.bytechef.atlas.coordinator.event.StopJobEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
@@ -81,7 +81,7 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
                         job.getParentTaskExecutionId());
 
                     eventPublisher.publishEvent(
-                        new JobStopEvent(Validate.notNull(subflowTaskExecution.getJobId(), "jobId")));
+                        new StopJobEvent(Validate.notNull(subflowTaskExecution.getJobId(), "jobId")));
 
                 }
                 case FAILED -> {
