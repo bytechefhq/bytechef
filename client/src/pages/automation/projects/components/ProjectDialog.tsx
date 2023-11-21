@@ -86,33 +86,21 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
 
     const queryClient = useQueryClient();
 
-    const createProjectMutation = useCreateProjectMutation({
-        onSuccess: (project: ProjectModel) => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectCategoryKeys.projectCategories,
-            });
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-            queryClient.invalidateQueries({
-                queryKey: ProjectTagKeys.projectTags,
-            });
+    const onSuccess = (project: ProjectModel) => {
+        queryClient.invalidateQueries({
+            queryKey: ProjectCategoryKeys.projectCategories,
+        });
+        queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+        queryClient.invalidateQueries({
+            queryKey: ProjectTagKeys.projectTags,
+        });
 
-            closeDialog(project);
-        },
-    });
+        closeDialog(project);
+    };
 
-    const updateProjectMutation = useUpdateProjectMutation({
-        onSuccess: (project: ProjectModel) => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectCategoryKeys.projectCategories,
-            });
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-            queryClient.invalidateQueries({
-                queryKey: ProjectTagKeys.projectTags,
-            });
+    const createProjectMutation = useCreateProjectMutation({onSuccess});
 
-            closeDialog(project);
-        },
-    });
+    const updateProjectMutation = useUpdateProjectMutation({onSuccess});
 
     const tagNames = project?.tags?.map((tag) => tag.name);
 

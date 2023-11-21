@@ -9,6 +9,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {Badge} from '@/components/ui/badge';
+import {Button} from '@/components/ui/button';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
@@ -38,7 +39,7 @@ import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import TagList from '../../../components/TagList/TagList';
+import TagList from '../../../../components/TagList/TagList';
 import ProjectInstanceDialog from './ProjectInstanceDialog';
 
 interface ProjectItemProps {
@@ -92,7 +93,7 @@ const ProjectInstanceListItem = ({
     });
 
     return (
-        <>
+        <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
             <div className="flex items-center justify-between">
                 <div className="w-10/12">
                     <div className="flex items-center justify-between">
@@ -217,7 +218,9 @@ const ProjectInstanceListItem = ({
                 <div className="flex w-1/12 justify-end">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                            <Button size="icon" variant="ghost">
+                                <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                            </Button>
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
@@ -282,7 +285,7 @@ const ProjectInstanceListItem = ({
                     projectInstance={projectInstance}
                 />
             )}
-        </>
+        </div>
     );
 };
 

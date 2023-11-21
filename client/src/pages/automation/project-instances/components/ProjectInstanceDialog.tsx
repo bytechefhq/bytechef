@@ -69,42 +69,31 @@ const ProjectInstanceDialog = ({
 
     const queryClient = useQueryClient();
 
-    const createProjectInstanceMutation = useCreateProjectInstanceMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectInstanceKeys.projectInstances,
-            });
-            queryClient.invalidateQueries({
-                queryKey: ProjectInstanceTagKeys.projectInstanceTags,
-            });
-            queryClient.invalidateQueries({
-                queryKey: ProjectKeys.filteredProjects({}),
-            });
+    const onSuccess = () => {
+        queryClient.invalidateQueries({
+            queryKey: ProjectInstanceKeys.projectInstances,
+        });
+        queryClient.invalidateQueries({
+            queryKey: ProjectInstanceTagKeys.projectInstanceTags,
+        });
+        queryClient.invalidateQueries({
+            queryKey: ProjectKeys.filteredProjects({}),
+        });
 
-            closeDialog();
-            setActiveStepIndex(0);
-        },
+        closeDialog();
+        setActiveStepIndex(0);
+    };
+
+    const createProjectInstanceMutation = useCreateProjectInstanceMutation({
+        onSuccess,
     });
 
     const updateProjectInstanceMutation = useUpdateProjectInstanceMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectInstanceKeys.projectInstances,
-            });
-            queryClient.invalidateQueries({
-                queryKey: ProjectInstanceTagKeys.projectInstanceTags,
-            });
-            queryClient.invalidateQueries({
-                queryKey: ProjectKeys.filteredProjects({}),
-            });
-
-            closeDialog();
-            setActiveStepIndex(0);
-        },
+        onSuccess,
     });
 
     function closeDialog() {
-        reset();
+        reset({});
 
         setActiveStepIndex(0);
         setIsOpen(false);
@@ -125,6 +114,7 @@ const ProjectInstanceDialog = ({
                     register={register}
                     setValue={setValue}
                     touchedFields={formState.touchedFields}
+                    trigger={trigger}
                 />
             ),
             name: 'Basic',

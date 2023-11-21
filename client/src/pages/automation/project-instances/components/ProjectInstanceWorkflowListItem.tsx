@@ -12,7 +12,7 @@ import {
 } from '@/middleware/helios/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/projectInstanceWorkflows.mutations';
-import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/ProjectInstanceEditWorkflowDialog';
+import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/components/ProjectInstanceEditWorkflowDialog';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';

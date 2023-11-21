@@ -1,4 +1,4 @@
-import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowsStepItem';
+import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
 import {useGetProjectWorkflowsQuery} from '@/queries/projects.queries';
 import {ProjectInstanceModel} from 'middleware/helios/configuration';
 import {Control, UseFormGetValues, UseFormRegister} from 'react-hook-form';
