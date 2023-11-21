@@ -54,7 +54,7 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
-    public Optional<Job> fetchLatestJob() {
+    public Optional<Job> fetchLastJob() {
         throw new UnsupportedOperationException();
     }
 

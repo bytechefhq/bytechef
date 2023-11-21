@@ -23,7 +23,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
  */
 public interface JobFacade {
 
-    long createJob(JobParameters jobParameters);
+    long createAsyncJob(JobParameters jobParameters);
 
     void restartJob(Long id);
 

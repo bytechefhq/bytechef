@@ -17,10 +17,10 @@
 package com.bytechef.atlas.execution.facade;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.coordinator.event.JobResumeEvent;
-import com.bytechef.atlas.coordinator.event.JobStartEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
-import com.bytechef.atlas.coordinator.event.JobStopEvent;
+import com.bytechef.atlas.coordinator.event.ResumeJobEvent;
+import com.bytechef.atlas.coordinator.event.StartJobEvent;
+import com.bytechef.atlas.coordinator.event.StopJobEvent;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
@@ -65,7 +65,7 @@ public class JobFacadeImpl implements JobFacade {
     // the job id is missing.
     @Override
     @Transactional(propagation = Propagation.NEVER)
-    public long createJob(JobParameters jobParameters) {
+    public long createAsyncJob(JobParameters jobParameters) {
         Job job = jobService.create(jobParameters, workflowService.getWorkflow(jobParameters.getWorkflowId()));
 
         long jobId = Validate.notNull(job.getId(), "id");
@@ -77,18 +77,18 @@ public class JobFacadeImpl implements JobFacade {
             taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, job.getInputs()));
 
         eventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, job.getStatus()));
-        eventPublisher.publishEvent(new JobStartEvent(jobId));
+        eventPublisher.publishEvent(new StartJobEvent(jobId));
 
         return jobId;
     }
 
     @Override
     public void restartJob(Long id) {
-        eventPublisher.publishEvent(new JobResumeEvent(id));
+        eventPublisher.publishEvent(new ResumeJobEvent(id));
     }
 
     @Override
     public void stopJob(Long id) {
-        eventPublisher.publishEvent(new JobStopEvent(id));
+        eventPublisher.publishEvent(new StopJobEvent(id));
     }
 }

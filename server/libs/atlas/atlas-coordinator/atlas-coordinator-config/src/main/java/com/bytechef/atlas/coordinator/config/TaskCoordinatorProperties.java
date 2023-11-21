@@ -41,9 +41,9 @@ public class TaskCoordinatorProperties {
     public static class TaskCoordinatorSubscriptions {
 
         private int applicationEvents = 1;
-        private int jobResumeEvents = 1;
-        private int jobStartEvents = 1;
-        private int jobStopEvents = 1;
+        private int resumeJobEvents = 1;
+        private int startJobEvents = 1;
+        private int stopJobEvents = 1;
         private int taskExecutionCompleteEvents = 1;
         private int taskExecutionErrorEvents = 1;
 
@@ -51,16 +51,16 @@ public class TaskCoordinatorProperties {
             return applicationEvents;
         }
 
-        public int getJobResumeEvents() {
-            return jobResumeEvents;
+        public int getResumeJobEvents() {
+            return resumeJobEvents;
         }
 
-        public int getJobStartEvents() {
-            return jobStartEvents;
+        public int getStartJobEvents() {
+            return startJobEvents;
         }
 
-        public int getJobStopEvents() {
-            return jobStopEvents;
+        public int getStopJobEvents() {
+            return stopJobEvents;
         }
 
         public int getTaskExecutionCompleteEvents() {
@@ -75,16 +75,16 @@ public class TaskCoordinatorProperties {
             this.applicationEvents = applicationEvents;
         }
 
-        public void setJobResumeEvents(int jobResumeEvents) {
-            this.jobResumeEvents = jobResumeEvents;
+        public void setResumeJobEvents(int resumeJobEvents) {
+            this.resumeJobEvents = resumeJobEvents;
         }
 
-        public void setJobStartEvents(int jobStartEvents) {
-            this.jobStartEvents = jobStartEvents;
+        public void setStartJobEvents(int startJobEvents) {
+            this.startJobEvents = startJobEvents;
         }
 
-        public void setJobStopEvents(int jobStopEvents) {
-            this.jobStopEvents = jobStopEvents;
+        public void setStopJobEvents(int stopJobEvents) {
+            this.stopJobEvents = stopJobEvents;
         }
 
         public void setTaskExecutionCompleteEvents(int taskExecutionCompleteEvents) {

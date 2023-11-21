@@ -58,7 +58,7 @@ public class JobApiController implements JobApi {
     public ResponseEntity<CreateJob200ResponseModel> createJob(JobParametersModel jobParametersModel) {
         return ResponseEntity.ok(
             new CreateJob200ResponseModel()
-                .jobId(jobFacade.createJob(conversionService.convert(jobParametersModel, JobParameters.class))));
+                .jobId(jobFacade.createAsyncJob(conversionService.convert(jobParametersModel, JobParameters.class))));
     }
 
     @Override
@@ -77,7 +77,7 @@ public class JobApiController implements JobApi {
     @Override
     public ResponseEntity<JobModel> getLatestJob() {
         return ResponseEntity.ok(
-            conversionService.convert(OptionalUtils.orElse(jobService.fetchLatestJob(), null), JobModel.class));
+            conversionService.convert(OptionalUtils.orElse(jobService.fetchLastJob(), null), JobModel.class));
     }
 
     @Override

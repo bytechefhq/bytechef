@@ -29,11 +29,11 @@ public class RemoteJobFacadeClient implements JobFacade {
     }
 
     @Override
-    public long createJob(JobParameters jobParameters) {
+    public long createAsyncJob(JobParameters jobParameters) {
         return loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
                 .host("execution-app")
-                .path("/remote/job-facade/create-job")
+                .path("/remote/job-facade/create-async-job")
                 .build(),
             jobParameters, Long.class);
     }

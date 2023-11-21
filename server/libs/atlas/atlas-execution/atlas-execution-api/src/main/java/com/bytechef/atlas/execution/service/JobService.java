@@ -31,7 +31,7 @@ public interface JobService {
 
     Job create(JobParameters jobParameters, Workflow workflow);
 
-    Optional<Job> fetchLatestJob();
+    Optional<Job> fetchLastJob();
 
     Job getJob(long id);
 

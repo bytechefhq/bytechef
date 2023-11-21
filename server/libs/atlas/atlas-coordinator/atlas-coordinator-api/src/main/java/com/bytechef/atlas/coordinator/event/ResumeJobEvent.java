@@ -21,14 +21,14 @@ import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 /**
  * @author Ivica Cardic
  */
-public class JobResumeEvent extends AbstractEvent {
+public class ResumeJobEvent extends AbstractEvent {
 
     private long jobId;
 
-    private JobResumeEvent() {
+    private ResumeJobEvent() {
     }
 
-    public JobResumeEvent(long jobId) {
+    public ResumeJobEvent(long jobId) {
         super(TaskCoordinatorMessageRoute.JOB_RESUME_EVENTS);
 
         this.jobId = jobId;
@@ -40,7 +40,7 @@ public class JobResumeEvent extends AbstractEvent {
 
     @Override
     public String toString() {
-        return "JobResumeEvent{" +
+        return "ResumeJobEvent{" +
             "jobId=" + jobId +
             ", createdDate=" + createDate +
             ", route=" + route +

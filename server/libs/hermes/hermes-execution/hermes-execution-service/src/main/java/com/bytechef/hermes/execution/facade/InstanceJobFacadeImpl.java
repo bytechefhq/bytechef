@@ -48,8 +48,8 @@ public class InstanceJobFacadeImpl implements InstanceJobFacade {
 
     @Override
     // TODO @Transactional
-    public Job createJob(JobParameters jobParameters, long instanceId, int type) {
-        long jobId = jobFacade.createJob(jobParameters);
+    public Job createAsyncJob(JobParameters jobParameters, long instanceId, int type) {
+        long jobId = jobFacade.createAsyncJob(jobParameters);
 
         instanceJobService.create(jobId, instanceId, type);
 
@@ -58,7 +58,7 @@ public class InstanceJobFacadeImpl implements InstanceJobFacade {
 
     @Override
     @Transactional
-    public Job createJob(JobParameters jobParameters, Workflow workflow, long instanceId, int type) {
+    public Job createSyncJob(JobParameters jobParameters, Workflow workflow, long instanceId, int type) {
         Job job = jobService.create(jobParameters, workflow);
 
         instanceJobService.create(Validate.notNull(job.getId(), "id"), instanceId, type);

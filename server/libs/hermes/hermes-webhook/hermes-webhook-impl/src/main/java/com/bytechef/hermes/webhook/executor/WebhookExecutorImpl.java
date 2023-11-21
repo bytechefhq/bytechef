@@ -75,7 +75,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
             for (Object outputItem : collectionOutput) {
                 Job job = jobSyncExecutor.execute(
                     createJobParameters(workflowExecutionId, inputMap, outputItem),
-                    (jobParameters, workflow) -> instanceJobFacade.createJob(
+                    (jobParameters, workflow) -> instanceJobFacade.createSyncJob(
                         jobParameters, workflow, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
 
                 outputsList.add(taskFileStorage.readJobOutputs(job.getOutputs()));
@@ -85,7 +85,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
         } else {
             Job job = jobSyncExecutor.execute(
                 createJobParameters(workflowExecutionId, inputMap, triggerOutput.value()),
-                (jobParameters, workflow) -> instanceJobFacade.createJob(
+                (jobParameters, workflow) -> instanceJobFacade.createSyncJob(
                     jobParameters, workflow, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
 
             outputs = job.getOutputs() == null ? null : taskFileStorage.readJobOutputs(job.getOutputs());

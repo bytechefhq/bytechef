@@ -119,7 +119,7 @@ public class TriggerCompletionHandler {
     private long createJob(
         WorkflowExecutionId workflowExecutionId, Map<String, ?> inpputMap, long instanceId, int type) {
 
-        Job job = instanceJobFacade.createJob(
+        Job job = instanceJobFacade.createAsyncJob(
             new JobParameters(workflowExecutionId.getWorkflowId(), inpputMap), instanceId, type);
 
         return Validate.notNull(job.getId(), "id");

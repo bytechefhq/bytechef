@@ -37,8 +37,8 @@ public class RemoteJobFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/create-job")
+        value = "/create-async-job")
     public ResponseEntity<Long> create(@Valid @RequestBody JobParameters jobParameters) {
-        return ResponseEntity.ok(jobFacade.createJob(jobParameters));
+        return ResponseEntity.ok(jobFacade.createAsyncJob(jobParameters));
     }
 }
