@@ -92,17 +92,6 @@ const ProjectInstanceDialog = ({
         onSuccess,
     });
 
-    function closeDialog() {
-        reset({});
-
-        setActiveStepIndex(0);
-        setIsOpen(false);
-
-        if (onClose) {
-            onClose();
-        }
-    }
-
     const projectInstanceDialogSteps = [
         {
             content: (
@@ -132,6 +121,17 @@ const ProjectInstanceDialog = ({
         },
     ];
 
+    function closeDialog() {
+        reset({});
+
+        setActiveStepIndex(0);
+        setIsOpen(false);
+
+        if (onClose) {
+            onClose();
+        }
+    }
+
     function saveProjectInstance() {
         const formData = getValues();
 
@@ -150,7 +150,7 @@ const ProjectInstanceDialog = ({
         }
     }
 
-    const handleNextClick = (event: MouseEvent) => {
+    function handleNextClick(event: MouseEvent) {
         trigger();
 
         if (!formState.isValid) {
@@ -158,7 +158,7 @@ const ProjectInstanceDialog = ({
         } else {
             setActiveStepIndex(activeStepIndex + 1);
         }
-    };
+    }
 
     return (
         <Dialog
