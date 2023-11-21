@@ -376,8 +376,6 @@ const Project = () => {
     };
 
     const handleWorkflowCodeEditorSheetSave = (definition: string) => {
-        setShowWorkflowCodeEditorSheet(false);
-
         if (currentWorkflow && currentWorkflow.id) {
             updateWorkflowMutation.mutate({
                 id: currentWorkflow.id,
