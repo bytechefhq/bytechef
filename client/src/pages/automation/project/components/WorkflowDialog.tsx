@@ -36,7 +36,6 @@ type WorkflowDialogProps = {
     onClose?: () => void;
     parentId?: number;
     triggerNode?: ReactNode;
-    triggerClassName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     updateWorkflowMutationMutation?: UseMutationResult<
         any,
