@@ -5,8 +5,8 @@ import {
     WorkflowConnectionModel,
     WorkflowModel,
 } from '@/middleware/helios/configuration';
-import ProjectInstanceDialogWorkflowsStepItemConfiguration from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowsStepItemConfiguration';
-import ProjectInstanceDialogWorkflowsStepItemConnection from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowsStepItemConnection';
+import ProjectInstanceDialogWorkflowsStepItemConfiguration from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConfiguration';
+import ProjectInstanceDialogWorkflowsStepItemConnection from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConnection';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
 import {Control, UseFormRegister} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';

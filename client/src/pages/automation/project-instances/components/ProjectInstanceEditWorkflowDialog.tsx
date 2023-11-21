@@ -14,7 +14,7 @@ import {
     WorkflowModel,
 } from '@/middleware/helios/configuration';
 import {useUpdateProjectInstanceWorkflowMutation} from '@/mutations/projectInstanceWorkflows.mutations';
-import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/ProjectInstanceDialogWorkflowsStepItem';
+import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';

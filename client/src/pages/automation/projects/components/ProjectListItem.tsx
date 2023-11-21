@@ -41,7 +41,7 @@ import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
-import TagList from '../../../components/TagList/TagList';
+import TagList from '../../../../components/TagList/TagList';
 import ProjectDialog from './ProjectDialog';
 
 interface ProjectItemProps {
@@ -97,7 +97,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
     });
 
     return (
-        <>
+        <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
             <div className="flex items-center justify-between">
                 <div className="w-10/12">
                     <div className="flex items-center justify-between">
@@ -200,7 +200,9 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                     )}
                                 </TooltipTrigger>
 
-                                <TooltipContent>Published Date</TooltipContent>
+                                <TooltipContent>
+                                    Last Published Date
+                                </TooltipContent>
                             </Tooltip>
                         </div>
                     </div>
@@ -298,7 +300,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                     parentId={project.id}
                 />
             )}
-        </>
+        </div>
     );
 };
 

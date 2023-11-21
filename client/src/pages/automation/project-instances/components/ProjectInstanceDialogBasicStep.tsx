@@ -21,6 +21,7 @@ import {
     UseFormRegister,
     UseFormReturn,
     UseFormSetValue,
+    UseFormTrigger,
 } from 'react-hook-form';
 
 interface ProjectDialogBasicStepProps {
@@ -31,6 +32,7 @@ interface ProjectDialogBasicStepProps {
     register: UseFormRegister<ProjectInstanceModel>;
     setValue: UseFormSetValue<ProjectInstanceModel>;
     touchedFields: UseFormReturn<ProjectInstanceModel>['formState']['touchedFields'];
+    trigger: UseFormTrigger<ProjectInstanceModel>;
 }
 
 const ProjectLabel = ({project}: {project: ProjectModel}) => (
@@ -48,6 +50,7 @@ const ProjectInstanceDialogBasicStep = ({
     getValues,
     projectInstance,
     setValue,
+    trigger,
 }: ProjectDialogBasicStepProps) => {
     const {
         data: projects,
@@ -131,8 +134,13 @@ const ProjectInstanceDialogBasicStep = ({
 
                                 <FormControl>
                                     <Input
+                                        onChange={(value) => {
+                                            field.onChange(value);
+
+                                            trigger();
+                                        }}
                                         placeholder="My CRM Project - Production"
-                                        {...field}
+                                        value={field.value}
                                     />
                                 </FormControl>
 

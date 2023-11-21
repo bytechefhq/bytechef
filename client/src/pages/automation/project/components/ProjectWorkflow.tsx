@@ -1,20 +1,20 @@
 import {ReactFlowProvider} from 'reactflow';
 
-import WorkflowNodeDetailsPanel from './components/WorkflowNodeDetailsPanel';
+import WorkflowNodeDetailsPanel from './WorkflowNodeDetailsPanel';
 
 import 'reactflow/dist/base.css';
 
-import './Workflow.css';
+import './ProjectWorkflow.css';
 
 import {ActionDefinitionModel} from '@/middleware/hermes/configuration';
 import {useGetActionDefinitionsQuery} from '@/queries/actionDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {useEffect, useState} from 'react';
 
-import DataPillPanel from './components/DataPillPanel';
-import WorkflowEditor, {WorkflowEditorProps} from './components/WorkflowEditor';
-import useWorkflowDataStore from './stores/useWorkflowDataStore';
-import {useWorkflowNodeDetailsPanelStore} from './stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
+import DataPillPanel from './DataPillPanel';
+import WorkflowEditor, {WorkflowEditorProps} from './WorkflowEditor';
 
 const ProjectWorkflow = ({
     componentDefinitions,
