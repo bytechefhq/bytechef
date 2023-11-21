@@ -19,7 +19,7 @@ import styles from './NodeTypes.module.css';
 const WorkflowNode = ({data, id}: NodeProps) => {
     const [isHovered, setIsHovered] = useState(false);
 
-    const {currentNode, nodeDetailsPanelOpen} =
+    const {currentNode, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
 
     const {componentNames, setComponentNames} = useWorkflowDataStore();
@@ -129,7 +129,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                 className={twMerge(
                     'h-18 w-18 rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none',
                     isSelected &&
-                        nodeDetailsPanelOpen &&
+                        workflowNodeDetailsPanelOpen &&
                         'border-blue-300 bg-blue-100 shadow-none'
                 )}
                 onClick={handleNodeClick}

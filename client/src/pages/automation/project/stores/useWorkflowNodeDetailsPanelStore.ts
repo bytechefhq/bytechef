@@ -13,8 +13,10 @@ interface Node {
 }
 
 interface WorkflowNodeDetailsPanelState {
-    nodeDetailsPanelOpen: boolean;
-    setNodeDetailsPanelOpen: (nodeDetailsPanelOpen: boolean) => void;
+    workflowNodeDetailsPanelOpen: boolean;
+    setWorkflowNodeDetailsPanelOpen: (
+        workflowNodeDetailsPanelOpen: boolean
+    ) => void;
 
     currentNode: Node;
     setCurrentNode: (currentNode: Node) => void;
@@ -29,11 +31,14 @@ export const useWorkflowNodeDetailsPanelStore =
     create<WorkflowNodeDetailsPanelState>()(
         devtools(
             (set) => ({
-                nodeDetailsPanelOpen: false,
-                setNodeDetailsPanelOpen: (nodeDetailsDialogOpen) =>
+                workflowNodeDetailsPanelOpen: false,
+                setWorkflowNodeDetailsPanelOpen: (
+                    workflowNodeDetailsPanelOpen
+                ) =>
                     set((state) => ({
                         ...state,
-                        nodeDetailsPanelOpen: nodeDetailsDialogOpen,
+                        workflowNodeDetailsPanelOpen:
+                            workflowNodeDetailsPanelOpen,
                     })),
 
                 currentNode: {name: '', type: 'component', version: 1},

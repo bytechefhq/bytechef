@@ -17,10 +17,12 @@ import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetails
 
 const DataPillPanel = () => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
+
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
-    const {currentNode, nodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore();
     const {componentActions, componentNames} = useWorkflowDataStore();
+
+    const {currentNode, workflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore();
 
     const currentNodeIndex = componentNames.indexOf(currentNode.name);
 
@@ -76,9 +78,9 @@ const DataPillPanel = () => {
     );
 
     const componentActionData = previousActions.map((action, index) => {
-        const componentDefinition = previousComponentDefinitions?.find(
-            (curComponentDefinition) =>
-                curComponentDefinition.name ===
+        const componentDefinition = previousComponentDefinitions.find(
+            (currentComponentDefinition) =>
+                currentComponentDefinition.name ===
                 normalizedPreviousComponentNames[index]
         );
 
@@ -115,12 +117,7 @@ const DataPillPanel = () => {
         <Dialog.Root
             modal={false}
             onOpenChange={() => setDataPillPanelOpen(!dataPillPanelOpen)}
-            open={
-                nodeDetailsPanelOpen &&
-                dataPillPanelOpen &&
-                !!previousComponentNames.length &&
-                !!previousComponentDefinitions
-            }
+            open={dataPillPanelOpen && workflowNodeDetailsPanelOpen}
         >
             <Dialog.Portal>
                 <Dialog.Content
@@ -169,12 +166,14 @@ const DataPillPanel = () => {
                                 value={dataPillFilterQuery}
                             />
 
-                            <DataPillPanelBody
-                                componentData={
-                                    dataPillComponentData as Array<ComponentActionData>
-                                }
-                                dataPillFilterQuery={dataPillFilterQuery}
-                            />
+                            {dataPillComponentData && (
+                                <DataPillPanelBody
+                                    componentData={
+                                        dataPillComponentData as Array<ComponentActionData>
+                                    }
+                                    dataPillFilterQuery={dataPillFilterQuery}
+                                />
+                            )}
                         </div>
                     </div>
                 </Dialog.Content>
