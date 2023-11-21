@@ -110,7 +110,7 @@ const ConnectionDialog = ({
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
             authorizationName: '',
-            componentName: undefined,
+            componentName: componentDefinition?.name || undefined,
             name: connection?.name || '',
             tags:
                 connection?.tags?.map((tag) => ({
@@ -573,11 +573,10 @@ const ConnectionDialog = ({
 
                                                         <FormControl>
                                                             <Input
-                                                                defaultValue={
+                                                                disabled
+                                                                value={
                                                                     componentDefinition?.title
                                                                 }
-                                                                disabled
-                                                                name="defaultComponentName"
                                                             />
                                                         </FormControl>
 
