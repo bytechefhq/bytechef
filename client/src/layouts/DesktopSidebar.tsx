@@ -17,7 +17,7 @@ export function DesktopSidebar({
 }) {
     return (
         <aside className="hidden border-r bg-muted lg:flex lg:shrink-0">
-            <div className="flex w-[64px]">
+            <div className="flex w-[54px]">
                 <div className="flex min-h-0 flex-1 flex-col">
                     <div className="flex-1">
                         <Link to="">
@@ -36,7 +36,7 @@ export function DesktopSidebar({
                         >
                             {navigation.map((item) => (
                                 <Link
-                                    className="flex items-center rounded-lg p-4 hover:text-blue-600"
+                                    className="flex items-center rounded-lg py-3 hover:text-blue-600"
                                     key={item.name}
                                     to={item.href}
                                 >

@@ -6,11 +6,11 @@ import {twMerge} from 'tailwind-merge';
 type SidebarContentLayoutProps = {
     className?: string;
     footer?: ReactNode;
-    header: ReactNode;
+    header?: ReactNode;
     leftSidebarBody?: ReactNode;
     leftSidebarHeader?: ReactNode;
     leftSidebarOpen?: boolean;
-    leftSidebarWidth?: '64' | '72' | '96';
+    leftSidebarWidth?: '56' | '64' | '72' | '96';
     rightSidebarBody?: ReactNode;
     rightSidebarHeader?: ReactNode;
     rightSidebarOpen?: boolean;
@@ -20,6 +20,7 @@ type SidebarContentLayoutProps = {
 };
 
 const leftSidebarWidths = {
+    56: ['md:w-56', 'md:pl-56'],
     64: ['md:w-64', 'md:pl-64'],
     72: ['md:w-72', 'md:pl-72'],
     96: ['md:w-96', 'md:pl-96'],
@@ -142,7 +143,7 @@ const LayoutContainer = ({
 
             <div
                 className={twMerge(
-                    'flex h-full',
+                    'flex h-full w-full',
                     leftSidebarOpen && leftSidebarWidths[leftSidebarWidth][1]
                 )}
             >
@@ -182,10 +183,8 @@ const LayoutContainer = ({
 
                 {rightToolbarOpen && !!rightToolbarBody && (
                     <aside className="hidden border-l bg-muted lg:flex lg:shrink-0">
-                        <div className="flex w-[56px]">
-                            <div className="flex flex-1 flex-col overflow-y-auto">
-                                {rightToolbarBody}
-                            </div>
+                        <div className="flex flex-1 flex-col overflow-y-auto">
+                            {rightToolbarBody}
                         </div>
                     </aside>
                 )}
