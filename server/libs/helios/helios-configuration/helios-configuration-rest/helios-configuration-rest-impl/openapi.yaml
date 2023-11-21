@@ -1014,6 +1014,15 @@ components:
       required:
       - "name"
       properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
         inputs:
           description: "The input parameters of an project instance used as workflow\
             \ input values."
@@ -1037,6 +1046,15 @@ components:
           description: "The last execution date of a project instance."
           type: "string"
           format: "date-time"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
         projectInstanceId:
           description: "The id of a project instance."
           type: "integer"
