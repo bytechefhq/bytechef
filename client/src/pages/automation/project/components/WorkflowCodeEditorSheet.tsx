@@ -2,7 +2,6 @@ import {Button} from '@/components/ui/button';
 import {
     Sheet,
     SheetContent,
-    SheetFooter,
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
@@ -11,7 +10,7 @@ import {WorkflowModel} from '@/middleware/helios/configuration';
 import Editor from '@monaco-editor/react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
-import {PlayIcon, SquareIcon} from 'lucide-react';
+import {PlayIcon, SaveIcon, SquareIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface WorkflowExecutionDetailsSheetProps {
@@ -46,36 +45,63 @@ const WorkflowCodeEditorSheet = ({
                             <div className="flex items-center">
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <>
-                                            {!workflowIsRunning && (
-                                                <Button
-                                                    className="text-success hover:bg-secondary hover:text-success"
-                                                    onClick={onWorkflowRunClick}
-                                                    size="icon"
-                                                    variant="ghost"
-                                                >
-                                                    <PlayIcon className="h-5" />
-                                                </Button>
-                                            )}
-
-                                            {workflowIsRunning && (
-                                                <Button
-                                                    onClick={() => {
-                                                        // TODO
-                                                    }}
-                                                    size="icon"
-                                                    variant="destructive"
-                                                >
-                                                    <SquareIcon className="h-5" />
-                                                </Button>
-                                            )}
-                                        </>
+                                        <Button
+                                            onClick={() => onSave(definition)}
+                                            size="icon"
+                                            type="submit"
+                                            variant="ghost"
+                                        >
+                                            <SaveIcon className="h-5" />
+                                        </Button>
                                     </TooltipTrigger>
 
                                     <TooltipContent>
-                                        Debug current workflow
+                                        Save current workflow
                                     </TooltipContent>
                                 </Tooltip>
+
+                                {!workflowIsRunning && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                className="text-success hover:bg-secondary hover:text-success"
+                                                onClick={() => {
+                                                    onSave(definition);
+
+                                                    onWorkflowRunClick();
+                                                }}
+                                                size="icon"
+                                                variant="ghost"
+                                            >
+                                                <PlayIcon className="h-5" />
+                                            </Button>
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>
+                                            Run current workflow
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+
+                                {workflowIsRunning && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                onClick={() => {
+                                                    // TODO
+                                                }}
+                                                size="icon"
+                                                variant="destructive"
+                                            >
+                                                <SquareIcon className="h-5" />
+                                            </Button>
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>
+                                            Stop current workflow
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
 
                                 <SheetPrimitive.Close asChild>
                                     <Button size="icon" variant="ghost">
@@ -96,12 +122,6 @@ const WorkflowCodeEditorSheet = ({
                         />
                     </div>
                 </div>
-
-                <SheetFooter>
-                    <Button onClick={() => onSave(definition)} type="submit">
-                        Save
-                    </Button>
-                </SheetFooter>
             </SheetContent>
         </Sheet>
     );
