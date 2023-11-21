@@ -29,7 +29,7 @@ const WorkflowEditor = ({
     const [nodeNames, setNodeNames] = useState<Array<string>>([]);
     const [viewportWidth, setViewportWidth] = useState(0);
 
-    const {nodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
     const nodeTypes = useMemo(
         () => ({
@@ -163,7 +163,7 @@ const WorkflowEditor = ({
     useEffect(() => {
         setViewportWidth(width);
 
-        const adaptedViewportWidth = nodeDetailsPanelOpen
+        const adaptedViewportWidth = workflowNodeDetailsPanelOpen
             ? width / 2 - window.innerWidth / 6
             : width / 2;
 
@@ -172,7 +172,7 @@ const WorkflowEditor = ({
             y: 50,
             zoom: 1,
         });
-    }, [nodeDetailsPanelOpen, setViewport, width]);
+    }, [workflowNodeDetailsPanelOpen, setViewport, width]);
 
     useLayout();
 

@@ -61,8 +61,15 @@ const WorkflowNodeDetailsPanel = ({
     >([]);
     const [currentActionName, setCurrentActionName] = useState('');
 
-    const {currentNode, nodeDetailsPanelOpen, setNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore();
+    useEffect(() => {
+        console.log('workflowNodeDetailsPanel render');
+    }, []);
+
+    const {
+        currentNode,
+        setWorkflowNodeDetailsPanelOpen,
+        workflowNodeDetailsPanelOpen,
+    } = useWorkflowNodeDetailsPanelStore();
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery({
         componentName: currentNode.originNodeName || currentNode.name,
@@ -478,15 +485,17 @@ const WorkflowNodeDetailsPanel = ({
 
     useEffect(() => {
         if (!componentNames.includes(currentNode.name)) {
-            setNodeDetailsPanelOpen(false);
+            setWorkflowNodeDetailsPanelOpen(false);
         }
-    }, [componentNames, currentNode.name, setNodeDetailsPanelOpen]);
+    }, [componentNames, currentNode.name, setWorkflowNodeDetailsPanelOpen]);
 
     return (
         <Dialog.Root
             modal={false}
-            onOpenChange={() => setNodeDetailsPanelOpen(!nodeDetailsPanelOpen)}
-            open={nodeDetailsPanelOpen}
+            onOpenChange={() =>
+                setWorkflowNodeDetailsPanelOpen(!workflowNodeDetailsPanelOpen)
+            }
+            open={workflowNodeDetailsPanelOpen}
         >
             <Dialog.Portal>
                 <Dialog.Content
@@ -528,7 +537,7 @@ const WorkflowNodeDetailsPanel = ({
                                         />
                                     }
                                     onClick={() =>
-                                        setNodeDetailsPanelOpen(false)
+                                        setWorkflowNodeDetailsPanelOpen(false)
                                     }
                                 />
                             </Dialog.Title>

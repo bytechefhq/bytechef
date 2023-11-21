@@ -8,7 +8,7 @@ export default function useNodeClick(
     data: NodeProps['data'],
     id: NodeProps['id']
 ) {
-    const {setCurrentNode, setNodeDetailsPanelOpen} =
+    const {setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
 
     const {setRightSidebarOpen} = useRightSidebarStore();
@@ -24,7 +24,7 @@ export default function useNodeClick(
 
         setRightSidebarOpen(false);
 
-        setNodeDetailsPanelOpen(true);
+        setWorkflowNodeDetailsPanelOpen(true);
 
         setCurrentNode(data);
     }, [
@@ -32,7 +32,7 @@ export default function useNodeClick(
         getNode,
         id,
         setCurrentNode,
-        setNodeDetailsPanelOpen,
+        setWorkflowNodeDetailsPanelOpen,
         setRightSidebarOpen,
     ]);
 }

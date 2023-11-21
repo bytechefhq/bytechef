@@ -127,7 +127,8 @@ const Project = () => {
 
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
-    const {setNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {setWorkflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore();
 
     const {toast} = useToast();
 
@@ -145,23 +146,20 @@ const Project = () => {
             icon: PuzzleIcon,
             name: 'Components & Control Flows',
             onClick: () => {
-                setNodeDetailsPanelOpen(false);
+                setWorkflowNodeDetailsPanelOpen(false);
+
                 setRightSidebarOpen(!rightSidebarOpen);
             },
         },
         {
             icon: SlidersIcon,
             name: 'Workflow Inputs',
-            onClick: () => {
-                setShowWorkflowInputsSheet(true);
-            },
+            onClick: () => setShowWorkflowInputsSheet(true),
         },
         {
             icon: Code2Icon,
             name: 'Workflow Code Editor',
-            onClick: () => {
-                setShowWorkflowCodeEditorSheet(true);
-            },
+            onClick: () => setShowWorkflowCodeEditorSheet(true),
         },
     ];
 
@@ -290,7 +288,8 @@ const Project = () => {
         }
 
         setLeftSidebarOpen(false);
-        setNodeDetailsPanelOpen(false);
+
+        setWorkflowNodeDetailsPanelOpen(false);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [projectWorkflows, workflowId]);
@@ -301,7 +300,7 @@ const Project = () => {
                 `/automation/projects/${projectId}/workflows/${currentWorkflow.id}`
             );
         }
-    }, [currentWorkflow, navigate, projectId, setNodeDetailsPanelOpen]);
+    }, [currentWorkflow, navigate, projectId, setWorkflowNodeDetailsPanelOpen]);
 
     useEffect(() => {
         setWorkflowIsRunning(false);

@@ -63,13 +63,16 @@
                     "animate-slide-down-fade",
                     "animate-slide-left-fade",
                     "animate-slide-right-fade",
-                    "line-clamp-2",
-                    "nowheel",
-                    "w-112",
-                    "bg-muted",
                     "bg-background",
-                    "max-w-tooltip-sm",
+                    "bg-muted",
+                    "bg-success",
+                    "border-input",
+                    "line-clamp-2",
                     "max-w-tooltip-lg",
+                    "max-w-tooltip-sm",
+                    "nowheel",
+                    "text-success-foreground",
+                    "w-112",
                     "w-workflow-nodes-popover-menu-width"
                 ]
             }
