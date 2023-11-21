@@ -63,7 +63,7 @@ public class JobTestExecutorImpl implements JobTestExecutor {
 
         return new JobDTO(
             job,
-            taskFileStorage.readContextValue(job.getOutputs()),
+			job.getOutputs() == null ? null : taskFileStorage.readContextValue(job.getOutputs()),
             CollectionUtils.map(
                 taskExecutionService.getJobTaskExecutions(Validate.notNull(job.getId(), "id")),
                 taskExecution -> new TaskExecutionDTO(
