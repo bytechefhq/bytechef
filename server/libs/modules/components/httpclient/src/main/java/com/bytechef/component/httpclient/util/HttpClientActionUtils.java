@@ -47,6 +47,7 @@ import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -139,8 +140,8 @@ public class HttpClientActionUtils {
                         .proxy(inputParameters.getString(PROXY))
                         .responseType(getResponseType(inputParameters))
                         .timeout(Duration.ofMillis(inputParameters.getInteger(TIMEOUT, 10000))))
-                .headers((Map) inputParameters.getMap(HEADERS, List.class))
-                .queryParameters((Map) inputParameters.getMap(QUERY_PARAMETERS, List.class))
+                .headers((Map) inputParameters.getMap(HEADERS, List.class, Collections.emptyMap()))
+                .queryParameters((Map) inputParameters.getMap(QUERY_PARAMETERS, List.class, Collections.emptyMap()))
                 .body(getPayload(inputParameters, getBodyContentType(inputParameters)))
                 .execute();
 
