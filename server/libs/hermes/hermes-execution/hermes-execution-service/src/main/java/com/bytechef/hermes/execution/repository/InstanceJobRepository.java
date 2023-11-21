@@ -25,7 +25,11 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-public interface InstanceJobRepository extends ListCrudRepository<InstanceJob, Long> {
+public interface InstanceJobRepository extends ListCrudRepository<InstanceJob, Long>, CustomInstanceJobRepository {
+
+    int DEFAULT_PAGE_SIZE = 20;
 
     Optional<InstanceJob> findByJobIdAndType(Long jobId, int type);
+
+    Optional<InstanceJob> findTop1ByInstanceIdAndTypeOrderByJobIdDesc(long instanceId, int type);
 }

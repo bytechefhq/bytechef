@@ -60,9 +60,6 @@ public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<Pr
     @Id
     private Long id;
 
-    @Column("last_execution_date")
-    private LocalDateTime lastExecutionDate;
-
     @Column("last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
@@ -139,10 +136,6 @@ public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<Pr
         return id;
     }
 
-    public LocalDateTime getLastExecutionDate() {
-        return lastExecutionDate;
-    }
-
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -192,10 +185,6 @@ public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<Pr
         }
     }
 
-    public void setLastExecutionDate(LocalDateTime lastExecutionDate) {
-        this.lastExecutionDate = lastExecutionDate;
-    }
-
     public void setProjectInstanceId(Long projectInstanceId) {
         if (projectInstanceId != null) {
             this.projectInstanceId = AggregateReference.to(projectInstanceId);
@@ -216,8 +205,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<Pr
             + id + '\'' + ", workflowId='"
             + workflowId + '\'' + ", inputs="
             + inputs + ", projectInstanceWorkflowConnections="
-            + projectInstanceWorkflowConnections + ", lastExecutionDate="
-            + lastExecutionDate + ", enabled="
+            + projectInstanceWorkflowConnections + ", enabled="
             + enabled + '}';
     }
 }

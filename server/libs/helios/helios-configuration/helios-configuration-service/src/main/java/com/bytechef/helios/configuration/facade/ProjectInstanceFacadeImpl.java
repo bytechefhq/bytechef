@@ -20,13 +20,16 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.configuration.dto.ProjectInstanceDTO;
+import com.bytechef.helios.configuration.dto.ProjectInstanceWorkflowDTO;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
@@ -34,6 +37,7 @@ import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
+import com.bytechef.hermes.execution.service.InstanceJobService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -56,6 +60,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private final InstanceJobFacade instanceJobFacade;
+    private final InstanceJobService instanceJobService;
+    private final JobService jobService;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
     private final ProjectService projectService;
@@ -66,12 +72,14 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectInstanceFacadeImpl(
-        InstanceJobFacade instanceJobFacade, ProjectInstanceService projectInstanceService,
-        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
-        TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade,
+        InstanceJobFacade instanceJobFacade, InstanceJobService instanceJobService, JobService jobService,
+        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        ProjectService projectService, TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade,
         @Value("bytechef.webhookUrl") String webhookUrl, WorkflowService workflowService) {
 
         this.instanceJobFacade = instanceJobFacade;
+        this.instanceJobService = instanceJobService;
+        this.jobService = jobService;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
         this.projectService = projectService;
@@ -100,11 +108,14 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         projectInstance = projectInstanceService.create(projectInstance);
 
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = createProjectInstanceWorkflows(
-            projectInstanceDTO.projectInstanceWorkflows(), projectInstance);
+            CollectionUtils.map(
+                projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow),
+            projectInstance);
 
         return new ProjectInstanceDTO(
-            getLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")), projectInstance,
-            projectInstanceWorkflows, projectService.getProject(projectInstance.getProjectId()), tags);
+            getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")), projectInstance,
+            CollectionUtils.map(projectInstanceWorkflows, ProjectInstanceWorkflowDTO::new),
+            projectService.getProject(projectInstance.getProjectId()), tags);
     }
 
     private List<ProjectInstanceWorkflow> createProjectInstanceWorkflows(
@@ -199,8 +210,11 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(id);
 
         return new ProjectInstanceDTO(
-            getLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")),
-            projectInstance, projectInstanceWorkflowService.getProjectInstanceWorkflows(id),
+            getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")),
+            projectInstance,
+            CollectionUtils.map(
+                projectInstanceWorkflowService.getProjectInstanceWorkflows(id),
+                ProjectInstanceWorkflowDTO::new),
             projectService.getProject(projectInstance.getProjectId()), tagService.getTags(projectInstance.getTagIds()));
     }
 
@@ -229,11 +243,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         return CollectionUtils.map(
             projectInstances,
             projectInstance -> new ProjectInstanceDTO(
-                getLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")), projectInstance,
-                projectInstanceWorkflows.stream()
-                    .filter(projectInstanceWorkflow -> Objects.equals(
-                        projectInstanceWorkflow.getProjectInstanceId(), projectInstance.getId()))
-                    .toList(),
+                getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")), projectInstance,
+                CollectionUtils.map(
+                    CollectionUtils.filter(
+                        projectInstanceWorkflows,
+                        projectInstanceWorkflow -> Objects.equals(
+                            projectInstanceWorkflow.getProjectInstanceId(), projectInstance.getId())),
+                    projectInstanceWorkflow -> new ProjectInstanceWorkflowDTO(
+                        projectInstanceWorkflow,
+                        getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()))),
                 CollectionUtils.getFirst(
                     projects, project -> Objects.equals(project.getId(), projectInstance.getProjectId())),
                 filterTags(tags, projectInstance)));
@@ -242,13 +260,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     @Override
     public ProjectInstanceDTO updateProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService.update(
-            projectInstanceDTO.projectInstanceWorkflows());
+            CollectionUtils.map(
+                projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow));
         List<Tag> tags = checkTags(projectInstanceDTO.tags());
 
         return new ProjectInstanceDTO(
-            getLastExecutionDate(projectInstanceDTO.id()),
+            getProjectInstanceLastExecutionDate(projectInstanceDTO.id()),
             projectInstanceService.update(projectInstanceDTO.toProjectInstance()),
-            projectInstanceWorkflows, projectService.getProject(projectInstanceDTO.projectId()), tags);
+            CollectionUtils.map(projectInstanceWorkflows, ProjectInstanceWorkflowDTO::new),
+            projectService.getProject(projectInstanceDTO.projectId()), tags);
     }
 
     @Override
@@ -261,33 +281,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         return projectInstanceWorkflowService.update(projectInstanceWorkflow);
     }
 
-    private LocalDateTime getLastExecutionDate(long projectInstanceId) {
-        LocalDateTime lastExecutionDate = null;
-
-        List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
-            .getProjectInstanceWorkflows(projectInstanceId);
-
-        for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
-            LocalDateTime curLastExecutionDate = projectInstanceWorkflow.getLastExecutionDate();
-
-            if (curLastExecutionDate == null) {
-                continue;
-            }
-
-            if (lastExecutionDate == null) {
-                lastExecutionDate = curLastExecutionDate;
-
-                continue;
-            }
-
-            if (curLastExecutionDate.isAfter(lastExecutionDate)) {
-                lastExecutionDate = curLastExecutionDate;
-            }
-        }
-
-        return lastExecutionDate;
-    }
-
     private List<Tag> checkTags(List<Tag> tags) {
         return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
@@ -297,28 +290,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         return tagIds.contains(tag.getId());
     }
-
-    private List<Tag> filterTags(List<Tag> tags, ProjectInstance projectInstance) {
-        return CollectionUtils.filter(tags, tag -> containsTag(projectInstance, tag));
-    }
-
-    private List<Project> getProjects(List<ProjectInstance> projectInstances) {
-        return projectService.getProjects(
-            projectInstances.stream()
-                .map(ProjectInstance::getProjectId)
-                .filter(Objects::nonNull)
-                .toList());
-    }
-
-    private List<Tag> getTags(List<ProjectInstance> projectInstances) {
-        return tagService.getTags(
-            projectInstances.stream()
-                .flatMap(projectInstance -> CollectionUtils.stream(projectInstance.getTagIds()))
-                .filter(Objects::nonNull)
-                .toList());
-    }
-
-    //
 
     private void disableWorkflowTriggers(ProjectInstanceWorkflow projectInstanceWorkflow) {
         Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
@@ -350,6 +321,10 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         }
     }
 
+    private List<Tag> filterTags(List<Tag> tags, ProjectInstance projectInstance) {
+        return CollectionUtils.filter(tags, tag -> containsTag(projectInstance, tag));
+    }
+
     private Long getConnectionId(long projectInstanceId, String workflowId, WorkflowConnection workflowConnection) {
         return workflowConnection.getId()
             .orElseGet(() -> getConnectionId(
@@ -373,6 +348,40 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                 projectInstanceId, workflowId, workflowConnectionOperationName, workflowConnectionKey);
 
         return projectInstanceWorkflowConnection.getConnectionId();
+    }
+
+    private LocalDateTime getProjectInstanceLastExecutionDate(long projectInstanceId) {
+        return OptionalUtils.mapOrElse(
+            instanceJobService.fetchLastJobId(projectInstanceId, ProjectConstants.PROJECT_TYPE),
+            jobId -> {
+                Job job = jobService.getJob(jobId);
+
+                return job.getEndDate();
+            },
+            null);
+    }
+
+    private List<Project> getProjects(List<ProjectInstance> projectInstances) {
+        return projectService.getProjects(
+            projectInstances.stream()
+                .map(ProjectInstance::getProjectId)
+                .filter(Objects::nonNull)
+                .toList());
+    }
+
+    private List<Tag> getTags(List<ProjectInstance> projectInstances) {
+        return tagService.getTags(
+            projectInstances.stream()
+                .flatMap(projectInstance -> CollectionUtils.stream(projectInstance.getTagIds()))
+                .filter(Objects::nonNull)
+                .toList());
+    }
+
+    private LocalDateTime getWorkflowLastExecutionDate(String workflowId) {
+        return OptionalUtils.mapOrElse(
+            jobService.fetchLastWorkflowJob(workflowId),
+            Job::getEndDate,
+            null);
     }
 
     private static void validate(Map<String, ?> inputs, Workflow workflow) {

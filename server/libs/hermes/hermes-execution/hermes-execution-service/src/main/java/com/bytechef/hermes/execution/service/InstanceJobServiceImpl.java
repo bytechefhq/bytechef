@@ -19,7 +19,11 @@ package com.bytechef.hermes.execution.service;
 import com.bytechef.hermes.execution.domain.InstanceJob;
 import com.bytechef.hermes.execution.repository.InstanceJobRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,8 +47,25 @@ public class InstanceJobServiceImpl implements InstanceJobService {
     }
 
     @Override
+    public Optional<Long> fetchLastJobId(long instanceId, int type) {
+        return instanceJobRepository.findTop1ByInstanceIdAndTypeOrderByJobIdDesc(instanceId, type)
+            .map(InstanceJob::getJobId);
+    }
+
+    @Override
     public Optional<Long> fetchJobInstanceId(long jobId, int type) {
         return instanceJobRepository.findByJobIdAndType(jobId, type)
             .map(InstanceJob::getInstanceId);
+    }
+
+    @Override
+    public Page<Long> getJobIds(
+        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        List<String> workflowIds, int pageNumber) {
+
+        PageRequest pageRequest = PageRequest.of(pageNumber, InstanceJobRepository.DEFAULT_PAGE_SIZE);
+
+        return instanceJobRepository.findAllJobIds(
+            status, startDate, endDate, instanceId, type, workflowIds, pageRequest);
     }
 }

@@ -13,8 +13,6 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.webclient.LoadBalancedWebClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
@@ -37,13 +35,6 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
-    public long countJobs(
-        String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, List<String> projectWorkflowIds) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Job create(JobParameters jobParameters, Workflow workflow) {
         return loadBalancedWebClient.post(
             uriBuilder -> uriBuilder
@@ -56,6 +47,17 @@ public class RemoteJobServiceClient implements JobService {
     @Override
     public Optional<Job> fetchLastJob() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<Job> fetchLastWorkflowJob(String workflowId) {
+        return Optional.ofNullable(
+            loadBalancedWebClient.get(
+                uriBuilder -> uriBuilder
+                    .host(EXECUTION_APP)
+                    .path(JOB_SERVICE + "/fetch-last-workflow-job/{workflowId}")
+                    .build(workflowId),
+                Job.class));
     }
 
     @Override
@@ -81,21 +83,6 @@ public class RemoteJobServiceClient implements JobService {
                 .path(JOB_SERVICE + "/get-task-execution-job/{taskExecutionId}")
                 .build(taskExecutionId),
             Job.class);
-    }
-
-    @Override
-    public List<Job> getJobs(
-        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Page<Job> getJobsPage(
-        String status, LocalDateTime startDate, LocalDateTime endDate, List<String> workflowIds,
-        Integer pageNumber) {
-
-        throw new UnsupportedOperationException();
     }
 
     @Override

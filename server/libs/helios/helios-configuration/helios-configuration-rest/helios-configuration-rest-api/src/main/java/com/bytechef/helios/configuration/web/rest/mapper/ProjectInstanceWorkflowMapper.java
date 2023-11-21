@@ -16,7 +16,7 @@
 
 package com.bytechef.helios.configuration.web.rest.mapper;
 
-import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.helios.configuration.dto.ProjectInstanceWorkflowDTO;
 import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
 import com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowModel;
 import org.mapstruct.Mapper;
@@ -27,8 +27,8 @@ import org.springframework.core.convert.converter.Converter;
  */
 @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
 public interface ProjectInstanceWorkflowMapper
-    extends Converter<ProjectInstanceWorkflow, ProjectInstanceWorkflowModel> {
+    extends Converter<ProjectInstanceWorkflowDTO, ProjectInstanceWorkflowModel> {
 
     @Override
-    ProjectInstanceWorkflowModel convert(ProjectInstanceWorkflow projectInstanceWorkflow);
+    ProjectInstanceWorkflowModel convert(ProjectInstanceWorkflowDTO projectInstanceWorkflow);
 }

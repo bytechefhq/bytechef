@@ -23,7 +23,6 @@ import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -37,6 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class JobServiceImpl implements JobService {
+
+    private static final int DEFAULT_PAGE_SIZE = 20;
 
     private final JobRepository jobRepository;
 
@@ -64,8 +65,14 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Job> fetchLatestJob() {
-        return jobRepository.findLatestJob();
+    public Optional<Job> fetchLastJob() {
+        return jobRepository.findLastJob();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Job> fetchLastWorkflowJob(String workflowId) {
+        return jobRepository.findTop1ByWorkflowIdOrderById(workflowId);
     }
 
     @Override
@@ -77,17 +84,7 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional(readOnly = true)
     public Page<Job> getJobsPage(int pageNumber) {
-        return jobRepository.findAll(PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE));
-    }
-
-    @Override
-    public Page<Job> getJobsPage(
-        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
-        List<String> workflowIds, int pageNumber) {
-
-        PageRequest pageRequest = PageRequest.of(pageNumber, JobRepository.DEFAULT_PAGE_SIZE);
-
-        return jobRepository.findAll(status, startDate, endDate, instanceId, type, workflowIds, pageRequest);
+        return jobRepository.findAll(PageRequest.of(pageNumber, DEFAULT_PAGE_SIZE));
     }
 
     @Override

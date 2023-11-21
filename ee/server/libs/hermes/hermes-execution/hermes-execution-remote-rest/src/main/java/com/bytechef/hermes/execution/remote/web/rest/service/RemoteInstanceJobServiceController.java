@@ -33,6 +33,23 @@ public class RemoteInstanceJobServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
+        value = "/fetch-last-job-id/{instanceId}/{type}",
+        consumes = {
+            "application/json"
+        },
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Long> fetchLastJobId(@PathVariable long instanceId, @PathVariable int type) {
+        return instanceJobService.fetchLastJobId(instanceId, type)
+            .map(ResponseEntity::ok)
+            .orElse(
+                ResponseEntity.noContent()
+                    .build());
+    }
+
+    @RequestMapping(
+        method = RequestMethod.GET,
         value = "/fetch-job-instance-id/{jobId}/{type}",
         consumes = {
             "application/json"
@@ -40,7 +57,7 @@ public class RemoteInstanceJobServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Long> getTriggerExecution(@PathVariable long jobId, @PathVariable int type) {
+    public ResponseEntity<Long> fetchJobInstanceId(@PathVariable long jobId, @PathVariable int type) {
         return instanceJobService.fetchJobInstanceId(jobId, type)
             .map(ResponseEntity::ok)
             .orElse(

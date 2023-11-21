@@ -94,7 +94,6 @@
             <column name="enabled" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_execution_date" type="TIMESTAMP"/>
             <column name="created_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
