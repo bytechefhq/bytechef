@@ -1,9 +1,11 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {
+    ActionDefinitionModel,
+    ComponentDefinitionBasicModel,
+} from '@/middleware/hermes/configuration';
 import DataPillPanelBody, {
     ComponentActionData,
 } from '@/pages/automation/project/components/DataPillPanelBody';
-import {useGetActionDefinitionsQuery} from '@/queries/actionDefinitions.queries';
-import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {PropertyType} from '@/types/projectTypes';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
@@ -15,53 +17,27 @@ import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 
-const DataPillPanel = () => {
+const DataPillPanel = ({
+    actionData,
+    normalizedPreviousComponentNames,
+    previousComponentDefinitions,
+    previousComponentNames,
+}: {
+    actionData: Array<ActionDefinitionModel>;
+    normalizedPreviousComponentNames: Array<string>;
+    previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
+    previousComponentNames: Array<string>;
+}) => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
-    const {componentActions, componentNames} = useWorkflowDataStore();
+    const {componentNames} = useWorkflowDataStore();
 
     const {currentNode, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
 
-    const currentNodeIndex = componentNames.indexOf(currentNode.name);
-
-    const previousComponentNames =
-        componentNames.length > 1
-            ? componentNames.slice(0, currentNodeIndex)
-            : [];
-
-    const normalizedPreviousComponentNames = previousComponentNames.map(
-        (name) =>
-            name.match(new RegExp(/-\d$/))
-                ? name.slice(0, name.length - 2)
-                : name
-    );
-
-    const {data: previousComponentDefinitions} =
-        useGetComponentDefinitionsQuery(
-            {
-                include: normalizedPreviousComponentNames,
-            },
-            !!normalizedPreviousComponentNames.length
-        );
-
-    const taskTypes = componentActions?.map(
-        (componentAction) =>
-            `${componentAction.componentName}/1/${componentAction.actionName}`
-    );
-
-    const {data: actionData} = useGetActionDefinitionsQuery(
-        {taskTypes},
-        !!componentActions?.length
-    );
-
-    if (!previousComponentDefinitions?.length || !actionData?.length) {
-        return <></>;
-    }
-
-    const actionDataWithComponentAlias = actionData.map((action) => {
-        const sameNameActions = actionData.filter(
+    const actionDataWithComponentAlias = actionData?.map((action) => {
+        const sameNameActions = actionData?.filter(
             (actionDatum) => actionDatum.componentName === action.componentName
         );
 
@@ -73,12 +49,12 @@ const DataPillPanel = () => {
         };
     });
 
-    const previousActions = actionDataWithComponentAlias.filter((action) =>
+    const previousActions = actionDataWithComponentAlias?.filter((action) =>
         previousComponentNames.includes(action.workflowAlias!)
     );
 
-    const componentActionData = previousActions.map((action, index) => {
-        const componentDefinition = previousComponentDefinitions.find(
+    const componentActionData = previousActions?.map((action, index) => {
+        const componentDefinition = previousComponentDefinitions?.find(
             (currentComponentDefinition) =>
                 currentComponentDefinition.name ===
                 normalizedPreviousComponentNames[index]
@@ -93,7 +69,7 @@ const DataPillPanel = () => {
         }
     });
 
-    const dataPillComponentData = componentActionData.filter((action) => {
+    const dataPillComponentData = componentActionData?.filter((action) => {
         if (!action) {
             return false;
         }
@@ -109,15 +85,17 @@ const DataPillPanel = () => {
         );
     });
 
-    if (!dataPillComponentData?.length) {
-        return <></>;
-    }
-
     return (
         <Dialog.Root
             modal={false}
             onOpenChange={() => setDataPillPanelOpen(!dataPillPanelOpen)}
-            open={dataPillPanelOpen && workflowNodeDetailsPanelOpen}
+            open={
+                dataPillPanelOpen &&
+                workflowNodeDetailsPanelOpen &&
+                !!previousComponentNames.length &&
+                !!previousComponentDefinitions &&
+                !!dataPillComponentData.length
+            }
         >
             <Dialog.Portal>
                 <Dialog.Content
