@@ -1,3 +1,4 @@
+import Input from '@/components/Input/Input';
 import {
     ComponentDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
@@ -6,23 +7,26 @@ import {useEffect, useState} from 'react';
 
 import WorkflowNodesTabs from './WorkflowNodesTabs';
 
-interface WorkflowNodesSidebarProps {
+const WorkflowNodesSidebar = ({
+    data,
+}: {
     data: {
         componentDefinitions: Array<ComponentDefinitionBasicModel>;
         taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
     };
-    filter: string;
-}
+}) => {
+    const [filter, setFilter] = useState('');
 
-const WorkflowNodesSidebar = ({data, filter}: WorkflowNodesSidebarProps) => {
     const [
         filteredActionComponentDefinitions,
         setFilteredActionComponentDefinitions,
     ] = useState<Array<ComponentDefinitionBasicModel>>([]);
+
     const [
         filteredTaskDispatcherDefinitions,
         setFilteredTaskDispatcherDefinitions,
     ] = useState<Array<TaskDispatcherDefinitionModel>>([]);
+
     const [
         filteredTriggerComponentDefinitions,
         setFilteredTriggerComponentDefinitions,
@@ -71,12 +75,31 @@ const WorkflowNodesSidebar = ({data, filter}: WorkflowNodesSidebarProps) => {
     }, [componentDefinitions, filter, taskDispatcherDefinitions]);
 
     return (
-        <WorkflowNodesTabs
-            actionComponentDefinitions={filteredActionComponentDefinitions}
-            itemsDraggable
-            taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
-            triggerComponentDefinitions={filteredTriggerComponentDefinitions}
-        />
+        <div>
+            <header className="border-b border-gray-200 px-3 pt-3 text-center text-gray-600">
+                <Input
+                    name="workflowNodeFilter"
+                    onChange={(event) => setFilter(event.target.value)}
+                    placeholder="Filter workflow nodes"
+                    value={filter}
+                />
+            </header>
+
+            <main>
+                <WorkflowNodesTabs
+                    actionComponentDefinitions={
+                        filteredActionComponentDefinitions
+                    }
+                    itemsDraggable
+                    taskDispatcherDefinitions={
+                        filteredTaskDispatcherDefinitions
+                    }
+                    triggerComponentDefinitions={
+                        filteredTriggerComponentDefinitions
+                    }
+                />
+            </main>
+        </div>
     );
 };
 

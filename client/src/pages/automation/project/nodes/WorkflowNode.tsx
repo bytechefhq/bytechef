@@ -96,7 +96,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             onMouseOut={() => setIsHovered(false)}
             onMouseOver={() => setIsHovered(true)}
         >
-            {!!isHovered && (
+            {isHovered && (
                 <div className="absolute left-[-40px] pr-4">
                     {data.type === 'trigger' ? (
                         <WorkflowNodesPopoverMenu
