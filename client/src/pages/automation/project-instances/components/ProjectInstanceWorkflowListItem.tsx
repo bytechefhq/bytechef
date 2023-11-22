@@ -1,3 +1,4 @@
+import {Button} from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -59,78 +60,70 @@ const ProjectInstanceWorkflowListItem = ({
 
     return (
         <>
-            <div className="w-10/12">
-                <Link
-                    className="flex items-center"
-                    to={`/automation/projects/${projectId}/workflows/${workflow.id}`}
-                >
-                    <div className="w-6/12 text-sm font-semibold">
-                        {workflow.label}
-                    </div>
+            <Link
+                className="flex flex-1 items-center"
+                to={`/automation/projects/${projectId}/workflows/${workflow.id}`}
+            >
+                <div className="w-6/12 text-sm font-semibold">
+                    {workflow.label}
+                </div>
 
-                    <div className="ml-6 flex">
-                        {filteredDefinitionNames?.map((name) => {
-                            const componentDefinition =
-                                workflowComponentDefinitions[name];
-                            const taskDispatcherDefinition =
-                                workflowTaskDispatcherDefinitions[name];
+                <div className="ml-6 flex">
+                    {filteredDefinitionNames?.map((name) => {
+                        const componentDefinition =
+                            workflowComponentDefinitions[name];
+                        const taskDispatcherDefinition =
+                            workflowTaskDispatcherDefinitions[name];
 
-                            return (
-                                <div
-                                    className="mr-0.5 flex items-center justify-center rounded-full border p-1"
-                                    key={name}
-                                >
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <InlineSVG
-                                                className="h-5 w-5 flex-none"
-                                                key={name}
-                                                src={
-                                                    componentDefinition?.icon
-                                                        ? componentDefinition?.icon
-                                                        : taskDispatcherDefinition?.icon ??
-                                                          ''
-                                                }
-                                            />
-                                        </TooltipTrigger>
-
-                                        <TooltipContent side="right">
-                                            {componentDefinition?.title}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    <div className="flex flex-1 justify-end text-sm">
-                        {projectInstanceWorkflow?.lastExecutionDate ? (
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <div className="flex items-center text-sm text-gray-500">
-                                        <CalendarIcon
-                                            aria-hidden="true"
-                                            className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
+                        return (
+                            <div
+                                className="mr-0.5 flex items-center justify-center rounded-full border p-1"
+                                key={name}
+                            >
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <InlineSVG
+                                            className="h-5 w-5 flex-none"
+                                            key={name}
+                                            src={
+                                                componentDefinition?.icon
+                                                    ? componentDefinition?.icon
+                                                    : taskDispatcherDefinition?.icon ??
+                                                      ''
+                                            }
                                         />
+                                    </TooltipTrigger>
 
-                                        <span>
-                                            {`${projectInstanceWorkflow.lastExecutionDate?.toLocaleDateString()} ${projectInstanceWorkflow.lastExecutionDate?.toLocaleTimeString()}`}
-                                        </span>
-                                    </div>
-                                </TooltipTrigger>
+                                    <TooltipContent side="right">
+                                        {componentDefinition?.title}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
+                        );
+                    })}
+                </div>
+            </Link>
 
-                                <TooltipContent>
-                                    Last Execution Date
-                                </TooltipContent>
-                            </Tooltip>
-                        ) : (
-                            '-'
-                        )}
-                    </div>
-                </Link>
-            </div>
+            <div className="flex items-center justify-end gap-x-6">
+                {projectInstanceWorkflow?.lastExecutionDate ? (
+                    <Tooltip>
+                        <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                            <CalendarIcon
+                                aria-hidden="true"
+                                className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
+                            />
 
-            <div className="flex w-1/12 items-center justify-end">
+                            <span>
+                                {`Executed at ${projectInstanceWorkflow.lastExecutionDate?.toLocaleDateString()} ${projectInstanceWorkflow.lastExecutionDate?.toLocaleTimeString()}`}
+                            </span>
+                        </TooltipTrigger>
+
+                        <TooltipContent>Last Execution Date</TooltipContent>
+                    </Tooltip>
+                ) : (
+                    '-'
+                )}
+
                 {projectInstanceWorkflow && (
                     <Switch
                         checked={projectInstanceWorkflow.enabled}
@@ -152,12 +145,12 @@ const ProjectInstanceWorkflowListItem = ({
                         }}
                     />
                 )}
-            </div>
 
-            <div className="flex w-1/12 justify-end">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                        <Button size="icon" variant="ghost">
+                            <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                        </Button>
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">

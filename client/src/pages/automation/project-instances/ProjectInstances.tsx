@@ -214,25 +214,28 @@ const ProjectInstances = () => {
                 }
             >
                 {projectInstances && projectInstances?.length > 0 ? (
-                    Array.from(projectInstanceMap.keys())?.map(
-                        (projectId) =>
-                            projects &&
-                            tags && (
-                                <ProjectInstanceList
-                                    key={projectId}
-                                    project={
-                                        projects.find(
-                                            (currentProject) =>
-                                                currentProject.id === projectId
-                                        )!
-                                    }
-                                    projectInstances={
-                                        projectInstanceMap.get(projectId)!
-                                    }
-                                    tags={tags}
-                                />
-                            )
-                    )
+                    <div className="w-full space-y-4 px-2 2xl:mx-auto 2xl:w-4/5">
+                        {Array.from(projectInstanceMap.keys())?.map(
+                            (projectId) =>
+                                projects &&
+                                tags && (
+                                    <ProjectInstanceList
+                                        key={projectId}
+                                        project={
+                                            projects.find(
+                                                (currentProject) =>
+                                                    currentProject.id ===
+                                                    projectId
+                                            )!
+                                        }
+                                        projectInstances={
+                                            projectInstanceMap.get(projectId)!
+                                        }
+                                        tags={tags}
+                                    />
+                                )
+                        )}
+                    </div>
                 ) : (
                     <EmptyList
                         button={
