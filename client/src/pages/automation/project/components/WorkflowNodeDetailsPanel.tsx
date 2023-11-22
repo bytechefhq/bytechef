@@ -61,10 +61,6 @@ const WorkflowNodeDetailsPanel = ({
     >([]);
     const [currentActionName, setCurrentActionName] = useState('');
 
-    useEffect(() => {
-        console.log('workflowNodeDetailsPanel render');
-    }, []);
-
     const {
         currentNode,
         setWorkflowNodeDetailsPanelOpen,

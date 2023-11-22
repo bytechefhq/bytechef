@@ -38,4 +38,5 @@ export const useGetActionDefinitionsQuery = (
         queryKey: ActionDefinitionKeys.filteredActionDefinitions(request),
         queryFn: () => new ActionDefinitionApi().getActionDefinitions(request),
         enabled: false || enabledCondition,
+        staleTime: 60 * 1000,
     });
