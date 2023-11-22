@@ -366,8 +366,7 @@ const WorkflowNodeDetailsPanel = ({
 
         if (
             activeTab === 'properties' &&
-            currentActionFetched &&
-            !currentActionProperties
+            (!currentActionFetched || !currentActionProperties)
         ) {
             setActiveTab('description');
         }
