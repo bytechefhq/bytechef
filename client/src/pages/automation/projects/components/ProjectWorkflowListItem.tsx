@@ -83,71 +83,67 @@ const ProjectWorkflowListItem = ({
 
     return (
         <>
-            <div className="w-10/12">
-                <Link
-                    className="flex items-center"
-                    to={`/automation/projects/${project.id}/workflows/${workflow.id}`}
-                >
-                    <div className="w-6/12 text-sm font-semibold">
-                        {workflow.label}
-                    </div>
+            <Link
+                className="flex flex-1 items-center"
+                to={`/automation/projects/${project.id}/workflows/${workflow.id}`}
+            >
+                <div className="w-6/12 text-sm font-semibold">
+                    {workflow.label}
+                </div>
 
-                    <div className="ml-6 flex">
-                        {filteredDefinitionNames?.map((name) => {
-                            const componentDefinition =
-                                workflowComponentDefinitions[name];
+                <div className="flex">
+                    {filteredDefinitionNames?.map((name) => {
+                        const componentDefinition =
+                            workflowComponentDefinitions[name];
 
-                            const taskDispatcherDefinition =
-                                workflowTaskDispatcherDefinitions[name];
+                        const taskDispatcherDefinition =
+                            workflowTaskDispatcherDefinitions[name];
 
-                            return (
-                                <div
-                                    className="mr-0.5 flex items-center justify-center rounded-full border p-1"
-                                    key={name}
-                                >
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <InlineSVG
-                                                className="h-5 w-5 flex-none"
-                                                key={name}
-                                                src={
-                                                    componentDefinition?.icon
-                                                        ? componentDefinition?.icon
-                                                        : taskDispatcherDefinition?.icon ??
-                                                          ''
-                                                }
-                                            />
-                                        </TooltipTrigger>
+                        return (
+                            <div
+                                className="mr-0.5 flex items-center justify-center rounded-full border p-1"
+                                key={name}
+                            >
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <InlineSVG
+                                            className="h-5 w-5 flex-none"
+                                            key={name}
+                                            src={
+                                                componentDefinition?.icon
+                                                    ? componentDefinition?.icon
+                                                    : taskDispatcherDefinition?.icon ??
+                                                      ''
+                                            }
+                                        />
+                                    </TooltipTrigger>
 
-                                        <TooltipContent side="right">
-                                            {componentDefinition?.title}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </div>
-                            );
-                        })}
-                    </div>
+                                    <TooltipContent side="right">
+                                        {componentDefinition?.title}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
+                        );
+                    })}
+                </div>
+            </Link>
 
-                    <div className="flex flex-1 justify-end">
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <div className="flex items-center text-sm text-gray-500">
-                                    <CalendarIcon
-                                        aria-hidden="true"
-                                        className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
-                                    />
+            <div className="flex justify-end gap-x-4">
+                <Tooltip>
+                    <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                        <CalendarIcon
+                            aria-hidden="true"
+                            className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
+                        />
 
-                                    <span>{`${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}</span>
-                                </div>
-                            </TooltipTrigger>
+                        <span>
+                            {`Modified at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
+                        </span>
+                    </TooltipTrigger>
 
-                            <TooltipContent>Last Modified Date</TooltipContent>
-                        </Tooltip>
-                    </div>
-                </Link>
-            </div>
+                    <TooltipContent>Last Modified Date</TooltipContent>
+                </Tooltip>
 
-            <div className="flex w-2/12 justify-end">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost">

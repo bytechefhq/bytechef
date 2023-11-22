@@ -91,7 +91,7 @@ const ConnectionListItem = ({
         <li key={connection.id}>
             <div className="group rounded-md bg-white p-2 py-3 hover:bg-gray-50">
                 <div className="flex items-center">
-                    <div className="w-10/12 flex-1">
+                    <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="relative flex items-center">
                                 {componentDefinition?.icon && (
@@ -108,20 +108,6 @@ const ConnectionListItem = ({
                                 <span className="mr-2 text-base font-semibold">
                                     {connection.name}
                                 </span>
-                            </div>
-
-                            <div className="ml-2 flex shrink-0">
-                                <Badge
-                                    className={twMerge(
-                                        connection.active &&
-                                            'bg-success text-success-foreground hover:bg-success'
-                                    )}
-                                    variant="secondary"
-                                >
-                                    {connection.active
-                                        ? 'Active'
-                                        : 'Not Active'}
-                                </Badge>
                             </div>
                         </div>
 
@@ -147,33 +133,41 @@ const ConnectionListItem = ({
                                     />
                                 )}
                             </div>
-
-                            <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                                {connection.createdDate && (
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <div className="flex items-center text-sm text-gray-500">
-                                                <CalendarIcon
-                                                    aria-hidden="true"
-                                                    className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
-                                                />
-
-                                                <span>
-                                                    {`${connection.createdDate?.toLocaleDateString()} ${connection.createdDate?.toLocaleTimeString()}`}
-                                                </span>
-                                            </div>
-                                        </TooltipTrigger>
-
-                                        <TooltipContent>
-                                            Created Date
-                                        </TooltipContent>
-                                    </Tooltip>
-                                )}
-                            </div>
                         </div>
                     </div>
 
-                    <div className="flex w-2/12 justify-end">
+                    <div className="flex items-center justify-end gap-x-6">
+                        <div className="flex flex-col items-end gap-y-4">
+                            <Badge
+                                className={twMerge(
+                                    connection.active &&
+                                        'bg-success text-success-foreground hover:bg-success'
+                                )}
+                                variant="secondary"
+                            >
+                                {connection.active ? 'Active' : 'Not Active'}
+                            </Badge>
+
+                            {connection.createdDate && (
+                                <Tooltip>
+                                    <TooltipTrigger className="flex items-center text-sm text-gray-500 sm:mt-0">
+                                        <CalendarIcon
+                                            aria-hidden="true"
+                                            className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
+                                        />
+
+                                        <span>
+                                            {`Created at ${connection.createdDate?.toLocaleDateString()} ${connection.createdDate?.toLocaleTimeString()}`}
+                                        </span>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>
+                                        Created Date
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
+                        </div>
+
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button size="icon" variant="ghost">
@@ -201,37 +195,35 @@ const ConnectionListItem = ({
                     </div>
                 </div>
 
-                {showDeleteDialog && (
-                    <AlertDialog open={showDeleteDialog}>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Are you absolutely sure?
-                                </AlertDialogTitle>
+                <AlertDialog open={showDeleteDialog}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Are you absolutely sure?
+                            </AlertDialogTitle>
 
-                                <AlertDialogDescription>
-                                    This action cannot be undone. This will
-                                    permanently delete the connection.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently delete the connection.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
 
-                            <AlertDialogFooter>
-                                <AlertDialogCancel
-                                    onClick={() => setShowDeleteDialog(false)}
-                                >
-                                    Cancel
-                                </AlertDialogCancel>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel
+                                onClick={() => setShowDeleteDialog(false)}
+                            >
+                                Cancel
+                            </AlertDialogCancel>
 
-                                <AlertDialogAction
-                                    className="bg-red-600"
-                                    onClick={handleAlertDeleteDialogClick}
-                                >
-                                    Delete
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                )}
+                            <AlertDialogAction
+                                className="bg-red-600"
+                                onClick={handleAlertDeleteDialogClick}
+                            >
+                                Delete
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
 
                 {showEditDialog && (
                     <ConnectionDialog

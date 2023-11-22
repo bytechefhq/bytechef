@@ -42,7 +42,7 @@ import {twMerge} from 'tailwind-merge';
 import TagList from '../../../../components/TagList/TagList';
 import ProjectInstanceDialog from './ProjectInstanceDialog';
 
-interface ProjectItemProps {
+interface ProjectInstanceListItemProps {
     projectInstance: ProjectInstanceModel;
     remainingTags?: TagModel[];
     project: ProjectModel;
@@ -52,7 +52,7 @@ const ProjectInstanceListItem = ({
     project,
     projectInstance,
     remainingTags,
-}: ProjectItemProps) => {
+}: ProjectInstanceListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const setProjectInstanceEnabled = useProjectInstancesEnabledStore(
@@ -92,10 +92,28 @@ const ProjectInstanceListItem = ({
         },
     });
 
+    const handleOnCheckedChange = (value: boolean) => {
+        enableProjectInstanceMutation.mutate(
+            {
+                enable: value,
+                id: projectInstance.id!,
+            },
+            {
+                onSuccess: () => {
+                    setProjectInstanceEnabled(
+                        projectInstance.id!,
+                        !projectInstance.enabled
+                    );
+                    projectInstance!.enabled = !projectInstance.enabled;
+                },
+            }
+        );
+    };
+
     return (
         <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
             <div className="flex items-center justify-between">
-                <div className="w-10/12">
+                <div className="flex-1">
                     <div className="flex items-center justify-between">
                         <div className="flex w-full items-center justify-between">
                             {projectInstance.description ? (
@@ -115,20 +133,6 @@ const ProjectInstanceListItem = ({
                                     {projectInstance.name}
                                 </span>
                             )}
-                        </div>
-
-                        <div className="ml-2 flex shrink-0">
-                            <Badge
-                                className={twMerge(
-                                    projectInstance.enabled &&
-                                        'bg-success text-success-foreground hover:bg-success'
-                                )}
-                                variant="secondary"
-                            >
-                                {projectInstance.enabled
-                                    ? 'Enabled'
-                                    : 'Disabled'}
-                            </Badge>
                         </div>
                     </div>
 
@@ -163,59 +167,48 @@ const ProjectInstanceListItem = ({
                                 )}
                             </div>
                         </div>
-
-                        <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    {projectInstance.lastExecutionDate ? (
-                                        <div className="flex text-sm text-gray-500">
-                                            <CalendarIcon
-                                                aria-hidden="true"
-                                                className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
-                                            />
-
-                                            <span>
-                                                {`${projectInstance.lastExecutionDate?.toLocaleDateString()} ${projectInstance.lastExecutionDate?.toLocaleTimeString()}`}
-                                            </span>
-                                        </div>
-                                    ) : (
-                                        '-'
-                                    )}
-                                </TooltipTrigger>
-
-                                <TooltipContent>
-                                    Last Execution Date
-                                </TooltipContent>
-                            </Tooltip>
-                        </div>
                     </div>
                 </div>
 
-                <div className="flex w-1/12 items-center justify-end">
+                <div className="flex items-center justify-end gap-x-6">
+                    <div className="flex flex-col items-end gap-y-4">
+                        <Badge
+                            className={twMerge(
+                                projectInstance.enabled &&
+                                    'bg-success text-success-foreground hover:bg-success'
+                            )}
+                            variant="secondary"
+                        >
+                            {projectInstance.enabled ? 'Enabled' : 'Disabled'}
+                        </Badge>
+
+                        <Tooltip>
+                            <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                                {projectInstance.lastExecutionDate ? (
+                                    <>
+                                        <CalendarIcon
+                                            aria-hidden="true"
+                                            className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
+                                        />
+
+                                        <span>
+                                            {`Executed at ${projectInstance.lastExecutionDate?.toLocaleDateString()} ${projectInstance.lastExecutionDate?.toLocaleTimeString()}`}
+                                        </span>
+                                    </>
+                                ) : (
+                                    '-'
+                                )}
+                            </TooltipTrigger>
+
+                            <TooltipContent>Last Execution Date</TooltipContent>
+                        </Tooltip>
+                    </div>
+
                     <Switch
                         checked={projectInstance.enabled}
-                        onCheckedChange={(value) => {
-                            enableProjectInstanceMutation.mutate(
-                                {
-                                    enable: value,
-                                    id: projectInstance.id!,
-                                },
-                                {
-                                    onSuccess: () => {
-                                        setProjectInstanceEnabled(
-                                            projectInstance.id!,
-                                            !projectInstance.enabled
-                                        );
-                                        projectInstance!.enabled =
-                                            !projectInstance.enabled;
-                                    },
-                                }
-                            );
-                        }}
+                        onCheckedChange={handleOnCheckedChange}
                     />
-                </div>
 
-                <div className="flex w-1/12 justify-end">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button size="icon" variant="ghost">

@@ -151,7 +151,9 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                                     )
                                 )
                             ) : (
-                                <p>No defined connections.</p>
+                                <p className="text-sm">
+                                    No defined connections.
+                                </p>
                             )}
                         </TabsContent>
                     </Tabs>

@@ -99,7 +99,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
     return (
         <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
             <div className="flex items-center justify-between">
-                <div className="w-10/12">
+                <div className="flex-1">
                     <div className="flex items-center justify-between">
                         <div className="relative flex items-center">
                             <Link
@@ -129,22 +129,6 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                     {project.category.name}
                                 </span>
                             )}
-                        </div>
-
-                        <div className="ml-2 flex shrink-0">
-                            <Badge
-                                className={twMerge(
-                                    project.status ===
-                                        ProjectModelStatusEnum.Published &&
-                                        'border-transparent bg-success text-success-foreground hover:bg-success'
-                                )}
-                                variant="secondary"
-                            >
-                                {project.status ===
-                                ProjectModelStatusEnum.Published
-                                    ? `Published V${project.projectVersion}`
-                                    : 'Not Published'}
-                            </Badge>
                         </div>
                     </div>
 
@@ -179,36 +163,49 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                 )}
                             </div>
                         </div>
-
-                        <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    {project.status ===
-                                    ProjectModelStatusEnum.Published ? (
-                                        <div className="flex items-center text-sm text-gray-500">
-                                            <CalendarIcon
-                                                aria-hidden="true"
-                                                className="mr-0.5 h-4 w-4 shrink-0 text-gray-400"
-                                            />
-
-                                            <span>
-                                                {`${project.publishedDate?.toLocaleDateString()} ${project.publishedDate?.toLocaleTimeString()}`}
-                                            </span>
-                                        </div>
-                                    ) : (
-                                        '-'
-                                    )}
-                                </TooltipTrigger>
-
-                                <TooltipContent>
-                                    Last Published Date
-                                </TooltipContent>
-                            </Tooltip>
-                        </div>
                     </div>
                 </div>
 
-                <div className="flex w-2/12 justify-end">
+                <div className="flex items-center justify-end gap-x-6">
+                    <div className="flex flex-col items-end gap-y-4">
+                        <Badge
+                            className={twMerge(
+                                project.status ===
+                                    ProjectModelStatusEnum.Published &&
+                                    'border-transparent bg-success text-success-foreground hover:bg-success'
+                            )}
+                            variant="secondary"
+                        >
+                            {project.status === ProjectModelStatusEnum.Published
+                                ? `Published V${project.projectVersion}`
+                                : 'Not Published'}
+                        </Badge>
+
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <div className="flex items-center text-sm text-gray-500 sm:mt-0">
+                                    {project.status ===
+                                    ProjectModelStatusEnum.Published ? (
+                                        <>
+                                            <CalendarIcon
+                                                aria-hidden="true"
+                                                className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
+                                            />
+
+                                            <span>
+                                                {`Published at ${project.publishedDate?.toLocaleDateString()} ${project.publishedDate?.toLocaleTimeString()}`}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        '-'
+                                    )}
+                                </div>
+                            </TooltipTrigger>
+
+                            <TooltipContent>Last Published Date</TooltipContent>
+                        </Tooltip>
+                    </div>
+
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button size="icon" variant="ghost">

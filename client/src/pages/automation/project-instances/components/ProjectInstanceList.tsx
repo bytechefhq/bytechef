@@ -23,10 +23,10 @@ const ProjectInstanceList = ({
     );
 
     return (
-        <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
+        <>
             {projectInstances.length > 0 && (
-                <>
-                    <h3 className="mb-1 px-2 text-xl font-semibold">
+                <div className="flex w-full flex-col">
+                    <h3 className="mb-1 px-2 text-lg font-semibold">
                         {project.name}
                     </h3>
 
@@ -76,9 +76,10 @@ const ProjectInstanceList = ({
                             );
                         })}
                     </div>
-                </>
+                </div>
             )}
-        </div>
+        </>
     );
 };
+
 export default ProjectInstanceList;
