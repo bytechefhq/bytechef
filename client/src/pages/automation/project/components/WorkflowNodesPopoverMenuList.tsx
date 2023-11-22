@@ -30,6 +30,12 @@ const WorkflowNodesPopoverMenuList = memo(
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
 
+        useEffect(() => {
+            if (filter) {
+                setFilter(filter.toLowerCase());
+            }
+        }, [filter]);
+
         const [
             filteredActionComponentDefinitions,
             setFilteredActionComponentDefinitions,
@@ -235,46 +241,38 @@ const WorkflowNodesPopoverMenuList = memo(
         };
 
         useEffect(() => {
-            if (componentDefinitions && taskDispatcherDefinitions) {
-                setFilteredActionComponentDefinitions(
-                    componentDefinitions.filter(
-                        (componentDefinition) =>
-                            componentDefinition?.actionsCount &&
-                            (componentDefinition.name
-                                ?.toLowerCase()
-                                .includes(filter.toLowerCase()) ||
-                                componentDefinition?.title
-                                    ?.toLowerCase()
-                                    .includes(filter.toLowerCase()))
-                    )
-                );
-
+            if (taskDispatcherDefinitions) {
                 setFilteredTaskDispatcherDefinitions(
                     taskDispatcherDefinitions.filter(
-                        (taskDispatcherDefinition) =>
-                            taskDispatcherDefinition.name
-                                ?.toLowerCase()
-                                .includes(filter.toLowerCase()) ||
-                            taskDispatcherDefinition?.title
-                                ?.toLowerCase()
-                                .includes(filter.toLowerCase())
+                        ({name, title}) =>
+                            name?.toLowerCase().includes(filter) ||
+                            title?.toLowerCase().includes(filter)
+                    )
+                );
+            }
+        }, [taskDispatcherDefinitions, filter, edge]);
+
+        useEffect(() => {
+            if (componentDefinitions) {
+                setFilteredActionComponentDefinitions(
+                    componentDefinitions.filter(
+                        ({actionsCount, name, title}) =>
+                            actionsCount &&
+                            (name?.toLowerCase().includes(filter) ||
+                                title?.toLowerCase().includes(filter))
                     )
                 );
 
                 setFilteredTriggerComponentDefinitions(
                     componentDefinitions.filter(
-                        (componentDefinition) =>
-                            componentDefinition?.triggersCount &&
-                            (componentDefinition.name
-                                ?.toLowerCase()
-                                .includes(filter.toLowerCase()) ||
-                                componentDefinition?.title
-                                    ?.toLowerCase()
-                                    .includes(filter.toLowerCase()))
+                        ({name, title, triggersCount}) =>
+                            triggersCount &&
+                            (name?.toLowerCase().includes(filter) ||
+                                title?.toLowerCase().includes(filter))
                     )
                 );
             }
-        }, [componentDefinitions, filter, taskDispatcherDefinitions, edge]);
+        }, [componentDefinitions, filter, edge]);
 
         return (
             <div className="nowheel">
@@ -287,7 +285,7 @@ const WorkflowNodesPopoverMenuList = memo(
 
                 <header className="border-b border-gray-200 px-3 pt-3 text-center text-gray-600">
                     <Input
-                        name="contextualMenuFilter"
+                        name="workflowNodeFilter"
                         onChange={(event) => setFilter(event.target.value)}
                         placeholder="Filter workflow nodes"
                         value={filter}

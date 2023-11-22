@@ -17,7 +17,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {Input} from '@/components/ui/input';
 import {
     Select,
     SelectContent,
@@ -106,7 +105,6 @@ const Project = () => {
     const [currentWorkflow, setCurrentWorkflow] = useState<
         WorkflowModel | undefined
     >();
-    const [filter, setFilter] = useState('');
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] =
         useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] =
@@ -647,26 +645,26 @@ const Project = () => {
                             ) : (
                                 <div className="absolute inset-x-0 bottom-0 top-2/4">
                                     <div className="flex w-full flex-col items-center text-gray-500">
-                                        <div className="text-gray-400">
+                                        <span className="text-gray-400">
                                             <RefreshCwOffIcon className="h-16 w-16" />
-                                        </div>
+                                        </span>
 
-                                        <div>
+                                        <span>
                                             Workflow has not yet been executed.
-                                        </div>
+                                        </span>
                                     </div>
                                 </div>
                             )
                         ) : (
                             <div className="absolute inset-x-0 bottom-0 top-2/4">
                                 <div className="flex w-full flex-col items-center">
-                                    <div className="flex animate-spin space-x-2 text-gray-400">
+                                    <span className="flex animate-spin space-x-2 text-gray-400">
                                         <RefreshCwIcon className="h-16 w-16" />
-                                    </div>
+                                    </span>
 
-                                    <div className="text-gray-500">
+                                    <span className="text-gray-500">
                                         Workflow is running...
-                                    </div>
+                                    </span>
                                 </div>
                             </div>
                         )}
@@ -675,31 +673,15 @@ const Project = () => {
                 leftSidebarOpen={leftSidebarOpen}
                 leftSidebarWidth="96"
                 rightSidebarBody={
-                    <>
-                        {componentDefinitions &&
-                            !!taskDispatcherDefinitions && (
-                                <WorkflowNodesSidebar
-                                    data={{
-                                        componentDefinitions:
-                                            componentDefinitions,
-                                        taskDispatcherDefinitions:
-                                            taskDispatcherDefinitions,
-                                    }}
-                                    filter={filter}
-                                />
-                            )}
-                    </>
-                }
-                rightSidebarHeader={
-                    <div className="px-3 py-4">
-                        <Input
-                            className="mb-0 px-3 py-4"
-                            name="workflowElementsFilter"
-                            onChange={(event) => setFilter(event.target.value)}
-                            placeholder="Filter workflow nodes"
-                            value={filter}
+                    componentDefinitions &&
+                    taskDispatcherDefinitions && (
+                        <WorkflowNodesSidebar
+                            data={{
+                                componentDefinitions,
+                                taskDispatcherDefinitions,
+                            }}
                         />
-                    </div>
+                    )
                 }
                 rightSidebarOpen={rightSidebarOpen}
                 rightSidebarWidth="96"
