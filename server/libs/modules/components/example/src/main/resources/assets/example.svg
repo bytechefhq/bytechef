@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="172" height="178">
+<path fill="#eee" d="M0,0h172v178H0"/>
+<switch style="letter-spacing:2pt;font-weight:bold;fill:#a00;text-anchor:middle;text-align:center;stroke:#700;font-family:sans-serif;font-size:22px" transform="rotate(45 89 86)">
+<text systemLanguage="ba" x="89" y="96" font-size="26px">Миҫал ғына</text>
+<text systemLanguage="bg" x="89" y="72">просто един<tspan x="89" y="110" font-size="34px">Пример</tspan></text>
+<text systemLanguage="da" x="89" y="96" font-size="26px">et eksempel</text>
+<text systemLanguage="de" x="89" y="72">nur ein<tspan x="89" y="110" font-size="42px">Beispiel</tspan></text>
+<text systemLanguage="dsb" x="89" y="106" font-size="24px">to jo pśikład</text>
+<text systemLanguage="en" x="89" y="72">just an<tspan x="89" y="110" font-size="34px">Example</tspan></text>
+<text systemLanguage="eo" x="89" y="106" font-size="24px">Jen ekzemplo</text>
+<text systemLanguage="es" x="89" y="72">solo un<tspan x="89" y="110" font-size="34px">ejemplo</tspan></text>
+<text systemLanguage="fi" x="89" y="106" font-size="26px">esimerkki</text>
+<text systemLanguage="fr" x="89" y="72">juste un<tspan x="89" y="110" font-size="34px">exemple</tspan></text>
+<text systemLanguage="fy" x="89" y="106" font-size="24px">elk foarbyld</text>
+<text systemLanguage="hsb" x="89" y="106" font-size="24px">to je přikład</text>
+<text systemLanguage="it" x="89" y="72">solo un<tspan x="89" y="110" font-size="34px">esempio</tspan></text>
+<text systemLanguage="lt" x="89" y="106" font-size="26px">Tai pavyzdys</text>
+<text systemLanguage="nl" x="89" y="106" font-size="24px">enig voorbeeld</text>
+<text systemLanguage="pl" x="89" y="106" font-size="24px">przykład</text>
+<text systemLanguage="pt" x="89" y="72">apenas um<tspan x="89" y="110" font-size="34px">Exemplo</tspan></text>
+<text systemLanguage="pt-br" x="89" y="72">apenas um<tspan x="89" y="110" font-size="34px">Exemplo</tspan></text>
+<text systemLanguage="ro" x="89" y="72">doar un<tspan x="89" y="110" font-size="34px">Exemplu</tspan></text>
+<text systemLanguage="ru" x="89" y="72">просто<tspan x="89" y="110" font-size="40px">Пример</tspan></text>
+<text systemLanguage="sr" x="89" y="72">само<tspan x="89" y="110" font-size="40px">Пример</tspan></text>
+<text systemLanguage="sr-ijek" x="89" y="72">само<tspan x="89" y="110" font-size="40px">Примјер</tspan></text>
+<text systemLanguage="sr-lat" x="89" y="72">samo<tspan x="89" y="110" font-size="42px">Primer</tspan></text>
+<text systemLanguage="sr-lat-ijek" x="89" y="72">samo<tspan x="89" y="110" font-size="42px">Primjer</tspan></text>
+<text systemLanguage="tr" x="89" y="72">sadece bir<tspan x="89" y="118" font-size="42px">Örnek</tspan></text>
+</switch>
+</svg>

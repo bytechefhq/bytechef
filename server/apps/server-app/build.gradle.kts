@@ -77,6 +77,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:delay"))
     implementation(project(":server:libs:modules:components:filestorage"))
     implementation(project(":server:libs:modules:components:email"))
+    implementation(project(":server:libs:modules:components:example"))
     implementation(project(":server:libs:modules:components:htmlhelper"))
     implementation(project(":server:libs:modules:components:httpclient"))
     implementation(project(":server:libs:modules:components:hubspot"))
