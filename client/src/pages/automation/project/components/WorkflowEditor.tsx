@@ -11,6 +11,7 @@ import WorkflowEdge from '../edges/WorkflowEdge';
 import defaultEdges from '../edges/defaultEdges';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
+import usePrevious from '../hooks/usePrevious';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import defaultNodes from '../nodes/defaultNodes';
@@ -26,8 +27,11 @@ const WorkflowEditor = ({
     componentDefinitions,
     taskDispatcherDefinitions,
 }: WorkflowEditorProps) => {
+    const [latestNodeName, setLatestNodeName] = useState('');
     const [nodeNames, setNodeNames] = useState<Array<string>>([]);
     const [viewportWidth, setViewportWidth] = useState(0);
+
+    const previousNodeNames: Array<string> | undefined = usePrevious(nodeNames);
 
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
@@ -47,9 +51,21 @@ const WorkflowEditor = ({
         []
     );
 
+    useEffect(() => {
+        if (nodeNames && previousNodeNames?.length) {
+            const latest = nodeNames.find(
+                (nodeName) => !previousNodeNames?.includes(nodeName)
+            );
+
+            if (latest) {
+                setLatestNodeName(latest);
+            }
+        }
+    }, [nodeNames, previousNodeNames]);
+
     const {data: workflowComponent} = useGetComponentDefinitionQuery(
         {
-            componentName: nodeNames[nodeNames.length - 1],
+            componentName: latestNodeName || nodeNames[nodeNames.length - 1],
         },
         !!nodeNames.length
     );
