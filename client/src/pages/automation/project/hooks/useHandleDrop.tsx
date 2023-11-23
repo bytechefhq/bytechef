@@ -7,6 +7,7 @@ import {
 import InlineSVG from 'react-inlinesvg';
 import {Edge, Node, useReactFlow} from 'reactflow';
 
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getFormattedName from '../utils/getFormattedName';
 
 export default function useHandleDrop(): [
@@ -23,6 +24,8 @@ export default function useHandleDrop(): [
             | TaskDispatcherDefinitionBasicModel
     ) => void,
 ] {
+    const {componentNames, setComponentNames} = useWorkflowDataStore();
+
     const {getEdges, getNodes, setEdges, setNodes} = useReactFlow();
 
     const newNodeId = getRandomId();
@@ -67,6 +70,16 @@ export default function useHandleDrop(): [
             );
 
             nodes[nodeIndex] = newWorkflowNode;
+
+            const tempComponentNames = [...componentNames];
+
+            tempComponentNames.splice(
+                nodeIndex - 1,
+                0,
+                newWorkflowNode.data.name
+            );
+
+            setComponentNames(tempComponentNames);
 
             return [...nodes, newPlaceholderNode];
         });
@@ -151,6 +164,16 @@ export default function useHandleDrop(): [
             );
 
             nodes.splice(nextNodeIndex, 0, draggedNode);
+
+            const tempComponentNames = [...componentNames];
+
+            tempComponentNames.splice(
+                nextNodeIndex - 1,
+                0,
+                draggedNode.data.name
+            );
+
+            setComponentNames(tempComponentNames);
 
             return nodes;
         });
