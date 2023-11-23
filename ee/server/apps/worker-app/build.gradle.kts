@@ -45,6 +45,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:datamapper"))
     implementation(project(":server:libs:modules:components:datastorage"))
     implementation(project(":server:libs:modules:components:delay"))
+    implementation(project(":server:libs:modules:components:dropbox"))
     implementation(project(":server:libs:modules:components:filestorage"))
     implementation(project(":server:libs:modules:components:email"))
     implementation(project(":server:libs:modules:components:example"))

@@ -44,6 +44,7 @@ public class FilesystemComponentHandler implements ComponentHandler {
             FilesystemReadFileAction.ACTION_DEFINITION,
             FilesystemWriteFileAction.ACTION_DEFINITION,
             FilesystemCreateTempDirAction.ACTION_DEFINITION,
+
             FilesystemGetFilePathAction.ACTION_DEFINITION,
             FilesystemLsAction.ACTION_DEFINITION,
             FilesystemMkdirAction.ACTION_DEFINITION,
