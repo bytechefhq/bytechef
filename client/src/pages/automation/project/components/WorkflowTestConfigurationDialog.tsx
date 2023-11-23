@@ -32,7 +32,10 @@ const WorkflowTestConfigurationDialog = ({
 
     return (
         <Dialog onOpenChange={onClose} open={true}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent
+                className="sm:max-w-[425px]"
+                onInteractOutside={(event) => event.preventDefault()}
+            >
                 <Form {...form}>
                     <form
                         onSubmit={handleSubmit((values) =>
