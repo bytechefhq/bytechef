@@ -88,7 +88,9 @@ const ProjectInstanceEditWorkflowDialog = ({
             }}
             open={isOpen}
         >
-            <DialogContent>
+            <DialogContent
+                onInteractOutside={(event) => event.preventDefault()}
+            >
                 <Form {...form}>
                     <DialogHeader>
                         <div className="flex items-center justify-between">

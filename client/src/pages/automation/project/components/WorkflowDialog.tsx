@@ -135,7 +135,9 @@ const WorkflowDialog = ({
                 <DialogTrigger asChild>{triggerNode}</DialogTrigger>
             )}
 
-            <DialogContent>
+            <DialogContent
+                onInteractOutside={(event) => event.preventDefault()}
+            >
                 <Form {...form}>
                     <DialogHeader>
                         <div className="flex items-center justify-between">

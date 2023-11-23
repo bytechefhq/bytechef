@@ -190,6 +190,7 @@ const ProjectInstanceDialog = ({
                     'flex flex-col',
                     activeStepIndex === 1 && 'h-[500px] max-h-[800px]'
                 )}
+                onInteractOutside={(event) => event.preventDefault()}
             >
                 <Form {...form}>
                     <DialogHeader>
