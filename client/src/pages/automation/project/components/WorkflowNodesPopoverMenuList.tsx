@@ -121,123 +121,129 @@ const WorkflowNodesPopoverMenuList = memo(
                 );
 
                 setNodes((nodes) => {
-                    if (!nodes.find((node) => node.type === 'contextualMenu')) {
-                        const previousWorkflowNode = nodes.find(
-                            (node) => node.id === clickedEdge.source
-                        );
+                    const previousWorkflowNode = nodes.find(
+                        (node) => node.id === clickedEdge.source
+                    );
 
-                        const previousComponentNameIndex =
-                            componentNames.findIndex(
-                                (name) =>
-                                    name === previousWorkflowNode?.data.name
-                            );
+                    const previousComponentNameIndex = componentNames.findIndex(
+                        (name) => name === previousWorkflowNode?.data.name
+                    );
 
-                        const tempComponentNames = [...componentNames];
+                    const tempComponentNames = [...componentNames];
 
-                        tempComponentNames.splice(
-                            previousComponentNameIndex + 1,
-                            0,
-                            newWorkflowNode.data.name
-                        );
+                    tempComponentNames.splice(
+                        previousComponentNameIndex + 1,
+                        0,
+                        newWorkflowNode.data.name
+                    );
 
-                        setComponentNames(tempComponentNames);
+                    setComponentNames(tempComponentNames);
 
-                        return nodes.concat(newWorkflowNode);
-                    } else {
-                        return nodes;
-                    }
+                    const previousWorkflowNodeIndex = nodes.findIndex(
+                        (node) => node.id === clickedEdge.source
+                    );
+
+                    const tempNodes = [...nodes];
+
+                    tempNodes.splice(
+                        previousWorkflowNodeIndex + 1,
+                        0,
+                        newWorkflowNode
+                    );
+
+                    return tempNodes;
                 });
+            } else {
+                const placeholderNode = getNode(id);
+
+                if (!placeholderNode) {
+                    return;
+                }
+
+                const placeholderId = placeholderNode.id;
+                const childPlaceholderId = getRandomId();
+
+                const childPlaceholderNode = {
+                    data: {label: '+'},
+                    id: childPlaceholderId,
+                    position: {
+                        x: placeholderNode.position.x,
+                        y: placeholderNode.position.y,
+                    },
+                    style: {
+                        zIndex: 9999,
+                    },
+                    type: 'placeholder',
+                };
+
+                const childPlaceholderEdge = {
+                    id: `${placeholderId}=>${childPlaceholderId}`,
+                    source: placeholderId,
+                    target: childPlaceholderId,
+                    type: 'placeholder',
+                };
+
+                setNodes((nodes: Node[]) =>
+                    nodes
+                        .map((node) => {
+                            if (node.id === placeholderId) {
+                                const formattedNodeName = getFormattedName(
+                                    clickedItem.name!,
+                                    nodes
+                                );
+
+                                setComponentNames([
+                                    ...componentNames,
+                                    formattedNodeName,
+                                ]);
+
+                                return {
+                                    ...node,
+                                    data: {
+                                        icon: (
+                                            <>
+                                                {clickedItem.icon ? (
+                                                    <InlineSVG
+                                                        className="h-9 w-9 text-gray-700"
+                                                        src={clickedItem.icon}
+                                                    />
+                                                ) : (
+                                                    <Component1Icon className="h-9 w-9 text-gray-700" />
+                                                )}
+                                            </>
+                                        ),
+                                        label: clickedItem?.title,
+                                        name: formattedNodeName,
+                                        originNodeName: clickedItem.name,
+                                        type: node.data?.type,
+                                    },
+                                    type: 'workflow',
+                                };
+                            }
+
+                            return node;
+                        })
+                        .concat([childPlaceholderNode])
+                );
+
+                setEdges((edges: Edge[]) =>
+                    edges
+                        .map((edge) => {
+                            if (edge.target === id) {
+                                return {
+                                    ...edge,
+                                    markerEnd: {
+                                        type: MarkerType.ArrowClosed,
+                                    },
+                                    type: 'workflow',
+                                };
+                            }
+
+                            return edge;
+                        })
+                        .concat([childPlaceholderEdge])
+                );
             }
-
-            const placeholderNode = getNode(id);
-
-            if (!placeholderNode) {
-                return;
-            }
-
-            const placeholderId = placeholderNode.id;
-            const childPlaceholderId = getRandomId();
-
-            const childPlaceholderNode = {
-                data: {label: '+'},
-                id: childPlaceholderId,
-                position: {
-                    x: placeholderNode.position.x,
-                    y: placeholderNode.position.y,
-                },
-                style: {
-                    zIndex: 9999,
-                },
-                type: 'placeholder',
-            };
-
-            const childPlaceholderEdge = {
-                id: `${placeholderId}=>${childPlaceholderId}`,
-                source: placeholderId,
-                target: childPlaceholderId,
-                type: 'placeholder',
-            };
-
-            setNodes((nodes: Node[]) =>
-                nodes
-                    .map((node) => {
-                        if (node.id === placeholderId) {
-                            const formattedNodeName = getFormattedName(
-                                clickedItem.name!,
-                                nodes
-                            );
-
-                            setComponentNames([
-                                ...componentNames,
-                                formattedNodeName,
-                            ]);
-
-                            return {
-                                ...node,
-                                data: {
-                                    icon: (
-                                        <>
-                                            {clickedItem.icon ? (
-                                                <InlineSVG
-                                                    className="h-9 w-9 text-gray-700"
-                                                    src={clickedItem.icon}
-                                                />
-                                            ) : (
-                                                <Component1Icon className="h-9 w-9 text-gray-700" />
-                                            )}
-                                        </>
-                                    ),
-                                    label: clickedItem?.title,
-                                    name: formattedNodeName,
-                                    originNodeName: clickedItem.name,
-                                    type: node.data?.type,
-                                },
-                                type: 'workflow',
-                            };
-                        }
-
-                        return node;
-                    })
-                    .concat([childPlaceholderNode])
-            );
-
-            setEdges((edges: Edge[]) =>
-                edges
-                    .map((edge) => {
-                        if (edge.target === id) {
-                            return {
-                                ...edge,
-                                markerEnd: {
-                                    type: MarkerType.ArrowClosed,
-                                },
-                                type: 'workflow',
-                            };
-                        }
-
-                        return edge;
-                    })
-                    .concat([childPlaceholderEdge])
-            );
         };
 
         useEffect(() => {
