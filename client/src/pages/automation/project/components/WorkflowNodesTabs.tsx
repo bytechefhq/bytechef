@@ -89,8 +89,8 @@ const WorkflowNodesTabs = ({
                 )}
 
                 {!hideActionComponents && (
-                    <TabsTrigger className="w-full" value="actions">
-                        Actions
+                    <TabsTrigger className="w-full" value="components">
+                        Components
                     </TabsTrigger>
                 )}
 
@@ -130,7 +130,7 @@ const WorkflowNodesTabs = ({
             )}
 
             {!hideActionComponents && (
-                <TabsContent value="actions">
+                <TabsContent value="components">
                     <ul className="mb-2" role="list">
                         {actionComponentDefinitions.length ? (
                             actionComponentDefinitions.map(
