@@ -16,7 +16,7 @@
 
 package com.bytechef.helios.execution.web.rest.mapper;
 
-import com.bytechef.helios.execution.dto.TestConnection;
+import com.bytechef.helios.execution.dto.TestConnectionDTO;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
 import com.bytechef.helios.execution.web.rest.model.TestConnectionModel;
 import org.mapstruct.Mapper;
@@ -26,8 +26,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = ProjectExecutionMapperSpringConfig.class)
-public interface TestConnectionModelMapper extends Converter<TestConnectionModel, TestConnection> {
+public interface TestConnectionModelMapper extends Converter<TestConnectionModel, TestConnectionDTO> {
 
     @Override
-    TestConnection convert(TestConnectionModel testConnectionModel);
+    TestConnectionDTO convert(TestConnectionModel testConnectionModel);
 }

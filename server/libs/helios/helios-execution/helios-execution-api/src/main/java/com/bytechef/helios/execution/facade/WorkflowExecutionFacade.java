@@ -16,8 +16,8 @@
 
 package com.bytechef.helios.execution.facade;
 
-import com.bytechef.helios.execution.dto.TestConnection;
-import com.bytechef.helios.execution.dto.WorkflowExecution;
+import com.bytechef.helios.execution.dto.TestConnectionDTO;
+import com.bytechef.helios.execution.dto.WorkflowExecutionDTO;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +28,12 @@ import org.springframework.data.domain.Page;
  */
 public interface WorkflowExecutionFacade {
 
-    WorkflowExecution getWorkflowExecution(long id);
+    WorkflowExecutionDTO getWorkflowExecution(long id);
 
-    Page<WorkflowExecution> getWorkflowExecutions(
+    Page<WorkflowExecutionDTO> getWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber);
 
-    WorkflowExecution testWorkflow(String workflowId, Map<String, Object> inputs, List<TestConnection> connections);
+    WorkflowExecutionDTO testWorkflow(
+        String workflowId, Map<String, Object> inputs, List<TestConnectionDTO> testConnectionDTOs);
 }
