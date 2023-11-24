@@ -16,19 +16,8 @@
 
 package com.bytechef.helios.execution.dto;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.helios.configuration.domain.Project;
-import com.bytechef.helios.configuration.domain.ProjectInstance;
-import com.bytechef.hermes.execution.dto.JobDTO;
-import com.bytechef.hermes.execution.dto.TriggerExecutionDTO;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.lang.NonNull;
-
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record WorkflowExecution(
-    long id, Project project, ProjectInstance instance, @NonNull Workflow workflow, @NonNull JobDTO job,
-    TriggerExecutionDTO triggerExecution) {
+public record TestConnectionDTO(Long id, String key, String operationName) {
 }

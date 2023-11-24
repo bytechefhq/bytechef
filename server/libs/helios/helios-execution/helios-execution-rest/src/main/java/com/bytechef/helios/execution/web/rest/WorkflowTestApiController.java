@@ -17,7 +17,7 @@
 package com.bytechef.helios.execution.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.helios.execution.dto.TestConnection;
+import com.bytechef.helios.execution.dto.TestConnectionDTO;
 import com.bytechef.helios.execution.facade.WorkflowExecutionFacade;
 import com.bytechef.helios.execution.web.rest.model.TestConnectionModel;
 import com.bytechef.helios.execution.web.rest.model.TestParametersModel;
@@ -49,16 +49,16 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     public ResponseEntity<WorkflowExecutionModel> testWorkflow(TestParametersModel testParametersModel) {
         List<TestConnectionModel> testConnectionModels = testParametersModel.getConnections();
 
-        List<TestConnection> testConnections = testConnectionModels == null
+        List<TestConnectionDTO> testConnectionDTOs = testConnectionModels == null
             ? List.of()
             : CollectionUtils.map(
                 testParametersModel.getConnections(),
-                testConnectionModel -> conversionService.convert(testConnectionModel, TestConnection.class));
+                testConnectionModel -> conversionService.convert(testConnectionModel, TestConnectionDTO.class));
 
         return ResponseEntity.ok(
             conversionService.convert(
                 workflowExecutionFacade.testWorkflow(
-                    testParametersModel.getWorkflowId(), testParametersModel.getInputs(), testConnections),
+                    testParametersModel.getWorkflowId(), testParametersModel.getInputs(), testConnectionDTOs),
                 WorkflowExecutionModel.class));
     }
 }
