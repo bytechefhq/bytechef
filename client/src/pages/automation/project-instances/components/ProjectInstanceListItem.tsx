@@ -111,8 +111,8 @@ const ProjectInstanceListItem = ({
     };
 
     return (
-        <div className="w-full rounded-md px-2 py-5 hover:bg-gray-50">
-            <div className="flex items-center justify-between">
+        <>
+            <div className="flex w-full items-center justify-between rounded-md px-2 py-5 hover:bg-gray-50">
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
                         <div className="flex w-full items-center justify-between">
@@ -278,7 +278,7 @@ const ProjectInstanceListItem = ({
                     projectInstance={projectInstance}
                 />
             )}
-        </div>
+        </>
     );
 };
 
