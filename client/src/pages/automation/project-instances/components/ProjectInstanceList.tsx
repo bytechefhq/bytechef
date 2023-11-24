@@ -26,7 +26,7 @@ const ProjectInstanceList = ({
         <>
             {projectInstances.length > 0 && (
                 <div className="flex w-full flex-col">
-                    <h3 className="mb-1 px-2 text-lg font-semibold">
+                    <h3 className="mb-1 px-2 text-lg font-semibold text-gray-500">
                         {project.name}
                     </h3>
 
