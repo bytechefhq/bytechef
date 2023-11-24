@@ -89,8 +89,8 @@ const ConnectionListItem = ({
 
     return (
         <li key={connection.id}>
-            <div className="group rounded-md bg-white p-2 py-3 hover:bg-gray-50">
-                <div className="flex items-center">
+            <>
+                <div className="group flex items-center rounded-md bg-white p-2 py-3 hover:bg-gray-50">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="relative flex items-center">
@@ -231,7 +231,7 @@ const ConnectionListItem = ({
                         onClose={() => setShowEditDialog(false)}
                     />
                 )}
-            </div>
+            </>
         </li>
     );
 };
