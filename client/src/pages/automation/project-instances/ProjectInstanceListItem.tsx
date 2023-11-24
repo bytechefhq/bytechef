@@ -240,44 +240,41 @@ const ProjectInstanceListItem = ({
                 </div>
             </div>
 
-            {showDeleteDialog && (
-                <AlertDialog open={showDeleteDialog}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>
-                                Are you absolutely sure?
-                            </AlertDialogTitle>
+            <AlertDialog open={showDeleteDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Are you absolutely sure?
+                        </AlertDialogTitle>
 
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will
-                                permanently delete the project and workflows it
-                                contains.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete the project and workflows it contains.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
 
-                        <AlertDialogFooter>
-                            <AlertDialogCancel
-                                onClick={() => setShowDeleteDialog(false)}
-                            >
-                                Cancel
-                            </AlertDialogCancel>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            onClick={() => setShowDeleteDialog(false)}
+                        >
+                            Cancel
+                        </AlertDialogCancel>
 
-                            <AlertDialogAction
-                                className="bg-red-600"
-                                onClick={() => {
-                                    if (projectInstance.id) {
-                                        deleteProjectInstanceMutation.mutate(
-                                            projectInstance.id
-                                        );
-                                    }
-                                }}
-                            >
-                                Delete
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            )}
+                        <AlertDialogAction
+                            className="bg-red-600"
+                            onClick={() => {
+                                if (projectInstance.id) {
+                                    deleteProjectInstanceMutation.mutate(
+                                        projectInstance.id
+                                    );
+                                }
+                            }}
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             {showEditDialog && (
                 <ProjectInstanceDialog
