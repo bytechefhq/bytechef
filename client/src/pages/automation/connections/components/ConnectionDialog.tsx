@@ -110,7 +110,7 @@ const ConnectionDialog = ({
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
             authorizationName: '',
-            componentName: componentDefinition?.name || undefined,
+            componentName: componentDefinition?.name,
             name: connection?.name || '',
             tags:
                 connection?.tags?.map((tag) => ({
