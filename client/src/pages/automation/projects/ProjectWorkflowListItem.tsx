@@ -193,44 +193,42 @@ const ProjectWorkflowListItem = ({
                 </DropdownMenu>
             </div>
 
-            {showDeleteDialog && (
-                <AlertDialog open={showDeleteDialog}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>
-                                Are you absolutely sure?
-                            </AlertDialogTitle>
+            <AlertDialog open={showDeleteDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Are you absolutely sure?
+                        </AlertDialogTitle>
 
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will
-                                permanently delete the workflow.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete the workflow.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
 
-                        <AlertDialogFooter>
-                            <AlertDialogCancel
-                                onClick={() => setShowDeleteDialog(false)}
-                            >
-                                Cancel
-                            </AlertDialogCancel>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel
+                            onClick={() => setShowDeleteDialog(false)}
+                        >
+                            Cancel
+                        </AlertDialogCancel>
 
-                            <AlertDialogAction
-                                className="bg-red-600"
-                                onClick={() => {
-                                    if (project?.id && selectedWorkflow?.id) {
-                                        deleteWorkflowMutationMutation.mutate({
-                                            id: project?.id,
-                                            workflowId: selectedWorkflow?.id,
-                                        });
-                                    }
-                                }}
-                            >
-                                Delete
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            )}
+                        <AlertDialogAction
+                            className="bg-red-600"
+                            onClick={() => {
+                                if (project?.id && selectedWorkflow?.id) {
+                                    deleteWorkflowMutationMutation.mutate({
+                                        id: project?.id,
+                                        workflowId: selectedWorkflow?.id,
+                                    });
+                                }
+                            }}
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             {showEditDialog && (
                 <WorkflowDialog
