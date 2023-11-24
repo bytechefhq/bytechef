@@ -275,12 +275,12 @@ components:
           type: "integer"
           format: "int64"
           readOnly: true
-        instance:
-          $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectInstance"
         job:
           $ref: "#/components/schemas/Job"
         project:
           $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/Project"
+        projectInstance:
+          $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectInstance"
         triggerExecution:
           $ref: "#/components/schemas/TriggerExecution"
         workflow:
@@ -294,7 +294,7 @@ components:
           type: "integer"
           format: "int64"
           readOnly: true
-        instance:
+        projectInstance:
           $ref: "../../helios-configuration/helios-configuration-rest/helios-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectInstanceBasic"
         job:
           $ref: "#/components/schemas/JobBasic"
