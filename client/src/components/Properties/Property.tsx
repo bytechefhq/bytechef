@@ -81,19 +81,22 @@ const Property = ({
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentData, setComponentData} = useWorkflowDefinitionStore();
 
+    let {name} = property;
+
     const {
         controlType,
         description,
         hidden,
+        items,
         label,
-        name,
         options,
+        properties,
         required,
         type,
     } = property;
 
     if (!name) {
-        return <></>;
+        type === 'OBJECT' ? (name = 'item') : <></>;
     }
 
     const hasError = (propertyName: string): boolean =>
@@ -199,6 +202,10 @@ const Property = ({
             }, 50);
         }
     };
+
+    if (type === 'OBJECT' && !properties?.length && !items?.length) {
+        return <></>;
+    }
 
     return (
         <li
