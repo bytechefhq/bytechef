@@ -32,6 +32,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.domain.Job;
@@ -76,10 +77,10 @@ public class JobSyncExecutor {
 
     private final ContextService contextService;
     private final ApplicationEventPublisher eventPublisher;
-    private final TaskFileStorage taskFileStorage;
-    private final WorkflowService workflowService;
     private final JobFacade jobFacade;
     private final JobService jobService;
+    private final TaskFileStorage taskFileStorage;
+    private final WorkflowService workflowService;
 
     public JobSyncExecutor(
         @NonNull ContextService contextService, @NonNull JobService jobService,
@@ -88,7 +89,7 @@ public class JobSyncExecutor {
         @NonNull WorkflowService workflowService) {
 
         this(
-            contextService, jobService, new SyncMessageBroker(objectMapper), List.of(), List.of(), List.of(),
+            contextService, jobService, new SyncMessageBroker(objectMapper), List.of(), List.of(), List.of(), List.of(),
             taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService);
     }
 
@@ -98,6 +99,7 @@ public class JobSyncExecutor {
         @NonNull SyncMessageBroker syncMessageBroker,
         @NonNull List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories,
         @NonNull List<TaskDispatcherAdapterFactory> taskDispatcherAdapterFactories,
+        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         @NonNull List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories,
         @NonNull TaskExecutionService taskExecutionService, @NonNull TaskHandlerRegistry taskHandlerRegistry,
         @NonNull TaskFileStorage taskFileStorage, @NonNull WorkflowService workflowService) {
@@ -140,7 +142,7 @@ public class JobSyncExecutor {
         taskDispatcherChain.setTaskDispatcherResolvers(
             CollectionUtils.concat(
                 getTaskDispatcherResolverStream(taskDispatcherResolverFactories, taskDispatcherChain),
-                Stream.of(new DefaultTaskDispatcher(eventPublisher, List.of()))));
+                Stream.of(new DefaultTaskDispatcher(eventPublisher, taskDispatcherPreSendProcessors))));
 
         JobExecutor jobExecutor = new JobExecutor(
             contextService, taskDispatcherChain, taskExecutionService, taskFileStorage, workflowService);

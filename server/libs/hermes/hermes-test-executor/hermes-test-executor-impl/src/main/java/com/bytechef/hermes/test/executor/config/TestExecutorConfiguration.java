@@ -18,6 +18,7 @@ package com.bytechef.hermes.test.executor.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
@@ -78,6 +79,7 @@ public class TestExecutorConfiguration {
     @Bean
     JobTestExecutor jobTestExecutor(
         ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
+        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
@@ -100,7 +102,7 @@ public class TestExecutorConfiguration {
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(objectMapper),
-                getTaskDispatcherResolverFactories(
+                taskDispatcherPreSendProcessors, getTaskDispatcherResolverFactories(
                     syncMessageBroker, contextService, counterService, taskExecutionService, taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
             taskExecutionService, taskFileStorage);
