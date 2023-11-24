@@ -18,6 +18,7 @@ package com.bytechef.hermes.webhook.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
@@ -72,6 +73,7 @@ public class WebhookConfiguration {
         ApplicationEventPublisher eventPublisher, ContextService contextService,
         CounterService counterService, InstanceAccessorRegistry instanceAccessorRegistry,
         InstanceJobFacade instanceJobFacade, JobService jobService, ObjectMapper objectMapper,
+        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
         TriggerSyncExecutor triggerSyncExecutor, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
@@ -84,7 +86,7 @@ public class WebhookConfiguration {
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(objectMapper),
-                getTaskDispatcherResolverFactories(
+                taskDispatcherPreSendProcessors, getTaskDispatcherResolverFactories(
                     contextService, counterService, syncMessageBroker, taskExecutionService,
                     taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
