@@ -17,9 +17,11 @@
 package com.bytechef.helios.configuration.config;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
+import com.bytechef.hermes.execution.service.InstanceJobService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -49,7 +51,13 @@ public class ProjectIntTestConfiguration {
     private InstanceJobFacade instanceJobFacade;
 
     @MockBean
+    private InstanceJobService instanceJobService;
+
+    @MockBean
     private JobFacade jobFacade;
+
+    @MockBean
+    private JobService jobService;
 
     @MockBean
     private TriggerLifecycleFacade triggerLifecycleFacade;
