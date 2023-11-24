@@ -34,6 +34,10 @@ const ObjectProperty = ({
 
     const {additionalProperties, label, name, properties} = property;
 
+    if (!properties?.length && !additionalProperties?.length) {
+        return <></>;
+    }
+
     return (
         <div key={name}>
             <ul className={twMerge(label && 'ml-2 border-l')}>
