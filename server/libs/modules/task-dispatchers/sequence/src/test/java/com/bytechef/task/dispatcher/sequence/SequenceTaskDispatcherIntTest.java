@@ -22,7 +22,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
-import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
+import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +46,7 @@ public class SequenceTaskDispatcherIntTest {
     protected TaskExecutionService taskExecutionService;
 
     @Autowired
-    private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
+    private TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor;
 
     @Autowired
     private TaskFileStorage taskFileStorage;
@@ -58,7 +58,7 @@ public class SequenceTaskDispatcherIntTest {
 
     @Test
     public void testDispatch() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("sequence_v1"),
             (counterService, taskExecutionService) -> List.of(
                 (taskCompletionHandler, taskDispatcher) -> new SequenceTaskCompletionHandler(

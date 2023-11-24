@@ -36,7 +36,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
+import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
@@ -90,12 +90,12 @@ public class TaskDispatcherIntTestConfiguration {
         }
 
         @Bean
-        TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport(
+        TaskDispatcherJobTestExecutor taskDispatcherWorkflowTestSupport(
             ContextService contextService, CounterService counterService, JobService jobService,
             ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
             TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
-            return new TaskDispatcherWorkflowTestSupport(
+            return new TaskDispatcherJobTestExecutor(
                 contextService, counterService, jobService, objectMapper, taskExecutionService,
                 taskFileStorage, workflowService);
         }

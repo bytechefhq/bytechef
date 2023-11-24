@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.context.ApplicationEventPublisher;
 
-public class TaskDispatcherWorkflowTestSupport {
+public class TaskDispatcherJobTestExecutor {
 
     private final ContextService contextService;
     private final CounterService counterService;
@@ -47,7 +47,7 @@ public class TaskDispatcherWorkflowTestSupport {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public TaskDispatcherWorkflowTestSupport(
+    public TaskDispatcherJobTestExecutor(
         ContextService contextService, CounterService counterService, JobService jobService,
         ObjectMapper objectMapper, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage, WorkflowService workflowService) {
@@ -81,7 +81,7 @@ public class TaskDispatcherWorkflowTestSupport {
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, jobService, syncMessageBroker,
-            taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService), List.of(),
+            taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService), List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(
                 event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
                 contextService, counterService, taskExecutionService),

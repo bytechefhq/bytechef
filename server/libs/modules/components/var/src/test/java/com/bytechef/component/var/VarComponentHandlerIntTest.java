@@ -18,7 +18,7 @@ package com.bytechef.component.var;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.hermes.component.test.JobTestExecutor;
+import com.bytechef.hermes.component.test.ComponentJobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -36,14 +36,14 @@ public class VarComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private JobTestExecutor jobTestExecutor;
+    private ComponentJobTestExecutor componentJobTestExecutor;
 
     @Autowired
     private TaskFileStorage taskFileStorage;
 
     @Test
     public void testVar() {
-        Job job = jobTestExecutor.execute(
+        Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("var_v1".getBytes(StandardCharsets.UTF_8)),
             Map.of());
 

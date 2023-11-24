@@ -42,7 +42,7 @@ import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.hermes.component.test.JobTestExecutor;
+import com.bytechef.hermes.component.test.ComponentJobTestExecutor;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.message.broker.MessageBroker;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -144,13 +144,13 @@ public class ComponentTestIntConfiguration {
     public static class WorkflowExecutionConfiguration {
 
         @Bean
-        JobTestExecutor componentWorkflowTestSupport(
+        ComponentJobTestExecutor componentWorkflowTestSupport(
             ContextService contextService, JobService jobService, ObjectMapper objectMapper,
             TaskExecutionService taskExecutionService,
             Map<String, TaskHandler<?>> taskHandlerMap, TaskHandlerMapFactory taskHandlerMapFactory,
             WorkflowService workflowService) {
 
-            return new JobTestExecutor(
+            return new ComponentJobTestExecutor(
                 contextService, jobService, objectMapper, taskExecutionService,
                 MapUtils.concat(taskHandlerMap, taskHandlerMapFactory.getTaskHandlerMap()), workflowService);
         }

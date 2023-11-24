@@ -26,7 +26,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
-import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
+import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
 import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -53,7 +53,7 @@ public class ConditionTaskDispatcherIntTest {
     protected TaskExecutionService taskExecutionService;
 
     @Autowired
-    private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
+    private TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor;
 
     @Autowired
     private TaskFileStorage taskFileStorage;
@@ -65,7 +65,7 @@ public class ConditionTaskDispatcherIntTest {
 
     @Test
     public void testDispatchBoolean() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("condition_v1-conditions-boolean".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "true", "value2", "false"),
             this::getTaskCompletionHandlerFactories,
@@ -78,7 +78,7 @@ public class ConditionTaskDispatcherIntTest {
 
     @Test
     public void testDispatchDateTime() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("condition_v1-conditions-dateTime".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "2022-01-01T00:00:00", "value2", "2022-01-01T00:00:01"),
             this::getTaskCompletionHandlerFactories,
@@ -91,7 +91,7 @@ public class ConditionTaskDispatcherIntTest {
 
     @Test
     public void testDispatchExpression() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("condition_v1-conditions-expression".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories,
@@ -102,7 +102,7 @@ public class ConditionTaskDispatcherIntTest {
 
     @Test
     public void testDispatchNumber() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("condition_v1-conditions-number".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", 100, "value2", 200),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories,
@@ -118,7 +118,7 @@ public class ConditionTaskDispatcherIntTest {
 
     @Test
     public void testDispatchString() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("condition_v1-conditions-string".getBytes(StandardCharsets.UTF_8)),
             Map.of("value1", "Hello World", "value2", "Hello"),
             this::getTaskCompletionHandlerFactories,
