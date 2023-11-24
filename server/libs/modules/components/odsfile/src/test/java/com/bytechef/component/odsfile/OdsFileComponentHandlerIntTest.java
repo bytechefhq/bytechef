@@ -22,7 +22,7 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.hermes.component.test.JobTestExecutor;
+import com.bytechef.hermes.component.test.ComponentJobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import java.io.File;
@@ -52,7 +52,7 @@ public class OdsFileComponentHandlerIntTest {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private JobTestExecutor jobTestExecutor;
+    private ComponentJobTestExecutor componentJobTestExecutor;
 
     @Autowired
     private TaskFileStorage taskFileStorage;
@@ -62,7 +62,7 @@ public class OdsFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.ods");
 
         try (FileInputStream fileInputStream = new FileInputStream(sampleFile)) {
-            Job job = jobTestExecutor.execute(
+            Job job = componentJobTestExecutor.execute(
                 ENCODER.encodeToString("odsfile_v1_read".getBytes(StandardCharsets.UTF_8)),
                 Map.of(
                     FILE_ENTRY,
@@ -83,7 +83,7 @@ public class OdsFileComponentHandlerIntTest {
 
     @Test
     public void testWrite() throws IOException, JSONException {
-        Job job = jobTestExecutor.execute(
+        Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("odsfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "rows",
@@ -100,7 +100,7 @@ public class OdsFileComponentHandlerIntTest {
         File sampleFile = getFile("sample_header.ods");
 
         try (FileInputStream fileInputStream = new FileInputStream(sampleFile)) {
-            job = jobTestExecutor.execute(
+            job = componentJobTestExecutor.execute(
                 ENCODER.encodeToString("odsfile_v1_read".getBytes(StandardCharsets.UTF_8)),
                 Map.of(
                     FILE_ENTRY,

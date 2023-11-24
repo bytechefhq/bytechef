@@ -29,12 +29,13 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class JobTestExecutor {
+public class ComponentJobTestExecutor {
 
     private final ContextService contextService;
     private final JobService jobService;
@@ -44,7 +45,7 @@ public class JobTestExecutor {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public JobTestExecutor(
+    public ComponentJobTestExecutor(
         ContextService contextService, JobService jobService, ObjectMapper objectMapper,
         TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
         WorkflowService workflowService) {

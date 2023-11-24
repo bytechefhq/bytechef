@@ -23,7 +23,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.hermes.component.test.JobTestExecutor;
+import com.bytechef.hermes.component.test.ComponentJobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import java.io.File;
@@ -48,7 +48,7 @@ public class JsonFileComponentHandlerIntTest {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     @Autowired
-    private JobTestExecutor jobTestExecutor;
+    private ComponentJobTestExecutor componentJobTestExecutor;
 
     @Autowired
     private FileStorageService fileStorageService;
@@ -60,7 +60,7 @@ public class JsonFileComponentHandlerIntTest {
     public void testRead() throws JSONException {
         File sampleFile = getFile("sample_array.json");
 
-        Job job = jobTestExecutor.execute(
+        Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("jsonfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 "fileEntry",
@@ -82,7 +82,7 @@ public class JsonFileComponentHandlerIntTest {
 
     @Test
     public void testWrite() throws JSONException {
-        Job job = jobTestExecutor.execute(
+        Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("jsonfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 SOURCE,

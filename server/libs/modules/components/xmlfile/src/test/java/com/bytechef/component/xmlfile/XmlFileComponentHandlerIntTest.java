@@ -24,7 +24,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.hermes.component.test.JobTestExecutor;
+import com.bytechef.hermes.component.test.ComponentJobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import java.io.File;
@@ -49,7 +49,7 @@ public class XmlFileComponentHandlerIntTest {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private JobTestExecutor jobTestExecutor;
+    private ComponentJobTestExecutor componentJobTestExecutor;
 
     @Autowired
     private TaskFileStorage taskFileStorage;
@@ -58,7 +58,7 @@ public class XmlFileComponentHandlerIntTest {
     public void testRead() {
         File sampleFile = getFile("sample.xml");
 
-        Job job = jobTestExecutor.execute(
+        Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("xmlfile_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
@@ -84,7 +84,7 @@ public class XmlFileComponentHandlerIntTest {
 
     @Test
     public void testWrite() {
-        Job job = jobTestExecutor.execute(
+        Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("xmlfile_v1_write".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 SOURCE,

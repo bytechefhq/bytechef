@@ -20,7 +20,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
-import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
+import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class EachTaskDispatcherIntTest {
     private TestVarTaskHandler<List<String>, String> testVarTaskHandler;
 
     @Autowired
-    private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
+    private TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor;
 
     @Autowired
     private TaskFileStorage taskFileStorage;
@@ -55,7 +55,7 @@ public class EachTaskDispatcherIntTest {
 
     @Test
     public void testEachTaskDispatcher() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("each_v1"),
             (counterService, taskExecutionService) -> List.of(
                 (taskCompletionHandler, taskDispatcher) -> new EachTaskCompletionHandler(

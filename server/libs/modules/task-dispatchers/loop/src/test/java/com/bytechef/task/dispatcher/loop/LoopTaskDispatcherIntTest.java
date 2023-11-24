@@ -25,7 +25,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
-import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherWorkflowTestSupport;
+import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
 import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
@@ -57,7 +57,7 @@ public class LoopTaskDispatcherIntTest {
     protected TaskExecutionService taskExecutionService;
 
     @Autowired
-    private TaskDispatcherWorkflowTestSupport taskDispatcherWorkflowTestSupport;
+    private TaskDispatcherJobTestExecutor taskDispatcherJobTestExecutor;
 
     @Autowired
     private TaskFileStorage taskFileStorage;
@@ -71,7 +71,7 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch1() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("loop_v1_1"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
@@ -84,7 +84,7 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch2() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("loop_v1_2"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
@@ -99,7 +99,7 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch3() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("loop_v1_3"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
@@ -112,7 +112,7 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch4() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("loop_v1_4"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
@@ -125,7 +125,7 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch5() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("loop_v1_5"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
@@ -138,7 +138,7 @@ public class LoopTaskDispatcherIntTest {
 
     @Test
     public void testDispatch6() {
-        taskDispatcherWorkflowTestSupport.execute(
+        taskDispatcherJobTestExecutor.execute(
             EncodingUtils.encodeBase64ToString("loop_v1_6"),
             this::getTaskCompletionHandlerFactories, this::getTaskDispatcherResolverFactories, getTaskHandlerMap());
 
@@ -181,7 +181,7 @@ public class LoopTaskDispatcherIntTest {
                 taskFileStorage));
     }
 
-    private TaskDispatcherWorkflowTestSupport.TaskHandlerMapSupplier getTaskHandlerMap() {
+    private TaskDispatcherJobTestExecutor.TaskHandlerMapSupplier getTaskHandlerMap() {
         return () -> Map.of("var", testVarTaskHandler);
     }
 }

@@ -23,7 +23,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.hermes.component.test.JobTestExecutor;
+import com.bytechef.hermes.component.test.ComponentJobTestExecutor;
 import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import java.io.File;
@@ -46,7 +46,7 @@ public class FilesystemComponentHandlerIntTest {
     private FileStorageService fileStorageService;
 
     @Autowired
-    private JobTestExecutor jobTestExecutor;
+    private ComponentJobTestExecutor componentJobTestExecutor;
 
     @Autowired
     private TaskFileStorage taskFileStorage;
@@ -55,7 +55,7 @@ public class FilesystemComponentHandlerIntTest {
     public void testRead() {
         File sampleFile = getFile();
 
-        Job job = jobTestExecutor.execute(
+        Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("filesystem_v1_readFile".getBytes(StandardCharsets.UTF_8)),
             Map.of("filename", sampleFile.getAbsolutePath()));
 
@@ -78,7 +78,7 @@ public class FilesystemComponentHandlerIntTest {
         File sampleFile = getFile();
         File tempFile = Files.newTemporaryFile();
 
-        Job job = jobTestExecutor.execute(
+        Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("filesystem_v1_writeFile".getBytes(StandardCharsets.UTF_8)),
             Map.of(
                 FILE_ENTRY,
