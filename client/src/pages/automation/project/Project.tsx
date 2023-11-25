@@ -631,10 +631,8 @@ const Project = () => {
                                 />
                             ) : (
                                 <div className="absolute inset-x-0 bottom-0 top-2/4">
-                                    <div className="flex w-full flex-col items-center text-gray-500">
-                                        <span className="text-gray-400">
-                                            <RefreshCwOffIcon className="h-16 w-16" />
-                                        </span>
+                                    <div className="flex w-full flex-col items-center gap-y-6 text-gray-500">
+                                        <RefreshCwOffIcon className="h-16 w-16 text-gray-300" />
 
                                         <span>
                                             Workflow has not yet been executed.
