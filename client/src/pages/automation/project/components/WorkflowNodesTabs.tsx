@@ -79,7 +79,7 @@ const WorkflowNodesTabs = ({
     <div className="mt-2 w-full px-3">
         <Tabs
             className="w-full"
-            defaultValue={hideActionComponents ? 'triggers' : 'actions'}
+            defaultValue={hideActionComponents ? 'triggers' : 'components'}
         >
             <TabsList className="flex w-full justify-between">
                 {!hideTriggerComponents && (
