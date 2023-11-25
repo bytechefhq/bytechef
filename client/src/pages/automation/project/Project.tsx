@@ -590,7 +590,7 @@ const Project = () => {
                                 </TooltipTrigger>
 
                                 <TooltipContent>
-                                    Debug current workflow
+                                    Save and run the current workflow
                                 </TooltipContent>
                             </Tooltip>
 
