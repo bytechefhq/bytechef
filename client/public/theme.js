@@ -21,7 +21,9 @@
 
     try {
         // Obtain the local user theme setting if available
-        preferredTheme = localStorage.getItem('theme');
+        var localTheme = localStorage.getItem('theme');
+
+        preferredTheme = localTheme ? localTheme : 'light';
     } catch (error) {}
 
     window.__setPreferredTheme = function (newTheme) {
