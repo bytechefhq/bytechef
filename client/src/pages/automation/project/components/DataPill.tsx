@@ -27,6 +27,13 @@ const DataPill = ({
 
     const subProperties = property?.properties || property?.items;
 
+    if (
+        !property?.name &&
+        (property?.type === 'OBJECT' || property?.type === 'ARRAY')
+    ) {
+        property.name = `[${arrayIndex || 0}]`;
+    }
+
     const addDataPillToInput = (
         componentAlias: string,
         propertyName?: string,
@@ -35,7 +42,7 @@ const DataPill = ({
         arrayIndex?: number
     ) => {
         const dataPillName = parentPropertyName
-            ? `${parentPropertyName}/${propertyName || `[${arrayIndex}]`}`
+            ? `${parentPropertyName}/${propertyName || `[${arrayIndex || 0}]`}`
             : `${propertyName || componentAlias}`;
 
         mentionInput.insertItem(
@@ -103,7 +110,7 @@ const DataPill = ({
 
                 {property?.name
                     ? property?.name
-                    : `[${arrayIndex}]` || componentAlias}
+                    : `[${arrayIndex || 0}]` || componentAlias}
             </div>
 
             {!!subProperties?.length && (
