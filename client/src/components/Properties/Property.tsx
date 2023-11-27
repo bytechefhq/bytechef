@@ -96,7 +96,7 @@ const Property = ({
     } = property;
 
     if (!name) {
-        type === 'OBJECT' ? (name = 'item') : <></>;
+        type === 'OBJECT' || type === 'ARRAY' ? (name = 'item') : <></>;
     }
 
     const hasError = (propertyName: string): boolean =>

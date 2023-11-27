@@ -30,12 +30,21 @@ const DataPillPanelBody = ({
                         const outputSchema: PropertyType | undefined =
                             componentData[index]?.outputSchema;
 
-                        const properties = outputSchema?.properties?.length
-                            ? outputSchema.properties
-                            : outputSchema?.items;
+                        const properties: Array<PropertyType> | undefined =
+                            outputSchema?.properties?.length
+                                ? outputSchema.properties
+                                : outputSchema?.items;
 
                         const existingProperties = properties?.filter(
-                            (property) => !!property.name
+                            (property) => {
+                                if (property.name) {
+                                    return true;
+                                } else {
+                                    if (property.properties || property.items) {
+                                        return true;
+                                    }
+                                }
+                            }
                         );
 
                         const filteredProperties = existingProperties?.length

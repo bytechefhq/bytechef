@@ -87,6 +87,14 @@ const WorkflowNodeDetailsPanel = ({
         setDataPills,
     } = useWorkflowDataStore();
 
+    let currentComponent: CurrentComponentType | undefined;
+
+    if (currentComponentDefinition) {
+        currentComponent = currentComponentDefinition;
+
+        currentComponent.workflowAlias = currentNode.name;
+    }
+
     const handleActionSelectChange = (value: string) => {
         setCurrentActionName(value);
 
@@ -102,15 +110,29 @@ const WorkflowNodeDetailsPanel = ({
                 }
             })
         );
+
+        if (currentComponent) {
+            setComponentData([
+                ...componentData.filter(
+                    (component) =>
+                        component.workflowAlias !== currentNode.name ||
+                        component.action !== value
+                ),
+                {
+                    action: value,
+                    connection: currentComponent?.connection,
+                    name: currentComponent?.name,
+                    properties: {
+                        ...currentComponentData?.properties,
+                        [value]: {},
+                    },
+                    title: currentComponent?.title,
+                    version: currentComponent?.version,
+                    workflowAlias: currentComponent?.workflowAlias,
+                },
+            ]);
+        }
     };
-
-    let currentComponent: CurrentComponentType | undefined;
-
-    if (currentComponentDefinition) {
-        currentComponent = currentComponentDefinition;
-
-        currentComponent.workflowAlias = currentNode.name;
-    }
 
     const getActionName = (): string => {
         const currentComponentActionNames = currentComponent?.actions?.map(
