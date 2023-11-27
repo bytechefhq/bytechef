@@ -91,12 +91,15 @@ public class HttpClientExecutor {
         Context context)
         throws Exception {
 
-        HttpClient httpClient = createHttpClient(
-            headers, queryParameters, configuration, componentName, connection, context);
-        HttpRequest httpRequest = createHTTPRequest(
-            urlString, requestMethod, headers, queryParameters, body, componentName, connection, context);
+        HttpResponse<?> httpResponse;
 
-        HttpResponse<?> httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
+        try (HttpClient httpClient = createHttpClient(
+            headers, queryParameters, configuration, componentName, connection, context)) {
+            HttpRequest httpRequest = createHTTPRequest(
+                urlString, requestMethod, headers, queryParameters, body, componentName, connection, context);
+
+            httpResponse = httpClient.send(httpRequest, createBodyHandler(configuration));
+        }
 
         return handleResponse(httpResponse, configuration);
     }
