@@ -45,11 +45,18 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
 1. Fork the repo and create a new branch from the `develop` branch.
 2. Branches are named as `bug/fix-name` or `feature/feature-name`
 3. Please add tests for your changes. Client-side changes require Cypress/Jest tests while server-side changes require JUnit tests.
-4. Once you are confident in your code changes, create a pull request in your fork to the `develop` branch in the bytechefhq/bytechef base repository.
-5. If you've changed any APIs, please call this out in the pull request and ensure backward compatibility.
-6. Link the issue of the base repository in your Pull request description. [Guide](https://docs.github.com/en/free-pro-team@latest/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue)
-7. When you raise a pull request, we automatically run tests on our CI. Please ensure that all the tests are passing for your code change. We will not be able to accept your change if the test suite doesn't pass.
-8. Documentation: When new features are added or there are changes to existing features that require updates to documentation, we encourage you to add/update any missing documentation in the [`/docs` folder](https://github.com/bytechefhq/bytechef/tree/master/docs). To update an existing documentation page, you can simply click on the `Edit this page` button on the bottom left corner of the documentation page.
+4. When you finish adding your changes, run the following commands on all directories you worked on:
+```bash
+./gradlew spotlessApply
+./gradlew spotbugsMain spotbugsTest
+./gradlew pmdMain pmdTest
+./gradlew checkstyleMain checkstyleTest
+```
+5. Once you are confident in your code changes, create a pull request in your fork to the `develop` branch in the bytechefhq/bytechef base repository.
+6. If you've changed any APIs, please call this out in the pull request and ensure backward compatibility.
+7. Link the issue of the base repository in your Pull request description. [Guide](https://docs.github.com/en/free-pro-team@latest/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue)
+8. When you raise a pull request, we automatically run tests on our CI. Please ensure that all the tests are passing for your code change. We will not be able to accept your change if the test suite doesn't pass.
+9. Documentation: When new features are added or there are changes to existing features that require updates to documentation, we encourage you to add/update any missing documentation in the [`/docs` folder](https://github.com/bytechefhq/bytechef/tree/master/docs). To update an existing documentation page, you can simply click on the `Edit this page` button on the bottom left corner of the documentation page.
 
 
 # Setup for local development
