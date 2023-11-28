@@ -392,9 +392,14 @@ const WorkflowNodeDetailsPanel = ({
             setActiveTab('description');
         }
 
+        if (currentComponent?.name === 'manual') {
+            setActiveTab('description');
+        }
+
         if (
             activeTab === 'properties' &&
-            (!currentActionFetched || !currentActionProperties)
+            currentActionFetched &&
+            !currentActionProperties
         ) {
             setActiveTab('description');
         }
