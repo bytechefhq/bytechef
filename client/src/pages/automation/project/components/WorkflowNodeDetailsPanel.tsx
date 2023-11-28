@@ -513,13 +513,7 @@ const WorkflowNodeDetailsPanel = ({
     }, [componentNames, currentNode.name, setWorkflowNodeDetailsPanelOpen]);
 
     return (
-        <Dialog.Root
-            modal={false}
-            onOpenChange={() =>
-                setWorkflowNodeDetailsPanelOpen(!workflowNodeDetailsPanelOpen)
-            }
-            open={workflowNodeDetailsPanelOpen}
-        >
+        <Dialog.Root modal={false} open={workflowNodeDetailsPanelOpen}>
             <Dialog.Portal>
                 <Dialog.Content
                     className="fixed inset-y-0 bottom-4 right-[65px] top-[70px] z-10 w-screen max-w-[460px] overflow-hidden rounded-xl border-l bg-white shadow-lg"
