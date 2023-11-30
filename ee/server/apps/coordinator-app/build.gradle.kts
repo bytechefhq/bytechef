@@ -34,6 +34,7 @@ dependencies {
     implementation(project(":ee:server:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":ee:server:libs:core:discovery:discovery-redis"))
     implementation(project(":ee:server:libs:helios:helios-configuration:helios-configuration-remote-client"))
+    implementation(project(":ee:server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-remote-client"))
     implementation(project(":ee:server:libs:hermes:hermes-configuration:hermes-configuration-remote-client"))
     implementation(project(":ee:server:libs:hermes:hermes-execution:hermes-execution-remote-client"))
     implementation(project(":ee:server:libs:hermes:hermes-task-dispatcher-registry:hermes-task-dispatcher-registry-remote-rest"))

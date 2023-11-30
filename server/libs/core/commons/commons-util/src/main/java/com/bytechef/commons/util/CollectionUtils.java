@@ -39,6 +39,14 @@ public final class CollectionUtils {
     private CollectionUtils() {
     }
 
+    public static <T> boolean anyMatch(List<T> list, Predicate<? super T> predicate) {
+        Validate.notNull(list, "'list' must not be null");
+        Validate.notNull(predicate, "'predicate' must not be null");
+
+        return list.stream()
+            .anyMatch(predicate);
+    }
+
     public static <T> List<T> concat(List<T> list1, T item) {
         Validate.notNull(list1, "'list1' must not be null");
         Validate.notNull(item, "'item' must not be null");

@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.execution.web.rest.mapper;
+package com.bytechef.helios.configuration.web.rest.mapper;
 
-import com.bytechef.helios.execution.dto.TestConnectionDTO;
-import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
-import com.bytechef.helios.execution.web.rest.model.TestConnectionModel;
+import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
+import com.bytechef.helios.configuration.web.rest.model.WorkflowConnectionModel;
+import com.bytechef.hermes.configuration.domain.WorkflowConnection;
+import java.util.Optional;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ProjectExecutionMapperSpringConfig.class)
-public interface TestConnectionModelMapper extends Converter<TestConnectionModel, TestConnectionDTO> {
+@Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+public interface ProjectWorkflowConnectionMapper extends Converter<WorkflowConnection, WorkflowConnectionModel> {
 
     @Override
-    TestConnectionDTO convert(TestConnectionModel testConnectionModel);
+    WorkflowConnectionModel convert(WorkflowConnection workflowConnection);
+
+    default Long map(Optional<Long> value) {
+        return value.orElse(null);
+    }
 }

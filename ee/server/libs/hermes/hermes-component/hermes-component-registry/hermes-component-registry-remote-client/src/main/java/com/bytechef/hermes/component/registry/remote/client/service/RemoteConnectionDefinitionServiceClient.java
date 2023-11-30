@@ -62,7 +62,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     }
 
     @Override
-    public boolean connectionExists(String componentName, int connectionVersion) {
+    public boolean connectionExists(String componentName) {
         throw new UnsupportedOperationException();
     }
 

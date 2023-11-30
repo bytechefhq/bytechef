@@ -52,6 +52,7 @@ import com.bytechef.hermes.component.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.hermes.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
+import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
@@ -851,6 +852,9 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         @MockBean
         WorkflowService workflowService;
+
+        @MockBean
+        WorkflowConnectionFacade workflowConnectionFacade;
 
         @Bean
         List<ComponentHandler> componentHandlers() {

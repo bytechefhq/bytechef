@@ -31,7 +31,6 @@ public class WorkflowConstants {
     public static final String DESCRIPTION = "description";
     public static final String EVENT = "event";
     public static final String FINALIZE = "finalize";
-    public static final String ID = "id";
     public static final String INPUTS = "inputs";
     public static final String LABEL = "label";
     public static final String MAX_RETRIES = "maxRetries";
@@ -58,6 +57,7 @@ public class WorkflowConstants {
         FINALIZE,
         INPUTS,
         LABEL,
+        METADATA,
         NAME,
         NODE,
         OUTPUTS,

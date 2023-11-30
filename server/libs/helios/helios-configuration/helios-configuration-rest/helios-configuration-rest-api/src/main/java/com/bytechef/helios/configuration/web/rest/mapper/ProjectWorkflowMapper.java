@@ -22,7 +22,7 @@ import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigura
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowTriggerModel;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import java.util.List;
 import java.util.Objects;
@@ -40,10 +40,13 @@ import org.springframework.core.convert.converter.Converter;
 public abstract class ProjectWorkflowMapper implements Converter<Workflow, WorkflowModel> {
 
     @Autowired
-    private WorkflowConnectionMapper workflowConnectionMapper;
+    private ProjectWorkflowConnectionMapper projectWorkflowConnectionMapper;
 
     @Autowired
     private ProjectWorkflowTriggerMapper projectWorkflowTriggerMapper;
+
+    @Autowired
+    private WorkflowConnectionFacade workflowConnectionFacade;
 
     @Override
     @Mapping(target = "triggers", ignore = true)
@@ -54,28 +57,27 @@ public abstract class ProjectWorkflowMapper implements Converter<Workflow, Workf
         for (WorkflowTaskModel workflowTaskModel : workflowModel.getTasks()) {
             workflowTaskModel.connections(
                 CollectionUtils.map(
-                    WorkflowConnection.of(
+                    workflowConnectionFacade.getWorkflowConnections(
                         CollectionUtils.getFirst(
                             workflow.getTasks(),
                             workflowTask -> Objects.equals(workflowTask.getName(), workflowTaskModel.getName()))),
-                    workflowConnection -> workflowConnectionMapper.convert(workflowConnection)));
+                    workflowConnection -> projectWorkflowConnectionMapper.convert(workflowConnection)));
         }
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
         List<WorkflowTriggerModel> workflowTriggerModels = CollectionUtils.map(
-            workflowTriggers,
-            workflowTrigger -> projectWorkflowTriggerMapper.convert(workflowTrigger));
+            workflowTriggers, workflowTrigger -> projectWorkflowTriggerMapper.convert(workflowTrigger));
 
         for (WorkflowTriggerModel workflowTriggerModel : workflowTriggerModels) {
             workflowTriggerModel.connections(
                 CollectionUtils.map(
-                    WorkflowConnection.of(
+                    workflowConnectionFacade.getWorkflowConnections(
                         CollectionUtils.getFirst(
                             workflowTriggers,
-                            workflowTrigger -> Objects.equals(workflowTrigger.getName(),
-                                workflowTriggerModel.getName()))),
-                    workflowConnection -> workflowConnectionMapper.convert(workflowConnection)));
+                            workflowTrigger -> Objects.equals(
+                                workflowTrigger.getName(), workflowTriggerModel.getName()))),
+                    workflowConnection -> projectWorkflowConnectionMapper.convert(workflowConnection)));
         }
 
         workflowModel.triggers(workflowTriggerModels);

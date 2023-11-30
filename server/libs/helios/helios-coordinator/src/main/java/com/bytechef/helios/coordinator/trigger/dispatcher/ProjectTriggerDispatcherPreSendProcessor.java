@@ -18,8 +18,8 @@ package com.bytechef.helios.coordinator.trigger.dispatcher;
 
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.coordinator.AbstractDispatcherPreSendProcessor;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
+import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
@@ -33,11 +33,15 @@ import org.springframework.stereotype.Component;
 public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
     implements TriggerDispatcherPreSendProcessor {
 
+    private final WorkflowConnectionFacade workflowConnectionFacade;
+
     @SuppressFBWarnings("EI")
     public ProjectTriggerDispatcherPreSendProcessor(
-        ProjectInstanceWorkflowService projectInstanceWorkflowService) {
+        ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        WorkflowConnectionFacade workflowConnectionFacade) {
 
         super(projectInstanceWorkflowService);
+        this.workflowConnectionFacade = workflowConnectionFacade;
     }
 
     @Override
@@ -47,7 +51,7 @@ public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcher
         triggerExecution.putMetadata(
             MetadataConstants.CONNECTION_IDS,
             getConnectionIdMap(workflowExecutionId.getInstanceId(), triggerExecution.getWorkflowId(),
-                WorkflowConnection.of(triggerExecution.getWorkflowTrigger())));
+                workflowConnectionFacade.getWorkflowConnections(triggerExecution.getWorkflowTrigger())));
 
         return triggerExecution;
     }

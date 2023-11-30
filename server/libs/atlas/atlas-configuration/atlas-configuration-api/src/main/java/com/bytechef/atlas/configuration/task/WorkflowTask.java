@@ -244,6 +244,8 @@ public class WorkflowTask implements Task, Serializable {
             map.put(WorkflowConstants.LABEL, label);
         }
 
+        map.put(WorkflowConstants.METADATA, metadata);
+
         if (name != null) {
             map.put(WorkflowConstants.NAME, name);
         }

@@ -37,6 +37,7 @@ import org.springframework.core.convert.converter.Converter;
 public class WorkflowTrigger implements Serializable, Trigger {
 
     private final Map<String, Object> extensions = new HashMap<>();
+    private Map<String, ?> metadata = new HashMap<>();
     private String name;
     private String label;
     private Map<String, ?> parameters = Collections.emptyMap();
@@ -52,6 +53,8 @@ public class WorkflowTrigger implements Serializable, Trigger {
         for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.LABEL.equals(entry.getKey())) {
                 this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
+            } else if (WorkflowConstants.METADATA.equals(entry.getKey())) {
+                this.metadata = MapUtils.getMap(source, WorkflowConstants.METADATA, Collections.emptyMap());
             } else if (WorkflowConstants.NAME.equals(entry.getKey())) {
                 this.name = MapUtils.getString(source, WorkflowConstants.NAME);
             } else if (WorkflowConstants.PARAMETERS.equals(entry.getKey())) {
@@ -127,6 +130,15 @@ public class WorkflowTrigger implements Serializable, Trigger {
         return label;
     }
 
+    /**
+     * Get the metadata.
+     *
+     * @return
+     */
+    public Map<String, Object> getMetadata() {
+        return Collections.unmodifiableMap(metadata);
+    }
+
     public Map<String, ?> getParameters() {
         return Collections.unmodifiableMap(parameters);
     }
@@ -149,6 +161,8 @@ public class WorkflowTrigger implements Serializable, Trigger {
         if (label != null) {
             map.put(WorkflowConstants.LABEL, label);
         }
+
+        map.put(WorkflowConstants.METADATA, metadata);
 
         if (name != null) {
             map.put(WorkflowConstants.NAME, name);
@@ -174,6 +188,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
             ", type='" + type + '\'' +
             ", parameters=" + parameters +
             ", extensions=" + extensions +
+            ", metadata=" + metadata +
             '}';
     }
 

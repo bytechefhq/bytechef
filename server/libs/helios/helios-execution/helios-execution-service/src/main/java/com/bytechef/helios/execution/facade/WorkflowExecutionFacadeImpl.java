@@ -31,8 +31,6 @@ import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectService;
-import com.bytechef.helios.execution.dto.TestConnectionDTO;
-import com.bytechef.hermes.component.registry.ComponentOperation;
 import com.bytechef.helios.execution.dto.WorkflowExecution;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
@@ -186,10 +184,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
     @Override
     public WorkflowExecution testWorkflow(JobParameters jobParameters) {
-
-//        TODO triggerTestExecutor
-
-        JobDTO job = jobTestExecutor.execute(new JobParameters(workflowId, inputs));
+        JobDTO job = jobTestExecutor.execute(jobParameters);
 
         return new WorkflowExecution(
             job.id(), null, null, job, workflowService.getWorkflow(jobParameters.getWorkflowId()), null);

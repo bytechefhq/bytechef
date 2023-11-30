@@ -1,2 +1,1 @@
-com.bytechef.hermes.configuration.workflow.contributor.ConnectionWorkflowReservedWordContributor
 com.bytechef.hermes.configuration.workflow.contributor.TriggerWorkflowReservedWordContributor

@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.workflow.contributor;
+package com.bytechef.hermes.configuration.facade;
 
-import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWordContributor;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.hermes.configuration.domain.WorkflowConnection;
+import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public class ConnectionWorkflowReservedWordContributor implements WorkflowReservedWordContributor {
+public interface WorkflowConnectionFacade {
 
-    @Override
-    public List<String> getReservedWords() {
-        return List.of(
-            WorkflowConnection.COMPONENT_NAME, WorkflowConnection.COMPONENT_VERSION, WorkflowConnection.CONNECTIONS,
-            WorkflowConnection.ID, WorkflowConnection.KEY);
-    }
+    List<WorkflowConnection> getWorkflowConnections(WorkflowTask workflowTask);
+
+    List<WorkflowConnection> getWorkflowConnections(WorkflowTrigger workflowTrigger);
 }

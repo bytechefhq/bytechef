@@ -118,6 +118,8 @@ public class JobSyncExecutor {
             TaskCoordinatorMessageRoute.ERROR_EVENTS, event -> {
                 TaskExecution erroredTaskExecution = ((TaskExecutionErrorEvent) event).getTaskExecution();
 
+                taskExecutionService.update(erroredTaskExecution);
+
                 ExecutionError error = erroredTaskExecution.getError();
 
                 logger.error(error.getMessage());

@@ -16,13 +16,10 @@
 
 package com.bytechef.helios.execution.web.rest;
 
-import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.helios.execution.dto.TestConnectionDTO;
+import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.helios.execution.facade.WorkflowExecutionFacade;
-import com.bytechef.helios.execution.web.rest.model.TestConnectionModel;
 import com.bytechef.helios.execution.web.rest.model.TestParametersModel;
 import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionModel;
-import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,18 +44,10 @@ public class WorkflowTestApiController implements WorkflowTestApi {
 
     @Override
     public ResponseEntity<WorkflowExecutionModel> testWorkflow(TestParametersModel testParametersModel) {
-        List<TestConnectionModel> testConnectionModels = testParametersModel.getConnections();
-
-        List<TestConnectionDTO> testConnectionDTOs = testConnectionModels == null
-            ? List.of()
-            : CollectionUtils.map(
-                testParametersModel.getConnections(),
-                testConnectionModel -> conversionService.convert(testConnectionModel, TestConnectionDTO.class));
-
         return ResponseEntity.ok(
             conversionService.convert(
                 workflowExecutionFacade.testWorkflow(
-                    testParametersModel.getWorkflowId(), testParametersModel.getInputs(), testConnectionDTOs),
+                    conversionService.convert(testParametersModel, JobParameters.class)),
                 WorkflowExecutionModel.class));
     }
 }

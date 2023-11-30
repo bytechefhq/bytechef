@@ -19,7 +19,7 @@ package com.bytechef.helios.execution.web.rest.mapper;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
 import com.bytechef.helios.execution.web.rest.mapper.util.ConverterUtils;
-import com.bytechef.helios.execution.web.rest.model.JobParametersModel;
+import com.bytechef.helios.execution.web.rest.model.TestParametersModel;
 import java.util.List;
 import java.util.Map;
 import org.mapstruct.Mapper;
@@ -31,23 +31,27 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = ProjectExecutionMapperSpringConfig.class)
-public interface ProjectJobParametersModelMapper extends Converter<JobParametersModel, JobParameters> {
+public interface ProjectTestParametersModelMapper extends Converter<TestParametersModel, JobParameters> {
 
     @Override
     @Mapping(target = "inputs", qualifiedByName = "inputs", source = ".")
+    @Mapping(target = "label", ignore = true)
     @Mapping(target = "metadata", qualifiedByName = "metadata", source = ".")
-    JobParameters convert(JobParametersModel jobParametersModel);
+    @Mapping(target = "parentTaskExecutionId", ignore = true)
+    @Mapping(target = "priority", ignore = true)
+    @Mapping(target = "webhooks", ignore = true)
+    JobParameters convert(TestParametersModel testParametersModel);
 
     @Named("inputs")
-    default Map<String, Object> getInputs(JobParametersModel jobParametersModel) {
+    default Map<String, Object> getInputs(TestParametersModel testParametersModel) {
         return ConverterUtils.getInputs(
-            jobParametersModel.getInputs() == null ? Map.of() : jobParametersModel.getInputs(),
-            jobParametersModel.getTriggerOutputs() == null ? List.of() : jobParametersModel.getTriggerOutputs());
+            testParametersModel.getInputs() == null ? Map.of() : testParametersModel.getInputs(),
+            testParametersModel.getTriggerOutputs() == null ? List.of() : testParametersModel.getTriggerOutputs());
     }
 
     @Named("metadata")
-    default Map<String, Object> getMetadata(JobParametersModel jobParametersModel) {
+    default Map<String, Object> getMetadata(TestParametersModel testParametersModel) {
         return ConverterUtils.getMetadata(
-            jobParametersModel.getConnections() == null ? List.of() : jobParametersModel.getConnections());
+            testParametersModel.getConnections() == null ? List.of() : testParametersModel.getConnections());
     }
 }

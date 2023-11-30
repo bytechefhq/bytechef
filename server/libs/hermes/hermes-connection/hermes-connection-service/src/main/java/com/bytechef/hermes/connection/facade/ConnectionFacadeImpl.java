@@ -27,7 +27,8 @@ import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import com.bytechef.hermes.configuration.domain.WorkflowConnection;
+import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.hermes.connection.domain.Connection;
@@ -60,13 +61,15 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final OAuth2Service oAuth2Service;
     private final TagService tagService;
+    private final WorkflowConnectionFacade workflowConnectionFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
         ConnectionDefinitionFacade connectionDefinitionFacade, ConnectionDefinitionService connectionDefinitionService,
         ConnectionService connectionService, InstanceAccessorRegistry instanceAccessorRegistry,
-        OAuth2Service oAuth2Service, TagService tagService, WorkflowService workflowService) {
+        OAuth2Service oAuth2Service, TagService tagService, WorkflowConnectionFacade workflowConnectionFacade,
+        WorkflowService workflowService) {
 
         this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionDefinitionService = connectionDefinitionService;
@@ -74,6 +77,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
+        this.workflowConnectionFacade = workflowConnectionFacade;
         this.workflowService = workflowService;
     }
 
@@ -231,10 +235,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 connectionId, type));
     }
 
-    private boolean isConnectionUsed(
-        String workflowId, WorkflowTask workflowTask, long id, int type) {
-
-        return WorkflowConnection.of(workflowTask)
+    private boolean isConnectionUsed(String workflowId, WorkflowTask workflowTask, long id, int type) {
+        return workflowConnectionFacade.getWorkflowConnections(workflowTask)
             .stream()
             .map(workflowConnection -> isConnectionUsed(workflowId, workflowConnection, id, type))
             .findFirst()

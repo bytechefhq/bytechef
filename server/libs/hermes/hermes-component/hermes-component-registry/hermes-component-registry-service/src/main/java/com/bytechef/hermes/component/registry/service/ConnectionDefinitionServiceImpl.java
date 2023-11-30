@@ -242,13 +242,12 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     @Override
-    public boolean connectionExists(String componentName, int connectionVersion) {
+    public boolean connectionExists(String componentName) {
         return componentDefinitionRegistry.getComponentDefinitions()
             .stream()
             .map(ComponentDefinition::getConnection)
             .flatMap(Optional::stream)
-            .anyMatch(connectionDefinition -> componentName.equalsIgnoreCase(connectionDefinition.getComponentName()) &&
-                connectionDefinition.getVersion() == connectionVersion);
+            .anyMatch(connectionDefinition -> componentName.equalsIgnoreCase(connectionDefinition.getComponentName()));
     }
 
     @Override
