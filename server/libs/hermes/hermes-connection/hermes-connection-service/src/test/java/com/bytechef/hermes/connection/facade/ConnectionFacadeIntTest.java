@@ -21,6 +21,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.dto.ConnectionDTO;
@@ -260,5 +261,8 @@ public class ConnectionFacadeIntTest {
 
         @MockBean
         WorkflowService workflowService;
+
+        @MockBean
+        WorkflowConnectionFacade workflowConnectionFacade;
     }
 }

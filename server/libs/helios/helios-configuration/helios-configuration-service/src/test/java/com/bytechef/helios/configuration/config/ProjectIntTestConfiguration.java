@@ -18,6 +18,7 @@ package com.bytechef.helios.configuration.config;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
@@ -61,6 +62,9 @@ public class ProjectIntTestConfiguration {
 
     @MockBean
     private TriggerLifecycleFacade triggerLifecycleFacade;
+
+    @MockBean
+    private WorkflowConnectionFacade workflowConnectionFacade;
 
     @EnableCaching
     @TestConfiguration

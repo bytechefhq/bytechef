@@ -25,6 +25,7 @@ import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.helios.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.helios.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -77,6 +78,9 @@ public class WorkflowApiControllerIntTest {
 
     @MockBean
     private WorkflowService workflowService;
+
+    @MockBean
+    private WorkflowConnectionFacade workflowConnectionFacade;
 
     @BeforeEach
     public void setup() {

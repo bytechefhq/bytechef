@@ -33,7 +33,8 @@ import com.bytechef.helios.configuration.dto.ProjectInstanceWorkflowDTO;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.configuration.service.ProjectService;
-import com.bytechef.hermes.configuration.connection.WorkflowConnection;
+import com.bytechef.hermes.configuration.domain.WorkflowConnection;
+import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
@@ -68,6 +69,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     private final TagService tagService;
     private final TriggerLifecycleFacade triggerLifecycleFacade;
     private final String webhookUrl;
+    private final WorkflowConnectionFacade workflowConnectionFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -75,7 +77,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         InstanceJobFacade instanceJobFacade, InstanceJobService instanceJobService, JobService jobService,
         ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
         ProjectService projectService, TagService tagService, TriggerLifecycleFacade triggerLifecycleFacade,
-        @Value("bytechef.webhookUrl") String webhookUrl, WorkflowService workflowService) {
+        @Value("bytechef.webhookUrl") String webhookUrl, WorkflowConnectionFacade workflowConnectionFacade,
+        WorkflowService workflowService) {
 
         this.instanceJobFacade = instanceJobFacade;
         this.instanceJobService = instanceJobService;
@@ -86,6 +89,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         this.tagService = tagService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
         this.webhookUrl = webhookUrl;
+        this.workflowConnectionFacade = workflowConnectionFacade;
         this.workflowService = workflowService;
     }
 
@@ -332,7 +336,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     private Long getConnectionId(long projectInstanceId, String workflowId, WorkflowTrigger workflowTrigger) {
-        return WorkflowConnection.of(workflowTrigger)
+        return workflowConnectionFacade.getWorkflowConnections(workflowTrigger)
             .stream()
             .findFirst()
             .map(workflowConnection -> getConnectionId(projectInstanceId, workflowId, workflowConnection))
