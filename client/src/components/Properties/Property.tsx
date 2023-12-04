@@ -96,6 +96,12 @@ const Property = ({
         type,
     } = property;
 
+    useEffect(() => {
+        if (controlType === 'SELECT') {
+            setMentionInput(false);
+        }
+    }, [controlType]);
+
     if (!name) {
         type === 'OBJECT' || type === 'ARRAY' ? (name = 'item') : <></>;
     }
@@ -136,11 +142,7 @@ const Property = ({
     }
 
     const showInputTypeSwitchButton =
-        type !== 'OBJECT' &&
-        type !== 'ARRAY' &&
-        type !== 'STRING' &&
-        !!dataPills?.length &&
-        !!name;
+        controlType === 'SELECT' && !!dataPills?.length && !!name;
 
     const otherComponentData = componentData.filter((component) => {
         if (component.name !== currentComponent?.name) {
@@ -239,7 +241,7 @@ const Property = ({
                     </Button>
                 )}
 
-                {showMentionInput && (
+                {showMentionInput && !!dataPills?.length && (
                     <MentionsInput
                         controlType={controlType || getInputType(controlType)}
                         dataPills={dataPills}
