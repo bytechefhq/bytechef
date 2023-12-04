@@ -89,6 +89,7 @@ const Property = ({
         hidden,
         items,
         label,
+        objectType,
         options,
         properties,
         required,
@@ -124,11 +125,15 @@ const Property = ({
 
     const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
 
-    const showMentionInput =
+    let showMentionInput =
         type !== 'OBJECT' &&
         type !== 'ARRAY' &&
         mentionInput &&
         !!dataPills?.length;
+
+    if (type === 'OBJECT' && objectType === 'FILE_ENTRY') {
+        showMentionInput = mentionInput && !!dataPills?.length;
+    }
 
     const showInputTypeSwitchButton =
         type !== 'OBJECT' &&

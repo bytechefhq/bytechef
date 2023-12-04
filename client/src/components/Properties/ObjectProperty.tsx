@@ -32,7 +32,30 @@ const ObjectProperty = ({
     const [additionalPropertiesDialogOpen, setAdditionalPropertiesDialogOpen] =
         useState(false);
 
-    const {additionalProperties, label, name, properties} = property;
+    const {additionalProperties, label, name, objectType, properties} =
+        property;
+
+    if (objectType === 'FILE_ENTRY' && dataPills?.length) {
+
+
+        return (
+            <Property
+                actionName={actionName}
+                currentComponent={currentComponent}
+                currentComponentData={currentComponentData}
+                dataPills={dataPills}
+                key={property.name}
+                mention
+                property={{
+                    description: property.description,
+                    label: property.label,
+                    name: property.name,
+                    required: property.required,
+                    type: property.type,
+                }}
+            />
+        );
+    }
 
     if (!properties?.length && !additionalProperties?.length) {
         return <></>;

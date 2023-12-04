@@ -35,7 +35,7 @@ const DataPillPanelBody = ({
                                 ? outputSchema.properties
                                 : outputSchema?.items;
 
-                        const existingProperties = properties?.filter(
+                        let existingProperties = properties?.filter(
                             (property) => {
                                 if (property.name) {
                                     return true;
@@ -46,6 +46,26 @@ const DataPillPanelBody = ({
                                 }
                             }
                         );
+
+                        if (
+                            outputSchema?.type === 'OBJECT' &&
+                            outputSchema.objectType === 'FILE_ENTRY'
+                        ) {
+                            existingProperties = [
+                                {
+                                    controlType: outputSchema.controlType,
+                                    description: outputSchema.description,
+                                    label: outputSchema.label,
+                                    name:
+                                        outputSchema.name ||
+                                        componentAction.workflowAlias ||
+                                        'fileEntry',
+                                    objectType: outputSchema.objectType,
+                                    required: outputSchema.required,
+                                    type: outputSchema.type,
+                                },
+                            ];
+                        }
 
                         const filteredProperties = existingProperties?.length
                             ? getFilteredProperties({

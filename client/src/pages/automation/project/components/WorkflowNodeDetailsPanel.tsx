@@ -277,12 +277,17 @@ const WorkflowNodeDetailsPanel = ({
         if (name === 'connection') {
             return (
                 currentComponent?.name &&
-                componentDefinitionNames?.includes(currentComponent.name)
+                componentDefinitionNames?.includes(currentComponent.name) &&
+                currentActionProperties?.length
             );
         }
 
         if (name === 'output') {
-            return currentAction?.outputSchema;
+            return (
+                (currentAction?.outputSchema as PropertyType)?.properties
+                    ?.length ||
+                (currentAction?.outputSchema as PropertyType)?.items?.length
+            );
         }
 
         if (name === 'properties') {
