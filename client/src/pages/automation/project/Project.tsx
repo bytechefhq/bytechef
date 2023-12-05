@@ -30,6 +30,8 @@ import {useToast} from '@/components/ui/use-toast';
 import {RightSidebar} from '@/layouts/RightSidebar';
 import {ProjectModel, WorkflowModel} from '@/middleware/helios/configuration';
 import {
+    TaskConnectionModel,
+    TriggerOutputModel,
     WorkflowExecutionModel,
     WorkflowTestApi,
 } from '@/middleware/helios/execution';
@@ -265,12 +267,16 @@ const Project = () => {
     });
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
-        onSuccess: () => {
+        onSuccess: (workflow: WorkflowModel) => {
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projectWorkflows(+projectId!),
             });
 
             setShowEditWorkflowDialog(false);
+
+            toast({
+                description: `The workflow ${workflow.label} is saved.`,
+            });
         },
     });
 
@@ -337,12 +343,17 @@ const Project = () => {
         }
     };
 
-    const handleRunWorkflowClick = () => {
+    const handleRunClick = () => {
+        // TODO
+    };
+
+    const handleWorkflowCodeEditorRunClick = () => {
         if (currentWorkflow?.inputs && currentWorkflow?.inputs?.length > 0) {
             setShowWorkflowTestConfigurationDialog(true);
         } else {
             setWorkflowIsRunning(true);
             setLeftSidebarOpen(true);
+            setWorkflowExecution(undefined);
 
             workflowTestApi
                 .testWorkflow({
@@ -355,8 +366,14 @@ const Project = () => {
         }
     };
 
-    const handleWorkflowTestConfigurationDialogRunWorkflowClick = (inputs?: {
-        [key: string]: object;
+    const handleWorkflowTestConfigurationDialogRunClick = ({
+        connections,
+        inputs,
+        triggerOutputs,
+    }: {
+        connections: TaskConnectionModel[];
+        inputs: {[key: string]: object};
+        triggerOutputs: TriggerOutputModel[];
     }) => {
         setWorkflowIsRunning(true);
         setLeftSidebarOpen(true);
@@ -365,7 +382,9 @@ const Project = () => {
         workflowTestApi
             .testWorkflow({
                 testParametersModel: {
+                    connections,
                     inputs,
+                    triggerOutputs,
                     workflowId: currentWorkflow?.id,
                 },
             })
@@ -572,7 +591,7 @@ const Project = () => {
                                         {!workflowIsRunning && (
                                             <Button
                                                 className="mr-1 bg-success text-success-foreground hover:bg-success/80"
-                                                onClick={handleRunWorkflowClick}
+                                                onClick={handleRunClick}
                                                 size="sm"
                                                 variant="secondary"
                                             >
@@ -598,7 +617,7 @@ const Project = () => {
                                 </TooltipTrigger>
 
                                 <TooltipContent>
-                                    Save and run the current workflow
+                                    Run the current workflow
                                 </TooltipContent>
                             </Tooltip>
 
@@ -792,8 +811,8 @@ const Project = () => {
                             onClose={() =>
                                 setShowWorkflowTestConfigurationDialog(false)
                             }
-                            onWorkflowRun={
-                                handleWorkflowTestConfigurationDialogRunWorkflowClick
+                            onRunClick={
+                                handleWorkflowTestConfigurationDialogRunClick
                             }
                             workflow={currentWorkflow}
                         />
@@ -804,8 +823,8 @@ const Project = () => {
                             onClose={() => {
                                 setShowWorkflowCodeEditorSheet(false);
                             }}
+                            onRunClick={handleWorkflowCodeEditorRunClick}
                             onSave={handleWorkflowCodeEditorSheetSave}
-                            onWorkflowRunClick={handleRunWorkflowClick}
                             workflow={currentWorkflow}
                             workflowIsRunning={workflowIsRunning}
                         />
