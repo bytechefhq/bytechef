@@ -1209,15 +1209,21 @@ components:
       - "componentVersion"
       - "key"
       - "operationName"
+      - "required"
       properties:
         componentName:
           type: "string"
         componentVersion:
           type: "integer"
+        id:
+          type: "integer"
+          format: "int64"
         key:
           type: "string"
         operationName:
           type: "string"
+        required:
+          type: "boolean"
     WorkflowFormat:
       type: "string"
       enum:
