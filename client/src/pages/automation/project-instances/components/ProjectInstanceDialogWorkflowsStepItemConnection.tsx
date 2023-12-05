@@ -130,7 +130,7 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                         <FormMessage />
                     </FormItem>
                 )}
-                rules={{required: true}}
+                rules={{required: workflowConnection.required}}
             />
 
             <FormField
