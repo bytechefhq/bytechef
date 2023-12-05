@@ -16,7 +16,7 @@
 
 package com.bytechef.component.dropbox;
 
-import org.junit.jupiter.api.Assertions;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -26,16 +26,6 @@ class DropboxComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        DropboxComponentHandler handler = new DropboxComponentHandler();
-
-        Assertions.assertEquals("Dropbox", handler.getDefinition()
-            .getTitle()
-            .get());
-
-        Assertions.assertEquals(9, handler.getDefinition()
-            .getActions()
-            .get()
-            .size(),
-            "Amount of defined actions does not match!");
+        JsonFileAssert.assertEquals("definition/dropbox_v1.json", new DropboxComponentHandler().getDefinition());
     }
 }

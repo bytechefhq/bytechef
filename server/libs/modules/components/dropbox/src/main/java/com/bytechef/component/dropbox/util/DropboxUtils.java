@@ -27,9 +27,10 @@ import com.dropbox.core.v2.files.DbxUserFilesRequests;
  */
 public final class DropboxUtils {
 
-    public static DbxUserFilesRequests getDropboxRequestObject(String accessToken) {
+    public static DbxUserFilesRequests getDbxUserFilesRequests(String accessToken) {
         DbxRequestConfig config = DbxRequestConfig.newBuilder(CLIENT_IDENTIFIER)
             .build();
+
         return new DbxClientV2(config, accessToken).files();
     }
 
