@@ -1,18 +1,12 @@
 import {useMutation} from '@tanstack/react-query';
-import {
-    ProjectApi,
-    ProjectModel,
-    PublishProjectRequest,
-} from 'middleware/helios/configuration';
+import {ProjectApi, ProjectModel, PublishProjectRequest} from 'middleware/helios/configuration';
 
 type CreateProjectMutationProps = {
     onSuccess?: (result: ProjectModel, variables: ProjectModel) => void;
     onError?: (error: Error, variables: ProjectModel) => void;
 };
 
-export const useCreateProjectMutation = (
-    mutationProps?: CreateProjectMutationProps
-) =>
+export const useCreateProjectMutation = (mutationProps?: CreateProjectMutationProps) =>
     useMutation({
         mutationFn: (projectModel: ProjectModel) => {
             return new ProjectApi().createProject({
@@ -28,9 +22,7 @@ type DeleteProjectMutationProps = {
     onError?: (error: Error, variables: number) => void;
 };
 
-export const useDeleteProjectMutation = (
-    mutationProps?: DeleteProjectMutationProps
-) =>
+export const useDeleteProjectMutation = (mutationProps?: DeleteProjectMutationProps) =>
     useMutation({
         mutationFn: (id: number) => {
             return new ProjectApi().deleteProject({id: id});
@@ -44,9 +36,7 @@ type DuplicateProjectMutationProps = {
     onError?: (error: Error, variables: number) => void;
 };
 
-export const useDuplicateProjectMutation = (
-    mutationProps?: DuplicateProjectMutationProps
-) =>
+export const useDuplicateProjectMutation = (mutationProps?: DuplicateProjectMutationProps) =>
     useMutation({
         mutationFn: (id: number) => {
             return new ProjectApi().duplicateProject({
@@ -58,16 +48,11 @@ export const useDuplicateProjectMutation = (
     });
 
 type PublishProjectMutationProps = {
-    onSuccess?: (
-        result: ProjectModel,
-        variables: PublishProjectRequest
-    ) => void;
+    onSuccess?: (result: ProjectModel, variables: PublishProjectRequest) => void;
     onError?: (error: Error, variables: PublishProjectRequest) => void;
 };
 
-export const usePublishProjectMutation = (
-    mutationProps?: PublishProjectMutationProps
-) =>
+export const usePublishProjectMutation = (mutationProps?: PublishProjectMutationProps) =>
     useMutation({
         mutationFn: (request: PublishProjectRequest) => {
             return new ProjectApi().publishProject(request);
@@ -81,9 +66,7 @@ type UpdateProjectMutationProps = {
     onError?: (error: Error, variables: ProjectModel) => void;
 };
 
-export const useUpdateProjectMutation = (
-    mutationProps?: UpdateProjectMutationProps
-) =>
+export const useUpdateProjectMutation = (mutationProps?: UpdateProjectMutationProps) =>
     useMutation({
         mutationFn: (projectModel: ProjectModel) => {
             return new ProjectApi().updateProject({

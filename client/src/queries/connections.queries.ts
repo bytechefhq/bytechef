@@ -10,18 +10,12 @@ import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
     connection: (id: number) => [...ConnectionKeys.connections, id],
-    connectionList: (filters: GetConnectionsRequest) => [
-        ...ConnectionKeys.connections,
-        filters,
-    ],
+    connectionList: (filters: GetConnectionsRequest) => [...ConnectionKeys.connections, filters],
     connectionTags: ['connectionTags'] as const,
     connections: ['connections'] as const,
 };
 
-export const useGetConnectionsQuery = (
-    filters: GetConnectionsRequest,
-    enabledCondition?: boolean
-) =>
+export const useGetConnectionsQuery = (filters: GetConnectionsRequest, enabledCondition?: boolean) =>
     useQuery<ConnectionModel[], Error>({
         queryKey: ConnectionKeys.connectionList(filters),
         queryFn: () => new ConnectionApi().getConnections(filters),

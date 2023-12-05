@@ -1,12 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {
-    ActionDefinitionModel,
-    ComponentDefinitionBasicModel,
-} from '@/middleware/hermes/configuration';
-import DataPillPanelBody, {
-    ComponentActionData,
-} from '@/pages/automation/project/components/DataPillPanelBody';
+import {ActionDefinitionModel, ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
+import DataPillPanelBody, {ComponentActionData} from '@/pages/automation/project/components/DataPillPanelBody';
 import {PropertyType} from '@/types/projectTypes';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
@@ -33,13 +28,10 @@ const DataPillPanel = ({
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentNames} = useWorkflowDataStore();
 
-    const {currentNode, workflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore();
+    const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
     const actionDataWithComponentAlias = actionData?.map((action) => {
-        const sameNameActions = actionData?.filter(
-            (actionDatum) => actionDatum.componentName === action.componentName
-        );
+        const sameNameActions = actionData?.filter((actionDatum) => actionDatum.componentName === action.componentName);
 
         const sameNameIndex = sameNameActions.indexOf(action);
 
@@ -55,9 +47,7 @@ const DataPillPanel = ({
 
     const componentActionData = previousActions?.map((action, index) => {
         const componentDefinition = previousComponentDefinitions?.find(
-            (currentComponentDefinition) =>
-                currentComponentDefinition.name ===
-                normalizedPreviousComponentNames[index]
+            (currentComponentDefinition) => currentComponentDefinition.name === normalizedPreviousComponentNames[index]
         );
 
         if (previousComponentNames.includes(action.workflowAlias!)) {
@@ -75,14 +65,9 @@ const DataPillPanel = ({
         }
 
         const outputSchemaContent =
-            (action.outputSchema as PropertyType)?.properties ||
-            (action.outputSchema as PropertyType)?.items;
+            (action.outputSchema as PropertyType)?.properties || (action.outputSchema as PropertyType)?.items;
 
-        return (
-            action.workflowAlias !== currentNode.name &&
-            action.componentDefinition &&
-            outputSchemaContent
-        );
+        return action.workflowAlias !== currentNode.name && action.componentDefinition && outputSchemaContent;
     });
 
     return (
@@ -113,9 +98,8 @@ const DataPillPanel = ({
                                 </TooltipTrigger>
 
                                 <TooltipContent>
-                                    To use data from the previous step drag its
-                                    data pill into a field, or click on the data
-                                    pill.
+                                    To use data from the previous step drag its data pill into a field, or click on the
+                                    data pill.
                                 </TooltipContent>
                             </Tooltip>
 
@@ -126,10 +110,7 @@ const DataPillPanel = ({
                                 size="icon"
                                 variant="ghost"
                             >
-                                <Cross1Icon
-                                    aria-hidden="true"
-                                    className="h-3 w-3 cursor-pointer"
-                                />
+                                <Cross1Icon aria-hidden="true" className="h-3 w-3 cursor-pointer" />
                             </Button>
                         </Dialog.Title>
 
@@ -137,18 +118,14 @@ const DataPillPanel = ({
                             <Input
                                 fieldsetClassName="p-4 border-b border-gray-100 mb-0"
                                 name="dataPillFilter"
-                                onChange={(event) =>
-                                    setDataPillFilterQuery(event.target.value)
-                                }
+                                onChange={(event) => setDataPillFilterQuery(event.target.value)}
                                 placeholder="Filter Data Pills..."
                                 value={dataPillFilterQuery}
                             />
 
                             {dataPillComponentData && (
                                 <DataPillPanelBody
-                                    componentData={
-                                        dataPillComponentData as Array<ComponentActionData>
-                                    }
+                                    componentData={dataPillComponentData as Array<ComponentActionData>}
                                     dataPillFilterQuery={dataPillFilterQuery}
                                 />
                             )}

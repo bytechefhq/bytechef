@@ -15,10 +15,7 @@ import {ProjectKeys} from '@/queries/projects.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ProjectInstanceModel} from 'middleware/helios/configuration';
-import {
-    useCreateProjectInstanceMutation,
-    useUpdateProjectInstanceMutation,
-} from 'mutations/projectInstances.mutations';
+import {useCreateProjectInstanceMutation, useUpdateProjectInstanceMutation} from 'mutations/projectInstances.mutations';
 import {MouseEvent, ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
@@ -32,11 +29,7 @@ interface ProjectInstanceDialogProps {
     triggerNode?: ReactNode;
 }
 
-const ProjectInstanceDialog = ({
-    onClose,
-    projectInstance,
-    triggerNode,
-}: ProjectInstanceDialogProps) => {
+const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectInstanceDialogProps) => {
     const [activeStepIndex, setActiveStepIndex] = useState(0);
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
@@ -56,16 +49,7 @@ const ProjectInstanceDialog = ({
         } as ProjectInstanceModel,
     });
 
-    const {
-        control,
-        formState,
-        getValues,
-        handleSubmit,
-        register,
-        reset,
-        setValue,
-        trigger,
-    } = form;
+    const {control, formState, getValues, handleSubmit, register, reset, setValue, trigger} = form;
 
     const queryClient = useQueryClient();
 
@@ -171,26 +155,15 @@ const ProjectInstanceDialog = ({
             }}
             open={isOpen}
         >
-            {triggerNode && (
-                <DialogTrigger asChild>{triggerNode}</DialogTrigger>
-            )}
+            {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent
-                className={twMerge('flex flex-col')}
-                onInteractOutside={(event) => event.preventDefault()}
-            >
+            <DialogContent className={twMerge('flex flex-col')} onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
                     <DialogHeader>
                         <div className="flex items-center justify-between">
                             <DialogTitle>
-                                {`${
-                                    projectInstance?.id ? 'Edit' : 'New'
-                                } Instance ${!projectInstance?.id ? '-' : ''} ${
-                                    !projectInstance?.id
-                                        ? projectInstanceDialogSteps[
-                                              activeStepIndex
-                                          ].name
-                                        : ''
+                                {`${projectInstance?.id ? 'Edit' : 'New'} Instance ${!projectInstance?.id ? '-' : ''} ${
+                                    !projectInstance?.id ? projectInstanceDialogSteps[activeStepIndex].name : ''
                                 }`}
                             </DialogTitle>
 
@@ -203,27 +176,19 @@ const ProjectInstanceDialog = ({
 
                         {!projectInstance?.id && (
                             <nav aria-label="Progress">
-                                <ol
-                                    className="space-y-4 md:flex md:space-y-0"
-                                    role="list"
-                                >
-                                    {projectInstanceDialogSteps.map(
-                                        (step, index) => (
-                                            <li
-                                                className="md:flex-1"
-                                                key={step.name}
-                                            >
-                                                <div
-                                                    className={twMerge(
-                                                        'group flex flex-col border-l-4 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4',
-                                                        index <= activeStepIndex
-                                                            ? 'border-gray-900 hover:border-gray-800'
-                                                            : 'border-gray-200 hover:border-gray-30'
-                                                    )}
-                                                ></div>
-                                            </li>
-                                        )
-                                    )}
+                                <ol className="space-y-4 md:flex md:space-y-0" role="list">
+                                    {projectInstanceDialogSteps.map((step, index) => (
+                                        <li className="md:flex-1" key={step.name}>
+                                            <div
+                                                className={twMerge(
+                                                    'group flex flex-col border-l-4 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4',
+                                                    index <= activeStepIndex
+                                                        ? 'border-gray-900 hover:border-gray-800'
+                                                        : 'border-gray-200 hover:border-gray-30'
+                                                )}
+                                            ></div>
+                                        </li>
+                                    ))}
                                 </ol>
                             </nav>
                         )}
@@ -240,34 +205,20 @@ const ProjectInstanceDialog = ({
                                     <Button variant="outline">Cancel</Button>
                                 </DialogClose>
 
-                                {!projectInstance?.id && (
-                                    <Button onClick={handleNextClick}>
-                                        Next
-                                    </Button>
-                                )}
+                                {!projectInstance?.id && <Button onClick={handleNextClick}>Next</Button>}
                             </>
                         )}
 
                         {(activeStepIndex === 1 || projectInstance?.id) && (
                             <>
                                 {!projectInstance?.id && (
-                                    <Button
-                                        onClick={() =>
-                                            setActiveStepIndex(
-                                                activeStepIndex - 1
-                                            )
-                                        }
-                                        variant="outline"
-                                    >
+                                    <Button onClick={() => setActiveStepIndex(activeStepIndex - 1)} variant="outline">
                                         Previous
                                     </Button>
                                 )}
 
                                 <Button
-                                    disabled={
-                                        projectInstance?.enabled &&
-                                        !projectInstance?.id
-                                    }
+                                    disabled={projectInstance?.enabled && !projectInstance?.id}
                                     onClick={handleSubmit(saveProjectInstance)}
                                 >
                                     Save

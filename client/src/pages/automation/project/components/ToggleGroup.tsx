@@ -14,13 +14,7 @@ type ToggleGroupProps = {
     value?: string;
 };
 
-const ToggleGroup = ({
-    containerClassName,
-    defaultValue,
-    onValueChange,
-    toggleItems,
-    value,
-}: ToggleGroupProps) => (
+const ToggleGroup = ({containerClassName, defaultValue, onValueChange, toggleItems, value}: ToggleGroupProps) => (
     <ToggleGroupPrimitive.Root
         aria-label="Items"
         className={twMerge('flex shadow-sm', containerClassName)}

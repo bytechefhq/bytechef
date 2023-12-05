@@ -1,22 +1,11 @@
 import {Badge} from '@/components/ui/badge';
-import {
-    CellContext,
-    createColumnHelper,
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
-} from '@tanstack/react-table';
-import {
-    JobBasicModel,
-    WorkflowExecutionModel,
-} from 'middleware/helios/execution';
+import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {JobBasicModel, WorkflowExecutionModel} from 'middleware/helios/execution';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowExecutionDetailsDialogStore from '../stores/useWorkflowExecutionDetailsDialogStore';
 
-const getDuration = (
-    info: CellContext<WorkflowExecutionModel, JobBasicModel | undefined>
-) => {
+const getDuration = (info: CellContext<WorkflowExecutionModel, JobBasicModel | undefined>) => {
     const infoValue = info.getValue();
 
     const startDate = infoValue?.startDate?.getTime();
@@ -34,14 +23,9 @@ const columns = [
         cell: (info) => (
             <Badge
                 className={twMerge(
-                    info.getValue()?.status === 'COMPLETED' &&
-                        'bg-success text-success-foreground hover:bg-success'
+                    info.getValue()?.status === 'COMPLETED' && 'bg-success text-success-foreground hover:bg-success'
                 )}
-                variant={
-                    info.getValue()?.status === 'COMPLETED'
-                        ? 'destructive'
-                        : 'secondary'
-                }
+                variant={info.getValue()?.status === 'COMPLETED' ? 'destructive' : 'secondary'}
             >
                 {info.getValue()?.status ?? ''}
             </Badge>
@@ -84,8 +68,7 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
         getCoreRowModel: getCoreRowModel(),
     });
 
-    const {setWorkflowExecutionDetailsDialogOpen, setWorkflowExecutionId} =
-        useWorkflowExecutionDetailsDialogStore();
+    const {setWorkflowExecutionDetailsDialogOpen, setWorkflowExecutionId} = useWorkflowExecutionDetailsDialogStore();
 
     const headerGroups = reactTable.getHeaderGroups();
     const rows = reactTable.getRowModel().rows;
@@ -110,10 +93,7 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
                                     key={header.id}
                                 >
                                     {!header.isPlaceholder &&
-                                        flexRender(
-                                            header.column.columnDef.header,
-                                            header.getContext()
-                                        )}
+                                        flexRender(header.column.columnDef.header, header.getContext())}
                                 </th>
                             ))}
                         </tr>
@@ -122,20 +102,10 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecutionModel[]}) => {
 
                 <tbody className="divide-y divide-gray-200 bg-white">
                     {rows.map((row) => (
-                        <tr
-                            className="cursor-pointer"
-                            key={row.id}
-                            onClick={() => handleRowClick(row.index)}
-                        >
+                        <tr className="cursor-pointer" key={row.id} onClick={() => handleRowClick(row.index)}>
                             {row.getVisibleCells().map((cell) => (
-                                <td
-                                    className="whitespace-nowrap px-3 py-4 text-sm"
-                                    key={cell.id}
-                                >
-                                    {flexRender(
-                                        cell.column.columnDef.cell,
-                                        cell.getContext()
-                                    )}
+                                <td className="whitespace-nowrap px-3 py-4 text-sm" key={cell.id}>
+                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </td>
                             ))}
                         </tr>

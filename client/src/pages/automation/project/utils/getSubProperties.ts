@@ -31,9 +31,7 @@ export default function getSubProperties({
         return {
             component: JSON.stringify(componentDefinition),
             id: subProperty.name,
-            value: propertyName
-                ? `${propertyName}/${subPropertyLabel}`
-                : `${subPropertyLabel}`,
+            value: propertyName ? `${propertyName}/${subPropertyLabel}` : `${subPropertyLabel}`,
         };
     });
 }

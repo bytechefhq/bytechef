@@ -1,10 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-} from '@/components/ui/sheet';
+import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {WorkflowModel} from '@/middleware/helios/configuration';
 import WorkflowInputsSheetDialog from '@/pages/automation/project/components/WorkflowInputsSheetDialog';
 import WorkflowInputsSheetTable from '@/pages/automation/project/components/WorkflowInputsSheetTable';
@@ -17,11 +12,7 @@ interface WorkflowInputsSheetProps {
     workflow: WorkflowModel;
 }
 
-const WorkflowInputsSheet = ({
-    onClose,
-    projectId,
-    workflow,
-}: WorkflowInputsSheetProps) => (
+const WorkflowInputsSheet = ({onClose, projectId, workflow}: WorkflowInputsSheetProps) => (
     <Sheet modal={false} onOpenChange={onClose} open>
         <SheetContent className="flex flex-col p-4 sm:max-w-[500px]">
             <SheetHeader>
@@ -44,11 +35,7 @@ const WorkflowInputsSheet = ({
                 </div>
             </SheetHeader>
 
-            <WorkflowInputsSheetTable
-                inputs={workflow.inputs || []}
-                projectId={projectId}
-                workflow={workflow}
-            />
+            <WorkflowInputsSheetTable inputs={workflow.inputs || []} projectId={projectId} workflow={workflow} />
         </SheetContent>
     </Sheet>
 );

@@ -1,22 +1,14 @@
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
-import {
-    ProjectApi,
-    ProjectModel,
-    WorkflowApi,
-    WorkflowModel,
-} from 'middleware/helios/configuration';
+import {ProjectApi, ProjectModel, WorkflowApi, WorkflowModel} from 'middleware/helios/configuration';
 
 export const ProjectKeys = {
-    filteredProjects: (
-        filters: {categoryId?: number; tagId?: number} | undefined
-    ) => [...ProjectKeys.projects, filters],
-    project: (id: number) => [...ProjectKeys.projects, id],
-    projectWorkflows: (projectId: number) => [
+    filteredProjects: (filters: {categoryId?: number; tagId?: number} | undefined) => [
         ...ProjectKeys.projects,
-        projectId,
-        'projectWorkflows',
+        filters,
     ],
+    project: (id: number) => [...ProjectKeys.projects, id],
+    projectWorkflows: (projectId: number) => [...ProjectKeys.projects, projectId, 'projectWorkflows'],
     projects: ['projects'] as const,
 };
 

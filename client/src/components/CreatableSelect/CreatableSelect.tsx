@@ -49,38 +49,23 @@ const CreatableSelect = <
 }: CreatableSelectProps<Option, IsMulti, Group, TFieldValues, TName>) => (
     <fieldset className={twMerge(label && 'mb-3', fieldsetClassName)}>
         {label && (
-            <label
-                className="text-sm font-medium text-gray-700"
-                htmlFor={name || field?.name}
-            >
+            <label className="text-sm font-medium text-gray-700" htmlFor={name || field?.name}>
                 {label}
             </label>
         )}
 
         <div className={twMerge([label && 'mt-1'])}>
-            <ReactSelectCreatable
-                {...field}
-                classNamePrefix="react-select"
-                isMulti={isMulti}
-                {...props}
-            />
+            <ReactSelectCreatable {...field} classNamePrefix="react-select" isMulti={isMulti} {...props} />
 
             {error && (
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                    <ExclamationTriangleIcon
-                        aria-hidden="true"
-                        className="h-5 w-5 text-red-500"
-                    />
+                    <ExclamationTriangleIcon aria-hidden="true" className="h-5 w-5 text-red-500" />
                 </div>
             )}
         </div>
 
         {error && (
-            <p
-                className="mt-2 text-sm text-red-600"
-                id={`${name}-error`}
-                role="alert"
-            >
+            <p className="mt-2 text-sm text-red-600" id={`${name}-error`} role="alert">
                 This field is required
             </p>
         )}

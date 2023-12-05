@@ -51,9 +51,7 @@ const ProjectLabel = ({project}: {project: ProjectModel}) => (
     <div className="flex items-center">
         <span className="mr-1 ">{project.name}</span>
 
-        <span className="text-xs text-gray-500">
-            {project?.tags?.map((tag) => tag.name).join(', ')}
-        </span>
+        <span className="text-xs text-gray-500">{project?.tags?.map((tag) => tag.name).join(', ')}</span>
     </div>
 );
 
@@ -61,47 +59,25 @@ const WorkflowExecutions = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
-    const [filterStatus, setFilterStatus] = useState<
-        GetWorkflowExecutionsJobStatusEnum | undefined
-    >(
-        searchParams.get('status')
-            ? (searchParams.get(
-                  'status'
-              )! as GetWorkflowExecutionsJobStatusEnum)
-            : undefined
+    const [filterStatus, setFilterStatus] = useState<GetWorkflowExecutionsJobStatusEnum | undefined>(
+        searchParams.get('status') ? (searchParams.get('status')! as GetWorkflowExecutionsJobStatusEnum) : undefined
     );
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
-        searchParams.get('startDate')
-            ? new Date(+searchParams.get('startDate')!)
-            : undefined
+        searchParams.get('startDate') ? new Date(+searchParams.get('startDate')!) : undefined
     );
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(
-        searchParams.get('endDate')
-            ? new Date(+searchParams.get('endDate')!)
-            : undefined
+        searchParams.get('endDate') ? new Date(+searchParams.get('endDate')!) : undefined
     );
-    const [filterPageNumber, setFilterPageNumber] = useState<
-        number | undefined
-    >(
-        searchParams.get('pageNumber')
-            ? +searchParams.get('pageNumber')!
-            : undefined
+    const [filterPageNumber, setFilterPageNumber] = useState<number | undefined>(
+        searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined
     );
     const [filterProjectId, setFilterProjectId] = useState<number | undefined>(
-        searchParams.get('projectId')
-            ? +searchParams.get('projectId')!
-            : undefined
+        searchParams.get('projectId') ? +searchParams.get('projectId')! : undefined
     );
-    const [filterProjectInstanceId, setFilterProjectInstanceId] = useState<
-        number | undefined
-    >(
-        searchParams.get('projectInstanceId')
-            ? +searchParams.get('projectInstanceId')!
-            : undefined
+    const [filterProjectInstanceId, setFilterProjectInstanceId] = useState<number | undefined>(
+        searchParams.get('projectInstanceId') ? +searchParams.get('projectInstanceId')! : undefined
     );
-    const [filterWorkflowId, setFilterWorkflowId] = useState<
-        string | undefined
-    >();
+    const [filterWorkflowId, setFilterWorkflowId] = useState<string | undefined>();
 
     const {data: projectInstances} = useGetProjectInstancesQuery({});
 
@@ -134,9 +110,8 @@ const WorkflowExecutions = () => {
             ? "You don't have any executed workflows yet."
             : 'There is no executed workflows for the current criteria.';
 
-    const workflowExecutions = workflowExecutionPage?.content?.map(
-        (workflowExecutionModel: WorkflowExecutionModel) =>
-            WorkflowExecutionModelFromJSON(workflowExecutionModel)
+    const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecutionModel: WorkflowExecutionModel) =>
+        WorkflowExecutionModelFromJSON(workflowExecutionModel)
     );
 
     function search(
@@ -151,13 +126,11 @@ const WorkflowExecutions = () => {
         navigate(
             `/automation/executions?status=${status ? status : ''}&${
                 'projectId=' + (projectId ? projectId : '') + '&'
-            }projectInstanceId=${
-                projectInstanceId ? projectInstanceId : ''
-            }&workflowId=${workflowId ? workflowId : ''}&startDate=${
-                startDate ? startDate.getTime() : ''
-            }&endDate=${endDate ? endDate.getTime() : ''}&pageNumber=${
-                pageNumber ? pageNumber : ''
-            }`
+            }projectInstanceId=${projectInstanceId ? projectInstanceId : ''}&workflowId=${
+                workflowId ? workflowId : ''
+            }&startDate=${startDate ? startDate.getTime() : ''}&endDate=${
+                endDate ? endDate.getTime() : ''
+            }&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
 
@@ -293,13 +266,7 @@ const WorkflowExecutions = () => {
                     </PageFooter>
                 )
             }
-            header={
-                <PageHeader
-                    centerTitle={true}
-                    position="main"
-                    title="All Workflow Executions"
-                />
-            }
+            header={<PageHeader centerTitle={true} position="main" title="All Workflow Executions" />}
             leftSidebarHeader={
                 <>
                     <PageHeader position="sidebar" title="Executions" />
@@ -308,29 +275,19 @@ const WorkflowExecutions = () => {
                         <div className="flex flex-col space-y-2">
                             <Label>Status</Label>
 
-                            <ComboBox
-                                items={jobStatusOptions}
-                                onChange={handleStatusChange}
-                                value={filterStatus}
-                            />
+                            <ComboBox items={jobStatusOptions} onChange={handleStatusChange} value={filterStatus} />
                         </div>
 
                         <div className="flex flex-col space-y-2">
                             <Label>Start date</Label>
 
-                            <DatePicker
-                                onChange={handleStartDateChange}
-                                value={filterStartDate}
-                            />
+                            <DatePicker onChange={handleStartDateChange} value={filterStartDate} />
                         </div>
 
                         <div className="flex flex-col space-y-2">
                             <Label>End date</Label>
 
-                            <DatePicker
-                                onChange={handleEndDateChange}
-                                value={filterEndDate}
-                            />
+                            <DatePicker onChange={handleEndDateChange} value={filterEndDate} />
                         </div>
 
                         <div className="flex flex-col space-y-2">
@@ -340,11 +297,7 @@ const WorkflowExecutions = () => {
                                 items={
                                     projects?.length
                                         ? projects?.map((project) => ({
-                                              label: (
-                                                  <ProjectLabel
-                                                      project={project}
-                                                  />
-                                              ),
+                                              label: <ProjectLabel project={project} />,
                                               value: project.id,
                                           }))
                                         : []
@@ -360,29 +313,18 @@ const WorkflowExecutions = () => {
                             <ComboBox
                                 items={
                                     projectInstances?.length
-                                        ? projectInstances?.map(
-                                              (projectInstance) => ({
-                                                  label: (
-                                                      <span className="flex items-center">
-                                                          <span className="mr-1 ">
-                                                              {
-                                                                  projectInstance.name
-                                                              }
-                                                          </span>
+                                        ? projectInstances?.map((projectInstance) => ({
+                                              label: (
+                                                  <span className="flex items-center">
+                                                      <span className="mr-1 ">{projectInstance.name}</span>
 
-                                                          <span className="text-xs text-gray-500">
-                                                              {projectInstance?.tags
-                                                                  ?.map(
-                                                                      (tag) =>
-                                                                          tag.name
-                                                                  )
-                                                                  .join(', ')}
-                                                          </span>
+                                                      <span className="text-xs text-gray-500">
+                                                          {projectInstance?.tags?.map((tag) => tag.name).join(', ')}
                                                       </span>
-                                                  ),
-                                                  value: projectInstance.id,
-                                              })
-                                          )
+                                                  </span>
+                                              ),
+                                              value: projectInstance.id,
+                                          }))
                                         : []
                                 }
                                 onChange={handleProjectInstanceChange}
@@ -397,9 +339,7 @@ const WorkflowExecutions = () => {
                                 items={
                                     workflows?.length
                                         ? workflows?.map((workflow) => ({
-                                              label:
-                                                  workflow.label ||
-                                                  'undefined label',
+                                              label: workflow.label || 'undefined label',
                                               value: workflow.id,
                                           }))
                                         : []
@@ -413,17 +353,12 @@ const WorkflowExecutions = () => {
                 </>
             }
         >
-            <PageLoader
-                errors={[workflowExecutionsError]}
-                loading={workflowExecutionsIsLoading}
-            >
+            <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
                 {workflowExecutions && workflowExecutions.length > 0 ? (
                     <WorkflowExecutionsTable data={workflowExecutions} />
                 ) : (
                     <EmptyList
-                        icon={
-                            <ActivityIcon className="h-12 w-12 text-gray-400" />
-                        }
+                        icon={<ActivityIcon className="h-12 w-12 text-gray-400" />}
                         message={emptyListMessage}
                         title="No executed workflows"
                     />

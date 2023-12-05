@@ -9,14 +9,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form';
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {WorkflowModel} from '@/middleware/helios/configuration';
@@ -27,22 +20,12 @@ import {useForm} from 'react-hook-form';
 
 type WorkflowDialogProps = {
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    createWorkflowRequestMutation?: UseMutationResult<
-        any,
-        object,
-        any,
-        unknown
-    >;
+    createWorkflowRequestMutation?: UseMutationResult<any, object, any, unknown>;
     onClose?: () => void;
     parentId?: number;
     triggerNode?: ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    updateWorkflowMutationMutation?: UseMutationResult<
-        any,
-        object,
-        any,
-        unknown
-    >;
+    updateWorkflowMutationMutation?: UseMutationResult<any, object, any, unknown>;
     workflow?: WorkflowModel;
 };
 
@@ -131,13 +114,9 @@ const WorkflowDialog = ({
             }}
             open={isOpen}
         >
-            {triggerNode && (
-                <DialogTrigger asChild>{triggerNode}</DialogTrigger>
-            )}
+            {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent
-                onInteractOutside={(event) => event.preventDefault()}
-            >
+            <DialogContent onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
                     <DialogHeader>
                         <div className="flex items-center justify-between">
@@ -151,8 +130,8 @@ const WorkflowDialog = ({
                         </div>
 
                         <DialogDescription>
-                            Use this to create a workflow. Creating a workflow
-                            will redirect you to the page where you can edit it.
+                            Use this to create a workflow. Creating a workflow will redirect you to the page where you
+                            can edit it.
                         </DialogDescription>
                     </DialogHeader>
 
@@ -181,10 +160,7 @@ const WorkflowDialog = ({
                                 <FormLabel>Description</FormLabel>
 
                                 <FormControl>
-                                    <Textarea
-                                        placeholder="Cute description of your project instance"
-                                        {...field}
-                                    />
+                                    <Textarea placeholder="Cute description of your project instance" {...field} />
                                 </FormControl>
 
                                 <FormMessage />
@@ -199,11 +175,7 @@ const WorkflowDialog = ({
                             </Button>
                         </DialogClose>
 
-                        <Button
-                            disabled={isPending}
-                            onClick={handleSubmit(saveWorkflow)}
-                            type="submit"
-                        >
+                        <Button disabled={isPending} onClick={handleSubmit(saveWorkflow)} type="submit">
                             Save
                         </Button>
                     </DialogFooter>

@@ -4,11 +4,7 @@ module.exports = {
     content: ['./src/**/*.{js,ts,jsx,tsx}', './*.html'],
     darkMode: 'class',
     important: true,
-    plugins: [
-        require('@headlessui/tailwindcss'),
-        require('@tailwindcss/forms'),
-        require('tailwindcss-animate'),
-    ],
+    plugins: [require('@headlessui/tailwindcss'), require('@tailwindcss/forms'), require('tailwindcss-animate')],
     theme: {
         container: {
             center: true,
@@ -84,17 +80,14 @@ module.exports = {
                 },
             },
             maxHeight: {
-                'select-content-available-height':
-                    'var(--radix-select-content-available-height)',
-                'select-content-available-height-1/2':
-                    'calc(var(--radix-select-content-available-height) / 2)',
+                'select-content-available-height': 'var(--radix-select-content-available-height)',
+                'select-content-available-height-1/2': 'calc(var(--radix-select-content-available-height) / 2)',
             },
             maxWidth: {
                 'select-trigger-width': 'var(--radix-select-trigger-width)',
             },
             minWidth: {
-                'combo-box-popper-anchor-width':
-                    'var(--radix-popper-anchor-width)',
+                'combo-box-popper-anchor-width': 'var(--radix-popper-anchor-width)',
                 'select-trigger-width': 'var(--radix-select-trigger-width)',
             },
             width: {

@@ -4,12 +4,8 @@ import {NodeProps, useReactFlow} from 'reactflow';
 
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 
-export default function useNodeClick(
-    data: NodeProps['data'],
-    id: NodeProps['id']
-) {
-    const {setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore();
+export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id']) {
+    const {setCurrentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
     const {setRightSidebarOpen} = useRightSidebarStore();
 
@@ -27,12 +23,5 @@ export default function useNodeClick(
         setWorkflowNodeDetailsPanelOpen(true);
 
         setCurrentNode(data);
-    }, [
-        data,
-        getNode,
-        id,
-        setCurrentNode,
-        setWorkflowNodeDetailsPanelOpen,
-        setRightSidebarOpen,
-    ]);
+    }, [data, getNode, id, setCurrentNode, setWorkflowNodeDetailsPanelOpen, setRightSidebarOpen]);
 }

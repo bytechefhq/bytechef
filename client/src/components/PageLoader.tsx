@@ -3,11 +3,7 @@ import {PropsWithChildren} from 'react';
 
 type TError = Error | null;
 
-const PageLoader = ({
-    children,
-    errors,
-    loading,
-}: PropsWithChildren<{errors: TError[]; loading: boolean}>) => {
+const PageLoader = ({children, errors, loading}: PropsWithChildren<{errors: TError[]; loading: boolean}>) => {
     let errorExists = false;
 
     errors.forEach((error) => {
@@ -22,10 +18,7 @@ const PageLoader = ({
                 <div className="flex min-h-screen min-w-full items-center justify-center p-5">
                     {errorExists ? (
                         <div className="flex items-center text-red-700">
-                            <CrossCircledIcon
-                                aria-hidden="true"
-                                className="mr-1 h-5 w-5 text-red-400"
-                            />
+                            <CrossCircledIcon aria-hidden="true" className="mr-1 h-5 w-5 text-red-400" />
 
                             <h1>Some error occurred.</h1>
                         </div>

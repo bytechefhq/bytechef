@@ -38,9 +38,7 @@ const DataPillPanelBodyItem = ({
                     <span className="text-sm">
                         {title}
 
-                        <span className="pl-1 text-xs text-gray-400">
-                            ({componentAction.workflowAlias})
-                        </span>
+                        <span className="pl-1 text-xs text-gray-400">({componentAction.workflowAlias})</span>
                     </span>
                 </div>
 
@@ -67,9 +65,7 @@ const DataPillPanelBodyItem = ({
                     {filteredProperties?.map((property) => (
                         <DataPill
                             componentAlias={componentAction.workflowAlias}
-                            componentIcon={
-                                componentAction.componentDefinition.icon
-                            }
+                            componentIcon={componentAction.componentDefinition.icon}
                             key={property.name}
                             property={property}
                         />

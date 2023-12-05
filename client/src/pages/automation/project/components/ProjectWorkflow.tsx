@@ -16,53 +16,36 @@ import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetails
 import DataPillPanel from './DataPillPanel';
 import WorkflowEditor, {WorkflowEditorProps} from './WorkflowEditor';
 
-const ProjectWorkflow = ({
-    componentDefinitions,
-    taskDispatcherDefinitions,
-}: WorkflowEditorProps) => {
-    const [actionData, setActionData] = useState<Array<ActionDefinitionModel>>(
-        []
-    );
+const ProjectWorkflow = ({componentDefinitions, taskDispatcherDefinitions}: WorkflowEditorProps) => {
+    const [actionData, setActionData] = useState<Array<ActionDefinitionModel>>([]);
 
     const {componentActions, componentNames} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     const currentNodeIndex = componentNames.indexOf(currentNode.name);
 
-    const previousComponentNames =
-        componentNames.length > 1
-            ? componentNames.slice(0, currentNodeIndex)
-            : [];
+    const previousComponentNames = componentNames.length > 1 ? componentNames.slice(0, currentNodeIndex) : [];
 
-    const normalizedPreviousComponentNames = previousComponentNames.map(
-        (name) =>
-            name.match(new RegExp(/-\d$/))
-                ? name.slice(0, name.length - 2)
-                : name
+    const normalizedPreviousComponentNames = previousComponentNames.map((name) =>
+        name.match(new RegExp(/-\d$/)) ? name.slice(0, name.length - 2) : name
     );
 
-    const {data: connectionComponentDefinitions} =
-        useGetComponentDefinitionsQuery({
-            connectionDefinitions: true,
-        });
+    const {data: connectionComponentDefinitions} = useGetComponentDefinitionsQuery({
+        connectionDefinitions: true,
+    });
 
-    const {data: previousComponentDefinitions} =
-        useGetComponentDefinitionsQuery(
-            {
-                include: normalizedPreviousComponentNames,
-            },
-            !!normalizedPreviousComponentNames.length
-        );
+    const {data: previousComponentDefinitions} = useGetComponentDefinitionsQuery(
+        {
+            include: normalizedPreviousComponentNames,
+        },
+        !!normalizedPreviousComponentNames.length
+    );
 
     const taskTypes = componentActions?.map(
-        (componentAction) =>
-            `${componentAction.componentName}/1/${componentAction.actionName}`
+        (componentAction) => `${componentAction.componentName}/1/${componentAction.actionName}`
     );
 
-    const {data: actionDefinitions} = useGetActionDefinitionsQuery(
-        {taskTypes},
-        !!previousComponentDefinitions?.length
-    );
+    const {data: actionDefinitions} = useGetActionDefinitionsQuery({taskTypes}, !!previousComponentDefinitions?.length);
 
     useEffect(() => {
         if (actionDefinitions) {
@@ -78,17 +61,13 @@ const ProjectWorkflow = ({
             />
 
             {connectionComponentDefinitions && currentNode.name && (
-                <WorkflowNodeDetailsPanel
-                    componentDefinitions={connectionComponentDefinitions}
-                />
+                <WorkflowNodeDetailsPanel componentDefinitions={connectionComponentDefinitions} />
             )}
 
             {previousComponentDefinitions && (
                 <DataPillPanel
                     actionData={actionData}
-                    normalizedPreviousComponentNames={
-                        normalizedPreviousComponentNames
-                    }
+                    normalizedPreviousComponentNames={normalizedPreviousComponentNames}
                     previousComponentDefinitions={previousComponentDefinitions}
                     previousComponentNames={previousComponentNames}
                 />

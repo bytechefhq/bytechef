@@ -54,9 +54,7 @@ const WorkflowInputsSheetTable = ({
 
         const inputs: InputModel[] = definitionObject.inputs;
 
-        const index = inputs.findIndex(
-            (curInput) => curInput.name === input.name
-        );
+        const index = inputs.findIndex((curInput) => curInput.name === input.name);
 
         inputs.splice(index, 1);
 
@@ -90,31 +88,19 @@ const WorkflowInputsSheetTable = ({
                                 Name
                             </th>
 
-                            <th
-                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                scope="col"
-                            >
+                            <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" scope="col">
                                 Label
                             </th>
 
-                            <th
-                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                scope="col"
-                            >
+                            <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" scope="col">
                                 Type
                             </th>
 
-                            <th
-                                className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                scope="col"
-                            >
+                            <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" scope="col">
                                 Required
                             </th>
 
-                            <th
-                                className="relative py-3.5 pl-3 pr-4 sm:pr-0"
-                                scope="col"
-                            >
+                            <th className="relative py-3.5 pl-3 pr-4 sm:pr-0" scope="col">
                                 <span className="sr-only">Edit</span>
                             </th>
                         </tr>
@@ -127,13 +113,9 @@ const WorkflowInputsSheetTable = ({
                                     {input.name}
                                 </td>
 
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {input.label}
-                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{input.label}</td>
 
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {input.type}
-                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{input.type}</td>
 
                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                     {input.required === true ? 'true' : 'false'}
@@ -178,23 +160,16 @@ const WorkflowInputsSheetTable = ({
                     <div className="flex flex-col items-center self-center align-middle">
                         <AlignJustifyIcon className="h-24 w-24 text-gray-300" />
 
-                        <h3 className="mt-2 text-sm font-semibold">
-                            No inputs
-                        </h3>
+                        <h3 className="mt-2 text-sm font-semibold">No inputs</h3>
 
-                        <p className="mt-1 text-sm text-gray-500">
-                            Get started by creating a new input.
-                        </p>
+                        <p className="mt-1 text-sm text-gray-500">Get started by creating a new input.</p>
 
                         <div className="mt-6">
                             <WorkflowInputsSheetDialog
                                 projectId={projectId}
                                 triggerNode={
                                     <Button>
-                                        <PlusIcon
-                                            aria-hidden="true"
-                                            className="-ml-0.5 mr-1.5 h-5 w-5"
-                                        />
+                                        <PlusIcon aria-hidden="true" className="-ml-0.5 mr-1.5 h-5 w-5" />
                                         Create Input
                                     </Button>
                                 }
@@ -208,30 +183,19 @@ const WorkflowInputsSheetTable = ({
             <AlertDialog open={showDeleteDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            Are you absolutely sure?
-                        </AlertDialogTitle>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete the input.
+                            This action cannot be undone. This will permanently delete the input.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel
-                            onClick={() => setShowDeleteDialog(false)}
-                        >
-                            Cancel
-                        </AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
                         <AlertDialogAction
                             className="bg-red-600"
-                            onClick={() =>
-                                handleDelete(
-                                    workflow.inputs![currentInputIndex]!
-                                )
-                            }
+                            onClick={() => handleDelete(workflow.inputs![currentInputIndex]!)}
                         >
                             Delete
                         </AlertDialogAction>

@@ -6,9 +6,7 @@ type CreateConnectionMutationProps = {
     onError?: (error: Error, variables: ConnectionModel) => void;
 };
 
-export const useCreateConnectionMutation = (
-    mutationProps?: CreateConnectionMutationProps
-) =>
+export const useCreateConnectionMutation = (mutationProps?: CreateConnectionMutationProps) =>
     useMutation<ConnectionModel, Error, ConnectionModel>({
         mutationFn: (connectionModel: ConnectionModel) => {
             return new ConnectionApi().createConnection({
@@ -24,9 +22,7 @@ type DeleteConnectionMutationProps = {
     onError?: (error: Error, id: number) => void;
 };
 
-export const useDeleteConnectionMutation = (
-    mutationProps?: DeleteConnectionMutationProps
-) =>
+export const useDeleteConnectionMutation = (mutationProps?: DeleteConnectionMutationProps) =>
     useMutation<void, Error, number>({
         mutationFn: (id: number) => {
             return new ConnectionApi().deleteConnection({
@@ -42,9 +38,7 @@ type UpdateConnectionMutationProps = {
     onError?: (error: Error, variables: ConnectionModel) => void;
 };
 
-export const useUpdateConnectionMutation = (
-    mutationProps?: UpdateConnectionMutationProps
-) =>
+export const useUpdateConnectionMutation = (mutationProps?: UpdateConnectionMutationProps) =>
     useMutation<ConnectionModel, Error, ConnectionModel>({
         mutationFn: (connection: ConnectionModel) => {
             return new ConnectionApi().updateConnection({

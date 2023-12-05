@@ -1,9 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {
-    ComponentDataType,
-    CurrentComponentType,
-    DataPillType,
-} from '@/types/types';
+import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
 import {PlusIcon} from '@radix-ui/react-icons';
 import ContextualDialog from 'components/ContextualDialog/ContextualDialog';
 import Input from 'components/Input/Input';
@@ -29,8 +25,7 @@ const ObjectProperty = ({
     dataPills,
     property,
 }: ObjectPropertyProps) => {
-    const [additionalPropertiesDialogOpen, setAdditionalPropertiesDialogOpen] =
-        useState(false);
+    const [additionalPropertiesDialogOpen, setAdditionalPropertiesDialogOpen] = useState(false);
 
     const {additionalProperties, label, name, properties} = property;
 
@@ -41,42 +36,32 @@ const ObjectProperty = ({
     return (
         <div key={name}>
             <ul className={twMerge(label && 'ml-2 border-l')}>
-                {(properties as Array<PropertyType>)?.map(
-                    (subProperty, index) => {
-                        if (
-                            subProperty.type === 'OBJECT' &&
-                            !subProperty.additionalProperties?.length &&
-                            !subProperty.properties?.length
-                        ) {
-                            return <></>;
-                        }
-
-                        return (
-                            <Property
-                                actionName={actionName}
-                                currentComponent={currentComponent}
-                                currentComponentData={currentComponentData}
-                                customClassName={twMerge(
-                                    'last-of-type:pb-0',
-                                    label && 'mb-0 pb-4 pl-2'
-                                )}
-                                dataPills={dataPills}
-                                key={`${property.name}_${subProperty.name}_${index}`}
-                                mention={!!dataPills?.length}
-                                property={subProperty}
-                            />
-                        );
+                {(properties as Array<PropertyType>)?.map((subProperty, index) => {
+                    if (
+                        subProperty.type === 'OBJECT' &&
+                        !subProperty.additionalProperties?.length &&
+                        !subProperty.properties?.length
+                    ) {
+                        return <></>;
                     }
-                )}
+
+                    return (
+                        <Property
+                            actionName={actionName}
+                            currentComponent={currentComponent}
+                            currentComponentData={currentComponentData}
+                            customClassName={twMerge('last-of-type:pb-0', label && 'mb-0 pb-4 pl-2')}
+                            dataPills={dataPills}
+                            key={`${property.name}_${subProperty.name}_${index}`}
+                            mention={!!dataPills?.length}
+                            property={subProperty}
+                        />
+                    );
+                })}
             </ul>
 
             {!!additionalProperties?.length && (
-                <div
-                    className={twMerge(
-                        !!properties?.length && 'mt-2',
-                        'relative w-full self-start'
-                    )}
-                >
+                <div className={twMerge(!!properties?.length && 'mt-2', 'relative w-full self-start')}>
                     <Button
                         className="rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
                         onClick={() => setAdditionalPropertiesDialogOpen(true)}
@@ -89,9 +74,7 @@ const ObjectProperty = ({
                     {additionalPropertiesDialogOpen && (
                         <div className="absolute z-50 w-3/4 rounded-md bg-gray-100 shadow-md">
                             <ContextualDialog
-                                handleCancelClick={() =>
-                                    setAdditionalPropertiesDialogOpen(false)
-                                }
+                                handleCancelClick={() => setAdditionalPropertiesDialogOpen(false)}
                                 handleSaveClick={() => console.log('save')}
                                 saveButtonLabel="Add"
                                 title="Add property"
@@ -102,13 +85,10 @@ const ObjectProperty = ({
                                     placeholder="Name for the additional property"
                                 />
 
-                                {(additionalProperties as Array<PropertyType>)
-                                    ?.length > 1 ? (
+                                {(additionalProperties as Array<PropertyType>)?.length > 1 ? (
                                     <Select
                                         label="Type"
-                                        options={(
-                                            additionalProperties as Array<PropertyType>
-                                        ).map((type) => ({
+                                        options={(additionalProperties as Array<PropertyType>).map((type) => ({
                                             label: type.type!,
                                             value: type.type!,
                                         }))}
@@ -116,9 +96,7 @@ const ObjectProperty = ({
                                     />
                                 ) : (
                                     <div className="flex w-full flex-col">
-                                        <span className="mb-1 text-sm font-medium text-gray-700">
-                                            Type
-                                        </span>
+                                        <span className="mb-1 text-sm font-medium text-gray-700">Type</span>
 
                                         <span className="inline-flex w-full rounded-md bg-white py-2 text-sm">
                                             {additionalProperties[0]?.type}

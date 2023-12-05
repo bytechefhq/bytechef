@@ -42,9 +42,7 @@ const DataPill = ({
             {
                 componentIcon: componentIcon,
                 id: propertyName || componentAlias,
-                value: propertyName
-                    ? `${componentAlias}/${path || dataPillName}`
-                    : componentAlias,
+                value: propertyName ? `${componentAlias}/${path || dataPillName}` : componentAlias,
             },
             true,
             {blotName: 'property-mention'}
@@ -52,9 +50,7 @@ const DataPill = ({
     };
 
     const getSubPropertyPath = (subPropertyName = '[0]') =>
-        path
-            ? `${path}/${subPropertyName}`
-            : `${property?.name || `[${arrayIndex}]`}/${subPropertyName}`;
+        path ? `${path}/${subPropertyName}` : `${property?.name || `[${arrayIndex}]`}/${subPropertyName}`;
 
     if (!property && componentIcon) {
         return (
@@ -82,28 +78,15 @@ const DataPill = ({
                 data-name={property?.name || componentAlias}
                 draggable
                 onClick={() =>
-                    addDataPillToInput(
-                        componentAlias,
-                        property?.name,
-                        parentProperty?.name,
-                        path,
-                        arrayIndex
-                    )
+                    addDataPillToInput(componentAlias, property?.name, parentProperty?.name, path, arrayIndex)
                 }
-                onDragStart={(event) =>
-                    event.dataTransfer.setData(
-                        'name',
-                        property?.name || componentAlias
-                    )
-                }
+                onDragStart={(event) => event.dataTransfer.setData('name', property?.name || componentAlias)}
             >
                 <span className="mr-2" title={property?.type}>
                     {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
                 </span>
 
-                {property?.name
-                    ? property?.name
-                    : `[${arrayIndex}]` || componentAlias}
+                {property?.name ? property?.name : `[${arrayIndex}]` || componentAlias}
             </div>
 
             {!!subProperties?.length && (

@@ -14,9 +14,7 @@ interface Node {
 
 interface WorkflowNodeDetailsPanelState {
     workflowNodeDetailsPanelOpen: boolean;
-    setWorkflowNodeDetailsPanelOpen: (
-        workflowNodeDetailsPanelOpen: boolean
-    ) => void;
+    setWorkflowNodeDetailsPanelOpen: (workflowNodeDetailsPanelOpen: boolean) => void;
 
     currentNode: Node;
     setCurrentNode: (currentNode: Node) => void;
@@ -27,30 +25,24 @@ interface WorkflowNodeDetailsPanelState {
     setFocusedInput: (focusedInput: any) => void;
 }
 
-export const useWorkflowNodeDetailsPanelStore =
-    create<WorkflowNodeDetailsPanelState>()(
-        devtools(
-            (set) => ({
-                workflowNodeDetailsPanelOpen: false,
-                setWorkflowNodeDetailsPanelOpen: (
-                    workflowNodeDetailsPanelOpen
-                ) =>
-                    set((state) => ({
-                        ...state,
-                        workflowNodeDetailsPanelOpen:
-                            workflowNodeDetailsPanelOpen,
-                    })),
+export const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelState>()(
+    devtools(
+        (set) => ({
+            workflowNodeDetailsPanelOpen: false,
+            setWorkflowNodeDetailsPanelOpen: (workflowNodeDetailsPanelOpen) =>
+                set((state) => ({
+                    ...state,
+                    workflowNodeDetailsPanelOpen: workflowNodeDetailsPanelOpen,
+                })),
 
-                currentNode: {name: '', type: 'component', version: 1},
-                setCurrentNode: (currentNode) =>
-                    set((state) => ({...state, currentNode})),
+            currentNode: {name: '', type: 'component', version: 1},
+            setCurrentNode: (currentNode) => set((state) => ({...state, currentNode})),
 
-                focusedInput: null,
-                setFocusedInput: (focusedInput) =>
-                    set((state) => ({...state, focusedInput})),
-            }),
-            {
-                name: 'workflow-node-details-panel',
-            }
-        )
-    );
+            focusedInput: null,
+            setFocusedInput: (focusedInput) => set((state) => ({...state, focusedInput})),
+        }),
+        {
+            name: 'workflow-node-details-panel',
+        }
+    )
+);

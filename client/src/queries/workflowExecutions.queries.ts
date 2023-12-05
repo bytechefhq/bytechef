@@ -14,26 +14,17 @@ export const WorkflowExecutionKeys = {
         ...WorkflowExecutionKeys.workflowExecutions,
         request,
     ],
-    workflowExecution: (id: number) => [
-        ...WorkflowExecutionKeys.workflowExecutions,
-        id,
-    ],
+    workflowExecution: (id: number) => [...WorkflowExecutionKeys.workflowExecutions, id],
     workflowExecutions: ['workflowExecutions'] as const,
 };
 
-export const useGetWorkflowExecutionsQuery = (
-    request: GetWorkflowExecutionsRequest
-) =>
+export const useGetWorkflowExecutionsQuery = (request: GetWorkflowExecutionsRequest) =>
     useQuery<PageModel, Error>({
         queryKey: WorkflowExecutionKeys.filteredWorkflowExecutions(request),
-        queryFn: () =>
-            new WorkflowExecutionApi().getWorkflowExecutions(request),
+        queryFn: () => new WorkflowExecutionApi().getWorkflowExecutions(request),
     });
 
-export const useGetWorkflowExecutionQuery = (
-    request: GetWorkflowExecutionRequest,
-    isEnabled: boolean
-) =>
+export const useGetWorkflowExecutionQuery = (request: GetWorkflowExecutionRequest, isEnabled: boolean) =>
     useQuery<WorkflowExecutionModel, Error>({
         queryKey: WorkflowExecutionKeys.workflowExecution(request.id),
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecution(request),

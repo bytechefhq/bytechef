@@ -9,9 +9,10 @@ import {ConnectionKeys} from '@/queries/connections.queries';
 import {useQuery} from '@tanstack/react-query';
 
 export const OAuth2Keys = {
-    oAuth2AuthorizationParameters: (
-        request: GetOAuth2AuthorizationParametersRequestModel
-    ) => [...ConnectionKeys.connections, request],
+    oAuth2AuthorizationParameters: (request: GetOAuth2AuthorizationParametersRequestModel) => [
+        ...ConnectionKeys.connections,
+        request,
+    ],
     oAuth2Properties: ['oAuth2Properties'] as const,
 };
 

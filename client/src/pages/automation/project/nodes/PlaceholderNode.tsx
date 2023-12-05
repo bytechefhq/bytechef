@@ -13,9 +13,7 @@ const PlaceholderNode = ({data, id}: NodeProps) => {
             <div
                 className={twMerge(
                     'mx-[22px] flex cursor-pointer items-center justify-center rounded-md text-lg text-gray-500 shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white',
-                    isDropzoneActive
-                        ? 'scale-150 cursor-pointer bg-blue-100 h-16 w-16 mx-1.5'
-                        : 'h-7 w-7 bg-gray-300'
+                    isDropzoneActive ? 'scale-150 cursor-pointer bg-blue-100 h-16 w-16 mx-1.5' : 'h-7 w-7 bg-gray-300'
                 )}
                 onDragEnter={() => setDropzoneActive(true)}
                 onDragLeave={() => setDropzoneActive(false)}
@@ -25,19 +23,9 @@ const PlaceholderNode = ({data, id}: NodeProps) => {
             >
                 {data.label}
 
-                <Handle
-                    className={styles.handle}
-                    isConnectable={false}
-                    position={Position.Top}
-                    type="target"
-                />
+                <Handle className={styles.handle} isConnectable={false} position={Position.Top} type="target" />
 
-                <Handle
-                    className={styles.handle}
-                    isConnectable={false}
-                    position={Position.Bottom}
-                    type="source"
-                />
+                <Handle className={styles.handle} isConnectable={false} position={Position.Bottom} type="source" />
             </div>
         </WorkflowNodesPopoverMenu>
     );

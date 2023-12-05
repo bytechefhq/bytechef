@@ -21,10 +21,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ConnectionModel, TagModel} from '@/middleware/helios/connection';
 import {useUpdateConnectionTagsMutation} from '@/mutations/connectionTags.mutations';
 import {useDeleteConnectionMutation} from '@/mutations/connections.mutations';
-import {
-    ComponentDefinitionKeys,
-    useGetComponentDefinitionQuery,
-} from '@/queries/componentDefinitions.queries';
+import {ComponentDefinitionKeys, useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
 import {ConnectionKeys} from '@/queries/connections.queries';
 import {Component1Icon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -41,10 +38,7 @@ interface ConnectionListItemProps {
     remainingTags?: TagModel[];
 }
 
-const ConnectionListItem = ({
-    connection,
-    remainingTags,
-}: ConnectionListItemProps) => {
+const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -95,27 +89,17 @@ const ConnectionListItem = ({
                         <div className="flex items-center justify-between">
                             <div className="relative flex items-center">
                                 {componentDefinition?.icon && (
-                                    <InlineSVG
-                                        className="mr-1 h-6 w-6 flex-none"
-                                        src={componentDefinition.icon}
-                                    />
+                                    <InlineSVG className="mr-1 h-6 w-6 flex-none" src={componentDefinition.icon} />
                                 )}
 
-                                {!componentDefinition?.icon && (
-                                    <Component1Icon className="mr-1 h-6 w-6 flex-none" />
-                                )}
+                                {!componentDefinition?.icon && <Component1Icon className="mr-1 h-6 w-6 flex-none" />}
 
-                                <span className="mr-2 text-base font-semibold">
-                                    {connection.name}
-                                </span>
+                                <span className="mr-2 text-base font-semibold">{connection.name}</span>
                             </div>
                         </div>
 
                         <div className="mt-2 sm:flex sm:items-center sm:justify-between">
-                            <div
-                                className="flex h-[38px] items-center"
-                                onClick={(event) => event.preventDefault()}
-                            >
+                            <div className="flex h-[38px] items-center" onClick={(event) => event.preventDefault()}>
                                 {connection.tags && (
                                     <TagList
                                         getRequest={(id, tags) => ({
@@ -127,9 +111,7 @@ const ConnectionListItem = ({
                                         id={connection.id!}
                                         remainingTags={remainingTags}
                                         tags={connection.tags}
-                                        updateTagsMutation={
-                                            updateConnectionTagsMutation
-                                        }
+                                        updateTagsMutation={updateConnectionTagsMutation}
                                     />
                                 )}
                             </div>
@@ -140,8 +122,7 @@ const ConnectionListItem = ({
                         <div className="flex flex-col items-end gap-y-4">
                             <Badge
                                 className={twMerge(
-                                    connection.active &&
-                                        'bg-success text-success-foreground hover:bg-success'
+                                    connection.active && 'bg-success text-success-foreground hover:bg-success'
                                 )}
                                 variant="secondary"
                             >
@@ -161,9 +142,7 @@ const ConnectionListItem = ({
                                         </span>
                                     </TooltipTrigger>
 
-                                    <TooltipContent>
-                                        Created Date
-                                    </TooltipContent>
+                                    <TooltipContent>Created Date</TooltipContent>
                                 </Tooltip>
                             )}
                         </div>
@@ -176,18 +155,11 @@ const ConnectionListItem = ({
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                    onClick={() => setShowEditDialog(true)}
-                                >
-                                    Edit
-                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
 
                                 <DropdownMenuSeparator />
 
-                                <DropdownMenuItem
-                                    className="text-red-600"
-                                    onClick={() => setShowDeleteDialog(true)}
-                                >
+                                <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
                                     Delete
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -198,27 +170,17 @@ const ConnectionListItem = ({
                 <AlertDialog open={showDeleteDialog}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle>
-                                Are you absolutely sure?
-                            </AlertDialogTitle>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
                             <AlertDialogDescription>
-                                This action cannot be undone. This will
-                                permanently delete the connection.
+                                This action cannot be undone. This will permanently delete the connection.
                             </AlertDialogDescription>
                         </AlertDialogHeader>
 
                         <AlertDialogFooter>
-                            <AlertDialogCancel
-                                onClick={() => setShowDeleteDialog(false)}
-                            >
-                                Cancel
-                            </AlertDialogCancel>
+                            <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
-                            <AlertDialogAction
-                                className="bg-red-600"
-                                onClick={handleAlertDeleteDialogClick}
-                            >
+                            <AlertDialogAction className="bg-red-600" onClick={handleAlertDeleteDialogClick}>
                                 Delete
                             </AlertDialogAction>
                         </AlertDialogFooter>
@@ -226,10 +188,7 @@ const ConnectionListItem = ({
                 </AlertDialog>
 
                 {showEditDialog && (
-                    <ConnectionDialog
-                        connection={connection}
-                        onClose={() => setShowEditDialog(false)}
-                    />
+                    <ConnectionDialog connection={connection} onClose={() => setShowEditDialog(false)} />
                 )}
             </>
         </li>

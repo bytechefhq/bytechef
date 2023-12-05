@@ -1,7 +1,4 @@
-import {
-    ProjectTagApi,
-    UpdateProjectTagsRequest,
-} from '@/middleware/helios/configuration';
+import {ProjectTagApi, UpdateProjectTagsRequest} from '@/middleware/helios/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 type UpdateProjectTagsMutationProps = {
@@ -9,9 +6,7 @@ type UpdateProjectTagsMutationProps = {
     onError?: (error: Error, variables: UpdateProjectTagsRequest) => void;
 };
 
-export const useUpdateProjectTagsMutation = (
-    mutationProps?: UpdateProjectTagsMutationProps
-) =>
+export const useUpdateProjectTagsMutation = (mutationProps?: UpdateProjectTagsMutationProps) =>
     useMutation({
         mutationFn: (request: UpdateProjectTagsRequest) => {
             return new ProjectTagApi().updateProjectTags(request);

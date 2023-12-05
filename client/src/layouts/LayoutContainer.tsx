@@ -52,11 +52,7 @@ const LayoutContainer = ({
     return (
         <>
             <Transition.Root as={Fragment} show={sidebarOpen}>
-                <Dialog
-                    as="div"
-                    className="relative z-40 md:hidden"
-                    onClose={setSidebarOpen}
-                >
+                <Dialog as="div" className="relative z-40 md:hidden" onClose={setSidebarOpen}>
                     <Transition.Child
                         as={Fragment}
                         enter="transition-opacity ease-linear duration-300"
@@ -92,28 +88,19 @@ const LayoutContainer = ({
                                     <div className="absolute right-0 top-0 -mr-14 p-1">
                                         <button
                                             className="flex h-12 w-12 items-center justify-center rounded-full focus:bg-gray-600 focus:outline-none"
-                                            onClick={() =>
-                                                setSidebarOpen(false)
-                                            }
+                                            onClick={() => setSidebarOpen(false)}
                                             type="button"
                                         >
-                                            <Cross1Icon
-                                                aria-hidden="true"
-                                                className="h-6 w-6 text-white"
-                                            />
+                                            <Cross1Icon aria-hidden="true" className="h-6 w-6 text-white" />
 
-                                            <span className="sr-only">
-                                                Close sidebar
-                                            </span>
+                                            <span className="sr-only">Close sidebar</span>
                                         </button>
                                     </div>
                                 </Transition.Child>
 
                                 <div className="mt-5 h-0 flex-1 overflow-y-auto">
                                     <nav className="flex h-full flex-col">
-                                        <div className="space-y-1">
-                                            {leftSidebarBody}
-                                        </div>
+                                        <div className="space-y-1">{leftSidebarBody}</div>
                                     </nav>
                                 </div>
                             </Dialog.Panel>
@@ -141,41 +128,22 @@ const LayoutContainer = ({
                 </aside>
             )}
 
-            <div
-                className={twMerge(
-                    'flex h-full w-full',
-                    leftSidebarOpen && leftSidebarWidths[leftSidebarWidth][1]
-                )}
-            >
-                <main
-                    className={twMerge(
-                        'flex h-full w-full flex-col',
-                        className
-                    )}
-                >
+            <div className={twMerge('flex h-full w-full', leftSidebarOpen && leftSidebarWidths[leftSidebarWidth][1])}>
+                <main className={twMerge('flex h-full w-full flex-col', className)}>
                     {header}
 
-                    <div className="flex flex-1 overflow-y-auto">
-                        {children}
-                    </div>
+                    <div className="flex flex-1 overflow-y-auto">{children}</div>
 
                     {footer}
                 </main>
 
                 {rightSidebarOpen && !!rightSidebarBody && (
                     <aside className="hidden border-l lg:flex lg:shrink-0">
-                        <div
-                            className={twMerge(
-                                'flex',
-                                rightSidebarWidths[rightSidebarWidth]
-                            )}
-                        >
+                        <div className={twMerge('flex', rightSidebarWidths[rightSidebarWidth])}>
                             <div className="flex h-full flex-1 flex-col">
                                 {rightSidebarHeader}
 
-                                <div className="overflow-y-auto">
-                                    {rightSidebarBody}
-                                </div>
+                                <div className="overflow-y-auto">{rightSidebarBody}</div>
                             </div>
                         </div>
                     </aside>
@@ -183,9 +151,7 @@ const LayoutContainer = ({
 
                 {rightToolbarOpen && !!rightToolbarBody && (
                     <aside className="hidden border-l bg-muted lg:flex lg:shrink-0">
-                        <div className="flex flex-1 flex-col overflow-y-auto">
-                            {rightToolbarBody}
-                        </div>
+                        <div className="flex flex-1 flex-col overflow-y-auto">{rightToolbarBody}</div>
                     </aside>
                 )}
             </div>

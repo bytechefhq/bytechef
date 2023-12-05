@@ -5,9 +5,7 @@ import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 const SidebarSubtitle = ({title}: {title: string}) => (
-    <h4 className="px-2 py-1 pr-4 text-sm font-medium tracking-tight">
-        {title}
-    </h4>
+    <h4 className="px-2 py-1 pr-4 text-sm font-medium tracking-tight">{title}</h4>
 );
 
 export interface LeftSidebarNavProps {
@@ -18,19 +16,10 @@ export interface LeftSidebarNavProps {
     topTitle?: string;
 }
 
-const LeftSidebarNav = ({
-    bottomBody,
-    bottomTitle,
-    className,
-    topBody,
-    topTitle,
-}: LeftSidebarNavProps) => (
+const LeftSidebarNav = ({bottomBody, bottomTitle, className, topBody, topTitle}: LeftSidebarNavProps) => (
     <div className={twMerge('px-2', className)}>
         {topBody && (
-            <div
-                aria-label={topTitle}
-                className="mb-4 flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1"
-            >
+            <div aria-label={topTitle} className="mb-4 flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1">
                 {topTitle && <SidebarSubtitle title={topTitle} />}
 
                 {topBody}
@@ -38,10 +27,7 @@ const LeftSidebarNav = ({
         )}
 
         {bottomBody && (
-            <div
-                aria-label={bottomTitle}
-                className="mb-4 flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1"
-            >
+            <div aria-label={bottomTitle} className="mb-4 flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1">
                 {bottomTitle && <SidebarSubtitle title={bottomTitle} />}
 
                 {bottomBody}
@@ -70,9 +56,7 @@ const LeftSidebarNavItem = ({
         aria-current={filterData ? 'page' : undefined}
         className={cn(
             buttonVariants({variant: 'ghost'}),
-            filterData
-                ? 'bg-muted hover:bg-muted'
-                : 'hover:bg-transparent hover:underline',
+            filterData ? 'bg-muted hover:bg-muted' : 'hover:bg-transparent hover:underline',
             'justify-start'
         )}
         onClick={() => (onItemClick ? onItemClick(id) : null)}

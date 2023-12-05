@@ -1,8 +1,4 @@
-import {
-    ComponentDataType,
-    CurrentComponentType,
-    DataPillType,
-} from '@/types/types';
+import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
 import {ChangeEvent} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
 import {FormState, UseFormRegister} from 'react-hook-form/dist/types/form';

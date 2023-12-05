@@ -9,33 +9,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form';
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
-import {
-    CategoryModel,
-    ProjectModel,
-    TagModel,
-} from '@/middleware/helios/configuration';
-import {
-    useCreateProjectMutation,
-    useUpdateProjectMutation,
-} from '@/mutations/projects.mutations';
-import {
-    ProjectCategoryKeys,
-    useGetProjectCategoriesQuery,
-} from '@/queries/projectCategories.queries';
-import {
-    ProjectTagKeys,
-    useGetProjectTagsQuery,
-} from '@/queries/projectTags.quries';
+import {CategoryModel, ProjectModel, TagModel} from '@/middleware/helios/configuration';
+import {useCreateProjectMutation, useUpdateProjectMutation} from '@/mutations/projects.mutations';
+import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/queries/projectCategories.queries';
+import {ProjectTagKeys, useGetProjectTagsQuery} from '@/queries/projectTags.quries';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -72,17 +52,9 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
 
     const {control, getValues, handleSubmit, reset, setValue} = form;
 
-    const {
-        data: categories,
-        error: categoriesError,
-        isLoading: categoriesLoading,
-    } = useGetProjectCategoriesQuery();
+    const {data: categories, error: categoriesError, isLoading: categoriesLoading} = useGetProjectCategoriesQuery();
 
-    const {
-        data: tags,
-        error: tagsError,
-        isLoading: tagsLoading,
-    } = useGetProjectTagsQuery();
+    const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetProjectTagsQuery();
 
     const queryClient = useQueryClient();
 
@@ -127,9 +99,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
             return {id: tag.id, name: tag.name, version: tag.version};
         });
 
-        const category = formData?.category?.name
-            ? formData?.category
-            : undefined;
+        const category = formData?.category?.name ? formData?.category : undefined;
 
         if (project?.id) {
             updateProjectMutation.mutate({
@@ -157,19 +127,13 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
             }}
             open={isOpen}
         >
-            {triggerNode && (
-                <DialogTrigger asChild>{triggerNode}</DialogTrigger>
-            )}
+            {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent
-                onInteractOutside={(event) => event.preventDefault()}
-            >
+            <DialogContent onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
                     <DialogHeader>
                         <div className="flex items-center justify-between">
-                            <DialogTitle>{`${
-                                project?.id ? 'Edit' : 'Create'
-                            } Project`}</DialogTitle>
+                            <DialogTitle>{`${project?.id ? 'Edit' : 'Create'} Project`}</DialogTitle>
 
                             <DialogClose asChild>
                                 <Button size="icon" variant="ghost">
@@ -185,13 +149,9 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                         </DialogDescription>
                     </DialogHeader>
 
-                    {categoriesError &&
-                        !categoriesLoading &&
-                        `An error has occurred: ${categoriesError.message}`}
+                    {categoriesError && !categoriesLoading && `An error has occurred: ${categoriesError.message}`}
 
-                    {tagsError &&
-                        !tagsLoading &&
-                        `An error has occurred: ${tagsError.message}`}
+                    {tagsError && !tagsLoading && `An error has occurred: ${tagsError.message}`}
 
                     <FormField
                         control={control}
@@ -201,10 +161,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                                 <FormLabel>Name</FormLabel>
 
                                 <FormControl>
-                                    <Input
-                                        placeholder="My CRM Project"
-                                        {...field}
-                                    />
+                                    <Input placeholder="My CRM Project" {...field} />
                                 </FormControl>
 
                                 <FormMessage />
@@ -221,10 +178,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                                 <FormLabel>Description</FormLabel>
 
                                 <FormControl>
-                                    <Textarea
-                                        placeholder="Cute description of your project"
-                                        {...field}
-                                    />
+                                    <Textarea placeholder="Cute description of your project" {...field} />
                                 </FormControl>
 
                                 <FormMessage />
@@ -244,9 +198,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                                         <CreatableSelect
                                             field={field}
                                             isMulti={false}
-                                            onCreateOption={(
-                                                inputValue: string
-                                            ) => {
+                                            onCreateOption={(inputValue: string) => {
                                                 setValue('category', {
                                                     label: inputValue,
                                                     name: inputValue,
@@ -254,15 +206,11 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                                                     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                                                 } as any);
                                             }}
-                                            options={categories!.map(
-                                                (category: CategoryModel) => ({
-                                                    label: category.name,
-                                                    value: category.name
-                                                        .toLowerCase()
-                                                        .replace(/\W/g, ''),
-                                                    ...category,
-                                                })
-                                            )}
+                                            options={categories!.map((category: CategoryModel) => ({
+                                                label: category.name,
+                                                value: category.name.toLowerCase().replace(/\W/g, ''),
+                                                ...category,
+                                            }))}
                                             placeholder="Marketing, Sales, Social Media..."
                                         />
                                     </FormControl>
@@ -285,9 +233,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                                         <CreatableSelect
                                             field={field}
                                             isMulti
-                                            onCreateOption={(
-                                                inputValue: string
-                                            ) => {
+                                            onCreateOption={(inputValue: string) => {
                                                 setValue('tags', [
                                                     ...getValues().tags!,
                                                     {
@@ -297,17 +243,13 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                                                     },
                                                 ] as never[]);
                                             }}
-                                            options={remainingTags!.map(
-                                                (tag: TagModel) => {
-                                                    return {
-                                                        label: tag.name,
-                                                        value: tag.name
-                                                            .toLowerCase()
-                                                            .replace(/\W/g, ''),
-                                                        ...tag,
-                                                    };
-                                                }
-                                            )}
+                                            options={remainingTags!.map((tag: TagModel) => {
+                                                return {
+                                                    label: tag.name,
+                                                    value: tag.name.toLowerCase().replace(/\W/g, ''),
+                                                    ...tag,
+                                                };
+                                            })}
                                         />
                                     </FormControl>
 
@@ -324,10 +266,7 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
                             </Button>
                         </DialogClose>
 
-                        <Button
-                            onClick={handleSubmit(saveProject)}
-                            type="submit"
-                        >
+                        <Button onClick={handleSubmit(saveProject)} type="submit">
                             Save
                         </Button>
                     </DialogFooter>

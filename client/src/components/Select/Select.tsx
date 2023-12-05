@@ -1,11 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {
-    CheckIcon,
-    ChevronDownIcon,
-    ChevronUpIcon,
-    QuestionMarkCircledIcon,
-} from '@radix-ui/react-icons';
+import {CheckIcon, ChevronDownIcon, ChevronUpIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Label} from '@radix-ui/react-label';
 import {
     Content,
@@ -62,12 +57,7 @@ const Select = ({
 }: SelectProps) => (
     <fieldset className={twMerge('w-full', fieldsetClassName)}>
         {label && (
-            <Label
-                className={twMerge(
-                    'flex items-center text-sm font-medium',
-                    description && 'space-x-1'
-                )}
-            >
+            <Label className={twMerge('flex items-center text-sm font-medium', description && 'space-x-1')}>
                 <span>{label}</span>
 
                 {description && (
@@ -82,19 +72,10 @@ const Select = ({
             </Label>
         )}
 
-        <Root
-            defaultValue={defaultValue}
-            name={name}
-            onValueChange={onValueChange}
-            value={value || defaultValue}
-        >
+        <Root defaultValue={defaultValue} name={name} onValueChange={onValueChange} value={value || defaultValue}>
             <Trigger aria-label="Select" asChild>
                 <Button
-                    className={twMerge(
-                        'mt-1',
-                        leadingIcon && 'relative pl-12 py-2.5',
-                        triggerClassName
-                    )}
+                    className={twMerge('mt-1', leadingIcon && 'relative pl-12 py-2.5', triggerClassName)}
                     variant="ghost"
                 >
                     {leadingIcon && (
@@ -131,8 +112,7 @@ const Select = ({
                                 <Item
                                     className={twMerge(
                                         'radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none',
-                                        option.value ===
-                                            (value || defaultValue) && 'px-2'
+                                        option.value === (value || defaultValue) && 'px-2'
                                     )}
                                     key={option.value}
                                     value={option.value}

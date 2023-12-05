@@ -13,13 +13,7 @@ type Props = {
 };
 
 const OAuthPopup = (props: Props) => {
-    const {
-        Component = (
-            <div className="flex h-screen items-center justify-center text-xl">
-                Loading...
-            </div>
-        ),
-    } = props;
+    const {Component = <div className="flex h-screen items-center justify-center text-xl">Loading...</div>} = props;
 
     // On mount
     useEffect(() => {
@@ -36,8 +30,7 @@ const OAuthPopup = (props: Props) => {
 
         if (error) {
             window.opener.postMessage({
-                error:
-                    decodeURI(error) || 'OAuth error: An error has occurred.',
+                error: decodeURI(error) || 'OAuth error: An error has occurred.',
                 type: OAUTH_RESPONSE,
             });
         } else if (state && checkState(state)) {

@@ -27,9 +27,7 @@ window.MonacoEnvironment = {
             case 'yaml':
                 return new YamlWorker();
             default:
-                throw new Error(
-                    `Unknown label ${label} for moduleId ${moduleId}`
-                );
+                throw new Error(`Unknown label ${label} for moduleId ${moduleId}`);
         }
     },
 };
@@ -50,10 +48,7 @@ function renderApp() {
             <QueryClientProvider client={queryClient}>
                 <RouterProvider router={router} />
 
-                <ReactQueryDevtools
-                    buttonPosition="bottom-right"
-                    initialIsOpen={false}
-                />
+                <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
             </QueryClientProvider>
         </React.StrictMode>
     );

@@ -4,21 +4,15 @@ import WorkflowExecutionDetailsTaskAccordionItem from '@/pages/automation/workfl
 import WorkflowExecutionDetailsTriggerAccordionItem from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsTriggerAccordionItem';
 import {CheckCircledIcon, CrossCircledIcon} from '@radix-ui/react-icons';
 
-const WorkflowExecutionDetailsAccordion = ({
-    workflowExecution,
-}: {
-    workflowExecution: WorkflowExecutionModel;
-}) => {
+const WorkflowExecutionDetailsAccordion = ({workflowExecution}: {workflowExecution: WorkflowExecutionModel}) => {
     const startTime = workflowExecution?.job?.startDate?.getTime();
     const endTime = workflowExecution?.job?.endDate?.getTime();
 
-    const taskExecutionsCompleted =
-        workflowExecution?.job?.taskExecutions?.every(
-            (taskExecution) => taskExecution.status === 'COMPLETED'
-        );
+    const taskExecutionsCompleted = workflowExecution?.job?.taskExecutions?.every(
+        (taskExecution) => taskExecution.status === 'COMPLETED'
+    );
     const triggerExecutionCompleted =
-        !workflowExecution?.triggerExecution ||
-        workflowExecution?.triggerExecution?.status === 'COMPLETED';
+        !workflowExecution?.triggerExecution || workflowExecution?.triggerExecution?.status === 'COMPLETED';
 
     let duration;
 
@@ -26,8 +20,7 @@ const WorkflowExecutionDetailsAccordion = ({
         duration = Math.round(endTime - startTime);
     }
 
-    const taskExecutionsCount =
-        workflowExecution.job?.taskExecutions?.length || 0;
+    const taskExecutionsCount = workflowExecution.job?.taskExecutions?.length || 0;
 
     return (
         <>
@@ -43,8 +36,7 @@ const WorkflowExecutionDetailsAccordion = ({
                         <CheckCircledIcon className="h-5 w-5 text-green-500" />
                     )}
 
-                    {(!taskExecutionsCompleted ||
-                        !triggerExecutionCompleted) && (
+                    {(!taskExecutionsCompleted || !triggerExecutionCompleted) && (
                         <CrossCircledIcon className="h-5 w-5 text-red-500" />
                     )}
                 </div>
@@ -57,31 +49,21 @@ const WorkflowExecutionDetailsAccordion = ({
 
                     <span>Duration: {duration}ms</span>
 
-                    <span>{`${taskExecutionsCount} task${
-                        taskExecutionsCount > 1 ? 's' : ''
-                    } executed`}</span>
+                    <span>{`${taskExecutionsCount} task${taskExecutionsCount > 1 ? 's' : ''} executed`}</span>
                 </div>
             </div>
 
             <div className="overflow-y-auto">
-                <Accordion
-                    collapsible
-                    defaultValue={workflowExecution.triggerExecution?.id || ''}
-                    type="single"
-                >
+                <Accordion collapsible defaultValue={workflowExecution.triggerExecution?.id || ''} type="single">
                     {workflowExecution.triggerExecution && (
                         <WorkflowExecutionDetailsTriggerAccordionItem
-                            triggerExecution={
-                                workflowExecution.triggerExecution
-                            }
+                            triggerExecution={workflowExecution.triggerExecution}
                         />
                     )}
 
                     {workflowExecution.job?.taskExecutions && (
                         <WorkflowExecutionDetailsTaskAccordionItem
-                            taskExecutions={
-                                workflowExecution.job.taskExecutions
-                            }
+                            taskExecutions={workflowExecution.job.taskExecutions}
                         />
                     )}
                 </Accordion>

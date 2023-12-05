@@ -1,8 +1,5 @@
 /* eslint-disable sort-keys */
-import {
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionModel,
-} from '@/middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/hermes/configuration';
 import {DataPillType} from '@/types/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
@@ -15,9 +12,7 @@ type ComponentActionsType = Array<{
 
 interface WorkflowDefinitionState {
     componentDefinitions: Array<ComponentDefinitionBasicModel>;
-    setComponentDefinitions: (
-        componentDefinitions: Array<ComponentDefinitionBasicModel>
-    ) => void;
+    setComponentDefinitions: (componentDefinitions: Array<ComponentDefinitionBasicModel>) => void;
 
     componentNames: string[];
     setComponentNames: (componentNames: string[]) => void;
@@ -29,29 +24,23 @@ interface WorkflowDefinitionState {
     setDataPills: (dataPills: Array<DataPillType>) => void;
 
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
-    setTaskDispatcherDefinitions: (
-        taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>
-    ) => void;
+    setTaskDispatcherDefinitions: (taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>) => void;
 }
 
 const useWorkflowDataStore = create<WorkflowDefinitionState>()(
     devtools(
         (set) => ({
             componentDefinitions: [],
-            setComponentDefinitions: (componentDefinitions) =>
-                set((state) => ({...state, componentDefinitions})),
+            setComponentDefinitions: (componentDefinitions) => set((state) => ({...state, componentDefinitions})),
 
             componentNames: ['manual'],
-            setComponentNames: (componentNames) =>
-                set((state) => ({...state, componentNames})),
+            setComponentNames: (componentNames) => set((state) => ({...state, componentNames})),
 
             componentActions: [],
-            setComponentActions: (componentActions) =>
-                set((state) => ({...state, componentActions})),
+            setComponentActions: (componentActions) => set((state) => ({...state, componentActions})),
 
             dataPills: [],
-            setDataPills: (dataPills) =>
-                set((state) => ({...state, dataPills})),
+            setDataPills: (dataPills) => set((state) => ({...state, dataPills})),
 
             taskDispatcherDefinitions: [],
             setTaskDispatcherDefinitions: (taskDispatcherDefinitions) =>

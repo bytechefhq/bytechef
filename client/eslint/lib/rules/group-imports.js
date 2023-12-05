@@ -62,10 +62,7 @@ module.exports = {
                 }
 
                 const message =
-                    `${DESCRIPTION} ` +
-                    `(${problem} blank line before: ${JSON.stringify(
-                        getSource(node)
-                    )})`;
+                    `${DESCRIPTION} ` + `(${problem} blank line before: ${JSON.stringify(getSource(node))})`;
 
                 context.report({
                     fix: (fixer) => {
@@ -146,13 +143,9 @@ module.exports = {
                         continue;
                     }
 
-                    const token = context
-                        .getSourceCode()
-                        .getTokenBefore(current);
+                    const token = context.getSourceCode().getTokenBefore(current);
 
-                    const last = context
-                        .getSourceCode()
-                        .getNodeByRangeIndex(token.range[0]);
+                    const last = context.getSourceCode().getNodeByRangeIndex(token.range[0]);
 
                     if (last !== previous) {
                         expectBlankLines(current);

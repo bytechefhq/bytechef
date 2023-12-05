@@ -8,34 +8,21 @@ module.exports = {
                 let previousNodeEndLocation;
 
                 node.children.map((childNode, i) => {
-                    if (
-                        childNode.type === 'JSXElement' ||
-                        childNode.type === 'JSXExpressionContainer'
-                    ) {
-                        if (
-                            previousNodeEndLocation + 1 ===
-                            childNode.loc.start.line
-                        ) {
+                    if (childNode.type === 'JSXElement' || childNode.type === 'JSXExpressionContainer') {
+                        if (previousNodeEndLocation + 1 === childNode.loc.start.line) {
                             context.report({
                                 fix: (fixer) => {
                                     let insertBeforeNode = childNode;
 
                                     const previousNode = node.children[i - 1];
 
-                                    if (
-                                        previousNode.type === 'Literal' ||
-                                        previousNode.type === 'JSXText'
-                                    ) {
+                                    if (previousNode.type === 'Literal' || previousNode.type === 'JSXText') {
                                         insertBeforeNode = previousNode;
                                     }
 
-                                    return fixer.insertTextBefore(
-                                        insertBeforeNode,
-                                        '\n'
-                                    );
+                                    return fixer.insertTextBefore(insertBeforeNode, '\n');
                                 },
-                                message:
-                                    'Expected an empty line between sibling elements.',
+                                message: 'Expected an empty line between sibling elements.',
                                 node: childNode,
                             });
                         }

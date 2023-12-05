@@ -204,17 +204,11 @@ module.exports = {
                                     return true;
                                 }
                             })
-                            .sort((a, b) =>
-                                compare(getSortKey(a), getSortKey(b))
-                            );
+                            .sort((a, b) => compare(getSortKey(a), getSortKey(b)));
 
                         return accumulator.concat(sorted);
                     }, [])
-                    .concat(
-                        typeImports.sort((a, b) =>
-                            compare(getSortKey(a), getSortKey(b))
-                        )
-                    );
+                    .concat(typeImports.sort((a, b) => compare(getSortKey(a), getSortKey(b))));
 
                 // Try to make error messages (somewhat) minimal by only
                 // reporting from the first to the last mismatch (ie.
@@ -254,9 +248,7 @@ module.exports = {
                     })
                     .join(' << ');
 
-                const message =
-                    'imports must be sorted by module name ' +
-                    `(expected: ${description})`;
+                const message = 'imports must be sorted by module name ' + `(expected: ${description})`;
 
                 context.report({
                     fix: (fixer) => {
@@ -280,10 +272,7 @@ module.exports = {
 
                         for (let i = firstMismatch; i <= lastMismatch; i++) {
                             fixings.push(
-                                fixer.replaceTextRange(
-                                    getRangeForNode(actual[i]),
-                                    sources.get(desired[i]).text
-                                )
+                                fixer.replaceTextRange(getRangeForNode(actual[i]), sources.get(desired[i]).text)
                             );
                         }
 

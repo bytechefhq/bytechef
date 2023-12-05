@@ -13,16 +13,13 @@ module.exports = {
                     node.callee.property.type === 'Identifier' &&
                     node.callee.property.name === 'useState';
 
-                const plainUseState =
-                    node.callee.type === 'Identifier' &&
-                    node.callee.name === 'useState';
+                const plainUseState = node.callee.type === 'Identifier' && node.callee.name === 'useState';
 
                 if (!reactUseState && !plainUseState) {
                     return;
                 }
 
-                const variables =
-                    node.parent && node.parent.id && node.parent.id.elements;
+                const variables = node.parent && node.parent.id && node.parent.id.elements;
 
                 if (!variables || variables.length !== 2) {
                     return;
@@ -42,17 +39,14 @@ module.exports = {
                 }
 
                 const expectedSetterVariableName = valueVariableName
-                    ? `set${valueVariableName
-                          .charAt(0)
-                          .toUpperCase()}${valueVariableName.slice(1)}`
+                    ? `set${valueVariableName.charAt(0).toUpperCase()}${valueVariableName.slice(1)}`
                     : undefined;
 
                 if (!setterVariableName === expectedSetterVariableName) {
                     return;
                 }
 
-                const setterStartsWithSet =
-                    setterVariableName.slice(0, 3) === 'set';
+                const setterStartsWithSet = setterVariableName.slice(0, 3) === 'set';
 
                 if (setterStartsWithSet) {
                     return;
@@ -66,10 +60,7 @@ module.exports = {
                     context.report({
                         fix: (fixer) => {
                             if (expectedSetterVariableName) {
-                                return fixer.replaceText(
-                                    reference.identifier,
-                                    expectedSetterVariableName
-                                );
+                                return fixer.replaceText(reference.identifier, expectedSetterVariableName);
                             }
                         },
                         message:

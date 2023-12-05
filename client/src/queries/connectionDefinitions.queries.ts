@@ -8,35 +8,27 @@ import {
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectDefinitionKeys = {
-    connectionDefinition: (
-        request?: GetComponentConnectionDefinitionRequest
-    ) => [...ConnectDefinitionKeys.connectionDefinitions, request],
+    connectionDefinition: (request?: GetComponentConnectionDefinitionRequest) => [
+        ...ConnectDefinitionKeys.connectionDefinitions,
+        request,
+    ],
     connectionDefinitions: ['connectionDefinitions'],
-    filteredConnectionDefinitions: (
-        request: GetComponentConnectionDefinitionsRequest
-    ) => [...ConnectDefinitionKeys.connectionDefinitions, request],
+    filteredConnectionDefinitions: (request: GetComponentConnectionDefinitionsRequest) => [
+        ...ConnectDefinitionKeys.connectionDefinitions,
+        request,
+    ],
 };
 
-export const useGetConnectionDefinitionQuery = (
-    request?: GetComponentConnectionDefinitionRequest
-) =>
+export const useGetConnectionDefinitionQuery = (request?: GetComponentConnectionDefinitionRequest) =>
     useQuery<ConnectionDefinitionModel, Error>({
         queryKey: ConnectDefinitionKeys.connectionDefinition(request),
-        queryFn: () =>
-            new ConnectionDefinitionApi().getComponentConnectionDefinition(
-                request!
-            ),
+        queryFn: () => new ConnectionDefinitionApi().getComponentConnectionDefinition(request!),
         enabled: !!request?.componentName,
     });
 
-export const useGetConnectionDefinitionsQuery = (
-    request: GetComponentConnectionDefinitionsRequest
-) =>
+export const useGetConnectionDefinitionsQuery = (request: GetComponentConnectionDefinitionsRequest) =>
     useQuery<ConnectionDefinitionModel[], Error>({
         queryKey: ConnectDefinitionKeys.filteredConnectionDefinitions(request),
-        queryFn: () =>
-            new ConnectionDefinitionApi().getComponentConnectionDefinitions(
-                request
-            ),
+        queryFn: () => new ConnectionDefinitionApi().getComponentConnectionDefinitions(request),
         enabled: !!request?.componentName,
     });

@@ -3,10 +3,7 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
-import {
-    useGetConnectionTagsQuery,
-    useGetConnectionsQuery,
-} from '@/queries/connections.queries';
+import {useGetConnectionTagsQuery, useGetConnectionsQuery} from '@/queries/connections.queries';
 import {Link2Icon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
@@ -44,41 +41,29 @@ const Connections = () => {
         isLoading: allConnectionsIsLoading,
     } = useGetConnectionsQuery({});
 
-    const allComponentNames = allConnections?.map(
-        (connection) => connection.componentName
-    );
+    const allComponentNames = allConnections?.map((connection) => connection.componentName);
 
-    const {data: componentDefinitions, isLoading: componentsLoading} =
-        useGetComponentDefinitionsQuery(
-            {include: allComponentNames},
-            allComponentNames !== undefined
-        );
+    const {data: componentDefinitions, isLoading: componentsLoading} = useGetComponentDefinitionsQuery(
+        {include: allComponentNames},
+        allComponentNames !== undefined
+    );
 
     const {
         data: connections,
         error: connectionsError,
         isLoading: connectionsIsLoading,
     } = useGetConnectionsQuery({
-        componentName: searchParams.get('componentName')
-            ? searchParams.get('componentName')!
-            : undefined,
-        tagId: searchParams.get('tagId')
-            ? parseInt(searchParams.get('tagId')!)
-            : undefined,
+        componentName: searchParams.get('componentName') ? searchParams.get('componentName')! : undefined,
+        tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
-    const {
-        data: tags,
-        error: tagsError,
-        isLoading: tagsIsLoading,
-    } = useGetConnectionTagsQuery();
+    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetConnectionTagsQuery();
 
     let pageTitle: string | undefined;
 
     if (filterData.type === Type.Component) {
-        pageTitle = componentDefinitions?.find(
-            (componentDefinition) => componentDefinition.name === filterData.id
-        )?.title;
+        pageTitle = componentDefinitions?.find((componentDefinition) => componentDefinition.name === filterData.id)
+            ?.title;
     } else {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
@@ -89,14 +74,8 @@ const Connections = () => {
                 <PageHeader
                     centerTitle={true}
                     position="main"
-                    right={
-                        <ConnectionDialog
-                            triggerNode={<Button>Create Connection</Button>}
-                        />
-                    }
-                    title={`${
-                        searchParams.get('tagId') ? 'Tags' : 'Components'
-                    }: ${pageTitle || 'All'}`}
+                    right={<ConnectionDialog triggerNode={<Button>Create Connection</Button>} />}
+                    title={`${searchParams.get('tagId') ? 'Tags' : 'Components'}: ${pageTitle || 'All'}`}
                 />
             }
             leftSidebarBody={
@@ -109,20 +88,12 @@ const Connections = () => {
                                 ) : (
                                     tags?.map((item) => (
                                         <LeftSidebarNavItem
-                                            icon={
-                                                <TagIcon className="mr-1 h-4 w-4" />
-                                            }
+                                            icon={<TagIcon className="mr-1 h-4 w-4" />}
                                             item={{
-                                                filterData:
-                                                    filterData?.id ===
-                                                        item.id &&
-                                                    filterData.type ===
-                                                        Type.Tag,
+                                                filterData: filterData?.id === item.id && filterData.type === Type.Tag,
                                                 id: item.id!,
                                                 name: item.name,
-                                                onItemClick: (
-                                                    id?: number | string
-                                                ) => {
+                                                onItemClick: (id?: number | string) => {
                                                     setFilterData({
                                                         id,
                                                         type: Type.Tag,
@@ -141,9 +112,7 @@ const Connections = () => {
                         <>
                             <LeftSidebarNavItem
                                 item={{
-                                    filterData:
-                                        !filterData?.id &&
-                                        filterData.type === Type.Component,
+                                    filterData: !filterData?.id && filterData.type === Type.Component,
                                     name: 'All Components',
                                     onItemClick: (id?: number | string) => {
                                         setFilterData({
@@ -159,14 +128,10 @@ const Connections = () => {
                                     <LeftSidebarNavItem
                                         item={{
                                             filterData:
-                                                filterData?.id === item.name &&
-                                                filterData.type ===
-                                                    Type.Component,
+                                                filterData?.id === item.name && filterData.type === Type.Component,
                                             id: item.name!,
                                             name: item.title!,
-                                            onItemClick: (
-                                                id?: number | string
-                                            ) =>
+                                            onItemClick: (id?: number | string) =>
                                                 setFilterData({
                                                     id,
                                                     type: Type.Component,
@@ -181,30 +146,17 @@ const Connections = () => {
                     topTitle="Components"
                 />
             }
-            leftSidebarHeader={
-                <PageHeader position="sidebar" title="Connections" />
-            }
+            leftSidebarHeader={<PageHeader position="sidebar" title="Connections" />}
         >
             <PageLoader
                 errors={[allConnectionsError, connectionsError, tagsError]}
-                loading={
-                    allConnectionsIsLoading ||
-                    connectionsIsLoading ||
-                    tagsIsLoading
-                }
+                loading={allConnectionsIsLoading || connectionsIsLoading || tagsIsLoading}
             >
                 {connections && connections?.length > 0 ? (
-                    connections &&
-                    tags && (
-                        <ConnectionList connections={connections} tags={tags} />
-                    )
+                    connections && tags && <ConnectionList connections={connections} tags={tags} />
                 ) : (
                     <EmptyList
-                        button={
-                            <ConnectionDialog
-                                triggerNode={<Button>Create Connection</Button>}
-                            />
-                        }
+                        button={<ConnectionDialog triggerNode={<Button>Create Connection</Button>} />}
                         icon={<Link2Icon className="h-12 w-12 text-gray-400" />}
                         message="You do not have any Connections created yet."
                         title="No Connections"

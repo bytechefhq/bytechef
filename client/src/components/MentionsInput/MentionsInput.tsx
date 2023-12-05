@@ -2,16 +2,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import getRandomId from '@/utils/getRandomId';
 
 import 'quill-mention';
-import {
-    ChangeEvent,
-    ReactNode,
-    Ref,
-    forwardRef,
-    memo,
-    useEffect,
-    useMemo,
-    useState,
-} from 'react';
+import {ChangeEvent, ReactNode, Ref, forwardRef, memo, useEffect, useMemo, useState} from 'react';
 import ReactQuill, {Quill} from 'react-quill';
 
 import './mentionsInput.css';
@@ -78,8 +69,7 @@ const MentionsInput = forwardRef(
         const [value, setValue] = useState('');
         const [mentionOccurences, setMentionOccurences] = useState(0);
 
-        const {focusedInput, setFocusedInput} =
-            useWorkflowNodeDetailsPanelStore();
+        const {focusedInput, setFocusedInput} = useWorkflowNodeDetailsPanelStore();
         const {setDataPillPanelOpen} = useDataPillPanelStore();
 
         const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
@@ -102,22 +92,13 @@ const MentionsInput = forwardRef(
 
                     const {height} = editorContainer.getBoundingClientRect();
 
-                    const mentionListParentElement =
-                        editorContainer.querySelector(
-                            '#quill-mention-list'
-                        ).parentNode;
+                    const mentionListParentElement = editorContainer.querySelector('#quill-mention-list').parentNode;
 
-                    mentionListParentElement.style.top = `${
-                        height + editorContainer.offsetTop + 10
-                    }px`;
+                    mentionListParentElement.style.top = `${height + editorContainer.offsetTop + 10}px`;
                 },
                 onSelect: (
                     item: DataPillType,
-                    insertItem: (
-                        data: DataPillType,
-                        programmaticInsert: boolean,
-                        overriddenOptions: object
-                    ) => void
+                    insertItem: (data: DataPillType, programmaticInsert: boolean, overriddenOptions: object) => void
                 ) => {
                     insertItem(
                         {
@@ -133,10 +114,7 @@ const MentionsInput = forwardRef(
                 },
                 renderItem: (item: DataPillType) => MentionInputListItem(item),
                 showDenotationChar: false,
-                source: (
-                    searchTerm: string,
-                    renderList: (arg1: Array<object>, arg2: string) => void
-                ) => {
+                source: (searchTerm: string, renderList: (arg1: Array<object>, arg2: string) => void) => {
                     const formattedData = dataPills.map((dataPill) => {
                         if (!dataPill.componentDefinition) {
                             return {
@@ -147,9 +125,7 @@ const MentionsInput = forwardRef(
                         }
 
                         return {
-                            componentIcon: JSON.parse(
-                                dataPill.componentDefinition as string
-                            ).icon,
+                            componentIcon: JSON.parse(dataPill.componentDefinition as string).icon,
                             id: dataPill.id,
                             value: dataPill.value,
                         };
@@ -159,10 +135,7 @@ const MentionsInput = forwardRef(
                         renderList(formattedData, searchTerm);
                     } else {
                         const matches = formattedData.filter(
-                            (datum) =>
-                                ~datum.value
-                                    .toLowerCase()
-                                    .indexOf(searchTerm.toLowerCase())
+                            (datum) => ~datum.value.toLowerCase().indexOf(searchTerm.toLowerCase())
                         );
 
                         renderList(matches, searchTerm);
@@ -200,11 +173,7 @@ const MentionsInput = forwardRef(
                             {label}
                         </label>
 
-                        {required && (
-                            <span className="px-1 leading-3 text-red-500">
-                                *
-                            </span>
-                        )}
+                        {required && <span className="px-1 leading-3 text-red-500">*</span>}
 
                         {description && (
                             <Tooltip>
@@ -212,9 +181,7 @@ const MentionsInput = forwardRef(
                                     <QuestionMarkCircledIcon />
                                 </TooltipTrigger>
 
-                                <TooltipContent className="max-w-tooltip-sm">
-                                    {description}
-                                </TooltipContent>
+                                <TooltipContent className="max-w-tooltip-sm">{description}</TooltipContent>
                             </Tooltip>
                         )}
                     </div>
@@ -223,11 +190,9 @@ const MentionsInput = forwardRef(
                 <div
                     className={twMerge(
                         'flex items-center',
-                        isFocused &&
-                            'ring ring-blue-500 shadow-lg shadow-blue-200',
+                        isFocused && 'ring ring-blue-500 shadow-lg shadow-blue-200',
                         label && 'mt-1',
-                        leadingIcon &&
-                            'relative rounded-md border border-gray-300'
+                        leadingIcon && 'relative rounded-md border border-gray-300'
                     )}
                     title={controlType}
                 >
@@ -238,10 +203,7 @@ const MentionsInput = forwardRef(
                     )}
 
                     <ReactQuill
-                        className={twMerge(
-                            'h-full w-full bg-white rounded-md',
-                            leadingIcon && 'border-0 pl-10'
-                        )}
+                        className={twMerge('h-full w-full bg-white rounded-md', leadingIcon && 'border-0 pl-10')}
                         defaultValue={defaultValue}
                         formats={['property-mention', 'mention']}
                         id={elementId}
@@ -257,9 +219,7 @@ const MentionsInput = forwardRef(
 
                             setValue(value);
 
-                            setMentionOccurences(
-                                value.match(/property-mention/g)?.length || 0
-                            );
+                            setMentionOccurences(value.match(/property-mention/g)?.length || 0);
                         }}
                         onFocus={() => {
                             // @ts-expect-error Quill false positive

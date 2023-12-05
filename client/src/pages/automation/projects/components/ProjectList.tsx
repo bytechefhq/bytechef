@@ -4,13 +4,7 @@ import ProjectListItem from 'pages/automation/projects/components/ProjectListIte
 
 import ProjectWorkflowList from './ProjectWorkflowList';
 
-const ProjectList = ({
-    projects,
-    tags,
-}: {
-    projects: ProjectModel[];
-    tags: TagModel[];
-}) => {
+const ProjectList = ({projects, tags}: {projects: ProjectModel[]; tags: TagModel[]}) => {
     return (
         <div className="w-full divide-y divide-gray-100 px-2 2xl:mx-auto 2xl:w-4/5">
             {projects.map((project) => {
@@ -21,9 +15,7 @@ const ProjectList = ({
                         <ProjectListItem
                             key={project.id}
                             project={project}
-                            remainingTags={tags?.filter(
-                                (tag) => !projectTagIds?.includes(tag.id)
-                            )}
+                            remainingTags={tags?.filter((tag) => !projectTagIds?.includes(tag.id))}
                         />
 
                         <CollapsibleContent>

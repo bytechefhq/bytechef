@@ -1,30 +1,14 @@
 import {Button} from '@/components/ui/button';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {PropertyType} from '@/types/projectTypes';
-import {
-    ComponentDataType,
-    CurrentComponentType,
-    DataPillType,
-} from '@/types/types';
+import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Properties from 'components/Properties/Properties';
-import {
-    useGetActionDefinitionQuery,
-    useGetActionDefinitionsQuery,
-} from 'queries/actionDefinitions.queries';
-import {
-    useGetComponentDefinitionQuery,
-    useGetComponentDefinitionsQuery,
-} from 'queries/componentDefinitions.queries';
+import {useGetActionDefinitionQuery, useGetActionDefinitionsQuery} from 'queries/actionDefinitions.queries';
+import {useGetComponentDefinitionQuery, useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -62,16 +46,11 @@ const WorkflowNodeDetailsPanel = ({
     componentDefinitions: Array<ComponentDefinitionBasicModel>;
 }) => {
     const [activeTab, setActiveTab] = useState('description');
-    const [componentDefinitionNames, setComponentDefinitionNames] = useState<
-        Array<string>
-    >([]);
+    const [componentDefinitionNames, setComponentDefinitionNames] = useState<Array<string>>([]);
     const [currentActionName, setCurrentActionName] = useState('');
 
-    const {
-        currentNode,
-        setWorkflowNodeDetailsPanelOpen,
-        workflowNodeDetailsPanelOpen,
-    } = useWorkflowNodeDetailsPanelStore();
+    const {currentNode, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore();
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery({
         componentName: currentNode.originNodeName || currentNode.name,
@@ -79,13 +58,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const {componentData, setComponentData} = useWorkflowDefinitionStore();
 
-    const {
-        componentActions,
-        componentNames,
-        dataPills,
-        setComponentActions,
-        setDataPills,
-    } = useWorkflowDataStore();
+    const {componentActions, componentNames, dataPills, setComponentActions, setDataPills} = useWorkflowDataStore();
 
     const handleActionSelectChange = (value: string) => {
         setCurrentActionName(value);
@@ -113,55 +86,40 @@ const WorkflowNodeDetailsPanel = ({
     }
 
     const getActionName = (): string => {
-        const currentComponentActionNames = currentComponent?.actions?.map(
-            (action) => action.name
-        );
+        const currentComponentActionNames = currentComponent?.actions?.map((action) => action.name);
 
         return currentComponentActionNames?.includes(currentActionName)
             ? currentActionName
             : (currentComponent?.actions?.[0]?.name as string);
     };
 
-    const {data: currentAction, isFetched: currentActionFetched} =
-        useGetActionDefinitionQuery(
-            {
-                actionName: getActionName(),
-                componentName: currentComponent?.name as string,
-                componentVersion: currentComponent?.version as number,
-            },
-            !!currentComponent?.actions && !!getActionName()
-        );
-
-    const currentActionProperties = currentAction?.properties?.filter(
-        (property: PropertyType) => {
-            if (
-                property.controlType === 'SELECT' &&
-                (!property.options || !property.options.length)
-            ) {
-                return false;
-            } else {
-                return true;
-            }
-        }
+    const {data: currentAction, isFetched: currentActionFetched} = useGetActionDefinitionQuery(
+        {
+            actionName: getActionName(),
+            componentName: currentComponent?.name as string,
+            componentVersion: currentComponent?.version as number,
+        },
+        !!currentComponent?.actions && !!getActionName()
     );
 
+    const currentActionProperties = currentAction?.properties?.filter((property: PropertyType) => {
+        if (property.controlType === 'SELECT' && (!property.options || !property.options.length)) {
+            return false;
+        } else {
+            return true;
+        }
+    });
+
     const taskTypes = componentActions?.map(
-        (componentAction) =>
-            `${componentAction.componentName}/1/${componentAction.actionName}`
+        (componentAction) => `${componentAction.componentName}/1/${componentAction.actionName}`
     );
 
     const currentNodeIndex = componentNames.indexOf(currentNode.name);
 
-    const previousComponentNames =
-        componentNames.length > 1
-            ? componentNames.slice(0, currentNodeIndex)
-            : [];
+    const previousComponentNames = componentNames.length > 1 ? componentNames.slice(0, currentNodeIndex) : [];
 
-    const normalizedPreviousComponentNames = previousComponentNames.map(
-        (name) =>
-            name.match(new RegExp(/-\d$/))
-                ? name.slice(0, name.length - 2)
-                : name
+    const normalizedPreviousComponentNames = previousComponentNames.map((name) =>
+        name.match(new RegExp(/-\d$/)) ? name.slice(0, name.length - 2) : name
     );
 
     const {data: previousComponents} = useGetComponentDefinitionsQuery(
@@ -171,34 +129,24 @@ const WorkflowNodeDetailsPanel = ({
         !!normalizedPreviousComponentNames.length
     );
 
-    const {data: actionData} = useGetActionDefinitionsQuery(
-        {taskTypes},
-        !!componentActions?.length
-    );
+    const {data: actionData} = useGetActionDefinitionsQuery({taskTypes}, !!componentActions?.length);
 
-    const previousComponentProperties = previousComponents?.map(
-        (componentDefinition, index) => {
-            if (!actionData?.length) {
-                return;
-            }
-
-            const outputSchema: PropertyType | undefined =
-                actionData[index]?.outputSchema;
-
-            const properties = outputSchema?.properties?.length
-                ? outputSchema.properties
-                : outputSchema?.items;
-
-            return {
-                componentDefinition,
-                properties,
-            };
+    const previousComponentProperties = previousComponents?.map((componentDefinition, index) => {
+        if (!actionData?.length) {
+            return;
         }
-    );
 
-    const getExistingProperties = (
-        properties: Array<PropertyType>
-    ): Array<PropertyType> =>
+        const outputSchema: PropertyType | undefined = actionData[index]?.outputSchema;
+
+        const properties = outputSchema?.properties?.length ? outputSchema.properties : outputSchema?.items;
+
+        return {
+            componentDefinition,
+            properties,
+        };
+    });
+
+    const getExistingProperties = (properties: Array<PropertyType>): Array<PropertyType> =>
         properties.filter((property) => {
             if (property.properties) {
                 return getExistingProperties(property.properties);
@@ -216,35 +164,27 @@ const WorkflowNodeDetailsPanel = ({
             return;
         }
 
-        const existingProperties = getExistingProperties(
-            componentProperty.properties
-        );
+        const existingProperties = getExistingProperties(componentProperty.properties);
 
-        const formattedProperties: DataPillType[] = existingProperties.map(
-            (property) => {
-                if (property.properties) {
-                    return getSubProperties({
-                        componentDefinition:
-                            componentProperty.componentDefinition!,
-                        properties: property.properties,
-                    });
-                } else if (property.items) {
-                    return getSubProperties({
-                        componentDefinition:
-                            componentProperty.componentDefinition!,
-                        properties: property.items,
-                    });
-                }
-
-                return {
-                    componentDefinition: JSON.stringify(
-                        componentProperty.componentDefinition
-                    ),
-                    id: property.name,
-                    value: property.label || property.name,
-                };
+        const formattedProperties: DataPillType[] = existingProperties.map((property) => {
+            if (property.properties) {
+                return getSubProperties({
+                    componentDefinition: componentProperty.componentDefinition!,
+                    properties: property.properties,
+                });
+            } else if (property.items) {
+                return getSubProperties({
+                    componentDefinition: componentProperty.componentDefinition!,
+                    properties: property.items,
+                });
             }
-        );
+
+            return {
+                componentDefinition: JSON.stringify(componentProperty.componentDefinition),
+                id: property.name,
+                value: property.label || property.name,
+            };
+        });
 
         if (existingProperties.length && formattedProperties.length) {
             availableDataPills.push(...formattedProperties);
@@ -253,10 +193,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const nodeTabs = TABS.filter(({name}) => {
         if (name === 'connection') {
-            return (
-                currentComponent?.name &&
-                componentDefinitionNames?.includes(currentComponent.name)
-            );
+            return currentComponent?.name && componentDefinitionNames?.includes(currentComponent.name);
         }
 
         if (name === 'output') {
@@ -285,9 +222,7 @@ const WorkflowNodeDetailsPanel = ({
     // Set currentActionName depending on the currentComponentAction.actionName
     useEffect(() => {
         if (componentActions?.length) {
-            const currentComponentAction = componentActions.find(
-                (action) => action.workflowAlias === currentNode.name
-            );
+            const currentComponentAction = componentActions.find((action) => action.workflowAlias === currentNode.name);
 
             if (currentComponentAction) {
                 setCurrentActionName(currentComponentAction.actionName);
@@ -299,11 +234,7 @@ const WorkflowNodeDetailsPanel = ({
     // Set componentDefinitionNames depending on componentDefinitions
     useEffect(() => {
         if (componentDefinitions?.length) {
-            setComponentDefinitionNames(
-                componentDefinitions.map(
-                    (componentDefinition) => componentDefinition.name
-                )
-            );
+            setComponentDefinitionNames(componentDefinitions.map((componentDefinition) => componentDefinition.name));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [componentDefinitions?.length]);
@@ -370,10 +301,7 @@ const WorkflowNodeDetailsPanel = ({
             setActiveTab('description');
         }
 
-        if (
-            activeTab === 'properties' &&
-            (!currentActionFetched || !currentActionProperties)
-        ) {
+        if (activeTab === 'properties' && (!currentActionFetched || !currentActionProperties)) {
             setActiveTab('description');
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -402,12 +330,10 @@ const WorkflowNodeDetailsPanel = ({
             if (componentActions && currentComponent) {
                 const {name, workflowAlias} = currentComponent;
 
-                const duplicateComponentActionIndex =
-                    componentActions.findIndex(
-                        (action) =>
-                            action.workflowAlias?.match(new RegExp(/-\d$/)) &&
-                            action.workflowAlias === workflowAlias
-                    );
+                const duplicateComponentActionIndex = componentActions.findIndex(
+                    (action) =>
+                        action.workflowAlias?.match(new RegExp(/-\d$/)) && action.workflowAlias === workflowAlias
+                );
 
                 if (duplicateComponentActionIndex !== -1) {
                     componentActions.splice(duplicateComponentActionIndex, 1, {
@@ -418,18 +344,13 @@ const WorkflowNodeDetailsPanel = ({
 
                     setComponentActions(componentActions);
                 } else {
-                    const orderedComponentActions = componentNames.map(
-                        (componentName) => {
-                            const componentActionIndex =
-                                componentActions.findIndex(
-                                    (componentAction) =>
-                                        componentAction.workflowAlias ===
-                                        componentName
-                                );
+                    const orderedComponentActions = componentNames.map((componentName) => {
+                        const componentActionIndex = componentActions.findIndex(
+                            (componentAction) => componentAction.workflowAlias === componentName
+                        );
 
-                            return componentActions[componentActionIndex];
-                        }
-                    );
+                        return componentActions[componentActionIndex];
+                    });
 
                     const updatedComponentActions = [
                         ...orderedComponentActions.slice(0, currentNodeIndex),
@@ -446,26 +367,17 @@ const WorkflowNodeDetailsPanel = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        currentComponent?.workflowAlias,
-        currentAction?.name,
-        currentActionFetched,
-    ]);
+    }, [currentComponent?.workflowAlias, currentAction?.name, currentActionFetched]);
 
     useEffect(() => {
         if (currentAction?.name) {
             const componentDataIndex = componentData.findIndex(
-                (component) =>
-                    component.workflowAlias === currentComponent?.workflowAlias
+                (component) => component.workflowAlias === currentComponent?.workflowAlias
             );
 
             if (!componentDataIndex && currentComponent) {
                 setComponentData([
-                    ...componentData.filter(
-                        (item) =>
-                            item.workflowAlias !==
-                            currentComponent!.workflowAlias
-                    ),
+                    ...componentData.filter((item) => item.workflowAlias !== currentComponent!.workflowAlias),
                     {
                         action: currentAction.name,
                         connection: currentComponent.connection,
@@ -493,9 +405,7 @@ const WorkflowNodeDetailsPanel = ({
     return (
         <Dialog.Root
             modal={false}
-            onOpenChange={() =>
-                setWorkflowNodeDetailsPanelOpen(!workflowNodeDetailsPanelOpen)
-            }
+            onOpenChange={() => setWorkflowNodeDetailsPanelOpen(!workflowNodeDetailsPanelOpen)}
             open={workflowNodeDetailsPanelOpen}
         >
             <Dialog.Portal>
@@ -508,9 +418,7 @@ const WorkflowNodeDetailsPanel = ({
                             <Dialog.Title className="flex items-center p-4 text-lg font-medium">
                                 {currentNode.label}
 
-                                <span className="mx-2 text-sm text-gray-500">
-                                    ({currentNode.name})
-                                </span>
+                                <span className="mx-2 text-sm text-gray-500">({currentNode.name})</span>
 
                                 {currentComponent?.description && (
                                     <Tooltip delayDuration={500}>
@@ -518,10 +426,7 @@ const WorkflowNodeDetailsPanel = ({
                                             <InfoCircledIcon className="h-4 w-4" />
                                         </TooltipTrigger>
 
-                                        <TooltipContent
-                                            className="max-w-md"
-                                            side="bottom"
-                                        >
+                                        <TooltipContent className="max-w-md" side="bottom">
                                             {currentComponent?.description}
                                         </TooltipContent>
                                     </Tooltip>
@@ -530,16 +435,11 @@ const WorkflowNodeDetailsPanel = ({
                                 <Button
                                     aria-label="Close the node details dialog"
                                     className="ml-auto pr-0"
-                                    onClick={() =>
-                                        setWorkflowNodeDetailsPanelOpen(false)
-                                    }
+                                    onClick={() => setWorkflowNodeDetailsPanelOpen(false)}
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <Cross1Icon
-                                        aria-hidden="true"
-                                        className="h-3 w-3 cursor-pointer"
-                                    />
+                                    <Cross1Icon aria-hidden="true" className="h-3 w-3 cursor-pointer" />
                                 </Button>
                             </Dialog.Title>
 
@@ -548,81 +448,54 @@ const WorkflowNodeDetailsPanel = ({
                                     <CurrentActionSelect
                                         actions={currentComponent.actions}
                                         description={currentAction?.description}
-                                        handleValueChange={
-                                            handleActionSelectChange
-                                        }
+                                        handleValueChange={handleActionSelectChange}
                                         value={currentActionName}
                                     />
                                 )}
 
-                                {currentActionFetched &&
-                                    nodeTabs.length > 1 && (
-                                        <div className="flex justify-center pt-4">
-                                            {nodeTabs.map((tab) => (
-                                                <Button
-                                                    className={twMerge(
-                                                        'grow justify-center whitespace-nowrap rounded-none border-0 border-b-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
-                                                        activeTab ===
-                                                            tab?.name &&
-                                                            'border-blue-500 text-blue-500 hover:text-blue-500'
-                                                    )}
-                                                    key={tab.name}
-                                                    name={tab.name}
-                                                    onClick={() =>
-                                                        setActiveTab(tab.name)
-                                                    }
-                                                >
-                                                    {tab.label}
-                                                </Button>
-                                            ))}
-                                        </div>
-                                    )}
+                                {currentActionFetched && nodeTabs.length > 1 && (
+                                    <div className="flex justify-center pt-4">
+                                        {nodeTabs.map((tab) => (
+                                            <Button
+                                                className={twMerge(
+                                                    'grow justify-center whitespace-nowrap rounded-none border-0 border-b-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
+                                                    activeTab === tab?.name &&
+                                                        'border-blue-500 text-blue-500 hover:text-blue-500'
+                                                )}
+                                                key={tab.name}
+                                                name={tab.name}
+                                                onClick={() => setActiveTab(tab.name)}
+                                            >
+                                                {tab.label}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                )}
 
                                 <div className="relative h-full overflow-y-scroll">
                                     <div className="absolute left-0 top-0 h-full w-full">
                                         {activeTab === 'description' && (
                                             <DescriptionTab
-                                                componentDefinition={
-                                                    currentComponent
-                                                }
-                                                currentComponentData={
-                                                    currentComponentData
-                                                }
-                                                otherComponentData={
-                                                    otherComponentData
-                                                }
+                                                componentDefinition={currentComponent}
+                                                currentComponentData={currentComponentData}
+                                                otherComponentData={otherComponentData}
                                             />
                                         )}
 
-                                        {activeTab === 'connection' &&
-                                            currentComponent.connection && (
-                                                <ConnectionTab
-                                                    componentDefinition={
-                                                        currentComponent
-                                                    }
-                                                />
-                                            )}
+                                        {activeTab === 'connection' && currentComponent.connection && (
+                                            <ConnectionTab componentDefinition={currentComponent} />
+                                        )}
 
                                         {activeTab === 'properties' &&
                                             (currentActionProperties?.length ? (
                                                 <Properties
-                                                    actionName={
-                                                        currentActionName
-                                                    }
-                                                    currentComponent={
-                                                        currentComponent
-                                                    }
-                                                    currentComponentData={
-                                                        currentComponentData
-                                                    }
+                                                    actionName={currentActionName}
+                                                    currentComponent={currentComponent}
+                                                    currentComponentData={currentComponentData}
                                                     customClassName="p-4"
                                                     dataPills={dataPills}
-                                                    mention={
-                                                        !!dataPills?.length
-                                                    }
-                                                    properties={
-                                                        currentActionProperties
-                                                    }
+                                                    mention={!!dataPills?.length}
+                                                    properties={currentActionProperties}
                                                 />
                                             ) : (
                                                 <div className="flex h-full items-center justify-center text-xl">
@@ -630,22 +503,15 @@ const WorkflowNodeDetailsPanel = ({
                                                 </div>
                                             ))}
 
-                                        {activeTab === 'output' &&
-                                            currentAction?.outputSchema && (
-                                                <OutputTab
-                                                    outputSchema={
-                                                        currentAction.outputSchema
-                                                    }
-                                                />
-                                            )}
+                                        {activeTab === 'output' && currentAction?.outputSchema && (
+                                            <OutputTab outputSchema={currentAction.outputSchema} />
+                                        )}
                                     </div>
                                 </div>
                             </div>
 
                             <footer className="z-50 mt-auto flex bg-white px-4 py-2">
-                                <Select
-                                    defaultValue={currentComponent.version.toString()}
-                                >
+                                <Select defaultValue={currentComponent.version.toString()}>
                                     <SelectTrigger className="w-auto border-none shadow-none">
                                         <SelectValue placeholder="Choose version..." />
                                     </SelectTrigger>
@@ -662,9 +528,7 @@ const WorkflowNodeDetailsPanel = ({
                         </div>
                     ) : (
                         <div className="flex w-full justify-center p-4">
-                            <span className="text-gray-500">
-                                Something went wrong 👾
-                            </span>
+                            <span className="text-gray-500">Something went wrong 👾</span>
                         </div>
                     )}
                 </Dialog.Content>

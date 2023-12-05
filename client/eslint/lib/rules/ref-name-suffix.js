@@ -17,20 +17,14 @@ module.exports = {
                 ) {
                     const variableName = node.id.name;
 
-                    if (
-                        variableName !== 'ref' &&
-                        !variableName.match(NAME_PATTERN)
-                    ) {
+                    if (variableName !== 'ref' && !variableName.match(NAME_PATTERN)) {
                         const [variable] = context.getDeclaredVariables(node);
                         const newVariableName = variable.name + 'Ref';
 
                         for (const reference of variable.references) {
                             context.report({
                                 fix: (fixer) => {
-                                    return fixer.replaceText(
-                                        reference.identifier,
-                                        newVariableName
-                                    );
+                                    return fixer.replaceText(reference.identifier, newVariableName);
                                 },
                                 message:
                                     reference.identifier === node.id

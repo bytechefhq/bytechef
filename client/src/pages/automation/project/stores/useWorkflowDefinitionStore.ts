@@ -14,8 +14,7 @@ const useWorkflowDefinitionStore = create<WorkflowDefinitionState>()(
         persist(
             (set) => ({
                 componentData: [],
-                setComponentData: (componentData) =>
-                    set(() => ({componentData})),
+                setComponentData: (componentData) => set(() => ({componentData})),
             }),
             {
                 name: 'workflow-definition',

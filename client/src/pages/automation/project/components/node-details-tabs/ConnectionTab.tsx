@@ -1,11 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Cross1Icon} from '@radix-ui/react-icons';
 import EmptyList from 'components/EmptyList';
 import {LinkIcon, PlusIcon} from 'lucide-react';
@@ -16,13 +10,8 @@ import {useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 
-const ConnectionTab = ({
-    componentDefinition,
-}: {
-    componentDefinition: ComponentDefinitionModel;
-}) => {
-    const [showEditConnectionDialog, setShowEditConnectionDialog] =
-        useState(false);
+const ConnectionTab = ({componentDefinition}: {componentDefinition: ComponentDefinitionModel}) => {
+    const [showEditConnectionDialog, setShowEditConnectionDialog] = useState(false);
 
     const {data: connections} = useGetConnectionsQuery(
         {
@@ -32,8 +21,7 @@ const ConnectionTab = ({
         !!componentDefinition.connection?.componentName
     );
 
-    const {setShowConnectionNote, showConnectionNote} =
-        useConnectionNoteStore();
+    const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
 
     return (
         <div className="h-full flex-[1_1_1px] overflow-auto p-4">
@@ -57,19 +45,12 @@ const ConnectionTab = ({
                     <SelectContent>
                         {connections &&
                             connections.map((connection) => (
-                                <SelectItem
-                                    key={connection.id}
-                                    value={connection.id!.toString()}
-                                >
+                                <SelectItem key={connection.id} value={connection.id!.toString()}>
                                     <div className="flex items-center">
-                                        <span className="mr-1 ">
-                                            {connection.name}
-                                        </span>
+                                        <span className="mr-1 ">{connection.name}</span>
 
                                         <span className="text-xs text-gray-500">
-                                            {connection?.tags
-                                                ?.map((tag) => tag.name)
-                                                .join(', ')}
+                                            {connection?.tags?.map((tag) => tag.name).join(', ')}
                                         </span>
                                     </div>
                                 </SelectItem>
@@ -79,10 +60,7 @@ const ConnectionTab = ({
             ) : (
                 <EmptyList
                     button={
-                        <Button
-                            onClick={() => setShowEditConnectionDialog(true)}
-                            title="Create a new connection"
-                        >
+                        <Button onClick={() => setShowEditConnectionDialog(true)} title="Create a new connection">
                             Create a connection
                         </Button>
                     }
@@ -108,10 +86,7 @@ const ConnectionTab = ({
                         </Button>
                     </div>
 
-                    <p className="text-sm text-gray-800">
-                        The selected connection is used for testing purposes
-                        only.
-                    </p>
+                    <p className="text-sm text-gray-800">The selected connection is used for testing purposes only.</p>
                 </div>
             )}
 

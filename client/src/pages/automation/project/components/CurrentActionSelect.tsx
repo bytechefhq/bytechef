@@ -1,10 +1,5 @@
 import {Label} from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
@@ -38,10 +33,7 @@ const ActionSelect = ({
                 )}
             </Label>
 
-            <Select
-                onValueChange={(value) => handleValueChange(value)}
-                value={value}
-            >
+            <Select onValueChange={(value) => handleValueChange(value)} value={value}>
                 <SelectTrigger className="w-full border-none bg-gray-100 shadow-none">
                     <SelectValue placeholder="Choose action..." />
                 </SelectTrigger>
@@ -62,9 +54,7 @@ const ActionSelect = ({
                             </span>
 
                             <div className="flex flex-col">
-                                <ItemText>
-                                    {action.title || action.name}
-                                </ItemText>
+                                <ItemText>{action.title || action.name}</ItemText>
 
                                 {action.description && (
                                     <span
@@ -98,9 +88,7 @@ const CurrentActionSelect = ({
         {actions?.length === 1 && !!actions[0] ? (
             <div className="flex w-full flex-col">
                 <div className="flex items-center space-x-1">
-                    <span className="text-sm font-medium leading-6">
-                        Action
-                    </span>
+                    <span className="text-sm font-medium leading-6">Action</span>
 
                     {description && (
                         <Tooltip>

@@ -10,27 +10,16 @@ type Props = {
     navigation: {
         name: string;
         href: string;
-        icon: React.ForwardRefExoticComponent<
-            Omit<React.SVGProps<SVGSVGElement>, 'ref'>
-        >;
+        icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
     }[];
     mobileMenuOpen: boolean;
     setMobileMenuOpen: (value: boolean) => void;
 };
 
-export function MobileSidebar({
-    mobileMenuOpen,
-    navigation,
-    setMobileMenuOpen,
-    user,
-}: Props) {
+export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen, user}: Props) {
     return (
         <Transition.Root as={Fragment} show={mobileMenuOpen}>
-            <Dialog
-                as="div"
-                className="relative z-40 lg:hidden"
-                onClose={setMobileMenuOpen}
-            >
+            <Dialog as="div" className="relative z-40 lg:hidden" onClose={setMobileMenuOpen}>
                 <Transition.Child
                     as={Fragment}
                     enter="transition-opacity ease-linear duration-300"
@@ -70,25 +59,16 @@ export function MobileSidebar({
                                         size="icon"
                                         variant="ghost"
                                     >
-                                        <span className="sr-only">
-                                            Close sidebar
-                                        </span>
+                                        <span className="sr-only">Close sidebar</span>
 
-                                        <Cross1Icon
-                                            aria-hidden="true"
-                                            className="h-6 w-6 text-white"
-                                        />
+                                        <Cross1Icon aria-hidden="true" className="h-6 w-6 text-white" />
                                     </Button>
                                 </div>
                             </Transition.Child>
 
                             <div className="pb-4 pt-5">
                                 <div className="flex shrink-0 items-center px-4">
-                                    <img
-                                        alt="ByteChef"
-                                        className="h-8 w-auto"
-                                        src={reactLogo}
-                                    />
+                                    <img alt="ByteChef" className="h-8 w-auto" src={reactLogo} />
                                 </div>
 
                                 <nav aria-label="Sidebar" className="mt-5">

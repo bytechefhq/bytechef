@@ -6,13 +6,7 @@ import {PropertyType} from 'types/projectTypes';
 
 import Property from './Property';
 
-const ArrayProperty = ({
-    dataPills,
-    property,
-}: {
-    dataPills?: Array<DataPillType>;
-    property: PropertyType;
-}) => {
+const ArrayProperty = ({dataPills, property}: {dataPills?: Array<DataPillType>; property: PropertyType}) => {
     const {items} = property;
 
     const formattedArrayItems = items?.map((item) => ({
@@ -33,17 +27,12 @@ const ArrayProperty = ({
             ))}
 
             <div className="relative ml-2 w-full self-start border-l pl-2 pt-2">
-                {formattedArrayItems?.length &&
-                formattedArrayItems?.length > 1 ? (
+                {formattedArrayItems?.length && formattedArrayItems?.length > 1 ? (
                     <DropdownMenu
                         customTriggerComponent={
                             <Button
                                 className="rounded-sm bg-gray-100 text-sm font-medium hover:bg-gray-200"
-                                onClick={() =>
-                                    console.log(
-                                        'update the workflow definition with a new property'
-                                    )
-                                }
+                                onClick={() => console.log('update the workflow definition with a new property')}
                                 size="sm"
                                 variant="ghost"
                             >
@@ -55,11 +44,7 @@ const ArrayProperty = ({
                 ) : (
                     <Button
                         className="rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
-                        onClick={() =>
-                            console.log(
-                                'update the workflow definition with a new property'
-                            )
-                        }
+                        onClick={() => console.log('update the workflow definition with a new property')}
                         size="sm"
                         variant="ghost"
                     >

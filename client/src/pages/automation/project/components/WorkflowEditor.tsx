@@ -1,8 +1,5 @@
 import {useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
-import {
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionBasicModel,
-} from 'middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/hermes/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import ReactFlow, {Controls, MiniMap, useReactFlow, useStore} from 'reactflow';
 
@@ -23,10 +20,7 @@ export type WorkflowEditorProps = {
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
 };
 
-const WorkflowEditor = ({
-    componentDefinitions,
-    taskDispatcherDefinitions,
-}: WorkflowEditorProps) => {
+const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: WorkflowEditorProps) => {
     const [latestNodeName, setLatestNodeName] = useState('');
     const [nodeNames, setNodeNames] = useState<Array<string>>([]);
     const [viewportWidth, setViewportWidth] = useState(0);
@@ -53,9 +47,7 @@ const WorkflowEditor = ({
 
     useEffect(() => {
         if (nodeNames && previousNodeNames?.length) {
-            const latest = nodeNames.find(
-                (nodeName) => !previousNodeNames?.includes(nodeName)
-            );
+            const latest = nodeNames.find((nodeName) => !previousNodeNames?.includes(nodeName));
 
             if (latest) {
                 setLatestNodeName(latest);
@@ -75,9 +67,7 @@ const WorkflowEditor = ({
             return undefined;
         }
 
-        const workflowNodes = nodeNames.filter(
-            (nodeName) => nodeName === workflowComponent.name
-        );
+        const workflowNodes = nodeNames.filter((nodeName) => nodeName === workflowComponent.name);
 
         return {
             ...workflowComponent,
@@ -105,11 +95,7 @@ const WorkflowEditor = ({
             let workflowAlias = `${name}-1`;
             let index = 2;
 
-            while (
-                componentActions.some(
-                    (action) => action.workflowAlias === workflowAlias
-                )
-            ) {
+            while (componentActions.some((action) => action.workflowAlias === workflowAlias)) {
                 workflowAlias = `${name}-${index}`;
 
                 index++;
@@ -132,27 +118,21 @@ const WorkflowEditor = ({
         width: store.width,
     }));
 
-    const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge] =
-        useHandleDrop();
+    const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge] = useHandleDrop();
 
     const onDrop: DragEventHandler = (event) => {
-        const droppedNodeName = event.dataTransfer.getData(
-            'application/reactflow'
-        );
+        const droppedNodeName = event.dataTransfer.getData('application/reactflow');
 
-        const droppedNode = [
-            ...componentDefinitions,
-            ...taskDispatcherDefinitions,
-        ].find((node) => node.name === droppedNodeName);
+        const droppedNode = [...componentDefinitions, ...taskDispatcherDefinitions].find(
+            (node) => node.name === droppedNodeName
+        );
 
         if (!droppedNode) {
             return;
         }
 
         if (event.target instanceof HTMLElement) {
-            const targetNodeElement = event.target.closest(
-                '.react-flow__node'
-            ) as HTMLElement;
+            const targetNodeElement = event.target.closest('.react-flow__node') as HTMLElement;
 
             if (targetNodeElement) {
                 const targetNodeId = targetNodeElement.dataset.id!;
@@ -179,9 +159,7 @@ const WorkflowEditor = ({
     useEffect(() => {
         setViewportWidth(width);
 
-        const adaptedViewportWidth = workflowNodeDetailsPanelOpen
-            ? width / 2 - window.innerWidth / 6
-            : width / 2;
+        const adaptedViewportWidth = workflowNodeDetailsPanelOpen ? width / 2 - window.innerWidth / 6 : width / 2;
 
         setViewport({
             x: adaptedViewportWidth,
