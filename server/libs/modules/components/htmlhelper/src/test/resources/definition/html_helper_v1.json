@@ -147,6 +147,5 @@
   "version": 1,
   "title": "HTML Helper",
   "triggers": null,
-  "allowedConnections": null,
-  "multipleConnections": null
+  "allowedConnections": null
 }

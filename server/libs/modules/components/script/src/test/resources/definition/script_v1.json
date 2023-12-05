@@ -1009,6 +1009,5 @@
   "version": 1,
   "title": "Script",
   "triggers": null,
-  "allowedConnections": null,
-  "multipleConnections": null
+  "allowedConnections": null
 }

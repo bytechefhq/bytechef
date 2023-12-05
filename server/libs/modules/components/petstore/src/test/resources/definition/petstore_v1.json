@@ -4658,6 +4658,5 @@
   "version": 1,
   "title": "Petstore",
   "triggers": [ ],
-  "allowedConnections": null,
-  "multipleConnections": null
+  "allowedConnections": null
 }

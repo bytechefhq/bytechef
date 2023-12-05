@@ -158,6 +158,5 @@
   "version": 1,
   "title": "Object Helper",
   "triggers": null,
-  "allowedConnections": null,
-  "multipleConnections": null
+  "allowedConnections": null
 }

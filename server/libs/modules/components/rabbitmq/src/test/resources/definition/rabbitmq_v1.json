@@ -151,7 +151,6 @@
   "icon": "path:assets/rabbitmq.svg",
   "tags": null,
   "allowedConnections": null,
-  "multipleConnections": null,
   "metadata": null,
   "name": "rabbitMQ",
   "resources": null,

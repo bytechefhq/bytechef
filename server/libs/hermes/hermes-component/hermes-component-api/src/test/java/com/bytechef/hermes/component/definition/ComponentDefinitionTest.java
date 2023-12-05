@@ -101,7 +101,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"actions":null,"category":null,"connection":null,"customAction":null,"customActionHelp":null,"description":"description","icon":"icon","tags":null,"allowedConnections":null,"metadata":null,"multipleConnections":null   ,"name":"name","resources":null,"version":1,"title":"title","triggers":null}
+                {"actions":null,"category":null,"connection":null,"customAction":null,"customActionHelp":null,"description":"description","icon":"icon","tags":null,"allowedConnections":null,"metadata":null,"name":"name","resources":null,"version":1,"title":"title","triggers":null}
                   """,
             componentDefinition);
     }

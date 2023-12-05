@@ -63,7 +63,6 @@
   "icon": "path:assets/bash.svg",
   "tags": null,
   "allowedConnections": null,
-  "multipleConnections": null,
   "metadata": null,
   "name": "bash",
   "resources": null,

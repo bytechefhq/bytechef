@@ -587,7 +587,6 @@ public final class ComponentDSL extends DefinitionDSL {
         private List<String> tags;
         private AllowedConnectionDefinitionsFunction allowedConnectionDefinitionsFunction;
         private Map<String, Object> metadata;
-        private Boolean multipleConnections;
         private final String name;
         private Resources resources;
         private int version = VERSION_1;
@@ -685,12 +684,6 @@ public final class ComponentDSL extends DefinitionDSL {
         @SuppressFBWarnings("EI2")
         public ModifiableComponentDefinition metadata(Map<String, Object> metadata) {
             this.metadata = metadata;
-
-            return this;
-        }
-
-        public ModifiableComponentDefinition multipleConnections(boolean multipleConnections) {
-            this.multipleConnections = multipleConnections;
 
             return this;
         }
@@ -806,11 +799,6 @@ public final class ComponentDSL extends DefinitionDSL {
         @Override
         public Optional<Map<String, Object>> getMetadata() {
             return Optional.ofNullable(metadata == null ? null : new HashMap<>(metadata));
-        }
-
-        @Override
-        public Optional<Boolean> getMultipleConnections() {
-            return Optional.ofNullable(multipleConnections);
         }
 
         @Override

@@ -15063,6 +15063,5 @@
   "version": 1,
   "title": "Jira",
   "triggers": [ ],
-  "allowedConnections": null,
-  "multipleConnections": null
+  "allowedConnections": null
 }

@@ -122,7 +122,6 @@
   "icon": "path:assets/randomhelper.svg",
   "tags": null,
   "allowedConnections": null,
-  "multipleConnections": null,
   "metadata": null,
   "name": "randomHelper",
   "resources": null,

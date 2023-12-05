@@ -88,12 +88,6 @@ public interface ComponentDefinition {
      *
      * @return
      */
-    Optional<Boolean> getMultipleConnections();
-
-    /**
-     *
-     * @return
-     */
     String getName();
 
     /**

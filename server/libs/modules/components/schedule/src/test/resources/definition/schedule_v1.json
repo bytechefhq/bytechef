@@ -8,7 +8,6 @@
   "icon": "path:assets/schedule.svg",
   "tags": null,
   "allowedConnections": null,
-  "multipleConnections": null,
   "metadata": null,
   "name": "schedule",
   "resources": null,
