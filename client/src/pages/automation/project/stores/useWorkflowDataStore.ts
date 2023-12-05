@@ -41,7 +41,7 @@ const useWorkflowDataStore = create<WorkflowDefinitionState>()(
             setComponentDefinitions: (componentDefinitions) =>
                 set((state) => ({...state, componentDefinitions})),
 
-            componentNames: [],
+            componentNames: ['manual'],
             setComponentNames: (componentNames) =>
                 set((state) => ({...state, componentNames})),
 
