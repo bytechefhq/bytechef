@@ -443,6 +443,10 @@ components:
         priority:
           description: "The priority value used during execution of individual tasks."
           type: "integer"
+        triggerOutputs:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TriggerOutput"
         workflowId:
           description: "Id of the workflow to execute."
           type: "string"
@@ -620,21 +624,6 @@ components:
           description: "The type of the task."
           type: "string"
           readOnly: true
-    TestConnection:
-      description: "The connection used in a particular task."
-      type: "object"
-      properties:
-        id:
-          description: "The connection id"
-          type: "integer"
-          format: "int64"
-        key:
-          description: "The connection key under which a connection is defined in\
-            \ a workflow definition."
-          type: "string"
-        operationName:
-          description: "The operation(task/trigger) name to which a connection belongs."
-          type: "string"
     TestParameters:
       description: "Defines parameters used to test a workflow."
       type: "object"
@@ -642,12 +631,16 @@ components:
         connections:
           type: "array"
           items:
-            $ref: "#/components/schemas/TestConnection"
+            $ref: "#/components/schemas/TaskConnection"
         inputs:
           description: "The inputs expected by the workflow"
           type: "object"
           additionalProperties:
             type: "object"
+        triggerOutputs:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TriggerOutput"
         workflowId:
           description: "Id of the workflow to execute."
           type: "string"
@@ -763,6 +756,16 @@ components:
           description: "The type of the task."
           type: "string"
           readOnly: true
+    TriggerOutput:
+      description: "The trigger output."
+      type: "object"
+      properties:
+        value:
+          description: "The trigger output value"
+          type: "object"
+        triggerName:
+          description: "The task name to which a connection belongs."
+          type: "string"
     Webhook:
       description: "Used to register to receive notifications for certain events."
       type: "object"
