@@ -32,8 +32,8 @@ const ProjectInstanceWorkflowList = ({
     } = {};
 
     return (
-        <div className="border-b border-b-gray-100 py-3 pl-4">
-            <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-400">
+        <div className="border-b border-b-gray-100 pl-4">
+            <h3 className="flex justify-start px-2 text-sm font-semibold uppercase text-gray-400">
                 Workflows
             </h3>
 
