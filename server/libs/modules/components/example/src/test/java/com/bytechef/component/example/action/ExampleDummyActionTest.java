@@ -16,7 +16,7 @@
 
 package com.bytechef.component.example.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ public class ExampleDummyActionTest {
     public void testPerform() {
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-        Assertions.assertNull(ExampleDummyAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class)));
+        Assertions.assertNull(
+            ExampleDummyAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class)));
     }
 }

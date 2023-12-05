@@ -24,6 +24,6 @@ public final class ExampleConstants {
     public static final String EXAMPLE = "example";
     public static final String DUMMY = "dummy";
 
-    public ExampleConstants() {
+    private ExampleConstants() {
     }
 }

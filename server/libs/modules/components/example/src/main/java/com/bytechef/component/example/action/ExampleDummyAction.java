@@ -37,12 +37,13 @@ public final class ExampleDummyAction {
         .outputSchema(string())
         .perform(ExampleDummyAction::perform);
 
-    protected static Object perform(
+    public static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
         throws ComponentExecutionException {
+
         return null;
     }
 
-    public ExampleDummyAction() {
+    private ExampleDummyAction() {
     }
 }

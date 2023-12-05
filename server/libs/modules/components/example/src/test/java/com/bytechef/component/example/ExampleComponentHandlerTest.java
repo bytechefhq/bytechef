@@ -22,8 +22,7 @@ import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Arik Cohen
- * @author Ivica Cardic
+ * @author Mario Cvjetojevic
  */
 public class ExampleComponentHandlerTest {
 
