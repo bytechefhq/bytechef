@@ -25,8 +25,8 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.MAP;
 
-import com.bytechef.atlas.configuration.task.Task;
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.configuration.domain.Task;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;

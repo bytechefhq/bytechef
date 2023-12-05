@@ -19,8 +19,8 @@
 package com.bytechef.atlas.coordinator.task.completion;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.job.JobExecutor;
 import com.bytechef.atlas.execution.domain.Context;

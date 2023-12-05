@@ -18,8 +18,8 @@
 
 package com.bytechef.atlas.coordinator.event.listener;
 
-import com.bytechef.atlas.configuration.task.CancelControlTask;
-import com.bytechef.atlas.configuration.task.Task;
+import com.bytechef.atlas.configuration.domain.CancelControlTask;
+import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;

@@ -19,7 +19,7 @@ package com.bytechef.helios.execution.web.rest.mapper;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
 import com.bytechef.helios.execution.web.rest.model.TriggerExecutionModel;
 import com.bytechef.helios.execution.web.rest.model.WorkflowTriggerModel;
-import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import com.bytechef.hermes.configuration.domain.WorkflowTrigger;
 import com.bytechef.hermes.execution.dto.TriggerExecutionDTO;
 import java.util.Optional;
 import org.mapstruct.Mapper;

@@ -16,9 +16,9 @@
 
 package com.bytechef.hermes.configuration.facade;
 
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.hermes.configuration.domain.WorkflowConnection;
-import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import com.bytechef.hermes.configuration.domain.WorkflowTrigger;
 import java.util.List;
 
 /**

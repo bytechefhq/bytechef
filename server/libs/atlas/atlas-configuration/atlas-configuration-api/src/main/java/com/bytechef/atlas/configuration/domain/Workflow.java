@@ -19,7 +19,6 @@
 package com.bytechef.atlas.configuration.domain;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
-import com.bytechef.atlas.configuration.task.WorkflowTask;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.CollectionUtils;

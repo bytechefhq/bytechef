@@ -16,13 +16,13 @@
 
 package com.bytechef.hermes.configuration.facade;
 
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.configuration.domain.WorkflowConnection;
-import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import com.bytechef.hermes.configuration.domain.WorkflowTrigger;
 import com.bytechef.hermes.registry.domain.Property;
 import java.util.List;
 import java.util.function.Function;

@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.coordinator.event.listener;
 
-import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
+import com.bytechef.hermes.configuration.domain.CancelControlTrigger;
 import com.bytechef.hermes.coordinator.event.ApplicationEvent;
 import com.bytechef.hermes.coordinator.event.TriggerStartedApplicationEvent;
 import com.bytechef.hermes.execution.domain.TriggerExecution;

@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2023 ByteChef Inc.
  */
 
-package com.bytechef.atlas.configuration.task;
+package com.bytechef.atlas.configuration.domain;
 
 /**
  * @author Arik Cohen

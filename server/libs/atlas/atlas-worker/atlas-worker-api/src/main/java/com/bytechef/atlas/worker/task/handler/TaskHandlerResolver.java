@@ -18,7 +18,7 @@
 
 package com.bytechef.atlas.worker.task.handler;
 
-import com.bytechef.atlas.configuration.task.Task;
+import com.bytechef.atlas.configuration.domain.Task;
 
 /**
  * a strategy interface used for resolving a {@link TaskHandler} implementation which can handle the given

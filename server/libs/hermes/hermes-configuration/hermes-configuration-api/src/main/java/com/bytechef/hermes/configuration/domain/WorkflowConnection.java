@@ -16,12 +16,11 @@
 
 package com.bytechef.hermes.configuration.domain;
 
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

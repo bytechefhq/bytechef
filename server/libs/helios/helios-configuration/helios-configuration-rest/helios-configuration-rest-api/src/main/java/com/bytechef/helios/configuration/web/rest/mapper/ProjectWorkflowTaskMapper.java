@@ -16,7 +16,7 @@
 
 package com.bytechef.helios.configuration.web.rest.mapper;
 
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel;
 import java.util.List;

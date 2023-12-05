@@ -18,9 +18,9 @@
 
 package com.bytechef.atlas.execution.domain;
 
-import com.bytechef.atlas.configuration.task.Progressable;
-import com.bytechef.atlas.configuration.task.Task;
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.configuration.domain.Progressable;
+import com.bytechef.atlas.configuration.domain.Task;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.error.Errorable;
 import com.bytechef.error.ExecutionError;

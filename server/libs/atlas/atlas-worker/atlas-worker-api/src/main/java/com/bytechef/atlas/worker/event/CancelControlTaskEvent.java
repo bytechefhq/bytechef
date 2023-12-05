@@ -16,7 +16,7 @@
 
 package com.bytechef.atlas.worker.event;
 
-import com.bytechef.atlas.configuration.task.CancelControlTask;
+import com.bytechef.atlas.configuration.domain.CancelControlTask;
 import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.message.event.MessageEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
