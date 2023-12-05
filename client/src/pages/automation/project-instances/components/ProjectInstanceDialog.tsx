@@ -176,10 +176,7 @@ const ProjectInstanceDialog = ({
             )}
 
             <DialogContent
-                className={twMerge(
-                    'flex flex-col',
-                    activeStepIndex === 1 && 'h-[500px] max-h-[800px]'
-                )}
+                className={twMerge('flex flex-col')}
                 onInteractOutside={(event) => event.preventDefault()}
             >
                 <Form {...form}>
@@ -232,7 +229,9 @@ const ProjectInstanceDialog = ({
                         )}
                     </DialogHeader>
 
-                    {projectInstanceDialogSteps[activeStepIndex].content}
+                    <div className="max-h-[600px] overflow-y-auto">
+                        {projectInstanceDialogSteps[activeStepIndex].content}
+                    </div>
 
                     <DialogFooter>
                         {activeStepIndex === 0 && (
