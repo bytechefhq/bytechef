@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.example.action;
+package com.bytechef.component.googledrive.action;
 
-import static com.bytechef.component.example.constant.ExampleConstants.DUMMY;
+import static com.bytechef.component.googledrive.constant.ExampleConstants.DUMMY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 

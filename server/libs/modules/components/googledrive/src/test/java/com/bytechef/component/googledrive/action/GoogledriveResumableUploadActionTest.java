@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.example.constant;
+package com.bytechef.component.googledrive.action;
+
+import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ParameterMap;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
  */
-public final class ExampleConstants {
+public class GoogledriveUploadActionTest {
 
-    public static final String EXAMPLE = "example";
-    public static final String DUMMY = "dummy";
+    @Test
+    public void testPerform() {
+        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-    private ExampleConstants() {
+        Assertions.assertNull(GoogledriveUploadAction.perform(
+            parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class)));
     }
 }

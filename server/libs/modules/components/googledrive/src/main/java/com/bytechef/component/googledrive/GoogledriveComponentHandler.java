@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.example;
+package com.bytechef.component.googledrive;
 
-import static com.bytechef.component.googledrive.constant.ExampleConstants.EXAMPLE;
+import static com.bytechef.component.googledrive.connection.GoogledriveConnection.CONNECTION_DEFINITION;
+import static com.bytechef.component.googledrive.constant.GoogledriveConstants.GOOGLEDRIVE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.googledrive.action.ExampleDummyAction;
+import com.bytechef.component.googledrive.action.GoogledriveUploadAction;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -28,13 +29,14 @@ import com.google.auto.service.AutoService;
  * @author Mario Cvjetojevic
  */
 @AutoService(ComponentHandler.class)
-public class ExampleComponentHandler implements ComponentHandler {
+public class GoogledriveComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(EXAMPLE)
-        .title("Example")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(GOOGLEDRIVE)
+        .title("Google Drive")
         .description("Component description.")
-        .icon("path:assets/example.svg")
-        .actions(ExampleDummyAction.ACTION_DEFINITION);
+        .icon("path:assets/googledrive.svg")
+        .connection(CONNECTION_DEFINITION)
+        .actions(GoogledriveUploadAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.example.action;
-
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+package com.bytechef.component.googledrive.constant;
 
 /**
  * @author Mario Cvjetojevic
  */
-public class ExampleDummyActionTest {
+public final class GoogledriveConstants {
 
-    @Test
-    public void testPerform() {
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+    public static final String GOOGLEDRIVE = "googledrive";
+    public static final String RESUMABLEUPLOAD = "resumableUpload";
 
-        Assertions.assertNull(
-            ExampleDummyAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class)));
+    public GoogledriveConstants() {
     }
 }

@@ -1,0 +1,14 @@
+---
+label: "Hello Script"
+inputs:
+- name: "path"
+  label: "Path pattern to list"
+  default: "/tmp/*.*"
+  type: "string"
+  required: true
+tasks:
+- label: "List files in ${path}"
+  name: "listOfFiles"
+  type: "googledrive/v1/execute"
+  parameters:
+    script: "for f in ${path}\ndo\n  echo \"$f\"\ndone\n"
