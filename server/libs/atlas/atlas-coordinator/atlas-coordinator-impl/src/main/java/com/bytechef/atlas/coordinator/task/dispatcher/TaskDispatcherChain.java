@@ -18,7 +18,7 @@
 
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
-import com.bytechef.atlas.configuration.task.Task;
+import com.bytechef.atlas.configuration.domain.Task;
 import java.util.ArrayList;
 import java.util.List;
 

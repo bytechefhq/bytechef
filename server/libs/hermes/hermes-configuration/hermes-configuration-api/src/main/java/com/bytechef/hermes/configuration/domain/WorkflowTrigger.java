@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.trigger;
+package com.bytechef.hermes.configuration.domain;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;

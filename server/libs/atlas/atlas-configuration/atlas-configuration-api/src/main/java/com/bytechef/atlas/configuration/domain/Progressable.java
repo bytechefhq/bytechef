@@ -16,7 +16,7 @@
  * Modifications copyright (C) 2023 ByteChef Inc.
  */
 
-package com.bytechef.atlas.configuration.task;
+package com.bytechef.atlas.configuration.domain;
 
 /**
  * An interface which denotes an object (typically a {@link Task} able to report its progress.

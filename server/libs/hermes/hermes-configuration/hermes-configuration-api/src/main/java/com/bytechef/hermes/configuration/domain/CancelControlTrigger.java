@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.trigger;
+package com.bytechef.hermes.configuration.domain;
 
 /**
  * @author Ivica Cardic

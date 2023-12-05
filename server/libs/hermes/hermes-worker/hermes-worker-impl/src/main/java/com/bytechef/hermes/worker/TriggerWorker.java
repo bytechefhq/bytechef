@@ -19,7 +19,7 @@ package com.bytechef.hermes.worker;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
-import com.bytechef.hermes.configuration.trigger.CancelControlTrigger;
+import com.bytechef.hermes.configuration.domain.CancelControlTrigger;
 import com.bytechef.hermes.coordinator.event.TriggerExecutionCompleteEvent;
 import com.bytechef.hermes.coordinator.event.TriggerExecutionErrorEvent;
 import com.bytechef.hermes.coordinator.event.TriggerStartedApplicationEvent;

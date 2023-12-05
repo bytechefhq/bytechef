@@ -18,7 +18,7 @@
 
 package com.bytechef.atlas.worker.task.handler;
 
-import com.bytechef.atlas.configuration.task.Task;
+import com.bytechef.atlas.configuration.domain.Task;
 
 /**
  * @author Arik Cohen

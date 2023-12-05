@@ -19,8 +19,8 @@ package com.bytechef.task.dispatcher.sequence.completion;
 import static com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher.TASKS;
 import static com.bytechef.task.dispatcher.sequence.constant.SequenceTaskDispatcherConstants.SEQUENCE;
 
-import com.bytechef.atlas.configuration.task.Task;
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.configuration.domain.Task;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Context;

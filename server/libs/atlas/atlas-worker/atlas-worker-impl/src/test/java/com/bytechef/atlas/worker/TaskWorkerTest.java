@@ -25,8 +25,8 @@ import static com.bytechef.atlas.configuration.constant.WorkflowConstants.POST;
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.PRE;
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.TYPE;
 
-import com.bytechef.atlas.configuration.task.CancelControlTask;
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.configuration.domain.CancelControlTask;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;

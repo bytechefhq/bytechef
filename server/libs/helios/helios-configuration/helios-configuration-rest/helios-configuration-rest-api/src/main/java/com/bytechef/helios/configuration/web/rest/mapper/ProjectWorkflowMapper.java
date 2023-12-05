@@ -22,8 +22,8 @@ import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigura
 import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowTriggerModel;
+import com.bytechef.hermes.configuration.domain.WorkflowTrigger;
 import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
-import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import java.util.List;
 import java.util.Objects;
 import org.mapstruct.AfterMapping;

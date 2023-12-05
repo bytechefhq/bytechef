@@ -17,7 +17,7 @@
 package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.Counter;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;

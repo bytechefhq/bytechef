@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.configuration.trigger;
+package com.bytechef.hermes.configuration.domain;
 
 /**
  * @author Ivica Cardic
  */
-public interface ControlTrigger extends Trigger {
+public interface Trigger {
+    /**
+     * Get the type of the trigger. Type strings are mapped to
+     * {@link com.bytechef.hermes.worker.trigger.handler.TriggerHandler} implementations designed to handle that type of
+     * trigger.
+     *
+     * @return String
+     */
+    String getType();
 }

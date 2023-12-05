@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.configuration.task;
+package com.bytechef.hermes.configuration.domain;
 
 /**
  * @author Ivica Cardic
  */
-public interface ControlTask extends Task {
-
-    String getType();
+public interface ControlTrigger extends Trigger {
 }

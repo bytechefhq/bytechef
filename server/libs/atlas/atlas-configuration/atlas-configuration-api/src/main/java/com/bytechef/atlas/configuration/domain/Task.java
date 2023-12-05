@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2016-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,18 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modifications copyright (C) 2023 ByteChef Inc.
  */
 
-package com.bytechef.hermes.configuration.trigger;
+package com.bytechef.atlas.configuration.domain;
 
 /**
- * @author Ivica Cardic
+ * @author Arik Cohen
  */
-public interface Trigger {
+public interface Task {
     /**
-     * Get the type of the trigger. Type strings are mapped to
-     * {@link com.bytechef.hermes.worker.trigger.handler.TriggerHandler} implementations designed to handle that type of
-     * trigger.
+     * Get the type of the task. Type strings are mapped to {@link com.bytechef.atlas.worker.task.handler.TaskHandler}
+     * implementations designed to handle that type of task.
      *
      * @return String
      */

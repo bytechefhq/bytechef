@@ -18,8 +18,8 @@
 
 package com.bytechef.atlas.coordinator.config;
 
+import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.configuration.task.Task;
 import com.bytechef.atlas.coordinator.TaskCoordinator;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.event.listener.ErrorEventListener;

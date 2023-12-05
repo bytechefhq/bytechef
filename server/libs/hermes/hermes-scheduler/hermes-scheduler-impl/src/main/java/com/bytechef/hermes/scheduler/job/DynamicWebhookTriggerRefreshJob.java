@@ -23,7 +23,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
-import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import com.bytechef.hermes.configuration.domain.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

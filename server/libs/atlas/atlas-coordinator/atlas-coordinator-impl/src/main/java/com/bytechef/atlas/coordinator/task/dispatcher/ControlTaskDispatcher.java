@@ -18,9 +18,9 @@
 
 package com.bytechef.atlas.coordinator.task.dispatcher;
 
-import com.bytechef.atlas.configuration.task.CancelControlTask;
-import com.bytechef.atlas.configuration.task.ControlTask;
-import com.bytechef.atlas.configuration.task.Task;
+import com.bytechef.atlas.configuration.domain.CancelControlTask;
+import com.bytechef.atlas.configuration.domain.ControlTask;
+import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import org.springframework.context.ApplicationEventPublisher;
 

@@ -18,7 +18,7 @@ package com.bytechef.helios.configuration.web.rest.mapper;
 
 import com.bytechef.helios.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
 import com.bytechef.helios.configuration.web.rest.model.WorkflowTriggerModel;
-import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import com.bytechef.hermes.configuration.domain.WorkflowTrigger;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;

@@ -18,7 +18,7 @@
 
 package com.bytechef.atlas.coordinator.event.listener;
 
-import com.bytechef.atlas.configuration.task.Task;
+import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.coordinator.event.ErrorEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;

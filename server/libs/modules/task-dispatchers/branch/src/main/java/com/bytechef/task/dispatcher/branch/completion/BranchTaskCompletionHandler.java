@@ -25,8 +25,8 @@ import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherC
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.KEY;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.TASKS;
 
-import com.bytechef.atlas.configuration.task.Task;
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.configuration.domain.Task;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Context.Classname;

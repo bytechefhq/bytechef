@@ -20,8 +20,8 @@ import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispa
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_TRUE;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CONDITION;
 
-import com.bytechef.atlas.configuration.task.Task;
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.configuration.domain.Task;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Context;

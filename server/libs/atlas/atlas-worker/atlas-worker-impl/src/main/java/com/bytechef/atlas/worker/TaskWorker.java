@@ -18,8 +18,8 @@
 
 package com.bytechef.atlas.worker;
 
-import com.bytechef.atlas.configuration.task.CancelControlTask;
-import com.bytechef.atlas.configuration.task.WorkflowTask;
+import com.bytechef.atlas.configuration.domain.CancelControlTask;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;

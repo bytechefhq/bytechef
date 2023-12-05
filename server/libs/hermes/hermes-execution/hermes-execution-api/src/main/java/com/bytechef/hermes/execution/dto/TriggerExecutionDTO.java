@@ -18,7 +18,7 @@ package com.bytechef.hermes.execution.dto;
 
 import com.bytechef.error.ExecutionError;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
-import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
+import com.bytechef.hermes.configuration.domain.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.domain.TriggerExecution.Status;
