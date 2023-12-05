@@ -16,7 +16,7 @@
 
 package com.bytechef.helios.execution.web.rest.mapper;
 
-import com.bytechef.helios.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.helios.execution.dto.WorkflowExecution;
 import com.bytechef.helios.execution.web.rest.mapper.config.ProjectExecutionMapperSpringConfig;
 import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.helios.execution.web.rest.model.WorkflowExecutionModel;
@@ -30,18 +30,17 @@ public class ProjectWorkflowExecutionMapper {
 
     @Mapper(config = ProjectExecutionMapperSpringConfig.class)
     public interface ProjectWorkflowExecutionDTOToWorkflowExecutionModelMapper
-        extends Converter<WorkflowExecutionDTO, WorkflowExecutionModel> {
+        extends Converter<WorkflowExecution, WorkflowExecutionModel> {
 
         @Override
-        WorkflowExecutionModel convert(WorkflowExecutionDTO workflowExecutionDTO);
+        WorkflowExecutionModel convert(WorkflowExecution workflowExecution);
     }
 
     @Mapper(config = ProjectExecutionMapperSpringConfig.class)
     public interface ProjectWorkflowExecutionDTOToWorkflowExecutionBasicModelMapper
-        extends Converter<WorkflowExecutionDTO, WorkflowExecutionBasicModel> {
+        extends Converter<WorkflowExecution, WorkflowExecutionBasicModel> {
 
         @Override
-        WorkflowExecutionBasicModel convert(WorkflowExecutionDTO workflowExecutionDTO);
+        WorkflowExecutionBasicModel convert(WorkflowExecution workflowExecution);
     }
-
 }

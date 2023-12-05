@@ -25,7 +25,7 @@ import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
@@ -123,11 +123,11 @@ public class WebhookController {
         Map<String, String[]> parameters = httpServletRequest.getParameterMap();
         ResponseEntity<?> responseEntity;
 
-        ComponentOperation componentOperation = getComponentOperation(workflowExecutionId);
+        OperationType operationType = getComponentOperation(workflowExecutionId);
 
         WebhookTriggerFlags webhookTriggerFlags = triggerDefinitionService.getWebhookTriggerFlags(
-            componentOperation.componentName(), componentOperation.componentVersion(),
-            componentOperation.operationName());
+            operationType.componentName(), operationType.componentVersion(),
+            operationType.componentOperationName());
 
         if (mediaType != null) {
             if (mediaType.startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)) {
@@ -229,12 +229,12 @@ public class WebhookController {
         return responseEntity;
     }
 
-    private ComponentOperation getComponentOperation(WorkflowExecutionId workflowExecutionId) {
+    private OperationType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
         Workflow workflow = workflowService.getWorkflow(workflowExecutionId.getWorkflowId());
 
         WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
 
-        return ComponentOperation.ofType(workflowTrigger.getType());
+        return OperationType.ofType(workflowTrigger.getType());
     }
 
     private static String getFilename(String mimeTypeString) {

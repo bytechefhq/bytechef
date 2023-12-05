@@ -18,7 +18,7 @@ package com.bytechef.hermes.component.registry.service;
 
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.registry.domain.Option;
@@ -67,5 +67,5 @@ public interface ActionDefinitionService {
 
     List<ActionDefinition> getActionDefinitions(@NonNull String componentName, int componentVersion);
 
-    List<ActionDefinition> getActionDefinitions(@NonNull List<ComponentOperation> componentOperations);
+    List<ActionDefinition> getActionDefinitions(@NonNull List<OperationType> operationTypes);
 }

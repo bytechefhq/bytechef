@@ -32,8 +32,9 @@ import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.helios.execution.dto.TestConnectionDTO;
-import com.bytechef.helios.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.helios.execution.dto.WorkflowExecution;
+import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
@@ -104,7 +105,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public WorkflowExecutionDTO getWorkflowExecution(long id) {
+    public WorkflowExecution getWorkflowExecution(long id) {
         Job job = jobService.getJob(id);
 
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(ProjectConstants.PROJECT_TYPE);
@@ -113,7 +114,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         Optional<Long> projectInstanceIdOptional = instanceJobService.fetchJobInstanceId(
             Validate.notNull(job.getId(), ""), ProjectConstants.PROJECT_TYPE);
 
-        return new WorkflowExecutionDTO(
+        return new WorkflowExecution(
             Validate.notNull(jobDTO.id(), "id"),
             projectService.getWorkflowProject(jobDTO.workflowId()),
             OptionalUtils.mapOrElse(projectInstanceIdOptional, projectInstanceService::getProjectInstance, null),
@@ -127,7 +128,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<WorkflowExecutionDTO> getWorkflowExecutions(
+    public Page<WorkflowExecution> getWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, int pageNumber) {
 
@@ -168,7 +169,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(ProjectConstants.PROJECT_TYPE);
 
-        return jobsPage.map(job -> new WorkflowExecutionDTO(
+        return jobsPage.map(job -> new WorkflowExecution(
             Validate.notNull(job.getId(), "id"),
             CollectionUtils.findFirstOrElse(
                 projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId()), null),
@@ -184,22 +185,21 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     }
 
     @Override
-    public WorkflowExecutionDTO testWorkflow(
-        String workflowId, Map<String, Object> inputs, List<TestConnectionDTO> testConnectionDTOs) {
+    public WorkflowExecution testWorkflow(JobParameters jobParameters) {
 
 //        TODO triggerTestExecutor
 
         JobDTO job = jobTestExecutor.execute(new JobParameters(workflowId, inputs));
 
-        return new WorkflowExecutionDTO(
-            job.id(), null, null, job, workflowService.getWorkflow(workflowId), null);
+        return new WorkflowExecution(
+            job.id(), null, null, job, workflowService.getWorkflow(jobParameters.getWorkflowId()), null);
     }
 
     private ComponentDefinition getComponentDefinition(String type) {
-        ComponentOperation componentOperation = ComponentOperation.ofType(type);
+        OperationType operationType = OperationType.ofType(type);
 
         return componentDefinitionService.getComponentDefinition(
-            componentOperation.componentName(), componentOperation.componentVersion());
+            operationType.componentName(), operationType.componentVersion());
     }
 
     private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {

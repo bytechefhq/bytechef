@@ -21,7 +21,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.configuration.trigger.WorkflowTrigger;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
@@ -90,22 +90,22 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
         this.workflowService = workflowService;
     }
 
-    private ComponentOperation getComponentOperation(WorkflowExecutionId workflowExecutionId) {
+    private OperationType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
         Workflow workflow = workflowService.getWorkflow(workflowExecutionId.getWorkflowId());
 
         WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
 
-        return ComponentOperation.ofType(workflowTrigger.getType());
+        return OperationType.ofType(workflowTrigger.getType());
     }
 
     private LocalDateTime refreshDynamicWebhookTrigger(WorkflowExecutionId workflowExecutionId) {
-        ComponentOperation componentOperation = getComponentOperation(workflowExecutionId);
+        OperationType operationType = getComponentOperation(workflowExecutionId);
         DynamicWebhookEnableOutput output = OptionalUtils.get(triggerStateService.fetchValue(workflowExecutionId));
         LocalDateTime webhookExpirationDate = null;
 
         output = remoteTriggerDefinitionFacade.executeDynamicWebhookRefresh(
-            componentOperation.componentName(), componentOperation.componentVersion(),
-            componentOperation.operationName(), output.parameters());
+            operationType.componentName(), operationType.componentVersion(),
+            operationType.componentOperationName(), output.parameters());
 
         if (output != null) {
             triggerStateService.save(workflowExecutionId, output);

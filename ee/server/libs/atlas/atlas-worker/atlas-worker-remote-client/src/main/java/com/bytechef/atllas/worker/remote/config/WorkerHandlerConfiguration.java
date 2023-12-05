@@ -12,7 +12,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import java.util.Map;
@@ -31,14 +31,14 @@ public class WorkerHandlerConfiguration {
     @Bean
     TaskHandlerRegistry taskHandlerRegistry(ActionDefinitionFacade actionDefinitionFacade) {
         return type -> (TaskHandler<?>) taskExecution -> {
-            ComponentOperation componentOperation = ComponentOperation.ofType(type);
+            OperationType operationType = OperationType.ofType(type);
 
             Map<String, Long> connectIdMap = MapUtils.getMap(
                 taskExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
 
             return actionDefinitionFacade.executePerform(
-                componentOperation.componentName(), componentOperation.componentVersion(),
-                componentOperation.operationName(),
+                operationType.componentName(), operationType.componentVersion(),
+                operationType.componentOperationName(),
                 MapUtils.getInteger(taskExecution.getMetadata(), MetadataConstants.TYPE),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.INSTANCE_ID),
                 MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),

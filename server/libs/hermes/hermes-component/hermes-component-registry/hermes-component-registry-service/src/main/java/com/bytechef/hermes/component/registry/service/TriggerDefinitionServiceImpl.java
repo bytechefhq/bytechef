@@ -46,7 +46,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
@@ -316,18 +316,18 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public List<TriggerDefinition> getTriggerDefinitions(@NonNull List<ComponentOperation> componentOperations) {
+    public List<TriggerDefinition> getTriggerDefinitions(@NonNull List<OperationType> operationTypes) {
         List<TriggerDefinition> triggerDefinitions;
 
-        if (componentOperations.isEmpty()) {
+        if (operationTypes.isEmpty()) {
             triggerDefinitions = CollectionUtils.map(
                 componentDefinitionRegistry.getTriggerDefinitions(), TriggerDefinition::new);
         } else {
             triggerDefinitions = CollectionUtils.map(
-                componentOperations,
+                operationTypes,
                 componentOperation -> getTriggerDefinition(
                     componentOperation.componentName(), componentOperation.componentVersion(),
-                    componentOperation.operationName()));
+                    componentOperation.componentOperationName()));
         }
 
         return triggerDefinitions;
