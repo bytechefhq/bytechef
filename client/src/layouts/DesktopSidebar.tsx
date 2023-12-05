@@ -17,7 +17,7 @@ export function DesktopSidebar({
 }) {
     return (
         <aside className="hidden border-r bg-muted lg:flex lg:shrink-0">
-            <div className="flex w-[54px]">
+            <div className="flex w-[56px]">
                 <div className="flex min-h-0 flex-1 flex-col">
                     <div className="flex-1">
                         <Link to="">
