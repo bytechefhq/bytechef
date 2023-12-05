@@ -46,7 +46,6 @@
   "icon": "path:assets/delay.svg",
   "tags": null,
   "allowedConnections": null,
-  "multipleConnections": null,
   "metadata": null,
   "name": "delay",
   "resources": null,

@@ -156,7 +156,6 @@
   "icon": "path:assets/logger.svg",
   "tags": null,
   "allowedConnections": null,
-  "multipleConnections": null,
   "metadata": null,
   "name": "logger",
   "resources": null,

@@ -37,7 +37,6 @@ public class ComponentDefinition {
     private ConnectionDefinitionBasic connection;
     private String description;
     private String icon;
-    private boolean multipleConnections;
     private String name;
     private Resources resources;
     private List<String> tags;
@@ -62,7 +61,6 @@ public class ComponentDefinition {
             OptionalUtils.mapOrElse(componentDefinition.getConnection(), ConnectionDefinitionBasic::new, null);
         this.description = OptionalUtils.orElse(componentDefinition.getDescription(), null);
         this.icon = OptionalUtils.mapOrElse(componentDefinition.getIcon(), IconUtils::readIcon, null);
-        this.multipleConnections = OptionalUtils.orElse(componentDefinition.getMultipleConnections(), false);
         this.name = componentDefinition.getName();
         this.resources = OptionalUtils.mapOrElse(componentDefinition.getResources(), Resources::new, null);
         this.tags = OptionalUtils.orElse(componentDefinition.getTags(), Collections.emptyList());
@@ -93,10 +91,6 @@ public class ComponentDefinition {
 
     public Optional<String> getIcon() {
         return Optional.ofNullable(icon);
-    }
-
-    public boolean isMultipleConnections() {
-        return multipleConnections;
     }
 
     public String getName() {

@@ -4252,6 +4252,5 @@
   "version": 1,
   "title": "HTTP Client",
   "triggers": null,
-  "allowedConnections": null,
-  "multipleConnections": null
+  "allowedConnections": null
 }

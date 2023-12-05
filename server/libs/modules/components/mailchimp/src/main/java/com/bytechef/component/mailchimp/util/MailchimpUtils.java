@@ -23,6 +23,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,11 @@ public class MailchimpUtils {
             .header(AUTHORIZATION, "OAuth " + accessToken)
             .execute()
             .getBody());
+
+        if (!response.containsKey("dc")) {
+            throw new ComponentExecutionException(
+                "%s: %s".formatted(response.get("error"), response.get("error_description")));
+        }
 
         return (String) response.get("dc");
     }

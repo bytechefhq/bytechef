@@ -655,6 +655,5 @@
   "version": 1,
   "title": "ODS File",
   "triggers": null,
-  "allowedConnections": null,
-  "multipleConnections": null
+  "allowedConnections": null
 }

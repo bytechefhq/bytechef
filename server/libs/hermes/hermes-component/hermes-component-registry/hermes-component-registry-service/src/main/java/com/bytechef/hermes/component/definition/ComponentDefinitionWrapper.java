@@ -43,7 +43,6 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
     protected final List<String> tags;
     protected final AllowedConnectionDefinitionsFunction allowedConnectionDefinitionsFunction;
     protected final Map<String, Object> metadata;
-    protected final Boolean multipleConnections;
     protected final String name;
     protected final Resources resources;
     protected final int version;
@@ -73,7 +72,6 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
         this.allowedConnectionDefinitionsFunction =
             OptionalUtils.orElse(componentDefinition.getAllowedConnections(), null);
         this.metadata = OptionalUtils.orElse(componentDefinition.getMetadata(), null);
-        this.multipleConnections = OptionalUtils.orElse(componentDefinition.getMultipleConnections(), null);
         this.name = componentDefinition.getName();
         this.resources = OptionalUtils.orElse(componentDefinition.getResources(), null);
         this.version = componentDefinition.getVersion();
@@ -124,11 +122,6 @@ public class ComponentDefinitionWrapper implements ComponentDefinition {
     @Override
     public Optional<Map<String, Object>> getMetadata() {
         return Optional.ofNullable(metadata == null ? null : new HashMap<>(metadata));
-    }
-
-    @Override
-    public Optional<Boolean> getMultipleConnections() {
-        return Optional.ofNullable(multipleConnections);
     }
 
     @Override

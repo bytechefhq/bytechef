@@ -87,6 +87,5 @@
   "version": 1,
   "title": "Map",
   "triggers": null,
-  "allowedConnections": null,
-  "multipleConnections": null
+  "allowedConnections": null
 }

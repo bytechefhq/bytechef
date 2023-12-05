@@ -167,6 +167,5 @@
     "webhookValidate": { },
     "editorDescriptionDataSource": null
   } ],
-  "allowedConnections": null,
-  "multipleConnections": null
+  "allowedConnections": null
 }

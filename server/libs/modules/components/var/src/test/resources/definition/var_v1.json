@@ -292,6 +292,5 @@
   "version": 1,
   "title": "Var",
   "triggers": null,
-  "allowedConnections": null,
-  "multipleConnections": null
+  "allowedConnections": null
 }
