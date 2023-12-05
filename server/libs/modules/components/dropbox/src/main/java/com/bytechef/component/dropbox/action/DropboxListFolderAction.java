@@ -18,7 +18,7 @@ package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.dropbox.constant.DropboxConstants.LISTAFOLDER;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FILENAME;
-import static com.bytechef.component.dropbox.util.DropboxUtils.getDropboxRequestObject;
+import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
@@ -29,6 +29,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDef
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import java.util.List;
 
 /**
@@ -48,19 +49,25 @@ public final class DropboxListFolderAction {
         .outputSchema(object())
         .perform(DropboxListFolderAction::perform);
 
-    protected static ListFolderResult perform(
+    private DropboxListFolderAction() {
+    }
+
+    public static ListFolderResult perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
         throws ComponentExecutionException {
+
         try {
+            DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
+                connectionParameters.getRequiredString(ACCESS_TOKEN));
+
             return new ListFolderResult(
-                getDropboxRequestObject(connectionParameters.getRequiredString(ACCESS_TOKEN))
-                    .listFolder(inputParameters.getRequiredString(SOURCE_FILENAME)));
+                dbxUserFilesRequests.listFolder(inputParameters.getRequiredString(SOURCE_FILENAME)));
         } catch (DbxException dbxException) {
             throw new ComponentExecutionException("Unable to list folder " + inputParameters, dbxException);
         }
     }
 
-    record ListFolderResult(List<Metadata> entries, String cursor, boolean hasMore) {
+    public record ListFolderResult(List<Metadata> entries, String cursor, boolean hasMore) {
         ListFolderResult(com.dropbox.core.v2.files.ListFolderResult listFolderResult) {
             this(
                 listFolderResult.getEntries()
@@ -72,7 +79,7 @@ public final class DropboxListFolderAction {
         }
     }
 
-    record Metadata(String name, String pathLower, String pathDisplay, String parentSharedFolderId,
+    public record Metadata(String name, String pathLower, String pathDisplay, String parentSharedFolderId,
         String previewUrl) {
         Metadata(com.dropbox.core.v2.files.Metadata metadata) {
             this(
@@ -82,8 +89,5 @@ public final class DropboxListFolderAction {
                 metadata.getParentSharedFolderId(),
                 metadata.getPreviewUrl());
         }
-    }
-
-    private DropboxListFolderAction() {
     }
 }

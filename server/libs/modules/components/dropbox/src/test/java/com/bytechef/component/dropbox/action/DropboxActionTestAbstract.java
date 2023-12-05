@@ -63,7 +63,7 @@ abstract class DropboxActionTestAbstract {
     @BeforeEach
     void beforeEach() {
         dropboxUtils = Mockito.mockStatic(DropboxUtils.class);
-        dropboxUtils.when(() -> DropboxUtils.getDropboxRequestObject(""))
+        dropboxUtils.when(() -> DropboxUtils.getDbxUserFilesRequests(""))
             .thenReturn(filesRequests);
     }
 

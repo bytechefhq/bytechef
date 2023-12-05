@@ -18,7 +18,7 @@ package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATENEWTEXTFILE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION_FILENAME;
-import static com.bytechef.component.dropbox.util.DropboxUtils.getDropboxRequestObject;
+import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -28,8 +28,10 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDef
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.ImportFormat;
 import com.dropbox.core.v2.files.PaperCreateResult;
+import com.dropbox.core.v2.files.PaperCreateUploader;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -49,22 +51,22 @@ public final class DropboxCreateNewTextFileAction {
                 .required(true))
         .perform(DropboxCreateNewTextFileAction::perform);
 
-    protected static PaperCreateResult perform(
+    private DropboxCreateNewTextFileAction() {
+    }
+
+    public static PaperCreateResult perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
         throws ComponentExecutionException {
 
-        String fileName = inputParameters.getRequiredString(DESTINATION_FILENAME);
+        DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
+            connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-        try {
-            return getDropboxRequestObject(connectionParameters.getRequiredString(ACCESS_TOKEN))
-                .paperCreate(fileName, ImportFormat.PLAIN_TEXT)
-                .uploadAndFinish(InputStream.nullInputStream());
+        try (PaperCreateUploader paperCreateUploader = dbxUserFilesRequests.paperCreate(
+            inputParameters.getRequiredString(DESTINATION_FILENAME), ImportFormat.PLAIN_TEXT)) {
 
+            return paperCreateUploader.uploadAndFinish(InputStream.nullInputStream());
         } catch (IOException | DbxException exception) {
             throw new ComponentExecutionException("Unable to create new text file " + inputParameters, exception);
         }
-    }
-
-    private DropboxCreateNewTextFileAction() {
     }
 }

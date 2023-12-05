@@ -19,7 +19,7 @@ package com.bytechef.component.dropbox.action;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION_FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.MOVE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FILENAME;
-import static com.bytechef.component.dropbox.util.DropboxUtils.getDropboxRequestObject;
+import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -29,6 +29,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDef
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.RelocationResult;
 
 /**
@@ -38,10 +39,9 @@ public final class DropboxMoveAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(MOVE)
         .title("Move")
-        .description("""
-            Move a file or folder to a different location in the user's Dropbox.
-            If the source path is a folder all its contents will be moved.
-            Note that we do not currently support case-only renaming.""")
+        .description(
+            "Move a file or folder to a different location in the user's Dropbox. If the source path is a folder all " +
+                "its contents will be moved. Note that we do not currently support case-only renaming.")
         .properties(
             string(SOURCE_FILENAME)
                 .label("Source path")
@@ -55,19 +55,22 @@ public final class DropboxMoveAction {
                 .required(true))
         .perform(DropboxMoveAction::perform);
 
-    protected static RelocationResult perform(
+    private DropboxMoveAction() {
+    }
+
+    public static RelocationResult perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
         throws ComponentExecutionException {
+
         try {
-            return getDropboxRequestObject(connectionParameters.getRequiredString(ACCESS_TOKEN))
-                .moveV2(
-                    inputParameters.getRequiredString(SOURCE_FILENAME),
-                    inputParameters.getRequiredString(DESTINATION_FILENAME));
+            DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
+                connectionParameters.getRequiredString(ACCESS_TOKEN));
+
+            return dbxUserFilesRequests.moveV2(
+                inputParameters.getRequiredString(SOURCE_FILENAME),
+                inputParameters.getRequiredString(DESTINATION_FILENAME));
         } catch (DbxException dbxException) {
             throw new ComponentExecutionException("Unable to move " + inputParameters, dbxException);
         }
-    }
-
-    private DropboxMoveAction() {
     }
 }

@@ -18,7 +18,7 @@ package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATENEWFOLDER;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION_FILENAME;
-import static com.bytechef.component.dropbox.util.DropboxUtils.getDropboxRequestObject;
+import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -29,6 +29,7 @@ import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.CreateFolderResult;
+import com.dropbox.core.v2.files.DbxUserFilesRequests;
 
 /**
  * @author Mario Cvjetojevic
@@ -44,17 +45,20 @@ public final class DropboxCreateNewFolderAction {
             .required(true))
         .perform(DropboxCreateNewFolderAction::perform);
 
-    protected static CreateFolderResult perform(
+    private DropboxCreateNewFolderAction() {
+    }
+
+    public static CreateFolderResult perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
         throws ComponentExecutionException {
+
         try {
-            return getDropboxRequestObject(connectionParameters.getRequiredString(ACCESS_TOKEN))
-                .createFolderV2(inputParameters.getRequiredString(DESTINATION_FILENAME));
+            DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
+                connectionParameters.getRequiredString(ACCESS_TOKEN));
+
+            return dbxUserFilesRequests.createFolderV2(inputParameters.getRequiredString(DESTINATION_FILENAME));
         } catch (DbxException dbxException) {
             throw new ComponentExecutionException("Unable to create new folder " + inputParameters, dbxException);
         }
-    }
-
-    private DropboxCreateNewFolderAction() {
     }
 }

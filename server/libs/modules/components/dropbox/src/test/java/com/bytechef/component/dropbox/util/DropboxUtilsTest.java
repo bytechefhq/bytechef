@@ -38,34 +38,36 @@ class DropboxUtilsTest {
 
     @Test
     void testGetDropboxRequestObject() {
-        MockedStatic<DbxRequestConfig> dbxRequestConfigMockedStatic = Mockito.mockStatic(DbxRequestConfig.class);
-        DbxRequestConfig.Builder builder = Mockito.mock(DbxRequestConfig.Builder.class);
-        DbxRequestConfig dbxRequestConfig = Mockito.mock(DbxRequestConfig.class);
-        DbxUserFilesRequests dbxUserFilesRequests = Mockito.mock(DbxUserFilesRequests.class);
+        try (MockedStatic<DbxRequestConfig> dbxRequestConfigMockedStatic = Mockito.mockStatic(DbxRequestConfig.class)) {
+            DbxRequestConfig.Builder builder = Mockito.mock(DbxRequestConfig.Builder.class);
+            DbxRequestConfig dbxRequestConfig = Mockito.mock(DbxRequestConfig.class);
+            DbxUserFilesRequests dbxUserFilesRequests = Mockito.mock(DbxUserFilesRequests.class);
 
-        dbxRequestConfigMockedStatic.when(() -> DbxRequestConfig.newBuilder(CLIENT_IDENTIFIER))
-            .thenReturn(builder);
-        Mockito.when(builder.build())
-            .thenReturn(dbxRequestConfig);
-        try (MockedConstruction<DbxClientV2> dbxClientV2MockedConstruction =
-            Mockito.mockConstruction(DbxClientV2.class, (dbxClientV2, context) -> {
-                Mockito.when(dbxClientV2.files())
-                    .thenReturn(dbxUserFilesRequests);
+            dbxRequestConfigMockedStatic.when(() -> DbxRequestConfig.newBuilder(CLIENT_IDENTIFIER))
+                .thenReturn(builder);
+            Mockito.when(builder.build())
+                .thenReturn(dbxRequestConfig);
 
-                Assertions.assertEquals(ACCESS_TOKEN_STUB, context.arguments()
-                    .get(1),
-                    "Access token used does not match getDropboxRequestObject() method argument!");
-            })) {
+            try (MockedConstruction<DbxClientV2> dbxClientV2MockedConstruction =
+                Mockito.mockConstruction(DbxClientV2.class, (dbxClientV2, context) -> {
+                    Mockito.when(dbxClientV2.files())
+                        .thenReturn(dbxUserFilesRequests);
 
-            DropboxUtils.getDropboxRequestObject(ACCESS_TOKEN_STUB);
+                    Assertions.assertEquals(ACCESS_TOKEN_STUB, context.arguments()
+                        .get(1),
+                        "Access token used does not match getDropboxRequestObject() method argument!");
+                })) {
 
-            then(dbxClientV2MockedConstruction.constructed()
-                .get(0)).should(atLeast(1))
-                    .files();
+                DropboxUtils.getDbxUserFilesRequests(ACCESS_TOKEN_STUB);
 
-            Assertions.assertEquals(1, dbxClientV2MockedConstruction.constructed()
-                .size(),
-                "One instance of DbxClientV2 is enough!");
+                then(dbxClientV2MockedConstruction.constructed()
+                    .get(0)).should(atLeast(1))
+                        .files();
+
+                Assertions.assertEquals(1, dbxClientV2MockedConstruction.constructed()
+                    .size(),
+                    "One instance of DbxClientV2 is enough!");
+            }
         }
     }
 }

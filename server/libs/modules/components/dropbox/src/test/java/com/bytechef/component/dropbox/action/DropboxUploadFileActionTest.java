@@ -45,8 +45,7 @@ class DropboxUploadFileActionTest extends DropboxActionTestAbstract {
         Mockito.when(filesRequests.uploadBuilder(DESTINATION_STUB))
             .thenReturn(uploadBuilder);
 
-        DropboxUploadFileAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
+        DropboxUploadFileAction.perform(parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
 
         then(filesRequests).should(times(1))
             .uploadBuilder(stringArgumentCaptorA.capture());
