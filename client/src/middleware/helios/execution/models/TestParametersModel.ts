@@ -13,12 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { TestConnectionModel } from './TestConnectionModel';
+import type { TaskConnectionModel } from './TaskConnectionModel';
 import {
-    TestConnectionModelFromJSON,
-    TestConnectionModelFromJSONTyped,
-    TestConnectionModelToJSON,
-} from './TestConnectionModel';
+    TaskConnectionModelFromJSON,
+    TaskConnectionModelFromJSONTyped,
+    TaskConnectionModelToJSON,
+} from './TaskConnectionModel';
+import type { TriggerOutputModel } from './TriggerOutputModel';
+import {
+    TriggerOutputModelFromJSON,
+    TriggerOutputModelFromJSONTyped,
+    TriggerOutputModelToJSON,
+} from './TriggerOutputModel';
 
 /**
  * Defines parameters used to test a workflow.
@@ -28,16 +34,22 @@ import {
 export interface TestParametersModel {
     /**
      * 
-     * @type {Array<TestConnectionModel>}
+     * @type {Array<TaskConnectionModel>}
      * @memberof TestParametersModel
      */
-    connections?: Array<TestConnectionModel>;
+    connections?: Array<TaskConnectionModel>;
     /**
      * The inputs expected by the workflow
      * @type {{ [key: string]: object; }}
      * @memberof TestParametersModel
      */
     inputs?: { [key: string]: object; };
+    /**
+     * 
+     * @type {Array<TriggerOutputModel>}
+     * @memberof TestParametersModel
+     */
+    triggerOutputs?: Array<TriggerOutputModel>;
     /**
      * Id of the workflow to execute.
      * @type {string}
@@ -65,8 +77,9 @@ export function TestParametersModelFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
-        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(TestConnectionModelFromJSON)),
+        'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(TaskConnectionModelFromJSON)),
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
+        'triggerOutputs': !exists(json, 'triggerOutputs') ? undefined : ((json['triggerOutputs'] as Array<any>).map(TriggerOutputModelFromJSON)),
         'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
     };
 }
@@ -80,8 +93,9 @@ export function TestParametersModelToJSON(value?: TestParametersModel | null): a
     }
     return {
         
-        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(TestConnectionModelToJSON)),
+        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(TaskConnectionModelToJSON)),
         'inputs': value.inputs,
+        'triggerOutputs': value.triggerOutputs === undefined ? undefined : ((value.triggerOutputs as Array<any>).map(TriggerOutputModelToJSON)),
         'workflowId': value.workflowId,
     };
 }
