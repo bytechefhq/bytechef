@@ -1,17 +1,18 @@
-FROM ghcr.io/graalvm/graalvm-community:21 AS build
+FROM gradle:8.5.0-jdk21-alpine AS build
 
 WORKDIR /build
 
 COPY --chown=gradle:gradle ./.git ./.git
 COPY --chown=gradle:gradle ./buildSrc ./buildSrc
 COPY --chown=gradle:gradle ./gradle ./gradle
-COPY --chown=gradle:gradle ./gradlew ./gradlew
 COPY --chown=gradle:gradle ./server ./server
 COPY --chown=gradle:gradle ./build.gradle.kts ./build.gradle.kts
 COPY --chown=gradle:gradle ./gradle.properties ./gradle.properties
 COPY --chown=gradle:gradle ./settings.gradle.kts ./settings.gradle.kts
 
-RUN ./gradlew bootJar --no-daemon
+WORKDIR ./
+
+RUN gradle bootJar --no-daemon
 
 FROM ghcr.io/graalvm/graalvm-community:21.0.1
 
