@@ -15,7 +15,7 @@ import {useState} from 'react';
 
 interface WorkflowExecutionDetailsSheetProps {
     onClose: () => void;
-    onWorkflowRunClick: () => void;
+    onRunClick: () => void;
     onSave: (definition: string) => void;
     workflow: WorkflowModel;
     workflowIsRunning: boolean;
@@ -23,8 +23,8 @@ interface WorkflowExecutionDetailsSheetProps {
 
 const WorkflowCodeEditorSheet = ({
     onClose,
+    onRunClick,
     onSave,
-    onWorkflowRunClick,
     workflow,
     workflowIsRunning,
 }: WorkflowExecutionDetailsSheetProps) => {
@@ -65,11 +65,7 @@ const WorkflowCodeEditorSheet = ({
                                         <TooltipTrigger asChild>
                                             <Button
                                                 className="text-success hover:bg-secondary hover:text-success"
-                                                onClick={() => {
-                                                    onSave(definition);
-
-                                                    onWorkflowRunClick();
-                                                }}
+                                                onClick={onRunClick}
                                                 size="icon"
                                                 variant="ghost"
                                             >
