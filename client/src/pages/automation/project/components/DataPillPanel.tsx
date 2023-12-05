@@ -1,3 +1,4 @@
+import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     ActionDefinitionModel,
@@ -9,7 +10,6 @@ import DataPillPanelBody, {
 import {PropertyType} from '@/types/projectTypes';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
-import Button from 'components/Button/Button';
 import Input from 'components/Input/Input';
 import {useState} from 'react';
 
@@ -122,15 +122,15 @@ const DataPillPanel = ({
                             <Button
                                 aria-label="Close the data pill panel"
                                 className="ml-auto pr-0"
-                                displayType="icon"
-                                icon={
-                                    <Cross1Icon
-                                        aria-hidden="true"
-                                        className="h-3 w-3 cursor-pointer"
-                                    />
-                                }
                                 onClick={() => setDataPillPanelOpen(false)}
-                            />
+                                size="icon"
+                                variant="ghost"
+                            >
+                                <Cross1Icon
+                                    aria-hidden="true"
+                                    className="h-3 w-3 cursor-pointer"
+                                />
+                            </Button>
                         </Dialog.Title>
 
                         <div className="flex w-full grow flex-col">

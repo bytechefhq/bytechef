@@ -1,5 +1,5 @@
-import EmptyList from '@/components/EmptyList/EmptyList';
-import PageLoader from '@/components/PageLoader/PageLoader';
+import EmptyList from '@/components/EmptyList';
+import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';

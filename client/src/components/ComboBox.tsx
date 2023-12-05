@@ -104,7 +104,10 @@ const ComboBox = ({
                 className="min-w-combo-box-popper-anchor-width p-0"
             >
                 <Command>
-                    <CommandInput className="h-9" placeholder="Search..." />
+                    <CommandInput
+                        className="h-9 border-none ring-0"
+                        placeholder="Search..."
+                    />
 
                     <CommandEmpty>No item found.</CommandEmpty>
 

@@ -39,7 +39,7 @@ import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import TagList from '../../../../components/TagList/TagList';
+import TagList from '../../../../components/TagList';
 import ProjectInstanceDialog from './ProjectInstanceDialog';
 
 interface ProjectInstanceListItemProps {

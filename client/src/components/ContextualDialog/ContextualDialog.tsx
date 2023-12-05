@@ -1,5 +1,5 @@
+import {Button} from '@/components/ui/button';
 import {Cross1Icon} from '@radix-ui/react-icons';
-import Button from 'components/Button/Button';
 import {ReactNode} from 'react';
 
 interface ContextualDialogProps {
@@ -23,30 +23,21 @@ const ContextualDialog = ({
         <header className="flex items-center justify-between px-4 py-2">
             <span className="font-medium">{title}</span>
 
-            <Button
-                displayType="icon"
-                icon={<Cross1Icon />}
-                onClick={handleCancelClick}
-                size="small"
-            />
+            <Button onClick={handleCancelClick} size="icon" variant="ghost">
+                <Cross1Icon />
+            </Button>
         </header>
 
         <main className="p-4">{children}</main>
 
         <footer className="flex items-center justify-end space-x-2 px-4 py-2">
-            <Button
-                displayType="secondary"
-                label={cancelButtonLabel}
-                onClick={handleCancelClick}
-                size="small"
-            />
+            <Button onClick={handleCancelClick} size="sm" variant="secondary">
+                {cancelButtonLabel}
+            </Button>
 
-            <Button
-                displayType="primary"
-                label={saveButtonLabel}
-                onClick={handleSaveClick}
-                size="small"
-            />
+            <Button onClick={handleSaveClick} size="sm">
+                {saveButtonLabel}
+            </Button>
         </footer>
     </div>
 );

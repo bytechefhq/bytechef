@@ -41,7 +41,7 @@ import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
-import TagList from '../../../../components/TagList/TagList';
+import TagList from '../../../../components/TagList';
 import ProjectDialog from './ProjectDialog';
 
 interface ProjectItemProps {

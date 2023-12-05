@@ -1,4 +1,5 @@
-import Button from '../../../../components/Button/Button';
+import {Button} from '@/components/ui/button';
+
 import useOAuth2, {AuthTokenPayload} from '../oauth2/useOAuth2';
 
 const LoadingIcon = () => (
@@ -62,16 +63,15 @@ const OAuth2Button = ({
     return (
         <Button
             disabled={loading}
-            icon={loading && <LoadingIcon />}
-            iconPosition={loading ? 'left' : undefined}
-            label={loading ? 'Connecting...' : 'Connect'}
             onClick={() => {
                 if (!loading) {
                     onClick(getAuth);
                 }
             }}
             type={loading ? 'button' : 'submit'}
-        />
+        >
+            {loading && <LoadingIcon />} {loading ? 'Connecting...' : 'Connect'}
+        </Button>
     );
 };
 

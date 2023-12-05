@@ -1,4 +1,3 @@
-import ToggleGroup, {IToggleItem} from '@/components/ToggleGroup/ToggleGroup';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -82,9 +81,10 @@ import {
 import {useEffect, useState} from 'react';
 import {useLoaderData, useNavigate, useParams} from 'react-router-dom';
 
-import PageLoader from '../../../components/PageLoader/PageLoader';
+import PageLoader from '../../../components/PageLoader';
 import LayoutContainer from '../../../layouts/LayoutContainer';
 import ProjectWorkflow from './components/ProjectWorkflow';
+import ToggleGroup, {IToggleItem} from './components/ToggleGroup';
 import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
 

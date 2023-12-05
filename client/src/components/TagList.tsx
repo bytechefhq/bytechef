@@ -1,6 +1,6 @@
+import {Button} from '@/components/ui/button';
 import {ChevronDownIcon, Cross1Icon, PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
-import Button from 'components/Button/Button';
 import CreatableSelect, {
     ISelectOption,
 } from 'components/CreatableSelect/CreatableSelect';
@@ -77,11 +77,12 @@ const TagList = ({
                 <div className="relative flex">
                     <Button
                         className="mr-2"
-                        displayType="unstyled"
-                        icon={<ChevronDownIcon />}
                         onClick={() => setShowAllTags(!showAllTags)}
-                        size="small"
-                    />
+                        size="icon"
+                        variant="ghost"
+                    >
+                        <ChevronDownIcon />
+                    </Button>
 
                     {showAllTags && (
                         <div

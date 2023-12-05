@@ -1,6 +1,7 @@
+import {Label} from '@/components/ui/label';
+import {Textarea} from '@/components/ui/textarea';
 import {ComponentDataType} from '@/types/types';
 import Input from 'components/Input/Input';
-import TextArea from 'components/TextArea/TextArea';
 import {ComponentDefinitionModel} from 'middleware/hermes/configuration';
 import {ChangeEvent} from 'react';
 
@@ -51,15 +52,18 @@ const DescriptionTab = ({
                 onChange={handleTitleChange}
             />
 
-            <TextArea
-                key={`${name}_nodeNotes`}
-                label="Notes"
-                labelClassName="px-2"
-                name="nodeNotes"
-                onChange={handleNotesChange}
-                placeholder="Write some notes for yourself..."
-                value={currentComponentData?.notes || ''}
-            />
+            <div>
+                <Label>Notes</Label>
+
+                <Textarea
+                    className="mt-1"
+                    key={`${name}_nodeNotes`}
+                    name="nodeNotes"
+                    onChange={handleNotesChange}
+                    placeholder="Write some notes for yourself..."
+                    value={currentComponentData?.notes || ''}
+                />
+            </div>
         </div>
     );
 };

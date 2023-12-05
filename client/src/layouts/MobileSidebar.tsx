@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {Dialog, Transition} from '@headlessui/react';
 import {Cross1Icon} from '@radix-ui/react-icons';
 import {Fragment} from 'react';
@@ -66,18 +66,18 @@ export function MobileSidebar({
                                 <div className="absolute right-0 top-0 -mr-12 pt-4">
                                     <Button
                                         className="ml-1 items-center justify-center rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                                        displayType="icon"
-                                        icon={
-                                            <Cross1Icon
-                                                aria-hidden="true"
-                                                className="h-6 w-6 text-white"
-                                            />
-                                        }
                                         onClick={() => setMobileMenuOpen(false)}
+                                        size="icon"
+                                        variant="ghost"
                                     >
                                         <span className="sr-only">
                                             Close sidebar
                                         </span>
+
+                                        <Cross1Icon
+                                            aria-hidden="true"
+                                            className="h-6 w-6 text-white"
+                                        />
                                     </Button>
                                 </div>
                             </Transition.Child>

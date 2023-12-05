@@ -33,7 +33,7 @@ import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
-import TagList from '../../../../components/TagList/TagList';
+import TagList from '../../../../components/TagList';
 import ConnectionDialog from './ConnectionDialog';
 
 interface ConnectionListItemProps {
