@@ -470,7 +470,7 @@ const ConnectionDialog = ({
 
                         {(wizardStep === 'configuration_step' ||
                             oAuth2AuthorizationParametersLoading) && (
-                            <>
+                            <div className="grid max-h-[600px] gap-4 overflow-y-auto">
                                 {!connection?.id && (
                                     <FormField
                                         control={control}
@@ -774,7 +774,7 @@ const ConnectionDialog = ({
                                         )}
                                     />
                                 )}
-                            </>
+                            </div>
                         )}
 
                         {!oAuth2AuthorizationParametersLoading &&

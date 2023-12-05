@@ -79,7 +79,7 @@ const ProjectInstanceDialogBasicStep = ({
             )}
 
             {projects ? (
-                <>
+                <div className="grid gap-4">
                     {!projectInstance?.id && (
                         <FormField
                             control={control}
@@ -208,7 +208,7 @@ const ProjectInstanceDialogBasicStep = ({
                             )}
                         />
                     )}
-                </>
+                </div>
             ) : (
                 <span className="px-2">Loading...</span>
             )}

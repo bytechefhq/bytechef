@@ -103,7 +103,9 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                     type="hidden"
                     {...register(
                         `projectInstanceWorkflows.${workflowIndex!}.enabled`,
-                        {value: workflowEnabledMap.get(workflow.id!)}
+                        {
+                            value: workflowEnabledMap.get(workflow.id!),
+                        }
                     )}
                 />
             )}
@@ -130,7 +132,7 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                             />
                         </TabsContent>
 
-                        <TabsContent value="connections">
+                        <TabsContent className="grid gap-4" value="connections">
                             {workflowConnections.length ? (
                                 workflowConnections.map(
                                     (
