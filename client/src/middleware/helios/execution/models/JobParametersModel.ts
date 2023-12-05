@@ -19,6 +19,12 @@ import {
     TaskConnectionModelFromJSONTyped,
     TaskConnectionModelToJSON,
 } from './TaskConnectionModel';
+import type { TriggerOutputModel } from './TriggerOutputModel';
+import {
+    TriggerOutputModelFromJSON,
+    TriggerOutputModelFromJSONTyped,
+    TriggerOutputModelToJSON,
+} from './TriggerOutputModel';
 import type { WebhookModel } from './WebhookModel';
 import {
     WebhookModelFromJSON,
@@ -63,6 +69,12 @@ export interface JobParametersModel {
      */
     priority?: number;
     /**
+     * 
+     * @type {Array<TriggerOutputModel>}
+     * @memberof JobParametersModel
+     */
+    triggerOutputs?: Array<TriggerOutputModel>;
+    /**
      * Id of the workflow to execute.
      * @type {string}
      * @memberof JobParametersModel
@@ -101,6 +113,7 @@ export function JobParametersModelFromJSONTyped(json: any, ignoreDiscriminator: 
         'label': !exists(json, 'label') ? undefined : json['label'],
         'parentTaskExecutionId': !exists(json, 'parentTaskExecutionId') ? undefined : json['parentTaskExecutionId'],
         'priority': !exists(json, 'priority') ? undefined : json['priority'],
+        'triggerOutputs': !exists(json, 'triggerOutputs') ? undefined : ((json['triggerOutputs'] as Array<any>).map(TriggerOutputModelFromJSON)),
         'workflowId': json['workflowId'],
         'webhooks': !exists(json, 'webhooks') ? undefined : ((json['webhooks'] as Array<any>).map(WebhookModelFromJSON)),
     };
@@ -120,6 +133,7 @@ export function JobParametersModelToJSON(value?: JobParametersModel | null): any
         'label': value.label,
         'parentTaskExecutionId': value.parentTaskExecutionId,
         'priority': value.priority,
+        'triggerOutputs': value.triggerOutputs === undefined ? undefined : ((value.triggerOutputs as Array<any>).map(TriggerOutputModelToJSON)),
         'workflowId': value.workflowId,
         'webhooks': value.webhooks === undefined ? undefined : ((value.webhooks as Array<any>).map(WebhookModelToJSON)),
     };
