@@ -2,8 +2,7 @@ import {Accordion} from '@/components/ui/accordion';
 import {WorkflowExecutionModel} from '@/middleware/helios/execution';
 import WorkflowExecutionDetailsTaskAccordionItem from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsTaskAccordionItem';
 import WorkflowExecutionDetailsTriggerAccordionItem from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsTriggerAccordionItem';
-import {CheckCircledIcon} from '@radix-ui/react-icons';
-import {twMerge} from 'tailwind-merge';
+import {CheckCircledIcon, CrossCircledIcon} from '@radix-ui/react-icons';
 
 const WorkflowExecutionDetailsAccordion = ({
     workflowExecution,
@@ -40,14 +39,14 @@ const WorkflowExecutionDetailsAccordion = ({
                             : 'Workflow failed'}
                     </span>
 
-                    <CheckCircledIcon
-                        className={twMerge(
-                            'h-5 w-5',
-                            taskExecutionsCompleted && triggerExecutionCompleted
-                                ? 'text-green-500'
-                                : 'text-red-500'
-                        )}
-                    />
+                    {taskExecutionsCompleted && triggerExecutionCompleted && (
+                        <CheckCircledIcon className="h-5 w-5 text-green-500" />
+                    )}
+
+                    {(!taskExecutionsCompleted ||
+                        !triggerExecutionCompleted) && (
+                        <CrossCircledIcon className="h-5 w-5 text-red-500" />
+                    )}
                 </div>
 
                 <div className="flex justify-between text-xs">
@@ -58,11 +57,9 @@ const WorkflowExecutionDetailsAccordion = ({
 
                     <span>Duration: {duration}ms</span>
 
-                    <span>
-                        {`${taskExecutionsCount} task${
-                            taskExecutionsCount > 1 ? 's' : ''
-                        } executed`}
-                    </span>
+                    <span>{`${taskExecutionsCount} task${
+                        taskExecutionsCount > 1 ? 's' : ''
+                    } executed`}</span>
                 </div>
             </div>
 
@@ -77,9 +74,6 @@ const WorkflowExecutionDetailsAccordion = ({
                             triggerExecution={
                                 workflowExecution.triggerExecution
                             }
-                            triggerExecutionCompleted={
-                                triggerExecutionCompleted
-                            }
                         />
                     )}
 
@@ -88,7 +82,6 @@ const WorkflowExecutionDetailsAccordion = ({
                             taskExecutions={
                                 workflowExecution.job.taskExecutions
                             }
-                            taskExecutionsCompleted={!!taskExecutionsCompleted}
                         />
                     )}
                 </Accordion>

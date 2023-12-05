@@ -4,17 +4,14 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@radix-ui/react-accordion';
-import {CheckCircledIcon} from '@radix-ui/react-icons';
+import {CheckCircledIcon, CrossCircledIcon} from '@radix-ui/react-icons';
 import InlineSVG from 'react-inlinesvg';
 import ReactJson from 'react-json-view';
-import {twMerge} from 'tailwind-merge';
 
 const WorkflowExecutionDetailsTriggerAccordionItem = ({
     triggerExecution,
-    triggerExecutionCompleted,
 }: {
     triggerExecution: TriggerExecutionModel;
-    triggerExecutionCompleted: boolean;
 }) => {
     const {endDate, id, input, output, startDate, workflowTrigger} =
         triggerExecution;
@@ -45,14 +42,13 @@ const WorkflowExecutionDetailsTriggerAccordionItem = ({
                                 {duration}ms
                             </span>
 
-                            <CheckCircledIcon
-                                className={twMerge(
-                                    'h-5 w-5',
-                                    triggerExecutionCompleted
-                                        ? 'text-green-500'
-                                        : 'text-red-500'
-                                )}
-                            />
+                            {triggerExecution.status === 'COMPLETED' && (
+                                <CheckCircledIcon className="h-5 w-5 text-green-500" />
+                            )}
+
+                            {triggerExecution.status === 'FAILED' && (
+                                <CrossCircledIcon className="h-5 w-5 text-red-500" />
+                            )}
                         </div>
                     </AccordionTrigger>
 
