@@ -2,7 +2,8 @@ package com.bytechef.helios.execution.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.helios.execution.web.rest.model.TestConnectionModel;
+import com.bytechef.helios.execution.web.rest.model.TaskConnectionModel;
+import com.bytechef.helios.execution.web.rest.model.TriggerOutputModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,23 +28,26 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TestParameters", description = "Defines parameters used to test a workflow.")
 @JsonTypeName("TestParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-21T21:27:08.772308+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-04T18:50:03.122916+01:00[Europe/Zagreb]")
 public class TestParametersModel {
 
   @Valid
-  private List<@Valid TestConnectionModel> connections;
+  private List<@Valid TaskConnectionModel> connections;
 
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
+  @Valid
+  private List<@Valid TriggerOutputModel> triggerOutputs;
+
   private String workflowId;
 
-  public TestParametersModel connections(List<@Valid TestConnectionModel> connections) {
+  public TestParametersModel connections(List<@Valid TaskConnectionModel> connections) {
     this.connections = connections;
     return this;
   }
 
-  public TestParametersModel addConnectionsItem(TestConnectionModel connectionsItem) {
+  public TestParametersModel addConnectionsItem(TaskConnectionModel connectionsItem) {
     if (this.connections == null) {
       this.connections = new ArrayList<>();
     }
@@ -58,11 +62,11 @@ public class TestParametersModel {
   @Valid 
   @Schema(name = "connections", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
-  public List<@Valid TestConnectionModel> getConnections() {
+  public List<@Valid TaskConnectionModel> getConnections() {
     return connections;
   }
 
-  public void setConnections(List<@Valid TestConnectionModel> connections) {
+  public void setConnections(List<@Valid TaskConnectionModel> connections) {
     this.connections = connections;
   }
 
@@ -92,6 +96,34 @@ public class TestParametersModel {
 
   public void setInputs(Map<String, Object> inputs) {
     this.inputs = inputs;
+  }
+
+  public TestParametersModel triggerOutputs(List<@Valid TriggerOutputModel> triggerOutputs) {
+    this.triggerOutputs = triggerOutputs;
+    return this;
+  }
+
+  public TestParametersModel addTriggerOutputsItem(TriggerOutputModel triggerOutputsItem) {
+    if (this.triggerOutputs == null) {
+      this.triggerOutputs = new ArrayList<>();
+    }
+    this.triggerOutputs.add(triggerOutputsItem);
+    return this;
+  }
+
+  /**
+   * Get triggerOutputs
+   * @return triggerOutputs
+  */
+  @Valid 
+  @Schema(name = "triggerOutputs", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("triggerOutputs")
+  public List<@Valid TriggerOutputModel> getTriggerOutputs() {
+    return triggerOutputs;
+  }
+
+  public void setTriggerOutputs(List<@Valid TriggerOutputModel> triggerOutputs) {
+    this.triggerOutputs = triggerOutputs;
   }
 
   public TestParametersModel workflowId(String workflowId) {
@@ -125,12 +157,13 @@ public class TestParametersModel {
     TestParametersModel testParameters = (TestParametersModel) o;
     return Objects.equals(this.connections, testParameters.connections) &&
         Objects.equals(this.inputs, testParameters.inputs) &&
+        Objects.equals(this.triggerOutputs, testParameters.triggerOutputs) &&
         Objects.equals(this.workflowId, testParameters.workflowId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connections, inputs, workflowId);
+    return Objects.hash(connections, inputs, triggerOutputs, workflowId);
   }
 
   @Override
@@ -139,6 +172,7 @@ public class TestParametersModel {
     sb.append("class TestParametersModel {\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
+    sb.append("    triggerOutputs: ").append(toIndentedString(triggerOutputs)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
     sb.append("}");
     return sb.toString();
