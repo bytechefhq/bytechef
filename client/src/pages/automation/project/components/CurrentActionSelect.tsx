@@ -9,7 +9,6 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
 import {ActionDefinitionBasicModel} from 'middleware/hermes/configuration';
-import * as React from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const ActionSelect = ({
