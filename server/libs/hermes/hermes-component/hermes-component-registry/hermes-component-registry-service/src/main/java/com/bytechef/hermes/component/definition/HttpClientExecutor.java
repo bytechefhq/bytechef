@@ -407,7 +407,7 @@ public class HttpClientExecutor {
 
         @Override
         public <T> T getBody() {
-            return objectMapper.convertValue(body, new TypeReference<T>() {});
+            return objectMapper.convertValue(body, new TypeReference<>() {});
         }
 
         @Override
