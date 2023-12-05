@@ -11,7 +11,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
@@ -120,11 +120,11 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
-    public List<ActionDefinition> getActionDefinitions(@NonNull List<ComponentOperation> componentOperations) {
+    public List<ActionDefinition> getActionDefinitions(@NonNull List<OperationType> operationTypes) {
         return CollectionUtils.map(
-            componentOperations,
+            operationTypes,
             componentOperation -> getActionDefinition(
                 componentOperation.componentName(), componentOperation.componentVersion(),
-                componentOperation.operationName()));
+                componentOperation.componentOperationName()));
     }
 }

@@ -17,7 +17,7 @@
 package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionBasicModel;
@@ -60,7 +60,7 @@ public class ActionDefinitionApiController implements ActionDefinitionApi {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 actionDefinitionService.getActionDefinitions(
-                    taskTypes == null ? List.of() : CollectionUtils.map(taskTypes, ComponentOperation::ofType)),
+                    taskTypes == null ? List.of() : CollectionUtils.map(taskTypes, OperationType::ofType)),
                 actionDefinition -> conversionService.convert(actionDefinition, ActionDefinitionModel.class)));
     }
 

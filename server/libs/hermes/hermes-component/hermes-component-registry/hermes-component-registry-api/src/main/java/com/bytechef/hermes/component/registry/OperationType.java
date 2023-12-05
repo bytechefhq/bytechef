@@ -19,15 +19,20 @@ package com.bytechef.hermes.component.registry;
 /**
  * @author Ivica Cardic
  *
- * @param componentName    The component name
- * @param componentVersion The component version
- * @param operationName    The component action or trigger name
+ * @param componentName          The component name
+ * @param componentVersion       The component version
+ * @param componentOperationName The component action or trigger name
  */
-public record ComponentOperation(String componentName, int componentVersion, String operationName) {
+public record OperationType(String componentName, int componentVersion, String componentOperationName) {
 
-    public static ComponentOperation ofType(String type) {
+    public static OperationType ofType(String type) {
         String[] typeItems = type.split("/");
 
-        return new ComponentOperation(typeItems[0], Integer.parseInt(typeItems[1].replace("v", "")), typeItems[2]);
+        if (typeItems.length < 2) {
+            throw new IllegalArgumentException("Wrong type format: %s".formatted(type));
+        }
+
+        return new OperationType(
+            typeItems[0], Integer.parseInt(typeItems[1].replace("v", "")), typeItems.length == 2 ? null : typeItems[2]);
     }
 }

@@ -17,7 +17,7 @@
 package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentOperationRequestModel;
@@ -142,7 +142,7 @@ public class TriggerDefinitionApiController implements TriggerDefinitionApi {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 triggerDefinitionService.getTriggerDefinitions(
-                    triggerTypes == null ? List.of() : CollectionUtils.map(triggerTypes, ComponentOperation::ofType)),
+                    triggerTypes == null ? List.of() : CollectionUtils.map(triggerTypes, OperationType::ofType)),
                 triggerDefinition -> conversionService.convert(triggerDefinition, TriggerDefinitionModel.class)));
     }
 }

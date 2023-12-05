@@ -12,7 +12,7 @@ import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
-import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
@@ -176,12 +176,12 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public List<TriggerDefinition> getTriggerDefinitions(@NonNull List<ComponentOperation> componentOperations) {
+    public List<TriggerDefinition> getTriggerDefinitions(@NonNull List<OperationType> operationTypes) {
         return CollectionUtils.map(
-            componentOperations,
+            operationTypes,
             componentOperation -> getTriggerDefinition(
                 componentOperation.componentName(), componentOperation.componentVersion(),
-                componentOperation.operationName()));
+                componentOperation.componentOperationName()));
     }
 
     @Override

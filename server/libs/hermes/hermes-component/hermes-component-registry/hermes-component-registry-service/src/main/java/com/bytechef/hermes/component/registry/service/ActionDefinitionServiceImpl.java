@@ -31,7 +31,7 @@ import com.bytechef.hermes.component.definition.ParameterMapImpl;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputFunction;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.hermes.component.registry.ComponentOperation;
+import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.definition.DynamicOptionsProperty;
@@ -165,18 +165,18 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public List<ActionDefinition> getActionDefinitions(@NonNull List<ComponentOperation> componentOperations) {
+    public List<ActionDefinition> getActionDefinitions(@NonNull List<OperationType> operationTypes) {
         List<ActionDefinition> actionDefinitions;
 
-        if (componentOperations.isEmpty()) {
+        if (operationTypes.isEmpty()) {
             actionDefinitions = CollectionUtils.map(
                 componentDefinitionRegistry.getActionDefinitions(), ActionDefinition::new);
         } else {
             actionDefinitions = CollectionUtils.map(
-                componentOperations,
+                operationTypes,
                 componentOperation -> getActionDefinition(
                     componentOperation.componentName(), componentOperation.componentVersion(),
-                    componentOperation.operationName()));
+                    componentOperation.componentOperationName()));
         }
 
         return actionDefinitions;
