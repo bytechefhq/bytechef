@@ -1,3 +1,4 @@
+import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     CheckIcon,
@@ -23,8 +24,6 @@ import {
 } from '@radix-ui/react-select';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
-
-import Button from '../Button/Button';
 
 export interface ISelectOption {
     label: string;
@@ -96,7 +95,7 @@ const Select = ({
                         leadingIcon && 'relative pl-12 py-2.5',
                         triggerClassName
                     )}
-                    displayType="light"
+                    variant="ghost"
                 >
                     {leadingIcon && (
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-300 bg-gray-100 px-3">

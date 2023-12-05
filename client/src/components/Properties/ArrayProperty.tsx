@@ -1,6 +1,6 @@
+import {Button} from '@/components/ui/button';
 import {DataPillType} from '@/types/types';
 import {PlusIcon} from '@radix-ui/react-icons';
-import Button from 'components/Button/Button';
 import DropdownMenu from 'components/DropdownMenu/DropdownMenu';
 import {PropertyType} from 'types/projectTypes';
 
@@ -39,34 +39,32 @@ const ArrayProperty = ({
                         customTriggerComponent={
                             <Button
                                 className="rounded-sm bg-gray-100 text-sm font-medium hover:bg-gray-200"
-                                displayType="unstyled"
-                                icon={<PlusIcon className="h-4 w-4" />}
-                                iconPosition="left"
-                                label="Add item"
                                 onClick={() =>
                                     console.log(
                                         'update the workflow definition with a new property'
                                     )
                                 }
-                                size="small"
-                            />
+                                size="sm"
+                                variant="ghost"
+                            >
+                                <PlusIcon className="h-4 w-4" /> Add item
+                            </Button>
                         }
                         menuItems={formattedArrayItems}
                     />
                 ) : (
                     <Button
                         className="rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
-                        displayType="unstyled"
-                        icon={<PlusIcon className="h-4 w-4" />}
-                        iconPosition="left"
-                        label="Add item"
                         onClick={() =>
                             console.log(
                                 'update the workflow definition with a new property'
                             )
                         }
-                        size="small"
-                    />
+                        size="sm"
+                        variant="ghost"
+                    >
+                        <PlusIcon className="h-4 w-4" /> Add item
+                    </Button>
                 )}
             </div>
         </ul>

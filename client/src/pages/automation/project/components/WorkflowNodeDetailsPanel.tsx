@@ -1,3 +1,11 @@
+import {Button} from '@/components/ui/button';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {PropertyType} from '@/types/projectTypes';
@@ -8,7 +16,6 @@ import {
 } from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
-import Button from 'components/Button/Button';
 import Properties from 'components/Properties/Properties';
 import {
     useGetActionDefinitionQuery,
@@ -21,7 +28,6 @@ import {
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import Select from '../../../../components/Select/Select';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -524,17 +530,17 @@ const WorkflowNodeDetailsPanel = ({
                                 <Button
                                     aria-label="Close the node details dialog"
                                     className="ml-auto pr-0"
-                                    displayType="icon"
-                                    icon={
-                                        <Cross1Icon
-                                            aria-hidden="true"
-                                            className="h-3 w-3 cursor-pointer"
-                                        />
-                                    }
                                     onClick={() =>
                                         setWorkflowNodeDetailsPanelOpen(false)
                                     }
-                                />
+                                    size="icon"
+                                    variant="ghost"
+                                >
+                                    <Cross1Icon
+                                        aria-hidden="true"
+                                        className="h-3 w-3 cursor-pointer"
+                                    />
+                                </Button>
                             </Dialog.Title>
 
                             <div className="flex h-full flex-col">
@@ -561,12 +567,13 @@ const WorkflowNodeDetailsPanel = ({
                                                             'border-blue-500 text-blue-500 hover:text-blue-500'
                                                     )}
                                                     key={tab.name}
-                                                    label={tab.label}
                                                     name={tab.name}
                                                     onClick={() =>
                                                         setActiveTab(tab.name)
                                                     }
-                                                />
+                                                >
+                                                    {tab.label}
+                                                </Button>
                                             ))}
                                         </div>
                                     )}
@@ -638,13 +645,19 @@ const WorkflowNodeDetailsPanel = ({
                             <footer className="z-50 mt-auto flex bg-white px-4 py-2">
                                 <Select
                                     defaultValue={currentComponent.version.toString()}
-                                    name="componentVersionSelect"
-                                    options={[
-                                        {label: 'v1', value: '1'},
-                                        {label: 'v2', value: '2'},
-                                        {label: 'v3', value: '3'},
-                                    ]}
-                                />
+                                >
+                                    <SelectTrigger className="w-auto border-none shadow-none">
+                                        <SelectValue placeholder="Choose version..." />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        <SelectItem value="1">v1</SelectItem>
+
+                                        <SelectItem value="2">v2</SelectItem>
+
+                                        <SelectItem value="3">v3</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </footer>
                         </div>
                     ) : (

@@ -1,10 +1,10 @@
+import {Button} from '@/components/ui/button';
 import {
     ComponentDataType,
     CurrentComponentType,
     DataPillType,
 } from '@/types/types';
 import {PlusIcon} from '@radix-ui/react-icons';
-import Button from 'components/Button/Button';
 import ContextualDialog from 'components/ContextualDialog/ContextualDialog';
 import Input from 'components/Input/Input';
 import Select from 'components/Select/Select';
@@ -79,13 +79,12 @@ const ObjectProperty = ({
                 >
                     <Button
                         className="rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
-                        displayType="unstyled"
-                        icon={<PlusIcon className="h-4 w-4" />}
-                        iconPosition="left"
-                        label="Add property"
                         onClick={() => setAdditionalPropertiesDialogOpen(true)}
-                        size="small"
-                    />
+                        size="sm"
+                        variant="ghost"
+                    >
+                        <PlusIcon className="h-4 w-4" /> Add property
+                    </Button>
 
                     {additionalPropertiesDialogOpen && (
                         <div className="absolute z-50 w-3/4 rounded-md bg-gray-100 shadow-md">

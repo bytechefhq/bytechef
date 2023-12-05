@@ -1,7 +1,13 @@
+import {Button} from '@/components/ui/button';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {Cross1Icon} from '@radix-ui/react-icons';
-import Button from 'components/Button/Button';
-import EmptyList from 'components/EmptyList/EmptyList';
-import Select from 'components/Select/Select';
+import EmptyList from 'components/EmptyList';
 import {LinkIcon, PlusIcon} from 'lucide-react';
 import {ComponentDefinitionModel} from 'middleware/hermes/configuration';
 import ConnectionDialog from 'pages/automation/connections/components/ConnectionDialog';
@@ -32,34 +38,53 @@ const ConnectionTab = ({
     return (
         <div className="h-full flex-[1_1_1px] overflow-auto p-4">
             {connections?.length ? (
-                <div className="flex space-x-2">
-                    <Select
-                        contentClassName="max-w-select-trigger-width max-h-select-content-available-height-1/2"
-                        label="Connections"
-                        options={connections.map((connection) => ({
-                            label: connection.name,
-                            value: connection.id!.toString(),
-                        }))}
-                        placeholder="Choose Connection..."
-                        triggerClassName="w-full bg-gray-100"
-                    />
+                <Select>
+                    <div className="flex space-x-2">
+                        <SelectTrigger>
+                            <SelectValue placeholder="Choose Connection..." />
+                        </SelectTrigger>
 
-                    <Button
-                        className="mt-auto p-2"
-                        displayType="secondary"
-                        icon={<PlusIcon className="h-5 w-5" />}
-                        onClick={() => setShowEditConnectionDialog(true)}
-                        title="Create a new connection"
-                    />
-                </div>
+                        <Button
+                            className="mt-auto p-2"
+                            onClick={() => setShowEditConnectionDialog(true)}
+                            title="Create a new connection"
+                            variant="outline"
+                        >
+                            <PlusIcon className="h-5 w-5" />
+                        </Button>
+                    </div>
+
+                    <SelectContent>
+                        {connections &&
+                            connections.map((connection) => (
+                                <SelectItem
+                                    key={connection.id}
+                                    value={connection.id!.toString()}
+                                >
+                                    <div className="flex items-center">
+                                        <span className="mr-1 ">
+                                            {connection.name}
+                                        </span>
+
+                                        <span className="text-xs text-gray-500">
+                                            {connection?.tags
+                                                ?.map((tag) => tag.name)
+                                                .join(', ')}
+                                        </span>
+                                    </div>
+                                </SelectItem>
+                            ))}
+                    </SelectContent>
+                </Select>
             ) : (
                 <EmptyList
                     button={
                         <Button
-                            label="Create a connection"
                             onClick={() => setShowEditConnectionDialog(true)}
                             title="Create a new connection"
-                        />
+                        >
+                            Create a connection
+                        </Button>
                     }
                     icon={<LinkIcon className="h-6 w-6 text-gray-400" />}
                     message="You have not created any connections for this component yet."
@@ -69,16 +94,18 @@ const ConnectionTab = ({
 
             {showConnectionNote && (
                 <div className="mt-4 flex flex-col rounded-md bg-amber-100 p-4 text-gray-800">
-                    <div className="flex pb-2">
+                    <div className="flex items-center pb-2">
                         <span className="font-medium">Note</span>
 
                         <Button
                             className="ml-auto p-0"
-                            displayType="icon"
-                            icon={<Cross1Icon className="ml-auto h-5 w-5" />}
                             onClick={() => setShowConnectionNote(false)}
+                            size="icon"
                             title="Close the note"
-                        />
+                            variant="ghost"
+                        >
+                            <Cross1Icon className="h-3 w-3" />
+                        </Button>
                     </div>
 
                     <p className="text-sm text-gray-800">

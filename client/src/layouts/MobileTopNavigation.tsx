@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import {Button} from '@/components/ui/button';
 import {Menu} from 'lucide-react';
 
 import reactLogo from '../assets/logo.svg';
@@ -21,11 +21,13 @@ export function MobileTopNavigation({
 
                 <div>
                     <Button
-                        displayType="icon"
-                        icon={<Menu aria-hidden="true" className="h-6 w-6" />}
                         onClick={() => setMobileMenuOpen(true)}
+                        size="icon"
+                        variant="ghost"
                     >
                         <span className="sr-only">Open sidebar</span>
+
+                        <Menu aria-hidden="true" className="h-6 w-6" />
                     </Button>
                 </div>
             </div>
