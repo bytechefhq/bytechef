@@ -20,16 +20,20 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-11-21T21:27:13.496994+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-04T15:12:04.933898+01:00[Europe/Zagreb]")
 public class WorkflowConnectionModel {
 
   private String componentName;
 
   private Integer componentVersion;
 
+  private Long id;
+
   private String key;
 
   private String operationName;
+
+  private Boolean required;
 
   public WorkflowConnectionModel() {
     super();
@@ -38,11 +42,12 @@ public class WorkflowConnectionModel {
   /**
    * Constructor with only required parameters
    */
-  public WorkflowConnectionModel(String componentName, Integer componentVersion, String key, String operationName) {
+  public WorkflowConnectionModel(String componentName, Integer componentVersion, String key, String operationName, Boolean required) {
     this.componentName = componentName;
     this.componentVersion = componentVersion;
     this.key = key;
     this.operationName = operationName;
+    this.required = required;
   }
 
   public WorkflowConnectionModel componentName(String componentName) {
@@ -85,6 +90,26 @@ public class WorkflowConnectionModel {
     this.componentVersion = componentVersion;
   }
 
+  public WorkflowConnectionModel id(Long id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * Get id
+   * @return id
+  */
+  
+  @Schema(name = "id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
   public WorkflowConnectionModel key(String key) {
     this.key = key;
     return this;
@@ -125,6 +150,26 @@ public class WorkflowConnectionModel {
     this.operationName = operationName;
   }
 
+  public WorkflowConnectionModel required(Boolean required) {
+    this.required = required;
+    return this;
+  }
+
+  /**
+   * Get required
+   * @return required
+  */
+  @NotNull 
+  @Schema(name = "required", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("required")
+  public Boolean getRequired() {
+    return required;
+  }
+
+  public void setRequired(Boolean required) {
+    this.required = required;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -136,13 +181,15 @@ public class WorkflowConnectionModel {
     WorkflowConnectionModel workflowConnection = (WorkflowConnectionModel) o;
     return Objects.equals(this.componentName, workflowConnection.componentName) &&
         Objects.equals(this.componentVersion, workflowConnection.componentVersion) &&
+        Objects.equals(this.id, workflowConnection.id) &&
         Objects.equals(this.key, workflowConnection.key) &&
-        Objects.equals(this.operationName, workflowConnection.operationName);
+        Objects.equals(this.operationName, workflowConnection.operationName) &&
+        Objects.equals(this.required, workflowConnection.required);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, key, operationName);
+    return Objects.hash(componentName, componentVersion, id, key, operationName, required);
   }
 
   @Override
@@ -151,8 +198,10 @@ public class WorkflowConnectionModel {
     sb.append("class WorkflowConnectionModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
     sb.append("    operationName: ").append(toIndentedString(operationName)).append("\n");
+    sb.append("    required: ").append(toIndentedString(required)).append("\n");
     sb.append("}");
     return sb.toString();
   }
