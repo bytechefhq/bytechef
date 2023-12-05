@@ -414,7 +414,7 @@ public final class MapUtils {
     public static <K1, K2, V> Map<K2, V> getMap(Map<K1, ?> map, K1 key, ParameterizedTypeReference<V> elementType) {
         ResolvableType resolvableType = ResolvableType.forType(elementType);
 
-        if (!map.containsValue(key)) {
+        if (!map.containsKey(key)) {
             return null;
         }
 
