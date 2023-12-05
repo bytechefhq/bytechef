@@ -277,6 +277,18 @@ const Project = () => {
     const queryClient = useQueryClient();
 
     useEffect(() => {
+        setLeftSidebarOpen(false);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        setWorkflowNodeDetailsPanelOpen(false);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflowId]);
+
+    useEffect(() => {
         if (projectWorkflows) {
             setCurrentWorkflow(
                 projectWorkflows.find(
@@ -284,10 +296,6 @@ const Project = () => {
                 )!
             );
         }
-
-        setLeftSidebarOpen(false);
-
-        setWorkflowNodeDetailsPanelOpen(false);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [projectWorkflows, workflowId]);
