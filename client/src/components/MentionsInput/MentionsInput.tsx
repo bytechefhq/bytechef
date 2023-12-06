@@ -2,7 +2,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import getRandomId from '@/utils/getRandomId';
 
 import 'quill-mention';
-import {ChangeEvent, ReactNode, Ref, forwardRef, memo, useEffect, useMemo, useState} from 'react';
+import {ChangeEvent, KeyboardEvent, ReactNode, Ref, forwardRef, memo, useEffect, useMemo, useState} from 'react';
 import ReactQuill, {Quill} from 'react-quill';
 
 import './mentionsInput.css';
@@ -14,6 +14,9 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {twMerge} from 'tailwind-merge';
 
 import MentionBlot from './MentionBlot';
+
+const isAlphaNumericalKeyCode = (event: KeyboardEvent) =>
+    (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90);
 
 Quill.register('formats/property-mention', MentionBlot);
 
@@ -100,6 +103,21 @@ const MentionsInput = forwardRef(
                     item: DataPillType,
                     insertItem: (data: DataPillType, programmaticInsert: boolean, overriddenOptions: object) => void
                 ) => {
+                    // @ts-expect-error Quill false positive
+                    const editor = ref.current.getEditor();
+
+                    const selection = editor.getSelection();
+
+                    const [leaf, offset] = editor.getLeaf(selection?.index || 0);
+
+                    if (leaf) {
+                        editor.deleteText(0, editor.getLength());
+
+                        editor.setText(' ');
+
+                        leaf.deleteAt(0, offset);
+                    }
+
                     insertItem(
                         {
                             componentIcon: item.componentIcon,
@@ -231,6 +249,25 @@ const MentionsInput = forwardRef(
                             }
                         }}
                         onKeyDown={(event) => {
+                            if (mentionOccurences && isAlphaNumericalKeyCode(event)) {
+                                // @ts-expect-error Quill false positive
+                                const editor = ref.current.getEditor();
+
+                                const selection = editor.getSelection();
+
+                                const [leaf] = editor.getLeaf(selection?.index || 0);
+
+                                if (leaf) {
+                                    const length = editor.getLength();
+
+                                    editor.deleteText(0, length);
+
+                                    editor.insertText(0, '');
+
+                                    editor.setSelection(length);
+                                }
+                            }
+
                             if (singleMention && mentionOccurences) {
                                 event.preventDefault();
                             }
