@@ -53,8 +53,10 @@ public class HeaderUtils {
         String message = enableTranslation ? "error." + errorKey : defaultMessage;
 
         HttpHeaders headers = new HttpHeaders();
+
         headers.add("X-" + applicationName + "-error", message);
         headers.add("X-" + applicationName + "-params", entityName);
+
         return headers;
     }
 }
