@@ -26,10 +26,14 @@ import org.springframework.web.ErrorResponseException;
  */
 public class BadRequestAlertException extends ErrorResponseException {
 
-    private static final long serialVersionUID = 1L;
+    private final String entityName;
+    private final String errorKey;
 
     public BadRequestAlertException(URI type, String defaultMessage, String entityName, String errorKey) {
         super(HttpStatus.BAD_REQUEST, asProblemDetail(type, defaultMessage, entityName, errorKey), null);
+
+        this.entityName = entityName;
+        this.errorKey = errorKey;
     }
 
     private static ProblemDetail asProblemDetail(URI type, String message, String entityName, String errorKey) {
@@ -41,5 +45,13 @@ public class BadRequestAlertException extends ErrorResponseException {
         problemDetail.setProperty("params", entityName);
 
         return problemDetail;
+    }
+
+    public String getEntityName() {
+        return entityName;
+    }
+
+    public String getErrorKey() {
+        return errorKey;
     }
 }

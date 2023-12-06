@@ -39,7 +39,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @WithMockUser
 @AutoConfigureMockMvc
 @SpringBootTest
-class ExceptionTranslatorIntTest {
+class GlobalResponseEntityExceptionHandlerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
