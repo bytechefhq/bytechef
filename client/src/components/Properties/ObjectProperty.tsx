@@ -36,8 +36,6 @@ const ObjectProperty = ({
         property;
 
     if (objectType === 'FILE_ENTRY' && dataPills?.length) {
-
-
         return (
             <Property
                 actionName={actionName}
