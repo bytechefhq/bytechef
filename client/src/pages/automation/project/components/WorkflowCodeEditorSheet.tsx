@@ -1,10 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-} from '@/components/ui/sheet';
+import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowModel} from '@/middleware/helios/configuration';
 import Editor from '@monaco-editor/react';
@@ -55,9 +50,7 @@ const WorkflowCodeEditorSheet = ({
                                         </Button>
                                     </TooltipTrigger>
 
-                                    <TooltipContent>
-                                        Save current workflow
-                                    </TooltipContent>
+                                    <TooltipContent>Save current workflow</TooltipContent>
                                 </Tooltip>
 
                                 {!workflowIsRunning && (
@@ -73,9 +66,7 @@ const WorkflowCodeEditorSheet = ({
                                             </Button>
                                         </TooltipTrigger>
 
-                                        <TooltipContent>
-                                            Run current workflow
-                                        </TooltipContent>
+                                        <TooltipContent>Run current workflow</TooltipContent>
                                     </Tooltip>
                                 )}
 
@@ -93,9 +84,7 @@ const WorkflowCodeEditorSheet = ({
                                             </Button>
                                         </TooltipTrigger>
 
-                                        <TooltipContent>
-                                            Stop current workflow
-                                        </TooltipContent>
+                                        <TooltipContent>Stop current workflow</TooltipContent>
                                     </Tooltip>
                                 )}
 

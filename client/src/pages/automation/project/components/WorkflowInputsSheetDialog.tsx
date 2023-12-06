@@ -10,22 +10,9 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form';
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {InputModel, WorkflowModel} from '@/middleware/helios/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
 import {ProjectKeys} from '@/queries/projects.queries';
@@ -119,17 +106,13 @@ const WorkflowInputsSheetDialog = ({
             }}
             open={isOpen}
         >
-            {triggerNode && (
-                <DialogTrigger asChild>{triggerNode}</DialogTrigger>
-            )}
+            {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent>
                 <Form {...form}>
                     <DialogHeader>
                         <div className="flex items-center justify-between">
-                            <DialogTitle>{`${
-                                inputIndex === -1 ? 'Edit' : 'Create'
-                            } Input`}</DialogTitle>
+                            <DialogTitle>{`${inputIndex === -1 ? 'Edit' : 'Create'} Input`}</DialogTitle>
 
                             <DialogClose asChild>
                                 <Button size="icon" variant="ghost">
@@ -138,9 +121,7 @@ const WorkflowInputsSheetDialog = ({
                             </DialogClose>
                         </div>
 
-                        <DialogDescription>
-                            Use this to define a workflow input.
-                        </DialogDescription>
+                        <DialogDescription>Use this to define a workflow input.</DialogDescription>
                     </DialogHeader>
 
                     <FormField
@@ -185,42 +166,25 @@ const WorkflowInputsSheetDialog = ({
                                 <FormLabel>Type</FormLabel>
 
                                 <FormControl>
-                                    <Select
-                                        defaultValue={field.value}
-                                        onValueChange={field.onChange}
-                                    >
+                                    <Select defaultValue={field.value} onValueChange={field.onChange}>
                                         <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select an input type" />
                                         </SelectTrigger>
 
                                         <SelectContent>
-                                            <SelectItem value="boolean">
-                                                Boolean
-                                            </SelectItem>
+                                            <SelectItem value="boolean">Boolean</SelectItem>
 
-                                            <SelectItem value="date">
-                                                Date
-                                            </SelectItem>
+                                            <SelectItem value="date">Date</SelectItem>
 
-                                            <SelectItem value="date_time">
-                                                Date Time
-                                            </SelectItem>
+                                            <SelectItem value="date_time">Date Time</SelectItem>
 
-                                            <SelectItem value="integer">
-                                                Integer
-                                            </SelectItem>
+                                            <SelectItem value="integer">Integer</SelectItem>
 
-                                            <SelectItem value="number">
-                                                Number
-                                            </SelectItem>
+                                            <SelectItem value="number">Number</SelectItem>
 
-                                            <SelectItem value="string">
-                                                String
-                                            </SelectItem>
+                                            <SelectItem value="string">String</SelectItem>
 
-                                            <SelectItem value="time">
-                                                Time
-                                            </SelectItem>
+                                            <SelectItem value="time">Time</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </FormControl>
@@ -239,10 +203,7 @@ const WorkflowInputsSheetDialog = ({
                                 <FormLabel>Required</FormLabel>
 
                                 <FormControl>
-                                    <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                    />
+                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                                 </FormControl>
 
                                 <FormMessage />
@@ -257,10 +218,7 @@ const WorkflowInputsSheetDialog = ({
                             </Button>
                         </DialogClose>
 
-                        <Button
-                            onClick={handleSubmit(handleSave)}
-                            type="submit"
-                        >
+                        <Button onClick={handleSubmit(handleSave)} type="submit">
                             Save
                         </Button>
                     </DialogFooter>

@@ -1,8 +1,5 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {
-    ExclamationTriangleIcon,
-    QuestionMarkCircledIcon,
-} from '@radix-ui/react-icons';
+import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -13,25 +10,10 @@ type TextAreaProps = {
     label?: string;
     labelClassName?: string;
     name: string;
-} & React.DetailedHTMLProps<
-    React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-    HTMLTextAreaElement
->;
+} & React.DetailedHTMLProps<React.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>;
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-    (
-        {
-            description,
-            error,
-            fieldsetClassName,
-            label,
-            labelClassName,
-            name,
-            required,
-            ...props
-        },
-        ref
-    ) => (
+    ({description, error, fieldsetClassName, label, labelClassName, name, required, ...props}, ref) => (
         <fieldset className={twMerge('mb-3', fieldsetClassName)}>
             {label && (
                 <div className="flex items-center">
@@ -46,9 +28,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
                         {label}
                     </label>
 
-                    {required && (
-                        <span className="px-1 leading-3 text-red-500">*</span>
-                    )}
+                    {required && <span className="px-1 leading-3 text-red-500">*</span>}
 
                     {description && (
                         <Tooltip>
@@ -79,20 +59,13 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 
                 {error && (
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <ExclamationTriangleIcon
-                            aria-hidden="true"
-                            className="h-5 w-5 text-red-500"
-                        />
+                        <ExclamationTriangleIcon aria-hidden="true" className="h-5 w-5 text-red-500" />
                     </div>
                 )}
             </div>
 
             {error && (
-                <p
-                    className="mt-2 text-sm text-red-600"
-                    id={`${name}-error`}
-                    role="alert"
-                >
+                <p className="mt-2 text-sm text-red-600" id={`${name}-error`} role="alert">
                     This field is required
                 </p>
             )}

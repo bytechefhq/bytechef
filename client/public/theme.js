@@ -4,15 +4,11 @@
         if (newTheme === 'light') {
             document.documentElement.classList.remove('dark');
             // Set Safari status bar color to white
-            document
-                .querySelector('meta[name="theme-color"]')
-                .setAttribute('content', '#fffff');
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fffff');
         } else {
             document.documentElement.classList.add('dark');
             // Set Safari status bar color to gray-900
-            document
-                .querySelector('meta[name="theme-color"]')
-                .setAttribute('content', '#111827');
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#111827');
         }
     }
 

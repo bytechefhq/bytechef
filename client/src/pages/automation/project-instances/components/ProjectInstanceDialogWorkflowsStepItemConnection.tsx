@@ -1,23 +1,7 @@
 import {Button} from '@/components/ui/button';
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    ProjectInstanceModel,
-    WorkflowConnectionModel,
-} from '@/middleware/helios/configuration';
+import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {ProjectInstanceModel, WorkflowConnectionModel} from '@/middleware/helios/configuration';
 import ConnectionDialog from '@/pages/automation/connections/components/ConnectionDialog';
 import {useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
 import {useGetConnectionsQuery} from '@/queries/connections.queries';
@@ -39,8 +23,7 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
     workflowConnectionIndex,
     workflowIndex,
 }: ProjectInstanceDialogWorkflowsStepItemConnectionProps) => {
-    const [showEditConnectionDialog, setShowEditConnectionDialog] =
-        useState(false);
+    const [showEditConnectionDialog, setShowEditConnectionDialog] = useState(false);
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: workflowConnection.componentName,
@@ -64,15 +47,11 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                         <FormLabel>
                             {`${componentDefinition?.title} `}
 
-                            <span className="text-xs text-gray-500">
-                                ({workflowConnection.key})
-                            </span>
+                            <span className="text-xs text-gray-500">({workflowConnection.key})</span>
                         </FormLabel>
 
                         <Select
-                            defaultValue={
-                                field.value ? field.value.toString() : undefined
-                            }
+                            defaultValue={field.value ? field.value.toString() : undefined}
                             onValueChange={field.onChange}
                         >
                             <FormControl>
@@ -83,9 +62,7 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
 
                                     <Button
                                         className="mt-auto p-2"
-                                        onClick={() =>
-                                            setShowEditConnectionDialog(true)
-                                        }
+                                        onClick={() => setShowEditConnectionDialog(true)}
                                         title="Create a new connection"
                                         variant="outline"
                                     >
@@ -97,19 +74,12 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                             <SelectContent>
                                 {connections &&
                                     connections.map((connection) => (
-                                        <SelectItem
-                                            key={connection.id}
-                                            value={connection.id!.toString()}
-                                        >
+                                        <SelectItem key={connection.id} value={connection.id!.toString()}>
                                             <div className="flex items-center">
-                                                <span className="mr-1 ">
-                                                    {connection.name}
-                                                </span>
+                                                <span className="mr-1 ">{connection.name}</span>
 
                                                 <span className="text-xs text-gray-500">
-                                                    {connection?.tags
-                                                        ?.map((tag) => tag.name)
-                                                        .join(', ')}
+                                                    {connection?.tags?.map((tag) => tag.name).join(', ')}
                                                 </span>
                                             </div>
                                         </SelectItem>
@@ -120,9 +90,7 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                         <FormDescription>
                             {`Choose connection for the ${componentDefinition?.title}`}
 
-                            <span className="text-xs text-gray-500">
-                                ({workflowConnection.key})
-                            </span>
+                            <span className="text-xs text-gray-500">({workflowConnection.key})</span>
 
                             {` component.`}
                         </FormDescription>

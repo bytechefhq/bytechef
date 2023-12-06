@@ -1,20 +1,11 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
-import {
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form';
+import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstanceTags.queries';
 import {useGetProjectsQuery} from '@/queries/projects.queries';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
-import {
-    ProjectInstanceModel,
-    ProjectModel,
-} from 'middleware/helios/configuration';
+import {ProjectInstanceModel, ProjectModel} from 'middleware/helios/configuration';
 import {
     Control,
     UseFormGetValues,
@@ -39,9 +30,7 @@ const ProjectLabel = ({project}: {project: ProjectModel}) => (
     <div className="flex items-center">
         <span className="mr-1 ">{project.name}</span>
 
-        <span className="text-xs text-gray-500">
-            {project?.tags?.map((tag) => tag.name).join(', ')}
-        </span>
+        <span className="text-xs text-gray-500">{project?.tags?.map((tag) => tag.name).join(', ')}</span>
     </div>
 );
 
@@ -52,17 +41,9 @@ const ProjectInstanceDialogBasicStep = ({
     setValue,
     trigger,
 }: ProjectDialogBasicStepProps) => {
-    const {
-        data: projects,
-        error: projectsError,
-        isLoading: projectsLoading,
-    } = useGetProjectsQuery({published: true});
+    const {data: projects, error: projectsError, isLoading: projectsLoading} = useGetProjectsQuery({published: true});
 
-    const {
-        data: tags,
-        error: tagsError,
-        isLoading: tagsLoading,
-    } = useGetProjectInstanceTagsQuery();
+    const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetProjectInstanceTagsQuery();
 
     const tagNames = projectInstance?.tags?.map((tag) => tag.name);
 
@@ -70,13 +51,9 @@ const ProjectInstanceDialogBasicStep = ({
 
     return (
         <>
-            {projectsError && !projectsLoading && (
-                <span>An error has occurred: {projectsError.message}</span>
-            )}
+            {projectsError && !projectsLoading && <span>An error has occurred: {projectsError.message}</span>}
 
-            {tagsError && !tagsLoading && (
-                <span>An error has occurred: {tagsError.message}</span>
-            )}
+            {tagsError && !tagsLoading && <span>An error has occurred: {tagsError.message}</span>}
 
             {projects ? (
                 <div className="grid gap-4">
@@ -93,13 +70,7 @@ const ProjectInstanceDialogBasicStep = ({
                                             items={projects.map(
                                                 (project) =>
                                                     ({
-                                                        label: (
-                                                            <ProjectLabel
-                                                                project={
-                                                                    project
-                                                                }
-                                                            />
-                                                        ),
+                                                        label: <ProjectLabel project={project} />,
                                                         value: project.id,
                                                     }) as ComboBoxItemType
                                             )}
@@ -107,10 +78,7 @@ const ProjectInstanceDialogBasicStep = ({
                                             onBlur={field.onBlur}
                                             onChange={(item) => {
                                                 if (item) {
-                                                    setValue(
-                                                        'projectId',
-                                                        item.value
-                                                    );
+                                                    setValue('projectId', item.value);
                                                 }
                                             }}
                                             value={field.value}
@@ -158,10 +126,7 @@ const ProjectInstanceDialogBasicStep = ({
                                 <FormLabel>Description</FormLabel>
 
                                 <FormControl>
-                                    <Textarea
-                                        placeholder="Cute description of your project instance"
-                                        {...field}
-                                    />
+                                    <Textarea placeholder="Cute description of your project instance" {...field} />
                                 </FormControl>
 
                                 <FormMessage />
@@ -180,9 +145,7 @@ const ProjectInstanceDialogBasicStep = ({
                                     <CreatableSelect
                                         field={field}
                                         isMulti
-                                        onCreateOption={(
-                                            inputValue: string
-                                        ) => {
+                                        onCreateOption={(inputValue: string) => {
                                             setValue('tags', [
                                                 ...getValues().tags!,
                                                 {
@@ -195,9 +158,7 @@ const ProjectInstanceDialogBasicStep = ({
                                         options={remainingTags.map((tag) => {
                                             return {
                                                 label: tag.name,
-                                                value: tag.name
-                                                    .toLowerCase()
-                                                    .replace(/\W/g, ''),
+                                                value: tag.name.toLowerCase().replace(/\W/g, ''),
                                                 ...tag,
                                             };
                                         })}

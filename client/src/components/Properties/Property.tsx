@@ -5,11 +5,7 @@ import useWorkflowDefinitionStore from '@/pages/automation/project/stores/useWor
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import getInputType from '@/pages/automation/project/utils/getInputType';
 import {PropertyType} from '@/types/projectTypes';
-import {
-    ComponentDataType,
-    CurrentComponentType,
-    DataPillType,
-} from '@/types/types';
+import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
 import Editor from '@monaco-editor/react';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
@@ -83,18 +79,7 @@ const Property = ({
 
     let {name} = property;
 
-    const {
-        controlType,
-        description,
-        hidden,
-        items,
-        label,
-        objectType,
-        options,
-        properties,
-        required,
-        type,
-    } = property;
+    const {controlType, description, hidden, items, label, objectType, options, properties, required, type} = property;
 
     useEffect(() => {
         if (controlType === 'SELECT') {
@@ -121,28 +106,19 @@ const Property = ({
     );
 
     const isValidPropertyType =
-        inputPropertyControlTypes.includes(controlType!) ||
-        inputPropertyControlTypes.includes(type!);
+        inputPropertyControlTypes.includes(controlType!) || inputPropertyControlTypes.includes(type!);
 
-    const isNumericalInput =
-        getInputType(controlType) === 'number' ||
-        type === 'INTEGER' ||
-        type === 'NUMBER';
+    const isNumericalInput = getInputType(controlType) === 'number' || type === 'INTEGER' || type === 'NUMBER';
 
     const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
 
-    let showMentionInput =
-        type !== 'OBJECT' &&
-        type !== 'ARRAY' &&
-        mentionInput &&
-        !!dataPills?.length;
+    let showMentionInput = type !== 'OBJECT' && type !== 'ARRAY' && mentionInput && !!dataPills?.length;
 
     if (type === 'OBJECT' && objectType === 'FILE_ENTRY') {
         showMentionInput = mentionInput && !!dataPills?.length;
     }
 
-    const showInputTypeSwitchButton =
-        controlType === 'SELECT' && !!dataPills?.length && !!name;
+    const showInputTypeSwitchButton = controlType === 'SELECT' && !!dataPills?.length && !!name;
 
     const otherComponentData = componentData.filter((component) => {
         if (component.name !== currentComponent?.name) {
@@ -156,13 +132,8 @@ const Property = ({
 
     let defaultValue = '';
 
-    if (
-        actionName &&
-        property.name &&
-        currentComponentData?.properties?.[actionName]
-    ) {
-        defaultValue =
-            currentComponentData?.properties?.[actionName][property.name];
+    if (actionName && property.name && currentComponentData?.properties?.[actionName]) {
+        defaultValue = currentComponentData?.properties?.[actionName][property.name];
     }
 
     const handlePropertyChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -270,9 +241,7 @@ const Property = ({
                                     {typeIcon}
                                 </span>
 
-                                <span className="text-sm font-medium">
-                                    {label}
-                                </span>
+                                <span className="text-sm font-medium">{label}</span>
 
                                 {description && (
                                     <Tooltip>
@@ -280,20 +249,14 @@ const Property = ({
                                             <QuestionMarkCircledIcon className="ml-1" />
                                         </TooltipTrigger>
 
-                                        <TooltipContent className="max-w-md">
-                                            {description}
-                                        </TooltipContent>
+                                        <TooltipContent className="max-w-md">{description}</TooltipContent>
                                     </Tooltip>
                                 )}
                             </div>
                         )}
 
-                        {(type === 'ARRAY' ||
-                            controlType === 'MULTI_SELECT') && (
-                            <ArrayProperty
-                                dataPills={dataPills}
-                                property={property}
-                            />
+                        {(type === 'ARRAY' || controlType === 'MULTI_SELECT') && (
+                            <ArrayProperty dataPills={dataPills} property={property} />
                         )}
 
                         {type === 'OBJECT' && (
@@ -340,10 +303,7 @@ const Property = ({
 
                                         const integerOnlyRegex = /^[0-9\b]+$/;
 
-                                        if (
-                                            value === '' ||
-                                            integerOnlyRegex.test(value)
-                                        ) {
+                                        if (value === '' || integerOnlyRegex.test(value)) {
                                             setIntegerValue(value);
                                         }
                                     }
@@ -351,29 +311,20 @@ const Property = ({
                                 ref={inputRef}
                                 required={required}
                                 title={type}
-                                type={
-                                    hidden
-                                        ? 'hidden'
-                                        : getInputType(controlType)
-                                }
-                                value={
-                                    isNumericalInput
-                                        ? integerValue || defaultValue
-                                        : defaultValue
-                                }
+                                type={hidden ? 'hidden' : getInputType(controlType)}
+                                value={isNumericalInput ? integerValue || defaultValue : defaultValue}
                             />
                         )}
 
-                        {controlType === 'SELECT' &&
-                            !!formattedOptions?.length && (
-                                <Select
-                                    description={description}
-                                    label={label}
-                                    leadingIcon={typeIcon}
-                                    options={formattedOptions}
-                                    triggerClassName="w-full border border-gray-300"
-                                />
-                            )}
+                        {controlType === 'SELECT' && !!formattedOptions?.length && (
+                            <Select
+                                description={description}
+                                label={label}
+                                leadingIcon={typeIcon}
+                                options={formattedOptions}
+                                triggerClassName="w-full border border-gray-300"
+                            />
+                        )}
 
                         {controlType === 'CODE_EDITOR' && (
                             <div className="h-full w-full border-2">
@@ -442,9 +393,7 @@ const Property = ({
                             />
                         )}
 
-                        {controlType === 'SCHEMA_DESIGNER' && (
-                            <span>Schema designer</span>
-                        )}
+                        {controlType === 'SCHEMA_DESIGNER' && <span>Schema designer</span>}
 
                         {!controlType && type === 'ANY' && (
                             <span>
@@ -454,9 +403,7 @@ const Property = ({
 
                         {type === 'NULL' && <span>NULL</span>}
 
-                        {type === 'DYNAMIC_PROPERTIES' && (
-                            <span>Dynamic properties</span>
-                        )}
+                        {type === 'DYNAMIC_PROPERTIES' && <span>Dynamic properties</span>}
                     </>
                 )}
             </div>

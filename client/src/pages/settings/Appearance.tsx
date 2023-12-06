@@ -1,13 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form';
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {zodResolver} from '@hookform/resolvers/zod';
 import React from 'react';
@@ -47,26 +39,19 @@ export default function Appearance() {
                         <FormItem className="space-y-1">
                             <FormLabel>Theme</FormLabel>
 
-                            <FormDescription>
-                                Select the theme for the dashboard.
-                            </FormDescription>
+                            <FormDescription>Select the theme for the dashboard.</FormDescription>
 
                             <FormMessage />
 
                             <RadioGroup
                                 className="grid max-w-xl grid-cols-3 gap-8 pt-2"
                                 defaultValue={field.value}
-                                onValueChange={(
-                                    e: 'light' | 'dark' | 'system'
-                                ) => field.onChange(e)}
+                                onValueChange={(e: 'light' | 'dark' | 'system') => field.onChange(e)}
                             >
                                 <FormItem>
                                     <FormLabel className="[&:has([data-state=checked])>div]:border-primary">
                                         <FormControl>
-                                            <RadioGroupItem
-                                                className="sr-only"
-                                                value="light"
-                                            />
+                                            <RadioGroupItem className="sr-only" value="light" />
                                         </FormControl>
 
                                         <div className="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
@@ -91,19 +76,14 @@ export default function Appearance() {
                                             </div>
                                         </div>
 
-                                        <span className="block w-full p-2 text-center font-normal">
-                                            Light
-                                        </span>
+                                        <span className="block w-full p-2 text-center font-normal">Light</span>
                                     </FormLabel>
                                 </FormItem>
 
                                 <FormItem>
                                     <FormLabel className="[&:has([data-state=checked])>div]:border-primary">
                                         <FormControl>
-                                            <RadioGroupItem
-                                                className="sr-only"
-                                                value="dark"
-                                            />
+                                            <RadioGroupItem className="sr-only" value="dark" />
                                         </FormControl>
 
                                         <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
@@ -128,19 +108,14 @@ export default function Appearance() {
                                             </div>
                                         </div>
 
-                                        <span className="block w-full p-2 text-center font-normal">
-                                            Dark
-                                        </span>
+                                        <span className="block w-full p-2 text-center font-normal">Dark</span>
                                     </FormLabel>
                                 </FormItem>
 
                                 <FormItem>
                                     <FormLabel className="[&:has([data-state=checked])>div]:border-primary">
                                         <FormControl>
-                                            <RadioGroupItem
-                                                className="sr-only"
-                                                value="system"
-                                            />
+                                            <RadioGroupItem className="sr-only" value="system" />
                                         </FormControl>
 
                                         <div className="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
@@ -165,9 +140,7 @@ export default function Appearance() {
                                             </div>
                                         </div>
 
-                                        <span className="block w-full p-2 text-center font-normal">
-                                            System
-                                        </span>
+                                        <span className="block w-full p-2 text-center font-normal">System</span>
                                     </FormLabel>
                                 </FormItem>
                             </RadioGroup>

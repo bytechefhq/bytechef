@@ -1,8 +1,5 @@
 import Input from '@/components/Input/Input';
-import {
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionModel,
-} from '@/middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/hermes/configuration';
 import WorkflowNodesTabs from '@/pages/automation/project/components/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import getFormattedName from '@/pages/automation/project/utils/getFormattedName';
@@ -36,35 +33,24 @@ const WorkflowNodesPopoverMenuList = memo(
             }
         }, [filter]);
 
-        const [
-            filteredActionComponentDefinitions,
-            setFilteredActionComponentDefinitions,
-        ] = useState<Array<ComponentDefinitionBasicModel>>([]);
+        const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
+            Array<ComponentDefinitionBasicModel>
+        >([]);
 
-        const [
-            filteredTaskDispatcherDefinitions,
-            setFilteredTaskDispatcherDefinitions,
-        ] = useState<Array<TaskDispatcherDefinitionModel>>([]);
+        const [filteredTaskDispatcherDefinitions, setFilteredTaskDispatcherDefinitions] = useState<
+            Array<TaskDispatcherDefinitionModel>
+        >([]);
 
-        const [
-            filteredTriggerComponentDefinitions,
-            setFilteredTriggerComponentDefinitions,
-        ] = useState<Array<ComponentDefinitionBasicModel>>([]);
+        const [filteredTriggerComponentDefinitions, setFilteredTriggerComponentDefinitions] = useState<
+            Array<ComponentDefinitionBasicModel>
+        >([]);
 
-        const {
-            componentDefinitions,
-            componentNames,
-            setComponentNames,
-            taskDispatcherDefinitions,
-        } = useWorkflowDataStore();
+        const {componentDefinitions, componentNames, setComponentNames, taskDispatcherDefinitions} =
+            useWorkflowDataStore();
 
         const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
-        const handleItemClick = (
-            clickedItem:
-                | ComponentDefinitionBasicModel
-                | TaskDispatcherDefinitionModel
-        ) => {
+        const handleItemClick = (clickedItem: ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel) => {
             if (edge) {
                 const clickedEdge = getEdge(id);
 
@@ -79,10 +65,7 @@ const WorkflowNodesPopoverMenuList = memo(
                         icon: (
                             <>
                                 {clickedItem.icon ? (
-                                    <InlineSVG
-                                        className="h-9 w-9 text-gray-700"
-                                        src={clickedItem.icon}
-                                    />
+                                    <InlineSVG className="h-9 w-9 text-gray-700" src={clickedItem.icon} />
                                 ) : (
                                     <Component1Icon className="h-9 w-9 text-gray-700" />
                                 )}
@@ -114,16 +97,10 @@ const WorkflowNodesPopoverMenuList = memo(
                     type: 'workflow',
                 };
 
-                setEdges((edges) =>
-                    edges
-                        .filter((edge) => edge.id !== id)
-                        .concat([sourceEdge, targetEdge])
-                );
+                setEdges((edges) => edges.filter((edge) => edge.id !== id).concat([sourceEdge, targetEdge]));
 
                 setNodes((nodes) => {
-                    const previousWorkflowNode = nodes.find(
-                        (node) => node.id === clickedEdge.source
-                    );
+                    const previousWorkflowNode = nodes.find((node) => node.id === clickedEdge.source);
 
                     const previousComponentNameIndex = componentNames.findIndex(
                         (name) => name === previousWorkflowNode?.data.name
@@ -131,25 +108,15 @@ const WorkflowNodesPopoverMenuList = memo(
 
                     const tempComponentNames = [...componentNames];
 
-                    tempComponentNames.splice(
-                        previousComponentNameIndex + 1,
-                        0,
-                        newWorkflowNode.data.name
-                    );
+                    tempComponentNames.splice(previousComponentNameIndex + 1, 0, newWorkflowNode.data.name);
 
                     setComponentNames(tempComponentNames);
 
-                    const previousWorkflowNodeIndex = nodes.findIndex(
-                        (node) => node.id === clickedEdge.source
-                    );
+                    const previousWorkflowNodeIndex = nodes.findIndex((node) => node.id === clickedEdge.source);
 
                     const tempNodes = [...nodes];
 
-                    tempNodes.splice(
-                        previousWorkflowNodeIndex + 1,
-                        0,
-                        newWorkflowNode
-                    );
+                    tempNodes.splice(previousWorkflowNodeIndex + 1, 0, newWorkflowNode);
 
                     return tempNodes;
                 });
@@ -187,15 +154,9 @@ const WorkflowNodesPopoverMenuList = memo(
                     nodes
                         .map((node) => {
                             if (node.id === placeholderId) {
-                                const formattedNodeName = getFormattedName(
-                                    clickedItem.name!,
-                                    nodes
-                                );
+                                const formattedNodeName = getFormattedName(clickedItem.name!, nodes);
 
-                                setComponentNames([
-                                    ...componentNames,
-                                    formattedNodeName,
-                                ]);
+                                setComponentNames([...componentNames, formattedNodeName]);
 
                                 return {
                                     ...node,
@@ -250,9 +211,7 @@ const WorkflowNodesPopoverMenuList = memo(
             if (taskDispatcherDefinitions) {
                 setFilteredTaskDispatcherDefinitions(
                     taskDispatcherDefinitions.filter(
-                        ({name, title}) =>
-                            name?.toLowerCase().includes(filter) ||
-                            title?.toLowerCase().includes(filter)
+                        ({name, title}) => name?.toLowerCase().includes(filter) || title?.toLowerCase().includes(filter)
                     )
                 );
             }
@@ -264,8 +223,7 @@ const WorkflowNodesPopoverMenuList = memo(
                     componentDefinitions.filter(
                         ({actionsCount, name, title}) =>
                             actionsCount &&
-                            (name?.toLowerCase().includes(filter) ||
-                                title?.toLowerCase().includes(filter))
+                            (name?.toLowerCase().includes(filter) || title?.toLowerCase().includes(filter))
                     )
                 );
 
@@ -273,8 +231,7 @@ const WorkflowNodesPopoverMenuList = memo(
                     componentDefinitions.filter(
                         ({name, title, triggersCount}) =>
                             triggersCount &&
-                            (name?.toLowerCase().includes(filter) ||
-                                title?.toLowerCase().includes(filter))
+                            (name?.toLowerCase().includes(filter) || title?.toLowerCase().includes(filter))
                     )
                 );
             }
@@ -284,9 +241,7 @@ const WorkflowNodesPopoverMenuList = memo(
             <div className="nowheel">
                 {typeof componentDefinitions === 'undefined' ||
                     (typeof taskDispatcherDefinitions === 'undefined' && (
-                        <div className="px-3 py-2 text-xs text-gray-500">
-                            Something went wrong.
-                        </div>
+                        <div className="px-3 py-2 text-xs text-gray-500">Something went wrong.</div>
                     ))}
 
                 <header className="border-b border-gray-200 px-3 pt-3 text-center text-gray-600">
@@ -300,19 +255,13 @@ const WorkflowNodesPopoverMenuList = memo(
 
                 <main className="max-h-80 overflow-auto rounded-b-lg bg-gray-100">
                     <WorkflowNodesTabs
-                        actionComponentDefinitions={
-                            filteredActionComponentDefinitions
-                        }
+                        actionComponentDefinitions={filteredActionComponentDefinitions}
                         hideActionComponents={hideActionComponents}
                         hideTaskDispatchers={hideTaskDispatchers}
                         hideTriggerComponents={hideTriggerComponents}
                         onItemClick={handleItemClick}
-                        taskDispatcherDefinitions={
-                            filteredTaskDispatcherDefinitions
-                        }
-                        triggerComponentDefinitions={
-                            filteredTriggerComponentDefinitions
-                        }
+                        taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
+                        triggerComponentDefinitions={filteredTriggerComponentDefinitions}
                     />
                 </main>
             </div>

@@ -34,9 +34,7 @@ export default function Settings() {
                     ))}
                 />
             }
-            leftSidebarHeader={
-                <PageHeader position="sidebar" title="Settings" />
-            }
+            leftSidebarHeader={<PageHeader position="sidebar" title="Settings" />}
         >
             <div className="px-4">
                 <Outlet />

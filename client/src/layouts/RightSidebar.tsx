@@ -6,9 +6,7 @@ export function RightSidebar({
 }: {
     navigation: {
         name: string;
-        icon: React.ForwardRefExoticComponent<
-            Omit<React.SVGProps<SVGSVGElement>, 'ref'>
-        >;
+        icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
         onClick?: () => void;
     }[];
 }) {
@@ -17,10 +15,7 @@ export function RightSidebar({
             <div className="flex w-[48px]">
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
                     <div className="flex-1">
-                        <nav
-                            aria-label="Sidebar"
-                            className="flex flex-col items-center py-3"
-                        >
+                        <nav aria-label="Sidebar" className="flex flex-col items-center py-3">
                             {navigation.map((item) => (
                                 <a
                                     className="flex items-center rounded-lg p-3 hover:text-blue-600"
@@ -29,15 +24,10 @@ export function RightSidebar({
                                 >
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <item.icon
-                                                aria-hidden="true"
-                                                className="h-6 w-6"
-                                            />
+                                            <item.icon aria-hidden="true" className="h-6 w-6" />
                                         </TooltipTrigger>
 
-                                        <TooltipContent side="left">
-                                            {item.name}
-                                        </TooltipContent>
+                                        <TooltipContent side="left">{item.name}</TooltipContent>
                                     </Tooltip>
 
                                     <span className="sr-only">{item.name}</span>

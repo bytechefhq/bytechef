@@ -19,23 +19,13 @@ module.exports = {
 
                     let message;
 
-                    if (
-                        parent.type === 'UnaryExpression' &&
-                        parent.operator === '!'
-                    ) {
-                        if (
-                            grandParent &&
-                            grandParent.type === 'UnaryExpression' &&
-                            grandParent.operator === '!'
-                        ) {
+                    if (parent.type === 'UnaryExpression' && parent.operator === '!') {
+                        if (grandParent && grandParent.type === 'UnaryExpression' && grandParent.operator === '!') {
                             message = `!!Object.keys({}) always evaluates to true`;
                         } else {
                             message = `!Object.keys({}) always evaluates to false`;
                         }
-                    } else if (
-                        parent.type === 'LogicalExpression' ||
-                        parent.type === 'IfStatement'
-                    ) {
+                    } else if (parent.type === 'LogicalExpression' || parent.type === 'IfStatement') {
                         message = `Object.keys({}) always evaluates to truthy`;
                     }
 

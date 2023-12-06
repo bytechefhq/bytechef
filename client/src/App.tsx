@@ -2,13 +2,7 @@ import {Toaster} from '@/components/ui/toaster';
 import {DesktopSidebar} from '@/layouts/DesktopSidebar';
 import {MobileSidebar} from '@/layouts/MobileSidebar';
 import {MobileTopNavigation} from '@/layouts/MobileTopNavigation';
-import {
-    ActivityIcon,
-    FolderIcon,
-    Layers3Icon,
-    Link2Icon,
-    LucideIcon,
-} from 'lucide-react';
+import {ActivityIcon, FolderIcon, Layers3Icon, Link2Icon, LucideIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
 
@@ -74,9 +68,7 @@ function App() {
                 <DesktopSidebar navigation={navigation} />
 
                 <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-                    <MobileTopNavigation
-                        setMobileMenuOpen={setMobileMenuOpen}
-                    />
+                    <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />
 
                     <Outlet />
                 </div>

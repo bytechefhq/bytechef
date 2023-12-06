@@ -1,11 +1,4 @@
-import {
-    Content,
-    Item,
-    Portal,
-    Root,
-    Separator,
-    Trigger,
-} from '@radix-ui/react-dropdown-menu';
+import {Content, Item, Portal, Root, Separator, Trigger} from '@radix-ui/react-dropdown-menu';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -26,11 +19,7 @@ type DropdownMenuProps = {
     id?: number;
 };
 
-const DropdownMenu = ({
-    customTriggerComponent,
-    id = 0,
-    menuItems,
-}: DropdownMenuProps) => (
+const DropdownMenu = ({customTriggerComponent, id = 0, menuItems}: DropdownMenuProps) => (
     <Root>
         <Trigger asChild>
             {customTriggerComponent ? (
@@ -59,8 +48,7 @@ const DropdownMenu = ({
                                 <Item
                                     className={twMerge(
                                         'flex cursor-default select-none items-center rounded-md px-4 py-2 text-sm text-gray-700 outline-none hover:cursor-pointer hover:bg-gray-50',
-                                        danger &&
-                                            'text-red-600 hover:bg-red-600 hover:text-white'
+                                        danger && 'text-red-600 hover:bg-red-600 hover:text-white'
                                     )}
                                     onClick={(event) => {
                                         if (onClick) {
@@ -70,14 +58,7 @@ const DropdownMenu = ({
                                 >
                                     {icon}
 
-                                    <span
-                                        className={twMerge(
-                                            'grow',
-                                            icon && 'ml-2'
-                                        )}
-                                    >
-                                        {label}
-                                    </span>
+                                    <span className={twMerge('grow', icon && 'ml-2')}>{label}</span>
                                 </Item>
                             )}
                         </div>

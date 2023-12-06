@@ -34,22 +34,13 @@ interface PaginationProps {
     onClick: (pageNumber: number) => void;
 }
 
-const Pagination = ({
-    onClick,
-    pageNumber,
-    pageSize,
-    totalElements,
-    totalPages,
-}: PaginationProps) => {
+const Pagination = ({onClick, pageNumber, pageSize, totalElements, totalPages}: PaginationProps) => {
     const renderPageLinks = useCallback(() => {
         if (totalPages === 0) {
             return null;
         }
 
-        let numberOfButtons =
-            totalPages < visiblePageButtonCount
-                ? totalPages
-                : visiblePageButtonCount;
+        let numberOfButtons = totalPages < visiblePageButtonCount ? totalPages : visiblePageButtonCount;
 
         const pageIndices = [pageNumber];
         numberOfButtons--;
@@ -58,11 +49,7 @@ const Pagination = ({
             const pageNumberBefore = pageIndices[0] - 1;
             const pageNumberAfter = pageIndices[pageIndices.length - 1] + 1;
 
-            if (
-                pageNumberBefore >= 0 &&
-                (itemIndex < numberOfButtons / 2 ||
-                    pageNumberAfter > totalPages - 1)
-            ) {
+            if (pageNumberBefore >= 0 && (itemIndex < numberOfButtons / 2 || pageNumberAfter > totalPages - 1)) {
                 pageIndices.unshift(pageNumberBefore);
             } else {
                 pageIndices.push(pageNumberAfter);
@@ -111,29 +98,17 @@ const Pagination = ({
                 <div>
                     <p className="text-sm text-gray-700">
                         Showing
-                        <span className="px-2 font-medium">
-                            {pageNumber * pageSize + 1}
-                        </span>
+                        <span className="px-2 font-medium">{pageNumber * pageSize + 1}</span>
                         to
-                        <span className="px-2 font-medium">
-                            {Math.min(
-                                totalElements,
-                                (pageNumber + 1) * pageSize
-                            )}
-                        </span>
+                        <span className="px-2 font-medium">{Math.min(totalElements, (pageNumber + 1) * pageSize)}</span>
                         of
-                        <span className="px-2 font-medium">
-                            {totalElements}
-                        </span>
+                        <span className="px-2 font-medium">{totalElements}</span>
                         results
                     </p>
                 </div>
 
                 <div>
-                    <nav
-                        aria-label="Pagination"
-                        className="isolate inline-flex -space-x-px rounded-md"
-                    >
+                    <nav aria-label="Pagination" className="isolate inline-flex -space-x-px rounded-md">
                         <button
                             className="relative inline-flex items-center rounded-l-md p-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                             disabled={pageNumber === 0}
@@ -145,10 +120,7 @@ const Pagination = ({
                         >
                             <span className="sr-only">Previous</span>
 
-                            <ChevronLeftIcon
-                                aria-hidden="true"
-                                className="h-5 w-5"
-                            />
+                            <ChevronLeftIcon aria-hidden="true" className="h-5 w-5" />
                         </button>
 
                         {renderPageLinks()}
@@ -164,10 +136,7 @@ const Pagination = ({
                         >
                             <span className="sr-only">Next</span>
 
-                            <ChevronRightIcon
-                                aria-hidden="true"
-                                className="h-5 w-5"
-                            />
+                            <ChevronRightIcon aria-hidden="true" className="h-5 w-5" />
                         </button>
                     </nav>
                 </div>

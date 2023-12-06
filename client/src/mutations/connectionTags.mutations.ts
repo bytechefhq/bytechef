@@ -1,7 +1,4 @@
-import {
-    ConnectionTagApi,
-    UpdateConnectionTagsRequest,
-} from '@/middleware/helios/connection';
+import {ConnectionTagApi, UpdateConnectionTagsRequest} from '@/middleware/helios/connection';
 import {useMutation} from '@tanstack/react-query';
 
 type UpdateConnectionTagsMutationProps = {
@@ -9,9 +6,7 @@ type UpdateConnectionTagsMutationProps = {
     onError?: (error: Error, variables: UpdateConnectionTagsRequest) => void;
 };
 
-export const useUpdateConnectionTagsMutation = (
-    mutationProps?: UpdateConnectionTagsMutationProps
-) =>
+export const useUpdateConnectionTagsMutation = (mutationProps?: UpdateConnectionTagsMutationProps) =>
     useMutation<void, Error, UpdateConnectionTagsRequest>({
         mutationFn: (request: UpdateConnectionTagsRequest) => {
             return new ConnectionTagApi().updateConnectionTags(request);

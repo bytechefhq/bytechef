@@ -14,14 +14,9 @@ module.exports = {
 
                 const source = getSource(node);
 
-                if (
-                    (typeImports.has(source) && isType) ||
-                    (imports.has(source) && !isType)
-                ) {
+                if ((typeImports.has(source) && isType) || (imports.has(source) && !isType)) {
                     context.report({
-                        message: `${DESCRIPTION} (duplicate import: ${JSON.stringify(
-                            source
-                        )})`,
+                        message: `${DESCRIPTION} (duplicate import: ${JSON.stringify(source)})`,
                         node,
                     });
                 } else {

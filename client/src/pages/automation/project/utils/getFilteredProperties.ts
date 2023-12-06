@@ -7,24 +7,16 @@ export default function getFilteredProperties({
     properties: Array<PropertyType>;
     filterQuery: string;
 }) {
-    return properties?.reduce(
-        (previousValue: Array<PropertyType>, currentValue) => {
-            const subProperties = getFilteredProperties({
-                filterQuery,
-                properties: currentValue.properties || currentValue.items || [],
-            });
+    return properties?.reduce((previousValue: Array<PropertyType>, currentValue) => {
+        const subProperties = getFilteredProperties({
+            filterQuery,
+            properties: currentValue.properties || currentValue.items || [],
+        });
 
-            if (
-                currentValue.name
-                    ?.toLowerCase()
-                    .includes(filterQuery.toLowerCase()) ||
-                subProperties.length
-            ) {
-                previousValue.push(Object.assign({}, currentValue));
-            }
+        if (currentValue.name?.toLowerCase().includes(filterQuery.toLowerCase()) || subProperties.length) {
+            previousValue.push(Object.assign({}, currentValue));
+        }
 
-            return previousValue;
-        },
-        []
-    );
+        return previousValue;
+    }, []);
 }

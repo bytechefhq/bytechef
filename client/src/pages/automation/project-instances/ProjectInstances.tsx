@@ -32,9 +32,7 @@ const ProjectInstances = () => {
         type: searchParams.get('tagId') ? Type.Tag : Type.Project,
     };
 
-    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(
-        defaultCurrentState
-    );
+    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(defaultCurrentState);
 
     const {
         data: projects,
@@ -49,18 +47,11 @@ const ProjectInstances = () => {
         error: projectInstancesError,
         isLoading: projectInstancesIsLoading,
     } = useGetProjectInstancesQuery({
-        projectId: searchParams.get('projectId')
-            ? parseInt(searchParams.get('projectId')!)
-            : undefined,
-        tagId: searchParams.get('tagId')
-            ? parseInt(searchParams.get('tagId')!)
-            : undefined,
+        projectId: searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : undefined,
+        tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
-    const projectInstanceMap: Map<number, ProjectInstanceModel[]> = new Map<
-        number,
-        ProjectInstanceModel[]
-    >();
+    const projectInstanceMap: Map<number, ProjectInstanceModel[]> = new Map<number, ProjectInstanceModel[]>();
 
     if (projectInstances) {
         for (const projectInstance of projectInstances) {
@@ -68,34 +59,24 @@ const ProjectInstances = () => {
 
             if (projectInstance.project) {
                 if (projectInstanceMap.has(projectInstance.project.id!)) {
-                    currentProjectInstances = projectInstanceMap.get(
-                        projectInstance.project.id!
-                    )!;
+                    currentProjectInstances = projectInstanceMap.get(projectInstance.project.id!)!;
                 } else {
                     currentProjectInstances = [];
                 }
 
                 currentProjectInstances.push(projectInstance);
 
-                projectInstanceMap.set(
-                    projectInstance.project.id!,
-                    currentProjectInstances
-                );
+                projectInstanceMap.set(projectInstance.project.id!, currentProjectInstances);
             }
         }
     }
 
-    const {
-        data: tags,
-        error: tagsError,
-        isLoading: tagsIsLoading,
-    } = useGetProjectInstanceTagsQuery();
+    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectInstanceTagsQuery();
 
     let pageTitle: string | undefined;
 
     if (filterData.type === Type.Project) {
-        pageTitle = projects?.find((project) => project.id === filterData.id)
-            ?.name;
+        pageTitle = projects?.find((project) => project.id === filterData.id)?.name;
     } else {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
@@ -106,14 +87,8 @@ const ProjectInstances = () => {
                 <PageHeader
                     centerTitle={true}
                     position="main"
-                    right={
-                        <ProjectInstanceDialog
-                            triggerNode={<Button>Create Instance</Button>}
-                        />
-                    }
-                    title={`${
-                        searchParams.get('tagId') ? 'Tags' : 'Projects'
-                    }: ${pageTitle || 'All'}`}
+                    right={<ProjectInstanceDialog triggerNode={<Button>Create Instance</Button>} />}
+                    title={`${searchParams.get('tagId') ? 'Tags' : 'Projects'}: ${pageTitle || 'All'}`}
                 />
             }
             leftSidebarBody={
@@ -124,20 +99,12 @@ const ProjectInstances = () => {
                                 (tags && !!tags.length ? (
                                     tags?.map((item) => (
                                         <LeftSidebarNavItem
-                                            icon={
-                                                <TagIcon className="mr-1 h-4 w-4" />
-                                            }
+                                            icon={<TagIcon className="mr-1 h-4 w-4" />}
                                             item={{
-                                                filterData:
-                                                    filterData?.id ===
-                                                        item.id &&
-                                                    filterData.type ===
-                                                        Type.Tag,
+                                                filterData: filterData?.id === item.id && filterData.type === Type.Tag,
                                                 id: item.id!,
                                                 name: item.name,
-                                                onItemClick: (
-                                                    id?: number | string
-                                                ) => {
+                                                onItemClick: (id?: number | string) => {
                                                     setFilterData({
                                                         id: id as number,
                                                         type: Type.Tag,
@@ -149,9 +116,7 @@ const ProjectInstances = () => {
                                         />
                                     ))
                                 ) : (
-                                    <span className="px-3 text-xs">
-                                        You have not created any tags yet.
-                                    </span>
+                                    <span className="px-3 text-xs">You have not created any tags yet.</span>
                                 ))}
                         </>
                     }
@@ -160,9 +125,7 @@ const ProjectInstances = () => {
                         <>
                             <LeftSidebarNavItem
                                 item={{
-                                    filterData:
-                                        !filterData?.id &&
-                                        filterData.type === Type.Project,
+                                    filterData: !filterData?.id && filterData.type === Type.Project,
                                     name: 'All Projects',
                                     onItemClick: (id?: number | string) => {
                                         setFilterData({
@@ -177,15 +140,10 @@ const ProjectInstances = () => {
                                 projects?.map((item) => (
                                     <LeftSidebarNavItem
                                         item={{
-                                            filterData:
-                                                filterData?.id === item.id &&
-                                                filterData.type ===
-                                                    Type.Project,
+                                            filterData: filterData?.id === item.id && filterData.type === Type.Project,
                                             id: item.id,
                                             name: item.name,
-                                            onItemClick: (
-                                                id?: number | string
-                                            ) => {
+                                            onItemClick: (id?: number | string) => {
                                                 setFilterData({
                                                     id: id as number,
                                                     type: Type.Project,
@@ -201,17 +159,11 @@ const ProjectInstances = () => {
                     topTitle="Projects"
                 />
             }
-            leftSidebarHeader={
-                <PageHeader position="sidebar" title="Instances" />
-            }
+            leftSidebarHeader={<PageHeader position="sidebar" title="Instances" />}
         >
             <PageLoader
                 errors={[projectsError, projectInstancesError, tagsError]}
-                loading={
-                    projectsIsLoading ||
-                    projectInstancesIsLoading ||
-                    tagsIsLoading
-                }
+                loading={projectsIsLoading || projectInstancesIsLoading || tagsIsLoading}
             >
                 {projectInstances && projectInstances?.length > 0 ? (
                     <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
@@ -221,16 +173,8 @@ const ProjectInstances = () => {
                                 tags && (
                                     <ProjectInstanceList
                                         key={projectId}
-                                        project={
-                                            projects.find(
-                                                (currentProject) =>
-                                                    currentProject.id ===
-                                                    projectId
-                                            )!
-                                        }
-                                        projectInstances={
-                                            projectInstanceMap.get(projectId)!
-                                        }
+                                        project={projects.find((currentProject) => currentProject.id === projectId)!}
+                                        projectInstances={projectInstanceMap.get(projectId)!}
                                         tags={tags}
                                     />
                                 )
@@ -238,14 +182,8 @@ const ProjectInstances = () => {
                     </div>
                 ) : (
                     <EmptyList
-                        button={
-                            <ProjectInstanceDialog
-                                triggerNode={<Button>Create Instance</Button>}
-                            />
-                        }
-                        icon={
-                            <Layers3Icon className="h-12 w-12 text-gray-400" />
-                        }
+                        button={<ProjectInstanceDialog triggerNode={<Button>Create Instance</Button>} />}
+                        icon={<Layers3Icon className="h-12 w-12 text-gray-400" />}
                         message="Get started by creating a new project instance."
                         title="No instances of projects"
                     />

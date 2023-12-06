@@ -1,16 +1,8 @@
 import {Button} from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {
-    ProjectInstanceWorkflowModel,
-    WorkflowModel,
-} from '@/middleware/helios/configuration';
+import {ProjectInstanceWorkflowModel, WorkflowModel} from '@/middleware/helios/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/mutations/projectInstanceWorkflows.mutations';
 import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/components/ProjectInstanceEditWorkflowDialog';
@@ -49,14 +41,13 @@ const ProjectInstanceWorkflowListItem = ({
 
     const queryClient = useQueryClient();
 
-    const enableProjectInstanceWorkflowMutation =
-        useEnableProjectInstanceWorkflowMutation({
-            onSuccess: () => {
-                queryClient.invalidateQueries({
-                    queryKey: ProjectInstanceKeys.projectInstances,
-                });
-            },
-        });
+    const enableProjectInstanceWorkflowMutation = useEnableProjectInstanceWorkflowMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectInstanceKeys.projectInstances,
+            });
+        },
+    });
 
     return (
         <>
@@ -64,22 +55,15 @@ const ProjectInstanceWorkflowListItem = ({
                 className="flex flex-1 items-center"
                 to={`/automation/projects/${projectId}/workflows/${workflow.id}`}
             >
-                <div className="w-6/12 text-sm font-semibold">
-                    {workflow.label}
-                </div>
+                <div className="w-6/12 text-sm font-semibold">{workflow.label}</div>
 
                 <div className="ml-6 flex">
                     {filteredDefinitionNames?.map((name) => {
-                        const componentDefinition =
-                            workflowComponentDefinitions[name];
-                        const taskDispatcherDefinition =
-                            workflowTaskDispatcherDefinitions[name];
+                        const componentDefinition = workflowComponentDefinitions[name];
+                        const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
 
                         return (
-                            <div
-                                className="mr-0.5 flex items-center justify-center rounded-full border p-1"
-                                key={name}
-                            >
+                            <div className="mr-0.5 flex items-center justify-center rounded-full border p-1" key={name}>
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <InlineSVG
@@ -88,15 +72,12 @@ const ProjectInstanceWorkflowListItem = ({
                                             src={
                                                 componentDefinition?.icon
                                                     ? componentDefinition?.icon
-                                                    : taskDispatcherDefinition?.icon ??
-                                                      ''
+                                                    : taskDispatcherDefinition?.icon ?? ''
                                             }
                                         />
                                     </TooltipTrigger>
 
-                                    <TooltipContent side="right">
-                                        {componentDefinition?.title}
-                                    </TooltipContent>
+                                    <TooltipContent side="right">{componentDefinition?.title}</TooltipContent>
                                 </Tooltip>
                             </div>
                         );
@@ -108,10 +89,7 @@ const ProjectInstanceWorkflowListItem = ({
                 {projectInstanceWorkflow?.lastExecutionDate ? (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                            <CalendarIcon
-                                aria-hidden="true"
-                                className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
-                            />
+                            <CalendarIcon aria-hidden="true" className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400" />
 
                             <span>
                                 {`Executed at ${projectInstanceWorkflow.lastExecutionDate?.toLocaleDateString()} ${projectInstanceWorkflow.lastExecutionDate?.toLocaleTimeString()}`}
@@ -137,8 +115,7 @@ const ProjectInstanceWorkflowListItem = ({
                                 },
                                 {
                                     onSuccess: () => {
-                                        projectInstanceWorkflow.enabled =
-                                            !projectInstanceWorkflow?.enabled;
+                                        projectInstanceWorkflow.enabled = !projectInstanceWorkflow?.enabled;
                                     },
                                 }
                             );
@@ -154,11 +131,7 @@ const ProjectInstanceWorkflowListItem = ({
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            onClick={() => setShowEditWorkflowDialog(true)}
-                        >
-                            Edit
-                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setShowEditWorkflowDialog(true)}>Edit</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

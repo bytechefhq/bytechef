@@ -34,9 +34,7 @@ const enhanceAuthorizationUrl = (
     scope: string,
     state: string,
     responseType: Oauth2Props['responseType'],
-    extraQueryParametersRef: React.MutableRefObject<
-        Oauth2Props['extraQueryParameters']
-    >
+    extraQueryParametersRef: React.MutableRefObject<Oauth2Props['extraQueryParameters']>
 ) => {
     const query = objectToQuery({
         client_id: clientId,
@@ -52,15 +50,12 @@ const enhanceAuthorizationUrl = (
 
 // https://medium.com/@dazcyril/generating-cryptographic-random-state-in-javascript-in-the-browser-c538b3daae50
 const generateState = () => {
-    const validChars =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const validChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let array = new Uint8Array(40);
 
     window.crypto.getRandomValues(array);
 
-    array = array.map(
-        (x: number) => validChars.codePointAt(x % validChars.length)!
-    );
+    array = array.map((x: number) => validChars.codePointAt(x % validChars.length)!);
 
     return String.fromCharCode.apply(null, Array.from(array));
 };
@@ -79,16 +74,10 @@ const openPopup = (url: string) => {
     const top = window.outerHeight / 2 + window.screenY - POPUP_HEIGHT / 2 - 50;
     const left = window.outerWidth / 2 + window.screenX - POPUP_WIDTH / 2;
 
-    return window.open(
-        url,
-        'OAuth2 Popup',
-        `height=${POPUP_HEIGHT},width=${POPUP_WIDTH},top=${top},left=${left}`
-    );
+    return window.open(url, 'OAuth2 Popup', `height=${POPUP_HEIGHT},width=${POPUP_WIDTH},top=${top},left=${left}`);
 };
 
-const closePopup = (
-    popupRef: React.MutableRefObject<Window | null | undefined>
-) => {
+const closePopup = (popupRef: React.MutableRefObject<Window | null | undefined>) => {
     popupRef.current?.close();
 };
 
@@ -157,10 +146,7 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
         async function handleMessageListener(message: MessageEvent<any>) {
             const type = message?.data?.type;
 
-            if (
-                type !== OAUTH_RESPONSE ||
-                curStateRef.current === message?.data?.payload.state
-            ) {
+            if (type !== OAUTH_RESPONSE || curStateRef.current === message?.data?.payload.state) {
                 return;
             }
 
@@ -214,8 +200,7 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
 
         // 4. Begin interval to check if popup was closed forcefully by the user
         intervalRef.current = setInterval(() => {
-            const popupClosed =
-                !popupRef.current?.window || popupRef.current?.window?.closed;
+            const popupClosed = !popupRef.current?.window || popupRef.current?.window?.closed;
             if (popupClosed) {
                 // Popup was closed before completing auth...
                 setUI((ui) => ({
@@ -223,9 +208,7 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
                     loading: false,
                 }));
 
-                console.warn(
-                    'Warning: Popup was closed before completing authentication.'
-                );
+                console.warn('Warning: Popup was closed before completing authentication.');
 
                 clearInterval(intervalRef.current);
                 removeState();
@@ -241,17 +224,7 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
                 clearInterval(intervalRef.current);
             }
         };
-    }, [
-        authorizationUrl,
-        clientId,
-        redirectUri,
-        scope,
-        responseType,
-        onCodeSuccess,
-        onTokenSuccess,
-        onError,
-        setUI,
-    ]);
+    }, [authorizationUrl, clientId, redirectUri, scope, responseType, onCodeSuccess, onTokenSuccess, onError, setUI]);
 
     return {error, getAuth, loading};
 };

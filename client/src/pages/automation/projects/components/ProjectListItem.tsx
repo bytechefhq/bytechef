@@ -19,17 +19,10 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {
-    ProjectModel,
-    ProjectModelStatusEnum,
-    TagModel,
-} from '@/middleware/helios/configuration';
+import {ProjectModel, ProjectModelStatusEnum, TagModel} from '@/middleware/helios/configuration';
 import {useUpdateProjectTagsMutation} from '@/mutations/projectTags.mutations';
 import {useCreateProjectWorkflowMutation} from '@/mutations/projectWorkflows.mutations';
-import {
-    useDeleteProjectMutation,
-    useDuplicateProjectMutation,
-} from '@/mutations/projects.mutations';
+import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/mutations/projects.mutations';
 import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
 import {ProjectCategoryKeys} from '@/queries/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/projectTags.quries';
@@ -58,16 +51,13 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     const queryClient = useQueryClient();
 
-    const createProjectWorkflowRequestMutation =
-        useCreateProjectWorkflowMutation({
-            onSuccess: (workflow) => {
-                navigate(
-                    `/automation/projects/${project.id}/workflows/${workflow?.id}`
-                );
+    const createProjectWorkflowRequestMutation = useCreateProjectWorkflowMutation({
+        onSuccess: (workflow) => {
+            navigate(`/automation/projects/${project.id}/workflows/${workflow?.id}`);
 
-                setShowWorkflowDialog(false);
-            },
-        });
+            setShowWorkflowDialog(false);
+        },
+    });
 
     const deleteProjectMutation = useDeleteProjectMutation({
         onSuccess: () => {
@@ -102,32 +92,22 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
                         <div className="relative flex items-center">
-                            <Link
-                                to={`/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`}
-                            >
+                            <Link to={`/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`}>
                                 {project.description ? (
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <span className="mr-2 text-base font-semibold">
-                                                {project.name}
-                                            </span>
+                                            <span className="mr-2 text-base font-semibold">{project.name}</span>
                                         </TooltipTrigger>
 
-                                        <TooltipContent>
-                                            {project.description}
-                                        </TooltipContent>
+                                        <TooltipContent>{project.description}</TooltipContent>
                                     </Tooltip>
                                 ) : (
-                                    <span className="mr-2 text-base font-semibold">
-                                        {project.name}
-                                    </span>
+                                    <span className="mr-2 text-base font-semibold">{project.name}</span>
                                 )}
                             </Link>
 
                             {project.category && (
-                                <span className="text-xs uppercase text-gray-700">
-                                    {project.category.name}
-                                </span>
+                                <span className="text-xs uppercase text-gray-700">{project.category.name}</span>
                             )}
                         </div>
                     </div>
@@ -156,9 +136,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                                         id={project.id!}
                                         remainingTags={remainingTags}
                                         tags={project.tags}
-                                        updateTagsMutation={
-                                            updateProjectTagsMutation
-                                        }
+                                        updateTagsMutation={updateProjectTagsMutation}
                                     />
                                 )}
                             </div>
@@ -170,8 +148,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                     <div className="flex flex-col items-end gap-y-4">
                         <Badge
                             className={twMerge(
-                                project.status ===
-                                    ProjectModelStatusEnum.Published &&
+                                project.status === ProjectModelStatusEnum.Published &&
                                     'border-transparent bg-success text-success-foreground hover:bg-success'
                             )}
                             variant="secondary"
@@ -184,8 +161,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                         <Tooltip>
                             <TooltipTrigger>
                                 <div className="flex items-center text-sm text-gray-500 sm:mt-0">
-                                    {project.status ===
-                                    ProjectModelStatusEnum.Published ? (
+                                    {project.status === ProjectModelStatusEnum.Published ? (
                                         <>
                                             <CalendarIcon
                                                 aria-hidden="true"
@@ -214,32 +190,19 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                onClick={() => setShowEditDialog(true)}
-                            >
-                                Edit
-                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
 
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    duplicateProjectMutation.mutate(project.id!)
-                                }
-                            >
+                            <DropdownMenuItem onClick={() => duplicateProjectMutation.mutate(project.id!)}>
                                 Duplicate
                             </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                                onClick={() => setShowWorkflowDialog(true)}
-                            >
+                            <DropdownMenuItem onClick={() => setShowWorkflowDialog(true)}>
                                 New Workflow
                             </DropdownMenuItem>
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem
-                                className="text-red-600"
-                                onClick={() => setShowDeleteDialog(true)}
-                            >
+                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -250,22 +213,16 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
             <AlertDialog open={showDeleteDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            Are you absolutely sure?
-                        </AlertDialogTitle>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete the project and workflows it contains..
+                            This action cannot be undone. This will permanently delete the project and workflows it
+                            contains..
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel
-                            onClick={() => setShowDeleteDialog(false)}
-                        >
-                            Cancel
-                        </AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
                         <AlertDialogAction
                             className="bg-red-600"
@@ -281,18 +238,11 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                 </AlertDialogContent>
             </AlertDialog>
 
-            {showEditDialog && (
-                <ProjectDialog
-                    onClose={() => setShowEditDialog(false)}
-                    project={project}
-                />
-            )}
+            {showEditDialog && <ProjectDialog onClose={() => setShowEditDialog(false)} project={project} />}
 
             {showWorkflowDialog && !!project.id && (
                 <WorkflowDialog
-                    createWorkflowRequestMutation={
-                        createProjectWorkflowRequestMutation
-                    }
+                    createWorkflowRequestMutation={createProjectWorkflowRequestMutation}
                     onClose={() => setShowWorkflowDialog(false)}
                     parentId={project.id}
                 />

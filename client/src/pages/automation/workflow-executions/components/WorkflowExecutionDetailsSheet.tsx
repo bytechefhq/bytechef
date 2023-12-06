@@ -6,44 +6,30 @@ import WorkflowExecutionDetailsAccordion from './WorkflowExecutionDetailsAccordi
 import WorkflowExecutionDetailsSheetWorkflowView from './WorkflowExecutionDetailsSheetWorkflowView';
 
 const WorkflowExecutionDetailsSheet = () => {
-    const {
-        setWorkflowExecutionDetailsDialogOpen,
-        workflowExecutionDetailsDialogOpen,
-        workflowExecutionId,
-    } = useWorkflowExecutionDetailsDialogStore();
+    const {setWorkflowExecutionDetailsDialogOpen, workflowExecutionDetailsDialogOpen, workflowExecutionId} =
+        useWorkflowExecutionDetailsDialogStore();
 
-    const {data: workflowExecution, isLoading: workflowExecutionLoading} =
-        useGetWorkflowExecutionQuery(
-            {
-                id: workflowExecutionId,
-            },
-            workflowExecutionDetailsDialogOpen
-        );
+    const {data: workflowExecution, isLoading: workflowExecutionLoading} = useGetWorkflowExecutionQuery(
+        {
+            id: workflowExecutionId,
+        },
+        workflowExecutionDetailsDialogOpen
+    );
 
     return (
         <Sheet
-            onOpenChange={() =>
-                setWorkflowExecutionDetailsDialogOpen(
-                    !workflowExecutionDetailsDialogOpen
-                )
-            }
+            onOpenChange={() => setWorkflowExecutionDetailsDialogOpen(!workflowExecutionDetailsDialogOpen)}
             open={workflowExecutionDetailsDialogOpen}
         >
             <SheetContent className="flex w-11/12 gap-0 p-0 sm:max-w-[1280px]">
                 {workflowExecutionLoading && <span>Loading...</span>}
 
                 <div className="flex w-7/12 flex-col border-r border-gray-100 bg-white">
-                    {workflowExecution && (
-                        <WorkflowExecutionDetailsAccordion
-                            workflowExecution={workflowExecution}
-                        />
-                    )}
+                    {workflowExecution && <WorkflowExecutionDetailsAccordion workflowExecution={workflowExecution} />}
                 </div>
 
                 {workflowExecution && (
-                    <WorkflowExecutionDetailsSheetWorkflowView
-                        workflowExecution={workflowExecution}
-                    />
+                    <WorkflowExecutionDetailsSheetWorkflowView workflowExecution={workflowExecution} />
                 )}
             </SheetContent>
         </Sheet>

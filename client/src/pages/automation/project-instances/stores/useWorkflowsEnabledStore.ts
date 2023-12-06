@@ -11,9 +11,7 @@ export const useWorkflowsEnabledStore = create<WorkflowsEnabledState>()(
         (set) => ({
             setWorkflowEnabled: (workflowId, enabled) =>
                 set(({workflowEnabledMap}) => ({
-                    workflowEnabledMap: new Map<string, boolean>(
-                        workflowEnabledMap.set(workflowId, enabled)
-                    ),
+                    workflowEnabledMap: new Map<string, boolean>(workflowEnabledMap.set(workflowId, enabled)),
                 })),
             workflowEnabledMap: new Map<string, boolean>(),
         }),

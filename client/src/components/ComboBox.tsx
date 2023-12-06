@@ -1,11 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-} from '@/components/ui/command';
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem} from '@/components/ui/command';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {cn} from '@/lib/utils';
@@ -31,14 +25,7 @@ export type ComboBoxProps = {
     value?: any;
 };
 
-const ComboBox = ({
-    items,
-    maxHeight = false,
-    name,
-    onBlur,
-    onChange,
-    value,
-}: ComboBoxProps) => {
+const ComboBox = ({items, maxHeight = false, name, onBlur, onChange, value}: ComboBoxProps) => {
     const [open, setOpen] = useState(false);
 
     const commandItems = items.map((comboBoxItem) => (
@@ -50,21 +37,11 @@ const ComboBox = ({
             }}
             value={comboBoxItem.value}
         >
-            {comboBoxItem.icon && (
-                <InlineSVG
-                    className="mr-2 h-6 w-6 flex-none"
-                    src={comboBoxItem.icon}
-                />
-            )}
+            {comboBoxItem.icon && <InlineSVG className="mr-2 h-6 w-6 flex-none" src={comboBoxItem.icon} />}
 
             {comboBoxItem.label}
 
-            <CheckIcon
-                className={cn(
-                    'ml-auto h-4 w-4',
-                    comboBoxItem.value === value ? 'opacity-100' : 'opacity-0'
-                )}
-            />
+            <CheckIcon className={cn('ml-auto h-4 w-4', comboBoxItem.value === value ? 'opacity-100' : 'opacity-0')} />
         </CommandItem>
     ));
 
@@ -82,12 +59,7 @@ const ComboBox = ({
                 >
                     {value ? (
                         <span className="flex w-full items-center">
-                            {item?.icon && (
-                                <InlineSVG
-                                    className="mr-2 h-6 w-6 flex-none"
-                                    src={item?.icon}
-                                />
-                            )}
+                            {item?.icon && <InlineSVG className="mr-2 h-6 w-6 flex-none" src={item?.icon} />}
 
                             {item?.label}
                         </span>
@@ -99,26 +71,14 @@ const ComboBox = ({
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent
-                align="start"
-                className="min-w-combo-box-popper-anchor-width p-0"
-            >
+            <PopoverContent align="start" className="min-w-combo-box-popper-anchor-width p-0">
                 <Command>
-                    <CommandInput
-                        className="h-9 border-none ring-0"
-                        placeholder="Search..."
-                    />
+                    <CommandInput className="h-9 border-none ring-0" placeholder="Search..." />
 
                     <CommandEmpty>No item found.</CommandEmpty>
 
                     <CommandGroup>
-                        {maxHeight ? (
-                            <ScrollArea className="h-72 w-full">
-                                {commandItems}
-                            </ScrollArea>
-                        ) : (
-                            commandItems
-                        )}
+                        {maxHeight ? <ScrollArea className="h-72 w-full">{commandItems}</ScrollArea> : commandItems}
                     </CommandGroup>
                 </Command>
             </PopoverContent>

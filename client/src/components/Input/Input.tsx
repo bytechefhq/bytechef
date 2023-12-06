@@ -1,15 +1,6 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {
-    ExclamationTriangleIcon,
-    QuestionMarkCircledIcon,
-} from '@radix-ui/react-icons';
-import {
-    ChangeEvent,
-    DetailedHTMLProps,
-    InputHTMLAttributes,
-    ReactNode,
-    forwardRef,
-} from 'react';
+import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import {ChangeEvent, DetailedHTMLProps, InputHTMLAttributes, ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 type InputProps = {
@@ -49,9 +40,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         },
         ref
     ) => (
-        <fieldset
-            className={twMerge(type !== 'hidden' && 'mb-3', fieldsetClassName)}
-        >
+        <fieldset className={twMerge(type !== 'hidden' && 'mb-3', fieldsetClassName)}>
             {label && type !== 'hidden' && (
                 <div className="flex items-center">
                     <label
@@ -65,9 +54,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         {label}
                     </label>
 
-                    {required && (
-                        <span className="px-1 leading-3 text-red-500">*</span>
-                    )}
+                    {required && <span className="px-1 leading-3 text-red-500">*</span>}
 
                     {description && (
                         <Tooltip>
@@ -81,19 +68,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 </div>
             )}
 
-            <div
-                className={twMerge([
-                    label && type !== 'hidden' && 'mt-1',
-                    leadingIcon && 'relative',
-                ])}
-                title={title}
-            >
+            <div className={twMerge([label && type !== 'hidden' && 'mt-1', leadingIcon && 'relative'])} title={title}>
                 <div
                     className={twMerge(
-                        trailing &&
-                            'flex flex-grow items-stretch focus-within:z-10',
-                        leadingIcon &&
-                            'relative rounded-md border border-gray-300',
+                        trailing && 'flex flex-grow items-stretch focus-within:z-10',
+                        leadingIcon && 'relative rounded-md border border-gray-300',
                         type === 'hidden' && 'border-0'
                     )}
                 >
@@ -109,8 +88,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                             error
                                 ? 'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-500'
                                 : 'border-gray-300 placeholder:text-gray-400 focus:border-transparent focus:ring focus:ring-blue-500',
-                            disabled &&
-                                'cursor-not-allowed bg-gray-100 text-gray-500',
+                            disabled && 'cursor-not-allowed bg-gray-100 text-gray-500',
                             leadingIcon && 'border-0 pl-12 leading-relaxed',
                             trailing &&
                                 'rounded-none rounded-l-md bg-gray-50 text-gray-700 outline-0 focus:border-gray-300 focus:ring-0',
@@ -132,20 +110,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
                 {error && (
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <ExclamationTriangleIcon
-                            aria-hidden="true"
-                            className="h-5 w-5 text-rose-500"
-                        />
+                        <ExclamationTriangleIcon aria-hidden="true" className="h-5 w-5 text-rose-500" />
                     </div>
                 )}
             </div>
 
             {error && (
-                <p
-                    className="mt-2 text-sm text-rose-600"
-                    id={`${name}-error`}
-                    role="alert"
-                >
+                <p className="mt-2 text-sm text-rose-600" id={`${name}-error`} role="alert">
                     This field is required
                 </p>
             )}

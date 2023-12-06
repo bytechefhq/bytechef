@@ -1,9 +1,6 @@
 import getRandomId from '@/utils/getRandomId';
 import {PlayIcon} from 'lucide-react';
-import {
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionBasicModel,
-} from 'middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/hermes/configuration';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, Node, useReactFlow} from 'reactflow';
 
@@ -11,18 +8,8 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getFormattedName from '../utils/getFormattedName';
 
 export default function useHandleDrop(): [
-    (
-        targetNode: Node,
-        droppedNode:
-            | ComponentDefinitionBasicModel
-            | TaskDispatcherDefinitionBasicModel
-    ) => void,
-    (
-        targetEdge: Edge,
-        droppedNode:
-            | ComponentDefinitionBasicModel
-            | TaskDispatcherDefinitionBasicModel
-    ) => void,
+    (targetNode: Node, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
+    (targetEdge: Edge, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
 ] {
     const {componentNames, setComponentNames} = useWorkflowDataStore();
 
@@ -34,18 +21,13 @@ export default function useHandleDrop(): [
 
     function handleDropOnPlaceholderNode(
         targetNode: Node,
-        droppedNode:
-            | ComponentDefinitionBasicModel
-            | TaskDispatcherDefinitionBasicModel
+        droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel
     ) {
         const newWorkflowNode = {
             ...targetNode,
             data: {
                 icon: droppedNode?.icon ? (
-                    <InlineSVG
-                        className="h-9 w-9 text-gray-700"
-                        src={droppedNode?.icon}
-                    />
+                    <InlineSVG className="h-9 w-9 text-gray-700" src={droppedNode?.icon} />
                 ) : (
                     <PlayIcon className="h-9 w-9 text-gray-700" />
                 ),
@@ -65,19 +47,13 @@ export default function useHandleDrop(): [
         };
 
         setNodes((nodes) => {
-            const nodeIndex = nodes.findIndex(
-                (node) => node.id === targetNode.id
-            );
+            const nodeIndex = nodes.findIndex((node) => node.id === targetNode.id);
 
             nodes[nodeIndex] = newWorkflowNode;
 
             const tempComponentNames = [...componentNames];
 
-            tempComponentNames.splice(
-                nodeIndex - 1,
-                0,
-                newWorkflowNode.data.name
-            );
+            tempComponentNames.splice(nodeIndex - 1, 0, newWorkflowNode.data.name);
 
             setComponentNames(tempComponentNames);
 
@@ -105,9 +81,7 @@ export default function useHandleDrop(): [
         };
 
         setEdges((edges) => {
-            const edgeIndex = edges.findIndex(
-                (edge) => edge.id === sourceEdge?.id
-            );
+            const edgeIndex = edges.findIndex((edge) => edge.id === sourceEdge?.id);
 
             edges[edgeIndex] = newWorkflowEdge;
 
@@ -117,13 +91,9 @@ export default function useHandleDrop(): [
 
     function handleDropOnWorkflowEdge(
         targetEdge: Edge,
-        droppedNode:
-            | ComponentDefinitionBasicModel
-            | TaskDispatcherDefinitionBasicModel
+        droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel
     ) {
-        const previousNode = nodes.find(
-            (node) => node.id === targetEdge.source
-        );
+        const previousNode = nodes.find((node) => node.id === targetEdge.source);
 
         const nextNode = nodes.find((node) => node.id === targetEdge.target);
 
@@ -131,17 +101,12 @@ export default function useHandleDrop(): [
             return;
         }
 
-        const targetEdgeIndex = edges.findIndex(
-            (edge) => edge.id === targetEdge.id
-        );
+        const targetEdgeIndex = edges.findIndex((edge) => edge.id === targetEdge.id);
 
         const draggedNode = {
             data: {
                 icon: droppedNode?.icon ? (
-                    <InlineSVG
-                        className="h-9 w-9 text-gray-700"
-                        src={droppedNode.icon}
-                    />
+                    <InlineSVG className="h-9 w-9 text-gray-700" src={droppedNode.icon} />
                 ) : (
                     <PlayIcon className="h-9 w-9 text-gray-700" />
                 ),
@@ -159,19 +124,13 @@ export default function useHandleDrop(): [
         };
 
         setNodes((nodes) => {
-            const nextNodeIndex = nodes.findIndex(
-                (node) => node.id === nextNode.id
-            );
+            const nextNodeIndex = nodes.findIndex((node) => node.id === nextNode.id);
 
             nodes.splice(nextNodeIndex, 0, draggedNode);
 
             const tempComponentNames = [...componentNames];
 
-            tempComponentNames.splice(
-                nextNodeIndex - 1,
-                0,
-                draggedNode.data.name
-            );
+            tempComponentNames.splice(nextNodeIndex - 1, 0, draggedNode.data.name);
 
             setComponentNames(tempComponentNames);
 

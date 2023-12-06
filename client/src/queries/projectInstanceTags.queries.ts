@@ -1,8 +1,5 @@
 /* eslint-disable sort-keys */
-import {
-    ProjectInstanceTagApi,
-    TagModel,
-} from '@/middleware/helios/configuration';
+import {ProjectInstanceTagApi, TagModel} from '@/middleware/helios/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ProjectInstanceTagKeys = {

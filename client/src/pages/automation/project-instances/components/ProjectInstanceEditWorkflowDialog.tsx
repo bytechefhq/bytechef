@@ -1,18 +1,7 @@
 import {Button} from '@/components/ui/button';
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import {Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
-import {
-    ProjectInstanceModel,
-    ProjectInstanceWorkflowModel,
-    WorkflowModel,
-} from '@/middleware/helios/configuration';
+import {ProjectInstanceModel, ProjectInstanceWorkflowModel, WorkflowModel} from '@/middleware/helios/configuration';
 import {useUpdateProjectInstanceWorkflowMutation} from '@/mutations/projectInstanceWorkflows.mutations';
 import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
@@ -46,16 +35,15 @@ const ProjectInstanceEditWorkflowDialog = ({
 
     const queryClient = useQueryClient();
 
-    const updateProjectInstanceWorkflowMutation =
-        useUpdateProjectInstanceWorkflowMutation({
-            onSuccess: () => {
-                queryClient.invalidateQueries({
-                    queryKey: ProjectInstanceKeys.projectInstances,
-                });
+    const updateProjectInstanceWorkflowMutation = useUpdateProjectInstanceWorkflowMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectInstanceKeys.projectInstances,
+            });
 
-                closeDialog();
-            },
-        });
+            closeDialog();
+        },
+    });
 
     function closeDialog() {
         setIsOpen(false);
@@ -72,9 +60,7 @@ const ProjectInstanceEditWorkflowDialog = ({
             return;
         }
 
-        updateProjectInstanceWorkflowMutation.mutate(
-            formData.projectInstanceWorkflows![0]
-        );
+        updateProjectInstanceWorkflowMutation.mutate(formData.projectInstanceWorkflows![0]);
     }
 
     return (
@@ -88,9 +74,7 @@ const ProjectInstanceEditWorkflowDialog = ({
             }}
             open={isOpen}
         >
-            <DialogContent
-                onInteractOutside={(event) => event.preventDefault()}
-            >
+            <DialogContent onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
                     <DialogHeader>
                         <div className="flex items-center justify-between">
@@ -120,12 +104,7 @@ const ProjectInstanceEditWorkflowDialog = ({
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
 
-                        <Button
-                            disabled={projectInstanceEnabled}
-                            onClick={handleSubmit(
-                                updateProjectInstanceWorkflow
-                            )}
-                        >
+                        <Button disabled={projectInstanceEnabled} onClick={handleSubmit(updateProjectInstanceWorkflow)}>
                             Save
                         </Button>
                     </DialogFooter>

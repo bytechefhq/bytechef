@@ -2,13 +2,7 @@ import {Button} from '@/components/ui/button';
 import WorkflowNodesPopoverMenu from '@/pages/automation/project/components/WorkflowNodesPopoverMenu';
 import {PencilIcon, TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
-import {
-    Handle,
-    NodeProps,
-    Position,
-    getConnectedEdges,
-    useReactFlow,
-} from 'reactflow';
+import {Handle, NodeProps, Position, getConnectedEdges, useReactFlow} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
 import useNodeClickHandler from '../hooks/useNodeClick';
@@ -19,8 +13,7 @@ import styles from './NodeTypes.module.css';
 const WorkflowNode = ({data, id}: NodeProps) => {
     const [isHovered, setIsHovered] = useState(false);
 
-    const {currentNode, workflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore();
+    const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
     const {componentNames, setComponentNames} = useWorkflowDataStore();
 
@@ -52,14 +45,9 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             const connectedEdgeIds = connectedEdges.map((edge) => edge.id);
 
             setEdges((edges) => {
-                const leftoverEdges = edges.filter(
-                    (edge) => !connectedEdgeIds.includes(edge.id)
-                );
+                const leftoverEdges = edges.filter((edge) => !connectedEdgeIds.includes(edge.id));
 
-                if (
-                    previousNode.type === 'workflow' &&
-                    nextNode.type === 'placeholder'
-                ) {
+                if (previousNode.type === 'workflow' && nextNode.type === 'placeholder') {
                     return [
                         ...leftoverEdges,
                         {
@@ -83,11 +71,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             });
         }
 
-        setComponentNames(
-            componentNames.filter(
-                (componentName) => componentName !== data.name
-            )
-        );
+        setComponentNames(componentNames.filter((componentName) => componentName !== data.name));
     };
 
     return (
@@ -99,11 +83,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             {isHovered && (
                 <div className="absolute left-[-40px] pr-4">
                     {data.type === 'trigger' ? (
-                        <WorkflowNodesPopoverMenu
-                            hideActionComponents
-                            hideTaskDispatchers
-                            id={id}
-                        >
+                        <WorkflowNodesPopoverMenu hideActionComponents hideTaskDispatchers id={id}>
                             <Button
                                 className="bg-white p-2 shadow-md hover:text-blue-500 hover:shadow-sm"
                                 title="Edit a trigger"
@@ -128,9 +108,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             <Button
                 className={twMerge(
                     'h-18 w-18 rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none',
-                    isSelected &&
-                        workflowNodeDetailsPanelOpen &&
-                        'border-blue-300 bg-blue-100 shadow-none'
+                    isSelected && workflowNodeDetailsPanelOpen && 'border-blue-300 bg-blue-100 shadow-none'
                 )}
                 onClick={handleNodeClick}
             >

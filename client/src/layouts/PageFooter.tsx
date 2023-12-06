@@ -13,12 +13,7 @@ const PageFooter = ({
     position = 'sidebar',
     right,
 }: PropsWithChildren<PageFooterProps>) => (
-    <footer
-        className={twMerge(
-            'p-4',
-            position === 'main' ? 'flex w-full place-self-center 2xl:w-4/5' : ''
-        )}
-    >
+    <footer className={twMerge('p-4', position === 'main' ? 'flex w-full place-self-center 2xl:w-4/5' : '')}>
         <div className="flex w-full items-center justify-between">
             <div
                 className={twMerge(

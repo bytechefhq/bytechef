@@ -10,8 +10,7 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery();
 
-    const {data: taskDispatcherDefinitions} =
-        useGetTaskDispatcherDefinitionsQuery();
+    const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
     const workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasicModel | undefined;
@@ -24,42 +23,29 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
     return (
         <div className="border-b border-b-gray-100 py-3 pl-4">
             <div className="mb-1 flex items-center justify-between">
-                <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-500">
-                    Workflows
-                </h3>
+                <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-500">Workflows</h3>
             </div>
 
             <ul>
                 {workflows?.map((workflow) => {
-                    const definitionNames = workflow.tasks?.map(
-                        (task) => task.type.split('/')[0]
-                    );
+                    const definitionNames = workflow.tasks?.map((task) => task.type.split('/')[0]);
 
                     definitionNames?.map((definitionName) => {
                         if (!workflowComponentDefinitions[definitionName]) {
-                            workflowComponentDefinitions[definitionName] =
-                                componentDefinitions?.find(
-                                    (componentDefinition) =>
-                                        componentDefinition.name ===
-                                        definitionName
-                                );
+                            workflowComponentDefinitions[definitionName] = componentDefinitions?.find(
+                                (componentDefinition) => componentDefinition.name === definitionName
+                            );
                         }
 
-                        if (
-                            !workflowTaskDispatcherDefinitions[definitionName]
-                        ) {
-                            workflowTaskDispatcherDefinitions[definitionName] =
-                                taskDispatcherDefinitions?.find(
-                                    (taskDispatcherDefinition) =>
-                                        taskDispatcherDefinition.name ===
-                                        definitionName
-                                );
+                        if (!workflowTaskDispatcherDefinitions[definitionName]) {
+                            workflowTaskDispatcherDefinitions[definitionName] = taskDispatcherDefinitions?.find(
+                                (taskDispatcherDefinition) => taskDispatcherDefinition.name === definitionName
+                            );
                         }
                     });
 
                     const filteredDefinitionNames = definitionNames?.filter(
-                        (item, index) =>
-                            definitionNames?.indexOf(item) === index
+                        (item, index) => definitionNames?.indexOf(item) === index
                     );
 
                     return (
@@ -68,18 +54,12 @@ const ProjectWorkflowList = ({project}: {project: ProjectModel}) => {
                             key={workflow.id}
                         >
                             <ProjectWorkflowListItem
-                                filteredDefinitionNames={
-                                    filteredDefinitionNames
-                                }
+                                filteredDefinitionNames={filteredDefinitionNames}
                                 key={workflow.id}
                                 project={project}
                                 workflow={workflow}
-                                workflowComponentDefinitions={
-                                    workflowComponentDefinitions
-                                }
-                                workflowTaskDispatcherDefinitions={
-                                    workflowTaskDispatcherDefinitions
-                                }
+                                workflowComponentDefinitions={workflowComponentDefinitions}
+                                workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
                             />
                         </li>
                     );

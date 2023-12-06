@@ -38,9 +38,7 @@ const DataPillPanelBodyItem = ({
                     <span className="text-sm">
                         {title}
 
-                        <span className="pl-1 text-xs text-gray-400">
-                            ({componentAction.workflowAlias})
-                        </span>
+                        <span className="pl-1 text-xs text-gray-400">({componentAction.workflowAlias})</span>
                     </span>
                 </div>
 
@@ -60,8 +58,7 @@ const DataPillPanelBodyItem = ({
                     componentIcon={componentAction.componentDefinition.icon}
                 />
 
-                {(componentAction.outputSchema as PropertyType)?.objectType !==
-                    'FILE_ENTRY' && (
+                {(componentAction.outputSchema as PropertyType)?.objectType !== 'FILE_ENTRY' && (
                     <ul
                         className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full"
                         data-property="foo"
@@ -69,9 +66,7 @@ const DataPillPanelBodyItem = ({
                         {filteredProperties?.map((property) => (
                             <DataPill
                                 componentAlias={componentAction.workflowAlias}
-                                componentIcon={
-                                    componentAction.componentDefinition.icon
-                                }
+                                componentIcon={componentAction.componentDefinition.icon}
                                 key={property.name}
                                 property={property}
                             />

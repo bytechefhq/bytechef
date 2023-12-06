@@ -38,9 +38,7 @@ export const router = createBrowserRouter([
                                     new ProjectApi().getProject({
                                         id: parseInt(params.projectId!),
                                     }),
-                                queryKey: ProjectKeys.project(
-                                    parseInt(params.projectId!)
-                                ),
+                                queryKey: ProjectKeys.project(parseInt(params.projectId!)),
                             }),
                         path: 'projects/:projectId/workflows/:workflowId',
                     },

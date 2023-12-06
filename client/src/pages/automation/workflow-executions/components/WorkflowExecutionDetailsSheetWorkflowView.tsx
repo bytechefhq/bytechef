@@ -19,9 +19,7 @@ const WorkflowExecutionDetailsSheetWorkflowView = ({
             <h3>
                 {workflow?.label
                     ? `${project?.name ? project.name + ' / ' : ''}${
-                          projectInstance?.name
-                              ? projectInstance.name + ' / '
-                              : ''
+                          projectInstance?.name ? projectInstance.name + ' / ' : ''
                       }${workflow?.label}`
                     : 'No data to show'}
             </h3>
@@ -29,11 +27,7 @@ const WorkflowExecutionDetailsSheetWorkflowView = ({
             <div className="flex align-middle">
                 <Button
                     className="mr-1"
-                    onClick={() =>
-                        navigate(
-                            `/automation/projects/${project?.id}/workflows/${workflow?.id}`
-                        )
-                    }
+                    onClick={() => navigate(`/automation/projects/${project?.id}/workflows/${workflow?.id}`)}
                     size="sm"
                     variant="outline"
                 >

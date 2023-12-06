@@ -20,11 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {
-    ProjectInstanceModel,
-    ProjectModel,
-    TagModel,
-} from '@/middleware/helios/configuration';
+import {ProjectInstanceModel, ProjectModel, TagModel} from '@/middleware/helios/configuration';
 import {useUpdateProjectInstanceTagsMutation} from '@/mutations/projectInstanceTags.mutations';
 import {
     useDeleteProjectInstanceMutation,
@@ -48,11 +44,7 @@ interface ProjectInstanceListItemProps {
     project: ProjectModel;
 }
 
-const ProjectInstanceListItem = ({
-    project,
-    projectInstance,
-    remainingTags,
-}: ProjectInstanceListItemProps) => {
+const ProjectInstanceListItem = ({project, projectInstance, remainingTags}: ProjectInstanceListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const setProjectInstanceEnabled = useProjectInstancesEnabledStore(
@@ -72,17 +64,16 @@ const ProjectInstanceListItem = ({
         },
     });
 
-    const updateProjectInstanceTagsMutation =
-        useUpdateProjectInstanceTagsMutation({
-            onSuccess: () => {
-                queryClient.invalidateQueries({
-                    queryKey: ProjectInstanceKeys.projectInstances,
-                });
-                queryClient.invalidateQueries({
-                    queryKey: ProjectInstanceTagKeys.projectInstanceTags,
-                });
-            },
-        });
+    const updateProjectInstanceTagsMutation = useUpdateProjectInstanceTagsMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectInstanceKeys.projectInstances,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ProjectInstanceTagKeys.projectInstanceTags,
+            });
+        },
+    });
 
     const enableProjectInstanceMutation = useEnableProjectInstanceMutation({
         onSuccess: () => {
@@ -100,10 +91,7 @@ const ProjectInstanceListItem = ({
             },
             {
                 onSuccess: () => {
-                    setProjectInstanceEnabled(
-                        projectInstance.id!,
-                        !projectInstance.enabled
-                    );
+                    setProjectInstanceEnabled(projectInstance.id!, !projectInstance.enabled);
                     projectInstance!.enabled = !projectInstance.enabled;
                 },
             }
@@ -119,19 +107,13 @@ const ProjectInstanceListItem = ({
                             {projectInstance.description ? (
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <span className="mr-2 text-base font-semibold">
-                                            {projectInstance.name}
-                                        </span>
+                                        <span className="mr-2 text-base font-semibold">{projectInstance.name}</span>
                                     </TooltipTrigger>
 
-                                    <TooltipContent>
-                                        {projectInstance.description}
-                                    </TooltipContent>
+                                    <TooltipContent>{projectInstance.description}</TooltipContent>
                                 </Tooltip>
                             ) : (
-                                <span className="mr-2 text-base font-semibold">
-                                    {projectInstance.name}
-                                </span>
+                                <span className="mr-2 text-base font-semibold">{projectInstance.name}</span>
                             )}
                         </div>
                     </div>
@@ -160,9 +142,7 @@ const ProjectInstanceListItem = ({
                                         id={projectInstance.id!}
                                         remainingTags={remainingTags}
                                         tags={projectInstance.tags}
-                                        updateTagsMutation={
-                                            updateProjectInstanceTagsMutation
-                                        }
+                                        updateTagsMutation={updateProjectInstanceTagsMutation}
                                     />
                                 )}
                             </div>
@@ -174,8 +154,7 @@ const ProjectInstanceListItem = ({
                     <div className="flex flex-col items-end gap-y-4">
                         <Badge
                             className={twMerge(
-                                projectInstance.enabled &&
-                                    'bg-success text-success-foreground hover:bg-success'
+                                projectInstance.enabled && 'bg-success text-success-foreground hover:bg-success'
                             )}
                             variant="secondary"
                         >
@@ -204,10 +183,7 @@ const ProjectInstanceListItem = ({
                         </Tooltip>
                     </div>
 
-                    <Switch
-                        checked={projectInstance.enabled}
-                        onCheckedChange={handleOnCheckedChange}
-                    />
+                    <Switch checked={projectInstance.enabled} onCheckedChange={handleOnCheckedChange} />
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -217,18 +193,11 @@ const ProjectInstanceListItem = ({
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                onClick={() => setShowEditDialog(true)}
-                            >
-                                Edit
-                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem
-                                className="text-red-600"
-                                onClick={() => setShowDeleteDialog(true)}
-                            >
+                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -239,30 +208,22 @@ const ProjectInstanceListItem = ({
             <AlertDialog open={showDeleteDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            Are you absolutely sure?
-                        </AlertDialogTitle>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete the project and workflows it contains.
+                            This action cannot be undone. This will permanently delete the project and workflows it
+                            contains.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel
-                            onClick={() => setShowDeleteDialog(false)}
-                        >
-                            Cancel
-                        </AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
                         <AlertDialogAction
                             className="bg-red-600"
                             onClick={() => {
                                 if (projectInstance.id) {
-                                    deleteProjectInstanceMutation.mutate(
-                                        projectInstance.id
-                                    );
+                                    deleteProjectInstanceMutation.mutate(projectInstance.id);
                                 }
                             }}
                         >
@@ -273,10 +234,7 @@ const ProjectInstanceListItem = ({
             </AlertDialog>
 
             {showEditDialog && (
-                <ProjectInstanceDialog
-                    onClose={() => setShowEditDialog(false)}
-                    projectInstance={projectInstance}
-                />
+                <ProjectInstanceDialog onClose={() => setShowEditDialog(false)} projectInstance={projectInstance} />
             )}
         </>
     );

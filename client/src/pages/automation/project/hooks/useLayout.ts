@@ -17,10 +17,7 @@ function layoutNodes(nodes: Node[], edges: Edge[]): Node[] {
         .id((data) => data.id)
         // get the id of each node by searching through the edges
         // this only works if every node has one connection
-        .parentId(
-            (node: Node) =>
-                edges.find((edge: Edge) => edge.target === node.id)?.source
-        )(nodes);
+        .parentId((node: Node) => edges.find((edge: Edge) => edge.target === node.id)?.source)(nodes);
 
     // run the layout algorithm with the hierarchy data structure
     const root = layout(hierarchy);

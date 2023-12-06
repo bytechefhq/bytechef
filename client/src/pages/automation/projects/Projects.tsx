@@ -31,43 +31,27 @@ const Projects = () => {
         type: searchParams.get('tagId') ? Type.Tag : Type.Category,
     };
 
-    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(
-        defaultCurrentState
-    );
+    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(defaultCurrentState);
 
     const navigate = useNavigate();
 
-    const {
-        data: categories,
-        error: categoriesError,
-        isLoading: categoriesIsLoading,
-    } = useGetProjectCategoriesQuery();
+    const {data: categories, error: categoriesError, isLoading: categoriesIsLoading} = useGetProjectCategoriesQuery();
 
     const {
         data: projects,
         error: projectsError,
         isLoading: projectsIsLoading,
     } = useGetProjectsQuery({
-        categoryId: searchParams.get('categoryId')
-            ? parseInt(searchParams.get('categoryId')!)
-            : undefined,
-        tagId: searchParams.get('tagId')
-            ? parseInt(searchParams.get('tagId')!)
-            : undefined,
+        categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
+        tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
-    const {
-        data: tags,
-        error: tagsError,
-        isLoading: tagsIsLoading,
-    } = useGetProjectTagsQuery();
+    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery();
 
     let pageTitle: string | undefined;
 
     if (filterData.type === Type.Category) {
-        pageTitle = categories?.find(
-            (category) => category.id === filterData.id
-        )?.name;
+        pageTitle = categories?.find((category) => category.id === filterData.id)?.name;
     } else {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
@@ -91,9 +75,7 @@ const Projects = () => {
                             triggerNode={<Button>Create Project</Button>}
                         />
                     }
-                    title={`${
-                        searchParams.get('tagId') ? 'Tags' : 'Categories'
-                    }: ${pageTitle || 'All'}`}
+                    title={`${searchParams.get('tagId') ? 'Tags' : 'Categories'}: ${pageTitle || 'All'}`}
                 />
             }
             leftSidebarBody={
@@ -104,20 +86,12 @@ const Projects = () => {
                                 (tags?.length ? (
                                     tags?.map((item) => (
                                         <LeftSidebarNavItem
-                                            icon={
-                                                <TagIcon className="mr-1 h-4 w-4" />
-                                            }
+                                            icon={<TagIcon className="mr-1 h-4 w-4" />}
                                             item={{
-                                                filterData:
-                                                    filterData?.id ===
-                                                        item.id &&
-                                                    filterData.type ===
-                                                        Type.Tag,
+                                                filterData: filterData?.id === item.id && filterData.type === Type.Tag,
                                                 id: item.id!,
                                                 name: item.name,
-                                                onItemClick: (
-                                                    id?: number | string
-                                                ) => {
+                                                onItemClick: (id?: number | string) => {
                                                     setFilterData({
                                                         id: id as number,
                                                         type: Type.Tag,
@@ -129,9 +103,7 @@ const Projects = () => {
                                         />
                                     ))
                                 ) : (
-                                    <span className="px-3 text-xs">
-                                        You have not created any tags yet.
-                                    </span>
+                                    <span className="px-3 text-xs">You have not created any tags yet.</span>
                                 ))}
                         </>
                     }
@@ -140,9 +112,7 @@ const Projects = () => {
                         <>
                             <LeftSidebarNavItem
                                 item={{
-                                    filterData:
-                                        !filterData?.id &&
-                                        filterData.type === Type.Category,
+                                    filterData: !filterData?.id && filterData.type === Type.Category,
                                     name: 'All Categories',
                                     onItemClick: (id?: number | string) => {
                                         setFilterData({
@@ -157,15 +127,10 @@ const Projects = () => {
                                 categories?.map((item) => (
                                     <LeftSidebarNavItem
                                         item={{
-                                            filterData:
-                                                filterData?.id === item.id &&
-                                                filterData.type ===
-                                                    Type.Category,
+                                            filterData: filterData?.id === item.id && filterData.type === Type.Category,
                                             id: item.id,
                                             name: item.name,
-                                            onItemClick: (
-                                                id?: number | string
-                                            ) => {
+                                            onItemClick: (id?: number | string) => {
                                                 setFilterData({
                                                     id: id as number,
                                                     type: Type.Category,
@@ -181,30 +146,18 @@ const Projects = () => {
                     topTitle="Categories"
                 />
             }
-            leftSidebarHeader={
-                <PageHeader position="sidebar" title="Projects" />
-            }
+            leftSidebarHeader={<PageHeader position="sidebar" title="Projects" />}
         >
             <PageLoader
                 errors={[categoriesError, projectsError, tagsError]}
-                loading={
-                    categoriesIsLoading || projectsIsLoading || tagsIsLoading
-                }
+                loading={categoriesIsLoading || projectsIsLoading || tagsIsLoading}
             >
                 {projects && projects?.length > 0 ? (
-                    projects &&
-                    tags && <ProjectList projects={projects} tags={projects} />
+                    projects && tags && <ProjectList projects={projects} tags={projects} />
                 ) : (
                     <EmptyList
-                        button={
-                            <ProjectDialog
-                                project={undefined}
-                                triggerNode={<Button>Create Project</Button>}
-                            />
-                        }
-                        icon={
-                            <FolderIcon className="h-12 w-12 text-gray-400" />
-                        }
+                        button={<ProjectDialog project={undefined} triggerNode={<Button>Create Project</Button>} />}
+                        icon={<FolderIcon className="h-12 w-12 text-gray-400" />}
                         message="Get started by creating a new project."
                         title="No projects"
                     />

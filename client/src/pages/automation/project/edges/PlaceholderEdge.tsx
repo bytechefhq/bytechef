@@ -22,13 +22,5 @@ export default function PlaceholderEdge({
         targetY,
     });
 
-    return (
-        <path
-            className={styles.placeholderPath}
-            d={edgePath}
-            id={id}
-            markerEnd={markerEnd}
-            style={style}
-        />
-    );
+    return <path className={styles.placeholderPath} d={edgePath} id={id} markerEnd={markerEnd} style={style} />;
 }

@@ -1,8 +1,5 @@
 /* eslint-disable sort-keys */
-import {
-    TaskDispatcherDefinitionApi,
-    TaskDispatcherDefinitionModel,
-} from '@/middleware/hermes/configuration';
+import {TaskDispatcherDefinitionApi, TaskDispatcherDefinitionModel} from '@/middleware/hermes/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const TaskDispatcherKeys = {
@@ -12,6 +9,5 @@ export const TaskDispatcherKeys = {
 export const useGetTaskDispatcherDefinitionsQuery = () =>
     useQuery<TaskDispatcherDefinitionModel[], Error>({
         queryKey: TaskDispatcherKeys.taskDispatcherDefinitions,
-        queryFn: () =>
-            new TaskDispatcherDefinitionApi().getTaskDispatcherDefinitions(),
+        queryFn: () => new TaskDispatcherDefinitionApi().getTaskDispatcherDefinitions(),
     });

@@ -8,12 +8,7 @@ interface PageHeaderProps {
     title: string;
 }
 
-const PageHeader = ({
-    centerTitle = false,
-    position = 'sidebar',
-    right,
-    title,
-}: PageHeaderProps) => (
+const PageHeader = ({centerTitle = false, position = 'sidebar', right, title}: PageHeaderProps) => (
     <header className={twMerge('p-4', centerTitle && '2xl:mx-auto 2xl:w-4/5')}>
         <div className="flex w-full items-center justify-between">
             <div

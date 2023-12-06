@@ -25,13 +25,7 @@ describe('Input', async () => {
     });
     it('should change input value', async () => {
         render(
-            <Input
-                aria-label="Email Address"
-                label="Email Address"
-                name="email"
-                placeholder="Email"
-                type="email"
-            />
+            <Input aria-label="Email Address" label="Email Address" name="email" placeholder="Email" type="email" />
         );
 
         screen.logTestingPlaygroundURL();
@@ -62,9 +56,7 @@ describe('Input', async () => {
                 name: /email address/i,
             })
         ).toBeInTheDocument();
-        expect(screen.getByRole('alert')).toHaveTextContent(
-            'This field is required'
-        );
+        expect(screen.getByRole('alert')).toHaveTextContent('This field is required');
     });
     it('should render the asterisk if input is required', () => {
         render(

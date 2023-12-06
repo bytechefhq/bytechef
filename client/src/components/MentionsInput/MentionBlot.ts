@@ -7,11 +7,7 @@ export default class MentionBlot extends Embed {
     static tagName = 'div';
     static className = 'property-mention';
 
-    static create(data: {
-        denotationChar: string;
-        value: string;
-        componentIcon: string;
-    }) {
+    static create(data: {denotationChar: string; value: string; componentIcon: string}) {
         const node = super.create();
         const iconNode = document.createElement('span');
         const contentNode = document.createElement('span');

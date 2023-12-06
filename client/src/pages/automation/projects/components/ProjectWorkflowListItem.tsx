@@ -50,9 +50,7 @@ const ProjectWorkflowListItem = ({
         [key: string]: ComponentDefinitionBasicModel | undefined;
     };
 }) => {
-    const [selectedWorkflow, setSelectedWorkflow] = useState<
-        WorkflowModel | undefined
-    >(undefined);
+    const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowModel | undefined>(undefined);
 
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
@@ -87,23 +85,16 @@ const ProjectWorkflowListItem = ({
                 className="flex flex-1 items-center"
                 to={`/automation/projects/${project.id}/workflows/${workflow.id}`}
             >
-                <div className="w-6/12 text-sm font-semibold">
-                    {workflow.label}
-                </div>
+                <div className="w-6/12 text-sm font-semibold">{workflow.label}</div>
 
                 <div className="flex">
                     {filteredDefinitionNames?.map((name) => {
-                        const componentDefinition =
-                            workflowComponentDefinitions[name];
+                        const componentDefinition = workflowComponentDefinitions[name];
 
-                        const taskDispatcherDefinition =
-                            workflowTaskDispatcherDefinitions[name];
+                        const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
 
                         return (
-                            <div
-                                className="mr-0.5 flex items-center justify-center rounded-full border p-1"
-                                key={name}
-                            >
+                            <div className="mr-0.5 flex items-center justify-center rounded-full border p-1" key={name}>
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <InlineSVG
@@ -112,15 +103,12 @@ const ProjectWorkflowListItem = ({
                                             src={
                                                 componentDefinition?.icon
                                                     ? componentDefinition?.icon
-                                                    : taskDispatcherDefinition?.icon ??
-                                                      ''
+                                                    : taskDispatcherDefinition?.icon ?? ''
                                             }
                                         />
                                     </TooltipTrigger>
 
-                                    <TooltipContent side="right">
-                                        {componentDefinition?.title}
-                                    </TooltipContent>
+                                    <TooltipContent side="right">{componentDefinition?.title}</TooltipContent>
                                 </Tooltip>
                             </div>
                         );
@@ -131,10 +119,7 @@ const ProjectWorkflowListItem = ({
             <div className="flex justify-end gap-x-4">
                 <Tooltip>
                     <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                        <CalendarIcon
-                            aria-hidden="true"
-                            className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
-                        />
+                        <CalendarIcon aria-hidden="true" className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400" />
 
                         <span>
                             {`Modified at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
@@ -192,22 +177,15 @@ const ProjectWorkflowListItem = ({
             <AlertDialog open={showDeleteDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            Are you absolutely sure?
-                        </AlertDialogTitle>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete the workflow.
+                            This action cannot be undone. This will permanently delete the workflow.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel
-                            onClick={() => setShowDeleteDialog(false)}
-                        >
-                            Cancel
-                        </AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
                         <AlertDialogAction
                             className="bg-red-600"
@@ -229,9 +207,7 @@ const ProjectWorkflowListItem = ({
             {showEditDialog && (
                 <WorkflowDialog
                     onClose={() => setShowEditDialog(false)}
-                    updateWorkflowMutationMutation={
-                        updateWorkflowMutationMutation
-                    }
+                    updateWorkflowMutationMutation={updateWorkflowMutationMutation}
                     workflow={selectedWorkflow!}
                 />
             )}

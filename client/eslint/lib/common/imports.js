@@ -42,8 +42,7 @@ function getLeadingComments(node, context) {
             includeComments: true,
         });
 
-        const trailing =
-            tokenBefore && tokenBefore.loc.end.line === comment.loc.start.line;
+        const trailing = tokenBefore && tokenBefore.loc.end.line === comment.loc.start.line;
 
         if (!trailing) {
             leadingComments.unshift(comment);
@@ -64,11 +63,7 @@ function getRequireStatement(node) {
     if (node.callee.type === 'Identifier' && node.callee.name === 'require') {
         const argument = node.arguments && node.arguments[0];
 
-        if (
-            argument &&
-            argument.type === 'Literal' &&
-            typeof argument.value === 'string'
-        ) {
+        if (argument && argument.type === 'Literal' && typeof argument.value === 'string') {
             if (
                 node.parent.type === 'CallExpression' &&
                 node.parent.parent.type === 'VariableDeclarator' &&
@@ -83,10 +78,7 @@ function getRequireStatement(node) {
                 node.parent.parent.parent.type === 'VariableDeclaration'
             ) {
                 return node.parent.parent.parent;
-            } else if (
-                node.parent.type === 'VariableDeclarator' &&
-                node.parent.parent.type === 'VariableDeclaration'
-            ) {
+            } else if (node.parent.type === 'VariableDeclarator' && node.parent.parent.type === 'VariableDeclaration') {
                 return node.parent.parent;
             }
         }
@@ -160,8 +152,7 @@ function isAbsolute(source) {
 
 function isHeaderComment(comment) {
     return (
-        /\bcopyright\b|\(c\)|©/i.test(comment.value) &&
-        comment.loc.start.line < 3 /* At top or just after shebang. */
+        /\bcopyright\b|\(c\)|©/i.test(comment.value) && comment.loc.start.line < 3 /* At top or just after shebang. */
     );
 }
 
@@ -209,9 +200,7 @@ function isRequireStatement(node) {
     // Check for `const a = require('a')()`
 
     return (
-        init.type === 'CallExpression' &&
-        init.callee.type === 'CallExpression' &&
-        init.callee.callee.name === 'require'
+        init.type === 'CallExpression' && init.callee.type === 'CallExpression' && init.callee.callee.name === 'require'
     );
 }
 

@@ -1,8 +1,5 @@
 import Input from '@/components/Input/Input';
-import {
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionModel,
-} from '@/middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/hermes/configuration';
 import {useEffect, useState} from 'react';
 
 import WorkflowNodesTabs from './WorkflowNodesTabs';
@@ -17,20 +14,17 @@ const WorkflowNodesSidebar = ({
 }) => {
     const [filter, setFilter] = useState('');
 
-    const [
-        filteredActionComponentDefinitions,
-        setFilteredActionComponentDefinitions,
-    ] = useState<Array<ComponentDefinitionBasicModel>>([]);
+    const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
+        Array<ComponentDefinitionBasicModel>
+    >([]);
 
-    const [
-        filteredTaskDispatcherDefinitions,
-        setFilteredTaskDispatcherDefinitions,
-    ] = useState<Array<TaskDispatcherDefinitionModel>>([]);
+    const [filteredTaskDispatcherDefinitions, setFilteredTaskDispatcherDefinitions] = useState<
+        Array<TaskDispatcherDefinitionModel>
+    >([]);
 
-    const [
-        filteredTriggerComponentDefinitions,
-        setFilteredTriggerComponentDefinitions,
-    ] = useState<Array<ComponentDefinitionBasicModel>>([]);
+    const [filteredTriggerComponentDefinitions, setFilteredTriggerComponentDefinitions] = useState<
+        Array<ComponentDefinitionBasicModel>
+    >([]);
 
     const {componentDefinitions, taskDispatcherDefinitions} = data;
 
@@ -39,24 +33,16 @@ const WorkflowNodesSidebar = ({
             componentDefinitions.filter(
                 (componentDefinition) =>
                     componentDefinition?.actionsCount &&
-                    (componentDefinition.name
-                        ?.toLowerCase()
-                        .includes(filter.toLowerCase()) ||
-                        componentDefinition?.title
-                            ?.toLowerCase()
-                            .includes(filter.toLowerCase()))
+                    (componentDefinition.name?.toLowerCase().includes(filter.toLowerCase()) ||
+                        componentDefinition?.title?.toLowerCase().includes(filter.toLowerCase()))
             )
         );
 
         setFilteredTaskDispatcherDefinitions(
             taskDispatcherDefinitions.filter(
                 (taskDispatcherDefinition) =>
-                    taskDispatcherDefinition.name
-                        ?.toLowerCase()
-                        .includes(filter.toLowerCase()) ||
-                    taskDispatcherDefinition?.title
-                        ?.toLowerCase()
-                        .includes(filter.toLowerCase())
+                    taskDispatcherDefinition.name?.toLowerCase().includes(filter.toLowerCase()) ||
+                    taskDispatcherDefinition?.title?.toLowerCase().includes(filter.toLowerCase())
             )
         );
 
@@ -64,12 +50,8 @@ const WorkflowNodesSidebar = ({
             componentDefinitions.filter(
                 (componentDefinition) =>
                     componentDefinition?.triggersCount &&
-                    (componentDefinition.name
-                        ?.toLowerCase()
-                        .includes(filter.toLowerCase()) ||
-                        componentDefinition?.title
-                            ?.toLowerCase()
-                            .includes(filter.toLowerCase()))
+                    (componentDefinition.name?.toLowerCase().includes(filter.toLowerCase()) ||
+                        componentDefinition?.title?.toLowerCase().includes(filter.toLowerCase()))
             )
         );
     }, [componentDefinitions, filter, taskDispatcherDefinitions]);
@@ -87,16 +69,10 @@ const WorkflowNodesSidebar = ({
 
             <main>
                 <WorkflowNodesTabs
-                    actionComponentDefinitions={
-                        filteredActionComponentDefinitions
-                    }
+                    actionComponentDefinitions={filteredActionComponentDefinitions}
                     itemsDraggable
-                    taskDispatcherDefinitions={
-                        filteredTaskDispatcherDefinitions
-                    }
-                    triggerComponentDefinitions={
-                        filteredTriggerComponentDefinitions
-                    }
+                    taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
+                    triggerComponentDefinitions={filteredTriggerComponentDefinitions}
                 />
             </main>
         </div>

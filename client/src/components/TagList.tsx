@@ -1,9 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {ChevronDownIcon, Cross1Icon, PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
-import CreatableSelect, {
-    ISelectOption,
-} from 'components/CreatableSelect/CreatableSelect';
+import CreatableSelect, {ISelectOption} from 'components/CreatableSelect/CreatableSelect';
 import {useState} from 'react';
 import {OnChangeValue} from 'react-select';
 
@@ -43,13 +41,7 @@ interface TagListProps {
     getRequest: (id: number, tags: TagModel[]) => any;
 }
 
-const TagList = ({
-    getRequest,
-    id,
-    remainingTags,
-    tags,
-    updateTagsMutation,
-}: TagListProps) => {
+const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagListProps) => {
     const [showAllTags, setShowAllTags] = useState(false);
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
 
@@ -75,12 +67,7 @@ const TagList = ({
 
             {tags.length > 3 && (
                 <div className="relative flex">
-                    <Button
-                        className="mr-2"
-                        onClick={() => setShowAllTags(!showAllTags)}
-                        size="icon"
-                        variant="ghost"
-                    >
+                    <Button className="mr-2" onClick={() => setShowAllTags(!showAllTags)} size="icon" variant="ghost">
                         <ChevronDownIcon />
                     </Button>
 
@@ -90,11 +77,7 @@ const TagList = ({
                             style={{maxHeight: '32px'}}
                         >
                             {tags.slice(3).map((tag) => (
-                                <Tag
-                                    key={tag.id}
-                                    onDeleteTag={handleDeleteTag}
-                                    tag={tag}
-                                />
+                                <Tag key={tag.id} onDeleteTag={handleDeleteTag} tag={tag} />
                             ))}
                         </div>
                     )}
@@ -105,9 +88,7 @@ const TagList = ({
                 <CreatableSelect
                     className="w-40 text-start"
                     name="newTag"
-                    onChange={(
-                        selectedOption: OnChangeValue<ISelectOption, false>
-                    ) => {
+                    onChange={(selectedOption: OnChangeValue<ISelectOption, false>) => {
                         if (selectedOption) {
                             handleAddTag(selectedOption.tag);
                         }

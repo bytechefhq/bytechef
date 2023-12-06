@@ -17,9 +17,7 @@ const ProjectInstanceDialogWorkflowsStep = ({
     getValues,
     register,
 }: ProjectInstanceDialogWorkflowsStepProps) => {
-    const {data: workflows} = useGetProjectWorkflowsQuery(
-        getValues().projectId!
-    );
+    const {data: workflows} = useGetProjectWorkflowsQuery(getValues().projectId!);
 
     return (
         <ul className="h-full space-y-4">

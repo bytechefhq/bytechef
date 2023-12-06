@@ -11,8 +11,7 @@ export const useDataPillPanelStore = create<DataPillPanelState>()(
     devtools(
         (set) => ({
             dataPillPanelOpen: false,
-            setDataPillPanelOpen: (dataPillPanelOpen) =>
-                set((state) => ({...state, dataPillPanelOpen})),
+            setDataPillPanelOpen: (dataPillPanelOpen) => set((state) => ({...state, dataPillPanelOpen})),
         }),
         {
             name: 'data-pill-panel',

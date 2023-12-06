@@ -58,17 +58,9 @@ import WorkflowExecutionDetailsAccordion from '@/pages/automation/workflow-execu
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
 import {ProjectCategoryKeys} from '@/queries/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/projectTags.quries';
-import {
-    ProjectKeys,
-    useGetProjectQuery,
-    useGetProjectWorkflowsQuery,
-} from '@/queries/projects.queries';
+import {ProjectKeys, useGetProjectQuery, useGetProjectWorkflowsQuery} from '@/queries/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
-import {
-    ChevronDownIcon,
-    DotsVerticalIcon,
-    PlusIcon,
-} from '@radix-ui/react-icons';
+import {ChevronDownIcon, DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     CircleDotDashedIcon,
@@ -104,31 +96,20 @@ const headerToggleItems: IToggleItem[] = [
 ];
 
 const Project = () => {
-    const [currentWorkflow, setCurrentWorkflow] = useState<
-        WorkflowModel | undefined
-    >();
-    const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] =
-        useState(false);
-    const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] =
-        useState(false);
+    const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel | undefined>();
+    const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
+    const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
-    const [
-        showWorkflowTestConfigurationDialog,
-        setShowWorkflowTestConfigurationDialog,
-    ] = useState(false);
-    const [showWorkflowCodeEditorSheet, setShowWorkflowCodeEditorSheet] =
-        useState(false);
-    const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] =
-        useState(false);
-    const [workflowExecution, setWorkflowExecution] =
-        useState<WorkflowExecutionModel>();
+    const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
+    const [showWorkflowCodeEditorSheet, setShowWorkflowCodeEditorSheet] = useState(false);
+    const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] = useState(false);
+    const [workflowExecution, setWorkflowExecution] = useState<WorkflowExecutionModel>();
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
 
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
-    const {setWorkflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore();
+    const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
     const {toast} = useToast();
 
@@ -137,9 +118,7 @@ const Project = () => {
 
     const rightSidebarNavigation: {
         name: string;
-        icon: React.ForwardRefExoticComponent<
-            Omit<React.SVGProps<SVGSVGElement>, 'ref'>
-        >;
+        icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
         onClick?: () => void;
     }[] = [
         {
@@ -163,10 +142,7 @@ const Project = () => {
         },
     ];
 
-    const {data: project} = useGetProjectQuery(
-        parseInt(projectId!),
-        useLoaderData() as ProjectModel
-    );
+    const {data: project} = useGetProjectQuery(parseInt(projectId!), useLoaderData() as ProjectModel);
 
     const {
         data: componentDefinitions,
@@ -183,8 +159,7 @@ const Project = () => {
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
-    const {setComponentDefinitions, setTaskDispatcherDefinitions} =
-        useWorkflowDataStore();
+    const {setComponentDefinitions, setTaskDispatcherDefinitions} = useWorkflowDataStore();
 
     useEffect(() => {
         if (componentDefinitions) {
@@ -244,9 +219,7 @@ const Project = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            navigate(
-                `/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`
-            );
+            navigate(`/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`);
         },
     });
 
@@ -296,11 +269,7 @@ const Project = () => {
 
     useEffect(() => {
         if (projectWorkflows) {
-            setCurrentWorkflow(
-                projectWorkflows.find(
-                    (workflow: WorkflowModel) => workflow.id === workflowId
-                )!
-            );
+            setCurrentWorkflow(projectWorkflows.find((workflow: WorkflowModel) => workflow.id === workflowId)!);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -308,9 +277,7 @@ const Project = () => {
 
     useEffect(() => {
         if (currentWorkflow?.id) {
-            navigate(
-                `/automation/projects/${projectId}/workflows/${currentWorkflow.id}`
-            );
+            navigate(`/automation/projects/${projectId}/workflows/${currentWorkflow.id}`);
         }
     }, [currentWorkflow, navigate, projectId, setWorkflowNodeDetailsPanelOpen]);
 
@@ -393,11 +360,7 @@ const Project = () => {
     };
 
     const handleProjectWorkflowValueChange = (id: string) => {
-        setCurrentWorkflow(
-            projectWorkflows!.find(
-                (workflow: WorkflowModel) => workflow.id === id
-            )!
-        );
+        setCurrentWorkflow(projectWorkflows!.find((workflow: WorkflowModel) => workflow.id === id)!);
 
         navigate(`/automation/projects/${projectId}/workflows/${id}`);
     };
@@ -431,21 +394,13 @@ const Project = () => {
                                     </DropdownMenuTrigger>
 
                                     <DropdownMenuContent>
-                                        <DropdownMenuItem
-                                            onClick={() =>
-                                                setShowEditProjectDialog(true)
-                                            }
-                                        >
+                                        <DropdownMenuItem onClick={() => setShowEditProjectDialog(true)}>
                                             Edit
                                         </DropdownMenuItem>
 
                                         {project && (
                                             <DropdownMenuItem
-                                                onClick={() =>
-                                                    duplicateProjectMutation.mutate(
-                                                        project.id!
-                                                    )
-                                                }
+                                                onClick={() => duplicateProjectMutation.mutate(project.id!)}
                                             >
                                                 Duplicate
                                             </DropdownMenuItem>
@@ -455,11 +410,7 @@ const Project = () => {
 
                                         <DropdownMenuItem
                                             className="text-red-600"
-                                            onClick={() =>
-                                                setShowDeleteProjectAlertDialog(
-                                                    true
-                                                )
-                                            }
+                                            onClick={() => setShowDeleteProjectAlertDialog(true)}
                                         >
                                             Delete
                                         </DropdownMenuItem>
@@ -472,9 +423,7 @@ const Project = () => {
                                     <Select
                                         defaultValue={workflowId}
                                         name="projectWorkflowSelect"
-                                        onValueChange={
-                                            handleProjectWorkflowValueChange
-                                        }
+                                        onValueChange={handleProjectWorkflowValueChange}
                                         value={currentWorkflow.id || workflowId}
                                     >
                                         <SelectTrigger className="mr-0.5 border-0 bg-white shadow-none">
@@ -483,20 +432,13 @@ const Project = () => {
 
                                         <SelectContent>
                                             <SelectGroup>
-                                                <SelectLabel>
-                                                    Workflows
-                                                </SelectLabel>
+                                                <SelectLabel>Workflows</SelectLabel>
 
-                                                {projectWorkflows.map(
-                                                    (workflow) => (
-                                                        <SelectItem
-                                                            key={workflow.id!}
-                                                            value={workflow.id!}
-                                                        >
-                                                            {workflow.label!}
-                                                        </SelectItem>
-                                                    )
-                                                )}
+                                                {projectWorkflows.map((workflow) => (
+                                                    <SelectItem key={workflow.id!} value={workflow.id!}>
+                                                        {workflow.label!}
+                                                    </SelectItem>
+                                                ))}
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
@@ -504,11 +446,7 @@ const Project = () => {
 
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button
-                                            className="border-0 bg-white shadow-none"
-                                            size="icon"
-                                            variant="outline"
-                                        >
+                                        <Button className="border-0 bg-white shadow-none" size="icon" variant="outline">
                                             <DotsVerticalIcon />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -525,13 +463,10 @@ const Project = () => {
                                         {project && currentWorkflow && (
                                             <DropdownMenuItem
                                                 onClick={() =>
-                                                    duplicateWorkflowMutationMutation.mutate(
-                                                        {
-                                                            id: project.id!,
-                                                            workflowId:
-                                                                currentWorkflow.id!,
-                                                        }
-                                                    )
+                                                    duplicateWorkflowMutationMutation.mutate({
+                                                        id: project.id!,
+                                                        workflowId: currentWorkflow.id!,
+                                                    })
                                                 }
                                             >
                                                 Duplicate
@@ -543,9 +478,7 @@ const Project = () => {
                                         <DropdownMenuItem
                                             className="text-red-600"
                                             onClick={() => {
-                                                setShowDeleteWorkflowAlertDialog(
-                                                    true
-                                                );
+                                                setShowDeleteWorkflowAlertDialog(true);
                                             }}
                                         >
                                             Delete
@@ -555,9 +488,7 @@ const Project = () => {
 
                                 {!!projectId && (
                                     <WorkflowDialog
-                                        createWorkflowRequestMutation={
-                                            createProjectWorkflowMutation
-                                        }
+                                        createWorkflowRequestMutation={createProjectWorkflowMutation}
                                         parentId={+projectId}
                                         triggerNode={
                                             <Button
@@ -576,9 +507,7 @@ const Project = () => {
                         <div className="flex flex-1 justify-center">
                             <ToggleGroup
                                 defaultValue="build"
-                                onValueChange={() =>
-                                    setLeftSidebarOpen(!leftSidebarOpen)
-                                }
+                                onValueChange={() => setLeftSidebarOpen(!leftSidebarOpen)}
                                 toggleItems={headerToggleItems}
                                 value={leftSidebarOpen ? 'debug' : 'build'}
                             />
@@ -595,8 +524,7 @@ const Project = () => {
                                                 size="sm"
                                                 variant="secondary"
                                             >
-                                                <PlayIcon className="mr-0.5 h-5" />{' '}
-                                                Run
+                                                <PlayIcon className="mr-0.5 h-5" /> Run
                                             </Button>
                                         )}
 
@@ -609,16 +537,13 @@ const Project = () => {
                                                 size="sm"
                                                 variant="destructive"
                                             >
-                                                <SquareIcon className="mr-0.5 h-5" />{' '}
-                                                Running
+                                                <SquareIcon className="mr-0.5 h-5" /> Running
                                             </Button>
                                         )}
                                     </>
                                 </TooltipTrigger>
 
-                                <TooltipContent>
-                                    Run the current workflow
-                                </TooltipContent>
+                                <TooltipContent>Run the current workflow</TooltipContent>
                             </Tooltip>
 
                             <Tooltip>
@@ -633,17 +558,12 @@ const Project = () => {
                                         }
                                         size="sm"
                                     >
-                                        <CircleDotDashedIcon className="mr-0.5 h-5" />{' '}
-                                        Publish
+                                        <CircleDotDashedIcon className="mr-0.5 h-5" /> Publish
                                     </Button>
                                 </TooltipTrigger>
 
                                 <TooltipContent>
-                                    {`${
-                                        !project?.publishedDate
-                                            ? 'Project is not published'
-                                            : 'Project is published'
-                                    }`}
+                                    {`${!project?.publishedDate ? 'Project is not published' : 'Project is published'}`}
                                 </TooltipContent>
                             </Tooltip>
                         </div>
@@ -653,17 +573,13 @@ const Project = () => {
                     <div className="py-1.5">
                         {!workflowIsRunning ? (
                             workflowExecution ? (
-                                <WorkflowExecutionDetailsAccordion
-                                    workflowExecution={workflowExecution}
-                                />
+                                <WorkflowExecutionDetailsAccordion workflowExecution={workflowExecution} />
                             ) : (
                                 <div className="absolute inset-x-0 bottom-0 top-2/4">
                                     <div className="flex w-full flex-col items-center gap-y-6 text-gray-500">
                                         <RefreshCwOffIcon className="h-16 w-16 text-gray-300" />
 
-                                        <span>
-                                            Workflow has not yet been executed.
-                                        </span>
+                                        <span>Workflow has not yet been executed.</span>
                                     </div>
                                 </div>
                             )
@@ -674,9 +590,7 @@ const Project = () => {
                                         <RefreshCwIcon className="h-16 w-16" />
                                     </span>
 
-                                    <span className="text-gray-500">
-                                        Workflow is running...
-                                    </span>
+                                    <span className="text-gray-500">Workflow is running...</span>
                                 </div>
                             </div>
                         )}
@@ -697,29 +611,17 @@ const Project = () => {
                 }
                 rightSidebarOpen={rightSidebarOpen}
                 rightSidebarWidth="96"
-                rightToolbarBody={
-                    <RightSidebar navigation={rightSidebarNavigation} />
-                }
+                rightToolbarBody={<RightSidebar navigation={rightSidebarNavigation} />}
                 rightToolbarOpen={true}
             >
                 <PageLoader
-                    errors={[
-                        componentsError,
-                        taskDispatcherDefinitionsError,
-                        projectWorkflowsError,
-                    ]}
-                    loading={
-                        componentsIsLoading ||
-                        taskDispatcherDefinitionsLoading ||
-                        projectWorkflowsLoading
-                    }
+                    errors={[componentsError, taskDispatcherDefinitionsError, projectWorkflowsError]}
+                    loading={componentsIsLoading || taskDispatcherDefinitionsLoading || projectWorkflowsLoading}
                 >
                     {componentDefinitions && !!taskDispatcherDefinitions && (
                         <ProjectWorkflow
                             componentDefinitions={componentDefinitions}
-                            taskDispatcherDefinitions={
-                                taskDispatcherDefinitions
-                            }
+                            taskDispatcherDefinitions={taskDispatcherDefinitions}
                         />
                     )}
                 </PageLoader>
@@ -728,29 +630,20 @@ const Project = () => {
             <AlertDialog open={showDeleteProjectAlertDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            Are you absolutely sure?
-                        </AlertDialogTitle>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete the project and workflows it contains.
+                            This action cannot be undone. This will permanently delete the project and workflows it
+                            contains.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel
-                            onClick={() =>
-                                setShowDeleteProjectAlertDialog(false)
-                            }
-                        >
+                        <AlertDialogCancel onClick={() => setShowDeleteProjectAlertDialog(false)}>
                             Cancel
                         </AlertDialogCancel>
 
-                        <AlertDialogAction
-                            className="bg-red-600"
-                            onClick={handleDeleteProjectAlertDialogClick}
-                        >
+                        <AlertDialogAction className="bg-red-600" onClick={handleDeleteProjectAlertDialogClick}>
                             Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -760,29 +653,19 @@ const Project = () => {
             <AlertDialog open={showDeleteWorkflowAlertDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            Are you absolutely sure?
-                        </AlertDialogTitle>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete the workflow.
+                            This action cannot be undone. This will permanently delete the workflow.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel
-                            onClick={() =>
-                                setShowDeleteWorkflowAlertDialog(false)
-                            }
-                        >
+                        <AlertDialogCancel onClick={() => setShowDeleteWorkflowAlertDialog(false)}>
                             Cancel
                         </AlertDialogCancel>
 
-                        <AlertDialogAction
-                            className="bg-red-600"
-                            onClick={handleDeleteWorkflowAlertDialogClick}
-                        >
+                        <AlertDialogAction className="bg-red-600" onClick={handleDeleteWorkflowAlertDialogClick}>
                             Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -790,10 +673,7 @@ const Project = () => {
             </AlertDialog>
 
             {showEditProjectDialog && project && (
-                <ProjectDialog
-                    onClose={handleProjectDialogCloseClick}
-                    project={project}
-                />
+                <ProjectDialog onClose={handleProjectDialogCloseClick} project={project} />
             )}
 
             {showEditWorkflowDialog && (
@@ -808,12 +688,8 @@ const Project = () => {
                 <>
                     {showWorkflowTestConfigurationDialog && (
                         <WorkflowTestConfigurationDialog
-                            onClose={() =>
-                                setShowWorkflowTestConfigurationDialog(false)
-                            }
-                            onRunClick={
-                                handleWorkflowTestConfigurationDialogRunClick
-                            }
+                            onClose={() => setShowWorkflowTestConfigurationDialog(false)}
+                            onRunClick={handleWorkflowTestConfigurationDialogRunClick}
                             workflow={currentWorkflow}
                         />
                     )}

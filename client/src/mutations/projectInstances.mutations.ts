@@ -6,16 +6,11 @@ import {
 import {useMutation} from '@tanstack/react-query';
 
 type CreateProjectInstanceMutationProps = {
-    onSuccess?: (
-        result: ProjectInstanceModel,
-        variables: ProjectInstanceModel
-    ) => void;
+    onSuccess?: (result: ProjectInstanceModel, variables: ProjectInstanceModel) => void;
     onError?: (error: Error, variables: ProjectInstanceModel) => void;
 };
 
-export const useCreateProjectInstanceMutation = (
-    mutationProps?: CreateProjectInstanceMutationProps
-) =>
+export const useCreateProjectInstanceMutation = (mutationProps?: CreateProjectInstanceMutationProps) =>
     useMutation({
         mutationFn: (projectInstanceModel: ProjectInstanceModel) => {
             return new ProjectInstanceApi().createProjectInstance({
@@ -31,9 +26,7 @@ type DeleteProjectInstanceMutationProps = {
     onError?: (error: Error, variables: number) => void;
 };
 
-export const useDeleteProjectInstanceMutation = (
-    mutationProps?: DeleteProjectInstanceMutationProps
-) =>
+export const useDeleteProjectInstanceMutation = (mutationProps?: DeleteProjectInstanceMutationProps) =>
     useMutation({
         mutationFn: (id: number) => {
             return new ProjectInstanceApi().deleteProjectInstance({
@@ -49,9 +42,7 @@ type EnableProjectInstanceMutationProps = {
     onError?: (error: Error, variables: EnableProjectInstanceRequest) => void;
 };
 
-export const useEnableProjectInstanceMutation = (
-    mutationProps: EnableProjectInstanceMutationProps
-) =>
+export const useEnableProjectInstanceMutation = (mutationProps: EnableProjectInstanceMutationProps) =>
     useMutation({
         mutationFn: (request: EnableProjectInstanceRequest) => {
             return new ProjectInstanceApi().enableProjectInstance(request);
@@ -61,16 +52,11 @@ export const useEnableProjectInstanceMutation = (
     });
 
 type UpdateProjectInstanceMutationProps = {
-    onSuccess?: (
-        result: ProjectInstanceModel,
-        variables: ProjectInstanceModel
-    ) => void;
+    onSuccess?: (result: ProjectInstanceModel, variables: ProjectInstanceModel) => void;
     onError?: (error: Error, variables: ProjectInstanceModel) => void;
 };
 
-export const useUpdateProjectInstanceMutation = (
-    mutationProps?: UpdateProjectInstanceMutationProps
-) =>
+export const useUpdateProjectInstanceMutation = (mutationProps?: UpdateProjectInstanceMutationProps) =>
     useMutation({
         mutationFn: (projectInstanceModel: ProjectInstanceModel) => {
             return new ProjectInstanceApi().updateProjectInstance({

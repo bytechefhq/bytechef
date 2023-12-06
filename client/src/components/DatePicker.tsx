@@ -6,23 +6,14 @@ import {format} from 'date-fns';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 
-const DatePicker = ({
-    onChange,
-    value,
-}: {
-    onChange: (date: Date | undefined) => void;
-    value?: Date;
-}) => {
+const DatePicker = ({onChange, value}: {onChange: (date: Date | undefined) => void; value?: Date}) => {
     const [date, setDate] = useState<Date | undefined>(value);
 
     return (
         <Popover>
             <PopoverTrigger asChild className="mt-1">
                 <Button
-                    className={cn(
-                        'w-full justify-start text-left font-normal',
-                        !date && 'text-muted-foreground'
-                    )}
+                    className={cn('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}
                     variant="outline"
                 >
                     <CalendarIcon className="mr-2 h-4 w-4" />

@@ -10,9 +10,7 @@ export function DesktopSidebar({
     navigation: {
         name: string;
         href: string;
-        icon: React.ForwardRefExoticComponent<
-            Omit<React.SVGProps<SVGSVGElement>, 'ref'>
-        >;
+        icon: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
     }[];
 }) {
     return (
@@ -22,18 +20,11 @@ export function DesktopSidebar({
                     <div className="flex-1">
                         <Link to="">
                             <div className="flex items-center justify-center py-4">
-                                <img
-                                    alt="ByteChef"
-                                    className="h-8 w-auto"
-                                    src={reactLogo}
-                                />
+                                <img alt="ByteChef" className="h-8 w-auto" src={reactLogo} />
                             </div>
                         </Link>
 
-                        <nav
-                            aria-label="Sidebar"
-                            className="flex flex-col items-center overflow-y-auto py-3"
-                        >
+                        <nav aria-label="Sidebar" className="flex flex-col items-center overflow-y-auto py-3">
                             {navigation.map((item) => (
                                 <Link
                                     className="flex items-center rounded-lg py-3 hover:text-blue-600"
@@ -42,15 +33,10 @@ export function DesktopSidebar({
                                 >
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <item.icon
-                                                aria-hidden="true"
-                                                className="h-7 w-7"
-                                            />
+                                            <item.icon aria-hidden="true" className="h-7 w-7" />
                                         </TooltipTrigger>
 
-                                        <TooltipContent side="right">
-                                            {item.name}
-                                        </TooltipContent>
+                                        <TooltipContent side="right">{item.name}</TooltipContent>
                                     </Tooltip>
 
                                     <span className="sr-only">{item.name}</span>
@@ -62,10 +48,7 @@ export function DesktopSidebar({
                     <div className="flex shrink-0 justify-center py-4">
                         <Link className="flex" to="/settings">
                             <Avatar>
-                                <AvatarImage
-                                    alt="@shadcn"
-                                    src="https://github.com/shadcn.png"
-                                />
+                                <AvatarImage alt="@shadcn" src="https://github.com/shadcn.png" />
 
                                 <AvatarFallback>CN</AvatarFallback>
                             </Avatar>

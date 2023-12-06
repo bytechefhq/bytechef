@@ -1,8 +1,5 @@
 import {Component1Icon} from '@radix-ui/react-icons';
-import {
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionModel,
-} from 'middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from 'middleware/hermes/configuration';
 import {HTMLAttributes, MouseEvent} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
@@ -15,11 +12,7 @@ type WorkflowNodesTabsItemProps = {
     node: ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel;
 } & HTMLAttributes<HTMLLIElement>;
 
-const WorkflowNodesTabsItem = ({
-    draggable,
-    handleClick,
-    node,
-}: WorkflowNodesTabsItemProps) => {
+const WorkflowNodesTabsItem = ({draggable, handleClick, node}: WorkflowNodesTabsItemProps) => {
     const onDragStart = (event: DragEvent, name: string) => {
         event.dataTransfer.setData('application/reactflow', name);
         event.dataTransfer.effectAllowed = 'move';
@@ -36,9 +29,7 @@ const WorkflowNodesTabsItem = ({
             {node.icon ? (
                 <InlineSVG
                     className="mr-2 h-7 w-7 flex-none"
-                    loader={
-                        <Component1Icon className="mr-2 h-7 w-7 flex-none" />
-                    }
+                    loader={<Component1Icon className="mr-2 h-7 w-7 flex-none" />}
                     src={node.icon}
                     title={node.title}
                 />
@@ -49,9 +40,7 @@ const WorkflowNodesTabsItem = ({
             <div className="flex flex-col">
                 <p className="text-sm font-medium">{node?.title}</p>
 
-                <p className="line-clamp-2 text-left text-xs text-gray-500">
-                    {node?.description}
-                </p>
+                <p className="line-clamp-2 text-left text-xs text-gray-500">{node?.description}</p>
             </div>
         </li>
     );
