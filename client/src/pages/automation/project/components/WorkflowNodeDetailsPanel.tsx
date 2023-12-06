@@ -597,6 +597,7 @@ const WorkflowNodeDetailsPanel = ({
                                                     onClick={() =>
                                                         setActiveTab(tab.name)
                                                     }
+                                                    variant="ghost"
                                                 >
                                                     {tab.label}
                                                 </Button>
