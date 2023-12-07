@@ -23,6 +23,9 @@ import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRe
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.hermes.definition.DefinitionDSL.array;
+import static com.bytechef.hermes.definition.DefinitionDSL.bool;
+import static com.bytechef.hermes.definition.DefinitionDSL.date;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
@@ -56,7 +59,66 @@ public final class DropboxUploadFileAction {
                 .description("The path to which the file should be written.")
                 .placeholder("/your_file.pdf")
                 .required(true))
-        .outputSchema(object().properties(integer("bytes")))
+        .outputSchema(
+            object().properties(
+                string("id").label("ID")
+                    .required(true),
+                date("clientModified").label("Client modified")
+                    .required(true),
+                date("serverModified").label("Server modified")
+                    .required(true),
+                string("rev").label("Rev")
+                    .required(true),
+                integer("size").label("Size")
+                    .required(true),
+                object("symlinkInfo").properties(
+                    string("target").label("Target")
+                        .required(true))
+                    .label("Sym link info"),
+                object("sharingInfo").properties(
+                    string("parentSharedFolderId").label("Parent shared folder ID")
+                        .required(true),
+                    string("modifiedBy").label("Modified by")
+                        .required(true))
+                    .label("Sharing info"),
+                bool("isDownloadable").label("Is downloadable")
+                    .required(true),
+                object("exportInfo").properties(
+                    string("exportAs").label("Export as")
+                        .required(true),
+                    array("exportOptions").items(
+                        string("option").label("Option")
+                            .required(true))
+                        .label("Export options"))
+                    .label("Export info"),
+                array("propertyGroups").items(
+                    object().properties(
+                        string("templateId").label("Template ID")
+                            .required(true),
+                        array("fields").items(
+                            object().properties(
+                                string("name").label("Name")
+                                    .required(true),
+                                string("value").label("Value")
+                                    .required(true))
+                                .label("Fields")))
+                        .required(true))
+                    .label("Property groups"),
+                bool("hasExplicitSharedMembers").label("Has explicit shared members")
+                    .required(true),
+                string("contentHash").label("Content hash")
+                    .required(true),
+                object("fileLockInfo").properties(
+                    bool("isLockholder").label("Is lockholder")
+                        .required(true),
+                    string("lockholderName").label("Lockholder name")
+                        .required(true),
+                    string("lockholderAccountId").label("Lockholder account ID")
+                        .required(true),
+                    date("created").label("Created")
+                        .required(true)
+                        .required(true))
+                    .label("File lock info")))
         .perform(DropboxUploadFileAction::perform);
 
     private DropboxUploadFileAction() {

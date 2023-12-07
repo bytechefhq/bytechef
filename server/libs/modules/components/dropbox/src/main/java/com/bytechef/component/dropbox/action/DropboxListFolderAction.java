@@ -21,6 +21,8 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FI
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.hermes.definition.DefinitionDSL.array;
+import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
@@ -30,7 +32,7 @@ import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
-import java.util.List;
+import com.dropbox.core.v2.files.ListFolderResult;
 
 /**
  * @author Mario Cvjetojevic
@@ -46,7 +48,26 @@ public final class DropboxListFolderAction {
                 .description("A unique identifier for the file. Must match pattern " +
                     "\" (/(.|[\\\\r\\\\n])*)?|id:.*|(ns:[0-9]+(/.*)?)\" and not be null.")
                 .required(true))
-        .outputSchema(object())
+        .outputSchema(
+            object().properties(
+                array("entries").items(
+                    object().properties(
+                        object("metadata").properties(
+                            string("name").label("Name")
+                                .required(true),
+                            string("pathLower").label("Path lowercase")
+                                .required(true),
+                            string("pathDisplay").label("Path display")
+                                .required(true),
+                            string("parentSharedFolderId").label("Parent shared folder")
+                                .required(true),
+                            string("previewUrl").label("Preview URL")
+                                .required(true))
+                            .label("Entries"))),
+                string("cursor").label("Cursor")
+                    .required(true),
+                bool("hasMore").label("Has more")
+                    .required(true)))
         .perform(DropboxListFolderAction::perform);
 
     private DropboxListFolderAction() {
@@ -60,34 +81,9 @@ public final class DropboxListFolderAction {
             DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
                 connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-            return new ListFolderResult(
-                dbxUserFilesRequests.listFolder(inputParameters.getRequiredString(SOURCE_FILENAME)));
+            return dbxUserFilesRequests.listFolder(inputParameters.getRequiredString(SOURCE_FILENAME));
         } catch (DbxException dbxException) {
             throw new ComponentExecutionException("Unable to list folder " + inputParameters, dbxException);
-        }
-    }
-
-    public record ListFolderResult(List<Metadata> entries, String cursor, boolean hasMore) {
-        ListFolderResult(com.dropbox.core.v2.files.ListFolderResult listFolderResult) {
-            this(
-                listFolderResult.getEntries()
-                    .stream()
-                    .map(Metadata::new)
-                    .toList(),
-                listFolderResult.getCursor(),
-                listFolderResult.getHasMore());
-        }
-    }
-
-    public record Metadata(String name, String pathLower, String pathDisplay, String parentSharedFolderId,
-        String previewUrl) {
-        Metadata(com.dropbox.core.v2.files.Metadata metadata) {
-            this(
-                metadata.getName(),
-                metadata.getPathLower(),
-                metadata.getPathDisplay(),
-                metadata.getParentSharedFolderId(),
-                metadata.getPreviewUrl());
         }
     }
 }
