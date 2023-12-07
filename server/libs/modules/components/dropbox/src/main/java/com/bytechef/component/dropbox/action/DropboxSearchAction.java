@@ -21,6 +21,8 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.SEARCH_ST
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.hermes.definition.DefinitionDSL.array;
+import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
@@ -30,7 +32,7 @@ import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
-import java.util.List;
+import com.dropbox.core.v2.files.SearchV2Result;
 
 /**
  * @author Mario Cvjetojevic
@@ -50,7 +52,20 @@ public final class DropboxSearchAction {
                     "The string to search for. May match across multiple fields based on the request arguments."
                         + "Must have length of at most 1000 and not be null.")
                 .required(true))
-        .outputSchema(object())
+        .outputSchema(object().properties(
+            array("matches").items(
+                object().properties(
+                    array("highlightSpans").items(
+                        string("highlightStr").label("Highlight string")
+                            .required(true),
+                        bool("isHighlighted").label("Is highlighted")
+                            .required(true))
+                        .label("Highlight spans")))
+                .label("Matches"),
+            bool("hasMore").label("Has more")
+                .required(true),
+            string("cursor").label("Cursor")
+                .required(true)))
         .perform(DropboxSearchAction::perform);
 
     private DropboxSearchAction() {
@@ -64,35 +79,9 @@ public final class DropboxSearchAction {
             DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
                 connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-            return new SearchV2Result(dbxUserFilesRequests.searchV2(inputParameters.getRequiredString(SEARCH_STRING)));
+            return dbxUserFilesRequests.searchV2(inputParameters.getRequiredString(SEARCH_STRING));
         } catch (DbxException dbxException) {
             throw new ComponentExecutionException("Unable to search " + inputParameters, dbxException);
-        }
-    }
-
-    public record SearchV2Result(List<SearchMatchV2> entries, String cursor, boolean hasMore) {
-        SearchV2Result(com.dropbox.core.v2.files.SearchV2Result searchV2Result) {
-            this(
-                searchV2Result.getMatches()
-                    .stream()
-                    .map(SearchMatchV2::new)
-                    .toList(),
-                searchV2Result.getCursor(), searchV2Result.getHasMore());
-        }
-    }
-
-    public record SearchMatchV2(List<HighlightSpan> highlightSpans) {
-        SearchMatchV2(com.dropbox.core.v2.files.SearchMatchV2 searchMatchV2) {
-            this(searchMatchV2.getHighlightSpans()
-                .stream()
-                .map(HighlightSpan::new)
-                .toList());
-        }
-    }
-
-    public record HighlightSpan(String highlightStr, boolean isHighlighted) {
-        HighlightSpan(com.dropbox.core.v2.files.HighlightSpan highlightSpan) {
-            this(highlightSpan.getHighlightStr(), highlightSpan.getIsHighlighted());
         }
     }
 }

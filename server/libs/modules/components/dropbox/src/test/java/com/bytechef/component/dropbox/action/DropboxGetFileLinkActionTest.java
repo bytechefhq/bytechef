@@ -45,8 +45,6 @@ class DropboxGetFileLinkActionTest extends DropboxActionTestAbstract {
 
         then(filesRequests).should(times(1))
             .getTemporaryLink(stringArgumentCaptorA.capture());
-        then(getTemporaryLinkResult).should(times(1))
-            .getLink();
 
         Assertions.assertEquals(SOURCE_STUB, stringArgumentCaptorA.getValue());
     }

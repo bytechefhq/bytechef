@@ -21,6 +21,8 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATI
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
@@ -49,6 +51,16 @@ public final class DropboxCreateNewTextFileAction {
                 .description("The path at which the new text file should be created.")
                 .placeholder("/New_text_file.txt")
                 .required(true))
+        .outputSchema(
+            object().properties(
+                string("url").label("URL")
+                    .required(true),
+                string("resultPath").label("Result path")
+                    .required(true),
+                string("fileId").label("File ID")
+                    .required(true),
+                integer("paperRevision").label("Paper revision")
+                    .required(true)))
         .perform(DropboxCreateNewTextFileAction::perform);
 
     private DropboxCreateNewTextFileAction() {

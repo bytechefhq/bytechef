@@ -22,6 +22,7 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FI
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
@@ -51,6 +52,20 @@ public final class DropboxCopyAction {
                 .label("Destination path")
                 .description("The path which the file or folder should be copyed to.")
                 .required(true))
+        .outputSchema(
+            object().properties(
+                object("metadata").properties(
+                    string("name").label("Name")
+                        .required(true),
+                    string("pathLower").label("Path lowercase")
+                        .required(true),
+                    string("pathDisplay").label("Path display")
+                        .required(true),
+                    string("parentSharedFolderId").label("Parent shared folder")
+                        .required(true),
+                    string("previewUrl").label("Preview URL")
+                        .required(true))
+                    .label("Metadata")))
         .perform(DropboxCopyAction::perform);
 
     private DropboxCopyAction() {

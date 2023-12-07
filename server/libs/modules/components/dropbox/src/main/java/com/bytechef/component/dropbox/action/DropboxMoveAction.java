@@ -22,6 +22,7 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FI
 import static com.bytechef.component.dropbox.util.DropboxUtils.getDbxUserFilesRequests;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
@@ -53,6 +54,20 @@ public final class DropboxMoveAction {
                 .description("Path in the user's Dropbox that is the destination. Must match pattern " +
                     "\"(/(.|[\\\\r\\\\n])*)|(ns:[0-9]+(/.*)?)|(id:.*)\" and not be null.")
                 .required(true))
+        .outputSchema(
+            object().properties(
+                object("metadata").properties(
+                    string("name").label("Name")
+                        .required(true),
+                    string("pathLower").label("Path lowercase")
+                        .required(true),
+                    string("pathDisplay").label("Path display")
+                        .required(true),
+                    string("parentSharedFolderId").label("Parent shared folder")
+                        .required(true),
+                    string("previewUrl").label("Preview URL")
+                        .required(true))
+                    .label("Metadata")))
         .perform(DropboxMoveAction::perform);
 
     private DropboxMoveAction() {
