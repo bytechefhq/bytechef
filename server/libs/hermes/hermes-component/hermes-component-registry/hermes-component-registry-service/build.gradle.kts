@@ -20,7 +20,7 @@ dependencies {
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    testImplementation(libs.com.github.tomakehurst.wiremock)
+    testImplementation(libs.org.wiremock.wiremock)
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
