@@ -106,6 +106,9 @@ spring:
         core-size: 2
         max-size: 50
         queue-capacity: 10000
+  threads:
+    virtual:
+      enabled: true
 
 server:
   servlet:
