@@ -194,7 +194,7 @@ const ProjectInstanceDialog = ({onClose, projectInstance, triggerNode}: ProjectI
                         )}
                     </DialogHeader>
 
-                    <div className="max-h-[600px] overflow-y-auto">
+                    <div className={twMerge(activeStepIndex === 1 && 'max-h-[600px] overflow-y-auto')}>
                         {projectInstanceDialogSteps[activeStepIndex].content}
                     </div>
 
