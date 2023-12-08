@@ -18,6 +18,8 @@ package com.bytechef.rest.error;
 
 import com.bytechef.rest.utils.HeaderUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(GlobalResponseEntityExceptionHandler.class);
+
     private final String applicationName;
 
     public GlobalResponseEntityExceptionHandler(@Value("${spring.applicationName}") String applicationName) {
@@ -48,6 +52,8 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler(Throwable.class)
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public ResponseEntity<ProblemDetail> handleAnyException(final Throwable throwable, final WebRequest request) {
+        logger.error(throwable.getMessage(), throwable);
+
         ProblemDetail problemDetail = createProblemDetail(
             throwable.getCause() == null ? (Exception) throwable : (Exception) throwable.getCause(),
             HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", null, null, request);
@@ -58,25 +64,24 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     @ExceptionHandler
     public ResponseEntity<Object> handleBadRequestAlertException(
-        BadRequestAlertException badRequestAlertException, WebRequest request) {
+        BadRequestAlertException exception, WebRequest request) {
 
         return handleExceptionInternal(
-            badRequestAlertException,
-            createProblemDetail(
-                badRequestAlertException, badRequestAlertException.getStatusCode(),
-                badRequestAlertException.getMessage(), null, null, request),
+            exception,
+            createProblemDetail(exception, exception.getStatusCode(), exception.getMessage(), null, null, request),
             HeaderUtils.createFailureAlert(
-                applicationName, true, badRequestAlertException.getEntityName(), badRequestAlertException.getErrorKey(),
-                badRequestAlertException.getMessage()),
-            badRequestAlertException.getStatusCode(), request);
+                applicationName, true, exception.getEntityName(), exception.getErrorKey(), exception.getMessage()),
+            exception.getStatusCode(), request);
     }
 
     @ExceptionHandler
     public ResponseEntity<ProblemDetail> handleConcurrencyFailureException(
-        ConcurrencyFailureException concurrencyFailureException, WebRequest request) {
+        ConcurrencyFailureException exception, WebRequest request) {
+
+        logger.error(exception.getMessage(), exception);
 
         ProblemDetail problemDetail = createProblemDetail(
-            concurrencyFailureException, HttpStatus.CONFLICT, "Concurrency Failure", null, null, request);
+            exception, HttpStatus.CONFLICT, "Concurrency Failure", null, null, request);
 
         return ResponseEntity.of(problemDetail)
             .build();
