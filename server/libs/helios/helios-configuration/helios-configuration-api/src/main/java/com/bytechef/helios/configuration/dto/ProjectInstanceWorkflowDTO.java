@@ -39,6 +39,7 @@ public record ProjectInstanceWorkflowDTO(
 
     public ProjectInstanceWorkflowDTO(ProjectInstanceWorkflow projectInstanceWorkflow,
         LocalDateTime lastExecutionDate) {
+
         this(
             projectInstanceWorkflow.getConnections(), projectInstanceWorkflow.getCreatedBy(),
             projectInstanceWorkflow.getCreatedDate(), projectInstanceWorkflow.getInputs(),
