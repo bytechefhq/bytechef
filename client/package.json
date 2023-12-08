@@ -79,6 +79,7 @@
         "d3-hierarchy": "^3.1.2",
         "d3-timer": "^3.0.1",
         "date-fns": "^2.30.0",
+        "fetch-intercept": "^2.4.0",
         "lucide-react": "^0.294.0",
         "monaco-editor": "^0.44.0",
         "monaco-yaml": "^5.1.0",
