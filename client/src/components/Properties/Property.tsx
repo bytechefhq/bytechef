@@ -132,8 +132,8 @@ const Property = ({
 
     let defaultValue = '';
 
-    if (actionName && property.name && currentComponentData?.properties?.[actionName]) {
-        defaultValue = currentComponentData?.properties?.[actionName][property.name];
+    if (actionName && name && currentComponentData?.properties?.[actionName]) {
+        defaultValue = currentComponentData?.properties?.[actionName][name];
     }
 
     const handlePropertyChange = (event: ChangeEvent<HTMLInputElement>) => {
