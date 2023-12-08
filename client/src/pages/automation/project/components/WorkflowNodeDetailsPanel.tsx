@@ -179,27 +179,34 @@ const WorkflowNodeDetailsPanel = ({
 
     const availableDataPills: Array<DataPillType> = [];
 
-    previousComponentProperties?.forEach((componentProperty) => {
+    previousComponentProperties?.forEach((componentProperty, index) => {
         if (!componentProperty || !componentProperty.properties?.length) {
             return;
         }
 
         const existingProperties = getExistingProperties(componentProperty.properties);
 
+        const componentAlias = previousComponentNames[index];
+
         const formattedProperties: DataPillType[] = existingProperties.map((property) => {
             if (property.properties) {
-                return getSubProperties({
-                    componentDefinition: componentProperty.componentDefinition!,
-                    properties: property.properties,
-                });
+                return getSubProperties(
+                    componentAlias,
+                    componentProperty.componentDefinition!,
+                    property.properties,
+                    property.name
+                );
             } else if (property.items) {
-                return getSubProperties({
-                    componentDefinition: componentProperty.componentDefinition!,
-                    properties: property.items,
-                });
+                return getSubProperties(
+                    componentAlias,
+                    componentProperty.componentDefinition!,
+                    property.items,
+                    property.name
+                );
             }
 
             return {
+                componentAlias,
                 componentDefinition: JSON.stringify(componentProperty.componentDefinition),
                 id: property.name,
                 value: property.label || property.name,
