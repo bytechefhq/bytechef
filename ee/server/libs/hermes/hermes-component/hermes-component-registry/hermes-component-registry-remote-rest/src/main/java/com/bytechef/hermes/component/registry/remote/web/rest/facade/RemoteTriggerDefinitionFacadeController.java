@@ -50,7 +50,7 @@ public class RemoteTriggerDefinitionFacadeController {
 
         triggerDefinitionFacade.executeDynamicWebhookDisable(
             dynamicWebhookDisableRequest.componentName, dynamicWebhookDisableRequest.componentVersion,
-            dynamicWebhookDisableRequest.triggerName, dynamicWebhookDisableRequest.triggerParameters,
+            dynamicWebhookDisableRequest.triggerName, dynamicWebhookDisableRequest.inputParameters,
             dynamicWebhookDisableRequest.workflowExecutionId, dynamicWebhookDisableRequest.outputParameters,
             dynamicWebhookDisableRequest.connectionId);
 
@@ -72,7 +72,7 @@ public class RemoteTriggerDefinitionFacadeController {
 
         return ResponseEntity.ok(triggerDefinitionFacade.executeDynamicWebhookEnable(
             dynamicWebhookEnableRequest.componentName, dynamicWebhookEnableRequest.componentVersion,
-            dynamicWebhookEnableRequest.triggerName, dynamicWebhookEnableRequest.triggerParameters,
+            dynamicWebhookEnableRequest.triggerName, dynamicWebhookEnableRequest.inputParameters,
             dynamicWebhookEnableRequest.workflowExecutionId, dynamicWebhookEnableRequest.connectionId,
             dynamicWebhookEnableRequest.webhookUrl));
     }
@@ -106,7 +106,7 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeEditorDescription(
                 editorDescriptionRequest.componentName, editorDescriptionRequest.componentVersion,
-                editorDescriptionRequest.triggerName, editorDescriptionRequest.triggerParameters,
+                editorDescriptionRequest.triggerName, editorDescriptionRequest.inputParameters,
                 editorDescriptionRequest.connectionId));
     }
 
@@ -121,7 +121,7 @@ public class RemoteTriggerDefinitionFacadeController {
 
         triggerDefinitionFacade.executeListenerDisable(
             listenerDisableRequest.componentName, listenerDisableRequest.componentVersion,
-            listenerDisableRequest.triggerName, listenerDisableRequest.triggerParameters,
+            listenerDisableRequest.triggerName, listenerDisableRequest.inputParameters,
             listenerDisableRequest.workflowExecutionId, listenerDisableRequest.connectionId);
 
         return ResponseEntity.noContent()
@@ -137,7 +137,7 @@ public class RemoteTriggerDefinitionFacadeController {
     public ResponseEntity<Void> executeListenerEnable(@Valid @RequestBody ListenerEnableRequest listenerEnableRequest) {
         triggerDefinitionFacade.executeListenerEnable(
             listenerEnableRequest.componentName, listenerEnableRequest.componentVersion,
-            listenerEnableRequest.triggerName, listenerEnableRequest.triggerParameters,
+            listenerEnableRequest.triggerName, listenerEnableRequest.inputParameters,
             listenerEnableRequest.workflowExecutionId, listenerEnableRequest.connectionId);
 
         return ResponseEntity.noContent()
@@ -156,7 +156,7 @@ public class RemoteTriggerDefinitionFacadeController {
     public List<Option> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
         return triggerDefinitionFacade.executeOptions(
             optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.triggerName,
-            optionsRequest.propertyName, optionsRequest.triggerParameters, optionsRequest.connectionId,
+            optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.connectionId,
             optionsRequest.searchText);
     }
 
@@ -173,7 +173,7 @@ public class RemoteTriggerDefinitionFacadeController {
         executeProperties(@Valid @RequestBody PropertiesRequest propertiesRequest) {
         return triggerDefinitionFacade.executeDynamicProperties(
             propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.triggerName,
-            propertiesRequest.propertyName, propertiesRequest.triggerParameters, propertiesRequest.connectionId);
+            propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.connectionId);
     }
 
     @RequestMapping(
@@ -190,7 +190,7 @@ public class RemoteTriggerDefinitionFacadeController {
 
         return triggerDefinitionFacade.executeOutputSchema(
             outputSchemaRequest.componentName, outputSchemaRequest.componentVersion, outputSchemaRequest.triggerName,
-            outputSchemaRequest.triggerParameters, outputSchemaRequest.connectionId);
+            outputSchemaRequest.inputParameters, outputSchemaRequest.connectionId);
     }
 
     @RequestMapping(
@@ -205,7 +205,7 @@ public class RemoteTriggerDefinitionFacadeController {
     public Object executeSampleOutput(@Valid @RequestBody SampleOutputRequest sampleOutputRequest) {
         return triggerDefinitionFacade.executeSampleOutput(
             sampleOutputRequest.componentName, sampleOutputRequest.componentVersion, sampleOutputRequest.triggerName,
-            sampleOutputRequest.triggerParameters, sampleOutputRequest.connectionId);
+            sampleOutputRequest.inputParameters, sampleOutputRequest.connectionId);
     }
 
     @RequestMapping(
@@ -218,7 +218,7 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeTrigger(
                 triggerRequest.componentName, triggerRequest.componentVersion,
-                triggerRequest.triggerName, triggerRequest.triggerParameters, triggerRequest.state,
+                triggerRequest.triggerName, triggerRequest.inputParameters, triggerRequest.state,
                 triggerRequest.webhookRequest, triggerRequest.connectionId));
     }
 
@@ -234,21 +234,21 @@ public class RemoteTriggerDefinitionFacadeController {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeWebhookValidate(
                 webhookValidateRequest.componentName, webhookValidateRequest.componentVersion,
-                webhookValidateRequest.triggerName, webhookValidateRequest.triggerParameters,
+                webhookValidateRequest.triggerName, webhookValidateRequest.inputParameters,
                 webhookValidateRequest.webhookRequest, webhookValidateRequest.connectionId));
     }
 
     @SuppressFBWarnings("EI")
     public record DynamicWebhookDisableRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, Object> triggerParameters, @NotNull Map<String, ?> outputParameters,
+        @NotNull Map<String, Object> inputParameters, @NotNull Map<String, ?> outputParameters,
         @NotNull String workflowExecutionId, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record DynamicWebhookEnableRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, Object> triggerParameters, @NotNull String workflowExecutionId, @NotNull String webhookUrl,
+        @NotNull Map<String, Object> inputParameters, @NotNull String workflowExecutionId, @NotNull String webhookUrl,
         Long connectionId) {
     }
 
@@ -260,55 +260,55 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @SuppressFBWarnings("EI")
     public record EditorDescriptionRequest(
-        @NotNull String componentName, String triggerName, int componentVersion, Map<String, ?> triggerParameters,
+        @NotNull String componentName, String triggerName, int componentVersion, Map<String, ?> inputParameters,
         long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record ListenerDisableRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, ?> triggerParameters, @NotNull String workflowExecutionId, Long connectionId) {
+        @NotNull Map<String, ?> inputParameters, @NotNull String workflowExecutionId, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record ListenerEnableRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, ?> triggerParameters, @NotNull String workflowExecutionId, Long connectionId) {
+        @NotNull Map<String, ?> inputParameters, @NotNull String workflowExecutionId, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
-        @NotNull Map<String, ?> triggerParameters, Long connectionId, String searchText) {
+        @NotNull Map<String, ?> inputParameters, Long connectionId, String searchText) {
     }
 
     @SuppressFBWarnings("EI")
     public record OutputSchemaRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, ?> triggerParameters, Long connectionId) {
+        @NotNull Map<String, ?> inputParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName, @NotNull String propertyName,
-        @NotNull Map<String, Object> triggerParameters, Long connectionId) {
+        @NotNull Map<String, Object> inputParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record SampleOutputRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, ?> triggerParameters, Long connectionId) {
+        @NotNull Map<String, ?> inputParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record TriggerRequest(
-        String componentName, int componentVersion, String triggerName, @NotNull Map<String, ?> triggerParameters,
+        String componentName, int componentVersion, String triggerName, @NotNull Map<String, ?> inputParameters,
         Object state, @NotNull WebhookRequest webhookRequest, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record WebhookValidateRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
-        @NotNull Map<String, ?> triggerParameters, @NotNull WebhookRequest webhookRequest, Long connectionId) {
+        @NotNull Map<String, ?> inputParameters, @NotNull WebhookRequest webhookRequest, Long connectionId) {
     }
 }

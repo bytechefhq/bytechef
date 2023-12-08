@@ -33,11 +33,11 @@ public interface ActionDefinitionFacade {
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, Object> actionParameters, Long connectionId, String searchText);
+        @NonNull Map<String, Object> inputParameters, Long connectionId, String searchText);
 
     List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> actionParameters, Long connectionId);
+        @NonNull Map<String, Object> inputParameters, Long connectionId);
 
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, int type, Long instanceId,
@@ -49,5 +49,5 @@ public interface ActionDefinitionFacade {
 
     List<? extends ValueProperty<?>> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, Object> actionParameters, Long connectionId);
+        Map<String, Object> inputParameters, Long connectionId);
 }

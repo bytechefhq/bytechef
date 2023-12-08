@@ -52,48 +52,48 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, Object> actionParameters, Long connectionId) {
+        Map<String, Object> inputParameters, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeDynamicProperties(
-            componentName, componentVersion, actionName, propertyName, actionParameters,
+            componentName, componentVersion, actionName, propertyName, inputParameters,
             componentConnection, contextFactory.createContext(componentName, componentConnection));
     }
 
     @Override
     public String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> actionParameters, Long connectionId) {
+        @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeEditorDescription(
-            componentName, componentVersion, actionName, actionParameters, componentConnection,
+            componentName, componentVersion, actionName, inputParameters, componentConnection,
             contextFactory.createContext(componentName, componentConnection));
     }
 
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, Object> actionParameters, Long connectionId, String searchText) {
+        @NonNull Map<String, Object> inputParameters, Long connectionId, String searchText) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeOptions(
-            componentName, componentVersion, actionName, propertyName, actionParameters, searchText,
+            componentName, componentVersion, actionName, propertyName, inputParameters, searchText,
             componentConnection, contextFactory.createContext(componentName, componentConnection));
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> actionParameters, Long connectionId) {
+        @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeOutputSchema(
-            componentName, componentVersion, actionName, actionParameters, componentConnection,
+            componentName, componentVersion, actionName, inputParameters, componentConnection,
             contextFactory.createContext(componentName, componentConnection));
     }
 

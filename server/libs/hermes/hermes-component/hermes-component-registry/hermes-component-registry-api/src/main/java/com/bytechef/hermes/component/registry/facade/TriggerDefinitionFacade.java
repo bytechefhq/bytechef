@@ -32,16 +32,16 @@ public interface TriggerDefinitionFacade {
 
     List<? extends ValueProperty<?>> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, Object> triggerParameters, Long connectionId);
+        @NonNull Map<String, Object> inputParameters, Long connectionId);
 
     void executeDynamicWebhookDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
         @NonNull Map<String, ?> outputParameters, Long connectionId);
 
     TriggerDefinition.DynamicWebhookEnableOutput executeDynamicWebhookEnable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId, Long connectionId,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId,
         @NonNull String webhookUrl);
 
     TriggerDefinition.DynamicWebhookEnableOutput executeDynamicWebhookRefresh(
@@ -50,27 +50,27 @@ public interface TriggerDefinitionFacade {
 
     String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, Long connectionId);
+        @NonNull Map<String, ?> inputParameters, Long connectionId);
 
     void executeListenerDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId, Long connectionId);
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId);
 
     void executeListenerEnable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId, Long connectionId);
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId);
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, ?> triggerParameters, Long connectionId, String searchText);
+        @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText);
 
     List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, Long connectionId);
+        @NonNull Map<String, ?> inputParameters, Long connectionId);
 
     Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, Long connectionId);
+        @NonNull Map<String, ?> inputParameters, Long connectionId);
 
     TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,

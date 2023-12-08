@@ -55,38 +55,38 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, Object> triggerParameters, Long connectionId) {
+        @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeDynamicProperties(
-            componentName, componentVersion, triggerName, triggerParameters, propertyName,
+            componentName, componentVersion, triggerName, inputParameters, propertyName,
             componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
     public void executeDynamicWebhookDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
         @NonNull Map<String, ?> outputParameters, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         triggerDefinitionService.executeDynamicWebhookDisable(
-            componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, outputParameters,
+            componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, outputParameters,
             componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
     public DynamicWebhookEnableOutput executeDynamicWebhookEnable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId, Long connectionId,
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId,
         @NonNull String webhookUrl) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeDynamicWebhookEnable(
-            componentName, componentVersion, triggerName, triggerParameters,
+            componentName, componentVersion, triggerName, inputParameters,
             createWebhookUrl(workflowExecutionId, webhookUrl), workflowExecutionId,
             componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
@@ -104,72 +104,72 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeEditorDescription(
-            componentName, componentVersion, triggerName, triggerParameters, componentConnection,
+            componentName, componentVersion, triggerName, inputParameters, componentConnection,
             contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
     public void executeListenerDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         triggerDefinitionService.executeListenerDisable(
-            componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId,
+            componentName, componentVersion, triggerName, inputParameters, workflowExecutionId,
             componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
     public void executeListenerEnable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         triggerDefinitionService.executeOnEnableListener(
-            componentName, componentVersion, triggerName, triggerParameters, workflowExecutionId, componentConnection,
+            componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, componentConnection,
             contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, ?> triggerParameters, Long connectionId, String searchText) {
+        @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeOptions(
-            componentName, componentVersion, triggerName, triggerParameters, propertyName, searchText,
+            componentName, componentVersion, triggerName, inputParameters, propertyName, searchText,
             componentConnection, contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeOutputSchema(
-            componentName, componentVersion, triggerName, triggerParameters, componentConnection,
+            componentName, componentVersion, triggerName, inputParameters, componentConnection,
             contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 
     @Override
     public Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeSampleOutput(
-            componentName, componentVersion, triggerName, triggerParameters, componentConnection,
+            componentName, componentVersion, triggerName, inputParameters, componentConnection,
             contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }
 

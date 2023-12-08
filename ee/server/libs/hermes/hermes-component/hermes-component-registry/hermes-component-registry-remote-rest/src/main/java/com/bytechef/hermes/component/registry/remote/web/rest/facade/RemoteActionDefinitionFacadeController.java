@@ -48,7 +48,7 @@ public class RemoteActionDefinitionFacadeController {
 
         return ResponseEntity.ok(actionDefinitionFacade.executeEditorDescription(
             editorDescriptionRequest.componentName, editorDescriptionRequest.componentVersion,
-            editorDescriptionRequest.actionName, editorDescriptionRequest.actionParameters,
+            editorDescriptionRequest.actionName, editorDescriptionRequest.inputParameters,
             editorDescriptionRequest.connectionId));
     }
 
@@ -63,7 +63,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOptions(
                 optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.actionName,
-                optionsRequest.propertyName, optionsRequest.actionParameters, optionsRequest.connectionId,
+                optionsRequest.propertyName, optionsRequest.inputParameters, optionsRequest.connectionId,
                 optionsRequest.searchText));
     }
 
@@ -79,7 +79,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeDynamicProperties(
                 propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.actionName,
-                propertiesRequest.propertyName, propertiesRequest.actionParameters, propertiesRequest.connectionId));
+                propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.connectionId));
     }
 
     @RequestMapping(
@@ -93,7 +93,7 @@ public class RemoteActionDefinitionFacadeController {
             actionDefinitionFacade.executePerform(
                 performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
                 performRequest.type, performRequest.instanceId, performRequest.workflowId,
-                performRequest.taskExecutionId, performRequest.actionParameters, performRequest.connectionId));
+                performRequest.taskExecutionId, performRequest.inputParameters, performRequest.connectionId));
     }
 
     @RequestMapping(
@@ -108,7 +108,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOutputSchema(
                 outputSchemaRequest.componentName, outputSchemaRequest.componentVersion, outputSchemaRequest.actionName,
-                outputSchemaRequest.actionParameters, outputSchemaRequest.connectionId));
+                outputSchemaRequest.inputParameters, outputSchemaRequest.connectionId));
     }
 
     @RequestMapping(
@@ -121,43 +121,43 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeSampleOutput(
                 sampleOutputRequest.componentName, sampleOutputRequest.componentVersion, sampleOutputRequest.actionName,
-                sampleOutputRequest.actionParameters, sampleOutputRequest.connectionId));
+                sampleOutputRequest.inputParameters, sampleOutputRequest.connectionId));
     }
 
     @SuppressFBWarnings("EI")
     public record EditorDescriptionRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> actionParameters, Long connectionId) {
+        Map<String, Object> inputParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record OptionsRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, @NotNull String propertyName,
-        Map<String, Object> actionParameters, Long connectionId, String searchText) {
+        Map<String, Object> inputParameters, Long connectionId, String searchText) {
     }
 
     @SuppressFBWarnings("EI")
     public record OutputSchemaRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> actionParameters, Long connectionId) {
+        Map<String, Object> inputParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        @NotNull String propertyName, Map<String, Object> actionParameters, Long connectionId) {
+        @NotNull String propertyName, Map<String, Object> inputParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record SampleOutputRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> actionParameters, Long connectionId) {
+        Map<String, Object> inputParameters, Long connectionId) {
     }
 
     @SuppressFBWarnings("EI")
     public record PerformRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, int type,
-        Long instanceId, @NonNull String workflowId, long taskExecutionId, @NotNull Map<String, ?> actionParameters,
+        Long instanceId, @NonNull String workflowId, long taskExecutionId, @NotNull Map<String, ?> inputParameters,
         Long connectionId) {
     }
 }

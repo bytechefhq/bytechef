@@ -42,25 +42,25 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     @Override
     public String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> actionParameters,
+        @NonNull Map<String, Object> inputParameters,
         Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-editor-description"),
             new EditorDescriptionRequest(
-                actionName, actionParameters, componentName, componentVersion, connectionId),
+                actionName, inputParameters, componentName, componentVersion, connectionId),
             String.class);
     }
 
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, Object> actionParameters, Long connectionId, String searchText) {
+        @NonNull Map<String, Object> inputParameters, Long connectionId, String searchText) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-options"),
             new OptionsRequest(
-                actionName, propertyName, actionParameters, componentName, componentVersion, connectionId,
+                actionName, propertyName, inputParameters, componentName, componentVersion, connectionId,
                 searchText),
             new ParameterizedTypeReference<>() {});
     }
@@ -68,24 +68,24 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> actionParameters, Long connectionId) {
+        @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-output-schema"),
             new OutputSchemaRequest(
-                actionName, actionParameters, componentName, componentVersion, connectionId),
+                actionName, inputParameters, componentName, componentVersion, connectionId),
             new ParameterizedTypeReference<>() {});
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, Object> actionParameters, Long connectionId) {
+        Map<String, Object> inputParameters, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-dynamic-properties"),
             new PropertiesRequest(
-                actionName, actionParameters, componentName, componentVersion, connectionId, propertyName),
+                actionName, inputParameters, componentName, componentVersion, connectionId, propertyName),
             new ParameterizedTypeReference<>() {});
     }
 
@@ -115,32 +115,32 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     private record EditorDescriptionRequest(
-        String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
+        String actionName, Map<String, Object> inputParameters, String componentName, int componentVersion,
         Long connectionId) {
     }
 
     private record OptionsRequest(
-        String actionName, String propertyName, Map<String, Object> actionParameters, String componentName,
+        String actionName, String propertyName, Map<String, Object> inputParameters, String componentName,
         int componentVersion, Long connectionId, String searchText) {
     }
 
     private record OutputSchemaRequest(
-        String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
+        String actionName, Map<String, Object> inputParameters, String componentName, int componentVersion,
         Long connectionId) {
     }
 
     private record PerformRequest(
         String componentName, int componentVersion, String actionName, int type, Long instanceId, String workflowId,
-        long taskExecutionId, Map<String, ?> actionParameters, Long connectionId) {
+        long taskExecutionId, Map<String, ?> inputParameters, Long connectionId) {
     }
 
     private record PropertiesRequest(
-        String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
+        String actionName, Map<String, Object> inputParameters, String componentName, int componentVersion,
         Long connectionId, String propertyName) {
     }
 
     private record SampleOutputRequest(
-        String actionName, Map<String, Object> actionParameters, String componentName, int componentVersion,
+        String actionName, Map<String, Object> inputParameters, String componentName, int componentVersion,
         Long connectionId) {
     }
 }
