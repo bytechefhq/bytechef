@@ -5,190 +5,159 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.commons.webclient;
+package com.bytechef.commons.restclient;
 
 import java.net.URI;
 import java.util.function.Function;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
-import reactor.core.publisher.Mono;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-public class AbstractWebClient {
+public class AbstractRestClient {
 
-    private final WebClient.Builder webClientBuilder;
+    private final RestClient.Builder restClientBuilder;
 
-    public AbstractWebClient(WebClient.Builder webClientBuilder) {
-        this.webClientBuilder = webClientBuilder;
+    public AbstractRestClient(RestClient.Builder restClientBuilder) {
+        this.restClientBuilder = restClientBuilder;
     }
 
     @Retryable
     public void delete(Function<UriBuilder, URI> uriFunction) {
-        webClientBuilder
+        restClientBuilder
             .build()
             .delete()
             .uri(uriFunction)
             .retrieve()
-            .toBodilessEntity()
-            .block();
+            .toBodilessEntity();
     }
 
     @Retryable
     public void get(Function<UriBuilder, URI> uriFunction) {
-        webClientBuilder
+        restClientBuilder
             .build()
             .get()
             .uri(uriFunction)
             .retrieve()
-            .toBodilessEntity()
-            .block();
+            .toBodilessEntity();
     }
 
     @Retryable
     public <T> T get(Function<UriBuilder, URI> uriFunction, Class<T> responseClass) {
-        return webClientBuilder
+        return restClientBuilder
             .build()
             .get()
             .uri(uriFunction)
             .retrieve()
-            .bodyToMono(responseClass)
-            .block();
+            .body(responseClass);
     }
 
     @Retryable
     public <T> T get(Function<UriBuilder, URI> uriFunction, ParameterizedTypeReference<T> responseTypeRef) {
-        return webClientBuilder
+        return restClientBuilder
             .build()
             .get()
             .uri(uriFunction)
             .retrieve()
-            .bodyToMono(responseTypeRef)
-            .block();
-    }
-
-    @Retryable
-    public <T> Mono<T> getMono(Function<UriBuilder, URI> uriFunction, Class<T> responseClass) {
-        return webClientBuilder
-            .build()
-            .get()
-            .uri(uriFunction)
-            .retrieve()
-            .bodyToMono(responseClass);
-    }
-
-    @Retryable
-    public <T> Mono<T> getMono(Function<UriBuilder, URI> uriFunction, ParameterizedTypeReference<T> responseTypeRef) {
-        return webClientBuilder
-            .build()
-            .get()
-            .uri(uriFunction)
-            .retrieve()
-            .bodyToMono(responseTypeRef);
+            .body(responseTypeRef);
     }
 
     @Retryable
     public void post(Function<UriBuilder, URI> uriFunction, Object bodyValue) {
-        WebClient.RequestBodySpec requestBodySpec = webClientBuilder
+        RestClient.RequestBodySpec requestBodySpec = restClientBuilder
             .build()
             .post()
             .uri(uriFunction);
 
         if (bodyValue != null) {
-            requestBodySpec.bodyValue(bodyValue);
+            requestBodySpec.body(bodyValue);
         }
 
         requestBodySpec.retrieve()
-            .toBodilessEntity()
-            .block();
+            .toBodilessEntity();
     }
 
     @Retryable
     public <T> T post(Function<UriBuilder, URI> uriFunction, Object bodyValue, Class<T> responseClass) {
-        WebClient.RequestBodySpec requestBodySpec = webClientBuilder
+        RestClient.RequestBodySpec requestBodySpec = restClientBuilder
             .build()
             .post()
             .uri(uriFunction);
 
         if (bodyValue != null) {
-            requestBodySpec.bodyValue(bodyValue);
+            requestBodySpec.body(bodyValue);
         }
 
         return requestBodySpec.retrieve()
-            .bodyToMono(responseClass)
-            .block();
+            .body(responseClass);
     }
 
     @Retryable
     public <T> T post(
         Function<UriBuilder, URI> uriFunction, Object bodyValue, ParameterizedTypeReference<T> responseTypeRef) {
 
-        WebClient.RequestBodySpec requestBodySpec = webClientBuilder
+        RestClient.RequestBodySpec requestBodySpec = restClientBuilder
             .build()
             .post()
             .uri(uriFunction);
 
         if (bodyValue != null) {
-            requestBodySpec.bodyValue(bodyValue);
+            requestBodySpec.body(bodyValue);
         }
 
         return requestBodySpec.retrieve()
-            .bodyToMono(responseTypeRef)
-            .block();
+            .body(responseTypeRef);
     }
 
     @Retryable
     public void put(Function<UriBuilder, URI> uriFunction, Object bodyValue) {
-        WebClient.RequestBodySpec requestBodySpec = webClientBuilder
+        RestClient.RequestBodySpec requestBodySpec = restClientBuilder
             .build()
             .put()
             .uri(uriFunction);
 
         if (bodyValue != null) {
-            requestBodySpec.bodyValue(bodyValue);
+            requestBodySpec.body(bodyValue);
         }
 
         requestBodySpec.retrieve()
-            .toBodilessEntity()
-            .block();
+            .toBodilessEntity();
     }
 
     @Retryable
     public <T> T put(Function<UriBuilder, URI> uriFunction, Object bodyValue, Class<T> responseClass) {
-        WebClient.RequestBodySpec requestBodySpec = webClientBuilder
+        RestClient.RequestBodySpec requestBodySpec = restClientBuilder
             .build()
             .put()
             .uri(uriFunction);
 
         if (bodyValue != null) {
-            requestBodySpec.bodyValue(bodyValue);
+            requestBodySpec.body(bodyValue);
         }
 
         return requestBodySpec.retrieve()
-            .bodyToMono(responseClass)
-            .block();
+            .body(responseClass);
     }
 
     @Retryable
     public <T> T put(
         Function<UriBuilder, URI> uriFunction, Object bodyValue, ParameterizedTypeReference<T> responseTypeRef) {
 
-        WebClient.RequestBodySpec requestBodySpec = webClientBuilder
+        RestClient.RequestBodySpec requestBodySpec = restClientBuilder
             .build()
             .put()
             .uri(uriFunction);
 
         if (bodyValue != null) {
-            requestBodySpec.bodyValue(bodyValue);
+            requestBodySpec.body(bodyValue);
         }
 
         return requestBodySpec.retrieve()
-            .bodyToMono(responseTypeRef)
-            .block();
+            .body(responseTypeRef);
     }
 }

@@ -9,7 +9,7 @@ package com.bytechef.atlas.execution.remote.client.facade;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -21,16 +21,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class RemoteJobFacadeClient implements JobFacade {
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteJobFacadeClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteJobFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
     public long createAsyncJob(JobParameters jobParameters) {
-        return loadBalancedWebClient.post(
+        return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host("execution-app")
                 .path("/remote/job-facade/create-async-job")

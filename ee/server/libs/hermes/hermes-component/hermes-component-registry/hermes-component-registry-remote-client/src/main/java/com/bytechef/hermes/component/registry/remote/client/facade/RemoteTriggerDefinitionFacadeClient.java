@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.component.registry.remote.client.facade;
 
-import com.bytechef.commons.webclient.DefaultWebClient;
+import com.bytechef.commons.restclient.DefaultRestClient;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
@@ -36,9 +36,9 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     private static final String TRIGGER_DEFINITION_FACADE = "/trigger-definition-facade";
 
     public RemoteTriggerDefinitionFacadeClient(
-        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        super(defaultWebClient, discoveryClient, objectMapper);
+        super(defaultRestClient, discoveryClient, objectMapper);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> triggerParameters, Long connectionId) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-editor-description"),
             new EditorDescriptionRequest(
@@ -59,7 +59,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId, Long connectionId) {
 
-        defaultWebClient.post(
+        defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-listener-disable"),
             new ListenerDisableRequest(
@@ -71,7 +71,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId, Long connectionId) {
 
-        defaultWebClient.post(
+        defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-listener-enable"),
             new ListenerEnableRequest(
@@ -83,7 +83,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-dynamic-webhook-refresh"),
             new DynamicWebhookRefresh(componentName, componentVersion, triggerName, outputParameters),
@@ -95,7 +95,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
         @NonNull Map<String, ?> triggerParameters, Long connectionId, String searchText) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-options"),
             new OptionsRequest(
                 componentName, componentVersion, triggerName, propertyName, triggerParameters, connectionId,
@@ -108,7 +108,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> triggerParameters, Long connectionId) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-output-schema"),
             new OutputSchemaRequest(componentName, componentVersion, triggerName, triggerParameters, connectionId),
             new ParameterizedTypeReference<List<? extends ValueProperty<?>>>() {});
@@ -119,7 +119,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
         @NonNull Map<String, Object> triggerParameters, Long connectionId) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-properties"),
             new PropertiesRequest(
                 componentName, componentVersion, triggerName, propertyName, triggerParameters, connectionId),
@@ -133,7 +133,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         @NonNull Map<String, ?> outputParameters,
         Long connectionId) {
 
-        defaultWebClient.post(
+        defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-dynamic-webhook-disable"),
             new DynamicWebhookDisableRequest(
@@ -147,7 +147,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         @NonNull Map<String, ?> triggerParameters, @NonNull String workflowExecutionId, Long connectionId,
         @NonNull String webhookUrl) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-dynamic-webhook-enable"),
             new DynamicWebhookEnableRequest(
@@ -161,7 +161,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> triggerParameters, Long connectionId) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-sample-output"),
             new SampleOutputRequest(componentName, componentVersion, triggerName, triggerParameters, connectionId),
             Object.class);
@@ -173,7 +173,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         @NonNull Map<String, ?> inputParameters, Object triggerState, @NonNull WebhookRequest webhookRequest,
         Long connectionId) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-trigger"),
             new TriggerRequest(
@@ -187,7 +187,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest, Long connectionId) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-webhook-validate"),
             new WebhookValidateRequest(

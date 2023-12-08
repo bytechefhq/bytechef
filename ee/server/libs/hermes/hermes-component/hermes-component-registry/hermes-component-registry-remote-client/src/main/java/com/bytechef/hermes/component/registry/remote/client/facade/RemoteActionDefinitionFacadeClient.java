@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.component.registry.remote.client.facade;
 
-import com.bytechef.commons.webclient.DefaultWebClient;
+import com.bytechef.commons.restclient.DefaultRestClient;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.registry.domain.Option;
@@ -34,9 +34,9 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     private static final String ACTION_DEFINITION_FACADE = "/action-definition-facade";
 
     public RemoteActionDefinitionFacadeClient(
-        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        super(defaultWebClient, discoveryClient, objectMapper);
+        super(defaultRestClient, discoveryClient, objectMapper);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
         @NonNull Map<String, Object> actionParameters,
         Long connectionId) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-editor-description"),
             new EditorDescriptionRequest(
                 actionName, actionParameters, componentName, componentVersion, connectionId),
@@ -57,7 +57,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, Object> actionParameters, Long connectionId, String searchText) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-options"),
             new OptionsRequest(
                 actionName, propertyName, actionParameters, componentName, componentVersion, connectionId,
@@ -70,7 +70,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> actionParameters, Long connectionId) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-output-schema"),
             new OutputSchemaRequest(
                 actionName, actionParameters, componentName, componentVersion, connectionId),
@@ -82,7 +82,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         Map<String, Object> actionParameters, Long connectionId) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-dynamic-properties"),
             new PropertiesRequest(
                 actionName, actionParameters, componentName, componentVersion, connectionId, propertyName),
@@ -94,7 +94,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
         @NonNull String componentName, int componentVersion, @NonNull String actionName, int type, Long instanceId,
         @NonNull String workflowId, long taskExecutionId, @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-perform"),
             new PerformRequest(
@@ -108,7 +108,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-sample-output"),
             new SampleOutputRequest(actionName, inputParameters, componentName, componentVersion, connectionId),
             Object.class);

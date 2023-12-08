@@ -8,7 +8,7 @@
 package com.bytechef.hermes.configuration.remote.client.facade;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import com.bytechef.hermes.configuration.domain.WorkflowConnection;
 import com.bytechef.hermes.configuration.domain.WorkflowTrigger;
 import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
@@ -28,16 +28,16 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
     private static final String CONFIGURATION_APP = "configuration-app";
     private static final String WORKFLOW_CONNECTION_FACADE = "/remote/workflow-connection-facade";
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public WorkflowConnectionFacadeImpl(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public WorkflowConnectionFacadeImpl(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
     public List<WorkflowConnection> getWorkflowConnections(WorkflowTask workflowTask) {
-        return loadBalancedWebClient.post(
+        return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(WORKFLOW_CONNECTION_FACADE + "/get-workflow-task-connections")
@@ -48,7 +48,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
 
     @Override
     public List<WorkflowConnection> getWorkflowConnections(WorkflowTrigger workflowTrigger) {
-        return loadBalancedWebClient.post(
+        return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(WORKFLOW_CONNECTION_FACADE + "/get-workflow-trigger-connections")

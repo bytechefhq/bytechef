@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.execution.remote.client.facade;
 
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -24,11 +24,11 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
     private static final String TRIGGER_LIFECYCLE_FACADE = "/remote/trigger-lifecycle-facade";
     private static final String EXECUTION_APP = "execution-app";
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteTriggerLifecycleFacadeClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteTriggerLifecycleFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
     }
 
     private void post(String path, TriggerRequest workflowExecutionId) {
-        loadBalancedWebClient.post(
+        loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(path)

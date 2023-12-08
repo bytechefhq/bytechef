@@ -7,7 +7,7 @@
 
 package com.bytechef.helios.configuration.remote.client.service;
 
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -25,11 +25,11 @@ public class RemoteProjectInstanceServiceClient implements ProjectInstanceServic
     private static final String CONFIGURATION_APP = "configuration-app";
     private static final String PROJECT_INSTANCE_SERVICE = "/remote/project-instance-service";
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteProjectInstanceServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteProjectInstanceServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class RemoteProjectInstanceServiceClient implements ProjectInstanceServic
 
     @Override
     public ProjectInstance getProjectInstance(long id) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(PROJECT_INSTANCE_SERVICE + "/get-project-instance/{id}")

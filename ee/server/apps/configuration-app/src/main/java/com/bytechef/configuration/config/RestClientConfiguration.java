@@ -22,7 +22,7 @@ import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 /**
  * @author Ivica Cardic
@@ -33,11 +33,11 @@ import org.springframework.web.reactive.function.client.WebClient;
     @LoadBalancerClient("configuration-app"), @LoadBalancerClient("coordinator-app"),
     @LoadBalancerClient("scheduler-app")
 })
-public class WebClientConfiguration {
+public class RestClientConfiguration {
 
     @LoadBalanced
     @Bean
-    WebClient.Builder loadBalancedWebClientBuilder() {
-        return WebClient.builder();
+    RestClient.Builder loadBalancedRestClientBuilder() {
+        return RestClient.builder();
     }
 }

@@ -61,6 +61,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.ForwardedHeaderUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -262,9 +263,12 @@ public class WebhookController {
     }
 
     private static UriComponents getUriComponents(HttpServletRequest httpServletRequest) {
-        return UriComponentsBuilder
-            .fromHttpRequest(new ServletServerHttpRequest(httpServletRequest))
-            .build();
+        ServletServerHttpRequest servletServerHttpRequest = new ServletServerHttpRequest(httpServletRequest);
+
+        UriComponentsBuilder uriComponentsBuilder = ForwardedHeaderUtils.adaptFromForwardedHeaders(
+            servletServerHttpRequest.getURI(), servletServerHttpRequest.getHeaders());
+
+        return uriComponentsBuilder.build();
     }
 
     private static String[] toArray(Enumeration<String> enumeration) {

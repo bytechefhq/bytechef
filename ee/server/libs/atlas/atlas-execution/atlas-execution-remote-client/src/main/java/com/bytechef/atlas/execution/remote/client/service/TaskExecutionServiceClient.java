@@ -9,7 +9,7 @@ package com.bytechef.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.ParameterizedTypeReference;
@@ -26,16 +26,16 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
     private static final String EXECUTION_APP = "execution-app";
     private static final String TASK_EXECUTION_SERVICE = "/remote/task-execution-service";
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public TaskExecutionServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public TaskExecutionServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
     public TaskExecution create(TaskExecution taskExecution) {
-        return loadBalancedWebClient.post(
+        return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(TASK_EXECUTION_SERVICE + "/create")
@@ -45,7 +45,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
 
     @Override
     public List<TaskExecution> getJobTaskExecutions(long jobId) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(TASK_EXECUTION_SERVICE + "/get-job-task-executions/{jobId}")
@@ -55,7 +55,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
 
     @Override
     public List<TaskExecution> getParentTaskExecutions(long parentId) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(TASK_EXECUTION_SERVICE + "/get-parent-task-executions/{parentId}")
@@ -65,7 +65,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
 
     @Override
     public TaskExecution getTaskExecution(long id) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(TASK_EXECUTION_SERVICE + "/get-task-execution/{id}")
@@ -75,7 +75,7 @@ public class TaskExecutionServiceClient implements TaskExecutionService {
 
     @Override
     public TaskExecution update(TaskExecution taskExecution) {
-        return loadBalancedWebClient.put(
+        return loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(TASK_EXECUTION_SERVICE + "/update")

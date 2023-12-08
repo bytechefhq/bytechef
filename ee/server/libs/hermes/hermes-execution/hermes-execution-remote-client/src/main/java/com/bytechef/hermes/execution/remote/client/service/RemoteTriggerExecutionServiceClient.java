@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.execution.remote.client.service;
 
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -24,16 +24,16 @@ public class RemoteTriggerExecutionServiceClient implements TriggerExecutionServ
     private static final String EXECUTION_APP = "execution-app";
     private static final String TRIGGER_EXECUTION_SERVICE = "/remote/trigger-execution-service";
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteTriggerExecutionServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteTriggerExecutionServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
     public TriggerExecution create(TriggerExecution triggerExecution) {
-        return loadBalancedWebClient.post(
+        return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(TRIGGER_EXECUTION_SERVICE + "/create")
@@ -48,7 +48,7 @@ public class RemoteTriggerExecutionServiceClient implements TriggerExecutionServ
 
     @Override
     public TriggerExecution getTriggerExecution(long id) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(TRIGGER_EXECUTION_SERVICE + "/get-trigger-execution/{id}")
@@ -58,7 +58,7 @@ public class RemoteTriggerExecutionServiceClient implements TriggerExecutionServ
 
     @Override
     public TriggerExecution update(TriggerExecution triggerExecution) {
-        return loadBalancedWebClient.put(
+        return loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(TRIGGER_EXECUTION_SERVICE + "/update")

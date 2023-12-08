@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.scheduler.remote.client;
 
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -26,16 +26,16 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
     private static final String SCHEDULER_APP = "scheduler-app";
     private static final String TRIGGER_SCHEDULER = "/remote/trigger-scheduler";
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteTriggerSchedulerClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteTriggerSchedulerClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
     public void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId) {
-        loadBalancedWebClient.post(
+        loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(SCHEDULER_APP)
                 .path(TRIGGER_SCHEDULER + "/cancel-dynamic-webhook-trigger-refresh")
@@ -45,7 +45,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
 
     @Override
     public void cancelPollingTrigger(String workflowExecutionId) {
-        loadBalancedWebClient.post(
+        loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(SCHEDULER_APP)
                 .path(TRIGGER_SCHEDULER + "/cancel-polling-trigger")
@@ -55,7 +55,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
 
     @Override
     public void cancelScheduleTrigger(String workflowExecutionId) {
-        loadBalancedWebClient.post(
+        loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(SCHEDULER_APP)
                 .path(TRIGGER_SCHEDULER + "/cancel-schedule-trigger")
@@ -68,7 +68,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
         LocalDateTime webhookExpirationDate, String componentName, int componentVersion,
         WorkflowExecutionId workflowExecutionId) {
 
-        loadBalancedWebClient.post(
+        loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(SCHEDULER_APP)
                 .path(TRIGGER_SCHEDULER + "/schedule-dynamic-webhook-trigger-refresh")
@@ -79,7 +79,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
 
     @Override
     public void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId) {
-        loadBalancedWebClient.post(
+        loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(SCHEDULER_APP)
                 .path(TRIGGER_SCHEDULER + "/schedule-polling-trigger")
@@ -91,7 +91,7 @@ public class RemoteTriggerSchedulerClient implements TriggerScheduler {
     public void scheduleScheduleTrigger(
         String pattern, String zoneId, Map<String, Object> output, WorkflowExecutionId workflowExecutionId) {
 
-        loadBalancedWebClient.post(
+        loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(SCHEDULER_APP)
                 .path(TRIGGER_SCHEDULER + "/schedule-schedule-trigger")

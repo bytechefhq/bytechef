@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.execution.remote.client.service;
 
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -26,17 +26,17 @@ public class RemoteTriggerStateServiceClient implements TriggerStateService {
     private static final String EXECUTION_APP = "execution-app";
     private static final String TRIGGER_STORAGE_SERVICE = "/remote/trigger-state-service";
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteTriggerStateServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteTriggerStateServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
     public <T> Optional<T> fetchValue(WorkflowExecutionId workflowExecutionId) {
         return Optional.ofNullable(
-            loadBalancedWebClient.get(
+            loadBalancedRestClient.get(
                 uriBuilder -> uriBuilder
                     .host(EXECUTION_APP)
                     .path(TRIGGER_STORAGE_SERVICE + "/fetch-value/{workflowExecutionId}")
@@ -46,7 +46,7 @@ public class RemoteTriggerStateServiceClient implements TriggerStateService {
 
     @Override
     public void save(WorkflowExecutionId workflowExecutionId, Object value) {
-        loadBalancedWebClient.put(
+        loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(TRIGGER_STORAGE_SERVICE + "/save/{workflowExecutionId}")

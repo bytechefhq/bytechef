@@ -8,21 +8,21 @@
 package com.bytechef.hermes.component.registry.remote.client.service;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.commons.webclient.DefaultWebClient;
+import com.bytechef.commons.restclient.DefaultRestClient;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
-import reactor.core.publisher.Mono;
 
 /**
  * @version ee
@@ -37,14 +37,14 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     private static final String COMPONENT_DEFINITION_SERVICE = "/component-definition-service";
 
     public RemoteComponentDefinitionServiceClient(
-        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        super(defaultWebClient, discoveryClient, objectMapper);
+        super(defaultRestClient, discoveryClient, objectMapper);
     }
 
     @Override
     public ComponentDefinition getComponentDefinition(String name, Integer version) {
-        return defaultWebClient.get(
+        return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, name, COMPONENT_DEFINITION_SERVICE + "/get-component-definition/{name}/{version}", name,
                 checkVersion(version)),
@@ -53,16 +53,15 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
 
     @Override
     public List<ComponentDefinition> getComponentDefinitions() {
-        return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper)
-                .stream()
-                .map(serviceInstance -> defaultWebClient.getMono(
-                    uriBuilder -> toUri(uriBuilder, serviceInstance,
-                        COMPONENT_DEFINITION_SERVICE + "/get-component-definitions"),
-                    new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
-                .toList(),
-            this::toComponentDefinitions)
-            .block();
+
+        List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper),
+            serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
+                uriBuilder -> toUri(
+                    uriBuilder, serviceInstance, COMPONENT_DEFINITION_SERVICE + "/get-component-definitions"),
+                new ParameterizedTypeReference<>() {})));
+
+        return getComponentDefinitions(completableFutures);
     }
 
     @Override
@@ -70,32 +69,29 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
         Boolean actionDefinitions, Boolean connectionDefinitions,
         Boolean triggerDefinitions, List<String> include) {
 
-        return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper)
-                .stream()
-                .map(serviceInstance -> defaultWebClient.getMono(
-                    uriBuilder -> toUri(
-                        uriBuilder, serviceInstance, COMPONENT_DEFINITION_SERVICE + "/get-component-definitions",
-                        Map.of(),
-                        getQueryParams(actionDefinitions, connectionDefinitions, triggerDefinitions)),
-                    new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
-                .toList(),
-            this::toComponentDefinitions)
-            .block();
+        List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper),
+            serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
+                uriBuilder -> toUri(
+                    uriBuilder, serviceInstance, COMPONENT_DEFINITION_SERVICE + "/get-component-definitions",
+                    Map.of(), getQueryParams(actionDefinitions, connectionDefinitions, triggerDefinitions)),
+                new ParameterizedTypeReference<>() {})));
+
+        return getComponentDefinitions(completableFutures);
+
     }
 
     @Override
     public List<ComponentDefinition> getComponentDefinitionVersions(String name) {
-        return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper)
-                .stream()
-                .map(serviceInstance -> defaultWebClient.getMono(
-                    uriBuilder -> toUri(uriBuilder, serviceInstance,
-                        COMPONENT_DEFINITION_SERVICE + "/get-component-definition-versions/{name}", name),
-                    new ParameterizedTypeReference<List<ComponentDefinition>>() {}))
-                .toList(),
-            this::toComponentDefinitions)
-            .block();
+        List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper),
+            serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
+                uriBuilder -> toUri(
+                    uriBuilder, serviceInstance,
+                    COMPONENT_DEFINITION_SERVICE + "/get-component-definition-versions/{name}", name),
+                new ParameterizedTypeReference<>() {})));
+
+        return getComponentDefinitions(completableFutures);
     }
 
     private static int checkVersion(Integer version) {
@@ -104,6 +100,18 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
         }
 
         return version;
+    }
+
+    private static List<ComponentDefinition> getComponentDefinitions(
+        List<CompletableFuture<List<ComponentDefinition>>> completableFutures) {
+
+        CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0]))
+            .join();
+
+        return completableFutures.stream()
+            .map(CompletableFuture::join)
+            .flatMap(CollectionUtils::stream)
+            .collect(Collectors.toList());
     }
 
     private static LinkedMultiValueMap<String, String> getQueryParams(
@@ -124,14 +132,5 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
         }
 
         return queryParamsMap;
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<ComponentDefinition> toComponentDefinitions(Object[] objectArray) {
-        return Arrays.stream(objectArray)
-            .map(object -> (List<ComponentDefinition>) object)
-            .flatMap(Collection::stream)
-            .distinct()
-            .toList();
     }
 }

@@ -7,7 +7,7 @@
 
 package com.bytechef.helios.configuration.remote.client.service;
 
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
@@ -26,11 +26,11 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
 
     private static final String CONFIGURATION_APP = "configuration-app";
     private static final String PROJECT_INSTANCE_WORKFLOW_SERVICE = "/remote/project-instance-workflow-service";
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteProjectInstanceWorkflowServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteProjectInstanceWorkflowServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
         String workflowConnectionKey) {
 
         return Optional.ofNullable(
-            loadBalancedWebClient.get(
+            loadBalancedRestClient.get(
                 uriBuilder -> uriBuilder
                     .host(CONFIGURATION_APP)
                     .path(
@@ -67,7 +67,7 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
 
     @Override
     public ProjectInstanceWorkflow getProjectInstanceWorkflow(long projectInstanceId, String workflowId) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(
@@ -82,7 +82,7 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
         long projectInstanceOd, String workflowId, String workflowConnectionOperationName,
         String workflowConnectionKey) {
 
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(
@@ -98,7 +98,7 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
         long projectInstanceId, String workflowId, String workflowConnectionOperationName,
         String workflowConnectionKey) {
 
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(

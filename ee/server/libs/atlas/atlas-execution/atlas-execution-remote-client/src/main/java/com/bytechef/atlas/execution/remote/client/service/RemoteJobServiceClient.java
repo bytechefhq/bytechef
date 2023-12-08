@@ -11,7 +11,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -27,16 +27,16 @@ public class RemoteJobServiceClient implements JobService {
 
     private static final String EXECUTION_APP = "execution-app";
     private static final String JOB_SERVICE = "/remote/job-service";
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteJobServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteJobServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
     public Job create(JobParameters jobParameters, Workflow workflow) {
-        return loadBalancedWebClient.post(
+        return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/create")
@@ -52,7 +52,7 @@ public class RemoteJobServiceClient implements JobService {
     @Override
     public Optional<Job> fetchLastWorkflowJob(String workflowId) {
         return Optional.ofNullable(
-            loadBalancedWebClient.get(
+            loadBalancedRestClient.get(
                 uriBuilder -> uriBuilder
                     .host(EXECUTION_APP)
                     .path(JOB_SERVICE + "/fetch-last-workflow-job/{workflowId}")
@@ -62,7 +62,7 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public Job getJob(long id) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/get-job/{id}")
@@ -77,7 +77,7 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public Job getTaskExecutionJob(long taskExecutionId) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/get-task-execution-job/{taskExecutionId}")
@@ -87,7 +87,7 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public Job resumeToStatusStarted(long id) {
-        return loadBalancedWebClient.put(
+        return loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/resume-to-status-started/{id}")
@@ -97,7 +97,7 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public Job setStatusToStarted(long id) {
-        return loadBalancedWebClient.put(
+        return loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/set-status-to-started/{id}")
@@ -107,7 +107,7 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public Job setStatusToStopped(long id) {
-        return loadBalancedWebClient.put(
+        return loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/set-status-to-stopped/{id}")
@@ -117,7 +117,7 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public Job update(Job job) {
-        return loadBalancedWebClient.put(
+        return loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/update")

@@ -7,8 +7,8 @@
 
 package com.bytechef.hermes.component.registry.remote.client.service;
 
+import com.bytechef.commons.restclient.DefaultRestClient;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
@@ -43,9 +43,9 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     private static final String TRIGGER_DEFINITION_SERVICE = "/trigger-definition-service";
 
     public RemoteTriggerDefinitionServiceClient(
-        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        super(defaultWebClient, discoveryClient, objectMapper);
+        super(defaultRestClient, discoveryClient, objectMapper);
     }
 
     @Override
@@ -156,7 +156,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     public TriggerDefinition getTriggerDefinition(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName) {
 
-        return defaultWebClient.get(
+        return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
                 TRIGGER_DEFINITION_SERVICE + "/get-trigger-definition/{componentName}/{componentVersion}/{triggerName}",
@@ -166,7 +166,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
 
     @Override
     public List<TriggerDefinition> getTriggerDefinitions(@NonNull String componentName, int componentVersion) {
-        return defaultWebClient.get(
+        return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
                 TRIGGER_DEFINITION_SERVICE + "/get-trigger-definitions/{componentName}/{componentVersion}",
@@ -188,7 +188,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     public WebhookTriggerFlags getWebhookTriggerFlags(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName) {
 
-        return defaultWebClient.get(
+        return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
                 TRIGGER_DEFINITION_SERVICE + "/get-webhook-trigger-flags/{componentName}/{componentVersion}" +

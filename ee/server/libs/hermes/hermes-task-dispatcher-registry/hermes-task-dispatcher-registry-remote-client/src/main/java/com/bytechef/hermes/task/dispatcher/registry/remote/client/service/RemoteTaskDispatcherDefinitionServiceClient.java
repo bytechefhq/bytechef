@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.task.dispatcher.registry.remote.client.service;
 
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
@@ -28,18 +28,18 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
     private static final String COORDINATOR_APP = "coordinator-app";
     private static final String TASK_DISPATCHER_DEFINITION_SERVICE = "/remote/task-dispatcher-definition-service";
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteTaskDispatcherDefinitionServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteTaskDispatcherDefinitionServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
     public List<? extends ValueProperty<?>> executeOutputSchema(
         String name, int version, Map<String, Object> inputParameters) {
 
-        return loadBalancedWebClient.post(
+        return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(COORDINATOR_APP)
                 .path(
@@ -51,7 +51,7 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
 
     @Override
     public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, Integer version) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(COORDINATOR_APP)
                 .path(
@@ -62,7 +62,7 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
 
     @Override
     public List<TaskDispatcherDefinition> getTaskDispatcherDefinitions() {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(COORDINATOR_APP)
                 .path(TASK_DISPATCHER_DEFINITION_SERVICE + "/get-task-dispatcher-definitions")
@@ -72,7 +72,7 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
 
     @Override
     public List<TaskDispatcherDefinition> getTaskDispatcherDefinitionVersions(String name) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(COORDINATOR_APP)
                 .path(TASK_DISPATCHER_DEFINITION_SERVICE + "/get-task-dispatcher-definition-versions/{name}")

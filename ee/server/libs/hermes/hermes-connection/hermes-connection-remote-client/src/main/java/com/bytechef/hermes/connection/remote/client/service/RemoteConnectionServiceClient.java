@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.connection.remote.client.service;
 
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -23,11 +23,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class RemoteConnectionServiceClient implements ConnectionService {
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteConnectionServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteConnectionServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
 
     @Override
     public Connection getConnection(long id) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host("connection-app")
                 .path("/remote/connection-service/get-connection/{id}")
@@ -52,7 +52,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
 
     @Override
     public List<Connection> getConnections(int type) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host("connection-app")
                 .path("/remote/connection-service/get-connections")
