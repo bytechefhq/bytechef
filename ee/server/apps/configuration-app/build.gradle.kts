@@ -9,7 +9,6 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
-    implementation("org.springframework:spring-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-web")
