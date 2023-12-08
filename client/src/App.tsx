@@ -1,4 +1,5 @@
 import {Toaster} from '@/components/ui/toaster';
+import useGlobalErrorInterceptor from '@/interceptors/useGlobalErrorInterceptor';
 import {DesktopSidebar} from '@/layouts/DesktopSidebar';
 import {MobileSidebar} from '@/layouts/MobileSidebar';
 import {MobileTopNavigation} from '@/layouts/MobileTopNavigation';
@@ -50,6 +51,8 @@ function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const location = useLocation();
+
+    useGlobalErrorInterceptor();
 
     useEffect(() => {
         document.title = titles[location.pathname] ?? 'ByteChef';
