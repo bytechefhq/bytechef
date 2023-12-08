@@ -7,7 +7,7 @@
 
 package com.bytechef.data.storage.db.remote.client.config;
 
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import com.bytechef.data.storage.db.remote.client.service.RemoteDbDataStorageServiceClient;
 import com.bytechef.data.storage.db.service.DbDataStorageService;
 import com.bytechef.data.storage.service.DataStorageService;
@@ -41,8 +41,8 @@ public class RemoteDbDataStorageClientConfiguration {
     }
 
     @Bean
-    DbDataStorageService dbDataStorageService(LoadBalancedWebClient loadBalancedWebClient) {
-        return new RemoteDbDataStorageServiceClient(loadBalancedWebClient);
+    DbDataStorageService dbDataStorageService(LoadBalancedRestClient loadBalancedRestClient) {
+        return new RemoteDbDataStorageServiceClient(loadBalancedRestClient);
     }
 
     private record DataStorageServiceImpl(DbDataStorageService dbDataStorageService)

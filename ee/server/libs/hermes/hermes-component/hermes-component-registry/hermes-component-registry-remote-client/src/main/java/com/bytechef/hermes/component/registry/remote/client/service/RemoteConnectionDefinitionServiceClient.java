@@ -8,7 +8,8 @@
 package com.bytechef.hermes.component.registry.remote.client.service;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.commons.webclient.DefaultWebClient;
+import com.bytechef.commons.restclient.DefaultRestClient;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
@@ -19,15 +20,14 @@ import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 /**
  * @version ee
@@ -41,9 +41,9 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     private static final String CONNECTION_DEFINITION_SERVICE = "/connection-definition-service";
 
     public RemoteConnectionDefinitionServiceClient(
-        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        super(defaultWebClient, discoveryClient, objectMapper);
+        super(defaultRestClient, discoveryClient, objectMapper);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     public AuthorizationType getAuthorizationType(
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
 
-        return defaultWebClient.get(
+        return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
                 CONNECTION_DEFINITION_SERVICE + "/get-authorization-type/{componentName}/{connectionVersion}" +
@@ -94,7 +94,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
 
     @Override
     public ConnectionDefinition getConnectionDefinition(@NonNull String componentName, int componentVersion) {
-        return defaultWebClient.get(
+        return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
                 CONNECTION_DEFINITION_SERVICE + "/get-connection-definition/{componentName}/{componentVersion}",
@@ -103,42 +103,39 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     }
 
     @Override
-    public List<ConnectionDefinition>
-        getConnectionDefinitions(@NonNull String componentName, @NonNull Integer componentVersion) {
-        return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper)
-                .stream()
-                .map(serviceInstance -> defaultWebClient.getMono(
-                    uriBuilder -> toUri(
-                        uriBuilder, serviceInstance,
-                        CONNECTION_DEFINITION_SERVICE
-                            + "/get-connection-definitions/{componentName}/{componentVersion}",
-                        componentName, componentVersion),
-                    new ParameterizedTypeReference<List<ConnectionDefinition>>() {}))
-                .toList(),
-            this::toConnectionDefinitions)
-            .block();
+    public List<ConnectionDefinition> getConnectionDefinitions(
+        @NonNull String componentName, @NonNull Integer componentVersion) {
+
+        List<CompletableFuture<List<ConnectionDefinition>>> completableFutures = CollectionUtils.map(
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper),
+            serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
+                uriBuilder -> toUri(
+                    uriBuilder, serviceInstance,
+                    CONNECTION_DEFINITION_SERVICE + "/get-connection-definitions/{componentName}/{componentVersion}",
+                    componentName, componentVersion),
+                new ParameterizedTypeReference<>() {})));
+
+        CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0]))
+            .join();
+
+        return completableFutures.stream()
+            .map(CompletableFuture::join)
+            .flatMap(CollectionUtils::stream)
+            .collect(Collectors.toList());
     }
 
     @Override
     public List<ConnectionDefinition> getConnectionDefinitions() {
-        return Mono.zip(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper)
-                .stream()
-                .map(serviceInstance -> defaultWebClient.getMono(
-                    uriBuilder -> toUri(
-                        uriBuilder, serviceInstance, CONNECTION_DEFINITION_SERVICE + "/get-connection-definitions"),
-                    ConnectionDefinition.class))
-                .toList(),
-            this::toConnectionDefinitions)
-            .block();
-    }
+        List<CompletableFuture<ConnectionDefinition>> completableFutures = CollectionUtils.map(
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper),
+            serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
+                uriBuilder -> toUri(
+                    uriBuilder, serviceInstance, CONNECTION_DEFINITION_SERVICE + "/get-connection-definitions"),
+                ConnectionDefinition.class)));
 
-    @SuppressWarnings("unchecked")
-    private List<ConnectionDefinition> toConnectionDefinitions(Object[] objectArray) {
-        return Arrays.stream(objectArray)
-            .map(object -> (List<ConnectionDefinition>) object)
-            .flatMap(Collection::stream)
-            .toList();
+        CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0]))
+            .join();
+
+        return CollectionUtils.map(completableFutures, CompletableFuture::join);
     }
 }

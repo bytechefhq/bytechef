@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.component.registry.remote.client.facade;
 
-import com.bytechef.commons.webclient.DefaultWebClient;
+import com.bytechef.commons.restclient.DefaultRestClient;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
@@ -31,16 +31,16 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
     private static final String CONNECTION_DEFINITION_FACADE = "/connection-definition-facade";
 
     public RemoteConnectionDefinitionFacadeClient(
-        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        super(defaultWebClient, discoveryClient, objectMapper);
+        super(defaultRestClient, discoveryClient, objectMapper);
     }
 
     @Override
     public Authorization.ApplyResponse executeAuthorizationApply(
         @NonNull String componentName, @NonNull ComponentConnection connection) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/execute-authorization-apply"),
             new ConnectionRequest(componentName, connection), Authorization.ApplyResponse.class);
@@ -51,7 +51,7 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
         @NonNull String componentName,
         @NonNull ComponentConnection connection, @NonNull String redirectUri) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/execute-authorization-callback"),
             new AuthorizationCallbackRequest(componentName, connection, redirectUri),
@@ -62,7 +62,7 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
     public Optional<String> executeBaseUri(
         @NonNull String componentName, ComponentConnection connection) {
         return Optional.ofNullable(
-            defaultWebClient.post(
+            defaultRestClient.post(
                 uriBuilder -> toUri(uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/execute-base-uri"),
                 new ConnectionRequest(componentName, connection), String.class));
     }
@@ -71,7 +71,7 @@ public class RemoteConnectionDefinitionFacadeClient extends AbstractWorkerClient
     public OAuth2AuthorizationParameters getOAuth2AuthorizationParameters(
         @NonNull String componentName, ComponentConnection connection) {
 
-        return defaultWebClient.post(
+        return defaultRestClient.post(
             uriBuilder -> toUri(
                 uriBuilder, componentName, CONNECTION_DEFINITION_FACADE + "/get-oauth2-authorization-parameters"),
             new ConnectionRequest(componentName, connection),

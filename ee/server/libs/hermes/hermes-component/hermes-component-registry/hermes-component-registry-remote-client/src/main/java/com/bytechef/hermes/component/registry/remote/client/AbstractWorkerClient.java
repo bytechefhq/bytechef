@@ -8,8 +8,8 @@
 package com.bytechef.hermes.component.registry.remote.client;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
+import com.bytechef.commons.restclient.DefaultRestClient;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.webclient.DefaultWebClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
@@ -27,16 +27,16 @@ import org.springframework.web.util.UriBuilder;
 public abstract class AbstractWorkerClient {
 
     protected static final String WORKER_APP = "worker-app";
-    protected final DefaultWebClient defaultWebClient;
+    protected final DefaultRestClient defaultRestClient;
 
     protected final DiscoveryClient discoveryClient;
     protected final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
     public AbstractWorkerClient(
-        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        this.defaultWebClient = defaultWebClient;
+        this.defaultRestClient = defaultRestClient;
         this.discoveryClient = discoveryClient;
         this.objectMapper = objectMapper;
     }

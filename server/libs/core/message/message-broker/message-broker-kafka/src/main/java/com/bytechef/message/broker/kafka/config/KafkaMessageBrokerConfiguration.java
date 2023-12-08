@@ -84,7 +84,7 @@ public class KafkaMessageBrokerConfiguration {
 
     @Bean
     Map<String, Object> producerConfigs(KafkaProperties kafkaProperties) {
-        Map<String, Object> props = kafkaProperties.buildProducerProperties();
+        Map<String, Object> props = kafkaProperties.buildProducerProperties(null);
 
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
@@ -94,7 +94,7 @@ public class KafkaMessageBrokerConfiguration {
 
     @Bean
     Map<String, Object> consumerConfigs(KafkaProperties kafkaProperties) {
-        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
 
         return props;
     }

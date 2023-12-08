@@ -5,10 +5,10 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.commons.webclient;
+package com.bytechef.commons.restclient;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 /**
  * @version ee
@@ -16,9 +16,9 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author Ivica Cardic
  */
 @Component
-public class LoadBalancedWebClient extends AbstractWebClient {
+public class LoadBalancedRestClient extends AbstractRestClient {
 
-    public LoadBalancedWebClient(WebClient.Builder loadBalancedWebClientBuilder) {
-        super(loadBalancedWebClientBuilder);
+    public LoadBalancedRestClient(RestClient.Builder loadBalancedRestClientBuilder) {
+        super(loadBalancedRestClientBuilder);
     }
 }

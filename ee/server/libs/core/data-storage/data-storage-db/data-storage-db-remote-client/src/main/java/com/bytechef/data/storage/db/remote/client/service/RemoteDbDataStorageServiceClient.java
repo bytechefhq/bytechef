@@ -7,7 +7,7 @@
 
 package com.bytechef.data.storage.db.remote.client.service;
 
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import com.bytechef.data.storage.db.service.DbDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
@@ -22,11 +22,11 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
 
     private static final String EXECUTION_APP = "execution-app";
     private static final String DATA_STORAGE_SERVICE = "/remote/db-ddata-storage-service";
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteDbDataStorageServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteDbDataStorageServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
         String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
         int type, Object value) {
 
-        loadBalancedWebClient.put(
+        loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(DATA_STORAGE_SERVICE
@@ -70,7 +70,7 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
         String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
         int type, ParameterizedTypeReference<T> responseTypeRef) {
 
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(DATA_STORAGE_SERVICE

@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
-@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "bytechef", name = "c   oordinator.enabled", matchIfMissing = true)
 public class ProjectApiController implements ProjectApi {
 
     private final ConversionService conversionService;

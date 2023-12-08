@@ -9,7 +9,7 @@ package com.bytechef.hermes.configuration.remote.client.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.ParameterizedTypeReference;
@@ -27,11 +27,11 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     private static final String CONFIGURATION_APP = "configuration-app";
     private static final String WORKFLOW_SERVICE = "/remote/workflow-service";
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteWorkflowServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteWorkflowServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
 
     @Override
     public Workflow getWorkflow(@NonNull String id) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(WORKFLOW_SERVICE + "/get-workflow/{id}")
@@ -63,7 +63,7 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
 
     @Override
     public List<Workflow> getWorkflows(int type) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(WORKFLOW_SERVICE + "/get-workflows/{type}")
@@ -78,7 +78,7 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
 
     @Override
     public List<Workflow> getWorkflows(@NonNull List<String> workflowIds) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(WORKFLOW_SERVICE + "/get-workflows/" + String.join(",", workflowIds))

@@ -7,8 +7,8 @@
 
 package com.bytechef.hermes.component.registry.remote.client.service;
 
+import com.bytechef.commons.restclient.DefaultRestClient;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.webclient.DefaultWebClient;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.registry.OperationType;
@@ -39,9 +39,9 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     private static final String ACTION_DEFINITION_SERVICE = "/action-definition-service";
 
     public RemoteActionDefinitionServiceClient(
-        DefaultWebClient defaultWebClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
+        DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
-        super(defaultWebClient, discoveryClient, objectMapper);
+        super(defaultRestClient, discoveryClient, objectMapper);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     public ActionDefinition getActionDefinition(
         @NonNull String componentName, int componentVersion, @NonNull String actionName) {
 
-        return defaultWebClient.get(
+        return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
                 ACTION_DEFINITION_SERVICE + "/get-action-definition/{componentName}/{componentVersion}/{actionName}",
@@ -111,7 +111,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
 
     @Override
     public List<ActionDefinition> getActionDefinitions(@NonNull String componentName, int componentVersion) {
-        return defaultWebClient.get(
+        return defaultRestClient.get(
             uriBuilder -> toUri(
                 uriBuilder, componentName,
                 ACTION_DEFINITION_SERVICE + "/get-action-definitions/{componentName}/{componentVersion}",

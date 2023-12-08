@@ -7,7 +7,7 @@
 
 package com.bytechef.helios.configuration.remote.client.service;
 
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -27,11 +27,11 @@ public class RemoteProjectServiceClient implements ProjectService {
     private static final String CONFIGURATION_APP = "configuration-app";
     private static final String PROJECT_SERVICE = "/remote/project-service";
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteProjectServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteProjectServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class RemoteProjectServiceClient implements ProjectService {
 
     @Override
     public Project getProjectInstanceProject(long projectInstanceId) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(PROJECT_SERVICE + "/get-project-instance-project/{projectInstanceId}")
@@ -76,7 +76,7 @@ public class RemoteProjectServiceClient implements ProjectService {
 
     @Override
     public Project getProject(long id) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(PROJECT_SERVICE + "/get-project/{id}")
@@ -86,7 +86,7 @@ public class RemoteProjectServiceClient implements ProjectService {
 
     @Override
     public List<Project> getProjects() {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(PROJECT_SERVICE + "/get-projects")
@@ -106,7 +106,7 @@ public class RemoteProjectServiceClient implements ProjectService {
 
     @Override
     public Project getWorkflowProject(String workflowId) {
-        return loadBalancedWebClient.get(
+        return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(PROJECT_SERVICE + "/get-workflow-project/{workflowId}")

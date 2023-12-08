@@ -64,7 +64,6 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -84,6 +83,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -93,6 +93,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import wiremock.com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 /**
  * @author Ivica Cardic
@@ -886,8 +887,8 @@ public class OpenApiComponentTaskHandlerIntTest {
         }
 
         @Bean
-        TaskFileStorage workflowFileStorage(ObjectMapper objectMapper) {
-            return new TaskFileStorageImpl(new Base64FileStorageService(), objectMapper);
+        TaskFileStorage workflowFileStorage() {
+            return new TaskFileStorageImpl(new Base64FileStorageService(), objectMapper());
         }
 
         @TestConfiguration
@@ -907,7 +908,9 @@ public class OpenApiComponentTaskHandlerIntTest {
             private final ObjectMapper objectMapper;
 
             @SuppressFBWarnings("EI2")
-            public ConnectionIntTestJdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+            public ConnectionIntTestJdbcConfiguration(
+                Encryption encryption, @Qualifier("objectMapper") ObjectMapper objectMapper) {
+
                 this.encryption = encryption;
                 this.objectMapper = objectMapper;
             }

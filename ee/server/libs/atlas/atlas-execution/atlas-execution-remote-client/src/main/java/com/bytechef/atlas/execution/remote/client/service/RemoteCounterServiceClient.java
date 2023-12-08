@@ -8,7 +8,7 @@
 package com.bytechef.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.commons.webclient.LoadBalancedWebClient;
+import com.bytechef.commons.restclient.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -23,16 +23,16 @@ public class RemoteCounterServiceClient implements CounterService {
     private static final String COUNTER_SERVICE = "/remote/counter-service";
     private static final String EXECUTION_APP = "execution-app";
 
-    private final LoadBalancedWebClient loadBalancedWebClient;
+    private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteCounterServiceClient(LoadBalancedWebClient loadBalancedWebClient) {
-        this.loadBalancedWebClient = loadBalancedWebClient;
+    public RemoteCounterServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
+        this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
     public void delete(long id) {
-        loadBalancedWebClient.delete(
+        loadBalancedRestClient.delete(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(COUNTER_SERVICE + "/delete/{id}")
@@ -41,7 +41,7 @@ public class RemoteCounterServiceClient implements CounterService {
 
     @Override
     public long decrement(long id) {
-        return loadBalancedWebClient.put(
+        return loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(COUNTER_SERVICE + "/decrement/{id}")
@@ -51,7 +51,7 @@ public class RemoteCounterServiceClient implements CounterService {
 
     @Override
     public void set(long id, long value) {
-        loadBalancedWebClient.post(
+        loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(COUNTER_SERVICE + "/set/{id}/{value}")
