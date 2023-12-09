@@ -23,7 +23,7 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
     workflowConnectionIndex,
     workflowIndex,
 }: ProjectInstanceDialogWorkflowsStepItemConnectionProps) => {
-    const [showEditConnectionDialog, setShowEditConnectionDialog] = useState(false);
+    const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: workflowConnection.componentName,
@@ -62,8 +62,9 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
 
                                     <Button
                                         className="mt-auto p-2"
-                                        onClick={() => setShowEditConnectionDialog(true)}
+                                        onClick={() => setShowNewConnectionDialog(true)}
                                         title="Create a new connection"
+                                        type="button"
                                         variant="outline"
                                     >
                                         <PlusIcon className="h-5 w-5" />
@@ -115,11 +116,11 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                 render={({field}) => <input type="hidden" {...field} />}
             />
 
-            {showEditConnectionDialog && (
+            {showNewConnectionDialog && (
                 <Portal.Root>
                     <ConnectionDialog
                         componentDefinition={componentDefinition}
-                        onClose={() => setShowEditConnectionDialog(false)}
+                        onClose={() => setShowNewConnectionDialog(false)}
                     />
                 </Portal.Root>
             )}
