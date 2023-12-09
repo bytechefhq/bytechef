@@ -255,7 +255,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, connection.version(), connection.authorizationName());
+            componentName, connection.authorizationName());
 
         ApplyFunction applyFunction = OptionalUtils.orElse(
             authorization.getApply(), getDefaultApply(authorization.getType()));
@@ -269,7 +269,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         @NonNull String redirectUri) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, connection.version(), connection.authorizationName());
+            componentName, connection.authorizationName());
         String verifier = null;
 
         if (authorization.getType() == AuthorizationType.OAUTH2_AUTHORIZATION_CODE_PKCE) {
@@ -309,7 +309,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
         com.bytechef.hermes.component.definition.ConnectionDefinition connectionDefinition =
-            componentDefinitionRegistry.getConnectionDefinition(componentName, connection.version());
+            componentDefinitionRegistry.getConnectionDefinition(componentName);
 
         BaseUriFunction baseUriFunction =
             OptionalUtils.orElse(
@@ -328,7 +328,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         @NonNull String componentName, int connectionVersion, @NonNull String authorizationName) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, connectionVersion, authorizationName);
+            componentName, authorizationName);
 
         return authorization.getType();
     }
@@ -358,7 +358,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
-            componentName, connection.version(), connection.authorizationName());
+            componentName, connection.authorizationName());
 
         AuthorizationUrlFunction authorizationUrlFunction = OptionalUtils.orElse(
             authorization.getAuthorizationUrl(),

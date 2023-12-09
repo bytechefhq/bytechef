@@ -121,8 +121,8 @@ public class ComponentDefinitionRegistry {
             property -> Objects.equals(propertyName, property.getName()));
     }
 
-    public Authorization getAuthorization(String componentName, int connectionVersion, String authorizationName) {
-        ConnectionDefinition connectionDefinition = getConnectionDefinition(componentName, connectionVersion);
+    public Authorization getAuthorization(String componentName, String authorizationName) {
+        ConnectionDefinition connectionDefinition = getConnectionDefinition(componentName);
 
         return connectionDefinition.getAuthorization(authorizationName);
     }
@@ -135,7 +135,7 @@ public class ComponentDefinitionRegistry {
             .toList();
 
         if (version == null) {
-            componentDefinition = filteredComponentDefinitions.get(filteredComponentDefinitions.size() - 1);
+            componentDefinition = filteredComponentDefinitions.getLast();
         } else {
             componentDefinition = filteredComponentDefinitions.stream()
                 .filter(curComponentDefinition -> version == curComponentDefinition.getVersion())
@@ -156,7 +156,7 @@ public class ComponentDefinitionRegistry {
         return componentDefinitions;
     }
 
-    public ConnectionDefinition getConnectionDefinition(String componentName, int connectionVersion) {
+    public ConnectionDefinition getConnectionDefinition(String componentName) {
         return CollectionUtils.getFirst(
             connectionDefinitions,
             connectionDefinition -> componentName.equalsIgnoreCase(connectionDefinition.getComponentName()));
