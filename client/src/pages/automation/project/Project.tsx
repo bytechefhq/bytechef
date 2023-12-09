@@ -315,7 +315,16 @@ const Project = () => {
     };
 
     const handleWorkflowCodeEditorRunClick = () => {
-        if (currentWorkflow?.inputs && currentWorkflow?.inputs?.length > 0) {
+        const workflowConnections = currentWorkflow?.tasks
+            ? currentWorkflow.tasks
+                  .flatMap((task) => (task.connections ? task.connections : []))
+                  .filter((workflowConnection) => !workflowConnection.id)
+            : [];
+
+        if (
+            (currentWorkflow?.inputs && currentWorkflow?.inputs?.length > 0) ||
+            (workflowConnections && workflowConnections?.length > 0)
+        ) {
             setShowWorkflowTestConfigurationDialog(true);
         } else {
             setWorkflowIsRunning(true);
@@ -491,13 +500,19 @@ const Project = () => {
                                         createWorkflowRequestMutation={createProjectWorkflowMutation}
                                         parentId={+projectId}
                                         triggerNode={
-                                            <Button
-                                                className="border-0 bg-white shadow-none"
-                                                size="icon"
-                                                variant="outline"
-                                            >
-                                                <PlusIcon className="mx-2 h-5 w-5" />
-                                            </Button>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        className="border-0 bg-white shadow-none"
+                                                        size="icon"
+                                                        variant="outline"
+                                                    >
+                                                        <PlusIcon className="mx-2 h-5 w-5" />
+                                                    </Button>
+                                                </TooltipTrigger>
+
+                                                <TooltipContent>Create new workflow</TooltipContent>
+                                            </Tooltip>
                                         }
                                     />
                                 )}
