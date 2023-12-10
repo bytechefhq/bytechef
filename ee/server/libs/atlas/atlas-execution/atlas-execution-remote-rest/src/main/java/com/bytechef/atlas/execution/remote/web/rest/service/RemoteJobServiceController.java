@@ -55,7 +55,8 @@ public class RemoteJobServiceController {
         return OptionalUtils.mapOrElse(
             jobService.fetchLastWorkflowJob(workflowId),
             ResponseEntity::ok,
-            ResponseEntity.noContent()
+            ResponseEntity
+                .noContent()
                 .build());
     }
 

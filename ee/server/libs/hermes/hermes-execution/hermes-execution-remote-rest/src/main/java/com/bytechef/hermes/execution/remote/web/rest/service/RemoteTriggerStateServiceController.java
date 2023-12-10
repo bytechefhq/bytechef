@@ -45,7 +45,8 @@ public class RemoteTriggerStateServiceController {
     public ResponseEntity<Object> fetchValue(@PathVariable String workflowExecutionId) {
         return triggerStateService.fetchValue(WorkflowExecutionId.parse(workflowExecutionId))
             .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.noContent()
+            .orElseGet(() -> ResponseEntity
+                .noContent()
                 .build());
     }
 
@@ -60,7 +61,8 @@ public class RemoteTriggerStateServiceController {
 
         triggerStateService.save(WorkflowExecutionId.parse(workflowExecutionId), value);
 
-        return ResponseEntity.noContent()
+        return ResponseEntity
+            .noContent()
             .build();
     }
 }

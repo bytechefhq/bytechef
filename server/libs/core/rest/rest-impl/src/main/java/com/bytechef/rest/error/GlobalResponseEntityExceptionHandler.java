@@ -54,17 +54,17 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
     public ResponseEntity<ProblemDetail> handleAnyException(final Throwable throwable, final WebRequest request) {
         logger.error(throwable.getMessage(), throwable);
 
-        ProblemDetail problemDetail = createProblemDetail(
-            throwable.getCause() == null ? (Exception) throwable : (Exception) throwable.getCause(),
-            HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", null, null, request);
-
-        return ResponseEntity.of(problemDetail)
+        return ResponseEntity
+            .of(
+                createProblemDetail(
+                    throwable.getCause() == null ? (Exception) throwable : (Exception) throwable.getCause(),
+                    HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", null, null, request))
             .build();
     }
 
     @ExceptionHandler
     public ResponseEntity<Object> handleBadRequestAlertException(
-        BadRequestAlertException exception, WebRequest request) {
+        final BadRequestAlertException exception, final WebRequest request) {
 
         return handleExceptionInternal(
             exception,
@@ -76,14 +76,14 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     @ExceptionHandler
     public ResponseEntity<ProblemDetail> handleConcurrencyFailureException(
-        ConcurrencyFailureException exception, WebRequest request) {
+        final ConcurrencyFailureException exception, final WebRequest request) {
 
         logger.error(exception.getMessage(), exception);
 
-        ProblemDetail problemDetail = createProblemDetail(
-            exception, HttpStatus.CONFLICT, "Concurrency Failure", null, null, request);
-
-        return ResponseEntity.of(problemDetail)
+        return ResponseEntity
+            .of(
+                createProblemDetail(
+                    exception, HttpStatus.CONFLICT, "Concurrency Failure", null, null, request))
             .build();
     }
 }

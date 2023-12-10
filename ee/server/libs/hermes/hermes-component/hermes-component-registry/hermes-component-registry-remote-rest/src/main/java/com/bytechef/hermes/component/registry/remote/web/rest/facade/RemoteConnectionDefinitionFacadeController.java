@@ -82,7 +82,8 @@ public class RemoteConnectionDefinitionFacadeController {
         return connectionDefinitionFacade.executeBaseUri(
             connectionRequest.componentName, connectionRequest.connection)
             .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.noContent()
+            .orElseGet(() -> ResponseEntity
+                .noContent()
                 .build());
     }
 

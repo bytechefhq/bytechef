@@ -59,7 +59,8 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<Void> deleteConnection(Long id) {
         connectionFacade.delete(id);
 
-        return ResponseEntity.noContent()
+        return ResponseEntity
+            .noContent()
             .build();
     }
 
