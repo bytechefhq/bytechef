@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.time.ZoneId;
-import java.util.TimeZone;
 import org.openapitools.jackson.nullable.JsonNullableModule;
+import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -37,6 +35,12 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
  */
 @Configuration
 public class JacksonConfiguration {
+
+    private final JsonComponentModule jsonComponentModule;
+
+    public JacksonConfiguration(JsonComponentModule jsonComponentModule) {
+        this.jsonComponentModule = jsonComponentModule;
+    }
 
     @Bean
     @Primary
@@ -49,15 +53,13 @@ public class JacksonConfiguration {
         return buildMapper(Jackson2ObjectMapperBuilder.xml());
     }
 
-    private static <T extends ObjectMapper> T buildMapper(Jackson2ObjectMapperBuilder objectMapperBuilder) {
+    private <T extends ObjectMapper> T buildMapper(Jackson2ObjectMapperBuilder objectMapperBuilder) {
         return objectMapperBuilder
-            .dateFormat(new StdDateFormat().withColonInTimeZone(true))
-            .timeZone(TimeZone.getTimeZone(ZoneId.systemDefault()))
             .featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .featuresToDisable(SerializationFeature.INDENT_OUTPUT)
             .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .serializationInclusion(JsonInclude.Include.NON_NULL)
-            .modules(new JavaTimeModule(), new Jdk8Module(), new JsonNullableModule())
+            .modules(new JavaTimeModule(), new Jdk8Module(), new JsonNullableModule(), jsonComponentModule)
             .build();
     }
 }

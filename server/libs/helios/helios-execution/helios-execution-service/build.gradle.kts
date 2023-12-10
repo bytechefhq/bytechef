@@ -6,7 +6,6 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:helios:helios-execution:helios-execution-api"))
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
-    implementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-instance-api"))
     implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api"))
     implementation(project(":server:libs:hermes:hermes-test-executor:hermes-test-executor-api"))
 
