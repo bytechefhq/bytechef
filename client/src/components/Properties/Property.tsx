@@ -296,16 +296,18 @@ const Property = ({
                                 leadingIcon={typeIcon}
                                 name={name!}
                                 onChange={(event) => {
-                                    handlePropertyChange(event);
-
                                     if (isNumericalInput) {
                                         const {value} = event.target;
 
-                                        const integerOnlyRegex = /^[0-9\b]+$/;
+                                        const integerOnlyRegex = type === 'NUMBER' ? /^\d*\.?\d*$/ : /^\d*$/;
 
-                                        if (value === '' || integerOnlyRegex.test(value)) {
+                                        if (integerOnlyRegex.test(value)) {
+                                            handlePropertyChange(event);
+
                                             setIntegerValue(value);
                                         }
+                                    } else {
+                                        handlePropertyChange(event);
                                     }
                                 }}
                                 ref={inputRef}
