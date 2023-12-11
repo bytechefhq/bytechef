@@ -358,9 +358,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Option"
+                $ref: "#/components/schemas/OptionsOutput"
   /component-definitions/{componentName}/{componentVersion}/connection-definition:
     get:
       description: "Get connection definition for a component."
@@ -740,9 +738,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Option"
+                $ref: "#/components/schemas/OptionsOutput"
   /oauth2/authorization-parameters:
     post:
       description: "Retrieves oauth2 authorization parameters."
@@ -1311,12 +1307,12 @@ components:
         properties:
           maxValue:
             description: "The maximum property value."
-            type: "integer"
-            format: "int32"
+            type: "number"
+            format: "double"
           minValue:
             description: "The minimum property value."
-            type: "integer"
-            format: "int32"
+            type: "number"
+            format: "double"
           numberPrecision:
             description: "The number value precision."
             type: "integer"
@@ -1406,6 +1402,17 @@ components:
           type: "array"
           items:
             type: "string"
+    OptionsOutput:
+      description: "The response object when dynamically resolving options."
+      type: "object"
+      properties:
+        errorMessage:
+          description: "The error message."
+          type: "string"
+        options:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Option"
     PropertiesDataSource:
       description: "Defines function that should load properties."
       type: "object"
@@ -1496,6 +1503,14 @@ components:
       - $ref: "#/components/schemas/ValueProperty"
       - type: "object"
         properties:
+          maxLength:
+            description: "The maximum string length."
+            type: "integer"
+            format: "int32"
+          minLength:
+            description: "The minimum string length."
+            type: "integer"
+            format: "int32"
           options:
             description: "The list of valid property options."
             type: "array"
@@ -1529,9 +1544,6 @@ components:
             $ref: "#/components/schemas/Property"
         resources:
           $ref: "#/components/schemas/Resources"
-        version:
-          type: "integer"
-          description: "The version of a task dispatcher."
         taskProperties:
           description: "Properties used to define tasks to be dispatched."
           type: "array"
@@ -1540,6 +1552,14 @@ components:
         title:
           description: "The title"
           type: "string"
+        variableProperties:
+          description: "Properties used to define tasks to be dispatched."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        version:
+          type: "integer"
+          description: "The version of a task dispatcher."
     TaskDispatcherDefinitionBasic:
       description: "A task dispatcher defines a strategy for dispatching tasks to\
         \ be executed."
