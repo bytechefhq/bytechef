@@ -101,7 +101,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             Map<String, Object> workflowTaskNameMap = new HashMap<>();
 
             if (!list.isEmpty()) {
-                workflowTaskNameMap.put(ITEM, list.get(0));
+                workflowTaskNameMap.put(ITEM, list.getFirst());
             }
 
             workflowTaskNameMap.put(ITEM_INDEX, 0);

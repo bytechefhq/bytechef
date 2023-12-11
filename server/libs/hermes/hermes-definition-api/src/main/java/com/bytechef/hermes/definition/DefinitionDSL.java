@@ -913,8 +913,8 @@ public abstract class DefinitionDSL {
             extends ModifiableValueProperty<Double, ModifiableNumberProperty>
             implements ModifiableInputProperty, ModifiableOutputProperty<Double>, Property.NumberProperty {
 
-            private Integer maxValue;
-            private Integer minValue;
+            private Double maxValue;
+            private Double minValue;
             private Integer numberPrecision;
             private List<String> loadOptionsDependsOn;
             private List<Option<?>> options;
@@ -984,13 +984,13 @@ public abstract class DefinitionDSL {
                 return this;
             }
 
-            public ModifiableNumberProperty maxValue(int maxValue) {
+            public ModifiableNumberProperty maxValue(double maxValue) {
                 this.maxValue = maxValue;
 
                 return this;
             }
 
-            public ModifiableNumberProperty minValue(int minValue) {
+            public ModifiableNumberProperty minValue(double minValue) {
                 this.minValue = minValue;
 
                 return this;
@@ -1027,12 +1027,12 @@ public abstract class DefinitionDSL {
             }
 
             @Override
-            public Optional<Integer> getMaxValue() {
+            public Optional<Double> getMaxValue() {
                 return Optional.ofNullable(maxValue);
             }
 
             @Override
-            public Optional<Integer> getMinValue() {
+            public Optional<Double> getMinValue() {
                 return Optional.ofNullable(minValue);
             }
 
@@ -1219,6 +1219,8 @@ public abstract class DefinitionDSL {
 
             private ControlType controlType;
             private List<String> loadOptionsDependsOn;
+            private Integer maxLength;
+            private Integer minLength;
             private List<Option<?>> options;
             private OptionsFunction optionsFunction;
             private SampleDataType sampleDataType;
@@ -1253,6 +1255,18 @@ public abstract class DefinitionDSL {
                 if (loadOptionsDependsOn != null) {
                     this.loadOptionsDependsOn = List.of(loadOptionsDependsOn);
                 }
+
+                return this;
+            }
+
+            public ModifiableStringProperty maxLength(int maxLength) {
+                this.maxLength = maxLength;
+
+                return this;
+            }
+
+            public ModifiableStringProperty minLength(int minLength) {
+                this.minLength = minLength;
 
                 return this;
             }
@@ -1295,6 +1309,16 @@ public abstract class DefinitionDSL {
                 } else {
                     return controlType;
                 }
+            }
+
+            @Override
+            public Optional<Integer> getMaxLength() {
+                return Optional.ofNullable(maxLength);
+            }
+
+            @Override
+            public Optional<Integer> getMinLength() {
+                return Optional.ofNullable(minLength);
             }
 
             @Override

@@ -43,6 +43,7 @@ public class TaskDispatcherDefinition {
     private Resources resources;
     private List<? extends Property> taskProperties;
     private String title;
+    private List<? extends Property> variableProperties;
     private int version;
 
     private TaskDispatcherDefinition() {
@@ -70,11 +71,18 @@ public class TaskDispatcherDefinition {
             OptionalUtils.orElse(taskDispatcherDefinition.getTaskProperties(), List.of()),
             valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         this.title = OptionalUtils.orElse(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getName());
+        this.variableProperties = CollectionUtils.map(
+            OptionalUtils.orElse(taskDispatcherDefinition.getVariableProperties(), List.of()),
+            valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         this.version = taskDispatcherDefinition.getVersion();
     }
 
     public Optional<String> getDescription() {
         return Optional.ofNullable(description);
+    }
+
+    public Help getHelp() {
+        return help;
     }
 
     public Optional<String> getIcon() {
@@ -105,6 +113,10 @@ public class TaskDispatcherDefinition {
         return title;
     }
 
+    public List<? extends Property> getVariableProperties() {
+        return variableProperties;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -119,13 +131,13 @@ public class TaskDispatcherDefinition {
             && Objects.equals(help, that.help) && Objects.equals(icon, that.icon) && Objects.equals(name, that.name)
             && Objects.equals(outputSchema, that.outputSchema) && Objects.equals(properties, that.properties)
             && Objects.equals(resources, that.resources) && Objects.equals(taskProperties, that.taskProperties)
-            && Objects.equals(title, that.title);
+            && Objects.equals(title, that.title) && Objects.equals(variableProperties, that.variableProperties);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(description, help, icon, name, outputSchema, properties, resources, taskProperties, title,
-            version);
+            variableProperties, version);
     }
 
     @Override
@@ -140,6 +152,7 @@ public class TaskDispatcherDefinition {
             ", resources=" + resources +
             ", taskProperties=" + taskProperties +
             ", title='" + title + '\'' +
+            ", variableProperties=" + variableProperties +
             ", version=" + version +
             '}';
     }

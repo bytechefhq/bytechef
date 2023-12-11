@@ -61,6 +61,7 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         private Resources resources;
         private List<? extends ModifiableValueProperty<?, ?>> taskProperties;
         private String title;
+        private List<? extends ModifiableValueProperty<?, ?>> variableProperties;
         private int version = 1;
 
         private ModifiableTaskDispatcherDefinition(String name) {
@@ -130,6 +131,15 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
             return this;
         }
 
+        @SafeVarargs
+        public final <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition taskProperties(
+            P... taskProperties) {
+
+            this.taskProperties = List.of(taskProperties);
+
+            return this;
+        }
+
         public ModifiableTaskDispatcherDefinition title(String title) {
             this.title = title;
 
@@ -143,10 +153,10 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @SafeVarargs
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition taskProperties(
-            P... taskProperties) {
+        public final <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition variableProperties(
+            P... variableProperties) {
 
-            this.taskProperties = List.of(taskProperties);
+            this.variableProperties = List.of(variableProperties);
 
             return this;
         }
@@ -193,18 +203,23 @@ public final class TaskDispatcherDSL extends DefinitionDSL {
         }
 
         @Override
+        public Optional<List<? extends ValueProperty<?>>> getTaskProperties() {
+            return Optional.ofNullable(taskProperties);
+        }
+
+        @Override
         public Optional<String> getTitle() {
             return Optional.ofNullable(title);
         }
 
         @Override
-        public int getVersion() {
-            return version;
+        public Optional<List<? extends ValueProperty<?>>> getVariableProperties() {
+            return Optional.ofNullable(variableProperties);
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getTaskProperties() {
-            return Optional.ofNullable(taskProperties);
+        public int getVersion() {
+            return version;
         }
     }
 

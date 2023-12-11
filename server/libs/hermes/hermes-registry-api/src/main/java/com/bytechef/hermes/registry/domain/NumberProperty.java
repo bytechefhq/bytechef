@@ -29,8 +29,8 @@ import java.util.Optional;
  */
 public class NumberProperty extends ValueProperty<Double> {
 
-    private Integer maxValue;
-    private Integer minValue;
+    private Double maxValue;
+    private Double minValue;
     private Integer numberPrecision;
     private List<Option> options;
     private OptionsDataSource optionsDataSource;
@@ -55,11 +55,11 @@ public class NumberProperty extends ValueProperty<Double> {
         return propertyVisitor.visit(this);
     }
 
-    public Optional<Integer> getMaxValue() {
+    public Optional<Double> getMaxValue() {
         return Optional.ofNullable(maxValue);
     }
 
-    public Optional<Integer> getMinValue() {
+    public Optional<Double> getMinValue() {
         return Optional.ofNullable(minValue);
     }
 

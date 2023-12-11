@@ -86,17 +86,23 @@ public interface TaskDispatcherDefinition {
      *
      * @return
      */
+    Optional<List<? extends ValueProperty<?>>> getTaskProperties();
+
+    /**
+     *
+     * @return
+     */
     Optional<String> getTitle();
 
     /**
      *
      * @return
      */
-    int getVersion();
+    Optional<List<? extends ValueProperty<?>>> getVariableProperties();
 
     /**
      *
      * @return
      */
-    Optional<List<? extends ValueProperty<?>>> getTaskProperties();
+    int getVersion();
 }
