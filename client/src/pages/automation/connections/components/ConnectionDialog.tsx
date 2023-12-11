@@ -739,7 +739,7 @@ const Scopes = ({scopes}: {scopes: string[]}) => (
         <div className="space-y-1">
             {scopes.map((scope) => (
                 <div className="flex items-center" key={scope}>
-                    <Checkbox disabled id={scope} />
+                    <Checkbox checked disabled id={scope} />
 
                     <Label htmlFor={scope}>{scope}</Label>
                 </div>
