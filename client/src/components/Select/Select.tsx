@@ -75,7 +75,7 @@ const Select = ({
         <Root defaultValue={defaultValue} name={name} onValueChange={onValueChange} value={value || defaultValue}>
             <Trigger aria-label="Select" asChild>
                 <Button
-                    className={twMerge('mt-1', leadingIcon && 'relative pl-12 py-2.5', triggerClassName)}
+                    className={twMerge('mt-1', leadingIcon && 'relative pl-12 h-9.5', triggerClassName)}
                     variant="ghost"
                 >
                     {leadingIcon && (
