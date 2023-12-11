@@ -16,7 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   ComponentOperationRequestModel,
-  OptionModel,
+  OptionsOutputModel,
   PropertyModel,
   TriggerDefinitionBasicModel,
   TriggerDefinitionModel,
@@ -24,8 +24,8 @@ import type {
 import {
     ComponentOperationRequestModelFromJSON,
     ComponentOperationRequestModelToJSON,
-    OptionModelFromJSON,
-    OptionModelToJSON,
+    OptionsOutputModelFromJSON,
+    OptionsOutputModelToJSON,
     PropertyModelFromJSON,
     PropertyModelToJSON,
     TriggerDefinitionBasicModelFromJSON,
@@ -309,7 +309,7 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
      * Get a trigger property options shown in the editor.
      * Get a trigger property options shown in the editor
      */
-    async getComponentTriggerPropertyOptionsRaw(requestParameters: GetComponentTriggerPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<OptionModel>>> {
+    async getComponentTriggerPropertyOptionsRaw(requestParameters: GetComponentTriggerPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OptionsOutputModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentTriggerPropertyOptions.');
         }
@@ -344,14 +344,14 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(OptionModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => OptionsOutputModelFromJSON(jsonValue));
     }
 
     /**
      * Get a trigger property options shown in the editor.
      * Get a trigger property options shown in the editor
      */
-    async getComponentTriggerPropertyOptions(requestParameters: GetComponentTriggerPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<OptionModel>> {
+    async getComponentTriggerPropertyOptions(requestParameters: GetComponentTriggerPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OptionsOutputModel> {
         const response = await this.getComponentTriggerPropertyOptionsRaw(requestParameters, initOverrides);
         return await response.value();
     }

@@ -25,6 +25,7 @@ export * from './OAuth2PropertiesModel';
 export * from './ObjectPropertyModel';
 export * from './OptionModel';
 export * from './OptionsDataSourceModel';
+export * from './OptionsOutputModel';
 export * from './PropertiesDataSourceModel';
 export * from './PropertyModel';
 export * from './PropertyTypeModel';

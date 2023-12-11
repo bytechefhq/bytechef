@@ -69,12 +69,6 @@ export interface TaskDispatcherDefinitionModel {
      */
     resources?: ResourcesModel;
     /**
-     * The version of a task dispatcher.
-     * @type {number}
-     * @memberof TaskDispatcherDefinitionModel
-     */
-    version: number;
-    /**
      * Properties used to define tasks to be dispatched.
      * @type {Array<PropertyModel>}
      * @memberof TaskDispatcherDefinitionModel
@@ -86,6 +80,18 @@ export interface TaskDispatcherDefinitionModel {
      * @memberof TaskDispatcherDefinitionModel
      */
     title?: string;
+    /**
+     * Properties used to define tasks to be dispatched.
+     * @type {Array<PropertyModel>}
+     * @memberof TaskDispatcherDefinitionModel
+     */
+    variableProperties?: Array<PropertyModel>;
+    /**
+     * The version of a task dispatcher.
+     * @type {number}
+     * @memberof TaskDispatcherDefinitionModel
+     */
+    version: number;
 }
 
 /**
@@ -115,9 +121,10 @@ export function TaskDispatcherDefinitionModelFromJSONTyped(json: any, ignoreDisc
         'outputSchema': !exists(json, 'outputSchema') ? undefined : PropertyModelFromJSON(json['outputSchema']),
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
-        'version': json['version'],
         'taskProperties': !exists(json, 'taskProperties') ? undefined : ((json['taskProperties'] as Array<any>).map(PropertyModelFromJSON)),
         'title': !exists(json, 'title') ? undefined : json['title'],
+        'variableProperties': !exists(json, 'variableProperties') ? undefined : ((json['variableProperties'] as Array<any>).map(PropertyModelFromJSON)),
+        'version': json['version'],
     };
 }
 
@@ -136,9 +143,10 @@ export function TaskDispatcherDefinitionModelToJSON(value?: TaskDispatcherDefini
         'outputSchema': PropertyModelToJSON(value.outputSchema),
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'resources': ResourcesModelToJSON(value.resources),
-        'version': value.version,
         'taskProperties': value.taskProperties === undefined ? undefined : ((value.taskProperties as Array<any>).map(PropertyModelToJSON)),
         'title': value.title,
+        'variableProperties': value.variableProperties === undefined ? undefined : ((value.variableProperties as Array<any>).map(PropertyModelToJSON)),
+        'version': value.version,
     };
 }
 

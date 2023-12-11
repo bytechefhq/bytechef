@@ -18,7 +18,7 @@ import type {
   ActionDefinitionBasicModel,
   ActionDefinitionModel,
   ComponentOperationRequestModel,
-  OptionModel,
+  OptionsOutputModel,
   PropertyModel,
 } from '../models/index';
 import {
@@ -28,8 +28,8 @@ import {
     ActionDefinitionModelToJSON,
     ComponentOperationRequestModelFromJSON,
     ComponentOperationRequestModelToJSON,
-    OptionModelFromJSON,
-    OptionModelToJSON,
+    OptionsOutputModelFromJSON,
+    OptionsOutputModelToJSON,
     PropertyModelFromJSON,
     PropertyModelToJSON,
 } from '../models/index';
@@ -341,7 +341,7 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
      * Get an action property options shown in the editor.
      * Get an action property options shown in the editor
      */
-    async getComponentActionPropertyOptionsRaw(requestParameters: GetComponentActionPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<OptionModel>>> {
+    async getComponentActionPropertyOptionsRaw(requestParameters: GetComponentActionPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OptionsOutputModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentActionPropertyOptions.');
         }
@@ -376,14 +376,14 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(OptionModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => OptionsOutputModelFromJSON(jsonValue));
     }
 
     /**
      * Get an action property options shown in the editor.
      * Get an action property options shown in the editor
      */
-    async getComponentActionPropertyOptions(requestParameters: GetComponentActionPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<OptionModel>> {
+    async getComponentActionPropertyOptions(requestParameters: GetComponentActionPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OptionsOutputModel> {
         const response = await this.getComponentActionPropertyOptionsRaw(requestParameters, initOverrides);
         return await response.value();
     }

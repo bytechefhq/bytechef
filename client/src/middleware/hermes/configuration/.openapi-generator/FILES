@@ -31,6 +31,7 @@ models/OAuth2PropertiesModel.ts
 models/ObjectPropertyModel.ts
 models/OptionModel.ts
 models/OptionsDataSourceModel.ts
+models/OptionsOutputModel.ts
 models/PropertiesDataSourceModel.ts
 models/PropertyModel.ts
 models/PropertyTypeModel.ts

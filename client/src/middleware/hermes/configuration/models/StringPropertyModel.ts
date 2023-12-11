@@ -51,6 +51,18 @@ import {
  */
 export interface StringPropertyModel extends ValuePropertyModel {
     /**
+     * The maximum string length.
+     * @type {number}
+     * @memberof StringPropertyModel
+     */
+    maxLength?: number;
+    /**
+     * The minimum string length.
+     * @type {number}
+     * @memberof StringPropertyModel
+     */
+    minLength?: number;
+    /**
      * The list of valid property options.
      * @type {Array<OptionModel>}
      * @memberof StringPropertyModel
@@ -83,6 +95,8 @@ export function StringPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        'maxLength': !exists(json, 'maxLength') ? undefined : json['maxLength'],
+        'minLength': !exists(json, 'minLength') ? undefined : json['minLength'],
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
         'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
     };
@@ -97,6 +111,8 @@ export function StringPropertyModelToJSON(value?: StringPropertyModel | null): a
     }
     return {
         ...ValuePropertyModelToJSON(value),
+        'maxLength': value.maxLength,
+        'minLength': value.minLength,
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
         'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
     };
