@@ -37,6 +37,10 @@ public interface OptionalMapper {
         return value.orElse(null);
     }
 
+    default Double mapToDouble(Optional<Double> value) {
+        return value.orElse(null);
+    }
+
     default Help mapToHelpDTO(Optional<Help> value) {
         return value.orElse(null);
     }
