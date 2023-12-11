@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +39,7 @@ public class JacksonConfiguration {
 
     private final JsonComponentModule jsonComponentModule;
 
+    @SuppressFBWarnings("EI")
     public JacksonConfiguration(JsonComponentModule jsonComponentModule) {
         this.jsonComponentModule = jsonComponentModule;
     }
