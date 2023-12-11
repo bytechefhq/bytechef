@@ -84,11 +84,17 @@ const Select = ({
                         </div>
                     )}
 
-                    <Value placeholder={placeholder} />
+                    {options.length ? (
+                        <>
+                            <Value placeholder={placeholder} />
 
-                    <Icon className="ml-auto pl-2">
-                        <ChevronDownIcon />
-                    </Icon>
+                            <Icon className="ml-auto pl-2">
+                                <ChevronDownIcon />
+                            </Icon>
+                        </>
+                    ) : (
+                        <span>No options available</span>
+                    )}
                 </Button>
             </Trigger>
 

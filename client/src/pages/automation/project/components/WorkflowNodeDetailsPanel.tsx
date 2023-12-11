@@ -122,13 +122,7 @@ const WorkflowNodeDetailsPanel = ({
         !!currentComponent?.actions && !!getActionName()
     );
 
-    const currentActionProperties = currentAction?.properties?.filter((property: PropertyType) => {
-        if (property.controlType === 'SELECT' && (!property.options || !property.options.length)) {
-            return false;
-        } else {
-            return true;
-        }
-    });
+    const currentActionProperties = currentAction?.properties;
 
     const taskTypes = componentActions?.map(
         (componentAction) => `${componentAction.componentName}/1/${componentAction.actionName}`

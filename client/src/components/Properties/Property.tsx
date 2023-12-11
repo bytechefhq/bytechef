@@ -316,12 +316,12 @@ const Property = ({
                             />
                         )}
 
-                        {controlType === 'SELECT' && !!formattedOptions?.length && (
+                        {controlType === 'SELECT' && (
                             <Select
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
-                                options={formattedOptions}
+                                options={formattedOptions || []}
                                 triggerClassName="w-full border border-gray-300"
                             />
                         )}
