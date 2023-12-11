@@ -272,15 +272,15 @@ public class WorkflowServiceImpl implements WorkflowService {
         Validate.notNull(id, "'id' must not be null");
         Validate.notNull(definition, "'definition' must not be null");
 
+        final Workflow workflow = getWorkflow(id);
+
         return CollectionUtils.getFirst(
             workflowCrudRepositories,
             workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(id)),
             workflowCrudRepository -> {
-                Workflow workflow = getWorkflow(id);
-
                 workflow.setDefinition(definition);
 
-                workflow = workflowCrudRepository.save(workflow);
+                workflowCrudRepository.save(workflow);
 
                 return updateCache(OptionalUtils.get(workflowCrudRepository.findById(workflow.getId())));
             });

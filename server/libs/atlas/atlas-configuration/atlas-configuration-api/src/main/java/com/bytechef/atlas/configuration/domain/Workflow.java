@@ -353,6 +353,15 @@ public final class Workflow implements Persistable<String>, Serializable {
     }
 
     public void setDefinition(String definition) {
+
+        // Validate
+
+        try {
+            readWorkflowMap(definition, id, format);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
+
         this.definition = definition;
     }
 
