@@ -27,6 +27,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
+import com.bytechef.hermes.component.definition.ComponentOptionsFunction.OptionsOutput;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
@@ -152,14 +153,14 @@ public class AirtableUtils {
         };
     }
 
-    private static List<Option<?>> getOptions(Map<String, List<Map<?, ?>>> response, String name) {
+    private static OptionsOutput getOptions(Map<String, List<Map<?, ?>>> response, String name) {
         List<Option<?>> options = new ArrayList<>();
 
         for (Map<?, ?> list : response.get(name)) {
             options.add(option((String) list.get("name"), list.get("id")));
         }
 
-        return options;
+        return new OptionsOutput(options);
     }
 
     private static List<ModifiableOption<String>> getOptions(AirtableField field) {

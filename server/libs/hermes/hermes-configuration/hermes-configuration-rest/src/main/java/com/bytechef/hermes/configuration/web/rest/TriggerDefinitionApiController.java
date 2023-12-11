@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentOperationRequestModel;
-import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
+import com.bytechef.hermes.configuration.web.rest.model.OptionsOutputModel;
 import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionModel;
@@ -124,17 +124,17 @@ public class TriggerDefinitionApiController implements TriggerDefinitionApi {
     }
 
     @Override
-    public ResponseEntity<List<OptionModel>> getComponentTriggerPropertyOptions(
+    public ResponseEntity<OptionsOutputModel> getComponentTriggerPropertyOptions(
         String componentName, Integer componentVersion, String triggerName, String propertyName, String searchText,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
         return ResponseEntity.ok(
-            CollectionUtils.map(
+            conversionService.convert(
                 triggerDefinitionFacade.executeOptions(
                     componentName, componentVersion, triggerName, propertyName,
                     componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId(),
                     searchText),
-                option -> conversionService.convert(option, OptionModel.class)));
+                OptionsOutputModel.class));
     }
 
     @Override

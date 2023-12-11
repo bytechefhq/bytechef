@@ -39,6 +39,7 @@ import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.registry.domain.Option;
+import com.bytechef.hermes.registry.domain.OptionsOutput;
 import com.bytechef.hermes.registry.domain.Property;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -93,7 +94,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public List<Option> executeOptions(
+    public OptionsOutput executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, String searchText, ComponentConnection connection,
         @NonNull Context context) {
@@ -101,11 +102,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         ComponentOptionsFunction optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, actionName, propertyName);
 
-        List<com.bytechef.hermes.definition.Option<?>> options = optionsFunction.apply(
+        ComponentOptionsFunction.OptionsOutput optionsOutput = optionsFunction.apply(
             new ParameterMapImpl(inputParameters),
             connection == null ? null : new ParameterMapImpl(connection.parameters()), searchText, context);
 
-        return CollectionUtils.map(options, Option::new);
+        return new OptionsOutput(
+            CollectionUtils.map(optionsOutput.options(), Option::new), optionsOutput.errorMessage());
     }
 
     @Override

@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.OptionsDataSource;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
@@ -34,7 +35,15 @@ public interface ComponentOptionsFunction extends OptionsDataSource.OptionsFunct
      * @param searchText
      * @return
      */
-    List<Option<?>> apply(
+    OptionsOutput apply(
         ParameterMap inputParameters, ParameterMap connectionParameters, String searchText, Context context)
         throws ComponentExecutionException;
+
+    @SuppressFBWarnings("EI")
+    record OptionsOutput(List<Option<?>> options, String errorMessage) {
+
+        public OptionsOutput(List<Option<?>> options) {
+            this(options, null);
+        }
+    }
 }

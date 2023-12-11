@@ -23,7 +23,7 @@ import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentOperationRequestModel;
-import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
+import com.bytechef.hermes.configuration.web.rest.model.OptionsOutputModel;
 import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -133,15 +133,16 @@ public class ActionDefinitionApiController implements ActionDefinitionApi {
     }
 
     @Override
-    public ResponseEntity<List<OptionModel>> getComponentActionPropertyOptions(
+    public ResponseEntity<OptionsOutputModel> getComponentActionPropertyOptions(
         String componentName, Integer componentVersion, String actionName, String propertyName, String searchText,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
-        return ResponseEntity.ok(CollectionUtils.map(
-            actionDefinitionFacade.executeOptions(
-                componentName, componentVersion, actionName, propertyName,
-                componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId(),
-                searchText),
-            option -> conversionService.convert(option, OptionModel.class)));
+        return ResponseEntity.ok(
+            conversionService.convert(
+                actionDefinitionFacade.executeOptions(
+                    componentName, componentVersion, actionName, propertyName,
+                    componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId(),
+                    searchText),
+                OptionsOutputModel.class));
     }
 }

@@ -25,7 +25,7 @@ import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.registry.domain.Option;
+import com.bytechef.hermes.registry.domain.OptionsOutput;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ public interface TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
         @Nullable ComponentConnection connection, @NonNull Context context);
 
-    List<Option> executeOptions(
+    OptionsOutput executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @Nullable String searchText,
         @Nullable ComponentConnection connection, @NonNull Context context);

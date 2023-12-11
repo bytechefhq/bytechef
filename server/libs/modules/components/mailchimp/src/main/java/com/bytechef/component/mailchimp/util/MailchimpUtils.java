@@ -21,6 +21,7 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
+import com.bytechef.hermes.component.definition.ComponentOptionsFunction.OptionsOutput;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -74,7 +75,7 @@ public class MailchimpUtils {
                 options.add(option((String) list.get("name"), list.get("id")));
             }
 
-            return options;
+            return new OptionsOutput(options);
         };
     }
 }

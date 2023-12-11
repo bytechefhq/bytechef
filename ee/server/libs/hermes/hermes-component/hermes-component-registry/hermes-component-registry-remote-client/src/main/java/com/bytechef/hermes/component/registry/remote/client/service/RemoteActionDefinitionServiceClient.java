@@ -16,7 +16,7 @@ import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
-import com.bytechef.hermes.registry.domain.Option;
+import com.bytechef.hermes.registry.domain.OptionsOutput;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -62,7 +62,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
-    public List<Option> executeOptions(
+    public OptionsOutput executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, String searchText, ComponentConnection connection,
         @NonNull Context context) {
