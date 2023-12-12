@@ -79,6 +79,8 @@ const Property = ({
 
     let {name} = property;
 
+    let defaultValue: string | undefined = property.defaultValue as string | undefined;
+
     const {controlType, description, hidden, items, label, objectType, options, properties, required, type} = property;
 
     useEffect(() => {
@@ -129,8 +131,6 @@ const Property = ({
             return false;
         }
     });
-
-    let defaultValue = '';
 
     if (actionName && name && currentComponentData?.properties?.[actionName]) {
         defaultValue = currentComponentData?.properties?.[actionName][name];
@@ -320,6 +320,7 @@ const Property = ({
 
                         {controlType === 'SELECT' && (
                             <Select
+                                defaultValue={defaultValue?.toString()}
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
@@ -367,6 +368,7 @@ const Property = ({
 
                         {register && type === 'BOOLEAN' && (
                             <Select
+                                defaultValue={defaultValue?.toString()}
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
@@ -383,6 +385,7 @@ const Property = ({
 
                         {!register && type === 'BOOLEAN' && (
                             <Select
+                                defaultValue={defaultValue?.toString()}
                                 description={description}
                                 fieldsetClassName="mt-2"
                                 label={label}

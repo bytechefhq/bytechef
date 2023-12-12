@@ -29,7 +29,7 @@ export interface ISelectOption {
 type SelectProps = {
     options: ISelectOption[];
     contentClassName?: string;
-    defaultValue?: string | undefined;
+    defaultValue?: string;
     description?: string;
     fieldsetClassName?: string;
     label?: string;
@@ -72,7 +72,7 @@ const Select = ({
             </Label>
         )}
 
-        <Root defaultValue={defaultValue} name={name} onValueChange={onValueChange} value={value || defaultValue}>
+        <Root defaultValue={defaultValue} name={name} onValueChange={onValueChange} value={value}>
             <Trigger aria-label="Select" asChild>
                 <Button
                     className={twMerge('mt-1', leadingIcon && 'relative pl-12 h-9.5', triggerClassName)}
