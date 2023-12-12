@@ -8,7 +8,7 @@ package com.bytechef.hermes.configuration.web.rest;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentOperationRequestModel;
-import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
+import com.bytechef.hermes.configuration.web.rest.model.OptionsOutputModel;
 import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-04T07:58:17.397618+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-11T17:41:37.501155+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "action-definition", description = "The Core Action Definition API")
 public interface ActionDefinitionApi {
@@ -330,7 +330,7 @@ public interface ActionDefinitionApi {
         tags = { "action-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of options.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = OptionModel.class)))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = OptionsOutputModel.class))
             })
         }
     )
@@ -341,7 +341,7 @@ public interface ActionDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<List<OptionModel>> getComponentActionPropertyOptions(
+    default ResponseEntity<OptionsOutputModel> getComponentActionPropertyOptions(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
@@ -352,7 +352,7 @@ public interface ActionDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"name\" : \"name\", \"description\" : \"description\", \"value\" : \"\" }, { \"displayCondition\" : \"displayCondition\", \"name\" : \"name\", \"description\" : \"description\", \"value\" : \"\" } ]";
+                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"options\" : [ { \"displayCondition\" : \"displayCondition\", \"name\" : \"name\", \"description\" : \"description\", \"value\" : \"\" }, { \"displayCondition\" : \"displayCondition\", \"name\" : \"name\", \"description\" : \"description\", \"value\" : \"\" } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

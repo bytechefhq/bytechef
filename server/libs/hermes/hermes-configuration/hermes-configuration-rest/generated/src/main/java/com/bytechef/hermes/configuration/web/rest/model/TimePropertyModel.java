@@ -33,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TimeProperty", description = "A time property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-04T07:58:17.397618+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-11T17:41:37.501155+01:00[Europe/Zagreb]")
 public class TimePropertyModel extends ValuePropertyModel {
 
   @Valid

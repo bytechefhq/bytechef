@@ -6,7 +6,7 @@
 package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.hermes.configuration.web.rest.model.ComponentOperationRequestModel;
-import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
+import com.bytechef.hermes.configuration.web.rest.model.OptionsOutputModel;
 import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionModel;
@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-04T07:58:17.397618+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-11T17:41:37.501155+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "trigger-definition", description = "The Core Trigger Definition API")
 public interface TriggerDefinitionApi {
@@ -289,7 +289,7 @@ public interface TriggerDefinitionApi {
         tags = { "trigger-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of options.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = OptionModel.class)))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = OptionsOutputModel.class))
             })
         }
     )
@@ -300,7 +300,7 @@ public interface TriggerDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<List<OptionModel>> getComponentTriggerPropertyOptions(
+    default ResponseEntity<OptionsOutputModel> getComponentTriggerPropertyOptions(
         @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
@@ -311,7 +311,7 @@ public interface TriggerDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"name\" : \"name\", \"description\" : \"description\", \"value\" : \"\" }, { \"displayCondition\" : \"displayCondition\", \"name\" : \"name\", \"description\" : \"description\", \"value\" : \"\" } ]";
+                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"options\" : [ { \"displayCondition\" : \"displayCondition\", \"name\" : \"name\", \"description\" : \"description\", \"value\" : \"\" }, { \"displayCondition\" : \"displayCondition\", \"name\" : \"name\", \"description\" : \"description\", \"value\" : \"\" } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

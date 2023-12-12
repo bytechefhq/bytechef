@@ -33,13 +33,57 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "StringProperty", description = "A string property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-04T07:58:17.397618+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-11T17:41:37.501155+01:00[Europe/Zagreb]")
 public class StringPropertyModel extends ValuePropertyModel {
+
+  private Integer maxLength;
+
+  private Integer minLength;
 
   @Valid
   private List<@Valid OptionModel> options;
 
   private OptionsDataSourceModel optionsDataSource;
+
+  public StringPropertyModel maxLength(Integer maxLength) {
+    this.maxLength = maxLength;
+    return this;
+  }
+
+  /**
+   * The maximum string length.
+   * @return maxLength
+  */
+  
+  @Schema(name = "maxLength", description = "The maximum string length.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("maxLength")
+  public Integer getMaxLength() {
+    return maxLength;
+  }
+
+  public void setMaxLength(Integer maxLength) {
+    this.maxLength = maxLength;
+  }
+
+  public StringPropertyModel minLength(Integer minLength) {
+    this.minLength = minLength;
+    return this;
+  }
+
+  /**
+   * The minimum string length.
+   * @return minLength
+  */
+  
+  @Schema(name = "minLength", description = "The minimum string length.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("minLength")
+  public Integer getMinLength() {
+    return minLength;
+  }
+
+  public void setMinLength(Integer minLength) {
+    this.minLength = minLength;
+  }
 
   public StringPropertyModel options(List<@Valid OptionModel> options) {
     this.options = options;
@@ -163,14 +207,16 @@ public class StringPropertyModel extends ValuePropertyModel {
       return false;
     }
     StringPropertyModel stringProperty = (StringPropertyModel) o;
-    return Objects.equals(this.options, stringProperty.options) &&
+    return Objects.equals(this.maxLength, stringProperty.maxLength) &&
+        Objects.equals(this.minLength, stringProperty.minLength) &&
+        Objects.equals(this.options, stringProperty.options) &&
         Objects.equals(this.optionsDataSource, stringProperty.optionsDataSource) &&
         super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(options, optionsDataSource, super.hashCode());
+    return Objects.hash(maxLength, minLength, options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -178,6 +224,8 @@ public class StringPropertyModel extends ValuePropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class StringPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("    maxLength: ").append(toIndentedString(maxLength)).append("\n");
+    sb.append("    minLength: ").append(toIndentedString(minLength)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");
     sb.append("    optionsDataSource: ").append(toIndentedString(optionsDataSource)).append("\n");
     sb.append("}");

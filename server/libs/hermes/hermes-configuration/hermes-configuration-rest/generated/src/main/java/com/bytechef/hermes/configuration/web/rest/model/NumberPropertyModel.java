@@ -32,12 +32,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NumberProperty", description = "A number property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-04T07:58:17.397618+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-11T17:41:37.501155+01:00[Europe/Zagreb]")
 public class NumberPropertyModel extends PropertyModel {
 
-  private Integer maxValue;
+  private Double maxValue;
 
-  private Integer minValue;
+  private Double minValue;
 
   private Integer numberPrecision;
 
@@ -46,7 +46,7 @@ public class NumberPropertyModel extends PropertyModel {
 
   private OptionsDataSourceModel optionsDataSource;
 
-  public NumberPropertyModel maxValue(Integer maxValue) {
+  public NumberPropertyModel maxValue(Double maxValue) {
     this.maxValue = maxValue;
     return this;
   }
@@ -58,15 +58,15 @@ public class NumberPropertyModel extends PropertyModel {
   
   @Schema(name = "maxValue", description = "The maximum property value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxValue")
-  public Integer getMaxValue() {
+  public Double getMaxValue() {
     return maxValue;
   }
 
-  public void setMaxValue(Integer maxValue) {
+  public void setMaxValue(Double maxValue) {
     this.maxValue = maxValue;
   }
 
-  public NumberPropertyModel minValue(Integer minValue) {
+  public NumberPropertyModel minValue(Double minValue) {
     this.minValue = minValue;
     return this;
   }
@@ -78,11 +78,11 @@ public class NumberPropertyModel extends PropertyModel {
   
   @Schema(name = "minValue", description = "The minimum property value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("minValue")
-  public Integer getMinValue() {
+  public Double getMinValue() {
     return minValue;
   }
 
-  public void setMinValue(Integer minValue) {
+  public void setMinValue(Double minValue) {
     this.minValue = minValue;
   }
 

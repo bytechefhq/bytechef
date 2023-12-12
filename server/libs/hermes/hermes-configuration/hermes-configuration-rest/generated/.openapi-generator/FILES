@@ -32,6 +32,7 @@ src/main/java/com/bytechef/hermes/configuration/web/rest/model/OAuth2PropertiesM
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ObjectPropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/OptionModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/OptionsDataSourceModel.java
+src/main/java/com/bytechef/hermes/configuration/web/rest/model/OptionsOutputModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/PropertiesDataSourceModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/PropertyModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/PropertyTypeModel.java
