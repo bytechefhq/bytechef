@@ -500,19 +500,19 @@ const Project = () => {
                                         createWorkflowRequestMutation={createProjectWorkflowMutation}
                                         parentId={+projectId}
                                         triggerNode={
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        className="border-0 bg-white shadow-none"
-                                                        size="icon"
-                                                        variant="outline"
-                                                    >
+                                            <Button
+                                                className="border-0 bg-white shadow-none"
+                                                size="icon"
+                                                variant="outline"
+                                            >
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
                                                         <PlusIcon className="mx-2 h-5 w-5" />
-                                                    </Button>
-                                                </TooltipTrigger>
+                                                    </TooltipTrigger>
 
-                                                <TooltipContent>Create new workflow</TooltipContent>
-                                            </Tooltip>
+                                                    <TooltipContent>Create new workflow</TooltipContent>
+                                                </Tooltip>
+                                            </Button>
                                         }
                                     />
                                 )}

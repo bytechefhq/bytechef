@@ -120,7 +120,7 @@ const WorkflowDialog = ({
                 <Form {...form}>
                     <DialogHeader>
                         <div className="flex items-center justify-between">
-                            <DialogTitle>Create Workflow</DialogTitle>
+                            <DialogTitle>{`${!workflow?.id ? 'Create' : 'Edit'}`} Workflow</DialogTitle>
 
                             <DialogClose asChild>
                                 <Button size="icon" variant="ghost">
