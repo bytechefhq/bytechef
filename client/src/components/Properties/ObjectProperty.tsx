@@ -55,7 +55,7 @@ const ObjectProperty = ({
 
     return (
         <div key={name}>
-            <ul className={twMerge(label && 'ml-2 border-l')}>
+            <ul className={twMerge('space-y-4', label && 'ml-2 border-l')}>
                 {(properties as Array<PropertyType>)?.map((subProperty, index) => {
                     if (
                         subProperty.type === 'OBJECT' &&
@@ -70,7 +70,7 @@ const ObjectProperty = ({
                             actionName={actionName}
                             currentComponent={currentComponent}
                             currentComponentData={currentComponentData}
-                            customClassName={twMerge('last-of-type:pb-0', label && 'mb-0 pb-4 pl-2')}
+                            customClassName={twMerge('last-of-type:pb-0', label && 'mb-0 pl-2')}
                             dataPills={dataPills}
                             key={`${property.name}_${subProperty.name}_${index}`}
                             mention={!!dataPills?.length}
