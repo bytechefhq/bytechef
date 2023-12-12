@@ -66,11 +66,11 @@ public class ComponentDefinitionTest {
             .label("label")
             .placeholder("placeholder")
             .required(true)
-            .items(ComponentDSL.string());
+            .items(ComponentDSL.integer());
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"ARRAY","defaultValue":[1,2],"exampleValue":null,"items":[{"advancedOption":null,"description":null,"displayCondition":null,"expressionEnabled":null,"hidden":null,"label":null,"metadata":{},"placeholder":null,"required":null,"name":null,"type":"STRING","defaultValue":null,"exampleValue":null,"controlType":"TEXT","options":null,"sampleDataType":null,"optionsDataSource":null}],"multipleValues":null,"options":null,"controlType":"ARRAY_BUILDER","optionsDataSource":null}
+                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"ARRAY","defaultValue":[1,2],"exampleValue":null,"items":[{"advancedOption":null,"description":null,"displayCondition":null,"expressionEnabled":null,"hidden":null,"label":null,"metadata":{},"placeholder":null,"required":null,"name":null,"type":"INTEGER","defaultValue":null,"exampleValue":null,"maxValue":null,"minValue":null,"options":null,"controlType":"INTEGER","optionsDataSource":null}],"multipleValues":null,"options":null,"controlType":"ARRAY_BUILDER","optionsDataSource":null}
                 """,
             property);
     }
@@ -198,7 +198,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"STRING","defaultValue":"defaultValue","exampleValue":null,"controlType":"TEXT","options":null,"sampleDataType":null,"optionsDataSource":null}
+                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"maxLength":null,"minLength":null,"placeholder":"placeholder","required":true,"name":"name","type":"STRING","defaultValue":"defaultValue","exampleValue":null,"controlType":"TEXT","options":null,"sampleDataType":null,"optionsDataSource":null}
                 """,
             property);
     }

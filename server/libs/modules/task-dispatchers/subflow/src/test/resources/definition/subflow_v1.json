@@ -18,6 +18,8 @@
     "defaultValue": null,
     "exampleValue": null,
     "controlType": "TEXT",
+    "maxLength": null,
+    "minLength": null,
     "options": null,
     "sampleDataType": null,
     "optionsDataSource": null
@@ -25,7 +27,8 @@
   "resources": null,
   "taskProperties": null,
   "title": "Subflow",
+  "variableProperties": null,
   "version": 1,
-  "outputSchema": null,
-  "outputSchemaDataSource": null
+  "outputSchemaDataSource": null,
+  "outputSchema": null
 }

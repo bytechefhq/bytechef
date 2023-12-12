@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Executes the script.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "execute",
@@ -26,12 +25,18 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
+    "sampleOutput": null,
     "title": "Execute",
     "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -47,13 +52,12 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    },
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { }
+    }
   } ],
   "category": null,
   "connection": null,
@@ -62,11 +66,11 @@
   "description": "Allows you to run arbitrary Bash scripts.",
   "icon": "path:assets/bash.svg",
   "tags": null,
-  "allowedConnections": null,
   "metadata": null,
   "name": "bash",
   "resources": null,
   "version": 1,
   "title": "Bash",
-  "triggers": null
+  "triggers": null,
+  "allowedConnections": null
 }

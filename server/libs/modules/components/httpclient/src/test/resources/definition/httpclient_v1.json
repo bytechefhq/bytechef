@@ -25,6 +25,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -69,6 +71,8 @@
       "defaultValue": "JSON",
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
@@ -107,6 +111,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -139,6 +145,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -147,8 +155,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -178,6 +186,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -186,18 +196,18 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "GET",
+    "perform": { },
     "outputSchema": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -224,6 +234,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -268,6 +280,8 @@
       "defaultValue": "JSON",
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
@@ -306,6 +320,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -338,6 +354,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -346,8 +364,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -377,6 +395,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -385,8 +405,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body Parameters to send.",
@@ -418,8 +438,8 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -461,8 +481,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -478,8 +498,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -497,8 +517,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -532,8 +552,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -553,8 +573,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -570,6 +590,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -588,15 +610,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "XML content to send.",
@@ -616,8 +638,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -647,6 +669,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -683,6 +707,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -701,6 +727,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -719,6 +747,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -737,19 +767,21 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -779,6 +811,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -787,8 +821,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The raw text to send.",
@@ -804,6 +838,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -840,6 +876,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -858,6 +896,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -876,6 +916,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -894,12 +936,14 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Content-Type to use when sending body parameters.",
@@ -915,6 +959,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "displayCondition": null,
@@ -963,6 +1009,8 @@
       "defaultValue": "text/plain",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1085,6 +1133,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1105,18 +1155,18 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "POST",
+    "perform": { },
     "outputSchema": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -1143,6 +1193,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1187,6 +1239,8 @@
       "defaultValue": "JSON",
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
@@ -1225,6 +1279,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1257,6 +1313,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1265,8 +1323,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -1296,6 +1354,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1304,8 +1364,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body Parameters to send.",
@@ -1337,8 +1397,8 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1380,8 +1440,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1397,8 +1457,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1416,8 +1476,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1451,8 +1511,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1472,8 +1532,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1489,6 +1549,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1507,15 +1569,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "XML content to send.",
@@ -1535,8 +1597,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -1566,6 +1628,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1602,6 +1666,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1620,6 +1686,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1638,6 +1706,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1656,19 +1726,21 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -1698,6 +1770,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1706,8 +1780,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The raw text to send.",
@@ -1723,6 +1797,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1759,6 +1835,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1777,6 +1855,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1795,6 +1875,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1813,12 +1895,14 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Content-Type to use when sending body parameters.",
@@ -1834,6 +1918,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "displayCondition": null,
@@ -1882,6 +1968,8 @@
       "defaultValue": "text/plain",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2004,6 +2092,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2024,18 +2114,18 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "PUT",
+    "perform": { },
     "outputSchema": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -2062,6 +2152,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2106,6 +2198,8 @@
       "defaultValue": "JSON",
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
@@ -2144,6 +2238,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2176,6 +2272,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2184,8 +2282,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -2215,6 +2313,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2223,8 +2323,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body Parameters to send.",
@@ -2256,8 +2356,8 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2299,8 +2399,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2316,8 +2416,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2335,8 +2435,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2370,8 +2470,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2391,8 +2491,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -2408,6 +2508,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2426,15 +2528,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "XML content to send.",
@@ -2454,8 +2556,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -2485,6 +2587,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2521,6 +2625,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2539,6 +2645,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2557,6 +2665,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2575,19 +2685,21 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Body parameters to send.",
@@ -2617,6 +2729,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2625,8 +2739,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The raw text to send.",
@@ -2642,6 +2756,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2678,6 +2794,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2696,6 +2814,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2714,6 +2834,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2732,12 +2854,14 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Content-Type to use when sending body parameters.",
@@ -2753,6 +2877,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "displayCondition": null,
@@ -2801,6 +2927,8 @@
       "defaultValue": "text/plain",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2923,6 +3051,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2943,18 +3073,18 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "PATCH",
+    "perform": { },
     "outputSchema": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -2981,6 +3111,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3025,6 +3157,8 @@
       "defaultValue": "JSON",
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
@@ -3063,6 +3197,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3095,6 +3231,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3103,8 +3241,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -3134,6 +3272,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3142,8 +3282,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Returns the full response data instead of only the body.",
@@ -3263,6 +3403,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3283,18 +3425,18 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "DELETE",
+    "perform": { },
     "outputSchema": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -3321,6 +3463,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3365,6 +3509,8 @@
       "defaultValue": "JSON",
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
@@ -3403,6 +3549,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3435,6 +3583,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3443,8 +3593,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Query parameters to send.",
@@ -3474,6 +3624,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3482,8 +3634,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Returns the full response data instead of only the body.",
@@ -3603,6 +3755,8 @@
       "defaultValue": "",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3623,18 +3777,18 @@
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "HEAD",
+    "perform": { },
     "outputSchema": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": {
@@ -3657,6 +3811,8 @@
         "defaultValue": "api_token",
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3675,6 +3831,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3693,6 +3851,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -3711,16 +3871,16 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
-      "tokenUrl": null,
-      "refreshUrl": null,
       "pkce": null,
       "refresh": null,
+      "refreshUrl": null,
       "scopes": null,
-      "apply": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "authorizationCallback": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3740,6 +3900,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3748,16 +3910,16 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
-      "tokenUrl": null,
-      "refreshUrl": null,
       "pkce": null,
       "refresh": null,
+      "refreshUrl": null,
       "scopes": null,
-      "apply": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "authorizationCallback": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3777,6 +3939,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3795,6 +3959,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3803,16 +3969,16 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
-      "tokenUrl": null,
-      "refreshUrl": null,
       "pkce": null,
       "refresh": null,
+      "refreshUrl": null,
       "scopes": null,
-      "apply": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "authorizationCallback": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3832,6 +3998,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3850,6 +4018,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3858,16 +4028,16 @@
       "title": "Digest Auth",
       "type": "DIGEST_AUTH",
       "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
-      "tokenUrl": null,
-      "refreshUrl": null,
       "pkce": null,
       "refresh": null,
+      "refreshUrl": null,
       "scopes": null,
-      "apply": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "authorizationCallback": null
     }, {
       "detectOn": null,
       "description": null,
@@ -3887,6 +4057,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3905,6 +4077,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3923,6 +4097,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3941,6 +4117,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3959,6 +4137,8 @@
         "defaultValue": "Bearer",
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3977,6 +4157,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT_AREA",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3985,16 +4167,16 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
-      "tokenUrl": null,
-      "refreshUrl": null,
       "pkce": null,
       "refresh": null,
+      "refreshUrl": null,
       "scopes": null,
-      "apply": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "authorizationCallback": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4014,6 +4196,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4032,6 +4216,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4050,6 +4236,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4068,6 +4256,8 @@
         "defaultValue": "Bearer",
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4086,6 +4276,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT_AREA",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4094,16 +4286,16 @@
       "title": "OAuth2 Implicit Code",
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
-      "tokenUrl": null,
-      "refreshUrl": null,
       "pkce": null,
       "refresh": null,
+      "refreshUrl": null,
       "scopes": null,
-      "apply": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "authorizationCallback": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4123,6 +4315,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4141,6 +4335,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4159,6 +4355,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4177,6 +4375,8 @@
         "defaultValue": "Bearer",
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4195,6 +4395,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT_AREA",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4203,16 +4405,16 @@
       "title": "OAuth2 Client Credentials",
       "type": "OAUTH2_CLIENT_CREDENTIALS",
       "acquire": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
-      "tokenUrl": null,
-      "refreshUrl": null,
       "pkce": null,
       "refresh": null,
+      "refreshUrl": null,
       "scopes": null,
-      "apply": null
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "authorizationCallback": null
     } ],
     "componentName": "httpClient",
     "componentDescription": "Makes an HTTP request and returns the response data.",
@@ -4232,6 +4434,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null

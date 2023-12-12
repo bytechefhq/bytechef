@@ -43,6 +43,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -61,6 +63,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -79,6 +83,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -97,6 +103,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -106,6 +114,10 @@
     } ],
     "sampleOutput": null,
     "title": "Read from file",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -121,14 +133,12 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    },
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    }
   }, {
     "batch": null,
     "componentName": "fileStorage",
@@ -155,6 +165,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -173,12 +185,18 @@
       "defaultValue": "file.txt",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Write to file",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -212,6 +230,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -230,6 +250,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -248,6 +270,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -266,17 +290,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    }
   }, {
     "batch": null,
     "componentName": "fileStorage",
@@ -303,6 +325,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -321,12 +345,18 @@
       "defaultValue": "file.txt",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Download file",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -360,6 +390,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -378,6 +410,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -396,6 +430,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -414,17 +450,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "editorDescriptionDataSource": null
+    }
   } ],
   "category": null,
   "connection": null,

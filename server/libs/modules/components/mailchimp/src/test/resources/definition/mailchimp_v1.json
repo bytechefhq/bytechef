@@ -32,6 +32,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": {
@@ -101,6 +103,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -119,6 +123,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -162,6 +168,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -204,6 +212,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -212,8 +222,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The key of this object's properties is the ID of the interest in question.",
@@ -243,6 +253,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -251,8 +263,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "If set/detected, the subscriber's language.",
@@ -268,6 +280,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -333,8 +347,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": "The location longitude.",
@@ -353,11 +367,11 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The marketing permissions for the subscriber.",
@@ -405,6 +419,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -435,13 +451,13 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": "IP address the subscriber signed up from.",
@@ -457,6 +473,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -475,6 +493,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -493,6 +513,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -511,6 +533,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -543,91 +567,96 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutput": {
-      "language": "string",
-      "interests": {
-        "property1": true,
-        "property2": true
-      },
-      "timestamp_signup": "2019-08-24T14:15:22",
-      "id": "string",
+      "vip": true,
+      "member_rating": 0,
+      "web_id": 0,
       "_links": [ {
         "schema": "string",
-        "href": "string",
-        "rel": "string",
+        "targetSchema": "string",
         "method": "GET",
-        "targetSchema": "string"
+        "rel": "string",
+        "href": "string"
       } ],
-      "web_id": 0,
-      "member_rating": 0,
-      "vip": true,
-      "last_changed": "2019-08-24T14:15:22",
-      "source": "string",
-      "consents_to_one_to_one_messaging": true,
-      "email_client": "string",
-      "unique_email_id": "string",
-      "tags_count": 0,
-      "list_id": "string",
-      "full_name": "string",
-      "merge_fields": {
-        "property1": "",
-        "property2": ""
+      "id": "string",
+      "timestamp_signup": "2019-08-24T14:15:22",
+      "interests": {
+        "property2": true,
+        "property1": true
       },
-      "stats": {
-        "avg_open_rate": 0,
-        "ecommerce_data": {
-          "number_of_orders": 0,
-          "currency_code": "USD",
-          "total_revenue": 0
-        },
-        "avg_click_rate": 0
-      },
-      "contact_id": "string",
-      "last_note": {
-        "note_id": 0,
-        "created_at": "2019-08-24T14:15:22",
-        "note": "string",
-        "created_by": "string"
-      },
-      "email_address": "string",
-      "status": "subscribed",
-      "unsubscribe_reason": "string",
-      "timestamp_opt": "2019-08-24T14:15:22",
-      "ip_opt": "string",
-      "location": {
-        "latitude": 0,
-        "dstoff": 0,
-        "timezone": "string",
-        "country_code": "string",
-        "gmtoff": 0,
-        "longitude": 0,
-        "region": "string"
-      },
-      "ip_signup": "string",
-      "tags": [ {
-        "name": "string",
-        "id": 0
-      } ],
+      "language": "string",
+      "email_type": "string",
       "marketing_permissions": [ {
         "enabled": true,
-        "text": "string",
-        "marketing_permission_id": "string"
+        "marketing_permission_id": "string",
+        "text": "string"
       } ],
-      "email_type": "string"
+      "tags": [ {
+        "id": 0,
+        "name": "string"
+      } ],
+      "ip_signup": "string",
+      "location": {
+        "dstoff": 0,
+        "latitude": 0,
+        "region": "string",
+        "longitude": 0,
+        "gmtoff": 0,
+        "country_code": "string",
+        "timezone": "string"
+      },
+      "ip_opt": "string",
+      "timestamp_opt": "2019-08-24T14:15:22",
+      "unsubscribe_reason": "string",
+      "status": "subscribed",
+      "email_address": "string",
+      "last_note": {
+        "created_by": "string",
+        "note": "string",
+        "created_at": "2019-08-24T14:15:22",
+        "note_id": 0
+      },
+      "contact_id": "string",
+      "stats": {
+        "avg_click_rate": 0,
+        "ecommerce_data": {
+          "number_of_orders": 0,
+          "total_revenue": 0,
+          "currency_code": "USD"
+        },
+        "avg_open_rate": 0
+      },
+      "merge_fields": {
+        "property2": "",
+        "property1": ""
+      },
+      "full_name": "string",
+      "list_id": "string",
+      "tags_count": 0,
+      "unique_email_id": "string",
+      "email_client": "string",
+      "consents_to_one_to_one_messaging": true,
+      "source": "string",
+      "last_changed": "2019-08-24T14:15:22"
     },
     "title": "Add a new member to the list",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -663,6 +692,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -681,6 +712,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -699,6 +732,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -717,6 +752,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -735,6 +772,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -753,6 +792,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -771,6 +812,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -789,6 +832,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -832,6 +877,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -890,6 +937,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -898,8 +947,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The key of this object's properties is the ID of the interest in question.",
@@ -929,6 +978,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -937,8 +988,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "Open and click rates for this subscriber.",
@@ -975,8 +1026,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": "A subscriber's average clickthrough rate.",
@@ -995,8 +1046,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": "Ecommerce stats for the list member if the list is attached to a store.",
@@ -1033,8 +1084,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "controlType": "NUMBER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "NUMBER"
           }, {
             "advancedOption": null,
             "description": "The total number of orders placed by the list member.",
@@ -1053,8 +1104,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "controlType": "NUMBER",
-            "optionsDataSource": null
+            "optionsDataSource": null,
+            "controlType": "NUMBER"
           }, {
             "advancedOption": null,
             "description": "The three-letter ISO 4217 code for the currency that the store accepts.",
@@ -1070,15 +1121,17 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "IP address the subscriber signed up from.",
@@ -1094,6 +1147,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1112,6 +1167,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1130,6 +1187,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1148,6 +1207,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1168,8 +1229,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": "The date and time the member's info was last changed in ISO 8601 format.",
@@ -1185,6 +1246,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1203,6 +1266,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1247,6 +1312,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1286,8 +1353,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": "The location longitude.",
@@ -1306,8 +1373,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": "The time difference in hours from GMT.",
@@ -1325,8 +1392,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": "The offset for timezones where daylight saving time is observed.",
@@ -1344,8 +1411,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": "The unique code for the location country.",
@@ -1361,6 +1428,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1379,6 +1448,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1397,12 +1468,14 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The marketing permissions for the subscriber.",
@@ -1450,6 +1523,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1468,6 +1543,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1498,13 +1575,13 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The most recent Note added about this member.",
@@ -1540,8 +1617,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": "The date and time the note was created in ISO 8601 format.",
@@ -1557,6 +1634,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1575,6 +1654,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1593,12 +1674,14 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The source from which the subscriber was added to this list.",
@@ -1614,6 +1697,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1634,8 +1719,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
         "description": "Returns up to 50 tags applied to this member.",
@@ -1671,8 +1756,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": "The name of the tag.",
@@ -1688,12 +1773,14 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": "The list id.",
@@ -1709,6 +1796,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1759,6 +1848,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1777,6 +1868,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1795,6 +1888,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1813,6 +1908,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1831,25 +1928,24 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     },
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "perform": null
   } ],
   "category": null,
   "connection": {
@@ -1872,6 +1968,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1890,6 +1988,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1900,14 +2000,14 @@
       "acquire": null,
       "authorizationCallback": null,
       "authorizationUrl": { },
-      "clientId": null,
       "clientSecret": null,
-      "refreshUrl": null,
-      "tokenUrl": { },
       "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
-      "scopes": null
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": { }
     } ],
     "componentName": "mailchimp",
     "componentDescription": "Mailchimp REST API documentation",
@@ -1953,6 +2053,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": {
@@ -1967,14 +2069,13 @@
     "webhookRawBody": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "deduplicate": null,
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "dynamicWebhookDisable": { },
     "dynamicWebhookEnable": { },
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": { },
-    "listenerDisable": null,
-    "listenerEnable": null,
-    "webhookValidate": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -2026,6 +2127,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2044,6 +2147,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2062,6 +2167,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2080,6 +2187,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2098,6 +2207,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2116,6 +2227,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2152,6 +2265,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2170,6 +2285,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2188,6 +2305,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2206,15 +2325,17 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
           } ],
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2230,8 +2351,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": null,
@@ -2247,17 +2368,20 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     },
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "poll": null,
-    "editorDescriptionDataSource": null
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "webhookValidate": null,
+    "deduplicate": null,
+    "poll": null
   } ],
   "allowedConnections": null
 }

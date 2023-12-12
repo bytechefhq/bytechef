@@ -43,6 +43,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -61,6 +63,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -79,6 +83,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -97,6 +103,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -234,13 +242,14 @@
       "defaultValue": "Sheet",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Read from file",
-    "editorDescriptionDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -261,9 +270,10 @@
       "optionsDataSource": null,
       "controlType": "ARRAY_BUILDER"
     },
+    "perform": { },
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "odsFile",
@@ -472,6 +482,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -519,6 +531,8 @@
       "defaultValue": "file.ods",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -537,13 +551,14 @@
       "defaultValue": "Sheet",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Write to file",
-    "editorDescriptionDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -577,6 +592,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -595,6 +612,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -613,6 +632,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -631,6 +652,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -638,9 +661,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
+    "perform": { },
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": null,

@@ -27,8 +27,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "Who to send the email to.",
@@ -58,14 +58,16 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Who to CC on the email.",
@@ -95,14 +97,16 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Who to BCC on the email.",
@@ -132,14 +136,16 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "When someone replies to this email, where should it go to?",
@@ -169,14 +175,16 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "Your email subject.",
@@ -192,6 +200,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -210,6 +220,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -260,6 +272,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -278,6 +292,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -296,6 +312,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -314,25 +332,27 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "sampleOutput": null,
     "title": "Send",
-    "perform": { },
     "outputSchema": null,
+    "perform": { },
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": {
@@ -355,6 +375,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -373,6 +395,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -381,16 +405,16 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
-      "scopes": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "scopes": null,
+      "tokenUrl": null,
+      "authorizationCallback": null
     } ],
     "componentName": "email",
     "componentDescription": "The Email connector sends emails using an SMTP email server.",
@@ -410,6 +434,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -430,8 +456,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": "If selected the connection will use TLS when connecting to server.",

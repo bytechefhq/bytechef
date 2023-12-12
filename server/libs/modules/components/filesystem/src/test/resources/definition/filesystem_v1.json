@@ -25,6 +25,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -32,6 +34,8 @@
     "sampleOutput": null,
     "title": "Read from file",
     "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "perform": { },
     "outputSchema": {
       "advancedOption": null,
@@ -66,6 +70,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -84,6 +90,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -102,6 +110,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -120,15 +130,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -173,6 +183,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -191,6 +203,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -209,6 +223,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -227,6 +243,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -248,6 +266,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -255,6 +275,8 @@
     "sampleOutput": null,
     "title": "Write to file",
     "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "perform": { },
     "outputSchema": {
       "advancedOption": null,
@@ -296,9 +318,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -314,10 +334,10 @@
     "sampleOutput": null,
     "title": "Create Temp Directory",
     "editorDescriptionDataSource": null,
-    "perform": { },
-    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -344,6 +364,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -351,6 +373,8 @@
     "sampleOutput": "/data",
     "title": "File Path",
     "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "perform": { },
     "outputSchema": {
       "advancedOption": null,
@@ -367,12 +391,12 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    },
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    }
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -399,6 +423,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -432,10 +458,10 @@
     "sampleOutput": null,
     "title": "List",
     "editorDescriptionDataSource": null,
-    "perform": { },
-    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -462,6 +488,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -469,10 +497,10 @@
     "sampleOutput": null,
     "title": "Create",
     "editorDescriptionDataSource": null,
-    "perform": { },
-    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -499,6 +527,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -506,10 +536,10 @@
     "sampleOutput": null,
     "title": "Remove",
     "editorDescriptionDataSource": null,
-    "perform": { },
-    "outputSchema": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "outputSchema": null
   } ],
   "category": null,
   "connection": null,

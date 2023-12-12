@@ -248,6 +248,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -271,13 +273,13 @@
     } ],
     "sampleOutput": null,
     "title": "Set value",
-    "editorDescriptionDataSource": null,
+    "perform": { },
     "outputSchema": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": null,

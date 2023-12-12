@@ -25,6 +25,8 @@
       "defaultValue": "file.txt",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -43,13 +45,14 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Get Object",
-    "editorDescriptionDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -83,6 +86,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -101,6 +106,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -119,6 +126,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -137,16 +146,19 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     },
+    "perform": { },
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "aws-s3",
@@ -173,13 +185,14 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Get URL",
-    "editorDescriptionDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -195,13 +208,16 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     },
+    "perform": { },
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "aws-s3",
@@ -228,13 +244,14 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "List Objects",
-    "editorDescriptionDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -282,6 +299,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -300,6 +319,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -318,21 +339,24 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     },
+    "perform": { },
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "aws-s3",
@@ -359,6 +383,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -377,13 +403,14 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Get Pre-signed Object",
-    "editorDescriptionDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -399,13 +426,16 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     },
+    "perform": { },
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "aws-s3",
@@ -450,6 +480,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -468,6 +500,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -486,6 +520,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -504,12 +540,14 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The object key.",
@@ -525,6 +563,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -543,6 +583,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "displayCondition": null,
@@ -584,7 +626,6 @@
     } ],
     "sampleOutput": null,
     "title": "Put Object",
-    "editorDescriptionDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -600,13 +641,16 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     },
+    "perform": { },
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": {
@@ -629,6 +673,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -647,6 +693,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -665,6 +713,8 @@
       "defaultValue": "us-east-1",
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "displayCondition": null,
@@ -828,6 +878,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null

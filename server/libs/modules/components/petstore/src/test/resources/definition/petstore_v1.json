@@ -69,6 +69,8 @@
         "defaultValue": null,
         "exampleValue": "doggie",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -124,6 +126,8 @@
           "defaultValue": null,
           "exampleValue": "Dogs",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -159,6 +163,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -233,6 +239,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -259,6 +267,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -283,7 +293,6 @@
     } ],
     "sampleOutput": null,
     "title": "Add a new pet to the store",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -338,6 +347,8 @@
         "defaultValue": null,
         "exampleValue": "doggie",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -393,6 +404,8 @@
           "defaultValue": null,
           "exampleValue": "Dogs",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -428,6 +441,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -502,6 +517,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -528,6 +545,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -550,9 +569,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -623,6 +643,8 @@
         "defaultValue": null,
         "exampleValue": "doggie",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -678,6 +700,8 @@
           "defaultValue": null,
           "exampleValue": "Dogs",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -713,6 +737,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -787,6 +813,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -813,6 +841,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -837,7 +867,6 @@
     } ],
     "sampleOutput": null,
     "title": "Update an existing pet",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -892,6 +921,8 @@
         "defaultValue": null,
         "exampleValue": "doggie",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -947,6 +978,8 @@
           "defaultValue": null,
           "exampleValue": "Dogs",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -982,6 +1015,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1056,6 +1091,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1082,6 +1119,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -1104,9 +1143,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -1138,6 +1178,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "displayCondition": null,
@@ -1159,7 +1201,6 @@
     } ],
     "sampleOutput": null,
     "title": "Finds Pets by status",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -1228,6 +1269,8 @@
           "defaultValue": null,
           "exampleValue": "doggie",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1283,6 +1326,8 @@
             "defaultValue": null,
             "exampleValue": "Dogs",
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1318,6 +1363,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1392,6 +1439,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -1418,6 +1467,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "SELECT",
+          "maxLength": null,
+          "minLength": null,
           "options": [ {
             "description": null,
             "displayCondition": null,
@@ -1445,9 +1496,10 @@
       "optionsDataSource": null,
       "controlType": "ARRAY_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -1493,6 +1545,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -1504,7 +1558,6 @@
     } ],
     "sampleOutput": null,
     "title": "Finds Pets by tags",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -1573,6 +1626,8 @@
           "defaultValue": null,
           "exampleValue": "doggie",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1628,6 +1683,8 @@
             "defaultValue": null,
             "exampleValue": "Dogs",
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1663,6 +1720,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -1737,6 +1796,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -1763,6 +1824,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "SELECT",
+          "maxLength": null,
+          "minLength": null,
           "options": [ {
             "description": null,
             "displayCondition": null,
@@ -1790,9 +1853,10 @@
       "optionsDataSource": null,
       "controlType": "ARRAY_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -1824,6 +1888,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -1851,11 +1917,11 @@
     } ],
     "sampleOutput": null,
     "title": "Deletes a pet",
-    "perform": null,
     "outputSchema": null,
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -1894,7 +1960,6 @@
     } ],
     "sampleOutput": null,
     "title": "Find pet by ID",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -1949,6 +2014,8 @@
         "defaultValue": null,
         "exampleValue": "doggie",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2004,6 +2071,8 @@
           "defaultValue": null,
           "exampleValue": "Dogs",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2039,6 +2108,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2113,6 +2184,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2139,6 +2212,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -2161,9 +2236,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2216,6 +2292,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2236,17 +2314,19 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Updates a pet in the store with form data",
-    "perform": null,
     "outputSchema": null,
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2301,6 +2381,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -2339,6 +2421,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2357,6 +2441,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2375,6 +2461,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2393,6 +2481,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2402,7 +2492,6 @@
     } ],
     "sampleOutput": null,
     "title": "uploads an image",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -2457,6 +2546,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2475,6 +2566,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -2482,9 +2575,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2502,7 +2596,6 @@
     "properties": [ ],
     "sampleOutput": null,
     "title": "Returns pet inventories by status",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -2546,9 +2639,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2674,6 +2768,8 @@
         "defaultValue": null,
         "exampleValue": "approved",
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -2724,7 +2820,6 @@
     } ],
     "sampleOutput": null,
     "title": "Place an order for a pet",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -2834,6 +2929,8 @@
         "defaultValue": null,
         "exampleValue": "approved",
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -2882,9 +2979,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2923,11 +3021,11 @@
     } ],
     "sampleOutput": null,
     "title": "Delete purchase order by ID",
-    "perform": null,
     "outputSchema": null,
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -2966,7 +3064,6 @@
     } ],
     "sampleOutput": null,
     "title": "Find purchase order by ID",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -3076,6 +3173,8 @@
         "defaultValue": null,
         "exampleValue": "approved",
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -3124,9 +3223,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -3197,6 +3297,8 @@
         "defaultValue": null,
         "exampleValue": "theUser",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3215,6 +3317,8 @@
         "defaultValue": null,
         "exampleValue": "John",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3233,6 +3337,8 @@
         "defaultValue": null,
         "exampleValue": "James",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3251,6 +3357,8 @@
         "defaultValue": null,
         "exampleValue": "john@email.com",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3269,6 +3377,8 @@
         "defaultValue": null,
         "exampleValue": "12345",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3287,6 +3397,8 @@
         "defaultValue": null,
         "exampleValue": "12345",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3315,7 +3427,6 @@
     } ],
     "sampleOutput": null,
     "title": "Create user",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -3370,6 +3481,8 @@
         "defaultValue": null,
         "exampleValue": "theUser",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3388,6 +3501,8 @@
         "defaultValue": null,
         "exampleValue": "John",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3406,6 +3521,8 @@
         "defaultValue": null,
         "exampleValue": "James",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3424,6 +3541,8 @@
         "defaultValue": null,
         "exampleValue": "john@email.com",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3442,6 +3561,8 @@
         "defaultValue": null,
         "exampleValue": "12345",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3460,6 +3581,8 @@
         "defaultValue": null,
         "exampleValue": "12345",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3486,9 +3609,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -3573,6 +3697,8 @@
           "defaultValue": null,
           "exampleValue": "theUser",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -3591,6 +3717,8 @@
           "defaultValue": null,
           "exampleValue": "John",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -3609,6 +3737,8 @@
           "defaultValue": null,
           "exampleValue": "James",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -3627,6 +3757,8 @@
           "defaultValue": null,
           "exampleValue": "john@email.com",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -3645,6 +3777,8 @@
           "defaultValue": null,
           "exampleValue": "12345",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -3663,6 +3797,8 @@
           "defaultValue": null,
           "exampleValue": "12345",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -3696,7 +3832,6 @@
     } ],
     "sampleOutput": null,
     "title": "Creates list of users with given input array",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -3765,6 +3900,8 @@
           "defaultValue": null,
           "exampleValue": "theUser",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -3783,6 +3920,8 @@
           "defaultValue": null,
           "exampleValue": "John",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -3801,6 +3940,8 @@
           "defaultValue": null,
           "exampleValue": "James",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -3819,6 +3960,8 @@
           "defaultValue": null,
           "exampleValue": "john@email.com",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -3837,6 +3980,8 @@
           "defaultValue": null,
           "exampleValue": "12345",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -3855,6 +4000,8 @@
           "defaultValue": null,
           "exampleValue": "12345",
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -3886,9 +4033,10 @@
       "optionsDataSource": null,
       "controlType": "ARRAY_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -3920,17 +4068,19 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Delete user",
-    "perform": null,
     "outputSchema": null,
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -3962,13 +4112,14 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Get user by user name",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -4023,6 +4174,8 @@
         "defaultValue": null,
         "exampleValue": "theUser",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4041,6 +4194,8 @@
         "defaultValue": null,
         "exampleValue": "John",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4059,6 +4214,8 @@
         "defaultValue": null,
         "exampleValue": "James",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4077,6 +4234,8 @@
         "defaultValue": null,
         "exampleValue": "john@email.com",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4095,6 +4254,8 @@
         "defaultValue": null,
         "exampleValue": "12345",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4113,6 +4274,8 @@
         "defaultValue": null,
         "exampleValue": "12345",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4139,9 +4302,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "petstore",
@@ -4175,6 +4339,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -4232,6 +4398,8 @@
         "defaultValue": null,
         "exampleValue": "theUser",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4250,6 +4418,8 @@
         "defaultValue": null,
         "exampleValue": "John",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4268,6 +4438,8 @@
         "defaultValue": null,
         "exampleValue": "James",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4286,6 +4458,8 @@
         "defaultValue": null,
         "exampleValue": "john@email.com",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4304,6 +4478,8 @@
         "defaultValue": null,
         "exampleValue": "12345",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4322,6 +4498,8 @@
         "defaultValue": null,
         "exampleValue": "12345",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4350,7 +4528,6 @@
     } ],
     "sampleOutput": null,
     "title": "Update user",
-    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -4405,6 +4582,8 @@
         "defaultValue": null,
         "exampleValue": "theUser",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4423,6 +4602,8 @@
         "defaultValue": null,
         "exampleValue": "John",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4441,6 +4622,8 @@
         "defaultValue": null,
         "exampleValue": "James",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4459,6 +4642,8 @@
         "defaultValue": null,
         "exampleValue": "john@email.com",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4477,6 +4662,8 @@
         "defaultValue": null,
         "exampleValue": "12345",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4495,6 +4682,8 @@
         "defaultValue": null,
         "exampleValue": "12345",
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4521,9 +4710,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
+    "perform": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": {
@@ -4546,6 +4736,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4564,6 +4756,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4572,16 +4766,16 @@
       "title": "OAuth2 Implicit",
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
+      "authorizationUrl": { },
+      "clientSecret": null,
       "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
-      "scopes": { },
-      "authorizationCallback": null,
-      "authorizationUrl": { },
-      "clientId": null,
-      "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "scopes": { },
+      "tokenUrl": null,
+      "authorizationCallback": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4601,6 +4795,8 @@
         "defaultValue": "api_key",
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4619,6 +4815,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4627,16 +4825,16 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
-      "scopes": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
       "refreshUrl": null,
-      "tokenUrl": null
+      "scopes": null,
+      "tokenUrl": null,
+      "authorizationCallback": null
     } ],
     "componentName": "petstore",
     "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",

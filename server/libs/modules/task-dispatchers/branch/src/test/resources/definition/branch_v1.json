@@ -18,6 +18,8 @@
     "defaultValue": null,
     "exampleValue": null,
     "controlType": "TEXT",
+    "maxLength": null,
+    "minLength": null,
     "options": null,
     "sampleDataType": null,
     "optionsDataSource": null
@@ -70,6 +72,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -106,21 +110,21 @@
           "objectType": "TASK",
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "multipleValues": null,
     "options": null,
-    "optionsDataSource": null,
-    "controlType": "ARRAY_BUILDER"
+    "controlType": "ARRAY_BUILDER",
+    "optionsDataSource": null
   }, {
     "advancedOption": null,
     "description": "The list of tasks to execute if the result of expression does not match any of 'key' values.",
@@ -154,16 +158,17 @@
       "objectType": "TASK",
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "multipleValues": null,
     "options": null,
-    "optionsDataSource": null,
-    "controlType": "ARRAY_BUILDER"
+    "controlType": "ARRAY_BUILDER",
+    "optionsDataSource": null
   } ],
   "title": "Branch",
+  "variableProperties": null,
   "version": 1,
-  "outputSchema": null,
-  "outputSchemaDataSource": null
+  "outputSchemaDataSource": null,
+  "outputSchema": null
 }

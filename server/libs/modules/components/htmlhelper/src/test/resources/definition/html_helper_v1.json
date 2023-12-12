@@ -10,7 +10,6 @@
     "help": null,
     "metadata": null,
     "name": "extractContent",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The HTML content.",
@@ -26,6 +25,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -44,6 +45,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -62,6 +65,8 @@
       "defaultValue": "html",
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": "Get an attribute value like 'class' from an element.",
         "displayCondition": null,
@@ -95,6 +100,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -127,12 +134,13 @@
     } ],
     "sampleOutput": null,
     "title": "Send",
+    "outputSchema": null,
     "perform": { },
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": null,

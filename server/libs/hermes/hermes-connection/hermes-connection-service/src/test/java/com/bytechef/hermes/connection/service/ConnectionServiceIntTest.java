@@ -97,10 +97,6 @@ public class ConnectionServiceIntTest {
 
     @Test
     public void getGetConnections() {
-        for (Connection connection : connectionRepository.findAll()) {
-            connectionRepository.deleteById(Validate.notNull(connection.getId(), "id"));
-        }
-
         connectionRepository.save(getConnection());
 
         assertThat(connectionService.getConnections(null, null, null, 1)).hasSize(1);
@@ -122,6 +118,7 @@ public class ConnectionServiceIntTest {
             .componentName("componentName")
             .name("name")
             .parameters(Map.of("key1", "value1"))
+            .type(1)
             .version(1)
             .build();
     }

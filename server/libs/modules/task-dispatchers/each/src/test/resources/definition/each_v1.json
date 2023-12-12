@@ -186,6 +186,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -236,9 +238,48 @@
     "controlType": "OBJECT_BUILDER"
   } ],
   "title": "Each",
+  "variableProperties": [ {
+    "advancedOption": null,
+    "description": null,
+    "displayCondition": null,
+    "expressionEnabled": null,
+    "hidden": null,
+    "label": null,
+    "metadata": { },
+    "placeholder": null,
+    "required": null,
+    "name": "item",
+    "type": "STRING",
+    "defaultValue": null,
+    "exampleValue": null,
+    "controlType": "TEXT",
+    "maxLength": null,
+    "minLength": null,
+    "options": null,
+    "sampleDataType": null,
+    "optionsDataSource": null
+  }, {
+    "advancedOption": null,
+    "description": null,
+    "displayCondition": null,
+    "expressionEnabled": null,
+    "hidden": null,
+    "label": null,
+    "metadata": { },
+    "placeholder": null,
+    "required": null,
+    "name": "itemIndex",
+    "type": "STRING",
+    "defaultValue": null,
+    "exampleValue": null,
+    "controlType": "TEXT",
+    "maxLength": null,
+    "minLength": null,
+    "options": null,
+    "sampleDataType": null,
+    "optionsDataSource": null
+  } ],
   "version": 1,
-  "outputSchema": null,
-  "outputSchemaDataSource": {
-    "outputSchema": { }
-  }
+  "outputSchemaDataSource": null,
+  "outputSchema": null
 }

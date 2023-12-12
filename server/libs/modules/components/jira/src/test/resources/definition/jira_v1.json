@@ -228,6 +228,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -435,6 +437,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -474,6 +478,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -492,6 +498,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -678,6 +686,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -717,6 +727,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -735,6 +747,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -753,6 +767,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -771,6 +787,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -789,6 +807,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -975,6 +995,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -1014,6 +1036,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -1051,6 +1075,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -1069,6 +1095,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -1087,6 +1115,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -1317,6 +1347,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -1335,6 +1367,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -1353,6 +1387,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -1371,6 +1407,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -1453,6 +1491,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -1471,6 +1511,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -1489,6 +1531,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -1547,6 +1591,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -1683,6 +1729,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -1980,6 +2028,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2019,6 +2069,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2037,6 +2089,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2055,6 +2109,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2073,6 +2129,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2091,6 +2149,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2109,6 +2169,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2127,6 +2189,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -2313,6 +2377,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2352,6 +2418,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2370,6 +2438,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2388,6 +2458,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2406,6 +2478,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2424,6 +2498,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2442,6 +2518,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2631,6 +2709,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2670,6 +2750,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2688,6 +2770,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2706,6 +2790,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2724,6 +2810,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2742,6 +2830,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2760,6 +2850,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2949,6 +3041,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -2988,6 +3082,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -3006,6 +3102,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -3024,6 +3122,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -3042,6 +3142,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -3060,6 +3162,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -3078,6 +3182,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -3113,6 +3219,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -3173,6 +3281,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -3211,17 +3321,18 @@
     } ],
     "sampleOutput": {
       "id": 10000.0,
-      "key": "ED-24",
+      "self": "https://your-domain.atlassian.net/rest/api/3/issue/10000",
       "transition": {
+        "status": 200,
         "errorCollection": {
           "errorMessages": [ ],
           "errors": { }
-        },
-        "status": 200
+        }
       },
-      "self": "https://your-domain.atlassian.net/rest/api/3/issue/10000"
+      "key": "ED-24"
     },
     "title": "Create issue",
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": "Details about a created issue or subtask.",
@@ -3257,6 +3368,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3275,6 +3388,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3293,6 +3408,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3380,6 +3497,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -3417,6 +3536,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -3456,10 +3577,9 @@
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     },
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "jira",
@@ -3491,6 +3611,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3525,6 +3647,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3578,6 +3702,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -3612,6 +3738,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3650,179 +3778,10 @@
       "controlType": "CHECKBOX"
     } ],
     "sampleOutput": {
-      "id": 10002.0,
       "fields": {
-        "timetracking": {
-          "remainingEstimateSeconds": 200,
-          "timeSpent": "6m",
-          "originalEstimate": "10m",
-          "timeSpentSeconds": 400,
-          "originalEstimateSeconds": 600,
-          "remainingEstimate": "3m"
-        },
-        "description": {
-          "version": 1,
-          "content": [ {
-            "content": [ {
-              "text": "Main order flow broken",
-              "type": "text"
-            } ],
-            "type": "paragraph"
-          } ],
-          "type": "doc"
-        },
-        "updated": 1,
-        "project": {
-          "avatarUrls": {
-            "32x32": "https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000",
-            "16x16": "https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000",
-            "24x24": "https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000",
-            "48x48": "https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000"
-          },
-          "projectCategory": {
-            "id": 10000.0,
-            "description": "First Project Category",
-            "name": "FIRST",
-            "self": "https://your-domain.atlassian.net/rest/api/3/projectCategory/10000"
-          },
-          "id": 10000.0,
-          "self": "https://your-domain.atlassian.net/rest/api/3/project/EX",
-          "key": "EX",
-          "style": "classic",
-          "name": "Example",
-          "simplified": false,
-          "insight": {
-            "lastIssueUpdateTime": "2022-11-30T07:18:17.152+0000",
-            "totalIssueCount": 100
-          }
-        },
-        "worklog": [ {
-          "comment": {
-            "version": 1,
-            "content": [ {
-              "content": [ {
-                "text": "I did some work here.",
-                "type": "text"
-              } ],
-              "type": "paragraph"
-            } ],
-            "type": "doc"
-          },
-          "started": "2021-01-17T12:34:00.000+0000",
-          "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000",
-          "updated": "2021-01-18T23:45:00.000+0000",
-          "timeSpent": "3h 20m",
-          "updateAuthor": {
-            "accountId": "5b10a2844c20165700ede21g",
-            "active": false,
-            "displayName": "Mia Krystof",
-            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g"
-          },
-          "author": {
-            "accountId": "5b10a2844c20165700ede21g",
-            "active": false,
-            "displayName": "Mia Krystof",
-            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g"
-          },
-          "visibility": {
-            "value": "jira-developers",
-            "type": "group",
-            "identifier": "276f955c-63d7-42c8-9520-92d01dca0625"
-          },
-          "timeSpentSeconds": 12000,
-          "issueId": 10002.0,
-          "id": 100028.0
-        } ],
-        "attachment": [ {
-          "author": {
-            "accountId": "5b10a2844c20165700ede21g",
-            "accountType": "atlassian",
-            "active": false,
-            "key": "",
-            "displayName": "Mia Krystof",
-            "avatarUrls": {
-              "32x32": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32",
-              "16x16": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=16&s=16",
-              "24x24": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=24&s=24",
-              "48x48": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48"
-            },
-            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
-            "name": ""
-          },
-          "filename": "picture.jpg",
-          "id": 10000,
-          "self": "https://your-domain.atlassian.net/rest/api/3/attachments/10000",
-          "thumbnail": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/thumbnail/10000",
-          "created": "2022-11-30T07:18:19.441+0000",
-          "content": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10000",
-          "size": 23123,
-          "mimeType": "image/jpeg"
-        } ],
-        "issuelinks": [ {
-          "outwardIssue": {
-            "id": "10004L",
-            "fields": {
-              "status": {
-                "name": "Open",
-                "iconUrl": "https://your-domain.atlassian.net/images/icons/statuses/open.png"
-              }
-            },
-            "key": "PR-2",
-            "self": "https://your-domain.atlassian.net/rest/api/3/issue/PR-2"
-          },
-          "id": 10001.0,
-          "type": {
-            "id": 10000.0,
-            "outward": "is depended by",
-            "inward": "depends on",
-            "name": "Dependent"
-          }
-        }, {
-          "inwardIssue": {
-            "id": 10004.0,
-            "fields": {
-              "status": {
-                "name": "Open",
-                "iconUrl": "https://your-domain.atlassian.net/images/icons/statuses/open.png"
-              }
-            },
-            "key": "PR-3",
-            "self": "https://your-domain.atlassian.net/rest/api/3/issue/PR-3"
-          },
-          "id": 10002.0,
-          "type": {
-            "id": 10000.0,
-            "outward": "is depended by",
-            "inward": "depends on",
-            "name": "Dependent"
-          }
-        } ],
-        "watcher": {
-          "watchCount": 1,
-          "watchers": [ {
-            "accountId": "5b10a2844c20165700ede21g",
-            "active": false,
-            "displayName": "Mia Krystof",
-            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g"
-          } ],
-          "isWatching": false,
-          "self": "https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers"
-        },
         "comment": [ {
-          "created": "2021-01-17T12:34:00.000+0000",
-          "updateAuthor": {
-            "accountId": "5b10a2844c20165700ede21g",
-            "active": false,
-            "displayName": "Mia Krystof",
-            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g"
-          },
-          "visibility": {
-            "value": "Administrators",
-            "type": "role",
-            "identifier": "Administrators"
-          },
           "body": {
-            "version": 1,
+            "type": "doc",
             "content": [ {
               "content": [ {
                 "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.",
@@ -3830,43 +3789,213 @@
               } ],
               "type": "paragraph"
             } ],
-            "type": "doc"
+            "version": 1
           },
-          "updated": "2021-01-18T23:45:00.000+0000",
+          "visibility": {
+            "type": "role",
+            "value": "Administrators",
+            "identifier": "Administrators"
+          },
+          "updateAuthor": {
+            "accountId": "5b10a2844c20165700ede21g",
+            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+            "displayName": "Mia Krystof",
+            "active": false
+          },
+          "created": "2021-01-17T12:34:00.000+0000",
+          "id": 10000.0,
+          "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000",
           "author": {
             "accountId": "5b10a2844c20165700ede21g",
-            "active": false,
+            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
             "displayName": "Mia Krystof",
-            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g"
+            "active": false
           },
-          "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000",
-          "id": 10000.0
+          "updated": "2021-01-18T23:45:00.000+0000"
         } ],
-        "sub-tasks": [ {
+        "watcher": {
+          "watchCount": 1,
+          "self": "https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers",
+          "isWatching": false,
+          "watchers": [ {
+            "accountId": "5b10a2844c20165700ede21g",
+            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+            "displayName": "Mia Krystof",
+            "active": false
+          } ]
+        },
+        "issuelinks": [ {
+          "type": {
+            "inward": "depends on",
+            "outward": "is depended by",
+            "id": 10000.0,
+            "name": "Dependent"
+          },
+          "id": 10001.0,
           "outwardIssue": {
-            "id": 10003.0,
             "fields": {
               "status": {
-                "name": "Open",
-                "iconUrl": "https://your-domain.atlassian.net/images/icons/statuses/open.png"
+                "iconUrl": "https://your-domain.atlassian.net/images/icons/statuses/open.png",
+                "name": "Open"
               }
             },
-            "key": "ED-2",
-            "self": "https://your-domain.atlassian.net/rest/api/3/issue/ED-2"
+            "id": "10004L",
+            "self": "https://your-domain.atlassian.net/rest/api/3/issue/PR-2",
+            "key": "PR-2"
+          }
+        }, {
+          "type": {
+            "inward": "depends on",
+            "outward": "is depended by",
+            "id": 10000.0,
+            "name": "Dependent"
+          },
+          "id": 10002.0,
+          "inwardIssue": {
+            "fields": {
+              "status": {
+                "iconUrl": "https://your-domain.atlassian.net/images/icons/statuses/open.png",
+                "name": "Open"
+              }
+            },
+            "id": 10004.0,
+            "self": "https://your-domain.atlassian.net/rest/api/3/issue/PR-3",
+            "key": "PR-3"
+          }
+        } ],
+        "attachment": [ {
+          "size": 23123,
+          "content": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10000",
+          "created": "2022-11-30T07:18:19.441+0000",
+          "thumbnail": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/thumbnail/10000",
+          "self": "https://your-domain.atlassian.net/rest/api/3/attachments/10000",
+          "id": 10000,
+          "filename": "picture.jpg",
+          "author": {
+            "key": "",
+            "active": false,
+            "accountType": "atlassian",
+            "accountId": "5b10a2844c20165700ede21g",
+            "name": "",
+            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+            "avatarUrls": {
+              "48x48": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48",
+              "24x24": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=24&s=24",
+              "16x16": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=16&s=16",
+              "32x32": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32"
+            },
+            "displayName": "Mia Krystof"
+          },
+          "mimeType": "image/jpeg"
+        } ],
+        "worklog": [ {
+          "visibility": {
+            "type": "group",
+            "value": "jira-developers",
+            "identifier": "276f955c-63d7-42c8-9520-92d01dca0625"
+          },
+          "author": {
+            "accountId": "5b10a2844c20165700ede21g",
+            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+            "displayName": "Mia Krystof",
+            "active": false
+          },
+          "updateAuthor": {
+            "accountId": "5b10a2844c20165700ede21g",
+            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+            "displayName": "Mia Krystof",
+            "active": false
+          },
+          "timeSpent": "3h 20m",
+          "updated": "2021-01-18T23:45:00.000+0000",
+          "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000",
+          "started": "2021-01-17T12:34:00.000+0000",
+          "comment": {
+            "type": "doc",
+            "content": [ {
+              "content": [ {
+                "text": "I did some work here.",
+                "type": "text"
+              } ],
+              "type": "paragraph"
+            } ],
+            "version": 1
+          },
+          "id": 100028.0,
+          "issueId": 10002.0,
+          "timeSpentSeconds": 12000
+        } ],
+        "project": {
+          "simplified": false,
+          "name": "Example",
+          "style": "classic",
+          "key": "EX",
+          "self": "https://your-domain.atlassian.net/rest/api/3/project/EX",
+          "id": 10000.0,
+          "projectCategory": {
+            "id": 10000.0,
+            "self": "https://your-domain.atlassian.net/rest/api/3/projectCategory/10000",
+            "name": "FIRST",
+            "description": "First Project Category"
+          },
+          "avatarUrls": {
+            "48x48": "https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000",
+            "24x24": "https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000",
+            "16x16": "https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000",
+            "32x32": "https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000"
+          },
+          "insight": {
+            "lastIssueUpdateTime": "2022-11-30T07:18:17.152+0000",
+            "totalIssueCount": 100
+          }
+        },
+        "updated": 1,
+        "description": {
+          "type": "doc",
+          "content": [ {
+            "content": [ {
+              "text": "Main order flow broken",
+              "type": "text"
+            } ],
+            "type": "paragraph"
+          } ],
+          "version": 1
+        },
+        "timetracking": {
+          "originalEstimateSeconds": 600,
+          "timeSpentSeconds": 400,
+          "originalEstimate": "10m",
+          "timeSpent": "6m",
+          "remainingEstimateSeconds": 200,
+          "remainingEstimate": "3m"
+        },
+        "sub-tasks": [ {
+          "type": {
+            "inward": "Parent",
+            "outward": "Sub-task",
+            "id": 10000.0,
+            "name": ""
           },
           "id": 10000.0,
-          "type": {
-            "id": 10000.0,
-            "outward": "Sub-task",
-            "inward": "Parent",
-            "name": ""
+          "outwardIssue": {
+            "fields": {
+              "status": {
+                "iconUrl": "https://your-domain.atlassian.net/images/icons/statuses/open.png",
+                "name": "Open"
+              }
+            },
+            "id": 10003.0,
+            "self": "https://your-domain.atlassian.net/rest/api/3/issue/ED-2",
+            "key": "ED-2"
           }
         } ]
       },
-      "key": "ED-1",
-      "self": "https://your-domain.atlassian.net/rest/api/3/issue/10002"
+      "id": 10002.0,
+      "self": "https://your-domain.atlassian.net/rest/api/3/issue/10002",
+      "key": "ED-1"
     },
     "title": "Get issue",
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": "Details about an issue.",
@@ -3902,6 +4031,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3920,6 +4051,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3938,6 +4071,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -3956,6 +4091,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -4072,6 +4209,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -4129,6 +4268,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -4147,6 +4288,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -4165,6 +4308,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -4183,6 +4328,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -4454,6 +4601,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -4493,6 +4642,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -4511,6 +4662,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -4697,6 +4850,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -4736,6 +4891,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -4754,6 +4911,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -4772,6 +4931,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -4790,6 +4951,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -4808,6 +4971,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -4994,6 +5159,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -5033,6 +5200,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -5070,6 +5239,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -5088,6 +5259,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -5106,6 +5279,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -5336,6 +5511,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5354,6 +5531,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5372,6 +5551,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5390,6 +5571,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5472,6 +5655,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -5490,6 +5675,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -5508,6 +5695,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -5566,6 +5755,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -5702,6 +5893,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -5922,6 +6115,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -5993,6 +6188,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -6011,6 +6208,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -6047,6 +6246,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6065,6 +6266,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6083,6 +6286,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6101,6 +6306,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6119,6 +6326,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6137,6 +6346,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6228,6 +6439,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -6246,6 +6459,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -6264,6 +6479,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -6282,6 +6499,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -6300,6 +6519,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -6318,6 +6539,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -6468,6 +6691,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6486,6 +6711,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6504,6 +6731,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6522,6 +6751,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6604,6 +6835,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -6622,6 +6855,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -6640,6 +6875,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -6698,6 +6935,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6944,6 +7183,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -6980,6 +7221,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -6998,6 +7241,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7016,6 +7261,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7034,6 +7281,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7052,6 +7301,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7088,6 +7339,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7106,6 +7359,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7124,6 +7379,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7142,6 +7399,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7163,6 +7422,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7207,6 +7468,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7225,6 +7488,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7295,6 +7560,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7313,6 +7580,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7331,6 +7600,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7349,6 +7620,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7367,6 +7640,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7385,6 +7660,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7403,6 +7680,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7597,6 +7876,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7636,6 +7917,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7654,6 +7937,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7672,6 +7957,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7690,6 +7977,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7708,6 +7997,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7726,6 +8017,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7744,6 +8037,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -7930,6 +8225,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7969,6 +8266,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -7987,6 +8286,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8005,6 +8306,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8023,6 +8326,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8041,6 +8346,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8059,6 +8366,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8248,6 +8557,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8287,6 +8598,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8305,6 +8618,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8323,6 +8638,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8341,6 +8658,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8359,6 +8678,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8377,6 +8698,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8566,6 +8889,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8605,6 +8930,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8623,6 +8950,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8641,6 +8970,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8659,6 +8990,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8677,6 +9010,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8695,6 +9030,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8730,6 +9067,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -8843,6 +9182,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -8880,6 +9221,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -8917,6 +9260,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -8974,10 +9319,9 @@
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     },
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "jira",
@@ -9009,6 +9353,8 @@
       "defaultValue": null,
       "exampleValue": "project = HSP",
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -9071,6 +9417,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": [ {
         "description": null,
         "displayCondition": null,
@@ -9130,6 +9478,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -9155,6 +9505,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -9189,6 +9541,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -9227,184 +9581,19 @@
       "controlType": "CHECKBOX"
     } ],
     "sampleOutput": {
-      "expand": "names,schema",
-      "maxResults": 50,
       "warningMessages": [ "The value 'bar' does not exist for the field 'foo'." ],
+      "maxResults": 50,
+      "expand": "names,schema",
+      "total": 1,
+      "startAt": 0,
       "issues": [ {
         "expand": "",
-        "key": "ED-1",
+        "id": 10002.0,
+        "self": "https://your-domain.atlassian.net/rest/api/3/issue/10002",
         "fields": {
-          "timetracking": {
-            "remainingEstimateSeconds": 200,
-            "timeSpent": "6m",
-            "originalEstimate": "10m",
-            "timeSpentSeconds": 400,
-            "originalEstimateSeconds": 600,
-            "remainingEstimate": "3m"
-          },
-          "description": {
-            "version": 1,
-            "content": [ {
-              "content": [ {
-                "text": "Main order flow broken",
-                "type": "text"
-              } ],
-              "type": "paragraph"
-            } ],
-            "type": "doc"
-          },
-          "updated": 1,
-          "project": {
-            "avatarUrls": {
-              "32x32": "https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000",
-              "16x16": "https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000",
-              "24x24": "https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000",
-              "48x48": "https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000"
-            },
-            "projectCategory": {
-              "id": 10000.0,
-              "description": "First Project Category",
-              "name": "FIRST",
-              "self": "https://your-domain.atlassian.net/rest/api/3/projectCategory/10000"
-            },
-            "id": 10000.0,
-            "self": "https://your-domain.atlassian.net/rest/api/3/project/EX",
-            "key": "EX",
-            "style": "classic",
-            "name": "Example",
-            "simplified": false,
-            "insight": {
-              "lastIssueUpdateTime": "2022-11-30T07:18:17.152+0000",
-              "totalIssueCount": 100
-            }
-          },
-          "worklog": [ {
-            "comment": {
-              "version": 1,
-              "content": [ {
-                "content": [ {
-                  "text": "I did some work here.",
-                  "type": "text"
-                } ],
-                "type": "paragraph"
-              } ],
-              "type": "doc"
-            },
-            "started": "2021-01-17T12:34:00.000+0000",
-            "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000",
-            "updated": "2021-01-18T23:45:00.000+0000",
-            "timeSpent": "3h 20m",
-            "updateAuthor": {
-              "accountId": "5b10a2844c20165700ede21g",
-              "active": false,
-              "displayName": "Mia Krystof",
-              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g"
-            },
-            "author": {
-              "accountId": "5b10a2844c20165700ede21g",
-              "active": false,
-              "displayName": "Mia Krystof",
-              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g"
-            },
-            "visibility": {
-              "value": "jira-developers",
-              "type": "group",
-              "identifier": "276f955c-63d7-42c8-9520-92d01dca0625"
-            },
-            "timeSpentSeconds": 12000,
-            "issueId": 10002.0,
-            "id": 100028.0
-          } ],
-          "attachment": [ {
-            "author": {
-              "accountId": "5b10a2844c20165700ede21g",
-              "accountType": "atlassian",
-              "active": false,
-              "key": "",
-              "displayName": "Mia Krystof",
-              "avatarUrls": {
-                "32x32": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32",
-                "16x16": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=16&s=16",
-                "24x24": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=24&s=24",
-                "48x48": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48"
-              },
-              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
-              "name": ""
-            },
-            "filename": "picture.jpg",
-            "id": 10000,
-            "self": "https://your-domain.atlassian.net/rest/api/3/attachments/10000",
-            "thumbnail": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/thumbnail/10000",
-            "created": "2022-11-30T07:18:19.441+0000",
-            "content": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10000",
-            "size": 23123,
-            "mimeType": "image/jpeg"
-          } ],
-          "issuelinks": [ {
-            "outwardIssue": {
-              "id": "10004L",
-              "fields": {
-                "status": {
-                  "name": "Open",
-                  "iconUrl": "https://your-domain.atlassian.net/images/icons/statuses/open.png"
-                }
-              },
-              "key": "PR-2",
-              "self": "https://your-domain.atlassian.net/rest/api/3/issue/PR-2"
-            },
-            "id": 10001.0,
-            "type": {
-              "id": 10000.0,
-              "outward": "is depended by",
-              "inward": "depends on",
-              "name": "Dependent"
-            }
-          }, {
-            "inwardIssue": {
-              "id": 10004.0,
-              "fields": {
-                "status": {
-                  "name": "Open",
-                  "iconUrl": "https://your-domain.atlassian.net/images/icons/statuses/open.png"
-                }
-              },
-              "key": "PR-3",
-              "self": "https://your-domain.atlassian.net/rest/api/3/issue/PR-3"
-            },
-            "id": 10002.0,
-            "type": {
-              "id": 10000.0,
-              "outward": "is depended by",
-              "inward": "depends on",
-              "name": "Dependent"
-            }
-          } ],
-          "watcher": {
-            "watchCount": 1,
-            "watchers": [ {
-              "accountId": "5b10a2844c20165700ede21g",
-              "active": false,
-              "displayName": "Mia Krystof",
-              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g"
-            } ],
-            "isWatching": false,
-            "self": "https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers"
-          },
           "comment": [ {
-            "created": "2021-01-17T12:34:00.000+0000",
-            "updateAuthor": {
-              "accountId": "5b10a2844c20165700ede21g",
-              "active": false,
-              "displayName": "Mia Krystof",
-              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g"
-            },
-            "visibility": {
-              "value": "Administrators",
-              "type": "role",
-              "identifier": "Administrators"
-            },
             "body": {
-              "version": 1,
+              "type": "doc",
               "content": [ {
                 "content": [ {
                   "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.",
@@ -9412,46 +9601,212 @@
                 } ],
                 "type": "paragraph"
               } ],
-              "type": "doc"
+              "version": 1
             },
-            "updated": "2021-01-18T23:45:00.000+0000",
+            "visibility": {
+              "type": "role",
+              "value": "Administrators",
+              "identifier": "Administrators"
+            },
+            "updateAuthor": {
+              "accountId": "5b10a2844c20165700ede21g",
+              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+              "displayName": "Mia Krystof",
+              "active": false
+            },
+            "created": "2021-01-17T12:34:00.000+0000",
+            "id": 10000.0,
+            "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000",
             "author": {
               "accountId": "5b10a2844c20165700ede21g",
-              "active": false,
+              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
               "displayName": "Mia Krystof",
-              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g"
+              "active": false
             },
-            "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000",
-            "id": 10000.0
+            "updated": "2021-01-18T23:45:00.000+0000"
           } ],
-          "sub-tasks": [ {
+          "watcher": {
+            "watchCount": 1,
+            "self": "https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers",
+            "isWatching": false,
+            "watchers": [ {
+              "accountId": "5b10a2844c20165700ede21g",
+              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+              "displayName": "Mia Krystof",
+              "active": false
+            } ]
+          },
+          "issuelinks": [ {
+            "type": {
+              "inward": "depends on",
+              "outward": "is depended by",
+              "id": 10000.0,
+              "name": "Dependent"
+            },
+            "id": 10001.0,
             "outwardIssue": {
-              "id": 10003.0,
               "fields": {
                 "status": {
-                  "name": "Open",
-                  "iconUrl": "https://your-domain.atlassian.net/images/icons/statuses/open.png"
+                  "iconUrl": "https://your-domain.atlassian.net/images/icons/statuses/open.png",
+                  "name": "Open"
                 }
               },
-              "key": "ED-2",
-              "self": "https://your-domain.atlassian.net/rest/api/3/issue/ED-2"
+              "id": "10004L",
+              "self": "https://your-domain.atlassian.net/rest/api/3/issue/PR-2",
+              "key": "PR-2"
+            }
+          }, {
+            "type": {
+              "inward": "depends on",
+              "outward": "is depended by",
+              "id": 10000.0,
+              "name": "Dependent"
+            },
+            "id": 10002.0,
+            "inwardIssue": {
+              "fields": {
+                "status": {
+                  "iconUrl": "https://your-domain.atlassian.net/images/icons/statuses/open.png",
+                  "name": "Open"
+                }
+              },
+              "id": 10004.0,
+              "self": "https://your-domain.atlassian.net/rest/api/3/issue/PR-3",
+              "key": "PR-3"
+            }
+          } ],
+          "attachment": [ {
+            "size": 23123,
+            "content": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10000",
+            "created": "2022-11-30T07:18:19.441+0000",
+            "thumbnail": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/thumbnail/10000",
+            "self": "https://your-domain.atlassian.net/rest/api/3/attachments/10000",
+            "id": 10000,
+            "filename": "picture.jpg",
+            "author": {
+              "key": "",
+              "active": false,
+              "accountType": "atlassian",
+              "accountId": "5b10a2844c20165700ede21g",
+              "name": "",
+              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+              "avatarUrls": {
+                "48x48": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48",
+                "24x24": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=24&s=24",
+                "16x16": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=16&s=16",
+                "32x32": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32"
+              },
+              "displayName": "Mia Krystof"
+            },
+            "mimeType": "image/jpeg"
+          } ],
+          "worklog": [ {
+            "visibility": {
+              "type": "group",
+              "value": "jira-developers",
+              "identifier": "276f955c-63d7-42c8-9520-92d01dca0625"
+            },
+            "author": {
+              "accountId": "5b10a2844c20165700ede21g",
+              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+              "displayName": "Mia Krystof",
+              "active": false
+            },
+            "updateAuthor": {
+              "accountId": "5b10a2844c20165700ede21g",
+              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+              "displayName": "Mia Krystof",
+              "active": false
+            },
+            "timeSpent": "3h 20m",
+            "updated": "2021-01-18T23:45:00.000+0000",
+            "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000",
+            "started": "2021-01-17T12:34:00.000+0000",
+            "comment": {
+              "type": "doc",
+              "content": [ {
+                "content": [ {
+                  "text": "I did some work here.",
+                  "type": "text"
+                } ],
+                "type": "paragraph"
+              } ],
+              "version": 1
+            },
+            "id": 100028.0,
+            "issueId": 10002.0,
+            "timeSpentSeconds": 12000
+          } ],
+          "project": {
+            "simplified": false,
+            "name": "Example",
+            "style": "classic",
+            "key": "EX",
+            "self": "https://your-domain.atlassian.net/rest/api/3/project/EX",
+            "id": 10000.0,
+            "projectCategory": {
+              "id": 10000.0,
+              "self": "https://your-domain.atlassian.net/rest/api/3/projectCategory/10000",
+              "name": "FIRST",
+              "description": "First Project Category"
+            },
+            "avatarUrls": {
+              "48x48": "https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000",
+              "24x24": "https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000",
+              "16x16": "https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000",
+              "32x32": "https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000"
+            },
+            "insight": {
+              "lastIssueUpdateTime": "2022-11-30T07:18:17.152+0000",
+              "totalIssueCount": 100
+            }
+          },
+          "updated": 1,
+          "description": {
+            "type": "doc",
+            "content": [ {
+              "content": [ {
+                "text": "Main order flow broken",
+                "type": "text"
+              } ],
+              "type": "paragraph"
+            } ],
+            "version": 1
+          },
+          "timetracking": {
+            "originalEstimateSeconds": 600,
+            "timeSpentSeconds": 400,
+            "originalEstimate": "10m",
+            "timeSpent": "6m",
+            "remainingEstimateSeconds": 200,
+            "remainingEstimate": "3m"
+          },
+          "sub-tasks": [ {
+            "type": {
+              "inward": "Parent",
+              "outward": "Sub-task",
+              "id": 10000.0,
+              "name": ""
             },
             "id": 10000.0,
-            "type": {
-              "id": 10000.0,
-              "outward": "Sub-task",
-              "inward": "Parent",
-              "name": ""
+            "outwardIssue": {
+              "fields": {
+                "status": {
+                  "iconUrl": "https://your-domain.atlassian.net/images/icons/statuses/open.png",
+                  "name": "Open"
+                }
+              },
+              "id": 10003.0,
+              "self": "https://your-domain.atlassian.net/rest/api/3/issue/ED-2",
+              "key": "ED-2"
             }
           } ]
         },
-        "self": "https://your-domain.atlassian.net/rest/api/3/issue/10002",
-        "id": 10002.0
-      } ],
-      "startAt": 0,
-      "total": 1
+        "key": "ED-1"
+      } ]
     },
     "title": "Search for issues using JQL (GET)",
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": "The result of a JQL search.",
@@ -9487,6 +9842,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -9594,6 +9951,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -9612,6 +9971,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -9630,6 +9991,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -9648,6 +10011,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -9764,6 +10129,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -9821,6 +10188,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -9839,6 +10208,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -9857,6 +10228,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -9875,6 +10248,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -10146,6 +10521,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -10185,6 +10562,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -10203,6 +10582,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -10389,6 +10770,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -10428,6 +10811,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -10446,6 +10831,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -10464,6 +10851,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -10482,6 +10871,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -10500,6 +10891,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -10686,6 +11079,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -10725,6 +11120,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -10762,6 +11159,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -10780,6 +11179,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -10798,6 +11199,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -11028,6 +11431,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -11046,6 +11451,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -11064,6 +11471,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -11082,6 +11491,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -11164,6 +11575,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -11182,6 +11595,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -11200,6 +11615,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -11258,6 +11675,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -11394,6 +11813,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -11614,6 +12035,8 @@
               "defaultValue": null,
               "exampleValue": null,
               "controlType": "TEXT",
+              "maxLength": null,
+              "minLength": null,
               "options": null,
               "sampleDataType": null,
               "optionsDataSource": null
@@ -11685,6 +12108,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -11703,6 +12128,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -11739,6 +12166,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -11757,6 +12186,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -11775,6 +12206,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -11793,6 +12226,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -11811,6 +12246,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -11829,6 +12266,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -11920,6 +12359,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -11938,6 +12379,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -11956,6 +12399,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -11974,6 +12419,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -11992,6 +12439,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -12010,6 +12459,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -12160,6 +12611,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12178,6 +12631,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12196,6 +12651,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12214,6 +12671,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12296,6 +12755,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -12314,6 +12775,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -12332,6 +12795,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -12390,6 +12855,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12636,6 +13103,8 @@
                   "defaultValue": null,
                   "exampleValue": null,
                   "controlType": "TEXT",
+                  "maxLength": null,
+                  "minLength": null,
                   "options": null,
                   "sampleDataType": null,
                   "optionsDataSource": null
@@ -12672,6 +13141,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12690,6 +13161,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12708,6 +13181,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12726,6 +13201,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12744,6 +13221,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12780,6 +13259,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -12798,6 +13279,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -12816,6 +13299,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -12834,6 +13319,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -12855,6 +13342,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12899,6 +13388,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12917,6 +13408,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -12987,6 +13480,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13005,6 +13500,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13023,6 +13520,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13041,6 +13540,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13059,6 +13560,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13077,6 +13580,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13095,6 +13600,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13289,6 +13796,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -13328,6 +13837,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -13346,6 +13857,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -13364,6 +13877,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -13382,6 +13897,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -13400,6 +13917,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -13418,6 +13937,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -13436,6 +13957,8 @@
                     "defaultValue": null,
                     "exampleValue": null,
                     "controlType": "TEXT",
+                    "maxLength": null,
+                    "minLength": null,
                     "options": null,
                     "sampleDataType": null,
                     "optionsDataSource": null
@@ -13622,6 +14145,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13661,6 +14186,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13679,6 +14206,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13697,6 +14226,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13715,6 +14246,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13733,6 +14266,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13751,6 +14286,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13940,6 +14477,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13979,6 +14518,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -13997,6 +14538,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14015,6 +14558,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14033,6 +14578,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14051,6 +14598,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14069,6 +14618,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14258,6 +14809,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14297,6 +14850,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14315,6 +14870,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14333,6 +14890,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14351,6 +14910,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14369,6 +14930,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14387,6 +14950,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14422,6 +14987,8 @@
                       "defaultValue": null,
                       "exampleValue": null,
                       "controlType": "TEXT",
+                      "maxLength": null,
+                      "minLength": null,
                       "options": null,
                       "sampleDataType": null,
                       "optionsDataSource": null
@@ -14535,6 +15102,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -14572,6 +15141,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -14609,6 +15180,8 @@
                 "defaultValue": null,
                 "exampleValue": null,
                 "controlType": "TEXT",
+                "maxLength": null,
+                "minLength": null,
                 "options": null,
                 "sampleDataType": null,
                 "optionsDataSource": null
@@ -14699,6 +15272,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -14736,6 +15311,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -14793,6 +15370,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -14811,6 +15390,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -14829,6 +15410,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -14847,6 +15430,8 @@
             "defaultValue": null,
             "exampleValue": null,
             "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
             "options": null,
             "sampleDataType": null,
             "optionsDataSource": null
@@ -14925,10 +15510,9 @@
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     },
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": {
@@ -14951,6 +15535,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -14969,6 +15555,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -14977,16 +15565,16 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "refreshUrl": null,
-      "tokenUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "authorizationCallback": null,
-      "authorizationUrl": null,
       "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
-      "scopes": null
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
+      "authorizationCallback": null
     }, {
       "detectOn": null,
       "description": null,
@@ -15006,6 +15594,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -15024,6 +15614,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -15032,16 +15624,16 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "refreshUrl": null,
-      "tokenUrl": { },
-      "clientId": null,
-      "clientSecret": null,
-      "authorizationCallback": null,
-      "authorizationUrl": { },
       "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
-      "scopes": { }
+      "refreshUrl": null,
+      "scopes": { },
+      "tokenUrl": { },
+      "authorizationUrl": { },
+      "clientSecret": null,
+      "authorizationCallback": null
     } ],
     "componentName": "jira",
     "componentDescription": "Jira is a proprietary issue tracking product developed by Atlassian that allows bug tracking and agile project management.",

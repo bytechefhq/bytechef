@@ -88,11 +88,13 @@ public record ConnectionDTO(
 
         public Builder active(boolean active) {
             this.active = active;
+
             return this;
         }
 
         public Builder authorizationName(String authorizationName) {
             this.authorizationName = authorizationName;
+
             return this;
         }
 
@@ -103,51 +105,61 @@ public record ConnectionDTO(
 
         public Builder connectionVersion(int connectionVersion) {
             this.connectionVersion = connectionVersion;
+
             return this;
         }
 
         public Builder createdBy(String createdBy) {
             this.createdBy = createdBy;
+
             return this;
         }
 
         public Builder createdDate(LocalDateTime createdDate) {
             this.createdDate = createdDate;
+
             return this;
         }
 
         public Builder credentialStatus(CredentialStatus credentialStatus) {
             this.credentialStatus = credentialStatus;
+
             return this;
         }
 
         public Builder id(Long id) {
             this.id = id;
+
             return this;
         }
 
         public Builder lastModifiedBy(String lastModifiedBy) {
             this.lastModifiedBy = lastModifiedBy;
+
             return this;
         }
 
         public Builder lastModifiedDate(LocalDateTime lastModifiedDate) {
             this.lastModifiedDate = lastModifiedDate;
+
             return this;
         }
 
         public Builder name(String name) {
             this.name = name;
+
             return this;
         }
 
         public Builder parameters(Map<String, Object> parameters) {
             this.parameters = parameters;
+
             return this;
         }
 
         public Builder tags(List<Tag> tags) {
             this.tags = tags;
+
             return this;
         }
 

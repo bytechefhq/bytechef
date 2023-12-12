@@ -102,6 +102,8 @@
         "defaultValue": "EQUALS",
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -194,6 +196,8 @@
         "defaultValue": "AFTER",
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -280,6 +284,8 @@
         "defaultValue": "LESS",
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -374,6 +380,8 @@
         "defaultValue": "",
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -392,6 +400,8 @@
         "defaultValue": "EQUALS",
         "exampleValue": null,
         "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
@@ -450,6 +460,8 @@
         "defaultValue": "",
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -468,6 +480,8 @@
         "defaultValue": "",
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -494,6 +508,8 @@
     "defaultValue": "ALL",
     "exampleValue": null,
     "controlType": "SELECT",
+    "maxLength": null,
+    "minLength": null,
     "options": [ {
       "description": "Only if all conditions are met, the workflow goes into \"true\" branch.",
       "displayCondition": null,
@@ -522,6 +538,8 @@
     "defaultValue": null,
     "exampleValue": null,
     "controlType": "TEXT",
+    "maxLength": null,
+    "minLength": null,
     "options": null,
     "sampleDataType": null,
     "optionsDataSource": null
@@ -609,6 +627,7 @@
     "optionsDataSource": null
   } ],
   "title": "Condition",
+  "variableProperties": null,
   "version": 1,
   "outputSchema": null,
   "outputSchemaDataSource": null

@@ -129,6 +129,7 @@ public class ConnectionFacadeIntTest {
 
         connection.setComponentName("componentName");
         connection.setName("name");
+        connection.setType(1);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -149,6 +150,7 @@ public class ConnectionFacadeIntTest {
 
         connection.setComponentName("componentName");
         connection.setName("name");
+        connection.setType(1);
 
         Tag tag1 = tagRepository.save(new Tag("tag1"));
         Tag tag2 = tagRepository.save(new Tag("tag2"));
@@ -180,6 +182,7 @@ public class ConnectionFacadeIntTest {
         connection.setComponentName("componentName");
         connection.setName("name");
         connection.setTags(List.of(tag1, tag2));
+        connection.setType(1);
 
         connectionRepository.save(connection);
 
@@ -193,6 +196,7 @@ public class ConnectionFacadeIntTest {
 
         connection.setComponentName("componentName");
         connection.setName("name2");
+        connection.setType(1);
 
         tag1 = OptionalUtils.get(tagRepository.findById(Validate.notNull(tag1.getId(), "id")));
 

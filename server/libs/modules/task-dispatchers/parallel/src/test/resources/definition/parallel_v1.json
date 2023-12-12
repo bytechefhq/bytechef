@@ -47,7 +47,8 @@
     "optionsDataSource": null
   } ],
   "title": "Parallel",
+  "variableProperties": null,
   "version": 1,
-  "outputSchema": null,
-  "outputSchemaDataSource": null
+  "outputSchemaDataSource": null,
+  "outputSchema": null
 }

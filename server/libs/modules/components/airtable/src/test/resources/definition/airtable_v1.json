@@ -32,6 +32,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": {
@@ -55,6 +57,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "SELECT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": {
@@ -83,6 +87,9 @@
     "sampleOutput": null,
     "title": "Creates a record",
     "editorDescriptionDataSource": null,
+    "sampleOutputDataSource": null,
+    "outputSchemaDataSource": null,
+    "perform": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -303,6 +310,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
           "sampleDataType": null,
           "optionsDataSource": null
@@ -333,10 +342,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": null
+    }
   } ],
   "category": null,
   "connection": {
@@ -359,6 +365,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
         "options": null,
         "sampleDataType": null,
         "optionsDataSource": null
@@ -368,15 +376,15 @@
       "type": "BEARER_TOKEN",
       "acquire": null,
       "authorizationCallback": null,
-      "authorizationUrl": null,
-      "clientId": null,
-      "clientSecret": null,
-      "refreshUrl": null,
-      "tokenUrl": null,
       "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
-      "scopes": null
+      "refreshUrl": null,
+      "scopes": null,
+      "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null
     } ],
     "componentName": "airtable",
     "componentDescription": "Airtable is a user-friendly and flexible cloud-based database management tool that enables teams and individuals to organize, share, and collaborate on their work in a visually pleasing and customizable way.",
@@ -422,6 +430,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -440,6 +450,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -458,6 +470,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -469,19 +483,19 @@
     "webhookRawBody": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "editorDescriptionDataSource": null,
-    "deduplicate": null,
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
+    "editorDescriptionDataSource": null,
+    "sampleOutputDataSource": null,
+    "outputSchemaDataSource": null,
+    "deduplicate": null,
+    "poll": { },
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
-    "outputSchema": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "poll": { }
+    "outputSchema": null
   } ],
   "allowedConnections": null
 }

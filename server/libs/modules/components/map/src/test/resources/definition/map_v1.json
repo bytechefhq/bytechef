@@ -44,6 +44,8 @@
       "defaultValue": "item",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -62,17 +64,19 @@
       "defaultValue": "itemIndex",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": null,
-    "outputSchema": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": null,
-    "editorDescriptionDataSource": null
+    "outputSchema": null,
+    "perform": null
   } ],
   "category": null,
   "connection": null,

@@ -7,7 +7,6 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Send a new RabbitMQ message.",
-    "sampleOutput": null,
     "help": null,
     "metadata": null,
     "name": "sendMessage",
@@ -26,6 +25,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -51,20 +52,19 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     } ],
+    "sampleOutput": null,
     "title": "Send Message",
-    "perform": { },
-    "outputSchema": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
+    "outputSchema": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": {
-    "authorizationRequired": null,
     "authorizations": null,
-    "baseUri": null,
     "componentName": "rabbitMQ",
     "componentDescription": "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.",
     "componentTitle": "RabbitMQ",
@@ -83,6 +83,8 @@
       "defaultValue": "localhost",
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -120,6 +122,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -138,11 +142,15 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "version": 1,
+    "authorizationRequired": null,
+    "baseUri": null,
     "test": null
   },
   "customAction": null,
@@ -150,7 +158,6 @@
   "description": "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.",
   "icon": "path:assets/rabbitmq.svg",
   "tags": null,
-  "allowedConnections": null,
   "metadata": null,
   "name": "rabbitMQ",
   "resources": null,
@@ -161,19 +168,11 @@
     "componentName": "rabbitMQ",
     "componentDescription": "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.",
     "componentTitle": "RabbitMQ",
-    "deduplicate": null,
     "componentVersion": 1,
     "deprecated": null,
     "description": "Triggers on new RabbitMQ messages.",
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
     "help": null,
-    "listenerEnable": { },
-    "listenerDisable": { },
     "name": "newMessage",
-    "poll": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the queue to read from",
@@ -189,6 +188,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -198,9 +199,18 @@
     "title": "New Message",
     "type": "LISTENER",
     "webhookRawBody": null,
-    "webhookValidate": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null,
+    "listenerDisable": { },
+    "listenerEnable": { },
+    "webhookValidate": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -223,8 +233,8 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "editorDescriptionDataSource": null
-  } ]
+    "deduplicate": null,
+    "poll": null
+  } ],
+  "allowedConnections": null
 }

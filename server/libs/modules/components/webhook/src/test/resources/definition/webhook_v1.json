@@ -22,7 +22,6 @@
     "description": "The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming webhook request. This guarantees execution of the webhook trigger, but does not involve any validation of the received request.",
     "help": null,
     "name": "autoRespondWithHTTP200",
-    "outputSchema": null,
     "properties": null,
     "sampleOutput": null,
     "staticWebhookRequest": { },
@@ -31,20 +30,21 @@
     "webhookRawBody": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "poll": null,
-    "deduplicate": null,
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "outputSchema": null,
     "webhookValidate": null,
-    "editorDescriptionDataSource": null
+    "deduplicate": null,
+    "poll": null
   }, {
     "batch": null,
     "componentName": "webhook",
@@ -55,7 +55,6 @@
     "description": "Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook trigger responds to the sender with an appropriate HTTP status code.",
     "help": null,
     "name": "validateAndRespond",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client.",
@@ -71,6 +70,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -82,20 +83,21 @@
     "webhookRawBody": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": true,
-    "poll": null,
-    "deduplicate": null,
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "outputSchema": null,
     "webhookValidate": { },
-    "editorDescriptionDataSource": null
+    "deduplicate": null,
+    "poll": null
   }, {
     "batch": null,
     "componentName": "webhook",
@@ -106,7 +108,6 @@
     "description": "You have the flexibility to set up your preferred response. After a webhook request is received, the webhook trigger enters a waiting state for the workflow's response.",
     "help": null,
     "name": "awaitWorkflowAndRespond",
-    "outputSchema": null,
     "properties": [ {
       "advancedOption": null,
       "description": "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client.",
@@ -122,6 +123,8 @@
       "defaultValue": null,
       "exampleValue": null,
       "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
@@ -142,8 +145,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     } ],
     "sampleOutput": null,
     "staticWebhookRequest": { },
@@ -152,20 +155,21 @@
     "webhookRawBody": null,
     "workflowSyncExecution": true,
     "workflowSyncValidation": null,
-    "poll": null,
-    "deduplicate": null,
     "dynamicWebhookDisable": null,
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "listenerDisable": null,
-    "listenerEnable": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
     "sampleOutputDataSource": null,
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "outputSchema": null,
     "webhookValidate": { },
-    "editorDescriptionDataSource": null
+    "deduplicate": null,
+    "poll": null
   } ],
   "allowedConnections": null
 }
