@@ -49,11 +49,12 @@ public class DataMapperMapKeysAction {
                 .description(
                     "The collection of of \"mappings\" where \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.")
                 .items(
-                    object().properties(
-                        string(FROM)
-                            .label("From"),
-                        string(TO)
-                            .label("To")))
+                    object()
+                        .properties(
+                            string(FROM)
+                                .label("From"),
+                            string(TO)
+                                .label("To")))
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
         .perform(DataMapperMapKeysAction::perform);

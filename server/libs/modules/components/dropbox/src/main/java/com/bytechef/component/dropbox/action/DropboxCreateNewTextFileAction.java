@@ -53,13 +53,17 @@ public final class DropboxCreateNewTextFileAction {
                 .required(true))
         .outputSchema(
             object().properties(
-                string("url").label("URL")
+                string("url")
+                    .label("URL")
                     .required(true),
-                string("resultPath").label("Result path")
+                string("resultPath")
+                    .label("Result path")
                     .required(true),
-                string("fileId").label("File ID")
+                string("fileId")
+                    .label("File ID")
                     .required(true),
-                integer("paperRevision").label("Paper revision")
+                integer("paperRevision")
+                    .label("Paper revision")
                     .required(true)))
         .perform(DropboxCreateNewTextFileAction::perform);
 

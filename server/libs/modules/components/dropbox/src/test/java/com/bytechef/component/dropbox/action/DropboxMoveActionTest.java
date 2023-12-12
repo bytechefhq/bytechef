@@ -28,14 +28,14 @@ import org.mockito.Mockito;
 /**
  * @author Mario Cvjetojevic
  */
-class DropboxMoveActionTest extends DropboxActionTestAbstract {
+public class DropboxMoveActionTest extends AbstractDropboxActionTest {
 
     @Test
-    void testPerform() throws DbxException {
-        DropboxMoveAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
+    public void testPerform() throws DbxException {
+        DropboxMoveAction.perform(parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
 
-        then(filesRequests).should(times(1))
+        then(filesRequests)
+            .should(times(1))
             .moveV2(stringArgumentCaptorA.capture(), stringArgumentCaptorB.capture());
 
         Assertions.assertEquals(SOURCE_STUB, stringArgumentCaptorA.getValue());

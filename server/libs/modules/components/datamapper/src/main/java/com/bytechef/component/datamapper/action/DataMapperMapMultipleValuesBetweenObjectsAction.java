@@ -55,11 +55,12 @@ public class DataMapperMapMultipleValuesBetweenObjectsAction {
                 .description(
                     "The collection of of \"mappings\" where \"From\" corresponds to an existing key in the Input, while the key \"To\" is utilized to determine the value to which the \"From\" key should be set, by referring to its key in the Values.")
                 .items(
-                    object().properties(
-                        string(FROM)
-                            .label("From"),
-                        string(TO)
-                            .label("To")))
+                    object()
+                        .properties(
+                            string(FROM)
+                                .label("From"),
+                            string(TO)
+                                .label("To")))
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
         .perform(DataMapperMapMultipleValuesBetweenObjectsAction::perform);

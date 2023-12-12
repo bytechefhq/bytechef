@@ -28,14 +28,15 @@ import org.mockito.Mockito;
 /**
  * @author Mario Cvjetojevic
  */
-class DropboxCreateNewFolderActionTest extends DropboxActionTestAbstract {
+public class DropboxCreateNewFolderActionTest extends AbstractDropboxActionTest {
 
     @Test
-    void testPerform() throws DbxException {
+    public void testPerform() throws DbxException {
         DropboxCreateNewFolderAction.perform(
             parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
 
-        then(filesRequests).should(times(1))
+        then(filesRequests)
+            .should(times(1))
             .createFolderV2(stringArgumentCaptorA.capture());
 
         Assertions.assertEquals(DESTINATION_STUB, stringArgumentCaptorA.getValue());

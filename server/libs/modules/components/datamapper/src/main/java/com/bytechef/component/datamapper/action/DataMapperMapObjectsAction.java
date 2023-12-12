@@ -68,11 +68,12 @@ public class DataMapperMapObjectsAction {
                 .description(
                     "The collection of of \"mappings\"  where the \"From\" key as the key and the value as the key that needs mapping. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.")
                 .items(
-                    object().properties(
-                        string(FROM)
-                            .label("From"),
-                        string(TO)
-                            .label("To")))
+                    object()
+                        .properties(
+                            string(FROM)
+                                .label("From"),
+                            string(TO)
+                                .label("To")))
                 .required(true),
             bool(INCLUDE_UNMAPPED)
                 .label("Include Unmapped")

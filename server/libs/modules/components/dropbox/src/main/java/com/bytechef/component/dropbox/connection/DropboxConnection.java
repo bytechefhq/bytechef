@@ -16,14 +16,14 @@
 
 package com.bytechef.component.dropbox.connection;
 
-import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
+import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_ID;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
 
-import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
 /**
  * Provides the component connection definition.
@@ -31,9 +31,9 @@ import com.bytechef.hermes.component.definition.ComponentDSL;
  * @author Mario Cvjetojevic
  */
 public final class DropboxConnection {
-    public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .authorizations(authorization(
-            AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .authorizations(
+            authorization(OAUTH2_AUTHORIZATION_CODE.toLowerCase(), OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
                     string(CLIENT_ID)

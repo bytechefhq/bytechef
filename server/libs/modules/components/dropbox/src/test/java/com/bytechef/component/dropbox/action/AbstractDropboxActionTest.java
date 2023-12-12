@@ -24,7 +24,6 @@ import com.bytechef.component.dropbox.util.DropboxUtils;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -33,42 +32,45 @@ import org.mockito.Mockito;
 /**
  * @author Mario Cvjetojevic
  */
-abstract class DropboxActionTestAbstract {
+public abstract class AbstractDropboxActionTest {
     static final String DESTINATION_STUB = "destinationPathStub";
     static final String SOURCE_STUB = "sourcePathStub";
-    static ParameterMap parameterMap;
-    static DbxUserFilesRequests filesRequests;
-    static ArgumentCaptor<String> stringArgumentCaptorA;
-    static ArgumentCaptor<String> stringArgumentCaptorB;
-    protected MockedStatic<DropboxUtils> dropboxUtils;
 
-    @BeforeAll
-    static void beforeAll() {
-        parameterMap = Mockito.mock(ParameterMap.class);
+    protected MockedStatic<DropboxUtils> dropboxUtils;
+    protected DbxUserFilesRequests filesRequests;
+    protected ParameterMap parameterMap;
+    protected ArgumentCaptor<String> stringArgumentCaptorA;
+    protected ArgumentCaptor<String> stringArgumentCaptorB;
+
+    @BeforeEach
+    public void beforeEach() {
+        dropboxUtils = Mockito.mockStatic(DropboxUtils.class);
+
         filesRequests = Mockito.mock(DbxUserFilesRequests.class);
 
+        dropboxUtils
+            .when(() -> DropboxUtils.getDbxUserFilesRequests(""))
+            .thenReturn(filesRequests);
+
+        parameterMap = Mockito.mock(ParameterMap.class);
         stringArgumentCaptorA = ArgumentCaptor.forClass(String.class);
         stringArgumentCaptorB = ArgumentCaptor.forClass(String.class);
 
-        Mockito.when(parameterMap.getRequiredString(ACCESS_TOKEN))
+        Mockito
+            .when(parameterMap.getRequiredString(ACCESS_TOKEN))
             .thenReturn("");
 
-        Mockito.when(parameterMap.getRequiredString(SOURCE_FILENAME))
+        Mockito
+            .when(parameterMap.getRequiredString(SOURCE_FILENAME))
             .thenReturn(SOURCE_STUB);
 
-        Mockito.when(parameterMap.getRequiredString(DESTINATION_FILENAME))
+        Mockito
+            .when(parameterMap.getRequiredString(DESTINATION_FILENAME))
             .thenReturn(DESTINATION_STUB);
     }
 
-    @BeforeEach
-    void beforeEach() {
-        dropboxUtils = Mockito.mockStatic(DropboxUtils.class);
-        dropboxUtils.when(() -> DropboxUtils.getDbxUserFilesRequests(""))
-            .thenReturn(filesRequests);
-    }
-
     @AfterEach
-    void afterEach() {
+    public void afterEach() {
         dropboxUtils.close();
     }
 }

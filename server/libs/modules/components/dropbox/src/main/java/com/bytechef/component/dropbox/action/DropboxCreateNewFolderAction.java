@@ -48,33 +48,48 @@ public final class DropboxCreateNewFolderAction {
             .required(true))
         .outputSchema(
             object().properties(
-                object("folderMetadata").properties(
-                    string("id").label("ID")
-                        .required(true),
-                    string("sharedFolderId").label("Shared folder ID")
-                        .required(true),
-                    object("sharingInfo").properties(
-                        string("parentSharedFolderId").label("Parent shared folder ID")
+                object("folderMetadata")
+                    .properties(
+                        string("id")
+                            .label("ID")
                             .required(true),
-                        string("sharedFolderId").label("Shared folder ID")
+                        string("sharedFolderId")
+                            .label("Shared folder ID")
                             .required(true),
-                        bool("traverseOnly").label("Traverse only"),
-                        bool("noAccess").label("No access"))
-                        .label("Sharing info")
-                        .required(true),
-                    array("propertyGroups").items(
-                        object().properties(
-                            string("templateId").label("Template ID")
-                                .required(true),
-                            array("fields").items(
-                                object().properties(
-                                    string("name").label("Name")
-                                        .required(true),
-                                    string("value").label("Value")
-                                        .required(true))
-                                    .label("Fields")))
-                            .label("Property groups")
-                            .required(true)))
+                        object("sharingInfo")
+                            .properties(
+                                string("parentSharedFolderId")
+                                    .label("Parent shared folder ID")
+                                    .required(true),
+                                string("sharedFolderId")
+                                    .label("Shared folder ID")
+                                    .required(true),
+                                bool("traverseOnly")
+                                    .label("Traverse only"),
+                                bool("noAccess")
+                                    .label("No access"))
+                            .label("Sharing info")
+                            .required(true),
+                        array("propertyGroups")
+                            .items(
+                                object()
+                                    .properties(
+                                        string("templateId")
+                                            .label("Template ID")
+                                            .required(true),
+                                        array("fields")
+                                            .items(
+                                                object()
+                                                    .properties(
+                                                        string("name")
+                                                            .label("Name")
+                                                            .required(true),
+                                                        string("value")
+                                                            .label("Value")
+                                                            .required(true))
+                                                    .label("Fields")))
+                                    .label("Property groups")
+                                    .required(true)))
                     .label("Metadata"))
                 .label("Create folder result"))
         .perform(DropboxCreateNewFolderAction::perform);

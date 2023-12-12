@@ -17,6 +17,7 @@
 package com.bytechef.component.dropbox.action;
 
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILE_ENTRY;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
@@ -24,33 +25,36 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.UploadBuilder;
 import java.io.IOException;
-import java.io.InputStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
  */
-class DropboxUploadFileActionTest extends DropboxActionTestAbstract {
+public class DropboxUploadFileActionTest extends AbstractDropboxActionTest {
 
     @Test
-    void testPerform() throws IOException, DbxException {
-        ArgumentCaptor<InputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(InputStream.class);
+    public void testPerform() throws IOException, DbxException {
+        Mockito
+            .when(parameterMap.getRequiredString(FILE_ENTRY))
+            .thenReturn(SOURCE_STUB);
+
         UploadBuilder uploadBuilder = Mockito.mock(UploadBuilder.class);
 
-        Mockito.when(parameterMap.getRequiredString(FILE_ENTRY))
-            .thenReturn(SOURCE_STUB);
-        Mockito.when(filesRequests.uploadBuilder(DESTINATION_STUB))
+        Mockito
+            .when(filesRequests.uploadBuilder(DESTINATION_STUB))
             .thenReturn(uploadBuilder);
 
         DropboxUploadFileAction.perform(parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
 
-        then(filesRequests).should(times(1))
+        then(filesRequests)
+            .should(times(1))
             .uploadBuilder(stringArgumentCaptorA.capture());
-        then(uploadBuilder).should(times(1))
-            .uploadAndFinish(inputStreamArgumentCaptor.capture());
+
+        then(uploadBuilder)
+            .should(times(1))
+            .uploadAndFinish(any());
 
         Assertions.assertEquals(DESTINATION_STUB, stringArgumentCaptorA.getValue());
     }

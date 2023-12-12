@@ -41,8 +41,9 @@ public class DropboxComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(DROPBOX)
         .title("Dropbox")
-        .description("Dropbox is a file hosting service that offers cloud storage, "
-            + "file synchronization, personal cloud, and client software.")
+        .description(
+            "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, " +
+                "and client software.")
         .icon("path:assets/dropbox.svg")
         .connection(DropboxConnection.CONNECTION_DEFINITION)
         .actions(

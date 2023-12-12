@@ -33,31 +33,36 @@ import org.mockito.Mockito;
 /**
  * @author Mario Cvjetojevic
  */
-class DropboxCreateNewTextFileActionTest extends DropboxActionTestAbstract {
+public class DropboxCreateNewTextFileActionTest extends AbstractDropboxActionTest {
 
     @Test
-    void testPerform() throws DbxException, IOException {
+    public void testPerform() throws DbxException, IOException {
         PaperCreateUploader paperCreateUploader = Mockito.mock(PaperCreateUploader.class);
 
-        ArgumentCaptor<ImportFormat> importFormatArgumentCaptor = ArgumentCaptor.forClass(ImportFormat.class);
-        ArgumentCaptor<InputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(InputStream.class);
-
-        Mockito.when(filesRequests.paperCreate(DESTINATION_STUB, ImportFormat.PLAIN_TEXT))
+        Mockito
+            .when(filesRequests.paperCreate(DESTINATION_STUB, ImportFormat.PLAIN_TEXT))
             .thenReturn(paperCreateUploader);
 
         DropboxCreateNewTextFileAction.perform(
             parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
 
-        then(filesRequests).should(times(1))
+        ArgumentCaptor<ImportFormat> importFormatArgumentCaptor = ArgumentCaptor.forClass(ImportFormat.class);
+
+        then(filesRequests)
+            .should(times(1))
             .paperCreate(stringArgumentCaptorA.capture(), importFormatArgumentCaptor.capture());
-        then(paperCreateUploader).should(times(1))
-            .uploadAndFinish(inputStreamArgumentCaptor.capture());
 
         Assertions.assertEquals(DESTINATION_STUB, stringArgumentCaptorA.getValue());
         Assertions.assertEquals(ImportFormat.PLAIN_TEXT, importFormatArgumentCaptor.getValue());
-        Assertions.assertEquals(
-            -1, inputStreamArgumentCaptor.getValue()
-                .read(),
-            "Input stream must be empty!");
+
+        ArgumentCaptor<InputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(InputStream.class);
+
+        then(paperCreateUploader)
+            .should(times(1))
+            .uploadAndFinish(inputStreamArgumentCaptor.capture());
+
+        InputStream inputStream = inputStreamArgumentCaptor.getValue();
+
+        Assertions.assertEquals(-1, inputStream.read(), "Input stream must be empty!");
     }
 }

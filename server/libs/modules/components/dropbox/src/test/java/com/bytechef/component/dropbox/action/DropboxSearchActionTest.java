@@ -29,17 +29,18 @@ import org.mockito.Mockito;
 /**
  * @author Mario Cvjetojevic
  */
-class DropboxSearchActionTest extends DropboxActionTestAbstract {
+public class DropboxSearchActionTest extends AbstractDropboxActionTest {
 
     @Test
-    void testPerform() throws DbxException {
-        Mockito.when(parameterMap.getRequiredString(SEARCH_STRING))
+    public void testPerform() throws DbxException {
+        Mockito
+            .when(parameterMap.getRequiredString(SEARCH_STRING))
             .thenReturn(SOURCE_STUB);
 
-        DropboxSearchAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
+        DropboxSearchAction.perform(parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
 
-        then(filesRequests).should(times(1))
+        then(filesRequests)
+            .should(times(1))
             .searchV2(stringArgumentCaptorA.capture());
 
         Assertions.assertEquals(SOURCE_STUB, stringArgumentCaptorA.getValue());

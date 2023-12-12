@@ -23,6 +23,7 @@ import static org.mockito.Mockito.atLeast;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
@@ -43,30 +44,36 @@ class DropboxUtilsTest {
             DbxRequestConfig dbxRequestConfig = Mockito.mock(DbxRequestConfig.class);
             DbxUserFilesRequests dbxUserFilesRequests = Mockito.mock(DbxUserFilesRequests.class);
 
-            dbxRequestConfigMockedStatic.when(() -> DbxRequestConfig.newBuilder(CLIENT_IDENTIFIER))
+            dbxRequestConfigMockedStatic
+                .when(() -> DbxRequestConfig.newBuilder(CLIENT_IDENTIFIER))
                 .thenReturn(builder);
-            Mockito.when(builder.build())
+            Mockito
+                .when(builder.build())
                 .thenReturn(dbxRequestConfig);
 
             try (MockedConstruction<DbxClientV2> dbxClientV2MockedConstruction =
                 Mockito.mockConstruction(DbxClientV2.class, (dbxClientV2, context) -> {
-                    Mockito.when(dbxClientV2.files())
+                    Mockito
+                        .when(dbxClientV2.files())
                         .thenReturn(dbxUserFilesRequests);
 
-                    Assertions.assertEquals(ACCESS_TOKEN_STUB, context.arguments()
-                        .get(1),
+                    List<?> arguments = context.arguments();
+
+                    Assertions.assertEquals(
+                        ACCESS_TOKEN_STUB, arguments.get(1),
                         "Access token used does not match getDropboxRequestObject() method argument!");
                 })) {
 
                 DropboxUtils.getDbxUserFilesRequests(ACCESS_TOKEN_STUB);
 
-                then(dbxClientV2MockedConstruction.constructed()
-                    .get(0)).should(atLeast(1))
-                        .files();
+                List<DbxClientV2> dbxClientV2s = dbxClientV2MockedConstruction.constructed();
 
-                Assertions.assertEquals(1, dbxClientV2MockedConstruction.constructed()
-                    .size(),
-                    "One instance of DbxClientV2 is enough!");
+                then(dbxClientV2s.getFirst())
+                    .should(atLeast(1))
+                    .files();
+
+                Assertions.assertEquals(
+                    1, dbxClientV2s.size(), "One instance of DbxClientV2 is enough!");
             }
         }
     }

@@ -30,20 +30,20 @@ import org.mockito.Mockito;
 /**
  * @author Mario Cvjetojevic
  */
-class DropboxGetFileLinkActionTest extends DropboxActionTestAbstract {
+public class DropboxGetFileLinkActionTest extends AbstractDropboxActionTest {
 
     @Test
     @SuppressFBWarnings
-    void testPerform() throws DbxException {
-        GetTemporaryLinkResult getTemporaryLinkResult = Mockito.mock(GetTemporaryLinkResult.class);
-
-        Mockito.when(filesRequests.getTemporaryLink(SOURCE_STUB))
-            .thenReturn(getTemporaryLinkResult);
+    public void testPerform() throws DbxException {
+        Mockito
+            .when(filesRequests.getTemporaryLink(SOURCE_STUB))
+            .thenReturn(Mockito.mock(GetTemporaryLinkResult.class));
 
         DropboxGetFileLinkAction.perform(
             parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
 
-        then(filesRequests).should(times(1))
+        then(filesRequests)
+            .should(times(1))
             .getTemporaryLink(stringArgumentCaptorA.capture());
 
         Assertions.assertEquals(SOURCE_STUB, stringArgumentCaptorA.getValue());

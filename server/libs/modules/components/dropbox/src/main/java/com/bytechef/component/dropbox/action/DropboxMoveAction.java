@@ -55,19 +55,26 @@ public final class DropboxMoveAction {
                     "\"(/(.|[\\\\r\\\\n])*)|(ns:[0-9]+(/.*)?)|(id:.*)\" and not be null.")
                 .required(true))
         .outputSchema(
-            object().properties(
-                object("metadata").properties(
-                    string("name").label("Name")
-                        .required(true),
-                    string("pathLower").label("Path lowercase")
-                        .required(true),
-                    string("pathDisplay").label("Path display")
-                        .required(true),
-                    string("parentSharedFolderId").label("Parent shared folder")
-                        .required(true),
-                    string("previewUrl").label("Preview URL")
-                        .required(true))
-                    .label("Metadata")))
+            object()
+                .properties(
+                    object("metadata")
+                        .properties(
+                            string("name")
+                                .label("Name")
+                                .required(true),
+                            string("pathLower")
+                                .label("Path lowercase")
+                                .required(true),
+                            string("pathDisplay")
+                                .label("Path display")
+                                .required(true),
+                            string("parentSharedFolderId")
+                                .label("Parent shared folder")
+                                .required(true),
+                            string("previewUrl")
+                                .label("Preview URL")
+                                .required(true))
+                        .label("Metadata")))
         .perform(DropboxMoveAction::perform);
 
     private DropboxMoveAction() {

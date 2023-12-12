@@ -51,22 +51,31 @@ public final class DropboxListFolderAction {
         .outputSchema(
             object().properties(
                 array("entries").items(
-                    object().properties(
-                        object("metadata").properties(
-                            string("name").label("Name")
-                                .required(true),
-                            string("pathLower").label("Path lowercase")
-                                .required(true),
-                            string("pathDisplay").label("Path display")
-                                .required(true),
-                            string("parentSharedFolderId").label("Parent shared folder")
-                                .required(true),
-                            string("previewUrl").label("Preview URL")
-                                .required(true))
-                            .label("Entries"))),
-                string("cursor").label("Cursor")
+                    object()
+                        .properties(
+                            object("metadata")
+                                .properties(
+                                    string("name")
+                                        .label("Name")
+                                        .required(true),
+                                    string("pathLower")
+                                        .label("Path lowercase")
+                                        .required(true),
+                                    string("pathDisplay")
+                                        .label("Path display")
+                                        .required(true),
+                                    string("parentSharedFolderId")
+                                        .label("Parent shared folder")
+                                        .required(true),
+                                    string("previewUrl")
+                                        .label("Preview URL")
+                                        .required(true))
+                                .label("Entries"))),
+                string("cursor")
+                    .label("Cursor")
                     .required(true),
-                bool("hasMore").label("Has more")
+                bool("hasMore")
+                    .label("Has more")
                     .required(true)))
         .perform(DropboxListFolderAction::perform);
 

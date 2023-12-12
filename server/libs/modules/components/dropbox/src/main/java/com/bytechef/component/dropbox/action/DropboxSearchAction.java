@@ -52,20 +52,28 @@ public final class DropboxSearchAction {
                     "The string to search for. May match across multiple fields based on the request arguments."
                         + "Must have length of at most 1000 and not be null.")
                 .required(true))
-        .outputSchema(object().properties(
-            array("matches").items(
-                object().properties(
-                    array("highlightSpans").items(
-                        string("highlightStr").label("Highlight string")
-                            .required(true),
-                        bool("isHighlighted").label("Is highlighted")
-                            .required(true))
-                        .label("Highlight spans")))
-                .label("Matches"),
-            bool("hasMore").label("Has more")
-                .required(true),
-            string("cursor").label("Cursor")
-                .required(true)))
+        .outputSchema(object()
+            .properties(
+                array("matches")
+                    .items(
+                        object()
+                            .properties(
+                                array("highlightSpans")
+                                    .items(
+                                        string("highlightStr")
+                                            .label("Highlight string")
+                                            .required(true),
+                                        bool("isHighlighted")
+                                            .label("Is highlighted")
+                                            .required(true))
+                                    .label("Highlight spans")))
+                    .label("Matches"),
+                bool("hasMore")
+                    .label("Has more")
+                    .required(true),
+                string("cursor")
+                    .label("Cursor")
+                    .required(true)))
         .perform(DropboxSearchAction::perform);
 
     private DropboxSearchAction() {

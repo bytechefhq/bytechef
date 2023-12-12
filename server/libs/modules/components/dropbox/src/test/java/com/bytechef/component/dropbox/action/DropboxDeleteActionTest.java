@@ -28,14 +28,14 @@ import org.mockito.Mockito;
 /**
  * @author Mario Cvjetojevic
  */
-class DropboxDeleteActionTest extends DropboxActionTestAbstract {
+public class DropboxDeleteActionTest extends AbstractDropboxActionTest {
 
     @Test
-    void testPerform() throws DbxException {
-        DropboxDeleteAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
+    public void testPerform() throws DbxException {
+        DropboxDeleteAction.perform(parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
 
-        then(filesRequests).should(times(1))
+        then(filesRequests)
+            .should(times(1))
             .deleteV2(stringArgumentCaptorA.capture());
 
         Assertions.assertEquals(SOURCE_STUB, stringArgumentCaptorA.getValue());
