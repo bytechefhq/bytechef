@@ -22,13 +22,14 @@ import static com.bytechef.hermes.definition.DefinitionDSL.array;
 import static com.bytechef.hermes.definition.DefinitionDSL.bool;
 import static com.bytechef.hermes.definition.DefinitionDSL.integer;
 import static com.bytechef.hermes.definition.DefinitionDSL.number;
+import static com.bytechef.hermes.definition.DefinitionDSL.object;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
-import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction.OptionsResponse;
 import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
+import com.bytechef.hermes.component.definition.ComponentPropertiesFunction.PropertiesResponse;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
@@ -126,14 +127,15 @@ public class AirtableUtils {
                                 : field.description()));
             }
 
-            return List.of(
-                ComponentDSL.object("__item")
-                    .label("Record")
-                    .properties(
-                        ComponentDSL.object("fields")
-                            .label("Fields")
-                            .properties(properties)
-                            .required(false)));
+            return new PropertiesResponse(
+                List.of(
+                    object("__item")
+                        .label("Record")
+                        .properties(
+                            object("fields")
+                                .label("Fields")
+                                .properties(properties)
+                                .required(false))));
         };
     }
 

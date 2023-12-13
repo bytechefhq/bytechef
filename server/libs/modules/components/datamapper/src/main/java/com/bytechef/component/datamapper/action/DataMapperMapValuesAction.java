@@ -37,6 +37,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
@@ -165,9 +166,9 @@ public class DataMapperMapValuesAction {
         // TODO
         return (inputParameters, connection, context) -> {
             if (inputParameters.getInteger(TYPE, 1) == 1) {
-                return object();
+                return new OutputSchemaResponse(object());
             } else {
-                return array();
+                return new OutputSchemaResponse(array());
             }
         };
     }

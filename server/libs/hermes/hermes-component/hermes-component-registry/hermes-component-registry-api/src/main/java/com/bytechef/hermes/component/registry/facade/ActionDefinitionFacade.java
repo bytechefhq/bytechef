@@ -16,9 +16,11 @@
 
 package com.bytechef.hermes.component.registry.facade;
 
+import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
 import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.ValueProperty;
-import java.util.List;
+import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.registry.domain.PropertiesResponse;
+import com.bytechef.hermes.registry.domain.SampleOutputResponse;
 import java.util.Map;
 import org.springframework.lang.NonNull;
 
@@ -27,7 +29,11 @@ import org.springframework.lang.NonNull;
  */
 public interface ActionDefinitionFacade {
 
-    String executeEditorDescription(
+    PropertiesResponse executeDynamicProperties(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
+        Map<String, Object> inputParameters, Long connectionId);
+
+    EditorDescriptionResponse executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> actionParameters, Long connectionId);
 
@@ -35,7 +41,7 @@ public interface ActionDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, Object> inputParameters, Long connectionId, String searchText);
 
-    List<? extends ValueProperty<?>> executeOutputSchema(
+    OutputSchemaResponse executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> inputParameters, Long connectionId);
 
@@ -43,11 +49,7 @@ public interface ActionDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String actionName, int type, Long instanceId,
         @NonNull String workflowId, long taskExecutionId, @NonNull Map<String, ?> inputParameters, Long connectionId);
 
-    Object executeSampleOutput(
+    SampleOutputResponse executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> inputParameters, Long connectionId);
-
-    List<? extends ValueProperty<?>> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, Object> inputParameters, Long connectionId);
 }

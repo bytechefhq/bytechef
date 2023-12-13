@@ -19,6 +19,7 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property.ValueProperty;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
@@ -32,7 +33,15 @@ public interface ComponentPropertiesFunction extends PropertiesDataSource.Proper
      * @param connectionParameters
      * @return
      */
-    List<? extends ValueProperty<?>> apply(
+    PropertiesResponse apply(
         ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
         throws ComponentExecutionException;
+
+    @SuppressFBWarnings("EI")
+    record PropertiesResponse(List<? extends ValueProperty<?>> properties, String errorMessage) {
+
+        public PropertiesResponse(List<? extends ValueProperty<?>> properties) {
+            this(properties, null);
+        }
+    }
 }

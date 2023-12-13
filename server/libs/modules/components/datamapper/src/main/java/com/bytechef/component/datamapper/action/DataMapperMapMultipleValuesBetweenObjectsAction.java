@@ -29,6 +29,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
@@ -75,7 +76,7 @@ public class DataMapperMapMultipleValuesBetweenObjectsAction {
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
         return (inputParameters, connection, context) -> {
-            return object();
+            return new OutputSchemaResponse(object());
         };
     }
 }

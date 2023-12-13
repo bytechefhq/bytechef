@@ -24,10 +24,12 @@ import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
 import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.ValueProperty;
+import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.registry.domain.PropertiesResponse;
+import com.bytechef.hermes.registry.domain.SampleOutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -53,7 +55,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public List<? extends ValueProperty<?>> executeDynamicProperties(
+    public PropertiesResponse executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
         @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
@@ -102,7 +104,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public String executeEditorDescription(
+    public EditorDescriptionResponse executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
@@ -150,7 +152,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public List<? extends ValueProperty<?>> executeOutputSchema(
+    public OutputSchemaResponse executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
@@ -162,7 +164,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public Object executeSampleOutput(
+    public SampleOutputResponse executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId) {
 

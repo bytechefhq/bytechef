@@ -21,8 +21,11 @@ import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
 import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.ValueProperty;
+import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.registry.domain.PropertiesResponse;
+import com.bytechef.hermes.registry.domain.SampleOutputResponse;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
@@ -33,12 +36,12 @@ import org.springframework.lang.Nullable;
  */
 public interface ActionDefinitionService {
 
-    List<? extends ValueProperty<?>> executeDynamicProperties(
+    PropertiesResponse executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull Context context);
 
-    String executeEditorDescription(
+    EditorDescriptionResponse executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull Context context);
@@ -48,7 +51,7 @@ public interface ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, String searchText, @Nullable ComponentConnection connection,
         @NonNull Context context);
 
-    List<? extends ValueProperty<?>> executeOutputSchema(
+    OutputSchemaResponse executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull Context context);
@@ -58,7 +61,7 @@ public interface ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull ActionContext context);
 
-    Object executeSampleOutput(
+    SampleOutputResponse executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> actionParameters, @Nullable ComponentConnection connection, @NonNull Context context);
 

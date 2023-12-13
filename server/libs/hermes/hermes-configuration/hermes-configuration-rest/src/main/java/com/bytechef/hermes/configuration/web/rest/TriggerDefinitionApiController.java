@@ -21,8 +21,11 @@ import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentOperationRequestModel;
-import com.bytechef.hermes.configuration.web.rest.model.OptionsOutputModel;
-import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.EditorDescriptionResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.OptionsResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.OutputSchemaResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.PropertiesResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.SampleOutputResponseModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionModel;
 import java.util.List;
@@ -76,55 +79,60 @@ public class TriggerDefinitionApiController implements TriggerDefinitionApi {
     }
 
     @Override
-    public ResponseEntity<String> getComponentTriggerEditorDescription(
+    public ResponseEntity<EditorDescriptionResponseModel> getComponentTriggerEditorDescription(
         String componentName, Integer componentVersion, String triggerName,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
         return ResponseEntity.ok(
-            triggerDefinitionFacade.executeEditorDescription(
-                componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
-                componentOperationRequestModel.getConnectionId()));
+            conversionService.convert(
+                triggerDefinitionFacade.executeEditorDescription(
+                    componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
+                    componentOperationRequestModel.getConnectionId()),
+                EditorDescriptionResponseModel.class));
     }
 
     @Override
-    public ResponseEntity<List<PropertyModel>> getComponentTriggerOutputSchema(
+    public ResponseEntity<OutputSchemaResponseModel> getComponentTriggerOutputSchema(
         String componentName, Integer componentVersion, String triggerName,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
         return ResponseEntity.ok(
-            CollectionUtils.map(
+            conversionService.convert(
                 triggerDefinitionFacade.executeOutputSchema(
                     componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
                     componentOperationRequestModel.getConnectionId()),
-                property -> conversionService.convert(property, PropertyModel.class)));
+                OutputSchemaResponseModel.class));
     }
 
     @Override
-    public ResponseEntity<Object> getComponentTriggerSampleOutput(
+    public ResponseEntity<SampleOutputResponseModel> getComponentTriggerSampleOutput(
         String componentName, Integer componentVersion, String triggerName,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
         return ResponseEntity.ok(
-            triggerDefinitionFacade.executeSampleOutput(
-                componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
-                componentOperationRequestModel.getConnectionId()));
+            conversionService.convert(
+                triggerDefinitionFacade.executeSampleOutput(
+                    componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
+                    componentOperationRequestModel.getConnectionId()),
+                SampleOutputResponseModel.class));
     }
 
     @Override
-    public ResponseEntity<List<PropertyModel>> getComponentTriggerPropertyDynamicProperties(
+    public ResponseEntity<PropertiesResponseModel> getComponentTriggerPropertyDynamicProperties(
         String componentName, Integer componentVersion, String triggerName, String propertyName,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
-        return ResponseEntity.ok(CollectionUtils.map(
-            triggerDefinitionFacade.executeDynamicProperties(
-                componentName, componentVersion, triggerName, propertyName,
-                componentOperationRequestModel.getParameters(),
-                componentOperationRequestModel.getConnectionId()),
-            option -> conversionService.convert(option, PropertyModel.class)));
+        return ResponseEntity.ok(
+            conversionService.convert(
+                triggerDefinitionFacade.executeDynamicProperties(
+                    componentName, componentVersion, triggerName, propertyName,
+                    componentOperationRequestModel.getParameters(),
+                    componentOperationRequestModel.getConnectionId()),
+                PropertiesResponseModel.class));
     }
 
     @Override
-    public ResponseEntity<OptionsOutputModel> getComponentTriggerPropertyOptions(
+    public ResponseEntity<OptionsResponseModel> getComponentTriggerPropertyOptions(
         String componentName, Integer componentVersion, String triggerName, String propertyName, String searchText,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
@@ -134,7 +142,7 @@ public class TriggerDefinitionApiController implements TriggerDefinitionApi {
                     componentName, componentVersion, triggerName, propertyName,
                     componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId(),
                     searchText),
-                OptionsOutputModel.class));
+                OptionsResponseModel.class));
     }
 
     @Override

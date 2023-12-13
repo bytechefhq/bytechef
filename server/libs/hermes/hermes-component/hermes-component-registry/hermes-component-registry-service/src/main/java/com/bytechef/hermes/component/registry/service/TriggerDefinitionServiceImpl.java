@@ -58,9 +58,13 @@ import com.bytechef.hermes.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
+import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
 import com.bytechef.hermes.registry.domain.Option;
 import com.bytechef.hermes.registry.domain.OptionsResponse;
+import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.registry.domain.PropertiesResponse;
 import com.bytechef.hermes.registry.domain.Property;
+import com.bytechef.hermes.registry.domain.SampleOutputResponse;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -92,7 +96,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public List<? extends ValueProperty<?>> executeDynamicProperties(
+    public PropertiesResponse executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
         @Nullable ComponentConnection connection, @NonNull Context context) {
@@ -100,15 +104,15 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         ComponentPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, triggerName, propertyName);
 
-        List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>> valueProperties =
-            propertiesFunction.apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()),
-                context);
+        ComponentPropertiesFunction.PropertiesResponse propertiesResponse = propertiesFunction.apply(
+            new ParameterMapImpl(inputParameters),
+            connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
 
-        return valueProperties.stream()
-            .map(valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty))
-            .toList();
+        return new PropertiesResponse(
+            CollectionUtils.map(
+                propertiesResponse.properties(),
+                valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty)),
+            propertiesResponse.errorMessage());
     }
 
     @Override
@@ -154,16 +158,20 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public String executeEditorDescription(
+    public EditorDescriptionResponse executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
         EditorDescriptionFunction editorDescriptionFunction = getEditorDescriptionFunction(
             componentName, componentVersion, triggerName);
 
-        return editorDescriptionFunction.apply(
-            new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+        EditorDescriptionDataSource.EditorDescriptionResponse editorDescriptionResponse = editorDescriptionFunction
+            .apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+
+        return new EditorDescriptionResponse(
+            editorDescriptionResponse.description(), editorDescriptionResponse.errorMessage());
     }
 
     @Override
@@ -218,30 +226,34 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public List<? extends ValueProperty<?>> executeOutputSchema(
+    public OutputSchemaResponse executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
         OutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
             componentName, componentVersion, triggerName);
 
-        return Property.toProperty(
-            outputSchemaFunction.apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()), context));
+        OutputSchemaDataSource.OutputSchemaResponse outputSchemaResponse = outputSchemaFunction.apply(
+            new ParameterMapImpl(inputParameters),
+            connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+
+        return new OutputSchemaResponse(
+            Property.toProperty(outputSchemaResponse.property()), outputSchemaResponse.errorMessage());
     }
 
     @Override
-    public Object executeSampleOutput(
+    public SampleOutputResponse executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
         SampleOutputFunction sampleOutputFunction = getSampleOutputFunction(
             componentName, componentVersion, triggerName);
 
-        return sampleOutputFunction.apply(
+        SampleOutputDataSource.SampleOutputResponse sampleOutputResponse = sampleOutputFunction.apply(
             new ParameterMapImpl(inputParameters),
             connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+
+        return new SampleOutputResponse(sampleOutputResponse.sampleOutput(), sampleOutputResponse.errorMessage());
     }
 
     @Override
@@ -470,8 +482,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return OptionalUtils.mapOrElse(
             triggerDefinition.getEditorDescriptionDataSource(),
             EditorDescriptionDataSource::getEditorDescription,
-            (inputParameters, connectionParameters, context) -> componentDefinition.getTitle() + ": " +
-                triggerDefinition.getTitle());
+            (
+                inputParameters, connectionParameters,
+                context) -> new EditorDescriptionDataSource.EditorDescriptionResponse(
+                    componentDefinition.getTitle() + ": " + triggerDefinition.getTitle()));
     }
 
     private ListenerDisableConsumer getListenerDisableConsumer(

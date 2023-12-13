@@ -20,8 +20,11 @@ import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
+import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
 import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.ValueProperty;
+import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.registry.domain.PropertiesResponse;
+import com.bytechef.hermes.registry.domain.SampleOutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +61,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public List<? extends ValueProperty<?>> executeDynamicProperties(
+    public PropertiesResponse executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, ComponentConnection connection,
         @NonNull Context context) {
@@ -84,7 +87,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public String executeEditorDescription(
+    public EditorDescriptionResponse executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> triggerParameters, ComponentConnection connection, @NonNull Context context) {
 
@@ -119,7 +122,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public List<? extends ValueProperty<?>> executeOutputSchema(
+    public OutputSchemaResponse executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 
@@ -127,7 +130,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public Object executeSampleOutput(
+    public SampleOutputResponse executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull Context context) {
 

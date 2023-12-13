@@ -13,10 +13,12 @@ import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
+import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
 import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.ValueProperty;
+import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.registry.domain.PropertiesResponse;
+import com.bytechef.hermes.registry.domain.SampleOutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -42,7 +44,19 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
-    public String executeEditorDescription(
+    public PropertiesResponse executeDynamicProperties(
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
+        @NonNull Map<String, Object> inputParameters, Long connectionId) {
+
+        return defaultRestClient.post(
+            uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-properties"),
+            new PropertiesRequest(
+                componentName, componentVersion, triggerName, propertyName, inputParameters, connectionId),
+            new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public EditorDescriptionResponse executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
@@ -51,7 +65,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
                 uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-editor-description"),
             new EditorDescriptionRequest(
                 componentName, componentVersion, triggerName, inputParameters, connectionId),
-            String.class);
+            EditorDescriptionResponse.class);
     }
 
     @Override
@@ -104,26 +118,14 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
-    public List<? extends ValueProperty<?>> executeOutputSchema(
+    public OutputSchemaResponse executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-output-schema"),
             new OutputSchemaRequest(componentName, componentVersion, triggerName, inputParameters, connectionId),
-            new ParameterizedTypeReference<List<? extends ValueProperty<?>>>() {});
-    }
-
-    @Override
-    public List<? extends ValueProperty<?>> executeDynamicProperties(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, Object> inputParameters, Long connectionId) {
-
-        return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-properties"),
-            new PropertiesRequest(
-                componentName, componentVersion, triggerName, propertyName, inputParameters, connectionId),
-            new ParameterizedTypeReference<List<? extends ValueProperty<?>>>() {});
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override
@@ -157,14 +159,14 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
-    public Object executeSampleOutput(
+    public SampleOutputResponse executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-sample-output"),
             new SampleOutputRequest(componentName, componentVersion, triggerName, inputParameters, connectionId),
-            Object.class);
+            SampleOutputResponse.class);
     }
 
     @Override

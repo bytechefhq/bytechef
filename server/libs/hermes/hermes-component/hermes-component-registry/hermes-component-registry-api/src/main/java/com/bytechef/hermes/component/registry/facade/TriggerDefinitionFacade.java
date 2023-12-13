@@ -19,9 +19,11 @@ package com.bytechef.hermes.component.registry.facade;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
+import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
 import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.ValueProperty;
-import java.util.List;
+import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.registry.domain.PropertiesResponse;
+import com.bytechef.hermes.registry.domain.SampleOutputResponse;
 import java.util.Map;
 import org.springframework.lang.NonNull;
 
@@ -30,7 +32,7 @@ import org.springframework.lang.NonNull;
  */
 public interface TriggerDefinitionFacade {
 
-    List<? extends ValueProperty<?>> executeDynamicProperties(
+    PropertiesResponse executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
         @NonNull Map<String, Object> inputParameters, Long connectionId);
 
@@ -48,7 +50,7 @@ public interface TriggerDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters);
 
-    String executeEditorDescription(
+    EditorDescriptionResponse executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId);
 
@@ -64,11 +66,11 @@ public interface TriggerDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText);
 
-    List<? extends ValueProperty<?>> executeOutputSchema(
+    OutputSchemaResponse executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId);
 
-    Object executeSampleOutput(
+    SampleOutputResponse executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId);
 

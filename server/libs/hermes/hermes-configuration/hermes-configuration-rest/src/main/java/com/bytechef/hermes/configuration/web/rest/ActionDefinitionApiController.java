@@ -23,8 +23,11 @@ import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentOperationRequestModel;
-import com.bytechef.hermes.configuration.web.rest.model.OptionsOutputModel;
-import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.EditorDescriptionResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.OptionsResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.OutputSchemaResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.PropertiesResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.SampleOutputResponseModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -87,53 +90,60 @@ public class ActionDefinitionApiController implements ActionDefinitionApi {
     }
 
     @Override
-    public ResponseEntity<String> getComponentActionEditorDescription(
+    public ResponseEntity<EditorDescriptionResponseModel> getComponentActionEditorDescription(
         String componentName, Integer componentVersion, String actionName,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
         return ResponseEntity.ok(
-            actionDefinitionFacade.executeEditorDescription(
-                componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
-                componentOperationRequestModel.getConnectionId()));
+            conversionService.convert(
+                actionDefinitionFacade.executeEditorDescription(
+                    componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
+                    componentOperationRequestModel.getConnectionId()),
+                EditorDescriptionResponseModel.class));
     }
 
     @Override
-    public ResponseEntity<List<PropertyModel>> getComponentActionOutputSchema(
+    public ResponseEntity<OutputSchemaResponseModel> getComponentActionOutputSchema(
         String componentName, Integer componentVersion, String actionName,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
-        return ResponseEntity.ok(CollectionUtils.map(
-            actionDefinitionFacade.executeOutputSchema(
-                componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
-                componentOperationRequestModel.getConnectionId()),
-            property -> conversionService.convert(property, PropertyModel.class)));
+        return ResponseEntity.ok(
+            conversionService.convert(
+                actionDefinitionFacade.executeOutputSchema(
+                    componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
+                    componentOperationRequestModel.getConnectionId()),
+                OutputSchemaResponseModel.class));
     }
 
     @Override
-    public ResponseEntity<Object> getComponentActionSampleOutput(
+    public ResponseEntity<SampleOutputResponseModel> getComponentActionSampleOutput(
         String componentName, Integer componentVersion, String actionName,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
-        return ResponseEntity.ok(actionDefinitionFacade.executeSampleOutput(
-            componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
-            componentOperationRequestModel.getConnectionId()));
+        return ResponseEntity.ok(
+            conversionService.convert(
+                actionDefinitionFacade.executeSampleOutput(
+                    componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
+                    componentOperationRequestModel.getConnectionId()),
+                SampleOutputResponseModel.class));
     }
 
     @Override
-    public ResponseEntity<List<PropertyModel>> getComponentActionPropertyDynamicProperties(
+    public ResponseEntity<PropertiesResponseModel> getComponentActionPropertyDynamicProperties(
         String componentName, Integer componentVersion, String actionName, String propertyName,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
-        return ResponseEntity.ok(CollectionUtils.map(
-            actionDefinitionFacade.executeDynamicProperties(
-                componentName, componentVersion, actionName, propertyName,
-                componentOperationRequestModel.getParameters(),
-                componentOperationRequestModel.getConnectionId()),
-            option -> conversionService.convert(option, PropertyModel.class)));
+        return ResponseEntity.ok(
+            conversionService.convert(
+                actionDefinitionFacade.executeDynamicProperties(
+                    componentName, componentVersion, actionName, propertyName,
+                    componentOperationRequestModel.getParameters(),
+                    componentOperationRequestModel.getConnectionId()),
+                PropertiesResponseModel.class));
     }
 
     @Override
-    public ResponseEntity<OptionsOutputModel> getComponentActionPropertyOptions(
+    public ResponseEntity<OptionsResponseModel> getComponentActionPropertyOptions(
         String componentName, Integer componentVersion, String actionName, String propertyName, String searchText,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
@@ -143,6 +153,6 @@ public class ActionDefinitionApiController implements ActionDefinitionApi {
                     componentName, componentVersion, actionName, propertyName,
                     componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId(),
                     searchText),
-                OptionsOutputModel.class));
+                OptionsResponseModel.class));
     }
 }

@@ -11,12 +11,14 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhook
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
+import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
 import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.ValueProperty;
+import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.registry.domain.PropertiesResponse;
+import com.bytechef.hermes.registry.domain.SampleOutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -100,7 +102,7 @@ public class RemoteTriggerDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<String> executeEditorDescription(
+    public ResponseEntity<EditorDescriptionResponse> executeEditorDescription(
         @Valid @RequestBody EditorDescriptionRequest editorDescriptionRequest) {
 
         return ResponseEntity.ok(
@@ -170,11 +172,12 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public List<? extends ValueProperty<?>>
+    public ResponseEntity<PropertiesResponse>
         executeProperties(@Valid @RequestBody PropertiesRequest propertiesRequest) {
-        return triggerDefinitionFacade.executeDynamicProperties(
-            propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.triggerName,
-            propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.connectionId);
+        return ResponseEntity.ok(
+            triggerDefinitionFacade.executeDynamicProperties(
+                propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.triggerName,
+                propertiesRequest.propertyName, propertiesRequest.inputParameters, propertiesRequest.connectionId));
     }
 
     @RequestMapping(
@@ -186,12 +189,14 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public List<? extends ValueProperty<?>> executeOutputSchema(
+    public ResponseEntity<OutputSchemaResponse> executeOutputSchema(
         @Valid @RequestBody RemoteTriggerDefinitionFacadeController.OutputSchemaRequest outputSchemaRequest) {
 
-        return triggerDefinitionFacade.executeOutputSchema(
-            outputSchemaRequest.componentName, outputSchemaRequest.componentVersion, outputSchemaRequest.triggerName,
-            outputSchemaRequest.inputParameters, outputSchemaRequest.connectionId);
+        return ResponseEntity.ok(
+            triggerDefinitionFacade.executeOutputSchema(
+                outputSchemaRequest.componentName, outputSchemaRequest.componentVersion,
+                outputSchemaRequest.triggerName,
+                outputSchemaRequest.inputParameters, outputSchemaRequest.connectionId));
     }
 
     @RequestMapping(
@@ -203,10 +208,14 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public Object executeSampleOutput(@Valid @RequestBody SampleOutputRequest sampleOutputRequest) {
-        return triggerDefinitionFacade.executeSampleOutput(
-            sampleOutputRequest.componentName, sampleOutputRequest.componentVersion, sampleOutputRequest.triggerName,
-            sampleOutputRequest.inputParameters, sampleOutputRequest.connectionId);
+    public ResponseEntity<SampleOutputResponse> executeSampleOutput(
+        @Valid @RequestBody SampleOutputRequest sampleOutputRequest) {
+
+        return ResponseEntity.ok(
+            triggerDefinitionFacade.executeSampleOutput(
+                sampleOutputRequest.componentName, sampleOutputRequest.componentVersion,
+                sampleOutputRequest.triggerName,
+                sampleOutputRequest.inputParameters, sampleOutputRequest.connectionId));
     }
 
     @RequestMapping(

@@ -185,7 +185,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "string"
+                $ref: "#/components/schemas/EditorDescriptionResponse"
   /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/output-schema:
     post:
       description: "Get an action output schema shown in the editor."
@@ -223,9 +223,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Property"
+                $ref: "#/components/schemas/OutputSchemaResponse"
   /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/sample-output:
     post:
       description: "Get an action sample output shown in the editor."
@@ -263,7 +261,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/SampleOutputResponse"
   ? /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/dynamic-properties
   : post:
       description: "Get dynamic properties for an action property shown in the editor."
@@ -307,9 +305,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Property"
+                $ref: "#/components/schemas/PropertiesResponse"
   /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/options:
     post:
       description: "Get an action property options shown in the editor."
@@ -565,7 +561,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "string"
+                $ref: "#/components/schemas/EditorDescriptionResponse"
   /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/output-schema:
     post:
       description: "Get a trigger output schema shown in the editor."
@@ -603,9 +599,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Property"
+                $ref: "#/components/schemas/OutputSchemaResponse"
   /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/sample-output:
     post:
       description: "Get a trigger sample output shown in the editor."
@@ -643,7 +637,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "object"
+                $ref: "#/components/schemas/SampleOutputResponse"
   ? /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/dynamic-properties
   : post:
       description: "Get dynamic properties for a trigger property shown in the editor."
@@ -687,9 +681,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Property"
+                $ref: "#/components/schemas/PropertiesResponse"
   /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/options:
     post:
       description: "Get a trigger property options shown in the editor."
@@ -1256,6 +1248,16 @@ components:
         properties:
           propertiesDataSource:
             $ref: "#/components/schemas/PropertiesDataSource"
+    EditorDescriptionResponse:
+      description: "A sample output response."
+      type: "object"
+      properties:
+        errorMessage:
+          description: "The error message."
+          type: "string"
+        description:
+          description: "The description."
+          type: "object"
     Help:
       description: "The help text that is meant to guide your users as to how to configure\
         \ this action or trigger."
@@ -1413,6 +1415,15 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Option"
+    OutputSchemaResponse:
+      description: "An output schema response."
+      type: "object"
+      properties:
+        errorMessage:
+          description: "The error message."
+          type: "string"
+        property:
+          $ref: "#/components/schemas/Property"
     PropertiesDataSource:
       description: "Defines function that should load properties."
       type: "object"
@@ -1489,6 +1500,18 @@ components:
       - "STRING"
       - "OBJECT"
       - "TIME"
+    PropertiesResponse:
+      description: "A dynamic properties response."
+      type: "object"
+      properties:
+        errorMessage:
+          description: "The error message."
+          type: "string"
+        properties:
+          description: "The list of properties."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
     Resources:
       description: "A set of available resources."
       type: "object"
@@ -1496,6 +1519,16 @@ components:
         documentationUrl:
           description: "The url of available documentation."
           type: "string"
+    SampleOutputResponse:
+      description: "A sample output response."
+      type: "object"
+      properties:
+        errorMessage:
+          description: "The error message."
+          type: "string"
+        sampleOutput:
+          description: "The sample output value."
+          type: "object"
     StringProperty:
       description: "A string property."
       type: "object"

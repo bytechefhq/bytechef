@@ -18,6 +18,7 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Property.OutputProperty;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
@@ -43,7 +44,15 @@ public interface OutputSchemaDataSource {
          * @param context
          * @return
          */
-        OutputProperty<?> apply(ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
+        OutputSchemaResponse apply(ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
             throws ComponentExecutionException;
+    }
+
+    @SuppressFBWarnings("EI")
+    record OutputSchemaResponse(OutputProperty<?> property, String errorMessage) {
+
+        public OutputSchemaResponse(OutputProperty<?> property) {
+            this(property, null);
+        }
     }
 }

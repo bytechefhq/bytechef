@@ -17,6 +17,7 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
@@ -33,8 +34,16 @@ public interface EditorDescriptionDataSource {
          * @param context
          * @return
          */
-        String apply(ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
-            throws ComponentExecutionException;
+        EditorDescriptionResponse
+            apply(ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
+                throws ComponentExecutionException;
+    }
 
+    @SuppressFBWarnings("EI")
+    record EditorDescriptionResponse(String description, String errorMessage) {
+
+        public EditorDescriptionResponse(String description) {
+            this(description, null);
+        }
     }
 }

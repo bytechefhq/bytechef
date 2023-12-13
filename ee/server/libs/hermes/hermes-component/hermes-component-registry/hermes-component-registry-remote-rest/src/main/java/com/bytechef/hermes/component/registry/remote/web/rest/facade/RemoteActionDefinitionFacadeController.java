@@ -8,12 +8,13 @@
 package com.bytechef.hermes.component.registry.remote.web.rest.facade;
 
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
 import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.ValueProperty;
+import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.registry.domain.PropertiesResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -43,7 +44,7 @@ public class RemoteActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<String> executeEditorDescription(
+    public ResponseEntity<EditorDescriptionResponse> executeEditorDescription(
         @Valid @RequestBody EditorDescriptionRequest editorDescriptionRequest) {
 
         return ResponseEntity.ok(actionDefinitionFacade.executeEditorDescription(
@@ -73,7 +74,7 @@ public class RemoteActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<List<? extends ValueProperty<?>>> executeDynamicProperties(
+    public ResponseEntity<PropertiesResponse> executeDynamicProperties(
         @Valid @RequestBody PropertiesRequest propertiesRequest) {
 
         return ResponseEntity.ok(
@@ -102,7 +103,7 @@ public class RemoteActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<List<? extends ValueProperty<?>>> executeOutputSchema(
+    public ResponseEntity<OutputSchemaResponse> executeOutputSchema(
         @Valid @RequestBody OutputSchemaRequest outputSchemaRequest) {
 
         return ResponseEntity.ok(

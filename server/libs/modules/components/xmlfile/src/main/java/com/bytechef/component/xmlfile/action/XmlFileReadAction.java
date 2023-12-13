@@ -35,6 +35,7 @@ import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.F
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.InputStream;
 import java.util.List;
@@ -128,9 +129,9 @@ public class XmlFileReadAction {
         // TODO
         return (inputParameters, connection, context) -> {
             if (inputParameters.getBoolean(IS_ARRAY, false)) {
-                return object();
+                return new OutputSchemaResponse(object());
             } else {
-                return array();
+                return new OutputSchemaResponse(array());
             }
         };
     }

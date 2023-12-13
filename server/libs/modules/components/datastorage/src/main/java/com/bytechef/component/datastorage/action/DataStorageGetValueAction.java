@@ -37,6 +37,7 @@ import static com.bytechef.hermes.definition.DefinitionDSL.time;
 import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
@@ -125,18 +126,19 @@ public class DataStorageGetValueAction {
 
     protected static OutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connection, context) -> switch (inputParameters.getRequiredInteger(TYPE)) {
-            case 1 -> array();
-            case 2 -> bool();
-            case 3 -> date();
-            case 4 -> dateTime();
-            case 5 -> integer();
-            case 6 -> nullable();
-            case 7 -> number();
-            case 8 -> object();
-            case 9 -> string();
-            case 10 -> time();
-            default -> throw new IllegalArgumentException("Type does not exist");
-        };
+        return (inputParameters, connection, context) -> new OutputSchemaResponse(
+            switch (inputParameters.getRequiredInteger(TYPE)) {
+                case 1 -> array();
+                case 2 -> bool();
+                case 3 -> date();
+                case 4 -> dateTime();
+                case 5 -> integer();
+                case 6 -> nullable();
+                case 7 -> number();
+                case 8 -> object();
+                case 9 -> string();
+                case 10 -> time();
+                default -> throw new IllegalArgumentException("Type does not exist");
+            });
     }
 }
