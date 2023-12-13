@@ -64,12 +64,6 @@ const Property = ({
     const [mentionInput, setMentionInput] = useState(true);
     const [integerValue, setIntegerValue] = useState('');
 
-    useEffect(() => {
-        if (mention !== undefined) {
-            setMentionInput(mention);
-        }
-    }, [mention]);
-
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -82,12 +76,6 @@ const Property = ({
     let defaultValue: string | undefined = property.defaultValue as string | undefined;
 
     const {controlType, description, hidden, items, label, objectType, options, properties, required, type} = property;
-
-    useEffect(() => {
-        if (controlType === 'SELECT') {
-            setMentionInput(false);
-        }
-    }, [controlType]);
 
     if (!name) {
         type === 'OBJECT' || type === 'ARRAY' ? (name = 'item') : <></>;
@@ -107,8 +95,7 @@ const Property = ({
             }) as ISelectOption
     );
 
-    const isValidPropertyType =
-        inputPropertyControlTypes.includes(controlType!) || inputPropertyControlTypes.includes(type!);
+    const isValidPropertyType = inputPropertyControlTypes.includes(controlType!);
 
     const isNumericalInput = getInputType(controlType) === 'number' || type === 'INTEGER' || type === 'NUMBER';
 
@@ -180,6 +167,16 @@ const Property = ({
             }, 50);
         }
     };
+
+    useEffect(() => {
+        if (mention !== undefined) {
+            setMentionInput(mention);
+
+            if (controlType === 'SELECT' && mention) {
+                setMentionInput(false);
+            }
+        }
+    }, [controlType, mention, mentionInput]);
 
     if (type === 'OBJECT' && !properties?.length && !items?.length) {
         return <></>;
