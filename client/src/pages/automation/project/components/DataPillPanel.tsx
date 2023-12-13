@@ -37,7 +37,7 @@ const DataPillPanel = ({
 
         return {
             ...action,
-            workflowAlias: `${action.componentName}-${sameNameIndex + 1}`,
+            workflowAlias: `${action.componentName}_${sameNameIndex + 1}`,
         };
     });
 

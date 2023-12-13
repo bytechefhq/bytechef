@@ -133,7 +133,7 @@ const WorkflowNodeDetailsPanel = ({
     const previousComponentNames = componentNames.length > 1 ? componentNames.slice(0, currentNodeIndex) : [];
 
     const normalizedPreviousComponentNames = previousComponentNames.map((name) =>
-        name.match(new RegExp(/-\d$/)) ? name.slice(0, name.length - 2) : name
+        name.match(new RegExp(/_\d$/)) ? name.slice(0, name.length - 2) : name
     );
 
     const {data: previousComponents} = useGetComponentDefinitionsQuery(
@@ -364,7 +364,7 @@ const WorkflowNodeDetailsPanel = ({
 
                 const duplicateComponentActionIndex = componentActions.findIndex(
                     (action) =>
-                        action.workflowAlias?.match(new RegExp(/-\d$/)) && action.workflowAlias === workflowAlias
+                        action.workflowAlias?.match(new RegExp(/_\d$/)) && action.workflowAlias === workflowAlias
                 );
 
                 if (duplicateComponentActionIndex !== -1) {
