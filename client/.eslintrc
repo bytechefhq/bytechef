@@ -25,14 +25,7 @@
         "ecmaVersion": 11,
         "sourceType": "module"
     },
-    "plugins": [
-        "@typescript-eslint",
-        "bytechef",
-        "react",
-        "react-hooks",
-        "sort-destructure-keys",
-        "tailwindcss"
-    ],
+    "plugins": ["@typescript-eslint", "bytechef", "react", "react-hooks", "sort-destructure-keys", "tailwindcss"],
     "rules": {
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
