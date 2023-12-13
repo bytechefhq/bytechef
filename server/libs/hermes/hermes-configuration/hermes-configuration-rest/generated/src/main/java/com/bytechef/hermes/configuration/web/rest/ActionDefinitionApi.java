@@ -8,8 +8,11 @@ package com.bytechef.hermes.configuration.web.rest;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.hermes.configuration.web.rest.model.ComponentOperationRequestModel;
-import com.bytechef.hermes.configuration.web.rest.model.OptionsOutputModel;
-import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.EditorDescriptionResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.OptionsResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.OutputSchemaResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.PropertiesResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.SampleOutputResponseModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,7 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-11T17:41:37.501155+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "action-definition", description = "The Core Action Definition API")
 public interface ActionDefinitionApi {
@@ -191,7 +194,7 @@ public interface ActionDefinitionApi {
         tags = { "action-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The editor description.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = EditorDescriptionResponseModel.class))
             })
         }
     )
@@ -202,12 +205,21 @@ public interface ActionDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<String> getComponentActionEditorDescription(
+    default ResponseEntity<EditorDescriptionResponseModel> getComponentActionEditorDescription(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
         @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) ComponentOperationRequestModel componentOperationRequestModel
     ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"description\" : \"{}\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -230,7 +242,7 @@ public interface ActionDefinitionApi {
         tags = { "action-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The output schema.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PropertyModel.class)))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = OutputSchemaResponseModel.class))
             })
         }
     )
@@ -241,7 +253,7 @@ public interface ActionDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<List<PropertyModel>> getComponentActionOutputSchema(
+    default ResponseEntity<OutputSchemaResponseModel> getComponentActionOutputSchema(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
@@ -250,7 +262,7 @@ public interface ActionDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ]";
+                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"property\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -279,7 +291,7 @@ public interface ActionDefinitionApi {
         tags = { "action-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of options.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PropertyModel.class)))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = PropertiesResponseModel.class))
             })
         }
     )
@@ -290,7 +302,7 @@ public interface ActionDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<List<PropertyModel>> getComponentActionPropertyDynamicProperties(
+    default ResponseEntity<PropertiesResponseModel> getComponentActionPropertyDynamicProperties(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
@@ -300,7 +312,7 @@ public interface ActionDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ]";
+                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -330,7 +342,7 @@ public interface ActionDefinitionApi {
         tags = { "action-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of options.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = OptionsOutputModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = OptionsResponseModel.class))
             })
         }
     )
@@ -341,7 +353,7 @@ public interface ActionDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<OptionsOutputModel> getComponentActionPropertyOptions(
+    default ResponseEntity<OptionsResponseModel> getComponentActionPropertyOptions(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
@@ -380,7 +392,7 @@ public interface ActionDefinitionApi {
         tags = { "action-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The output schema.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = Object.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SampleOutputResponseModel.class))
             })
         }
     )
@@ -391,12 +403,21 @@ public interface ActionDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<Object> getComponentActionSampleOutput(
+    default ResponseEntity<SampleOutputResponseModel> getComponentActionSampleOutput(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
         @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) ComponentOperationRequestModel componentOperationRequestModel
     ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"sampleOutput\" : \"{}\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

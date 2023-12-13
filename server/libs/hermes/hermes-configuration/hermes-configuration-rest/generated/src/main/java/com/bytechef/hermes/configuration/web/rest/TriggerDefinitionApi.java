@@ -6,8 +6,11 @@
 package com.bytechef.hermes.configuration.web.rest;
 
 import com.bytechef.hermes.configuration.web.rest.model.ComponentOperationRequestModel;
-import com.bytechef.hermes.configuration.web.rest.model.OptionsOutputModel;
-import com.bytechef.hermes.configuration.web.rest.model.PropertyModel;
+import com.bytechef.hermes.configuration.web.rest.model.EditorDescriptionResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.OptionsResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.OutputSchemaResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.PropertiesResponseModel;
+import com.bytechef.hermes.configuration.web.rest.model.SampleOutputResponseModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.hermes.configuration.web.rest.model.TriggerDefinitionModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -36,7 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-11T17:41:37.501155+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "trigger-definition", description = "The Core Trigger Definition API")
 public interface TriggerDefinitionApi {
@@ -150,7 +153,7 @@ public interface TriggerDefinitionApi {
         tags = { "trigger-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The editor description.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = EditorDescriptionResponseModel.class))
             })
         }
     )
@@ -161,12 +164,21 @@ public interface TriggerDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<String> getComponentTriggerEditorDescription(
+    default ResponseEntity<EditorDescriptionResponseModel> getComponentTriggerEditorDescription(
         @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
         @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) ComponentOperationRequestModel componentOperationRequestModel
     ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"description\" : \"{}\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -189,7 +201,7 @@ public interface TriggerDefinitionApi {
         tags = { "trigger-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The output schema.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PropertyModel.class)))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = OutputSchemaResponseModel.class))
             })
         }
     )
@@ -200,7 +212,7 @@ public interface TriggerDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<List<PropertyModel>> getComponentTriggerOutputSchema(
+    default ResponseEntity<OutputSchemaResponseModel> getComponentTriggerOutputSchema(
         @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
@@ -209,7 +221,7 @@ public interface TriggerDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ]";
+                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"property\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -238,7 +250,7 @@ public interface TriggerDefinitionApi {
         tags = { "trigger-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of options.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PropertyModel.class)))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = PropertiesResponseModel.class))
             })
         }
     )
@@ -249,7 +261,7 @@ public interface TriggerDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<List<PropertyModel>> getComponentTriggerPropertyDynamicProperties(
+    default ResponseEntity<PropertiesResponseModel> getComponentTriggerPropertyDynamicProperties(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
@@ -259,7 +271,7 @@ public interface TriggerDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ]";
+                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"label\" : \"label\", \"placeholder\" : \"placeholder\", \"required\" : true, \"expressionEnabled\" : true } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -289,7 +301,7 @@ public interface TriggerDefinitionApi {
         tags = { "trigger-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of options.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = OptionsOutputModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = OptionsResponseModel.class))
             })
         }
     )
@@ -300,7 +312,7 @@ public interface TriggerDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<OptionsOutputModel> getComponentTriggerPropertyOptions(
+    default ResponseEntity<OptionsResponseModel> getComponentTriggerPropertyOptions(
         @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
@@ -339,7 +351,7 @@ public interface TriggerDefinitionApi {
         tags = { "trigger-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The output schema.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = Object.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = SampleOutputResponseModel.class))
             })
         }
     )
@@ -350,12 +362,21 @@ public interface TriggerDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<Object> getComponentTriggerSampleOutput(
+    default ResponseEntity<SampleOutputResponseModel> getComponentTriggerSampleOutput(
         @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
         @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) ComponentOperationRequestModel componentOperationRequestModel
     ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errorMessage\" : \"errorMessage\", \"sampleOutput\" : \"{}\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

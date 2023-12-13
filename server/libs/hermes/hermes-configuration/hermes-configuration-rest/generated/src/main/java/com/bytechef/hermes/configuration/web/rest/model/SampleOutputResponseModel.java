@@ -2,13 +2,9 @@ package com.bytechef.hermes.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -20,20 +16,19 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The response object when dynamically resolving options.
+ * A sample output response.
  */
 
-@Schema(name = "OptionsOutput", description = "The response object when dynamically resolving options.")
-@JsonTypeName("OptionsOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-11T17:41:37.501155+01:00[Europe/Zagreb]")
-public class OptionsOutputModel {
+@Schema(name = "SampleOutputResponse", description = "A sample output response.")
+@JsonTypeName("SampleOutputResponse")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+public class SampleOutputResponseModel {
 
   private String errorMessage;
 
-  @Valid
-  private List<@Valid OptionModel> options;
+  private Object sampleOutput;
 
-  public OptionsOutputModel errorMessage(String errorMessage) {
+  public SampleOutputResponseModel errorMessage(String errorMessage) {
     this.errorMessage = errorMessage;
     return this;
   }
@@ -53,32 +48,24 @@ public class OptionsOutputModel {
     this.errorMessage = errorMessage;
   }
 
-  public OptionsOutputModel options(List<@Valid OptionModel> options) {
-    this.options = options;
-    return this;
-  }
-
-  public OptionsOutputModel addOptionsItem(OptionModel optionsItem) {
-    if (this.options == null) {
-      this.options = new ArrayList<>();
-    }
-    this.options.add(optionsItem);
+  public SampleOutputResponseModel sampleOutput(Object sampleOutput) {
+    this.sampleOutput = sampleOutput;
     return this;
   }
 
   /**
-   * Get options
-   * @return options
+   * The sample output value.
+   * @return sampleOutput
   */
-  @Valid 
-  @Schema(name = "options", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("options")
-  public List<@Valid OptionModel> getOptions() {
-    return options;
+  
+  @Schema(name = "sampleOutput", description = "The sample output value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sampleOutput")
+  public Object getSampleOutput() {
+    return sampleOutput;
   }
 
-  public void setOptions(List<@Valid OptionModel> options) {
-    this.options = options;
+  public void setSampleOutput(Object sampleOutput) {
+    this.sampleOutput = sampleOutput;
   }
 
   @Override
@@ -89,22 +76,22 @@ public class OptionsOutputModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    OptionsOutputModel optionsOutput = (OptionsOutputModel) o;
-    return Objects.equals(this.errorMessage, optionsOutput.errorMessage) &&
-        Objects.equals(this.options, optionsOutput.options);
+    SampleOutputResponseModel sampleOutputResponse = (SampleOutputResponseModel) o;
+    return Objects.equals(this.errorMessage, sampleOutputResponse.errorMessage) &&
+        Objects.equals(this.sampleOutput, sampleOutputResponse.sampleOutput);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(errorMessage, options);
+    return Objects.hash(errorMessage, sampleOutput);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class OptionsOutputModel {\n");
+    sb.append("class SampleOutputResponseModel {\n");
     sb.append("    errorMessage: ").append(toIndentedString(errorMessage)).append("\n");
-    sb.append("    options: ").append(toIndentedString(options)).append("\n");
+    sb.append("    sampleOutput: ").append(toIndentedString(sampleOutput)).append("\n");
     sb.append("}");
     return sb.toString();
   }
