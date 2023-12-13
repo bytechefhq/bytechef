@@ -190,6 +190,16 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    navigate(
+                                        `/automation/projects/${project?.id}/workflows/${project?.workflowIds![0]}`
+                                    )
+                                }
+                            >
+                                View
+                            </DropdownMenuItem>
+
                             <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
 
                             <DropdownMenuItem onClick={() => duplicateProjectMutation.mutate(project.id!)}>
