@@ -27,7 +27,7 @@ const ProjectWorkflow = ({componentDefinitions, taskDispatcherDefinitions}: Work
     const previousComponentNames = componentNames.length > 1 ? componentNames.slice(0, currentNodeIndex) : [];
 
     const normalizedPreviousComponentNames = previousComponentNames.map((name) =>
-        name.match(new RegExp(/-\d$/)) ? name.slice(0, name.length - 2) : name
+        name.match(new RegExp(/_\d$/)) ? name.slice(0, name.length - 2) : name
     );
 
     const {data: connectionComponentDefinitions} = useGetComponentDefinitionsQuery({

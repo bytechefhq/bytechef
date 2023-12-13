@@ -92,11 +92,11 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         if (workflowComponentWithAlias?.actions) {
             const {actions, name} = workflowComponentWithAlias;
 
-            let workflowAlias = `${name}-1`;
+            let workflowAlias = `${name}_1`;
             let index = 2;
 
             while (componentActions.some((action) => action.workflowAlias === workflowAlias)) {
-                workflowAlias = `${name}-${index}`;
+                workflowAlias = `${name}_${index}`;
 
                 index++;
             }

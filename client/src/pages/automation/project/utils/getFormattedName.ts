@@ -5,7 +5,7 @@ export default function getFormattedName(itemName: string, nodes: Node[]): strin
 
     const existingNodes = nodeNames.filter((name) => name?.includes(itemName));
 
-    const formattedName = existingNodes.length ? `${itemName}-${existingNodes.length + 1}` : `${itemName}-1`;
+    const formattedName = existingNodes.length ? `${itemName}_${existingNodes.length + 1}` : `${itemName}_1`;
 
     return formattedName;
 }
