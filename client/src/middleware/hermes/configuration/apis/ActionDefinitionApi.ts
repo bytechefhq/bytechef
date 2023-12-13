@@ -18,8 +18,11 @@ import type {
   ActionDefinitionBasicModel,
   ActionDefinitionModel,
   ComponentOperationRequestModel,
-  OptionsOutputModel,
-  PropertyModel,
+  EditorDescriptionResponseModel,
+  OptionsResponseModel,
+  OutputSchemaResponseModel,
+  PropertiesResponseModel,
+  SampleOutputResponseModel,
 } from '../models/index';
 import {
     ActionDefinitionBasicModelFromJSON,
@@ -28,10 +31,16 @@ import {
     ActionDefinitionModelToJSON,
     ComponentOperationRequestModelFromJSON,
     ComponentOperationRequestModelToJSON,
-    OptionsOutputModelFromJSON,
-    OptionsOutputModelToJSON,
-    PropertyModelFromJSON,
-    PropertyModelToJSON,
+    EditorDescriptionResponseModelFromJSON,
+    EditorDescriptionResponseModelToJSON,
+    OptionsResponseModelFromJSON,
+    OptionsResponseModelToJSON,
+    OutputSchemaResponseModelFromJSON,
+    OutputSchemaResponseModelToJSON,
+    PropertiesResponseModelFromJSON,
+    PropertiesResponseModelToJSON,
+    SampleOutputResponseModelFromJSON,
+    SampleOutputResponseModelToJSON,
 } from '../models/index';
 
 export interface GetActionDefinitionsRequest {
@@ -204,7 +213,7 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
      * Get an action description shown in the editor.
      * Get an action description shown in the editor
      */
-    async getComponentActionEditorDescriptionRaw(requestParameters: GetComponentActionEditorDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+    async getComponentActionEditorDescriptionRaw(requestParameters: GetComponentActionEditorDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EditorDescriptionResponseModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentActionEditorDescription.');
         }
@@ -231,18 +240,14 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        if (this.isJsonMime(response.headers.get('content-type'))) {
-            return new runtime.JSONApiResponse<string>(response);
-        } else {
-            return new runtime.TextApiResponse(response) as any;
-        }
+        return new runtime.JSONApiResponse(response, (jsonValue) => EditorDescriptionResponseModelFromJSON(jsonValue));
     }
 
     /**
      * Get an action description shown in the editor.
      * Get an action description shown in the editor
      */
-    async getComponentActionEditorDescription(requestParameters: GetComponentActionEditorDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+    async getComponentActionEditorDescription(requestParameters: GetComponentActionEditorDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EditorDescriptionResponseModel> {
         const response = await this.getComponentActionEditorDescriptionRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -251,7 +256,7 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
      * Get an action output schema shown in the editor.
      * Get an action output schema shown in the editor
      */
-    async getComponentActionOutputSchemaRaw(requestParameters: GetComponentActionOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
+    async getComponentActionOutputSchemaRaw(requestParameters: GetComponentActionOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OutputSchemaResponseModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentActionOutputSchema.');
         }
@@ -278,14 +283,14 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PropertyModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => OutputSchemaResponseModelFromJSON(jsonValue));
     }
 
     /**
      * Get an action output schema shown in the editor.
      * Get an action output schema shown in the editor
      */
-    async getComponentActionOutputSchema(requestParameters: GetComponentActionOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PropertyModel>> {
+    async getComponentActionOutputSchema(requestParameters: GetComponentActionOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OutputSchemaResponseModel> {
         const response = await this.getComponentActionOutputSchemaRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -294,7 +299,7 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
      * Get dynamic properties for an action property shown in the editor.
      * Get dynamic properties for an action property shown in the editor
      */
-    async getComponentActionPropertyDynamicPropertiesRaw(requestParameters: GetComponentActionPropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
+    async getComponentActionPropertyDynamicPropertiesRaw(requestParameters: GetComponentActionPropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PropertiesResponseModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentActionPropertyDynamicProperties.');
         }
@@ -325,14 +330,14 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PropertyModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PropertiesResponseModelFromJSON(jsonValue));
     }
 
     /**
      * Get dynamic properties for an action property shown in the editor.
      * Get dynamic properties for an action property shown in the editor
      */
-    async getComponentActionPropertyDynamicProperties(requestParameters: GetComponentActionPropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PropertyModel>> {
+    async getComponentActionPropertyDynamicProperties(requestParameters: GetComponentActionPropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PropertiesResponseModel> {
         const response = await this.getComponentActionPropertyDynamicPropertiesRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -341,7 +346,7 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
      * Get an action property options shown in the editor.
      * Get an action property options shown in the editor
      */
-    async getComponentActionPropertyOptionsRaw(requestParameters: GetComponentActionPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OptionsOutputModel>> {
+    async getComponentActionPropertyOptionsRaw(requestParameters: GetComponentActionPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OptionsResponseModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentActionPropertyOptions.');
         }
@@ -376,14 +381,14 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => OptionsOutputModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => OptionsResponseModelFromJSON(jsonValue));
     }
 
     /**
      * Get an action property options shown in the editor.
      * Get an action property options shown in the editor
      */
-    async getComponentActionPropertyOptions(requestParameters: GetComponentActionPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OptionsOutputModel> {
+    async getComponentActionPropertyOptions(requestParameters: GetComponentActionPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OptionsResponseModel> {
         const response = await this.getComponentActionPropertyOptionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -392,7 +397,7 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
      * Get an action sample output shown in the editor.
      * Get an action sample output shown in the editor
      */
-    async getComponentActionSampleOutputRaw(requestParameters: GetComponentActionSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async getComponentActionSampleOutputRaw(requestParameters: GetComponentActionSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SampleOutputResponseModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentActionSampleOutput.');
         }
@@ -419,14 +424,14 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => SampleOutputResponseModelFromJSON(jsonValue));
     }
 
     /**
      * Get an action sample output shown in the editor.
      * Get an action sample output shown in the editor
      */
-    async getComponentActionSampleOutput(requestParameters: GetComponentActionSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async getComponentActionSampleOutput(requestParameters: GetComponentActionSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SampleOutputResponseModel> {
         const response = await this.getComponentActionSampleOutputRaw(requestParameters, initOverrides);
         return await response.value();
     }

@@ -21,6 +21,7 @@ models/ControlTypeModel.ts
 models/DatePropertyModel.ts
 models/DateTimePropertyModel.ts
 models/DynamicPropertiesPropertyModel.ts
+models/EditorDescriptionResponseModel.ts
 models/GetOAuth2AuthorizationParametersRequestModel.ts
 models/HelpModel.ts
 models/IntegerPropertyModel.ts
@@ -31,11 +32,14 @@ models/OAuth2PropertiesModel.ts
 models/ObjectPropertyModel.ts
 models/OptionModel.ts
 models/OptionsDataSourceModel.ts
-models/OptionsOutputModel.ts
+models/OptionsResponseModel.ts
+models/OutputSchemaResponseModel.ts
 models/PropertiesDataSourceModel.ts
+models/PropertiesResponseModel.ts
 models/PropertyModel.ts
 models/PropertyTypeModel.ts
 models/ResourcesModel.ts
+models/SampleOutputResponseModel.ts
 models/StringPropertyModel.ts
 models/TaskDispatcherDefinitionBasicModel.ts
 models/TaskDispatcherDefinitionModel.ts

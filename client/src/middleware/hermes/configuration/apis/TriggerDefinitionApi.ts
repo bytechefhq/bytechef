@@ -16,18 +16,27 @@
 import * as runtime from '../runtime';
 import type {
   ComponentOperationRequestModel,
-  OptionsOutputModel,
-  PropertyModel,
+  EditorDescriptionResponseModel,
+  OptionsResponseModel,
+  OutputSchemaResponseModel,
+  PropertiesResponseModel,
+  SampleOutputResponseModel,
   TriggerDefinitionBasicModel,
   TriggerDefinitionModel,
 } from '../models/index';
 import {
     ComponentOperationRequestModelFromJSON,
     ComponentOperationRequestModelToJSON,
-    OptionsOutputModelFromJSON,
-    OptionsOutputModelToJSON,
-    PropertyModelFromJSON,
-    PropertyModelToJSON,
+    EditorDescriptionResponseModelFromJSON,
+    EditorDescriptionResponseModelToJSON,
+    OptionsResponseModelFromJSON,
+    OptionsResponseModelToJSON,
+    OutputSchemaResponseModelFromJSON,
+    OutputSchemaResponseModelToJSON,
+    PropertiesResponseModelFromJSON,
+    PropertiesResponseModelToJSON,
+    SampleOutputResponseModelFromJSON,
+    SampleOutputResponseModelToJSON,
     TriggerDefinitionBasicModelFromJSON,
     TriggerDefinitionBasicModelToJSON,
     TriggerDefinitionModelFromJSON,
@@ -172,7 +181,7 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
      * Get an trigger description shown in the editor.
      * Get an trigger description shown in the editor
      */
-    async getComponentTriggerEditorDescriptionRaw(requestParameters: GetComponentTriggerEditorDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+    async getComponentTriggerEditorDescriptionRaw(requestParameters: GetComponentTriggerEditorDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EditorDescriptionResponseModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentTriggerEditorDescription.');
         }
@@ -199,18 +208,14 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        if (this.isJsonMime(response.headers.get('content-type'))) {
-            return new runtime.JSONApiResponse<string>(response);
-        } else {
-            return new runtime.TextApiResponse(response) as any;
-        }
+        return new runtime.JSONApiResponse(response, (jsonValue) => EditorDescriptionResponseModelFromJSON(jsonValue));
     }
 
     /**
      * Get an trigger description shown in the editor.
      * Get an trigger description shown in the editor
      */
-    async getComponentTriggerEditorDescription(requestParameters: GetComponentTriggerEditorDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+    async getComponentTriggerEditorDescription(requestParameters: GetComponentTriggerEditorDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EditorDescriptionResponseModel> {
         const response = await this.getComponentTriggerEditorDescriptionRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -219,7 +224,7 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
      * Get a trigger output schema shown in the editor.
      * Get a trigger output schema shown in the editor
      */
-    async getComponentTriggerOutputSchemaRaw(requestParameters: GetComponentTriggerOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
+    async getComponentTriggerOutputSchemaRaw(requestParameters: GetComponentTriggerOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OutputSchemaResponseModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentTriggerOutputSchema.');
         }
@@ -246,14 +251,14 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PropertyModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => OutputSchemaResponseModelFromJSON(jsonValue));
     }
 
     /**
      * Get a trigger output schema shown in the editor.
      * Get a trigger output schema shown in the editor
      */
-    async getComponentTriggerOutputSchema(requestParameters: GetComponentTriggerOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PropertyModel>> {
+    async getComponentTriggerOutputSchema(requestParameters: GetComponentTriggerOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OutputSchemaResponseModel> {
         const response = await this.getComponentTriggerOutputSchemaRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -262,7 +267,7 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
      * Get dynamic properties for a trigger property shown in the editor.
      * Get dynamic properties for a trigger property shown in the editor
      */
-    async getComponentTriggerPropertyDynamicPropertiesRaw(requestParameters: GetComponentTriggerPropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
+    async getComponentTriggerPropertyDynamicPropertiesRaw(requestParameters: GetComponentTriggerPropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PropertiesResponseModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentTriggerPropertyDynamicProperties.');
         }
@@ -293,14 +298,14 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PropertyModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PropertiesResponseModelFromJSON(jsonValue));
     }
 
     /**
      * Get dynamic properties for a trigger property shown in the editor.
      * Get dynamic properties for a trigger property shown in the editor
      */
-    async getComponentTriggerPropertyDynamicProperties(requestParameters: GetComponentTriggerPropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PropertyModel>> {
+    async getComponentTriggerPropertyDynamicProperties(requestParameters: GetComponentTriggerPropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PropertiesResponseModel> {
         const response = await this.getComponentTriggerPropertyDynamicPropertiesRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -309,7 +314,7 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
      * Get a trigger property options shown in the editor.
      * Get a trigger property options shown in the editor
      */
-    async getComponentTriggerPropertyOptionsRaw(requestParameters: GetComponentTriggerPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OptionsOutputModel>> {
+    async getComponentTriggerPropertyOptionsRaw(requestParameters: GetComponentTriggerPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OptionsResponseModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentTriggerPropertyOptions.');
         }
@@ -344,14 +349,14 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => OptionsOutputModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => OptionsResponseModelFromJSON(jsonValue));
     }
 
     /**
      * Get a trigger property options shown in the editor.
      * Get a trigger property options shown in the editor
      */
-    async getComponentTriggerPropertyOptions(requestParameters: GetComponentTriggerPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OptionsOutputModel> {
+    async getComponentTriggerPropertyOptions(requestParameters: GetComponentTriggerPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OptionsResponseModel> {
         const response = await this.getComponentTriggerPropertyOptionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -360,7 +365,7 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
      * Get a trigger sample output shown in the editor.
      * Get a trigger sample output shown in the editor
      */
-    async getComponentTriggerSampleOutputRaw(requestParameters: GetComponentTriggerSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async getComponentTriggerSampleOutputRaw(requestParameters: GetComponentTriggerSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SampleOutputResponseModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentTriggerSampleOutput.');
         }
@@ -387,14 +392,14 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => SampleOutputResponseModelFromJSON(jsonValue));
     }
 
     /**
      * Get a trigger sample output shown in the editor.
      * Get a trigger sample output shown in the editor
      */
-    async getComponentTriggerSampleOutput(requestParameters: GetComponentTriggerSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async getComponentTriggerSampleOutput(requestParameters: GetComponentTriggerSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SampleOutputResponseModel> {
         const response = await this.getComponentTriggerSampleOutputRaw(requestParameters, initOverrides);
         return await response.value();
     }

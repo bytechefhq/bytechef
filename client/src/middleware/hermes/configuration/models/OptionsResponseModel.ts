@@ -23,37 +23,37 @@ import {
 /**
  * The response object when dynamically resolving options.
  * @export
- * @interface OptionsOutputModel
+ * @interface OptionsResponseModel
  */
-export interface OptionsOutputModel {
+export interface OptionsResponseModel {
     /**
      * The error message.
      * @type {string}
-     * @memberof OptionsOutputModel
+     * @memberof OptionsResponseModel
      */
     errorMessage?: string;
     /**
      * 
      * @type {Array<OptionModel>}
-     * @memberof OptionsOutputModel
+     * @memberof OptionsResponseModel
      */
     options?: Array<OptionModel>;
 }
 
 /**
- * Check if a given object implements the OptionsOutputModel interface.
+ * Check if a given object implements the OptionsResponseModel interface.
  */
-export function instanceOfOptionsOutputModel(value: object): boolean {
+export function instanceOfOptionsResponseModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function OptionsOutputModelFromJSON(json: any): OptionsOutputModel {
-    return OptionsOutputModelFromJSONTyped(json, false);
+export function OptionsResponseModelFromJSON(json: any): OptionsResponseModel {
+    return OptionsResponseModelFromJSONTyped(json, false);
 }
 
-export function OptionsOutputModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): OptionsOutputModel {
+export function OptionsResponseModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): OptionsResponseModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -64,7 +64,7 @@ export function OptionsOutputModelFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function OptionsOutputModelToJSON(value?: OptionsOutputModel | null): any {
+export function OptionsResponseModelToJSON(value?: OptionsResponseModel | null): any {
     if (value === undefined) {
         return undefined;
     }
