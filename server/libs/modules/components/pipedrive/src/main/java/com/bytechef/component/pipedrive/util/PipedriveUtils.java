@@ -19,7 +19,7 @@ package com.bytechef.component.pipedrive.util;
 import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
 import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
-import com.bytechef.hermes.component.definition.ComponentOptionsFunction.OptionsOutput;
+import com.bytechef.hermes.component.definition.ComponentOptionsFunction.OptionsResponse;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.definition.Option;
@@ -78,7 +78,7 @@ public class PipedriveUtils {
                 options.add(option((String) list.get("name"), list.get("id")));
             }
 
-            return new OptionsOutput(options);
+            return new OptionsResponse(options);
         };
     }
 }

@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.registry.dto.ComponentConnection;
 import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.registry.domain.OptionsOutput;
+import com.bytechef.hermes.registry.domain.OptionsResponse;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -74,7 +74,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     @Override
-    public OptionsOutput executeOptions(
+    public OptionsResponse executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, Object> inputParameters, Long connectionId, String searchText) {
 

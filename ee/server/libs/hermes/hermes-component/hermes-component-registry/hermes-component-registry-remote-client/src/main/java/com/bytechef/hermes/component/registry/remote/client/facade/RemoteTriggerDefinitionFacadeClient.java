@@ -13,7 +13,7 @@ import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.registry.domain.OptionsOutput;
+import com.bytechef.hermes.registry.domain.OptionsResponse;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -91,7 +91,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
-    public OptionsOutput executeOptions(
+    public OptionsResponse executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText) {
 

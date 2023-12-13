@@ -35,14 +35,14 @@ public interface ComponentOptionsFunction extends OptionsDataSource.OptionsFunct
      * @param searchText
      * @return
      */
-    OptionsOutput apply(
+    OptionsResponse apply(
         ParameterMap inputParameters, ParameterMap connectionParameters, String searchText, Context context)
         throws ComponentExecutionException;
 
     @SuppressFBWarnings("EI")
-    record OptionsOutput(List<Option<?>> options, String errorMessage) {
+    record OptionsResponse(List<Option<?>> options, String errorMessage) {
 
-        public OptionsOutput(List<Option<?>> options) {
+        public OptionsResponse(List<Option<?>> options) {
             this(options, null);
         }
     }

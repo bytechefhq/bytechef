@@ -17,8 +17,8 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.configuration.web.rest.model.OptionsOutputModel;
-import com.bytechef.hermes.registry.domain.OptionsOutput;
+import com.bytechef.hermes.configuration.web.rest.model.OptionsResponseModel;
+import com.bytechef.hermes.registry.domain.OptionsResponse;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -26,8 +26,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = ConfigurationMapperSpringConfig.class)
-public interface OptionsOutputMapper extends Converter<OptionsOutput, OptionsOutputModel> {
+public interface OptionsResponseMapper extends Converter<OptionsResponse, OptionsResponseModel> {
 
     @Override
-    OptionsOutputModel convert(OptionsOutput optionsOutput);
+    OptionsResponseModel convert(OptionsResponse optionsResponse);
 }

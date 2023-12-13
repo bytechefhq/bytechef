@@ -59,7 +59,7 @@ import com.bytechef.hermes.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.registry.domain.Option;
-import com.bytechef.hermes.registry.domain.OptionsOutput;
+import com.bytechef.hermes.registry.domain.OptionsResponse;
 import com.bytechef.hermes.registry.domain.Property;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -201,7 +201,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public OptionsOutput executeOptions(
+    public OptionsResponse executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, String searchText,
         ComponentConnection connection, @NonNull Context context) {
@@ -209,12 +209,12 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         ComponentOptionsFunction optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, triggerName, propertyName);
 
-        ComponentOptionsFunction.OptionsOutput optionsOutput = optionsFunction.apply(
+        ComponentOptionsFunction.OptionsResponse optionsResponse = optionsFunction.apply(
             new ParameterMapImpl(inputParameters),
             connection == null ? null : new ParameterMapImpl(connection.parameters()), searchText, context);
 
-        return new OptionsOutput(
-            CollectionUtils.map(optionsOutput.options(), Option::new), optionsOutput.errorMessage());
+        return new OptionsResponse(
+            CollectionUtils.map(optionsResponse.options(), Option::new), optionsResponse.errorMessage());
     }
 
     @Override

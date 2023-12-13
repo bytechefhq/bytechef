@@ -11,7 +11,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhook
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.registry.domain.OptionsOutput;
+import com.bytechef.hermes.registry.domain.OptionsResponse;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
@@ -153,7 +153,7 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<OptionsOutput> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
+    public ResponseEntity<OptionsResponse> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeOptions(
                 optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.triggerName,

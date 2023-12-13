@@ -8,7 +8,7 @@
 package com.bytechef.hermes.component.registry.remote.web.rest.facade;
 
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.hermes.registry.domain.OptionsOutput;
+import com.bytechef.hermes.registry.domain.OptionsResponse;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
@@ -58,7 +58,7 @@ public class RemoteActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<OptionsOutput> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
+    public ResponseEntity<OptionsResponse> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
 
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOptions(

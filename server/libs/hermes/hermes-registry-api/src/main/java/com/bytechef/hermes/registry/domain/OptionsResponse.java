@@ -23,5 +23,5 @@ import java.util.List;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record OptionsOutput(List<Option> options, String errorMessage) {
+public record OptionsResponse(List<Option> options, String errorMessage) {
 }

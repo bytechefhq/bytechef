@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.component.registry.facade;
 
-import com.bytechef.hermes.registry.domain.OptionsOutput;
+import com.bytechef.hermes.registry.domain.OptionsResponse;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ public interface ActionDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> actionParameters, Long connectionId);
 
-    OptionsOutput executeOptions(
+    OptionsResponse executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, Object> inputParameters, Long connectionId, String searchText);
 

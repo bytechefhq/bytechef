@@ -358,7 +358,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OptionsOutput"
+                $ref: "#/components/schemas/OptionsResponse"
   /component-definitions/{componentName}/{componentVersion}/connection-definition:
     get:
       description: "Get connection definition for a component."
@@ -738,7 +738,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OptionsOutput"
+                $ref: "#/components/schemas/OptionsResponse"
   /oauth2/authorization-parameters:
     post:
       description: "Retrieves oauth2 authorization parameters."
@@ -1402,7 +1402,7 @@ components:
           type: "array"
           items:
             type: "string"
-    OptionsOutput:
+    OptionsResponse:
       description: "The response object when dynamically resolving options."
       type: "object"
       properties:

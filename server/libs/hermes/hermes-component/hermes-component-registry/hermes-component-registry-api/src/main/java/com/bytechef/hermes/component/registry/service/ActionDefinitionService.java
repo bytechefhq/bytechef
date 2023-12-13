@@ -21,7 +21,7 @@ import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.dto.ComponentConnection;
-import com.bytechef.hermes.registry.domain.OptionsOutput;
+import com.bytechef.hermes.registry.domain.OptionsResponse;
 import com.bytechef.hermes.registry.domain.ValueProperty;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +43,7 @@ public interface ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull Context context);
 
-    OptionsOutput executeOptions(
+    OptionsResponse executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, String searchText, @Nullable ComponentConnection connection,
         @NonNull Context context);
