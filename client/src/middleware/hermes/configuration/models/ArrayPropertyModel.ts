@@ -57,6 +57,18 @@ import {
  */
 export interface ArrayPropertyModel extends ValuePropertyModel {
     /**
+     * The property default value.
+     * @type {Array<object>}
+     * @memberof ArrayPropertyModel
+     */
+    defaultValue?: Array<object>;
+    /**
+     * The property sample value.
+     * @type {Array<object>}
+     * @memberof ArrayPropertyModel
+     */
+    exampleValue?: Array<object>;
+    /**
      * Types of the array items.
      * @type {Array<PropertyModel>}
      * @memberof ArrayPropertyModel
@@ -101,6 +113,8 @@ export function ArrayPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
+        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
         'items': !exists(json, 'items') ? undefined : ((json['items'] as Array<any>).map(PropertyModelFromJSON)),
         'multipleValues': !exists(json, 'multipleValues') ? undefined : json['multipleValues'],
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
@@ -117,6 +131,8 @@ export function ArrayPropertyModelToJSON(value?: ArrayPropertyModel | null): any
     }
     return {
         ...ValuePropertyModelToJSON(value),
+        'defaultValue': value.defaultValue,
+        'exampleValue': value.exampleValue,
         'items': value.items === undefined ? undefined : ((value.items as Array<any>).map(PropertyModelToJSON)),
         'multipleValues': value.multipleValues,
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),

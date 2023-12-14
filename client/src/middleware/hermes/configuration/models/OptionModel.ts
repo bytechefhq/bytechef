@@ -32,11 +32,11 @@ export interface OptionModel {
      */
     displayCondition?: string;
     /**
-     * The name of an option.
+     * The label of an option.
      * @type {string}
      * @memberof OptionModel
      */
-    name?: string;
+    label?: string;
     /**
      * Can be anything: string, number, array, object, etc. (except `null`)
      * @type {any}
@@ -66,7 +66,7 @@ export function OptionModelFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'description': !exists(json, 'description') ? undefined : json['description'],
         'displayCondition': !exists(json, 'displayCondition') ? undefined : json['displayCondition'],
-        'name': !exists(json, 'name') ? undefined : json['name'],
+        'label': !exists(json, 'label') ? undefined : json['label'],
         'value': !exists(json, 'value') ? undefined : json['value'],
     };
 }
@@ -82,7 +82,7 @@ export function OptionModelToJSON(value?: OptionModel | null): any {
         
         'description': value.description,
         'displayCondition': value.displayCondition,
-        'name': value.name,
+        'label': value.label,
         'value': value.value,
     };
 }

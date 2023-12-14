@@ -19,6 +19,12 @@ import {
     ControlTypeModelFromJSONTyped,
     ControlTypeModelToJSON,
 } from './ControlTypeModel';
+import type { OptionModel } from './OptionModel';
+import {
+    OptionModelFromJSON,
+    OptionModelFromJSONTyped,
+    OptionModelToJSON,
+} from './OptionModel';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,
@@ -38,6 +44,24 @@ import {
  * @interface BooleanPropertyModel
  */
 export interface BooleanPropertyModel extends ValuePropertyModel {
+    /**
+     * The property default value.
+     * @type {boolean}
+     * @memberof BooleanPropertyModel
+     */
+    defaultValue?: boolean;
+    /**
+     * The property sample value.
+     * @type {boolean}
+     * @memberof BooleanPropertyModel
+     */
+    exampleValue?: boolean;
+    /**
+     * The list of valid property options.
+     * @type {Array<OptionModel>}
+     * @memberof BooleanPropertyModel
+     */
+    options?: Array<OptionModel>;
 }
 
 /**
@@ -54,10 +78,29 @@ export function BooleanPropertyModelFromJSON(json: any): BooleanPropertyModel {
 }
 
 export function BooleanPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): BooleanPropertyModel {
-    return json;
+    if ((json === undefined) || (json === null)) {
+        return json;
+    }
+    return {
+        ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
+        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
+        'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
+    };
 }
 
 export function BooleanPropertyModelToJSON(value?: BooleanPropertyModel | null): any {
-    return value;
+    if (value === undefined) {
+        return undefined;
+    }
+    if (value === null) {
+        return null;
+    }
+    return {
+        ...ValuePropertyModelToJSON(value),
+        'defaultValue': value.defaultValue,
+        'exampleValue': value.exampleValue,
+        'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
+    };
 }
 

@@ -45,6 +45,18 @@ import {
  */
 export interface NumberPropertyModel extends PropertyModel {
     /**
+     * The property default value.
+     * @type {number}
+     * @memberof NumberPropertyModel
+     */
+    defaultValue?: number;
+    /**
+     * The property sample value.
+     * @type {number}
+     * @memberof NumberPropertyModel
+     */
+    exampleValue?: number;
+    /**
      * The maximum property value.
      * @type {number}
      * @memberof NumberPropertyModel
@@ -95,6 +107,8 @@ export function NumberPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
+        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
         'numberPrecision': !exists(json, 'numberPrecision') ? undefined : json['numberPrecision'],
@@ -112,6 +126,8 @@ export function NumberPropertyModelToJSON(value?: NumberPropertyModel | null): a
     }
     return {
         ...PropertyModelToJSON(value),
+        'defaultValue': value.defaultValue,
+        'exampleValue': value.exampleValue,
         'maxValue': value.maxValue,
         'minValue': value.minValue,
         'numberPrecision': value.numberPrecision,

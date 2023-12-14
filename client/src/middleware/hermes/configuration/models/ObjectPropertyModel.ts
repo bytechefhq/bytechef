@@ -63,6 +63,18 @@ export interface ObjectPropertyModel extends ValuePropertyModel {
      */
     additionalProperties?: Array<PropertyModel>;
     /**
+     * The property default value.
+     * @type {object}
+     * @memberof ObjectPropertyModel
+     */
+    defaultValue?: object;
+    /**
+     * The property sample value.
+     * @type {object}
+     * @memberof ObjectPropertyModel
+     */
+    exampleValue?: object;
+    /**
      * If the object can contain multiple additional properties.
      * @type {boolean}
      * @memberof ObjectPropertyModel
@@ -114,6 +126,8 @@ export function ObjectPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
         'additionalProperties': !exists(json, 'additionalProperties') ? undefined : ((json['additionalProperties'] as Array<any>).map(PropertyModelFromJSON)),
+        'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
+        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
         'multipleValues': !exists(json, 'multipleValues') ? undefined : json['multipleValues'],
         'objectType': !exists(json, 'objectType') ? undefined : json['objectType'],
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
@@ -132,6 +146,8 @@ export function ObjectPropertyModelToJSON(value?: ObjectPropertyModel | null): a
     return {
         ...ValuePropertyModelToJSON(value),
         'additionalProperties': value.additionalProperties === undefined ? undefined : ((value.additionalProperties as Array<any>).map(PropertyModelToJSON)),
+        'defaultValue': value.defaultValue,
+        'exampleValue': value.exampleValue,
         'multipleValues': value.multipleValues,
         'objectType': value.objectType,
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),

@@ -51,6 +51,18 @@ import {
  */
 export interface DateTimePropertyModel extends ValuePropertyModel {
     /**
+     * The property default value.
+     * @type {Date}
+     * @memberof DateTimePropertyModel
+     */
+    defaultValue?: Date;
+    /**
+     * The property sample value.
+     * @type {Date}
+     * @memberof DateTimePropertyModel
+     */
+    exampleValue?: Date;
+    /**
      * The list of valid property options.
      * @type {Array<OptionModel>}
      * @memberof DateTimePropertyModel
@@ -83,6 +95,8 @@ export function DateTimePropertyModelFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        'defaultValue': !exists(json, 'defaultValue') ? undefined : (new Date(json['defaultValue'])),
+        'exampleValue': !exists(json, 'exampleValue') ? undefined : (new Date(json['exampleValue'])),
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
         'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
     };
@@ -97,6 +111,8 @@ export function DateTimePropertyModelToJSON(value?: DateTimePropertyModel | null
     }
     return {
         ...ValuePropertyModelToJSON(value),
+        'defaultValue': value.defaultValue === undefined ? undefined : (value.defaultValue.toISOString()),
+        'exampleValue': value.exampleValue === undefined ? undefined : (value.exampleValue.toISOString()),
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
         'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
     };

@@ -57,11 +57,11 @@ export interface TriggerDefinitionModel {
      */
     description?: string;
     /**
-     * The sample value of the action's output.
-     * @type {object}
+     * Does trigger has defined dynamic editor description.
+     * @type {boolean}
      * @memberof TriggerDefinitionModel
      */
-    sampleOutput?: object;
+    editorDescriptionDataSource?: boolean;
     /**
      * 
      * @type {HelpModel}
@@ -81,11 +81,29 @@ export interface TriggerDefinitionModel {
      */
     outputSchema?: PropertyModel;
     /**
+     * Does trigger has defined dynamic output schema.
+     * @type {boolean}
+     * @memberof TriggerDefinitionModel
+     */
+    outputSchemaDataSource?: boolean;
+    /**
      * The list of action properties.
      * @type {Array<PropertyModel>}
      * @memberof TriggerDefinitionModel
      */
     properties?: Array<PropertyModel>;
+    /**
+     * The sample value of the action's output.
+     * @type {object}
+     * @memberof TriggerDefinitionModel
+     */
+    sampleOutput?: object;
+    /**
+     * Does trigger has defined dynamic sample output.
+     * @type {boolean}
+     * @memberof TriggerDefinitionModel
+     */
+    sampleOutputDataSource?: boolean;
     /**
      * The title
      * @type {string}
@@ -124,11 +142,14 @@ export function TriggerDefinitionModelFromJSONTyped(json: any, ignoreDiscriminat
         'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
         'componentVersion': !exists(json, 'componentVersion') ? undefined : json['componentVersion'],
         'description': !exists(json, 'description') ? undefined : json['description'],
-        'sampleOutput': !exists(json, 'sampleOutput') ? undefined : json['sampleOutput'],
+        'editorDescriptionDataSource': !exists(json, 'editorDescriptionDataSource') ? undefined : json['editorDescriptionDataSource'],
         'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
         'outputSchema': !exists(json, 'outputSchema') ? undefined : PropertyModelFromJSON(json['outputSchema']),
+        'outputSchemaDataSource': !exists(json, 'outputSchemaDataSource') ? undefined : json['outputSchemaDataSource'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
+        'sampleOutput': !exists(json, 'sampleOutput') ? undefined : json['sampleOutput'],
+        'sampleOutputDataSource': !exists(json, 'sampleOutputDataSource') ? undefined : json['sampleOutputDataSource'],
         'title': !exists(json, 'title') ? undefined : json['title'],
         'type': TriggerTypeModelFromJSON(json['type']),
     };
@@ -146,11 +167,14 @@ export function TriggerDefinitionModelToJSON(value?: TriggerDefinitionModel | nu
         'componentName': value.componentName,
         'componentVersion': value.componentVersion,
         'description': value.description,
-        'sampleOutput': value.sampleOutput,
+        'editorDescriptionDataSource': value.editorDescriptionDataSource,
         'help': HelpModelToJSON(value.help),
         'name': value.name,
         'outputSchema': PropertyModelToJSON(value.outputSchema),
+        'outputSchemaDataSource': value.outputSchemaDataSource,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
+        'sampleOutput': value.sampleOutput,
+        'sampleOutputDataSource': value.sampleOutputDataSource,
         'title': value.title,
         'type': TriggerTypeModelToJSON(value.type),
     };
