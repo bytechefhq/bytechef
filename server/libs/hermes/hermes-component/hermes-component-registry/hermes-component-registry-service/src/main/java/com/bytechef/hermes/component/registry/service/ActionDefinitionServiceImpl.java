@@ -95,9 +95,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentName, componentVersion, actionName);
 
         EditorDescriptionDataSource.EditorDescriptionResponse editorDescriptionResponse = editorDescriptionFunction
-            .apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+            .apply(new ParameterMapImpl(inputParameters), context);
 
         return new EditorDescriptionResponse(
             editorDescriptionResponse.description(), editorDescriptionResponse.errorMessage());
@@ -237,11 +235,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return OptionalUtils.mapOrElse(
             actionDefinition.getEditorDescriptionDataSource(),
             EditorDescriptionDataSource::getEditorDescription,
-            (
-                inputParameters, connectionParameters,
-                context) -> new EditorDescriptionDataSource.EditorDescriptionResponse(
-                    OptionalUtils.orElse(componentDefinition.getTitle(), componentDefinition.getName()) + ": " +
-                        OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName())));
+            (inputParameters, context) -> new EditorDescriptionDataSource.EditorDescriptionResponse(
+                OptionalUtils.orElse(componentDefinition.getTitle(), componentDefinition.getName()) + ": " +
+                    OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName())));
     }
 
     private OutputSchemaFunction getOutputSchemaFunction(

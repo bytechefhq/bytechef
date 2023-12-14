@@ -30,13 +30,11 @@ public interface EditorDescriptionDataSource {
 
         /**
          * @param inputParameters
-         * @param connectionParameters
          * @param context
          * @return
          */
-        EditorDescriptionResponse
-            apply(ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
-                throws ComponentExecutionException;
+        EditorDescriptionResponse apply(ParameterMap inputParameters, Context context)
+            throws ComponentExecutionException;
     }
 
     @SuppressFBWarnings("EI")
