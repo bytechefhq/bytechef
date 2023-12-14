@@ -34,11 +34,15 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ObjectProperty", description = "An object property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class ObjectPropertyModel extends ValuePropertyModel {
 
   @Valid
   private List<@Valid PropertyModel> additionalProperties;
+
+  private Object defaultValue;
+
+  private Object exampleValue;
 
   private Boolean multipleValues;
 
@@ -78,6 +82,46 @@ public class ObjectPropertyModel extends ValuePropertyModel {
 
   public void setAdditionalProperties(List<@Valid PropertyModel> additionalProperties) {
     this.additionalProperties = additionalProperties;
+  }
+
+  public ObjectPropertyModel defaultValue(Object defaultValue) {
+    this.defaultValue = defaultValue;
+    return this;
+  }
+
+  /**
+   * The property default value.
+   * @return defaultValue
+  */
+  
+  @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("defaultValue")
+  public Object getDefaultValue() {
+    return defaultValue;
+  }
+
+  public void setDefaultValue(Object defaultValue) {
+    this.defaultValue = defaultValue;
+  }
+
+  public ObjectPropertyModel exampleValue(Object exampleValue) {
+    this.exampleValue = exampleValue;
+    return this;
+  }
+
+  /**
+   * The property sample value.
+   * @return exampleValue
+  */
+  
+  @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("exampleValue")
+  public Object getExampleValue() {
+    return exampleValue;
+  }
+
+  public void setExampleValue(Object exampleValue) {
+    this.exampleValue = exampleValue;
   }
 
   public ObjectPropertyModel multipleValues(Boolean multipleValues) {
@@ -202,16 +246,6 @@ public class ObjectPropertyModel extends ValuePropertyModel {
     return this;
   }
 
-  public ObjectPropertyModel defaultValue(Object defaultValue) {
-    super.defaultValue(defaultValue);
-    return this;
-  }
-
-  public ObjectPropertyModel exampleValue(Object exampleValue) {
-    super.exampleValue(exampleValue);
-    return this;
-  }
-
   public ObjectPropertyModel advancedOption(Boolean advancedOption) {
     super.advancedOption(advancedOption);
     return this;
@@ -271,6 +305,8 @@ public class ObjectPropertyModel extends ValuePropertyModel {
     }
     ObjectPropertyModel objectProperty = (ObjectPropertyModel) o;
     return Objects.equals(this.additionalProperties, objectProperty.additionalProperties) &&
+        Objects.equals(this.defaultValue, objectProperty.defaultValue) &&
+        Objects.equals(this.exampleValue, objectProperty.exampleValue) &&
         Objects.equals(this.multipleValues, objectProperty.multipleValues) &&
         Objects.equals(this.objectType, objectProperty.objectType) &&
         Objects.equals(this.options, objectProperty.options) &&
@@ -281,7 +317,7 @@ public class ObjectPropertyModel extends ValuePropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(additionalProperties, multipleValues, objectType, options, optionsDataSource, properties, super.hashCode());
+    return Objects.hash(additionalProperties, defaultValue, exampleValue, multipleValues, objectType, options, optionsDataSource, properties, super.hashCode());
   }
 
   @Override
@@ -290,6 +326,8 @@ public class ObjectPropertyModel extends ValuePropertyModel {
     sb.append("class ObjectPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
+    sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
+    sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("    multipleValues: ").append(toIndentedString(multipleValues)).append("\n");
     sb.append("    objectType: ").append(toIndentedString(objectType)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");

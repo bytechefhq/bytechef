@@ -33,8 +33,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "StringProperty", description = "A string property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class StringPropertyModel extends ValuePropertyModel {
+
+  private String defaultValue;
+
+  private String exampleValue;
 
   private Integer maxLength;
 
@@ -44,6 +48,46 @@ public class StringPropertyModel extends ValuePropertyModel {
   private List<@Valid OptionModel> options;
 
   private OptionsDataSourceModel optionsDataSource;
+
+  public StringPropertyModel defaultValue(String defaultValue) {
+    this.defaultValue = defaultValue;
+    return this;
+  }
+
+  /**
+   * The property default value.
+   * @return defaultValue
+  */
+  
+  @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("defaultValue")
+  public String getDefaultValue() {
+    return defaultValue;
+  }
+
+  public void setDefaultValue(String defaultValue) {
+    this.defaultValue = defaultValue;
+  }
+
+  public StringPropertyModel exampleValue(String exampleValue) {
+    this.exampleValue = exampleValue;
+    return this;
+  }
+
+  /**
+   * The property sample value.
+   * @return exampleValue
+  */
+  
+  @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("exampleValue")
+  public String getExampleValue() {
+    return exampleValue;
+  }
+
+  public void setExampleValue(String exampleValue) {
+    this.exampleValue = exampleValue;
+  }
 
   public StringPropertyModel maxLength(Integer maxLength) {
     this.maxLength = maxLength;
@@ -139,16 +183,6 @@ public class StringPropertyModel extends ValuePropertyModel {
     return this;
   }
 
-  public StringPropertyModel defaultValue(Object defaultValue) {
-    super.defaultValue(defaultValue);
-    return this;
-  }
-
-  public StringPropertyModel exampleValue(Object exampleValue) {
-    super.exampleValue(exampleValue);
-    return this;
-  }
-
   public StringPropertyModel advancedOption(Boolean advancedOption) {
     super.advancedOption(advancedOption);
     return this;
@@ -207,7 +241,9 @@ public class StringPropertyModel extends ValuePropertyModel {
       return false;
     }
     StringPropertyModel stringProperty = (StringPropertyModel) o;
-    return Objects.equals(this.maxLength, stringProperty.maxLength) &&
+    return Objects.equals(this.defaultValue, stringProperty.defaultValue) &&
+        Objects.equals(this.exampleValue, stringProperty.exampleValue) &&
+        Objects.equals(this.maxLength, stringProperty.maxLength) &&
         Objects.equals(this.minLength, stringProperty.minLength) &&
         Objects.equals(this.options, stringProperty.options) &&
         Objects.equals(this.optionsDataSource, stringProperty.optionsDataSource) &&
@@ -216,7 +252,7 @@ public class StringPropertyModel extends ValuePropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(maxLength, minLength, options, optionsDataSource, super.hashCode());
+    return Objects.hash(defaultValue, exampleValue, maxLength, minLength, options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -224,6 +260,8 @@ public class StringPropertyModel extends ValuePropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class StringPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
+    sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("    maxLength: ").append(toIndentedString(maxLength)).append("\n");
     sb.append("    minLength: ").append(toIndentedString(minLength)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");

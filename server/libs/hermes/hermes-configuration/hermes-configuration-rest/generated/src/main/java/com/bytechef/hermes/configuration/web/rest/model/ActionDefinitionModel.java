@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class ActionDefinitionModel {
 
   private String componentName;
@@ -35,7 +35,7 @@ public class ActionDefinitionModel {
 
   private String description;
 
-  private Object sampleOutput;
+  private Boolean editorDescriptionDataSource;
 
   private HelpModel help;
 
@@ -43,8 +43,14 @@ public class ActionDefinitionModel {
 
   private PropertyModel outputSchema;
 
+  private Boolean outputSchemaDataSource;
+
   @Valid
   private List<@Valid PropertyModel> properties;
+
+  private Object sampleOutput;
+
+  private Boolean sampleOutputDataSource;
 
   private String title;
 
@@ -119,24 +125,24 @@ public class ActionDefinitionModel {
     this.description = description;
   }
 
-  public ActionDefinitionModel sampleOutput(Object sampleOutput) {
-    this.sampleOutput = sampleOutput;
+  public ActionDefinitionModel editorDescriptionDataSource(Boolean editorDescriptionDataSource) {
+    this.editorDescriptionDataSource = editorDescriptionDataSource;
     return this;
   }
 
   /**
-   * The sample value of the action's output.
-   * @return sampleOutput
+   * Does action has defined dynamic editor description.
+   * @return editorDescriptionDataSource
   */
   
-  @Schema(name = "sampleOutput", description = "The sample value of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("sampleOutput")
-  public Object getSampleOutput() {
-    return sampleOutput;
+  @Schema(name = "editorDescriptionDataSource", description = "Does action has defined dynamic editor description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("editorDescriptionDataSource")
+  public Boolean getEditorDescriptionDataSource() {
+    return editorDescriptionDataSource;
   }
 
-  public void setSampleOutput(Object sampleOutput) {
-    this.sampleOutput = sampleOutput;
+  public void setEditorDescriptionDataSource(Boolean editorDescriptionDataSource) {
+    this.editorDescriptionDataSource = editorDescriptionDataSource;
   }
 
   public ActionDefinitionModel help(HelpModel help) {
@@ -199,6 +205,26 @@ public class ActionDefinitionModel {
     this.outputSchema = outputSchema;
   }
 
+  public ActionDefinitionModel outputSchemaDataSource(Boolean outputSchemaDataSource) {
+    this.outputSchemaDataSource = outputSchemaDataSource;
+    return this;
+  }
+
+  /**
+   * Does action has defined dynamic output schema.
+   * @return outputSchemaDataSource
+  */
+  
+  @Schema(name = "outputSchemaDataSource", description = "Does action has defined dynamic output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputSchemaDataSource")
+  public Boolean getOutputSchemaDataSource() {
+    return outputSchemaDataSource;
+  }
+
+  public void setOutputSchemaDataSource(Boolean outputSchemaDataSource) {
+    this.outputSchemaDataSource = outputSchemaDataSource;
+  }
+
   public ActionDefinitionModel properties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
     return this;
@@ -225,6 +251,46 @@ public class ActionDefinitionModel {
 
   public void setProperties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
+  }
+
+  public ActionDefinitionModel sampleOutput(Object sampleOutput) {
+    this.sampleOutput = sampleOutput;
+    return this;
+  }
+
+  /**
+   * The sample value of the action's output.
+   * @return sampleOutput
+  */
+  
+  @Schema(name = "sampleOutput", description = "The sample value of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sampleOutput")
+  public Object getSampleOutput() {
+    return sampleOutput;
+  }
+
+  public void setSampleOutput(Object sampleOutput) {
+    this.sampleOutput = sampleOutput;
+  }
+
+  public ActionDefinitionModel sampleOutputDataSource(Boolean sampleOutputDataSource) {
+    this.sampleOutputDataSource = sampleOutputDataSource;
+    return this;
+  }
+
+  /**
+   * Does action has defined dynamic sample output.
+   * @return sampleOutputDataSource
+  */
+  
+  @Schema(name = "sampleOutputDataSource", description = "Does action has defined dynamic sample output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sampleOutputDataSource")
+  public Boolean getSampleOutputDataSource() {
+    return sampleOutputDataSource;
+  }
+
+  public void setSampleOutputDataSource(Boolean sampleOutputDataSource) {
+    this.sampleOutputDataSource = sampleOutputDataSource;
   }
 
   public ActionDefinitionModel title(String title) {
@@ -259,17 +325,20 @@ public class ActionDefinitionModel {
     return Objects.equals(this.componentName, actionDefinition.componentName) &&
         Objects.equals(this.componentVersion, actionDefinition.componentVersion) &&
         Objects.equals(this.description, actionDefinition.description) &&
-        Objects.equals(this.sampleOutput, actionDefinition.sampleOutput) &&
+        Objects.equals(this.editorDescriptionDataSource, actionDefinition.editorDescriptionDataSource) &&
         Objects.equals(this.help, actionDefinition.help) &&
         Objects.equals(this.name, actionDefinition.name) &&
         Objects.equals(this.outputSchema, actionDefinition.outputSchema) &&
+        Objects.equals(this.outputSchemaDataSource, actionDefinition.outputSchemaDataSource) &&
         Objects.equals(this.properties, actionDefinition.properties) &&
+        Objects.equals(this.sampleOutput, actionDefinition.sampleOutput) &&
+        Objects.equals(this.sampleOutputDataSource, actionDefinition.sampleOutputDataSource) &&
         Objects.equals(this.title, actionDefinition.title);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, sampleOutput, help, name, outputSchema, properties, title);
+    return Objects.hash(componentName, componentVersion, description, editorDescriptionDataSource, help, name, outputSchema, outputSchemaDataSource, properties, sampleOutput, sampleOutputDataSource, title);
   }
 
   @Override
@@ -279,11 +348,14 @@ public class ActionDefinitionModel {
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    sampleOutput: ").append(toIndentedString(sampleOutput)).append("\n");
+    sb.append("    editorDescriptionDataSource: ").append(toIndentedString(editorDescriptionDataSource)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
+    sb.append("    outputSchemaDataSource: ").append(toIndentedString(outputSchemaDataSource)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+    sb.append("    sampleOutput: ").append(toIndentedString(sampleOutput)).append("\n");
+    sb.append("    sampleOutputDataSource: ").append(toIndentedString(sampleOutputDataSource)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("}");
     return sb.toString();

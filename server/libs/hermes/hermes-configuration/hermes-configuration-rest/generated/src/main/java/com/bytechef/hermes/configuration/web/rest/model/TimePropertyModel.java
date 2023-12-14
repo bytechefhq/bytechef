@@ -33,13 +33,57 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TimeProperty", description = "A time property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class TimePropertyModel extends ValuePropertyModel {
+
+  private String defaultValue;
+
+  private String exampleValue;
 
   @Valid
   private List<@Valid OptionModel> options;
 
   private OptionsDataSourceModel optionsDataSource;
+
+  public TimePropertyModel defaultValue(String defaultValue) {
+    this.defaultValue = defaultValue;
+    return this;
+  }
+
+  /**
+   * The property default value.
+   * @return defaultValue
+  */
+  
+  @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("defaultValue")
+  public String getDefaultValue() {
+    return defaultValue;
+  }
+
+  public void setDefaultValue(String defaultValue) {
+    this.defaultValue = defaultValue;
+  }
+
+  public TimePropertyModel exampleValue(String exampleValue) {
+    this.exampleValue = exampleValue;
+    return this;
+  }
+
+  /**
+   * The property sample value.
+   * @return exampleValue
+  */
+  
+  @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("exampleValue")
+  public String getExampleValue() {
+    return exampleValue;
+  }
+
+  public void setExampleValue(String exampleValue) {
+    this.exampleValue = exampleValue;
+  }
 
   public TimePropertyModel options(List<@Valid OptionModel> options) {
     this.options = options;
@@ -92,16 +136,6 @@ public class TimePropertyModel extends ValuePropertyModel {
 
   public TimePropertyModel controlType(ControlTypeModel controlType) {
     super.controlType(controlType);
-    return this;
-  }
-
-  public TimePropertyModel defaultValue(Object defaultValue) {
-    super.defaultValue(defaultValue);
-    return this;
-  }
-
-  public TimePropertyModel exampleValue(Object exampleValue) {
-    super.exampleValue(exampleValue);
     return this;
   }
 
@@ -163,14 +197,16 @@ public class TimePropertyModel extends ValuePropertyModel {
       return false;
     }
     TimePropertyModel timeProperty = (TimePropertyModel) o;
-    return Objects.equals(this.options, timeProperty.options) &&
+    return Objects.equals(this.defaultValue, timeProperty.defaultValue) &&
+        Objects.equals(this.exampleValue, timeProperty.exampleValue) &&
+        Objects.equals(this.options, timeProperty.options) &&
         Objects.equals(this.optionsDataSource, timeProperty.optionsDataSource) &&
         super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(options, optionsDataSource, super.hashCode());
+    return Objects.hash(defaultValue, exampleValue, options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -178,6 +214,8 @@ public class TimePropertyModel extends ValuePropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class TimePropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
+    sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");
     sb.append("    optionsDataSource: ").append(toIndentedString(optionsDataSource)).append("\n");
     sb.append("}");

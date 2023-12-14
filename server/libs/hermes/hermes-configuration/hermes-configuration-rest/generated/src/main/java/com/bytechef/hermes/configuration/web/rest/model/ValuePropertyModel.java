@@ -46,14 +46,10 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = TimePropertyModel.class, name = "TIME")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class ValuePropertyModel extends PropertyModel {
 
   private ControlTypeModel controlType;
-
-  private Object defaultValue;
-
-  private Object exampleValue;
 
   public ValuePropertyModel controlType(ControlTypeModel controlType) {
     this.controlType = controlType;
@@ -73,46 +69,6 @@ public class ValuePropertyModel extends PropertyModel {
 
   public void setControlType(ControlTypeModel controlType) {
     this.controlType = controlType;
-  }
-
-  public ValuePropertyModel defaultValue(Object defaultValue) {
-    this.defaultValue = defaultValue;
-    return this;
-  }
-
-  /**
-   * The property default value.
-   * @return defaultValue
-  */
-  
-  @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("defaultValue")
-  public Object getDefaultValue() {
-    return defaultValue;
-  }
-
-  public void setDefaultValue(Object defaultValue) {
-    this.defaultValue = defaultValue;
-  }
-
-  public ValuePropertyModel exampleValue(Object exampleValue) {
-    this.exampleValue = exampleValue;
-    return this;
-  }
-
-  /**
-   * The property sample value.
-   * @return exampleValue
-  */
-  
-  @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("exampleValue")
-  public Object getExampleValue() {
-    return exampleValue;
-  }
-
-  public void setExampleValue(Object exampleValue) {
-    this.exampleValue = exampleValue;
   }
 
 
@@ -175,14 +131,12 @@ public class ValuePropertyModel extends PropertyModel {
     }
     ValuePropertyModel valueProperty = (ValuePropertyModel) o;
     return Objects.equals(this.controlType, valueProperty.controlType) &&
-        Objects.equals(this.defaultValue, valueProperty.defaultValue) &&
-        Objects.equals(this.exampleValue, valueProperty.exampleValue) &&
         super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(controlType, defaultValue, exampleValue, super.hashCode());
+    return Objects.hash(controlType, super.hashCode());
   }
 
   @Override
@@ -191,8 +145,6 @@ public class ValuePropertyModel extends PropertyModel {
     sb.append("class ValuePropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("    controlType: ").append(toIndentedString(controlType)).append("\n");
-    sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
-    sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("}");
     return sb.toString();
   }

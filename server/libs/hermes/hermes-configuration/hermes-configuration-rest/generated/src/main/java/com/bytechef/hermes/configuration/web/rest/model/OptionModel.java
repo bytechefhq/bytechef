@@ -24,14 +24,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Option", description = "Defines valid property value.")
 @JsonTypeName("Option")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class OptionModel {
 
   private String description;
 
   private String displayCondition;
 
-  private String name;
+  private String label;
 
   private JsonNullable<Object> value = JsonNullable.<Object>undefined();
 
@@ -75,24 +75,24 @@ public class OptionModel {
     this.displayCondition = displayCondition;
   }
 
-  public OptionModel name(String name) {
-    this.name = name;
+  public OptionModel label(String label) {
+    this.label = label;
     return this;
   }
 
   /**
-   * The name of an option.
-   * @return name
+   * The label of an option.
+   * @return label
   */
   
-  @Schema(name = "name", description = "The name of an option.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("name")
-  public String getName() {
-    return name;
+  @Schema(name = "label", description = "The label of an option.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("label")
+  public String getLabel() {
+    return label;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   public OptionModel value(Object value) {
@@ -126,7 +126,7 @@ public class OptionModel {
     OptionModel option = (OptionModel) o;
     return Objects.equals(this.description, option.description) &&
         Objects.equals(this.displayCondition, option.displayCondition) &&
-        Objects.equals(this.name, option.name) &&
+        Objects.equals(this.label, option.label) &&
         equalsNullable(this.value, option.value);
   }
 
@@ -136,7 +136,7 @@ public class OptionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, displayCondition, name, hashCodeNullable(value));
+    return Objects.hash(description, displayCondition, label, hashCodeNullable(value));
   }
 
   private static <T> int hashCodeNullable(JsonNullable<T> a) {
@@ -152,7 +152,7 @@ public class OptionModel {
     sb.append("class OptionModel {\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    displayCondition: ").append(toIndentedString(displayCondition)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");
     sb.append("}");
     return sb.toString();

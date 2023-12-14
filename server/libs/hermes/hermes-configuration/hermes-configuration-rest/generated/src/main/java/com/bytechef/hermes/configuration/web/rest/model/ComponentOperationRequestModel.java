@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ComponentOperationRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class ComponentOperationRequestModel {
 
   private Long connectionId;
@@ -37,8 +37,7 @@ public class ComponentOperationRequestModel {
   /**
    * Constructor with only required parameters
    */
-  public ComponentOperationRequestModel(Long connectionId, Map<String, Object> parameters) {
-    this.connectionId = connectionId;
+  public ComponentOperationRequestModel(Map<String, Object> parameters) {
     this.parameters = parameters;
   }
 
@@ -51,8 +50,8 @@ public class ComponentOperationRequestModel {
    * The connection id.
    * @return connectionId
   */
-  @NotNull 
-  @Schema(name = "connectionId", description = "The connection id.", requiredMode = Schema.RequiredMode.REQUIRED)
+  
+  @Schema(name = "connectionId", description = "The connection id.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connectionId")
   public Long getConnectionId() {
     return connectionId;
