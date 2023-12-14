@@ -24,7 +24,7 @@ export interface ComponentOperationRequestModel {
      * @type {number}
      * @memberof ComponentOperationRequestModel
      */
-    connectionId: number;
+    connectionId?: number;
     /**
      * The parameters of an action.
      * @type {{ [key: string]: object; }}
@@ -38,7 +38,6 @@ export interface ComponentOperationRequestModel {
  */
 export function instanceOfComponentOperationRequestModel(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "connectionId" in value;
     isInstance = isInstance && "parameters" in value;
 
     return isInstance;
@@ -54,7 +53,7 @@ export function ComponentOperationRequestModelFromJSONTyped(json: any, ignoreDis
     }
     return {
         
-        'connectionId': json['connectionId'],
+        'connectionId': !exists(json, 'connectionId') ? undefined : json['connectionId'],
         'parameters': json['parameters'],
     };
 }

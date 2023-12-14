@@ -51,6 +51,18 @@ import {
  */
 export interface TimePropertyModel extends ValuePropertyModel {
     /**
+     * The property default value.
+     * @type {string}
+     * @memberof TimePropertyModel
+     */
+    defaultValue?: string;
+    /**
+     * The property sample value.
+     * @type {string}
+     * @memberof TimePropertyModel
+     */
+    exampleValue?: string;
+    /**
      * The list of valid property options.
      * @type {Array<OptionModel>}
      * @memberof TimePropertyModel
@@ -83,6 +95,8 @@ export function TimePropertyModelFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
+        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
         'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
     };
@@ -97,6 +111,8 @@ export function TimePropertyModelToJSON(value?: TimePropertyModel | null): any {
     }
     return {
         ...ValuePropertyModelToJSON(value),
+        'defaultValue': value.defaultValue,
+        'exampleValue': value.exampleValue,
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
         'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
     };

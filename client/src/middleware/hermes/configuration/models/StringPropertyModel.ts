@@ -51,6 +51,18 @@ import {
  */
 export interface StringPropertyModel extends ValuePropertyModel {
     /**
+     * The property default value.
+     * @type {string}
+     * @memberof StringPropertyModel
+     */
+    defaultValue?: string;
+    /**
+     * The property sample value.
+     * @type {string}
+     * @memberof StringPropertyModel
+     */
+    exampleValue?: string;
+    /**
      * The maximum string length.
      * @type {number}
      * @memberof StringPropertyModel
@@ -95,6 +107,8 @@ export function StringPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
+        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
         'maxLength': !exists(json, 'maxLength') ? undefined : json['maxLength'],
         'minLength': !exists(json, 'minLength') ? undefined : json['minLength'],
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
@@ -111,6 +125,8 @@ export function StringPropertyModelToJSON(value?: StringPropertyModel | null): a
     }
     return {
         ...ValuePropertyModelToJSON(value),
+        'defaultValue': value.defaultValue,
+        'exampleValue': value.exampleValue,
         'maxLength': value.maxLength,
         'minLength': value.minLength,
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),

@@ -44,18 +44,6 @@ export interface ValuePropertyModel extends PropertyModel {
      * @memberof ValuePropertyModel
      */
     controlType?: ControlTypeModel;
-    /**
-     * The property default value.
-     * @type {object}
-     * @memberof ValuePropertyModel
-     */
-    defaultValue?: object;
-    /**
-     * The property sample value.
-     * @type {object}
-     * @memberof ValuePropertyModel
-     */
-    exampleValue?: object;
 }
 
 /**
@@ -78,8 +66,6 @@ export function ValuePropertyModelFromJSONTyped(json: any, ignoreDiscriminator: 
     return {
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
         'controlType': !exists(json, 'controlType') ? undefined : ControlTypeModelFromJSON(json['controlType']),
-        'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
-        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
     };
 }
 
@@ -93,8 +79,6 @@ export function ValuePropertyModelToJSON(value?: ValuePropertyModel | null): any
     return {
         ...PropertyModelToJSON(value),
         'controlType': ControlTypeModelToJSON(value.controlType),
-        'defaultValue': value.defaultValue,
-        'exampleValue': value.exampleValue,
     };
 }
 

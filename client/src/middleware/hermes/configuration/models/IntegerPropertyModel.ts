@@ -51,6 +51,18 @@ import {
  */
 export interface IntegerPropertyModel extends ValuePropertyModel {
     /**
+     * The property default value.
+     * @type {number}
+     * @memberof IntegerPropertyModel
+     */
+    defaultValue?: number;
+    /**
+     * The property sample value.
+     * @type {number}
+     * @memberof IntegerPropertyModel
+     */
+    exampleValue?: number;
+    /**
      * The maximum property value.
      * @type {number}
      * @memberof IntegerPropertyModel
@@ -95,6 +107,8 @@ export function IntegerPropertyModelFromJSONTyped(json: any, ignoreDiscriminator
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
+        'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
@@ -111,6 +125,8 @@ export function IntegerPropertyModelToJSON(value?: IntegerPropertyModel | null):
     }
     return {
         ...ValuePropertyModelToJSON(value),
+        'defaultValue': value.defaultValue,
+        'exampleValue': value.exampleValue,
         'maxValue': value.maxValue,
         'minValue': value.minValue,
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
