@@ -32,8 +32,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NumberProperty", description = "A number property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class NumberPropertyModel extends PropertyModel {
+
+  private Double defaultValue;
+
+  private Double exampleValue;
 
   private Double maxValue;
 
@@ -45,6 +49,46 @@ public class NumberPropertyModel extends PropertyModel {
   private List<@Valid OptionModel> options;
 
   private OptionsDataSourceModel optionsDataSource;
+
+  public NumberPropertyModel defaultValue(Double defaultValue) {
+    this.defaultValue = defaultValue;
+    return this;
+  }
+
+  /**
+   * The property default value.
+   * @return defaultValue
+  */
+  
+  @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("defaultValue")
+  public Double getDefaultValue() {
+    return defaultValue;
+  }
+
+  public void setDefaultValue(Double defaultValue) {
+    this.defaultValue = defaultValue;
+  }
+
+  public NumberPropertyModel exampleValue(Double exampleValue) {
+    this.exampleValue = exampleValue;
+    return this;
+  }
+
+  /**
+   * The property sample value.
+   * @return exampleValue
+  */
+  
+  @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("exampleValue")
+  public Double getExampleValue() {
+    return exampleValue;
+  }
+
+  public void setExampleValue(Double exampleValue) {
+    this.exampleValue = exampleValue;
+  }
 
   public NumberPropertyModel maxValue(Double maxValue) {
     this.maxValue = maxValue;
@@ -213,7 +257,9 @@ public class NumberPropertyModel extends PropertyModel {
       return false;
     }
     NumberPropertyModel numberProperty = (NumberPropertyModel) o;
-    return Objects.equals(this.maxValue, numberProperty.maxValue) &&
+    return Objects.equals(this.defaultValue, numberProperty.defaultValue) &&
+        Objects.equals(this.exampleValue, numberProperty.exampleValue) &&
+        Objects.equals(this.maxValue, numberProperty.maxValue) &&
         Objects.equals(this.minValue, numberProperty.minValue) &&
         Objects.equals(this.numberPrecision, numberProperty.numberPrecision) &&
         Objects.equals(this.options, numberProperty.options) &&
@@ -223,7 +269,7 @@ public class NumberPropertyModel extends PropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(maxValue, minValue, numberPrecision, options, optionsDataSource, super.hashCode());
+    return Objects.hash(defaultValue, exampleValue, maxValue, minValue, numberPrecision, options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -231,6 +277,8 @@ public class NumberPropertyModel extends PropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class NumberPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
+    sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("    maxValue: ").append(toIndentedString(maxValue)).append("\n");
     sb.append("    minValue: ").append(toIndentedString(minValue)).append("\n");
     sb.append("    numberPrecision: ").append(toIndentedString(numberPrecision)).append("\n");

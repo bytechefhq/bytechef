@@ -34,8 +34,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ArrayProperty", description = "An array property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class ArrayPropertyModel extends ValuePropertyModel {
+
+  @Valid
+  private List<Object> defaultValue;
+
+  @Valid
+  private List<Object> exampleValue;
 
   @Valid
   private List<@Valid PropertyModel> items;
@@ -46,6 +52,62 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   private List<@Valid OptionModel> options;
 
   private OptionsDataSourceModel optionsDataSource;
+
+  public ArrayPropertyModel defaultValue(List<Object> defaultValue) {
+    this.defaultValue = defaultValue;
+    return this;
+  }
+
+  public ArrayPropertyModel addDefaultValueItem(Object defaultValueItem) {
+    if (this.defaultValue == null) {
+      this.defaultValue = new ArrayList<>();
+    }
+    this.defaultValue.add(defaultValueItem);
+    return this;
+  }
+
+  /**
+   * The property default value.
+   * @return defaultValue
+  */
+  
+  @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("defaultValue")
+  public List<Object> getDefaultValue() {
+    return defaultValue;
+  }
+
+  public void setDefaultValue(List<Object> defaultValue) {
+    this.defaultValue = defaultValue;
+  }
+
+  public ArrayPropertyModel exampleValue(List<Object> exampleValue) {
+    this.exampleValue = exampleValue;
+    return this;
+  }
+
+  public ArrayPropertyModel addExampleValueItem(Object exampleValueItem) {
+    if (this.exampleValue == null) {
+      this.exampleValue = new ArrayList<>();
+    }
+    this.exampleValue.add(exampleValueItem);
+    return this;
+  }
+
+  /**
+   * The property sample value.
+   * @return exampleValue
+  */
+  
+  @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("exampleValue")
+  public List<Object> getExampleValue() {
+    return exampleValue;
+  }
+
+  public void setExampleValue(List<Object> exampleValue) {
+    this.exampleValue = exampleValue;
+  }
 
   public ArrayPropertyModel items(List<@Valid PropertyModel> items) {
     this.items = items;
@@ -149,16 +211,6 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return this;
   }
 
-  public ArrayPropertyModel defaultValue(Object defaultValue) {
-    super.defaultValue(defaultValue);
-    return this;
-  }
-
-  public ArrayPropertyModel exampleValue(Object exampleValue) {
-    super.exampleValue(exampleValue);
-    return this;
-  }
-
   public ArrayPropertyModel advancedOption(Boolean advancedOption) {
     super.advancedOption(advancedOption);
     return this;
@@ -217,7 +269,9 @@ public class ArrayPropertyModel extends ValuePropertyModel {
       return false;
     }
     ArrayPropertyModel arrayProperty = (ArrayPropertyModel) o;
-    return Objects.equals(this.items, arrayProperty.items) &&
+    return Objects.equals(this.defaultValue, arrayProperty.defaultValue) &&
+        Objects.equals(this.exampleValue, arrayProperty.exampleValue) &&
+        Objects.equals(this.items, arrayProperty.items) &&
         Objects.equals(this.multipleValues, arrayProperty.multipleValues) &&
         Objects.equals(this.options, arrayProperty.options) &&
         Objects.equals(this.optionsDataSource, arrayProperty.optionsDataSource) &&
@@ -226,7 +280,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(items, multipleValues, options, optionsDataSource, super.hashCode());
+    return Objects.hash(defaultValue, exampleValue, items, multipleValues, options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -234,6 +288,8 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ArrayPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
+    sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("    items: ").append(toIndentedString(items)).append("\n");
     sb.append("    multipleValues: ").append(toIndentedString(multipleValues)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");

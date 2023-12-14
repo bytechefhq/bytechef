@@ -33,12 +33,16 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegerProperty", description = "An integer property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class IntegerPropertyModel extends ValuePropertyModel {
 
-  private Integer maxValue;
+  private Long defaultValue;
 
-  private Integer minValue;
+  private Long exampleValue;
+
+  private Long maxValue;
+
+  private Long minValue;
 
   @Valid
   private List<@Valid OptionModel> options;
@@ -56,7 +60,47 @@ public class IntegerPropertyModel extends ValuePropertyModel {
     super();
   }
 
-  public IntegerPropertyModel maxValue(Integer maxValue) {
+  public IntegerPropertyModel defaultValue(Long defaultValue) {
+    this.defaultValue = defaultValue;
+    return this;
+  }
+
+  /**
+   * The property default value.
+   * @return defaultValue
+  */
+  
+  @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("defaultValue")
+  public Long getDefaultValue() {
+    return defaultValue;
+  }
+
+  public void setDefaultValue(Long defaultValue) {
+    this.defaultValue = defaultValue;
+  }
+
+  public IntegerPropertyModel exampleValue(Long exampleValue) {
+    this.exampleValue = exampleValue;
+    return this;
+  }
+
+  /**
+   * The property sample value.
+   * @return exampleValue
+  */
+  
+  @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("exampleValue")
+  public Long getExampleValue() {
+    return exampleValue;
+  }
+
+  public void setExampleValue(Long exampleValue) {
+    this.exampleValue = exampleValue;
+  }
+
+  public IntegerPropertyModel maxValue(Long maxValue) {
     this.maxValue = maxValue;
     return this;
   }
@@ -68,15 +112,15 @@ public class IntegerPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "maxValue", description = "The maximum property value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("maxValue")
-  public Integer getMaxValue() {
+  public Long getMaxValue() {
     return maxValue;
   }
 
-  public void setMaxValue(Integer maxValue) {
+  public void setMaxValue(Long maxValue) {
     this.maxValue = maxValue;
   }
 
-  public IntegerPropertyModel minValue(Integer minValue) {
+  public IntegerPropertyModel minValue(Long minValue) {
     this.minValue = minValue;
     return this;
   }
@@ -88,11 +132,11 @@ public class IntegerPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "minValue", description = "The minimum property value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("minValue")
-  public Integer getMinValue() {
+  public Long getMinValue() {
     return minValue;
   }
 
-  public void setMinValue(Integer minValue) {
+  public void setMinValue(Long minValue) {
     this.minValue = minValue;
   }
 
@@ -147,16 +191,6 @@ public class IntegerPropertyModel extends ValuePropertyModel {
 
   public IntegerPropertyModel controlType(ControlTypeModel controlType) {
     super.controlType(controlType);
-    return this;
-  }
-
-  public IntegerPropertyModel defaultValue(Object defaultValue) {
-    super.defaultValue(defaultValue);
-    return this;
-  }
-
-  public IntegerPropertyModel exampleValue(Object exampleValue) {
-    super.exampleValue(exampleValue);
     return this;
   }
 
@@ -218,7 +252,9 @@ public class IntegerPropertyModel extends ValuePropertyModel {
       return false;
     }
     IntegerPropertyModel integerProperty = (IntegerPropertyModel) o;
-    return Objects.equals(this.maxValue, integerProperty.maxValue) &&
+    return Objects.equals(this.defaultValue, integerProperty.defaultValue) &&
+        Objects.equals(this.exampleValue, integerProperty.exampleValue) &&
+        Objects.equals(this.maxValue, integerProperty.maxValue) &&
         Objects.equals(this.minValue, integerProperty.minValue) &&
         Objects.equals(this.options, integerProperty.options) &&
         Objects.equals(this.optionsDataSource, integerProperty.optionsDataSource) &&
@@ -227,7 +263,7 @@ public class IntegerPropertyModel extends ValuePropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(maxValue, minValue, options, optionsDataSource, super.hashCode());
+    return Objects.hash(defaultValue, exampleValue, maxValue, minValue, options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -235,6 +271,8 @@ public class IntegerPropertyModel extends ValuePropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class IntegerPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
+    sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("    maxValue: ").append(toIndentedString(maxValue)).append("\n");
     sb.append("    minValue: ").append(toIndentedString(minValue)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");

@@ -14,9 +14,11 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -33,13 +35,59 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DateProperty", description = "A date property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class DatePropertyModel extends ValuePropertyModel {
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+  private LocalDate defaultValue;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+  private LocalDate exampleValue;
 
   @Valid
   private List<@Valid OptionModel> options;
 
   private OptionsDataSourceModel optionsDataSource;
+
+  public DatePropertyModel defaultValue(LocalDate defaultValue) {
+    this.defaultValue = defaultValue;
+    return this;
+  }
+
+  /**
+   * The property default value.
+   * @return defaultValue
+  */
+  @Valid 
+  @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("defaultValue")
+  public LocalDate getDefaultValue() {
+    return defaultValue;
+  }
+
+  public void setDefaultValue(LocalDate defaultValue) {
+    this.defaultValue = defaultValue;
+  }
+
+  public DatePropertyModel exampleValue(LocalDate exampleValue) {
+    this.exampleValue = exampleValue;
+    return this;
+  }
+
+  /**
+   * The property sample value.
+   * @return exampleValue
+  */
+  @Valid 
+  @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("exampleValue")
+  public LocalDate getExampleValue() {
+    return exampleValue;
+  }
+
+  public void setExampleValue(LocalDate exampleValue) {
+    this.exampleValue = exampleValue;
+  }
 
   public DatePropertyModel options(List<@Valid OptionModel> options) {
     this.options = options;
@@ -92,16 +140,6 @@ public class DatePropertyModel extends ValuePropertyModel {
 
   public DatePropertyModel controlType(ControlTypeModel controlType) {
     super.controlType(controlType);
-    return this;
-  }
-
-  public DatePropertyModel defaultValue(Object defaultValue) {
-    super.defaultValue(defaultValue);
-    return this;
-  }
-
-  public DatePropertyModel exampleValue(Object exampleValue) {
-    super.exampleValue(exampleValue);
     return this;
   }
 
@@ -163,14 +201,16 @@ public class DatePropertyModel extends ValuePropertyModel {
       return false;
     }
     DatePropertyModel dateProperty = (DatePropertyModel) o;
-    return Objects.equals(this.options, dateProperty.options) &&
+    return Objects.equals(this.defaultValue, dateProperty.defaultValue) &&
+        Objects.equals(this.exampleValue, dateProperty.exampleValue) &&
+        Objects.equals(this.options, dateProperty.options) &&
         Objects.equals(this.optionsDataSource, dateProperty.optionsDataSource) &&
         super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(options, optionsDataSource, super.hashCode());
+    return Objects.hash(defaultValue, exampleValue, options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -178,6 +218,8 @@ public class DatePropertyModel extends ValuePropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class DatePropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
+    sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");
     sb.append("    optionsDataSource: ").append(toIndentedString(optionsDataSource)).append("\n");
     sb.append("}");

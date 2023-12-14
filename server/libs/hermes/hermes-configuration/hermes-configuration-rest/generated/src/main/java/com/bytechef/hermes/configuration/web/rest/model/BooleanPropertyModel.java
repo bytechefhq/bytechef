@@ -3,6 +3,7 @@ package com.bytechef.hermes.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.hermes.configuration.web.rest.model.ControlTypeModel;
+import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
 import com.bytechef.hermes.configuration.web.rest.model.PropertyTypeModel;
 import com.bytechef.hermes.configuration.web.rest.model.ValuePropertyModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,6 +13,9 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -28,22 +32,87 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "BooleanProperty", description = "A boolean property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class BooleanPropertyModel extends ValuePropertyModel {
+
+  private Boolean defaultValue;
+
+  private Boolean exampleValue;
+
+  @Valid
+  private List<@Valid OptionModel> options;
+
+  public BooleanPropertyModel defaultValue(Boolean defaultValue) {
+    this.defaultValue = defaultValue;
+    return this;
+  }
+
+  /**
+   * The property default value.
+   * @return defaultValue
+  */
+  
+  @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("defaultValue")
+  public Boolean getDefaultValue() {
+    return defaultValue;
+  }
+
+  public void setDefaultValue(Boolean defaultValue) {
+    this.defaultValue = defaultValue;
+  }
+
+  public BooleanPropertyModel exampleValue(Boolean exampleValue) {
+    this.exampleValue = exampleValue;
+    return this;
+  }
+
+  /**
+   * The property sample value.
+   * @return exampleValue
+  */
+  
+  @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("exampleValue")
+  public Boolean getExampleValue() {
+    return exampleValue;
+  }
+
+  public void setExampleValue(Boolean exampleValue) {
+    this.exampleValue = exampleValue;
+  }
+
+  public BooleanPropertyModel options(List<@Valid OptionModel> options) {
+    this.options = options;
+    return this;
+  }
+
+  public BooleanPropertyModel addOptionsItem(OptionModel optionsItem) {
+    if (this.options == null) {
+      this.options = new ArrayList<>();
+    }
+    this.options.add(optionsItem);
+    return this;
+  }
+
+  /**
+   * The list of valid property options.
+   * @return options
+  */
+  @Valid 
+  @Schema(name = "options", description = "The list of valid property options.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("options")
+  public List<@Valid OptionModel> getOptions() {
+    return options;
+  }
+
+  public void setOptions(List<@Valid OptionModel> options) {
+    this.options = options;
+  }
 
 
   public BooleanPropertyModel controlType(ControlTypeModel controlType) {
     super.controlType(controlType);
-    return this;
-  }
-
-  public BooleanPropertyModel defaultValue(Object defaultValue) {
-    super.defaultValue(defaultValue);
-    return this;
-  }
-
-  public BooleanPropertyModel exampleValue(Object exampleValue) {
-    super.exampleValue(exampleValue);
     return this;
   }
 
@@ -104,12 +173,16 @@ public class BooleanPropertyModel extends ValuePropertyModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    return true;
+    BooleanPropertyModel booleanProperty = (BooleanPropertyModel) o;
+    return Objects.equals(this.defaultValue, booleanProperty.defaultValue) &&
+        Objects.equals(this.exampleValue, booleanProperty.exampleValue) &&
+        Objects.equals(this.options, booleanProperty.options) &&
+        super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode());
+    return Objects.hash(defaultValue, exampleValue, options, super.hashCode());
   }
 
   @Override
@@ -117,6 +190,9 @@ public class BooleanPropertyModel extends ValuePropertyModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class BooleanPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
+    sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
+    sb.append("    options: ").append(toIndentedString(options)).append("\n");
     sb.append("}");
     return sb.toString();
   }

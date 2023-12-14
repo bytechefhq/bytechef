@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-13T12:40:34.070611+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
 public class TriggerDefinitionModel {
 
   private String componentName;
@@ -37,7 +37,7 @@ public class TriggerDefinitionModel {
 
   private String description;
 
-  private Object sampleOutput;
+  private Boolean editorDescriptionDataSource;
 
   private HelpModel help;
 
@@ -45,8 +45,14 @@ public class TriggerDefinitionModel {
 
   private PropertyModel outputSchema;
 
+  private Boolean outputSchemaDataSource;
+
   @Valid
   private List<@Valid PropertyModel> properties;
+
+  private Object sampleOutput;
+
+  private Boolean sampleOutputDataSource;
 
   private String title;
 
@@ -124,24 +130,24 @@ public class TriggerDefinitionModel {
     this.description = description;
   }
 
-  public TriggerDefinitionModel sampleOutput(Object sampleOutput) {
-    this.sampleOutput = sampleOutput;
+  public TriggerDefinitionModel editorDescriptionDataSource(Boolean editorDescriptionDataSource) {
+    this.editorDescriptionDataSource = editorDescriptionDataSource;
     return this;
   }
 
   /**
-   * The sample value of the action's output.
-   * @return sampleOutput
+   * Does trigger has defined dynamic editor description.
+   * @return editorDescriptionDataSource
   */
   
-  @Schema(name = "sampleOutput", description = "The sample value of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("sampleOutput")
-  public Object getSampleOutput() {
-    return sampleOutput;
+  @Schema(name = "editorDescriptionDataSource", description = "Does trigger has defined dynamic editor description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("editorDescriptionDataSource")
+  public Boolean getEditorDescriptionDataSource() {
+    return editorDescriptionDataSource;
   }
 
-  public void setSampleOutput(Object sampleOutput) {
-    this.sampleOutput = sampleOutput;
+  public void setEditorDescriptionDataSource(Boolean editorDescriptionDataSource) {
+    this.editorDescriptionDataSource = editorDescriptionDataSource;
   }
 
   public TriggerDefinitionModel help(HelpModel help) {
@@ -204,6 +210,26 @@ public class TriggerDefinitionModel {
     this.outputSchema = outputSchema;
   }
 
+  public TriggerDefinitionModel outputSchemaDataSource(Boolean outputSchemaDataSource) {
+    this.outputSchemaDataSource = outputSchemaDataSource;
+    return this;
+  }
+
+  /**
+   * Does trigger has defined dynamic output schema.
+   * @return outputSchemaDataSource
+  */
+  
+  @Schema(name = "outputSchemaDataSource", description = "Does trigger has defined dynamic output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputSchemaDataSource")
+  public Boolean getOutputSchemaDataSource() {
+    return outputSchemaDataSource;
+  }
+
+  public void setOutputSchemaDataSource(Boolean outputSchemaDataSource) {
+    this.outputSchemaDataSource = outputSchemaDataSource;
+  }
+
   public TriggerDefinitionModel properties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
     return this;
@@ -230,6 +256,46 @@ public class TriggerDefinitionModel {
 
   public void setProperties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
+  }
+
+  public TriggerDefinitionModel sampleOutput(Object sampleOutput) {
+    this.sampleOutput = sampleOutput;
+    return this;
+  }
+
+  /**
+   * The sample value of the action's output.
+   * @return sampleOutput
+  */
+  
+  @Schema(name = "sampleOutput", description = "The sample value of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sampleOutput")
+  public Object getSampleOutput() {
+    return sampleOutput;
+  }
+
+  public void setSampleOutput(Object sampleOutput) {
+    this.sampleOutput = sampleOutput;
+  }
+
+  public TriggerDefinitionModel sampleOutputDataSource(Boolean sampleOutputDataSource) {
+    this.sampleOutputDataSource = sampleOutputDataSource;
+    return this;
+  }
+
+  /**
+   * Does trigger has defined dynamic sample output.
+   * @return sampleOutputDataSource
+  */
+  
+  @Schema(name = "sampleOutputDataSource", description = "Does trigger has defined dynamic sample output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("sampleOutputDataSource")
+  public Boolean getSampleOutputDataSource() {
+    return sampleOutputDataSource;
+  }
+
+  public void setSampleOutputDataSource(Boolean sampleOutputDataSource) {
+    this.sampleOutputDataSource = sampleOutputDataSource;
   }
 
   public TriggerDefinitionModel title(String title) {
@@ -284,18 +350,21 @@ public class TriggerDefinitionModel {
     return Objects.equals(this.componentName, triggerDefinition.componentName) &&
         Objects.equals(this.componentVersion, triggerDefinition.componentVersion) &&
         Objects.equals(this.description, triggerDefinition.description) &&
-        Objects.equals(this.sampleOutput, triggerDefinition.sampleOutput) &&
+        Objects.equals(this.editorDescriptionDataSource, triggerDefinition.editorDescriptionDataSource) &&
         Objects.equals(this.help, triggerDefinition.help) &&
         Objects.equals(this.name, triggerDefinition.name) &&
         Objects.equals(this.outputSchema, triggerDefinition.outputSchema) &&
+        Objects.equals(this.outputSchemaDataSource, triggerDefinition.outputSchemaDataSource) &&
         Objects.equals(this.properties, triggerDefinition.properties) &&
+        Objects.equals(this.sampleOutput, triggerDefinition.sampleOutput) &&
+        Objects.equals(this.sampleOutputDataSource, triggerDefinition.sampleOutputDataSource) &&
         Objects.equals(this.title, triggerDefinition.title) &&
         Objects.equals(this.type, triggerDefinition.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, sampleOutput, help, name, outputSchema, properties, title, type);
+    return Objects.hash(componentName, componentVersion, description, editorDescriptionDataSource, help, name, outputSchema, outputSchemaDataSource, properties, sampleOutput, sampleOutputDataSource, title, type);
   }
 
   @Override
@@ -305,11 +374,14 @@ public class TriggerDefinitionModel {
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    sampleOutput: ").append(toIndentedString(sampleOutput)).append("\n");
+    sb.append("    editorDescriptionDataSource: ").append(toIndentedString(editorDescriptionDataSource)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
+    sb.append("    outputSchemaDataSource: ").append(toIndentedString(outputSchemaDataSource)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+    sb.append("    sampleOutput: ").append(toIndentedString(sampleOutput)).append("\n");
+    sb.append("    sampleOutputDataSource: ").append(toIndentedString(sampleOutputDataSource)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
