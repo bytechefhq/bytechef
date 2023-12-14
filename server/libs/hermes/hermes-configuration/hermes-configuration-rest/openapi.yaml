@@ -935,9 +935,9 @@ components:
         description:
           description: "The description."
           type: "string"
-        sampleOutput:
-          description: "The sample value of the action's output."
-          type: "object"
+        editorDescriptionDataSource:
+          description: "Does action has defined dynamic editor description."
+          type: "boolean"
         help:
           $ref: "#/components/schemas/Help"
         name:
@@ -945,11 +945,20 @@ components:
           type: "string"
         outputSchema:
           $ref: "#/components/schemas/Property"
+        outputSchemaDataSource:
+          description: "Does action has defined dynamic output schema."
+          type: "boolean"
         properties:
           description: "The list of action properties."
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
+        sampleOutput:
+          description: "The sample value of the action's output."
+          type: "object"
+        sampleOutputDataSource:
+          description: "Does action has defined dynamic sample output."
+          type: "boolean"
         title:
           description: "The title"
           type: "string"
@@ -983,6 +992,16 @@ components:
       - $ref: "#/components/schemas/ValueProperty"
       - type: "object"
         properties:
+          defaultValue:
+            description: "The property default value."
+            type: "array"
+            items:
+              type: "object"
+          exampleValue:
+            description: "The property sample value."
+            type: "array"
+            items:
+              type: "object"
           items:
             description: "Types of the array items."
             type: "array"
@@ -1037,6 +1056,19 @@ components:
       type: "object"
       allOf:
       - $ref: "#/components/schemas/ValueProperty"
+      - type: object
+        properties:
+          defaultValue:
+            description: "The property default value."
+            type: "boolean"
+          exampleValue:
+            description: "The property sample value."
+            type: "boolean"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
     ComponentDefinition:
       description: "A component contains a set of reusable code(actions) that accomplish\
         \ specific tasks, triggers and connections if there is a need for a connection\
@@ -1122,7 +1154,6 @@ components:
     ComponentOperationRequest:
       type: "object"
       required:
-      - "connectionId"
       - "parameters"
       properties:
         connectionId:
@@ -1218,6 +1249,14 @@ components:
       - $ref: "#/components/schemas/ValueProperty"
       - type: "object"
         properties:
+          defaultValue:
+            description: "The property default value."
+            type: "string"
+            format: "date"
+          exampleValue:
+            description: "The property sample value."
+            type: "string"
+            format: "date"
           options:
             description: "The list of valid property options."
             type: "array"
@@ -1232,6 +1271,14 @@ components:
       - $ref: "#/components/schemas/ValueProperty"
       - type: "object"
         properties:
+          defaultValue:
+            description: "The property default value."
+            type: "string"
+            format: "date-time"
+          exampleValue:
+            description: "The property sample value."
+            type: "string"
+            format: "date-time"
           options:
             description: "The list of valid property options."
             type: "array"
@@ -1280,14 +1327,22 @@ components:
       - $ref: "#/components/schemas/ValueProperty"
       - type: "object"
         properties:
+          defaultValue:
+            description: "The property default value."
+            type: "integer"
+            format: "int64"
+          exampleValue:
+            description: "The property sample value."
+            type: "integer"
+            format: "int64"
           maxValue:
             description: "The maximum property value."
             type: "integer"
-            format: "int32"
+            format: "int64"
           minValue:
             description: "The minimum property value."
             type: "integer"
-            format: "int32"
+            format: "int64"
           options:
             description: "The list of valid property options."
             type: "array"
@@ -1307,6 +1362,14 @@ components:
       - $ref: "#/components/schemas/Property"
       - type: "object"
         properties:
+          defaultValue:
+            description: "The property default value."
+            type: "number"
+            format: "double"
+          exampleValue:
+            description: "The property sample value."
+            type: "number"
+            format: "double"
           maxValue:
             description: "The maximum property value."
             type: "number"
@@ -1360,6 +1423,12 @@ components:
             type: "array"
             items:
               $ref: "#/components/schemas/Property"
+          defaultValue:
+            description: "The property default value."
+            type: "object"
+          exampleValue:
+            description: "The property sample value."
+            type: "object"
           multipleValues:
             description: "If the object can contain multiple additional properties."
             type: "boolean"
@@ -1388,8 +1457,8 @@ components:
         displayCondition:
           description: "Defines rules when a property should be shown or hidden."
           type: "string"
-        name:
-          description: "The name of an option."
+        label:
+          description: "The label of an option."
           type: "string"
         value:
           $ref: "#/components/schemas/AnyValue"
@@ -1536,6 +1605,12 @@ components:
       - $ref: "#/components/schemas/ValueProperty"
       - type: "object"
         properties:
+          defaultValue:
+            description: "The property default value."
+            type: "string"
+          exampleValue:
+            description: "The property sample value."
+            type: "string"
           maxLength:
             description: "The maximum string length."
             type: "integer"
@@ -1631,6 +1706,14 @@ components:
       - $ref: "#/components/schemas/ValueProperty"
       - type: "object"
         properties:
+          defaultValue:
+            description: "The property default value."
+            type: "string"
+            format: "time"
+          exampleValue:
+            description: "The property sample value."
+            type: "string"
+            format: "time"
           options:
             description: "The list of valid property options."
             type: "array"
@@ -1655,9 +1738,9 @@ components:
         description:
           description: "The description."
           type: "string"
-        sampleOutput:
-          description: "The sample value of the action's output."
-          type: "object"
+        editorDescriptionDataSource:
+          description: "Does trigger has defined dynamic editor description."
+          type: "boolean"
         help:
           $ref: "#/components/schemas/Help"
         name:
@@ -1665,11 +1748,20 @@ components:
           type: "string"
         outputSchema:
           $ref: "#/components/schemas/Property"
+        outputSchemaDataSource:
+          description: "Does trigger has defined dynamic output schema."
+          type: "boolean"
         properties:
           description: "The list of action properties."
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
+        sampleOutput:
+          description: "The sample value of the action's output."
+          type: "object"
+        sampleOutputDataSource:
+          description: "Does trigger has defined dynamic sample output."
+          type: "boolean"
         title:
           description: "The title"
           type: "string"
@@ -1713,9 +1805,3 @@ components:
         properties:
           controlType:
             $ref: "#/components/schemas/ControlType"
-          defaultValue:
-            description: "The property default value."
-            type: "object"
-          exampleValue:
-            description: "The property sample value."
-            type: "object"
