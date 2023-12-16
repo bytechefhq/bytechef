@@ -16,9 +16,9 @@
 
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
+import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
 import com.bytechef.hermes.configuration.web.rest.model.SampleOutputResponseModel;
-import com.bytechef.hermes.registry.domain.SampleOutputResponse;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 

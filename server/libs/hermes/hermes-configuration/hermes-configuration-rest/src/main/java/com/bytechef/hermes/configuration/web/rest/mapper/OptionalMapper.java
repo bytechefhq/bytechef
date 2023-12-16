@@ -17,11 +17,15 @@
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinitionBasic;
+import com.bytechef.hermes.component.registry.domain.OptionsDataSource;
+import com.bytechef.hermes.component.registry.domain.Property;
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
 import com.bytechef.hermes.registry.domain.Help;
-import com.bytechef.hermes.registry.domain.OptionsDataSource;
-import com.bytechef.hermes.registry.domain.Property;
 import com.bytechef.hermes.registry.domain.Resources;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 import org.mapstruct.Mapper;
 
@@ -31,9 +35,21 @@ import org.mapstruct.Mapper;
 @Mapper(config = ConfigurationMapperSpringConfig.class)
 public interface OptionalMapper {
 
+    default Property mapToComponentToProperty(Optional<Property> value) {
+        return value.orElse(null);
+    }
+
     default ConnectionDefinitionBasic mapToConnectionDefinitionBasicDTO(
         Optional<ConnectionDefinitionBasic> value) {
 
+        return value.orElse(null);
+    }
+
+    default Object[] mapToArray(Optional<Object[]> value) {
+        return value.orElse(null);
+    }
+
+    default Boolean mapToBoolean(Optional<Boolean> value) {
         return value.orElse(null);
     }
 
@@ -41,7 +57,7 @@ public interface OptionalMapper {
         return value.orElse(null);
     }
 
-    default Help mapToHelpDTO(Optional<Help> value) {
+    default Help mapToHelp(Optional<Help> value) {
         return value.orElse(null);
     }
 
@@ -49,11 +65,23 @@ public interface OptionalMapper {
         return value.orElse(null);
     }
 
-    default OptionsDataSource mapToOptionsDataSourceDTO(Optional<OptionsDataSource> value) {
+    default List<Object> mapToList(Optional<List<Object>> value) {
         return value.orElse(null);
     }
 
-    default Property mapToPropertyDTO(Optional<Property> value) {
+    default LocalDate mapToLocalDate(Optional<LocalDate> value) {
+        return value.orElse(null);
+    }
+
+    default LocalDateTime mapToLocalDateTime(Optional<LocalDateTime> value) {
+        return value.orElse(null);
+    }
+
+    default Long mapToLong(Optional<Long> value) {
+        return value.orElse(null);
+    }
+
+    default OptionsDataSource mapToOptionsDataSource(Optional<OptionsDataSource> value) {
         return value.orElse(null);
     }
 
@@ -62,6 +90,17 @@ public interface OptionalMapper {
     }
 
     default String mapToString(Optional<String> value) {
+        return value.orElse(null);
+    }
+
+    default String mapToTime(Optional<LocalTime> value) {
+        return value.map(LocalTime::toString)
+            .orElse(null);
+    }
+
+    default com.bytechef.hermes.task.dispatcher.registry.domain.Property mapToTaskDispatcherProperty(
+        Optional<com.bytechef.hermes.task.dispatcher.registry.domain.Property> value) {
+
         return value.orElse(null);
     }
 }
