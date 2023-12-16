@@ -16,8 +16,8 @@
 
 package com.bytechef.task.dispatcher.loop.completion;
 
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM;
-import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP;
@@ -115,7 +115,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
                 workflowTaskNameMap.put(ITEM, list.get(taskExecution.getTaskNumber()));
             }
 
-            workflowTaskNameMap.put(ITEM_INDEX, taskExecution.getTaskNumber());
+            workflowTaskNameMap.put(INDEX, taskExecution.getTaskNumber());
 
             newContext.put(workflowTask.getName(), workflowTaskNameMap);
 

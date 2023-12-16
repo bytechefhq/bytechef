@@ -23,8 +23,7 @@ public class MapTaskDispatcherConstants {
 
     public static final String MAP = "map";
     public static final String LIST = "list";
-    public static final String ITEM_VAR = "itemVar";
-    public static final String ITEM_INDEX = "itemIndex";
+    public static final String INDEX = "index";
     public static final String ITERATEE = "iteratee";
     public static final String ITEM = "item";
 }

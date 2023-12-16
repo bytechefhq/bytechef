@@ -18,9 +18,8 @@
 
 package com.bytechef.task.dispatcher.map;
 
+import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM;
-import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM_INDEX;
-import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM_VAR;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.MAP;
@@ -106,8 +105,9 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
                     taskFileStorage.readContextValue(
                         contextService.peek(Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION)));
 
-                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_VAR, ITEM), item);
-                newContext.put(MapUtils.getString(taskExecution.getParameters(), ITEM_INDEX, ITEM_INDEX), i);
+                WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+
+                newContext.put(workflowTask.getName(), Map.of(ITEM, item, INDEX, i));
 
                 iterateeTaskExecution.evaluate(newContext);
 

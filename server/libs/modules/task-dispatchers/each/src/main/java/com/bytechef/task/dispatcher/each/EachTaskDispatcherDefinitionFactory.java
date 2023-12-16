@@ -28,8 +28,8 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.t
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.time;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.EACH;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM;
-import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.LIST;
 
@@ -54,7 +54,7 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .description("List of items to iterate over.")
                 .items(array(), bool(), date(), dateTime(), integer(), number(), object(), string(), time()))
         .taskProperties(task(ITERATEE))
-        .variableProperties(string(ITEM), string(ITEM_INDEX));
+        .variableProperties(string(ITEM), string(INDEX));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
