@@ -23,15 +23,9 @@ import java.util.Optional;
  */
 public interface DbDataStorageService {
 
-    <T> Optional<T> fetch(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
-        int type);
+    <T> Optional<T> fetch(String componentName, String actionName, int scope, String scopeId, String key, int type);
 
-    <T> T get(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
-        int type);
+    <T> T get(String componentName, String actionName, int scope, String scopeId, String key, int type);
 
-    void put(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
-        int type, Object value);
+    void put(String componentName, String actionName, int scope, String scopeId, String key, int type, Object value);
 }
