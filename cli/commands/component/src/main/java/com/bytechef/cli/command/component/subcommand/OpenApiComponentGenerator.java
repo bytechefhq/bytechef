@@ -194,7 +194,6 @@ public class OpenApiComponentGenerator {
             .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "USERNAME")
             .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "VALUE")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
-            .addStaticImport(COMPONENT_DSL_CLASS_NAME, "any")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "bool")
@@ -610,8 +609,8 @@ public class OpenApiComponentGenerator {
                             .label($S)
                             .required($L)
                     )
-                    .authorizationUrl(connection -> $S)
-                    $L.tokenUrl(connection -> $S)
+                    .authorizationUrl((connectionParameters, context) -> $S)
+                    $L.tokenUrl((connectionParameters, context) -> $S)
                 """,
             "OAuth2 Authorization Code",
             "Client Id",
@@ -622,11 +621,12 @@ public class OpenApiComponentGenerator {
             StringUtils.isEmpty(oAuth2Scopes)
                 ? CodeBlock.builder()
                     .build()
-                : CodeBlock.of(".scopes(connection -> $T.of($L))", List.class, getOAUth2Scopes(oAuthFlow.getScopes())),
+                : CodeBlock.of(
+                    ".scopes((connection, context) -> $T.of($L))", List.class, getOAUth2Scopes(oAuthFlow.getScopes())),
             oAuthFlow.getTokenUrl());
 
         if (oAuthFlow.getRefreshUrl() != null) {
-            builder.add(".refreshUrl(connection -> $S)", oAuthFlow.getRefreshUrl());
+            builder.add(".refreshUrl((connectionParameters, context) -> $S)", oAuthFlow.getRefreshUrl());
         }
 
         return builder.build();
@@ -648,8 +648,8 @@ public class OpenApiComponentGenerator {
                             .label($S)
                             .required($L)
                     )
-                    .scopes(connection -> $T.of($L))
-                    .tokenUrl(connection -> $S)
+                    .scopes((connectionParameters, context) -> $T.of($L))
+                    .tokenUrl((connectionParameters, context) -> $S)
                 """,
             "Client Credentials",
             "Client Id",
@@ -661,7 +661,7 @@ public class OpenApiComponentGenerator {
             oAuthFlow.getTokenUrl());
 
         if (oAuthFlow.getRefreshUrl() != null) {
-            builder.add(".refreshUrl(connection -> $S)", oAuthFlow.getRefreshUrl());
+            builder.add(".refreshUrl((connectionParameters, context) -> $S)", oAuthFlow.getRefreshUrl());
         }
 
         return builder.build();
@@ -683,8 +683,8 @@ public class OpenApiComponentGenerator {
                             .label($S)
                             .required($L)
                     )
-                    .authorizationUrl(connection -> $S)
-                    .scopes(connection -> $T.of($L))
+                    .authorizationUrl((connectionParameters, context) -> $S)
+                    .scopes((connectionParameters, context) -> $T.of($L))
                 """,
             "OAuth2 Implicit",
             "Client Id",
@@ -696,7 +696,7 @@ public class OpenApiComponentGenerator {
             getOAUth2Scopes(oAuthFlow.getScopes()));
 
         if (oAuthFlow.getRefreshUrl() != null) {
-            builder.add(".refreshUrl(connection -> $S)", oAuthFlow.getRefreshUrl());
+            builder.add(".refreshUrl((connectionParameters, context) -> $S)", oAuthFlow.getRefreshUrl());
         }
 
         return builder.build();
@@ -718,8 +718,8 @@ public class OpenApiComponentGenerator {
                             .label($S)
                             .required($L)
                     )
-                    .scopes(connection -> $T.of($L))
-                    .tokenUrl(connection -> $S)
+                    .scopes((connectionParameters, context) -> $T.of($L))
+                    .tokenUrl((connectionParameters, context) -> $S)
                 """,
             "OAuth2 Resource Owner Password",
             "Client Id",
@@ -732,7 +732,7 @@ public class OpenApiComponentGenerator {
             oAuthFlow.getTokenUrl());
 
         if (oAuthFlow.getRefreshUrl() != null) {
-            builder.add(".refreshUrl(connection -> $S)", oAuthFlow.getRefreshUrl());
+            builder.add(".refreshUrl((connectionParameters, context) -> $S)", oAuthFlow.getRefreshUrl());
         }
 
         return builder.build();
@@ -829,7 +829,7 @@ public class OpenApiComponentGenerator {
                 Server server = servers.get(0);
 
                 if (!StringUtils.isEmpty(server.getUrl()) && !Objects.equals(server.getUrl(), "/")) {
-                    builder.add(".baseUri((connectionParameters) -> $S)", server.getUrl());
+                    builder.add(".baseUri((connectionParameters, context) -> $S)", server.getUrl());
                 }
             } else {
                 List<CodeBlock> codeBlocks = new ArrayList<>();
@@ -1366,6 +1366,14 @@ public class OpenApiComponentGenerator {
 
             if (convertedSampleOutput == null) {
                 convertedSampleOutput = convert(sampleOutput, new TypeReference<LocalDate>() {});
+            }
+
+            if (convertedSampleOutput == null) {
+                convertedSampleOutput = convert(sampleOutput, new TypeReference<Map<String, Object>>() {});
+            }
+
+            if (convertedSampleOutput == null) {
+                convertedSampleOutput = convert(sampleOutput, new TypeReference<List<?>>() {});
             }
 
             if (convertedSampleOutput != null) {
@@ -1933,8 +1941,7 @@ public class OpenApiComponentGenerator {
                         ClassName.get("java.util", "List"),
                         ParameterizedTypeName.get(
                             ClassName.get(
-                                "com.bytechef.hermes.definition", "DefinitionDSL", "ModifiableProperty",
-                                "ModifiableValueProperty"),
+                                "com.bytechef.hermes.component.definition", "ComponentDSL", "ModifiableValueProperty"),
                             WildcardTypeName.subtypeOf(Object.class), WildcardTypeName.subtypeOf(Object.class))),
                     "PROPERTIES")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
