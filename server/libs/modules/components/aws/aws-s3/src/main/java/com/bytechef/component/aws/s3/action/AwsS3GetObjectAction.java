@@ -22,11 +22,11 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.GET_OBJECT;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
+import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import software.amazon.awssdk.core.sync.ResponseTransformer;

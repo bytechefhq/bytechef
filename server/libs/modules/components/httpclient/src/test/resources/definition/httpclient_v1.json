@@ -47,12 +47,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -76,22 +76,22 @@
       "options": [ {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
-        "name": "JSON",
+        "label": "JSON",
         "value": "JSON"
       }, {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
-        "name": "XML",
+        "label": "XML",
         "value": "XML"
       }, {
         "description": "The response is returned as a text.",
         "displayCondition": null,
-        "name": "Text",
+        "label": "Text",
         "value": "TEXT"
       }, {
         "description": "The response is returned as a file object.",
         "displayCondition": null,
-        "name": "File",
+        "label": "File",
         "value": "BINARY"
       } ],
       "sampleDataType": null,
@@ -256,12 +256,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -285,22 +285,22 @@
       "options": [ {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
-        "name": "JSON",
+        "label": "JSON",
         "value": "JSON"
       }, {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
-        "name": "XML",
+        "label": "XML",
         "value": "XML"
       }, {
         "description": "The response is returned as a text.",
         "displayCondition": null,
-        "name": "Text",
+        "label": "Text",
         "value": "TEXT"
       }, {
         "description": "The response is returned as a file object.",
         "displayCondition": null,
-        "name": "File",
+        "label": "File",
         "value": "BINARY"
       } ],
       "sampleDataType": null,
@@ -457,12 +457,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -964,32 +964,32 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "None",
+        "label": "None",
         "value": ""
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "JSON",
+        "label": "JSON",
         "value": "JSON"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Form-Data",
+        "label": "Form-Data",
         "value": "FORM_DATA"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Form-Urlencoded",
+        "label": "Form-Urlencoded",
         "value": "FORM_URL_ENCODED"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Raw",
+        "label": "Raw",
         "value": "RAW"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Binary",
+        "label": "Binary",
         "value": "BINARY"
       } ],
       "sampleDataType": null,
@@ -1031,12 +1031,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -1057,12 +1057,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -1083,12 +1083,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -1109,12 +1109,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -1215,12 +1215,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -1244,22 +1244,22 @@
       "options": [ {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
-        "name": "JSON",
+        "label": "JSON",
         "value": "JSON"
       }, {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
-        "name": "XML",
+        "label": "XML",
         "value": "XML"
       }, {
         "description": "The response is returned as a text.",
         "displayCondition": null,
-        "name": "Text",
+        "label": "Text",
         "value": "TEXT"
       }, {
         "description": "The response is returned as a file object.",
         "displayCondition": null,
-        "name": "File",
+        "label": "File",
         "value": "BINARY"
       } ],
       "sampleDataType": null,
@@ -1416,12 +1416,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -1923,32 +1923,32 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "None",
+        "label": "None",
         "value": ""
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "JSON",
+        "label": "JSON",
         "value": "JSON"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Form-Data",
+        "label": "Form-Data",
         "value": "FORM_DATA"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Form-Urlencoded",
+        "label": "Form-Urlencoded",
         "value": "FORM_URL_ENCODED"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Raw",
+        "label": "Raw",
         "value": "RAW"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Binary",
+        "label": "Binary",
         "value": "BINARY"
       } ],
       "sampleDataType": null,
@@ -1990,12 +1990,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -2016,12 +2016,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -2042,12 +2042,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -2068,12 +2068,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -2174,12 +2174,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -2203,22 +2203,22 @@
       "options": [ {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
-        "name": "JSON",
+        "label": "JSON",
         "value": "JSON"
       }, {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
-        "name": "XML",
+        "label": "XML",
         "value": "XML"
       }, {
         "description": "The response is returned as a text.",
         "displayCondition": null,
-        "name": "Text",
+        "label": "Text",
         "value": "TEXT"
       }, {
         "description": "The response is returned as a file object.",
         "displayCondition": null,
-        "name": "File",
+        "label": "File",
         "value": "BINARY"
       } ],
       "sampleDataType": null,
@@ -2375,12 +2375,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -2882,32 +2882,32 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "None",
+        "label": "None",
         "value": ""
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "JSON",
+        "label": "JSON",
         "value": "JSON"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Form-Data",
+        "label": "Form-Data",
         "value": "FORM_DATA"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Form-Urlencoded",
+        "label": "Form-Urlencoded",
         "value": "FORM_URL_ENCODED"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Raw",
+        "label": "Raw",
         "value": "RAW"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Binary",
+        "label": "Binary",
         "value": "BINARY"
       } ],
       "sampleDataType": null,
@@ -2949,12 +2949,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -2975,12 +2975,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3001,12 +3001,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3027,12 +3027,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3133,12 +3133,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3162,22 +3162,22 @@
       "options": [ {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
-        "name": "JSON",
+        "label": "JSON",
         "value": "JSON"
       }, {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
-        "name": "XML",
+        "label": "XML",
         "value": "XML"
       }, {
         "description": "The response is returned as a text.",
         "displayCondition": null,
-        "name": "Text",
+        "label": "Text",
         "value": "TEXT"
       }, {
         "description": "The response is returned as a file object.",
         "displayCondition": null,
-        "name": "File",
+        "label": "File",
         "value": "BINARY"
       } ],
       "sampleDataType": null,
@@ -3301,12 +3301,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3327,12 +3327,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3353,12 +3353,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3379,12 +3379,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3485,12 +3485,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3514,22 +3514,22 @@
       "options": [ {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
-        "name": "JSON",
+        "label": "JSON",
         "value": "JSON"
       }, {
         "description": "The response is automatically converted to object/array.",
         "displayCondition": null,
-        "name": "XML",
+        "label": "XML",
         "value": "XML"
       }, {
         "description": "The response is returned as a text.",
         "displayCondition": null,
-        "name": "Text",
+        "label": "Text",
         "value": "TEXT"
       }, {
         "description": "The response is returned as a file object.",
         "displayCondition": null,
-        "name": "File",
+        "label": "File",
         "value": "BINARY"
       } ],
       "sampleDataType": null,
@@ -3653,12 +3653,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3679,12 +3679,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3705,12 +3705,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3731,12 +3731,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3856,12 +3856,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "Header",
+          "label": "Header",
           "value": "HEADER"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "QueryParams",
+          "label": "QueryParams",
           "value": "QUERY_PARAMETERS"
         } ],
         "sampleDataType": null,

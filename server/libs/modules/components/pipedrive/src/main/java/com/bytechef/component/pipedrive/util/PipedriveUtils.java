@@ -16,12 +16,11 @@
 
 package com.bytechef.component.pipedrive.util;
 
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 
-import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
-import com.bytechef.hermes.component.definition.ComponentOptionsFunction.OptionsResponse;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.OptionsDataSource;
 import com.bytechef.hermes.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +57,7 @@ public class PipedriveUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static ComponentOptionsFunction getOptions(String path, String dependsOn) {
+    public static OptionsDataSource.ActionOptionsFunction getOptions(String path, String dependsOn) {
         return (inputParameters, connectionParameters, searchText, context) -> {
             Map<String, ?> response = context
                 .http(http -> http.get(path))
@@ -78,7 +77,7 @@ public class PipedriveUtils {
                 options.add(option((String) list.get("name"), list.get("id")));
             }
 
-            return new OptionsResponse(options);
+            return new OptionsDataSource.OptionsResponse(options);
         };
     }
 }

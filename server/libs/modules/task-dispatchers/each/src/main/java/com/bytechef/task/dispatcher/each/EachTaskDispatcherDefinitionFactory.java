@@ -16,18 +16,17 @@
 
 package com.bytechef.task.dispatcher.each;
 
-import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.date;
-import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
-import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
-import static com.bytechef.hermes.definition.DefinitionDSL.number;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.time;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.date;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.dateTime;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.integer;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.number;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.object;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.time;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.EACH;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM_INDEX;
@@ -53,8 +52,7 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
             array(LIST)
                 .label("List of items")
                 .description("List of items to iterate over.")
-                .items(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time()))
+                .items(array(), bool(), date(), dateTime(), integer(), number(), object(), string(), time()))
         .taskProperties(task(ITERATEE))
         .variableProperties(string(ITEM), string(ITEM_INDEX));
 

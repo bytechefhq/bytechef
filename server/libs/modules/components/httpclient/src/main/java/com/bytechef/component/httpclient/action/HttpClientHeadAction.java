@@ -22,7 +22,7 @@ import static com.bytechef.hermes.component.definition.Context.Http.RequestMetho
 
 import com.bytechef.component.httpclient.constant.HttpClientConstants;
 import com.bytechef.component.httpclient.util.HttpClientActionUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 
@@ -50,7 +50,7 @@ public class HttpClientHeadAction {
         .perform(HttpClientHeadAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionDefinition.ActionContext context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
         return HttpClientActionUtils.execute(inputParameters, RequestMethod.HEAD, context);
     }
 }

@@ -27,7 +27,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 
-import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
 
 /**
@@ -36,10 +36,9 @@ import java.util.List;
  * @generated
  */
 public class JiraChangelogProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        string("id").label("Id")
-            .description("The ID of the changelog.")
-            .required(false),
+    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(string("id").label("Id")
+        .description("The ID of the changelog.")
+        .required(false),
         object("author").properties(JiraUserDetailsProperties.PROPERTIES)
             .placeholder("Add to Author")
             .label("Author")

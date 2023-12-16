@@ -19,12 +19,12 @@ package com.bytechef.component.email.connection;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.PASSWORD;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.USERNAME;
-import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.component.email.constant.EmailConstants;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;

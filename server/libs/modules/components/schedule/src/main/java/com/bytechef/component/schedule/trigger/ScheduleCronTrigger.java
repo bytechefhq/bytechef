@@ -19,9 +19,9 @@ package com.bytechef.component.schedule.trigger;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DATETIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.EXPRESSION;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIMEZONE;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;

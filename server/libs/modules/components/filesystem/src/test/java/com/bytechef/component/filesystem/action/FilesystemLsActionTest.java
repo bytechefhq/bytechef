@@ -20,7 +20,7 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.PAT
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.RECURSIVE;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.File;
 import java.util.List;

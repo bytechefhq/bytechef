@@ -20,7 +20,7 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.SEARCH_ST
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.dropbox.core.DbxException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class DropboxSearchActionTest extends AbstractDropboxActionTest {
             .when(parameterMap.getRequiredString(SEARCH_STRING))
             .thenReturn(SOURCE_STUB);
 
-        DropboxSearchAction.perform(parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
+        DropboxSearchAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))

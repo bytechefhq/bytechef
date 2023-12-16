@@ -56,7 +56,7 @@ public class JiraConnection {
                         string(CLIENT_SECRET)
                             .label("Client Secret")
                             .required(true))
-                    .authorizationUrl((connection, context) -> "https://auth.atlassian.com/authorize")
+                    .authorizationUrl((connectionParameters, context) -> "https://auth.atlassian.com/authorize")
                     .scopes((connection, context) -> List.of("read:jira-work", "write:jira-work"))
-                    .tokenUrl((connection, context) -> "https://auth.atlassian.com/oauth/token"));
+                    .tokenUrl((connectionParameters, context) -> "https://auth.atlassian.com/oauth/token"));
 }

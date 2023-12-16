@@ -20,21 +20,21 @@ import static com.bytechef.component.var.constant.VarConstants.SET;
 import static com.bytechef.component.var.constant.VarConstants.TYPE;
 import static com.bytechef.component.var.constant.VarConstants.VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.date;
-import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
-import static com.bytechef.hermes.definition.DefinitionDSL.number;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
-import static com.bytechef.hermes.definition.DefinitionDSL.time;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.date;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
@@ -119,7 +119,7 @@ public class VarSetAction {
         return inputParameters.getRequired(VALUE);
     }
 
-    protected static OutputSchemaFunction getOutputSchemaFunction() {
+    protected static OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction() {
         // TODO
         return (inputParameters, connectionParameters, context) -> null;
     }

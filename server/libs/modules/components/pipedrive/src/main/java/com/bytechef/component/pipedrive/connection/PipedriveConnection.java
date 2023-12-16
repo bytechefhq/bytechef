@@ -62,10 +62,10 @@ public class PipedriveConnection {
                             string(CLIENT_SECRET)
                                 .label("Client Secret")
                                 .required(true))
-                        .authorizationUrl((connection, context) -> "https://oauth.pipedrive.com/oauth/authorize")
-                        .scopes(
-                            (connection, context) -> List.of("deals:full", "contacts:full", "search:read", "leads:read",
-                                "leads:full", "contacts:read", "deals:read"))
-                        .tokenUrl((connection, context) -> "https://oauth.pipedrive.com/oauth/token")
-                        .refreshUrl((connection, context) -> "https://oauth.pipedrive.com/oauth/token"));
+                        .authorizationUrl(
+                            (connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/authorize")
+                        .scopes((connection, context) -> List.of("deals:full", "contacts:full", "search:read",
+                            "leads:read", "leads:full", "contacts:read", "deals:read"))
+                        .tokenUrl((connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/token")
+                        .refreshUrl((connectionParameters, context) -> "https://oauth.pipedrive.com/oauth/token"));
 }

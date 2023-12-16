@@ -18,7 +18,7 @@ package com.bytechef.component.delay.action;
 
 import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;

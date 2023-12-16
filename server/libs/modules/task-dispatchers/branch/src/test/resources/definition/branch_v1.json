@@ -17,12 +17,11 @@
     "type": "STRING",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "controlType": "TEXT",
     "maxLength": null,
     "minLength": null,
-    "options": null,
-    "sampleDataType": null,
-    "optionsDataSource": null
+    "sampleDataType": null
   } ],
   "resources": null,
   "taskProperties": [ {
@@ -39,6 +38,7 @@
     "type": "ARRAY",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "items": [ {
       "advancedOption": null,
       "description": null,
@@ -53,10 +53,10 @@
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "additionalProperties": null,
       "multipleValues": null,
       "objectType": null,
-      "options": null,
       "properties": [ {
         "advancedOption": null,
         "description": null,
@@ -71,12 +71,11 @@
         "type": "STRING",
         "defaultValue": null,
         "exampleValue": null,
+        "options": null,
         "controlType": "TEXT",
         "maxLength": null,
         "minLength": null,
-        "options": null,
-        "sampleDataType": null,
-        "optionsDataSource": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The list of tasks.",
@@ -91,6 +90,7 @@
         "type": "ARRAY",
         "defaultValue": null,
         "exampleValue": null,
+        "options": null,
         "items": [ {
           "advancedOption": null,
           "description": "The task or task dispatcher to use.",
@@ -105,26 +105,20 @@
           "type": "OBJECT",
           "defaultValue": null,
           "exampleValue": null,
+          "options": null,
           "additionalProperties": null,
           "multipleValues": null,
           "objectType": "TASK",
-          "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "controlType": "OBJECT_BUILDER"
         } ],
         "multipleValues": null,
-        "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "controlType": "ARRAY_BUILDER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "controlType": "OBJECT_BUILDER"
     } ],
     "multipleValues": null,
-    "options": null,
-    "controlType": "ARRAY_BUILDER",
-    "optionsDataSource": null
+    "controlType": "ARRAY_BUILDER"
   }, {
     "advancedOption": null,
     "description": "The list of tasks to execute if the result of expression does not match any of 'key' values.",
@@ -139,6 +133,7 @@
     "type": "ARRAY",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "items": [ {
       "advancedOption": null,
       "description": "The task or task dispatcher to use.",
@@ -153,18 +148,15 @@
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "additionalProperties": null,
       "multipleValues": null,
       "objectType": "TASK",
-      "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "controlType": "OBJECT_BUILDER"
     } ],
     "multipleValues": null,
-    "options": null,
-    "controlType": "ARRAY_BUILDER",
-    "optionsDataSource": null
+    "controlType": "ARRAY_BUILDER"
   } ],
   "title": "Branch",
   "variableProperties": null,

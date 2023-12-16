@@ -22,12 +22,11 @@ import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
 import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
 
-import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
@@ -63,10 +62,8 @@ public class WebhookUtils {
     }
 
     public static WebhookValidateFunction getWebhookValidateFunction() {
-        return (
-            ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-            WebhookMethod method, Context triggerContext) -> Objects.equals(
-                getCsrfToken(headers), inputParameters.getRequiredString(CSRF_TOKEN));
+        return (inputParameters, headers, parameters, body, method, triggerContext) -> Objects.equals(
+            getCsrfToken(headers), inputParameters.getRequiredString(CSRF_TOKEN));
     }
 
     private static String getCsrfToken(HttpHeaders headers) {

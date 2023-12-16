@@ -18,7 +18,7 @@ package com.bytechef.component.hubspot.property;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
 
 /**
@@ -27,7 +27,6 @@ import java.util.List;
  * @generated
  */
 public class HubspotPublicObjectIdProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(string("id").label("Id")
-            .required(true));
+    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(string("id").label("Id")
+        .required(true));
 }

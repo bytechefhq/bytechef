@@ -17,12 +17,11 @@
     "type": "STRING",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "controlType": "TEXT",
     "maxLength": null,
     "minLength": null,
-    "options": null,
-    "sampleDataType": null,
-    "optionsDataSource": null
+    "sampleDataType": null
   } ],
   "resources": null,
   "taskProperties": null,

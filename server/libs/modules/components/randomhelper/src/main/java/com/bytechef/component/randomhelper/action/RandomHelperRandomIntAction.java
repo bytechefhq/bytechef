@@ -20,10 +20,10 @@ import static com.bytechef.component.randomhelper.constant.RandomHelperConstants
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.RANDOM_INT;
 import static com.bytechef.component.randomhelper.constant.RandomHelperConstants.START_INCLUSIVE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 
 import com.bytechef.component.randomhelper.constant.RandomHelperConstants;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;

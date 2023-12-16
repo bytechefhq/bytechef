@@ -17,8 +17,8 @@
 package com.bytechef.component.rabbitmq.connection;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.rabbitmq.constant.RabbitMqConstants;
 import com.bytechef.hermes.component.definition.ComponentDSL;

@@ -321,17 +321,17 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "HUBSPOT_DEFINED",
+                  "label": "HUBSPOT_DEFINED",
                   "value": "HUBSPOT_DEFINED"
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "USER_DEFINED",
+                  "label": "USER_DEFINED",
                   "value": "USER_DEFINED"
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "INTEGRATOR_DEFINED",
+                  "label": "INTEGRATOR_DEFINED",
                   "value": "INTEGRATOR_DEFINED"
                 } ],
                 "sampleDataType": null,
@@ -377,9 +377,6 @@
     } ],
     "sampleOutput": null,
     "title": "Create",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -552,12 +549,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -582,7 +579,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
-    "perform": null
+    "perform": null,
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "hubspot",
@@ -808,9 +808,6 @@
     } ],
     "sampleOutput": null,
     "title": "Update",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -983,12 +980,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -1013,7 +1010,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
-    "perform": null
+    "perform": null,
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": {
@@ -1066,7 +1066,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": { },
       "clientSecret": null,
       "apply": null,
@@ -1075,7 +1074,8 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationCallback": null
     } ],
     "componentName": "hubspot",
     "componentDescription": "HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service.",
@@ -1146,207 +1146,207 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "contact.creation",
+        "label": "contact.creation",
         "value": "Contact Creation"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "contact.deletion",
+        "label": "contact.deletion",
         "value": "Contact Deletion"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "contact.merge",
+        "label": "contact.merge",
         "value": "Contact Merge"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "contact.associationChange",
+        "label": "contact.associationChange",
         "value": "Contact Association Change"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "contact.restore",
+        "label": "contact.restore",
         "value": "Contact Restore"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "contact.privacyDeletion",
+        "label": "contact.privacyDeletion",
         "value": "Contact  Privacy Deletion"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "contact.propertyChange",
+        "label": "contact.propertyChange",
         "value": "Contact Property Change"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "company.creation",
+        "label": "company.creation",
         "value": "Contact Creation"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "company.deletion",
+        "label": "company.deletion",
         "value": "Company Deletion"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "company.propertyChange",
+        "label": "company.propertyChange",
         "value": "Company Property Change"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "company.associationChange",
+        "label": "company.associationChange",
         "value": "Company Association Change"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "company.restore",
+        "label": "company.restore",
         "value": "Company Restore"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "company.merge",
+        "label": "company.merge",
         "value": "Company Merge"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "deal.creation",
+        "label": "deal.creation",
         "value": "Deal Creation"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "deal.deletion",
+        "label": "deal.deletion",
         "value": "Deal Deletion"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "deal.associationChange",
+        "label": "deal.associationChange",
         "value": "Deal Association Change"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "deal.restore",
+        "label": "deal.restore",
         "value": "Deal Restore"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "deal.merge",
+        "label": "deal.merge",
         "value": "Deal Merge"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "deal.propertyChange",
+        "label": "deal.propertyChange",
         "value": "Deal Property Change"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "ticket.creation",
+        "label": "ticket.creation",
         "value": "Ticket Creation"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "ticket.deletion",
+        "label": "ticket.deletion",
         "value": "Ticket Deletion"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "ticket.propertyChange",
+        "label": "ticket.propertyChange",
         "value": "Ticket Property Change"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "ticket.associationChange",
+        "label": "ticket.associationChange",
         "value": "Ticket Association Change"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "ticket.restore",
+        "label": "ticket.restore",
         "value": "Ticket Restore"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "ticket.merge",
+        "label": "ticket.merge",
         "value": "Ticket Merge"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "product.creation",
+        "label": "product.creation",
         "value": "Product Creation"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "product.deletion",
+        "label": "product.deletion",
         "value": "Product Deletion"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "product.restore",
+        "label": "product.restore",
         "value": "Product Restore"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "product.merge",
+        "label": "product.merge",
         "value": "Product Merge"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "product.propertyChange",
+        "label": "product.propertyChange",
         "value": "Product Property Change"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "line_item.creation",
+        "label": "line_item.creation",
         "value": "Line Item Creation"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "line_item.deletion",
+        "label": "line_item.deletion",
         "value": "Line Item Deletion"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "line_item.associationChange",
+        "label": "line_item.associationChange",
         "value": "Line Item Association Change"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "line_item.restore",
+        "label": "line_item.restore",
         "value": "Line Item Restore"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "line_item.merge",
+        "label": "line_item.merge",
         "value": "Line Item Merge"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "line_item.propertyChange",
+        "label": "line_item.propertyChange",
         "value": "Line Item Property Change"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "conversation.creation",
+        "label": "conversation.creation",
         "value": "Conversation Creation"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "conversation.deletion",
+        "label": "conversation.deletion",
         "value": "Conversation Deletion"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "conversation.privacyDeletion",
+        "label": "conversation.privacyDeletion",
         "value": "Conversation Privacy Deletion"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "conversation.propertyChange",
+        "label": "conversation.propertyChange",
         "value": "Conversation Property Change"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "conversation.newMessage",
+        "label": "conversation.newMessage",
         "value": "Conversation New Message"
       } ],
       "sampleDataType": null,
@@ -1379,13 +1379,6 @@
     "webhookRawBody": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "dynamicWebhookDisable": { },
-    "dynamicWebhookEnable": { },
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": { },
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
@@ -1704,7 +1697,14 @@
       "controlType": "ARRAY_BUILDER"
     },
     "deduplicate": null,
-    "poll": null
+    "poll": null,
+    "dynamicWebhookDisable": { },
+    "dynamicWebhookEnable": { },
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": { },
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null
   } ],
   "allowedConnections": null
 }

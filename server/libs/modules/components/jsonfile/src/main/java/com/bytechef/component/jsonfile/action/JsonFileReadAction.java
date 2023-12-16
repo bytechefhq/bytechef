@@ -24,17 +24,17 @@ import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PAGE_SI
 import static com.bytechef.component.jsonfile.constant.JsonFileConstants.PATH;
 import static com.bytechef.component.jsonfile.constant.JsonFileConstants.READ;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.jsonfile.constant.JsonFileConstants;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
+import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.BufferedReader;
@@ -91,6 +91,17 @@ public class JsonFileReadAction {
                 .advancedOption(true))
         .outputSchema(getOutputSchemaFunction())
         .perform(JsonFileReadAction::perform);
+
+    protected static JsonFileConstants.FileType getFileType(ParameterMap inputParameters) {
+        String fileType = inputParameters.getString(FILE_TYPE, JsonFileConstants.FileType.JSON.name());
+
+        return JsonFileConstants.FileType.valueOf(fileType.toUpperCase());
+    }
+
+    protected static OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction() {
+        // TODO
+        return (inputParameters, connection, context) -> null;
+    }
 
     @SuppressWarnings("unchecked")
     protected static Object perform(
@@ -150,16 +161,5 @@ public class JsonFileReadAction {
         }
 
         return result;
-    }
-
-    protected static JsonFileConstants.FileType getFileType(ParameterMap inputParameters) {
-        String fileType = inputParameters.getString(FILE_TYPE, JsonFileConstants.FileType.JSON.name());
-
-        return JsonFileConstants.FileType.valueOf(fileType.toUpperCase());
-    }
-
-    protected static OutputSchemaFunction getOutputSchemaFunction() {
-        // TODO
-        return (inputParameters, connection, context) -> null;
     }
 }

@@ -22,7 +22,7 @@ import static com.bytechef.component.odsfile.constant.OdsFileConstants.SHEET_NAM
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.component.odsfile.OdsFileComponentHandlerTest;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.ByteArrayInputStream;

@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.UploadBuilder;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class DropboxUploadFileActionTest extends AbstractDropboxActionTest {
             .when(filesRequests.uploadBuilder(DESTINATION_STUB))
             .thenReturn(uploadBuilder);
 
-        DropboxUploadFileAction.perform(parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
+        DropboxUploadFileAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))

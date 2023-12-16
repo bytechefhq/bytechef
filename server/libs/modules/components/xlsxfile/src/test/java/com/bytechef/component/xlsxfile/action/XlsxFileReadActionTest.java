@@ -25,8 +25,8 @@ import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.READ_AS
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
+import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;

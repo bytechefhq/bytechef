@@ -21,7 +21,7 @@ import static com.bytechef.component.filestorage.constant.FileStorageConstants.F
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.filestorage.FileStorageComponentHandlerTest;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.File;
 import java.nio.charset.StandardCharsets;

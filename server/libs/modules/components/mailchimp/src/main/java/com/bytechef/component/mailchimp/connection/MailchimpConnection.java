@@ -42,6 +42,6 @@ public class MailchimpConnection {
                     string(CLIENT_SECRET)
                         .label("Client Secret")
                         .required(true))
-                .authorizationUrl((connection, context) -> "https://login.mailchimp.com/oauth2/authorize")
-                .tokenUrl((connection, context) -> "https://login.mailchimp.com/oauth2/token"));
+                .authorizationUrl((connectionParameters, context) -> "https://login.mailchimp.com/oauth2/authorize")
+                .tokenUrl((connectionParameters, context) -> "https://login.mailchimp.com/oauth2/token"));
 }

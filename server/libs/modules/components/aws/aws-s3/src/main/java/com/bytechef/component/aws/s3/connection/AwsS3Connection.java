@@ -18,8 +18,8 @@ package com.bytechef.component.aws.s3.connection;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.aws.s3.constant.AwsS3Constants;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;

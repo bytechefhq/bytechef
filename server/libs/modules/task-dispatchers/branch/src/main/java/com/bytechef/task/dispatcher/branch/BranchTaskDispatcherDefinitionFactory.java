@@ -42,18 +42,19 @@ public class BranchTaskDispatcherDefinitionFactory implements TaskDispatcherDefi
         .title("Branch")
         .description("Executes one and only one branch of execution based on the `expression` value.")
         .icon("path:assets/branch.svg")
-        .properties(string(EXPRESSION)
-            .label("Expression")
-            .description("Defines expression upon which evaluation the proper branch continues execution."))
+        .properties(
+            string(EXPRESSION)
+                .label("Expression")
+                .description("Defines expression upon which evaluation the proper branch continues execution."))
         .taskProperties(
             array(CASES)
-                .description(
-                    "The list of tasks to execute if the result of expression matches the 'key' value.")
-                .items(object().properties(
-                    string(KEY),
-                    array(TASKS)
-                        .description("The list of tasks.")
-                        .items(task()))),
+                .description("The list of tasks to execute if the result of expression matches the 'key' value.")
+                .items(object()
+                    .properties(
+                        string(KEY),
+                        array(TASKS)
+                            .description("The list of tasks.")
+                            .items(task()))),
             array(DEFAULT)
                 .description(
                     "The list of tasks to execute if the result of expression does not match any of 'key' values.")

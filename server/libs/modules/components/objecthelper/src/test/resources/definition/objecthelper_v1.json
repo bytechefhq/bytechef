@@ -33,13 +33,13 @@
     } ],
     "sampleOutput": null,
     "title": "Convert from JSON string",
-    "outputSchema": null,
-    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "outputSchema": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "objectHelper",
@@ -70,12 +70,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "Object",
+        "label": "Object",
         "value": 1
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Array",
+        "label": "Array",
         "value": 2
       } ],
       "optionsDataSource": null,
@@ -123,6 +123,9 @@
     } ],
     "sampleOutput": null,
     "title": "Convert to JSON string",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -144,10 +147,7 @@
       "sampleDataType": null,
       "optionsDataSource": null
     },
-    "perform": { },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

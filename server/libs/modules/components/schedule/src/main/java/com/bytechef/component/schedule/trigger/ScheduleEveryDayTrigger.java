@@ -21,16 +21,17 @@ import static com.bytechef.component.schedule.constant.ScheduleConstants.DAY_OF_
 import static com.bytechef.component.schedule.constant.ScheduleConstants.HOUR;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.MINUTE;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIMEZONE;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
@@ -119,7 +120,7 @@ public class ScheduleEveryDayTrigger {
 
     protected void listenerEnable(
         ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
-        ListenerEmitter listenerEmitter, Context context) {
+        ListenerEmitter listenerEmitter, TriggerContext context) {
 
         triggerScheduler.scheduleScheduleTrigger(
             "0 %s %s ? * %s".formatted(

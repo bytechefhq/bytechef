@@ -31,12 +31,12 @@ import static com.bytechef.component.httpclient.constant.HttpClientConstants.RES
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.TIMEOUT;
 import static com.bytechef.component.httpclient.constant.HttpClientConstants.URI;
-import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.Body;
@@ -44,7 +44,7 @@ import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
 import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
 import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
+import com.bytechef.hermes.component.definition.Property.InputProperty;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,8 +56,8 @@ import java.util.Map;
  */
 public class HttpClientActionUtils {
 
-    public static List<? extends ModifiableInputProperty> options(boolean includeBodyContentProperties) {
-        List<ModifiableInputProperty> properties = new ArrayList<>();
+    public static List<? extends InputProperty> options(boolean includeBodyContentProperties) {
+        List<InputProperty> properties = new ArrayList<>();
 
         if (includeBodyContentProperties) {
             properties.add(string(BODY_CONTENT_TYPE)
@@ -153,14 +153,14 @@ public class HttpClientActionUtils {
     }
 
     @SafeVarargs
-    public static ModifiableInputProperty[] toArray(List<? extends ModifiableInputProperty>... propertiesArray) {
-        List<? super ModifiableInputProperty> allProperties = new ArrayList<>();
+    public static InputProperty[] toArray(List<? extends InputProperty>... propertiesArray) {
+        List<? super InputProperty> allProperties = new ArrayList<>();
 
-        for (List<? extends ModifiableInputProperty> properties : propertiesArray) {
+        for (List<? extends InputProperty> properties : propertiesArray) {
             allProperties.addAll(properties);
         }
 
-        return allProperties.toArray(ModifiableInputProperty[]::new);
+        return allProperties.toArray(InputProperty[]::new);
     }
 
     private static BodyContentType getBodyContentType(ParameterMap inputParameters) {

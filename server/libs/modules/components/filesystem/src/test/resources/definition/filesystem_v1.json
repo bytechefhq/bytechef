@@ -33,10 +33,6 @@
     } ],
     "sampleOutput": null,
     "title": "Read from file",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -136,9 +132,13 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
+    },
+    "perform": { },
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -249,8 +249,8 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The path to which the file should be written.",
@@ -274,10 +274,6 @@
     } ],
     "sampleOutput": null,
     "title": "Write to file",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -313,12 +309,16 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
+    },
+    "perform": { },
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -333,11 +333,11 @@
     "properties": null,
     "sampleOutput": null,
     "title": "Create Temp Directory",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "outputSchema": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -372,10 +372,6 @@
     } ],
     "sampleOutput": "/data",
     "title": "File Path",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -396,7 +392,11 @@
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    }
+    },
+    "perform": { },
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -445,23 +445,23 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
     } ],
     "sampleOutput": null,
     "title": "List",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "outputSchema": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -496,11 +496,11 @@
     } ],
     "sampleOutput": null,
     "title": "Create",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "outputSchema": null
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "filesystem",
@@ -535,11 +535,11 @@
     } ],
     "sampleOutput": null,
     "title": "Remove",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "outputSchema": null
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": null,

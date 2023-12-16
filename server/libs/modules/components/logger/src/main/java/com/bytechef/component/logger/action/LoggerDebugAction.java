@@ -19,9 +19,9 @@ package com.bytechef.component.logger.action;
 import static com.bytechef.component.logger.constant.LoggerConstants.DEBUG;
 import static com.bytechef.component.logger.constant.LoggerConstants.TEXT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 

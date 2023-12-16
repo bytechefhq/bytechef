@@ -19,7 +19,7 @@ package com.bytechef.component.dropbox.action;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.dropbox.core.DbxException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ public class DropboxListFolderActionTest extends AbstractDropboxActionTest {
 
     @Test
     public void testPerform() throws DbxException {
-        DropboxListFolderAction.perform(parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
+        DropboxListFolderAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))

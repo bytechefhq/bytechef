@@ -41,8 +41,8 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -60,12 +60,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -84,8 +84,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -101,8 +101,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -120,8 +120,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -155,8 +155,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -176,8 +176,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -213,15 +213,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Add your Java custom logic here.",
@@ -245,13 +245,13 @@
     } ],
     "sampleOutput": null,
     "title": "Java",
+    "perform": { },
+    "outputSchema": null,
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "script",
@@ -294,8 +294,8 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -313,12 +313,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -337,8 +337,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -354,8 +354,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -373,8 +373,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -408,8 +408,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -429,8 +429,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -466,15 +466,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Add your JavaScript custom logic here.",
@@ -498,13 +498,13 @@
     } ],
     "sampleOutput": null,
     "title": "JavaScript",
+    "perform": { },
+    "outputSchema": null,
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "script",
@@ -547,8 +547,8 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -566,12 +566,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -590,8 +590,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -607,8 +607,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -626,8 +626,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -661,8 +661,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -682,8 +682,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -719,15 +719,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Add your Python custom logic here.",
@@ -751,13 +751,13 @@
     } ],
     "sampleOutput": null,
     "title": "Python",
+    "perform": { },
+    "outputSchema": null,
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "script",
@@ -800,8 +800,8 @@
         "items": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -819,12 +819,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -843,8 +843,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -860,8 +860,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -879,8 +879,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -914,8 +914,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -935,8 +935,8 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -972,15 +972,15 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Add your Ruby custom logic here.",
@@ -1004,13 +1004,13 @@
     } ],
     "sampleOutput": null,
     "title": "Ruby",
+    "perform": { },
+    "outputSchema": null,
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": null,

@@ -19,11 +19,11 @@ package com.bytechef.component.objecthelper.action;
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.PARSE;
 import static com.bytechef.component.objecthelper.constant.ObjectHelperConstants.SOURCE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
@@ -49,7 +49,7 @@ public class ObjectHelperParseAction {
         return context.json(json -> json.read((String) input));
     }
 
-    protected static OutputSchemaFunction getOutputSchemaFunction() {
+    protected static OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction() {
         // TODO
         return (inputParameters, connection, context) -> null;
     }

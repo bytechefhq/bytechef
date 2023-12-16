@@ -272,17 +272,17 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "Available",
+          "label": "Available",
           "value": "available"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Pending",
+          "label": "Pending",
           "value": "pending"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Sold",
+          "label": "Sold",
           "value": "sold"
         } ],
         "sampleDataType": null,
@@ -550,17 +550,17 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "Available",
+          "label": "Available",
           "value": "available"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Pending",
+          "label": "Pending",
           "value": "pending"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Sold",
+          "label": "Sold",
           "value": "sold"
         } ],
         "sampleDataType": null,
@@ -846,17 +846,17 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "Available",
+          "label": "Available",
           "value": "available"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Pending",
+          "label": "Pending",
           "value": "pending"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Sold",
+          "label": "Sold",
           "value": "sold"
         } ],
         "sampleDataType": null,
@@ -1124,17 +1124,17 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "Available",
+          "label": "Available",
           "value": "available"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Pending",
+          "label": "Pending",
           "value": "pending"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Sold",
+          "label": "Sold",
           "value": "sold"
         } ],
         "sampleDataType": null,
@@ -1183,17 +1183,17 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "Available",
+        "label": "Available",
         "value": "available"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Pending",
+        "label": "Pending",
         "value": "pending"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Sold",
+        "label": "Sold",
         "value": "sold"
       } ],
       "sampleDataType": null,
@@ -1472,17 +1472,17 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "Available",
+            "label": "Available",
             "value": "available"
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "Pending",
+            "label": "Pending",
             "value": "pending"
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "Sold",
+            "label": "Sold",
             "value": "sold"
           } ],
           "sampleDataType": null,
@@ -1829,17 +1829,17 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "Available",
+            "label": "Available",
             "value": "available"
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "Pending",
+            "label": "Pending",
             "value": "pending"
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "Sold",
+            "label": "Sold",
             "value": "sold"
           } ],
           "sampleDataType": null,
@@ -2217,17 +2217,17 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "Available",
+          "label": "Available",
           "value": "available"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Pending",
+          "label": "Pending",
           "value": "pending"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Sold",
+          "label": "Sold",
           "value": "sold"
         } ],
         "sampleDataType": null,
@@ -2773,17 +2773,17 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "Placed",
+          "label": "Placed",
           "value": "placed"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Approved",
+          "label": "Approved",
           "value": "approved"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Delivered",
+          "label": "Delivered",
           "value": "delivered"
         } ],
         "sampleDataType": null,
@@ -2805,12 +2805,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -2934,17 +2934,17 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "Placed",
+          "label": "Placed",
           "value": "placed"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Approved",
+          "label": "Approved",
           "value": "approved"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Delivered",
+          "label": "Delivered",
           "value": "delivered"
         } ],
         "sampleDataType": null,
@@ -2966,12 +2966,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -3178,17 +3178,17 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "Placed",
+          "label": "Placed",
           "value": "placed"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Approved",
+          "label": "Approved",
           "value": "approved"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Delivered",
+          "label": "Delivered",
           "value": "delivered"
         } ],
         "sampleDataType": null,
@@ -3210,12 +3210,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"

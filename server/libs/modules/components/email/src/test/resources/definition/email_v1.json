@@ -348,11 +348,11 @@
     } ],
     "sampleOutput": null,
     "title": "Send",
-    "outputSchema": null,
-    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "outputSchema": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -405,6 +405,7 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
+      "authorizationCallback": null,
       "authorizationUrl": null,
       "clientSecret": null,
       "apply": null,
@@ -413,8 +414,7 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationCallback": null
+      "tokenUrl": null
     } ],
     "componentName": "email",
     "componentDescription": "The Email connector sends emails using an SMTP email server.",
@@ -475,12 +475,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"

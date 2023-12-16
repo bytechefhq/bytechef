@@ -61,12 +61,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -137,13 +137,13 @@
     } ],
     "sampleOutput": null,
     "title": "Query",
-    "perform": { },
-    "outputSchema": null,
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "postgresql",
@@ -298,12 +298,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -468,6 +468,9 @@
     } ],
     "sampleOutput": null,
     "title": "Insert",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "perform": { },
     "outputSchema": {
       "advancedOption": null,
@@ -509,10 +512,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    }
   }, {
     "batch": null,
     "componentName": "postgresql",
@@ -687,12 +687,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -857,6 +857,9 @@
     } ],
     "sampleOutput": null,
     "title": "Update",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "perform": { },
     "outputSchema": {
       "advancedOption": null,
@@ -898,10 +901,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    }
   }, {
     "batch": null,
     "componentName": "postgresql",
@@ -1037,12 +1037,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -1207,6 +1207,9 @@
     } ],
     "sampleOutput": null,
     "title": "Delete",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "perform": { },
     "outputSchema": {
       "advancedOption": null,
@@ -1248,10 +1251,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    }
   }, {
     "batch": null,
     "componentName": "postgresql",
@@ -1347,12 +1347,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -1545,12 +1545,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -1621,6 +1621,9 @@
     } ],
     "sampleOutput": null,
     "title": "Execute",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "perform": { },
     "outputSchema": {
       "advancedOption": null,
@@ -1662,10 +1665,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    }
   } ],
   "category": null,
   "connection": {

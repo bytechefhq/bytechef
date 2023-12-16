@@ -19,7 +19,7 @@ package com.bytechef.component.filestorage.action;
 import static com.bytechef.component.filestorage.constant.FileStorageConstants.FILE_ENTRY;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

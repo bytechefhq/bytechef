@@ -16,7 +16,7 @@
 
 package com.bytechef.component.datastorage.constant;
 
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 
 import com.bytechef.hermes.definition.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

@@ -46,8 +46,8 @@ public class PetstoreConnection {
                     string(CLIENT_SECRET)
                         .label("Client Secret")
                         .required(true))
-                .authorizationUrl((connection, context) -> "https://petstore3.swagger.io/oauth/authorize")
-                .scopes((connection, context) -> List.of("write:pets", "read:pets")),
+                .authorizationUrl((connectionParameters, context) -> "https://petstore3.swagger.io/oauth/authorize")
+                .scopes((connectionParameters, context) -> List.of("write:pets", "read:pets")),
             authorization(
                 AuthorizationType.API_KEY.toLowerCase(), AuthorizationType.API_KEY)
                     .title("API Key")

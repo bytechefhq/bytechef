@@ -19,7 +19,7 @@ package com.bytechef.component.xmlhelper.action;
 import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.util.List;
 import java.util.Map;
