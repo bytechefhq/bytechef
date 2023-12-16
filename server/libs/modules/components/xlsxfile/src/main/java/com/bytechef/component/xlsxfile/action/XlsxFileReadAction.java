@@ -24,7 +24,6 @@ import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.PAGE_SI
 import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.READ_AS_STRING;
 import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.SHEET_NAME;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
@@ -37,8 +36,11 @@ import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -104,11 +106,18 @@ public class XlsxFileReadAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(getOutputSchemaFunction())
+        .sampleOutput(getSampleOutputSchemaFunction())
         .perform(XlsxFileReadAction::perform);
 
-    protected static OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction() {
-        // TODO
-        return (inputParameters, connection, context) -> new OutputSchemaDataSource.OutputSchemaResponse(array());
+    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
+            context.outputSchema(outputSchema -> outputSchema.get(
+                perform(inputParameters, connectionParameters, context))));
+    }
+
+    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
+            perform(inputParameters, connectionParameters, context));
     }
 
     protected static Object perform(

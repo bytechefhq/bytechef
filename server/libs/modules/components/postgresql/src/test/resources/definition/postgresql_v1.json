@@ -85,8 +85,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": null,
@@ -105,8 +105,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -132,8 +132,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutput": null,
     "title": "Query",
@@ -141,9 +141,12 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "outputSchema": null
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
+    "outputSchema": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "postgresql",
@@ -232,8 +235,8 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "List of rows.",
@@ -279,8 +282,8 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -322,8 +325,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -339,8 +342,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -358,8 +361,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -393,8 +396,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -414,8 +417,8 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -451,68 +454,33 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "sampleOutput": null,
     "title": "Insert",
     "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "outputSchema": {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "OBJECT",
-      "defaultValue": null,
-      "exampleValue": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": null,
-      "options": null,
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "placeholder": null,
-        "required": null,
-        "name": "rows",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }
+    "outputSchemaDataSource": {
+      "outputSchema": { }
+    },
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
+    "outputSchema": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "postgresql",
@@ -601,8 +569,8 @@
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The name of the property which decides which rows in the database should be updated.",
@@ -668,8 +636,8 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -711,8 +679,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -728,8 +696,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -747,8 +715,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -782,8 +750,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -803,8 +771,8 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -840,68 +808,33 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "sampleOutput": null,
     "title": "Update",
     "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "outputSchema": {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "OBJECT",
-      "defaultValue": null,
-      "exampleValue": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": null,
-      "options": null,
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "placeholder": null,
-        "required": null,
-        "name": "rows",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }
+    "outputSchemaDataSource": {
+      "outputSchema": { }
+    },
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
+    "outputSchema": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "postgresql",
@@ -1018,8 +951,8 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1061,8 +994,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1078,8 +1011,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1097,8 +1030,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1132,8 +1065,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1153,8 +1086,8 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1190,68 +1123,33 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "sampleOutput": null,
     "title": "Delete",
     "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "outputSchema": {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "OBJECT",
-      "defaultValue": null,
-      "exampleValue": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": null,
-      "options": null,
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "placeholder": null,
-        "required": null,
-        "name": "rows",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }
+    "outputSchemaDataSource": {
+      "outputSchema": { }
+    },
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
+    "outputSchema": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "postgresql",
@@ -1328,8 +1226,8 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1371,8 +1269,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1388,8 +1286,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1407,8 +1305,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1442,8 +1340,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1463,8 +1361,8 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -1500,20 +1398,20 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The list of properties which should be used as parameters.",
@@ -1569,8 +1467,8 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1589,8 +1487,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": null,
@@ -1616,56 +1514,21 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutput": null,
     "title": "Execute",
     "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "outputSchema": {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "OBJECT",
-      "defaultValue": null,
-      "exampleValue": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": null,
-      "options": null,
-      "properties": [ {
-        "advancedOption": null,
-        "description": null,
-        "displayCondition": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": null,
-        "metadata": { },
-        "placeholder": null,
-        "required": null,
-        "name": "rows",
-        "type": "INTEGER",
-        "defaultValue": null,
-        "exampleValue": null,
-        "maxValue": null,
-        "minValue": null,
-        "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
-      } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }
+    "outputSchemaDataSource": {
+      "outputSchema": { }
+    },
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
+    "outputSchema": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -1710,8 +1573,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
       "description": null,

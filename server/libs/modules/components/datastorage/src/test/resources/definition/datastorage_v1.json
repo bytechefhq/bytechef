@@ -384,11 +384,11 @@
     } ],
     "sampleOutput": null,
     "title": "Append Value to List",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -481,9 +481,6 @@
     } ],
     "sampleOutput": null,
     "title": "Atomic Increment",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -525,7 +522,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
-    "perform": { }
+    "perform": { },
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -618,13 +618,16 @@
     } ],
     "sampleOutput": null,
     "title": "Await Get Value",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    }
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -698,11 +701,11 @@
     } ],
     "sampleOutput": null,
     "title": "Delete Value",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -795,11 +798,11 @@
     } ],
     "sampleOutput": null,
     "title": "Delete Value from List",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -853,13 +856,16 @@
     } ],
     "sampleOutput": null,
     "title": "Get All Entries(Keys and Values)",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    }
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -1193,13 +1199,16 @@
     } ],
     "sampleOutput": null,
     "title": "Get Value",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    }
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -1533,11 +1542,11 @@
     } ],
     "sampleOutput": null,
     "title": "Set Value",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -1890,11 +1899,11 @@
     } ],
     "sampleOutput": null,
     "title": "Set Value in List",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": null,

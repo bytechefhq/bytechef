@@ -34,8 +34,11 @@ import com.bytechef.component.jsonfile.constant.JsonFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -90,6 +93,7 @@ public class JsonFileReadAction {
                 .displayCondition("%s === true".formatted(IS_ARRAY))
                 .advancedOption(true))
         .outputSchema(getOutputSchemaFunction())
+        .sampleOutput(getSampleOutputSchemaFunction())
         .perform(JsonFileReadAction::perform);
 
     protected static JsonFileConstants.FileType getFileType(ParameterMap inputParameters) {
@@ -98,9 +102,15 @@ public class JsonFileReadAction {
         return JsonFileConstants.FileType.valueOf(fileType.toUpperCase());
     }
 
-    protected static OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction() {
-        // TODO
-        return (inputParameters, connection, context) -> null;
+    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
+            context.outputSchema(outputSchema -> outputSchema.get(
+                perform(inputParameters, connectionParameters, context))));
+    }
+
+    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
+            perform(inputParameters, connectionParameters, context));
     }
 
     @SuppressWarnings("unchecked")

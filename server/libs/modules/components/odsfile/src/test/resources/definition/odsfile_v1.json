@@ -109,8 +109,8 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "The first row of the file contains the header names.",
@@ -180,8 +180,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -199,8 +199,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -251,29 +251,15 @@
     "sampleOutput": null,
     "title": "Read from file",
     "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "outputSchema": {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "ARRAY",
-      "defaultValue": null,
-      "exampleValue": null,
-      "items": null,
-      "multipleValues": null,
-      "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
-    }
+    "outputSchemaDataSource": {
+      "outputSchema": { }
+    },
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
+    "outputSchema": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "odsFile",
@@ -330,8 +316,8 @@
           "items": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -373,8 +359,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -390,8 +376,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -409,8 +395,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -444,8 +430,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -465,8 +451,8 @@
           "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -502,20 +488,20 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.ods\" will be used.",
@@ -561,8 +547,10 @@
     "title": "Write to file",
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -662,9 +650,10 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

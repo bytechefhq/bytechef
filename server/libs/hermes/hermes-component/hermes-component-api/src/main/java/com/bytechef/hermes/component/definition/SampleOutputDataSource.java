@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -47,5 +48,42 @@ public interface SampleOutputDataSource {
         public SampleOutputResponse(Object sampleOutput) {
             this(sampleOutput, null);
         }
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ActionSampleOutputFunction extends SampleOutputFunction {
+
+        /**
+         *
+         * @param inputParameters
+         * @param connectionParameters
+         * @param context
+         * @return
+         * @throws ComponentExecutionException
+         */
+        SampleOutputResponse apply(
+            ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
+            throws ComponentExecutionException;
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface TriggerSampleOutputFunction extends SampleOutputFunction {
+
+        /**
+         * @param inputParameters
+         * @param connectionParameters
+         * @param context
+         * @return
+         * @throws ComponentExecutionException
+         */
+        SampleOutputResponse apply(
+            ParameterMap inputParameters, ParameterMap connectionParameters, TriggerContext context)
+            throws ComponentExecutionException;
     }
 }

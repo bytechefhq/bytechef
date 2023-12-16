@@ -139,8 +139,8 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The object input is array?",
@@ -204,8 +204,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -223,8 +223,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Read from file",
@@ -232,9 +232,12 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
+    "perform": { },
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "jsonFile",
@@ -303,8 +306,8 @@
         "label": "Array",
         "value": 2
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The object to write to the file.",
@@ -324,8 +327,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The array to write to the file.",
@@ -343,8 +346,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.json\" will be used.",
@@ -370,7 +373,11 @@
     "title": "Write to file",
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -470,10 +477,9 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
-    },
-    "perform": { }
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
+    }
   } ],
   "category": null,
   "connection": null,

@@ -32,7 +32,6 @@ import static com.bytechef.hermes.component.definition.Context.Http.BodyContentT
 import static com.bytechef.hermes.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.Property.InputProperty;
 import java.util.Arrays;
 import java.util.Collections;
@@ -100,18 +99,6 @@ public class HttpClientConstants {
                 .label("Body Content - Binary")
                 .description("The object property which contains a reference to the file to upload.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
-
-    public static final OutputSchemaDataSource.ActionOutputSchemaFunction OUTPUT_PROPERTIES =
-        // TODO
-        (inputParameters, connection, context) -> null;
-//        {
-//            if (inputParameters.getBoolean(FULL_RESPONSE, false)) {
-//                return object()
-//                    .properties(any("body"), object("headers"), integer("status"));
-//            } else {
-//                return any();
-//            }
-//        };
 
     public static final List<? extends InputProperty> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(

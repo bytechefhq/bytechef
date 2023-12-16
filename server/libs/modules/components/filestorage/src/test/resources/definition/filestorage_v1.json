@@ -109,15 +109,14 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     } ],
     "sampleOutput": null,
     "title": "Read from file",
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -138,7 +137,8 @@
       "options": null,
       "sampleDataType": null,
       "optionsDataSource": null
-    }
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "fileStorage",
@@ -195,8 +195,10 @@
     "title": "Write to file",
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -296,9 +298,10 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "fileStorage",
@@ -356,7 +359,6 @@
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -456,9 +458,10 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

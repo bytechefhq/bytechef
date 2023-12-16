@@ -26,7 +26,7 @@ public class ObjectHelperComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/objecthelper_v1.json",
-            new ObjectHelperComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/objecthelper_v1.json", new ObjectHelperComponentHandler().getDefinition());
     }
 }

@@ -18,8 +18,8 @@ package com.bytechef.hermes.component.registry.facade;
 
 import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
+import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
 import java.util.Optional;
 import org.springframework.lang.NonNull;
 

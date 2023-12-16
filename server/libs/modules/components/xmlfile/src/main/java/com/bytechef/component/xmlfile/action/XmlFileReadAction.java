@@ -23,19 +23,20 @@ import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_SIZE
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PATH;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.READ;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +77,19 @@ public class XmlFileReadAction {
                 .displayCondition("%s === true".formatted(IS_ARRAY))
                 .advancedOption(true))
         .outputSchema(getOutputSchemaFunction())
+        .sampleOutput(getSampleOutputSchemaFunction())
         .perform(XmlFileReadAction::perform);
+
+    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
+            context.outputSchema(outputSchema -> outputSchema.get(
+                perform(inputParameters, connectionParameters, context))));
+    }
+
+    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
+            perform(inputParameters, connectionParameters, context));
+    }
 
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
@@ -122,16 +135,5 @@ public class XmlFileReadAction {
         }
 
         return result;
-    }
-
-    protected static OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction() {
-        // TODO
-        return (inputParameters, connection, context) -> {
-            if (inputParameters.getBoolean(IS_ARRAY, false)) {
-                return new OutputSchemaDataSource.OutputSchemaResponse(object());
-            } else {
-                return new OutputSchemaDataSource.OutputSchemaResponse(array());
-            }
-        };
     }
 }
