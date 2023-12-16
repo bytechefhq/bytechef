@@ -100,7 +100,7 @@
     "metadata": { },
     "placeholder": null,
     "required": null,
-    "name": "itemIndex",
+    "name": "index",
     "type": "STRING",
     "defaultValue": null,
     "exampleValue": null,

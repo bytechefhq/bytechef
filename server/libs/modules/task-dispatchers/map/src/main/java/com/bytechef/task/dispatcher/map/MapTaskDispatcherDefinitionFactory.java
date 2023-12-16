@@ -27,8 +27,8 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.s
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.time;
+import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM;
-import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.MAP;
@@ -55,7 +55,7 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
                 .items(array(), bool(), date(), dateTime(), integer(), number(), object(), string(), time()))
         .outputSchema(getOutputSchemaFunction())
         .taskProperties(task(ITERATEE))
-        .variableProperties(string(ITEM), string(ITEM_INDEX));
+        .variableProperties(string(ITEM), string(INDEX));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {

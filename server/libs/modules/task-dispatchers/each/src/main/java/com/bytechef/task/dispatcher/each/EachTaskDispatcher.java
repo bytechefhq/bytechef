@@ -18,6 +18,8 @@
 
 package com.bytechef.task.dispatcher.each;
 
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.INDEX;
+import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.LIST;
 
@@ -109,8 +111,7 @@ public class EachTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
                 WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
-                newContext.put(workflowTask.getName(),
-                    Map.of(EachTaskDispatcherConstants.ITEM, item, EachTaskDispatcherConstants.ITEM_INDEX, i));
+                newContext.put(workflowTask.getName(), Map.of(ITEM, item, INDEX, i));
 
                 iterateeTaskExecution = taskExecutionService.create(iterateeTaskExecution.evaluate(newContext));
 

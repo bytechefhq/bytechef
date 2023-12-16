@@ -13,13 +13,13 @@ tasks:
         - name: "sumVar1"
           type: "var"
           parameters:
-            value: "${1 + loop_1.itemIndex}"
+            value: "${1 + loop_1.index}"
         - name: "condition_1"
           type: "condition/v1"
           parameters:
             conditions:
             - number:
-                value1: "${loop_1.itemIndex}"
+                value1: "${loop_1.index}"
                 operation: "GREATER"
                 value2: 5
             combineOperation: "ANY"

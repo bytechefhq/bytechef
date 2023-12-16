@@ -21,8 +21,8 @@ import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.b
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
+import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM;
-import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM_INDEX;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP;
@@ -50,7 +50,7 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .description("Should loop iterate until condition set by 'Loop Break' statement is met.")
                 .defaultValue(false))
         .taskProperties(task(ITERATEE))
-        .variableProperties(string(ITEM), string(ITEM_INDEX));
+        .variableProperties(string(ITEM), string(INDEX));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
