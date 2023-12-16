@@ -34,12 +34,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -95,12 +95,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -304,12 +304,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -553,12 +553,12 @@
             "options": [ {
               "description": null,
               "displayCondition": null,
-              "name": "True",
+              "label": "True",
               "value": true
             }, {
               "description": null,
               "displayCondition": null,
-              "name": "False",
+              "label": "False",
               "value": true
             } ],
             "controlType": "CHECKBOX"
@@ -862,12 +862,12 @@
               "options": [ {
                 "description": null,
                 "displayCondition": null,
-                "name": "True",
+                "label": "True",
                 "value": true
               }, {
                 "description": null,
                 "displayCondition": null,
-                "name": "False",
+                "label": "False",
                 "value": true
               } ],
               "controlType": "CHECKBOX"
@@ -1143,12 +1143,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -1169,12 +1169,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -1195,12 +1195,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -1221,12 +1221,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -1247,12 +1247,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -1305,12 +1305,12 @@
               "options": [ {
                 "description": null,
                 "displayCondition": null,
-                "name": "True",
+                "label": "True",
                 "value": true
               }, {
                 "description": null,
                 "displayCondition": null,
-                "name": "False",
+                "label": "False",
                 "value": true
               } ],
               "controlType": "CHECKBOX"
@@ -1553,12 +1553,12 @@
               "options": [ {
                 "description": null,
                 "displayCondition": null,
-                "name": "True",
+                "label": "True",
                 "value": true
               }, {
                 "description": null,
                 "displayCondition": null,
-                "name": "False",
+                "label": "False",
                 "value": true
               } ],
               "controlType": "CHECKBOX"
@@ -1751,12 +1751,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -1895,12 +1895,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -2244,12 +2244,12 @@
             "options": [ {
               "description": null,
               "displayCondition": null,
-              "name": "True",
+              "label": "True",
               "value": true
             }, {
               "description": null,
               "displayCondition": null,
-              "name": "False",
+              "label": "False",
               "value": true
             } ],
             "controlType": "CHECKBOX"
@@ -2576,12 +2576,12 @@
             "options": [ {
               "description": null,
               "displayCondition": null,
-              "name": "True",
+              "label": "True",
               "value": true
             }, {
               "description": null,
               "displayCondition": null,
-              "name": "False",
+              "label": "False",
               "value": true
             } ],
             "controlType": "CHECKBOX"
@@ -2908,12 +2908,12 @@
             "options": [ {
               "description": null,
               "displayCondition": null,
-              "name": "True",
+              "label": "True",
               "value": true
             }, {
               "description": null,
               "displayCondition": null,
-              "name": "False",
+              "label": "False",
               "value": true
             } ],
             "controlType": "CHECKBOX"
@@ -3325,13 +3325,16 @@
       "transition": {
         "status": 200,
         "errorCollection": {
-          "errorMessages": [ ],
-          "errors": { }
+          "errors": { },
+          "errorMessages": [ ]
         }
       },
       "key": "ED-24"
     },
     "title": "Create issue",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "perform": null,
     "outputSchema": {
       "advancedOption": null,
@@ -3576,10 +3579,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    }
   }, {
     "batch": null,
     "componentName": "jira",
@@ -3676,12 +3676,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -3767,70 +3767,19 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
     } ],
     "sampleOutput": {
       "fields": {
-        "comment": [ {
-          "body": {
-            "type": "doc",
-            "content": [ {
-              "content": [ {
-                "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.",
-                "type": "text"
-              } ],
-              "type": "paragraph"
-            } ],
-            "version": 1
-          },
-          "visibility": {
-            "type": "role",
-            "value": "Administrators",
-            "identifier": "Administrators"
-          },
-          "updateAuthor": {
-            "accountId": "5b10a2844c20165700ede21g",
-            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
-            "displayName": "Mia Krystof",
-            "active": false
-          },
-          "created": "2021-01-17T12:34:00.000+0000",
-          "id": 10000.0,
-          "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000",
-          "author": {
-            "accountId": "5b10a2844c20165700ede21g",
-            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
-            "displayName": "Mia Krystof",
-            "active": false
-          },
-          "updated": "2021-01-18T23:45:00.000+0000"
-        } ],
-        "watcher": {
-          "watchCount": 1,
-          "self": "https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers",
-          "isWatching": false,
-          "watchers": [ {
-            "accountId": "5b10a2844c20165700ede21g",
-            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
-            "displayName": "Mia Krystof",
-            "active": false
-          } ]
-        },
         "issuelinks": [ {
-          "type": {
-            "inward": "depends on",
-            "outward": "is depended by",
-            "id": 10000.0,
-            "name": "Dependent"
-          },
           "id": 10001.0,
           "outwardIssue": {
             "fields": {
@@ -3842,14 +3791,14 @@
             "id": "10004L",
             "self": "https://your-domain.atlassian.net/rest/api/3/issue/PR-2",
             "key": "PR-2"
-          }
-        }, {
+          },
           "type": {
             "inward": "depends on",
             "outward": "is depended by",
             "id": 10000.0,
             "name": "Dependent"
-          },
+          }
+        }, {
           "id": 10002.0,
           "inwardIssue": {
             "fields": {
@@ -3861,10 +3810,15 @@
             "id": 10004.0,
             "self": "https://your-domain.atlassian.net/rest/api/3/issue/PR-3",
             "key": "PR-3"
+          },
+          "type": {
+            "inward": "depends on",
+            "outward": "is depended by",
+            "id": 10000.0,
+            "name": "Dependent"
           }
         } ],
         "attachment": [ {
-          "size": 23123,
           "content": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10000",
           "created": "2022-11-30T07:18:19.441+0000",
           "thumbnail": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/thumbnail/10000",
@@ -3872,46 +3826,41 @@
           "id": 10000,
           "filename": "picture.jpg",
           "author": {
-            "key": "",
             "active": false,
             "accountType": "atlassian",
             "accountId": "5b10a2844c20165700ede21g",
             "name": "",
             "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
             "avatarUrls": {
-              "48x48": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48",
               "24x24": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=24&s=24",
               "16x16": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=16&s=16",
-              "32x32": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32"
+              "32x32": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32",
+              "48x48": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48"
             },
-            "displayName": "Mia Krystof"
+            "displayName": "Mia Krystof",
+            "key": ""
           },
-          "mimeType": "image/jpeg"
+          "mimeType": "image/jpeg",
+          "size": 23123
         } ],
         "worklog": [ {
-          "visibility": {
-            "type": "group",
-            "value": "jira-developers",
-            "identifier": "276f955c-63d7-42c8-9520-92d01dca0625"
-          },
           "author": {
-            "accountId": "5b10a2844c20165700ede21g",
             "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
             "displayName": "Mia Krystof",
-            "active": false
+            "active": false,
+            "accountId": "5b10a2844c20165700ede21g"
           },
           "updateAuthor": {
-            "accountId": "5b10a2844c20165700ede21g",
             "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
             "displayName": "Mia Krystof",
-            "active": false
+            "active": false,
+            "accountId": "5b10a2844c20165700ede21g"
           },
           "timeSpent": "3h 20m",
           "updated": "2021-01-18T23:45:00.000+0000",
           "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000",
           "started": "2021-01-17T12:34:00.000+0000",
           "comment": {
-            "type": "doc",
             "content": [ {
               "content": [ {
                 "text": "I did some work here.",
@@ -3919,11 +3868,17 @@
               } ],
               "type": "paragraph"
             } ],
-            "version": 1
+            "version": 1,
+            "type": "doc"
           },
           "id": 100028.0,
           "issueId": 10002.0,
-          "timeSpentSeconds": 12000
+          "timeSpentSeconds": 12000,
+          "visibility": {
+            "value": "jira-developers",
+            "identifier": "276f955c-63d7-42c8-9520-92d01dca0625",
+            "type": "group"
+          }
         } ],
         "project": {
           "simplified": false,
@@ -3939,10 +3894,10 @@
             "description": "First Project Category"
           },
           "avatarUrls": {
-            "48x48": "https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000",
             "24x24": "https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000",
             "16x16": "https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000",
-            "32x32": "https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000"
+            "32x32": "https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000",
+            "48x48": "https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000"
           },
           "insight": {
             "lastIssueUpdateTime": "2022-11-30T07:18:17.152+0000",
@@ -3951,7 +3906,6 @@
         },
         "updated": 1,
         "description": {
-          "type": "doc",
           "content": [ {
             "content": [ {
               "text": "Main order flow broken",
@@ -3959,23 +3913,18 @@
             } ],
             "type": "paragraph"
           } ],
-          "version": 1
+          "version": 1,
+          "type": "doc"
         },
         "timetracking": {
-          "originalEstimateSeconds": 600,
-          "timeSpentSeconds": 400,
           "originalEstimate": "10m",
           "timeSpent": "6m",
           "remainingEstimateSeconds": 200,
-          "remainingEstimate": "3m"
+          "remainingEstimate": "3m",
+          "originalEstimateSeconds": 600,
+          "timeSpentSeconds": 400
         },
         "sub-tasks": [ {
-          "type": {
-            "inward": "Parent",
-            "outward": "Sub-task",
-            "id": 10000.0,
-            "name": ""
-          },
           "id": 10000.0,
           "outwardIssue": {
             "fields": {
@@ -3987,14 +3936,68 @@
             "id": 10003.0,
             "self": "https://your-domain.atlassian.net/rest/api/3/issue/ED-2",
             "key": "ED-2"
+          },
+          "type": {
+            "inward": "Parent",
+            "outward": "Sub-task",
+            "id": 10000.0,
+            "name": ""
           }
-        } ]
+        } ],
+        "comment": [ {
+          "body": {
+            "content": [ {
+              "content": [ {
+                "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.",
+                "type": "text"
+              } ],
+              "type": "paragraph"
+            } ],
+            "version": 1,
+            "type": "doc"
+          },
+          "visibility": {
+            "value": "Administrators",
+            "identifier": "Administrators",
+            "type": "role"
+          },
+          "updateAuthor": {
+            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+            "displayName": "Mia Krystof",
+            "active": false,
+            "accountId": "5b10a2844c20165700ede21g"
+          },
+          "created": "2021-01-17T12:34:00.000+0000",
+          "id": 10000.0,
+          "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000",
+          "author": {
+            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+            "displayName": "Mia Krystof",
+            "active": false,
+            "accountId": "5b10a2844c20165700ede21g"
+          },
+          "updated": "2021-01-18T23:45:00.000+0000"
+        } ],
+        "watcher": {
+          "self": "https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers",
+          "isWatching": false,
+          "watchers": [ {
+            "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+            "displayName": "Mia Krystof",
+            "active": false,
+            "accountId": "5b10a2844c20165700ede21g"
+          } ],
+          "watchCount": 1
+        }
       },
       "id": 10002.0,
       "self": "https://your-domain.atlassian.net/rest/api/3/issue/10002",
       "key": "ED-1"
     },
     "title": "Get issue",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "perform": null,
     "outputSchema": {
       "advancedOption": null,
@@ -4468,12 +4471,12 @@
             "options": [ {
               "description": null,
               "displayCondition": null,
-              "name": "True",
+              "label": "True",
               "value": true
             }, {
               "description": null,
               "displayCondition": null,
-              "name": "False",
+              "label": "False",
               "value": true
             } ],
             "controlType": "CHECKBOX"
@@ -4717,12 +4720,12 @@
               "options": [ {
                 "description": null,
                 "displayCondition": null,
-                "name": "True",
+                "label": "True",
                 "value": true
               }, {
                 "description": null,
                 "displayCondition": null,
-                "name": "False",
+                "label": "False",
                 "value": true
               } ],
               "controlType": "CHECKBOX"
@@ -5026,12 +5029,12 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "True",
+                  "label": "True",
                   "value": true
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "False",
+                  "label": "False",
                   "value": true
                 } ],
                 "controlType": "CHECKBOX"
@@ -5307,12 +5310,12 @@
             "options": [ {
               "description": null,
               "displayCondition": null,
-              "name": "True",
+              "label": "True",
               "value": true
             }, {
               "description": null,
               "displayCondition": null,
-              "name": "False",
+              "label": "False",
               "value": true
             } ],
             "controlType": "CHECKBOX"
@@ -5333,12 +5336,12 @@
             "options": [ {
               "description": null,
               "displayCondition": null,
-              "name": "True",
+              "label": "True",
               "value": true
             }, {
               "description": null,
               "displayCondition": null,
-              "name": "False",
+              "label": "False",
               "value": true
             } ],
             "controlType": "CHECKBOX"
@@ -5359,12 +5362,12 @@
             "options": [ {
               "description": null,
               "displayCondition": null,
-              "name": "True",
+              "label": "True",
               "value": true
             }, {
               "description": null,
               "displayCondition": null,
-              "name": "False",
+              "label": "False",
               "value": true
             } ],
             "controlType": "CHECKBOX"
@@ -5385,12 +5388,12 @@
             "options": [ {
               "description": null,
               "displayCondition": null,
-              "name": "True",
+              "label": "True",
               "value": true
             }, {
               "description": null,
               "displayCondition": null,
-              "name": "False",
+              "label": "False",
               "value": true
             } ],
             "controlType": "CHECKBOX"
@@ -5411,12 +5414,12 @@
             "options": [ {
               "description": null,
               "displayCondition": null,
-              "name": "True",
+              "label": "True",
               "value": true
             }, {
               "description": null,
               "displayCondition": null,
-              "name": "False",
+              "label": "False",
               "value": true
             } ],
             "controlType": "CHECKBOX"
@@ -5469,12 +5472,12 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "True",
+                  "label": "True",
                   "value": true
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "False",
+                  "label": "False",
                   "value": true
                 } ],
                 "controlType": "CHECKBOX"
@@ -5717,12 +5720,12 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "True",
+                  "label": "True",
                   "value": true
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "False",
+                  "label": "False",
                   "value": true
                 } ],
                 "controlType": "CHECKBOX"
@@ -5915,12 +5918,12 @@
             "options": [ {
               "description": null,
               "displayCondition": null,
-              "name": "True",
+              "label": "True",
               "value": true
             }, {
               "description": null,
               "displayCondition": null,
-              "name": "False",
+              "label": "False",
               "value": true
             } ],
             "controlType": "CHECKBOX"
@@ -5982,12 +5985,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -6649,12 +6652,12 @@
               "options": [ {
                 "description": null,
                 "displayCondition": null,
-                "name": "True",
+                "label": "True",
                 "value": true
               }, {
                 "description": null,
                 "displayCondition": null,
-                "name": "False",
+                "label": "False",
                 "value": true
               } ],
               "controlType": "CHECKBOX"
@@ -6897,12 +6900,12 @@
               "options": [ {
                 "description": null,
                 "displayCondition": null,
-                "name": "True",
+                "label": "True",
                 "value": true
               }, {
                 "description": null,
                 "displayCondition": null,
-                "name": "False",
+                "label": "False",
                 "value": true
               } ],
               "controlType": "CHECKBOX"
@@ -7444,12 +7447,12 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "True",
+                  "label": "True",
                   "value": true
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "False",
+                  "label": "False",
                   "value": true
                 } ],
                 "controlType": "CHECKBOX"
@@ -7743,12 +7746,12 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "True",
+                  "label": "True",
                   "value": true
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "False",
+                  "label": "False",
                   "value": true
                 } ],
                 "controlType": "CHECKBOX"
@@ -8092,12 +8095,12 @@
                   "options": [ {
                     "description": null,
                     "displayCondition": null,
-                    "name": "True",
+                    "label": "True",
                     "value": true
                   }, {
                     "description": null,
                     "displayCondition": null,
-                    "name": "False",
+                    "label": "False",
                     "value": true
                   } ],
                   "controlType": "CHECKBOX"
@@ -8424,12 +8427,12 @@
                   "options": [ {
                     "description": null,
                     "displayCondition": null,
-                    "name": "True",
+                    "label": "True",
                     "value": true
                   }, {
                     "description": null,
                     "displayCondition": null,
-                    "name": "False",
+                    "label": "False",
                     "value": true
                   } ],
                   "controlType": "CHECKBOX"
@@ -8756,12 +8759,12 @@
                   "options": [ {
                     "description": null,
                     "displayCondition": null,
-                    "name": "True",
+                    "label": "True",
                     "value": true
                   }, {
                     "description": null,
                     "displayCondition": null,
-                    "name": "False",
+                    "label": "False",
                     "value": true
                   } ],
                   "controlType": "CHECKBOX"
@@ -9318,10 +9321,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    }
   }, {
     "batch": null,
     "componentName": "jira",
@@ -9422,27 +9422,27 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "Strict",
+        "label": "Strict",
         "value": "strict"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Warn",
+        "label": "Warn",
         "value": "warn"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "None",
+        "label": "None",
         "value": "none"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": "true"
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": "false"
       } ],
       "sampleDataType": null,
@@ -9570,18 +9570,17 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
     } ],
     "sampleOutput": {
-      "warningMessages": [ "The value 'bar' does not exist for the field 'foo'." ],
       "maxResults": 50,
       "expand": "names,schema",
       "total": 1,
@@ -9591,58 +9590,7 @@
         "id": 10002.0,
         "self": "https://your-domain.atlassian.net/rest/api/3/issue/10002",
         "fields": {
-          "comment": [ {
-            "body": {
-              "type": "doc",
-              "content": [ {
-                "content": [ {
-                  "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.",
-                  "type": "text"
-                } ],
-                "type": "paragraph"
-              } ],
-              "version": 1
-            },
-            "visibility": {
-              "type": "role",
-              "value": "Administrators",
-              "identifier": "Administrators"
-            },
-            "updateAuthor": {
-              "accountId": "5b10a2844c20165700ede21g",
-              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
-              "displayName": "Mia Krystof",
-              "active": false
-            },
-            "created": "2021-01-17T12:34:00.000+0000",
-            "id": 10000.0,
-            "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000",
-            "author": {
-              "accountId": "5b10a2844c20165700ede21g",
-              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
-              "displayName": "Mia Krystof",
-              "active": false
-            },
-            "updated": "2021-01-18T23:45:00.000+0000"
-          } ],
-          "watcher": {
-            "watchCount": 1,
-            "self": "https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers",
-            "isWatching": false,
-            "watchers": [ {
-              "accountId": "5b10a2844c20165700ede21g",
-              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
-              "displayName": "Mia Krystof",
-              "active": false
-            } ]
-          },
           "issuelinks": [ {
-            "type": {
-              "inward": "depends on",
-              "outward": "is depended by",
-              "id": 10000.0,
-              "name": "Dependent"
-            },
             "id": 10001.0,
             "outwardIssue": {
               "fields": {
@@ -9654,14 +9602,14 @@
               "id": "10004L",
               "self": "https://your-domain.atlassian.net/rest/api/3/issue/PR-2",
               "key": "PR-2"
-            }
-          }, {
+            },
             "type": {
               "inward": "depends on",
               "outward": "is depended by",
               "id": 10000.0,
               "name": "Dependent"
-            },
+            }
+          }, {
             "id": 10002.0,
             "inwardIssue": {
               "fields": {
@@ -9673,10 +9621,15 @@
               "id": 10004.0,
               "self": "https://your-domain.atlassian.net/rest/api/3/issue/PR-3",
               "key": "PR-3"
+            },
+            "type": {
+              "inward": "depends on",
+              "outward": "is depended by",
+              "id": 10000.0,
+              "name": "Dependent"
             }
           } ],
           "attachment": [ {
-            "size": 23123,
             "content": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/content/10000",
             "created": "2022-11-30T07:18:19.441+0000",
             "thumbnail": "https://your-domain.atlassian.net/jira/rest/api/3/attachment/thumbnail/10000",
@@ -9684,46 +9637,41 @@
             "id": 10000,
             "filename": "picture.jpg",
             "author": {
-              "key": "",
               "active": false,
               "accountType": "atlassian",
               "accountId": "5b10a2844c20165700ede21g",
               "name": "",
               "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
               "avatarUrls": {
-                "48x48": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48",
                 "24x24": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=24&s=24",
                 "16x16": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=16&s=16",
-                "32x32": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32"
+                "32x32": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=32&s=32",
+                "48x48": "https://avatar-management--avatars.server-location.prod.public.atl-paas.net/initials/MK-5.png?size=48&s=48"
               },
-              "displayName": "Mia Krystof"
+              "displayName": "Mia Krystof",
+              "key": ""
             },
-            "mimeType": "image/jpeg"
+            "mimeType": "image/jpeg",
+            "size": 23123
           } ],
           "worklog": [ {
-            "visibility": {
-              "type": "group",
-              "value": "jira-developers",
-              "identifier": "276f955c-63d7-42c8-9520-92d01dca0625"
-            },
             "author": {
-              "accountId": "5b10a2844c20165700ede21g",
               "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
               "displayName": "Mia Krystof",
-              "active": false
+              "active": false,
+              "accountId": "5b10a2844c20165700ede21g"
             },
             "updateAuthor": {
-              "accountId": "5b10a2844c20165700ede21g",
               "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
               "displayName": "Mia Krystof",
-              "active": false
+              "active": false,
+              "accountId": "5b10a2844c20165700ede21g"
             },
             "timeSpent": "3h 20m",
             "updated": "2021-01-18T23:45:00.000+0000",
             "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/worklog/10000",
             "started": "2021-01-17T12:34:00.000+0000",
             "comment": {
-              "type": "doc",
               "content": [ {
                 "content": [ {
                   "text": "I did some work here.",
@@ -9731,11 +9679,17 @@
                 } ],
                 "type": "paragraph"
               } ],
-              "version": 1
+              "version": 1,
+              "type": "doc"
             },
             "id": 100028.0,
             "issueId": 10002.0,
-            "timeSpentSeconds": 12000
+            "timeSpentSeconds": 12000,
+            "visibility": {
+              "value": "jira-developers",
+              "identifier": "276f955c-63d7-42c8-9520-92d01dca0625",
+              "type": "group"
+            }
           } ],
           "project": {
             "simplified": false,
@@ -9751,10 +9705,10 @@
               "description": "First Project Category"
             },
             "avatarUrls": {
-              "48x48": "https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000",
               "24x24": "https://your-domain.atlassian.net/secure/projectavatar?size=small&pid=10000",
               "16x16": "https://your-domain.atlassian.net/secure/projectavatar?size=xsmall&pid=10000",
-              "32x32": "https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000"
+              "32x32": "https://your-domain.atlassian.net/secure/projectavatar?size=medium&pid=10000",
+              "48x48": "https://your-domain.atlassian.net/secure/projectavatar?size=large&pid=10000"
             },
             "insight": {
               "lastIssueUpdateTime": "2022-11-30T07:18:17.152+0000",
@@ -9763,7 +9717,6 @@
           },
           "updated": 1,
           "description": {
-            "type": "doc",
             "content": [ {
               "content": [ {
                 "text": "Main order flow broken",
@@ -9771,23 +9724,18 @@
               } ],
               "type": "paragraph"
             } ],
-            "version": 1
+            "version": 1,
+            "type": "doc"
           },
           "timetracking": {
-            "originalEstimateSeconds": 600,
-            "timeSpentSeconds": 400,
             "originalEstimate": "10m",
             "timeSpent": "6m",
             "remainingEstimateSeconds": 200,
-            "remainingEstimate": "3m"
+            "remainingEstimate": "3m",
+            "originalEstimateSeconds": 600,
+            "timeSpentSeconds": 400
           },
           "sub-tasks": [ {
-            "type": {
-              "inward": "Parent",
-              "outward": "Sub-task",
-              "id": 10000.0,
-              "name": ""
-            },
             "id": 10000.0,
             "outwardIssue": {
               "fields": {
@@ -9799,13 +9747,68 @@
               "id": 10003.0,
               "self": "https://your-domain.atlassian.net/rest/api/3/issue/ED-2",
               "key": "ED-2"
+            },
+            "type": {
+              "inward": "Parent",
+              "outward": "Sub-task",
+              "id": 10000.0,
+              "name": ""
             }
-          } ]
+          } ],
+          "comment": [ {
+            "body": {
+              "content": [ {
+                "content": [ {
+                  "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eget venenatis elit. Duis eu justo eget augue iaculis fermentum. Sed semper quam laoreet nisi egestas at posuere augue semper.",
+                  "type": "text"
+                } ],
+                "type": "paragraph"
+              } ],
+              "version": 1,
+              "type": "doc"
+            },
+            "visibility": {
+              "value": "Administrators",
+              "identifier": "Administrators",
+              "type": "role"
+            },
+            "updateAuthor": {
+              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+              "displayName": "Mia Krystof",
+              "active": false,
+              "accountId": "5b10a2844c20165700ede21g"
+            },
+            "created": "2021-01-17T12:34:00.000+0000",
+            "id": 10000.0,
+            "self": "https://your-domain.atlassian.net/rest/api/3/issue/10010/comment/10000",
+            "author": {
+              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+              "displayName": "Mia Krystof",
+              "active": false,
+              "accountId": "5b10a2844c20165700ede21g"
+            },
+            "updated": "2021-01-18T23:45:00.000+0000"
+          } ],
+          "watcher": {
+            "self": "https://your-domain.atlassian.net/rest/api/3/issue/EX-1/watchers",
+            "isWatching": false,
+            "watchers": [ {
+              "self": "https://your-domain.atlassian.net/rest/api/3/user?accountId=5b10a2844c20165700ede21g",
+              "displayName": "Mia Krystof",
+              "active": false,
+              "accountId": "5b10a2844c20165700ede21g"
+            } ],
+            "watchCount": 1
+          }
         },
         "key": "ED-1"
-      } ]
+      } ],
+      "warningMessages": [ "The value 'bar' does not exist for the field 'foo'." ]
     },
     "title": "Search for issues using JQL (GET)",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "perform": null,
     "outputSchema": {
       "advancedOption": null,
@@ -10388,12 +10391,12 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "True",
+                  "label": "True",
                   "value": true
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "False",
+                  "label": "False",
                   "value": true
                 } ],
                 "controlType": "CHECKBOX"
@@ -10637,12 +10640,12 @@
                   "options": [ {
                     "description": null,
                     "displayCondition": null,
-                    "name": "True",
+                    "label": "True",
                     "value": true
                   }, {
                     "description": null,
                     "displayCondition": null,
-                    "name": "False",
+                    "label": "False",
                     "value": true
                   } ],
                   "controlType": "CHECKBOX"
@@ -10946,12 +10949,12 @@
                     "options": [ {
                       "description": null,
                       "displayCondition": null,
-                      "name": "True",
+                      "label": "True",
                       "value": true
                     }, {
                       "description": null,
                       "displayCondition": null,
-                      "name": "False",
+                      "label": "False",
                       "value": true
                     } ],
                     "controlType": "CHECKBOX"
@@ -11227,12 +11230,12 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "True",
+                  "label": "True",
                   "value": true
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "False",
+                  "label": "False",
                   "value": true
                 } ],
                 "controlType": "CHECKBOX"
@@ -11253,12 +11256,12 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "True",
+                  "label": "True",
                   "value": true
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "False",
+                  "label": "False",
                   "value": true
                 } ],
                 "controlType": "CHECKBOX"
@@ -11279,12 +11282,12 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "True",
+                  "label": "True",
                   "value": true
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "False",
+                  "label": "False",
                   "value": true
                 } ],
                 "controlType": "CHECKBOX"
@@ -11305,12 +11308,12 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "True",
+                  "label": "True",
                   "value": true
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "False",
+                  "label": "False",
                   "value": true
                 } ],
                 "controlType": "CHECKBOX"
@@ -11331,12 +11334,12 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "True",
+                  "label": "True",
                   "value": true
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "False",
+                  "label": "False",
                   "value": true
                 } ],
                 "controlType": "CHECKBOX"
@@ -11389,12 +11392,12 @@
                     "options": [ {
                       "description": null,
                       "displayCondition": null,
-                      "name": "True",
+                      "label": "True",
                       "value": true
                     }, {
                       "description": null,
                       "displayCondition": null,
-                      "name": "False",
+                      "label": "False",
                       "value": true
                     } ],
                     "controlType": "CHECKBOX"
@@ -11637,12 +11640,12 @@
                     "options": [ {
                       "description": null,
                       "displayCondition": null,
-                      "name": "True",
+                      "label": "True",
                       "value": true
                     }, {
                       "description": null,
                       "displayCondition": null,
-                      "name": "False",
+                      "label": "False",
                       "value": true
                     } ],
                     "controlType": "CHECKBOX"
@@ -11835,12 +11838,12 @@
                 "options": [ {
                   "description": null,
                   "displayCondition": null,
-                  "name": "True",
+                  "label": "True",
                   "value": true
                 }, {
                   "description": null,
                   "displayCondition": null,
-                  "name": "False",
+                  "label": "False",
                   "value": true
                 } ],
                 "controlType": "CHECKBOX"
@@ -11902,12 +11905,12 @@
               "options": [ {
                 "description": null,
                 "displayCondition": null,
-                "name": "True",
+                "label": "True",
                 "value": true
               }, {
                 "description": null,
                 "displayCondition": null,
-                "name": "False",
+                "label": "False",
                 "value": true
               } ],
               "controlType": "CHECKBOX"
@@ -12569,12 +12572,12 @@
                   "options": [ {
                     "description": null,
                     "displayCondition": null,
-                    "name": "True",
+                    "label": "True",
                     "value": true
                   }, {
                     "description": null,
                     "displayCondition": null,
-                    "name": "False",
+                    "label": "False",
                     "value": true
                   } ],
                   "controlType": "CHECKBOX"
@@ -12817,12 +12820,12 @@
                   "options": [ {
                     "description": null,
                     "displayCondition": null,
-                    "name": "True",
+                    "label": "True",
                     "value": true
                   }, {
                     "description": null,
                     "displayCondition": null,
-                    "name": "False",
+                    "label": "False",
                     "value": true
                   } ],
                   "controlType": "CHECKBOX"
@@ -13364,12 +13367,12 @@
                     "options": [ {
                       "description": null,
                       "displayCondition": null,
-                      "name": "True",
+                      "label": "True",
                       "value": true
                     }, {
                       "description": null,
                       "displayCondition": null,
-                      "name": "False",
+                      "label": "False",
                       "value": true
                     } ],
                     "controlType": "CHECKBOX"
@@ -13663,12 +13666,12 @@
                     "options": [ {
                       "description": null,
                       "displayCondition": null,
-                      "name": "True",
+                      "label": "True",
                       "value": true
                     }, {
                       "description": null,
                       "displayCondition": null,
-                      "name": "False",
+                      "label": "False",
                       "value": true
                     } ],
                     "controlType": "CHECKBOX"
@@ -14012,12 +14015,12 @@
                       "options": [ {
                         "description": null,
                         "displayCondition": null,
-                        "name": "True",
+                        "label": "True",
                         "value": true
                       }, {
                         "description": null,
                         "displayCondition": null,
-                        "name": "False",
+                        "label": "False",
                         "value": true
                       } ],
                       "controlType": "CHECKBOX"
@@ -14344,12 +14347,12 @@
                       "options": [ {
                         "description": null,
                         "displayCondition": null,
-                        "name": "True",
+                        "label": "True",
                         "value": true
                       }, {
                         "description": null,
                         "displayCondition": null,
-                        "name": "False",
+                        "label": "False",
                         "value": true
                       } ],
                       "controlType": "CHECKBOX"
@@ -14676,12 +14679,12 @@
                       "options": [ {
                         "description": null,
                         "displayCondition": null,
-                        "name": "True",
+                        "label": "True",
                         "value": true
                       }, {
                         "description": null,
                         "displayCondition": null,
-                        "name": "False",
+                        "label": "False",
                         "value": true
                       } ],
                       "controlType": "CHECKBOX"
@@ -15509,10 +15512,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    }
   } ],
   "category": null,
   "connection": {
@@ -15565,6 +15565,7 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -15573,8 +15574,7 @@
       "scopes": null,
       "tokenUrl": null,
       "authorizationUrl": null,
-      "clientSecret": null,
-      "authorizationCallback": null
+      "clientSecret": null
     }, {
       "detectOn": null,
       "description": null,
@@ -15624,6 +15624,7 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
+      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -15632,8 +15633,7 @@
       "scopes": { },
       "tokenUrl": { },
       "authorizationUrl": { },
-      "clientSecret": null,
-      "authorizationCallback": null
+      "clientSecret": null
     } ],
     "componentName": "jira",
     "componentDescription": "Jira is a proprietary issue tracking product developed by Atlassian that allows bug tracking and agile project management.",

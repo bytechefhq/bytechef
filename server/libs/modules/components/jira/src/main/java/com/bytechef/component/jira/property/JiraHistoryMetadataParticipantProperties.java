@@ -18,7 +18,7 @@ package com.bytechef.component.jira.property;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
 
 /**
@@ -27,10 +27,9 @@ import java.util.List;
  * @generated
  */
 public class JiraHistoryMetadataParticipantProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        string("id").label("Id")
-            .description("The ID of the user or system associated with a history record.")
-            .required(false),
+    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(string("id").label("Id")
+        .description("The ID of the user or system associated with a history record.")
+        .required(false),
         string("displayName").label("Display Name")
             .description("The display name of the user or system associated with a history record.")
             .required(false),

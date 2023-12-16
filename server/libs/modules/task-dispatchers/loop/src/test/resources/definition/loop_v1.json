@@ -17,11 +17,10 @@
     "type": "ARRAY",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "items": null,
     "multipleValues": null,
-    "options": null,
-    "controlType": "ARRAY_BUILDER",
-    "optionsDataSource": null
+    "controlType": "ARRAY_BUILDER"
   }, {
     "advancedOption": null,
     "description": "Should loop iterate until condition set by 'Loop Break' statement is met.",
@@ -39,12 +38,12 @@
     "options": [ {
       "description": null,
       "displayCondition": null,
-      "name": "True",
+      "label": "True",
       "value": true
     }, {
       "description": null,
       "displayCondition": null,
-      "name": "False",
+      "label": "False",
       "value": true
     } ],
     "controlType": "CHECKBOX"
@@ -64,13 +63,12 @@
     "type": "OBJECT",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "additionalProperties": null,
     "multipleValues": null,
     "objectType": "TASK",
-    "options": null,
     "properties": null,
-    "controlType": "OBJECT_BUILDER",
-    "optionsDataSource": null
+    "controlType": "OBJECT_BUILDER"
   } ],
   "title": "Loop",
   "variableProperties": [ {
@@ -87,12 +85,11 @@
     "type": "STRING",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "controlType": "TEXT",
     "maxLength": null,
     "minLength": null,
-    "options": null,
-    "sampleDataType": null,
-    "optionsDataSource": null
+    "sampleDataType": null
   }, {
     "advancedOption": null,
     "description": null,
@@ -107,12 +104,11 @@
     "type": "STRING",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "controlType": "TEXT",
     "maxLength": null,
     "minLength": null,
-    "options": null,
-    "sampleDataType": null,
-    "optionsDataSource": null
+    "sampleDataType": null
   } ],
   "version": 1,
   "outputSchema": null,

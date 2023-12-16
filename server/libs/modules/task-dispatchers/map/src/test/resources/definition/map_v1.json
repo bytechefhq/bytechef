@@ -17,6 +17,7 @@
     "type": "ARRAY",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "items": [ {
       "advancedOption": null,
       "description": null,
@@ -31,10 +32,9 @@
       "type": "ARRAY",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "items": null,
       "multipleValues": null,
-      "options": null,
-      "optionsDataSource": null,
       "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
@@ -53,12 +53,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -77,7 +77,6 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
       "controlType": "DATE"
     }, {
       "advancedOption": null,
@@ -94,7 +93,6 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
       "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
@@ -110,26 +108,10 @@
       "type": "INTEGER",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "maxValue": null,
       "minValue": null,
-      "options": null,
-      "optionsDataSource": null,
       "controlType": "INTEGER"
-    }, {
-      "advancedOption": null,
-      "description": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": null,
-      "metadata": { },
-      "placeholder": null,
-      "required": null,
-      "name": null,
-      "type": "NULL",
-      "defaultValue": null,
-      "exampleValue": null,
-      "controlType": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -144,11 +126,10 @@
       "type": "NUMBER",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "maxValue": null,
       "minValue": null,
       "numberPrecision": null,
-      "options": null,
-      "optionsDataSource": null,
       "controlType": "NUMBER"
     }, {
       "advancedOption": null,
@@ -164,12 +145,11 @@
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "additionalProperties": null,
       "multipleValues": null,
       "objectType": null,
-      "options": null,
       "properties": null,
-      "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
@@ -185,12 +165,11 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "controlType": "TEXT",
       "maxLength": null,
       "minLength": null,
-      "options": null,
-      "sampleDataType": null,
-      "optionsDataSource": null
+      "sampleDataType": null
     }, {
       "advancedOption": null,
       "description": null,
@@ -206,12 +185,9 @@
       "defaultValue": null,
       "exampleValue": null,
       "options": null,
-      "optionsDataSource": null,
       "controlType": "TIME"
     } ],
     "multipleValues": null,
-    "options": null,
-    "optionsDataSource": null,
     "controlType": "ARRAY_BUILDER"
   } ],
   "resources": null,
@@ -229,12 +205,11 @@
     "type": "OBJECT",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "additionalProperties": null,
     "multipleValues": null,
     "objectType": "TASK",
-    "options": null,
     "properties": null,
-    "optionsDataSource": null,
     "controlType": "OBJECT_BUILDER"
   } ],
   "title": "Map",
@@ -252,12 +227,11 @@
     "type": "STRING",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "controlType": "TEXT",
     "maxLength": null,
     "minLength": null,
-    "options": null,
-    "sampleDataType": null,
-    "optionsDataSource": null
+    "sampleDataType": null
   }, {
     "advancedOption": null,
     "description": null,
@@ -272,16 +246,15 @@
     "type": "STRING",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "controlType": "TEXT",
     "maxLength": null,
     "minLength": null,
-    "options": null,
-    "sampleDataType": null,
-    "optionsDataSource": null
+    "sampleDataType": null
   } ],
   "version": 1,
-  "outputSchema": null,
   "outputSchemaDataSource": {
     "outputSchema": { }
-  }
+  },
+  "outputSchema": null
 }

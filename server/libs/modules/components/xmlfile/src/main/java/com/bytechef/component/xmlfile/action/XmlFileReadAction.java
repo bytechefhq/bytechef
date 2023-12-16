@@ -23,19 +23,18 @@ import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_SIZE
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PATH;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.READ;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
+import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.InputStream;
 import java.util.List;
@@ -125,13 +124,13 @@ public class XmlFileReadAction {
         return result;
     }
 
-    protected static OutputSchemaFunction getOutputSchemaFunction() {
+    protected static OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction() {
         // TODO
         return (inputParameters, connection, context) -> {
             if (inputParameters.getBoolean(IS_ARRAY, false)) {
-                return new OutputSchemaResponse(object());
+                return new OutputSchemaDataSource.OutputSchemaResponse(object());
             } else {
-                return new OutputSchemaResponse(array());
+                return new OutputSchemaDataSource.OutputSchemaResponse(array());
             }
         };
     }

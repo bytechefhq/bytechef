@@ -16,11 +16,11 @@
 
 package com.bytechef.component.hubspot.trigger;
 
-import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.Context;

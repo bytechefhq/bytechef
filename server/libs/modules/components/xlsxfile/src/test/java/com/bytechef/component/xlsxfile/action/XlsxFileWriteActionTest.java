@@ -23,7 +23,7 @@ import static com.bytechef.component.xlsxfile.constant.XlsxFileConstants.SHEET_N
 import com.bytechef.component.xlsxfile.XlsxFileComponentHandlerTest;
 import com.bytechef.component.xlsxfile.action.XlsxFileReadAction.ReadConfiguration;
 import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.ByteArrayInputStream;

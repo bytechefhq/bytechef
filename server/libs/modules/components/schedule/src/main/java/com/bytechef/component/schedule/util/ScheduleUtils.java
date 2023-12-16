@@ -50,9 +50,9 @@ public class ScheduleUtils {
         }
 
         options.sort((o1, o2) -> {
-            String name = o1.getName();
+            String name = o1.getLabel();
 
-            return name.compareTo(o2.getName());
+            return name.compareTo(o2.getLabel());
         });
 
         return options;

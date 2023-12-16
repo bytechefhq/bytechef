@@ -19,7 +19,7 @@ package com.bytechef.component.xmlfile.action;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.FILENAME;
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.SOURCE;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

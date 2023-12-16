@@ -23,7 +23,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.component.jsonfile.JsonFileComponentHandlerTest;
 import com.bytechef.component.jsonfile.constant.JsonFileConstants;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.ByteArrayInputStream;
 import java.io.File;

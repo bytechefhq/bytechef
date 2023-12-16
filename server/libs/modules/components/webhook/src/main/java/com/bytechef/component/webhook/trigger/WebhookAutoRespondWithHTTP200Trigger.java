@@ -20,7 +20,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
 
 import com.bytechef.component.webhook.util.WebhookUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 
 /**
@@ -36,7 +36,7 @@ public class WebhookAutoRespondWithHTTP200Trigger {
         .outputSchema(getOutputSchemaFunction())
         .staticWebhookRequest(WebhookUtils.getStaticWebhookRequestFunction());
 
-    protected static OutputSchemaFunction getOutputSchemaFunction() {
+    protected static OutputSchemaDataSource.TriggerOutputSchemaFunction getOutputSchemaFunction() {
         // TODO
         return (inputParameters, connectionParameters, context) -> null;
 //        object()

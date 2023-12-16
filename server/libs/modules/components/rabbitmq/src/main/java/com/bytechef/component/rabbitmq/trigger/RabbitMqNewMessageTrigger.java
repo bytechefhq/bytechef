@@ -21,9 +21,9 @@ import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PASSWOR
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PORT;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.QUEUE;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.USERNAME;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;

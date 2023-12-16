@@ -25,7 +25,7 @@ import static com.bytechef.component.odsfile.constant.OdsFileConstants.READ_AS_S
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.component.odsfile.OdsFileComponentHandlerTest;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;

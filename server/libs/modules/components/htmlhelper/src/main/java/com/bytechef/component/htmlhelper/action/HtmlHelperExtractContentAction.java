@@ -23,14 +23,16 @@ import static com.bytechef.component.htmlhelper.constant.HtmlHelperConstants.QUE
 import static com.bytechef.component.htmlhelper.constant.HtmlHelperConstants.RETURN_ARRAY;
 import static com.bytechef.component.htmlhelper.constant.HtmlHelperConstants.RETURN_VALUE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.definition.Property;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;
@@ -44,12 +46,13 @@ import org.jsoup.select.Elements;
 public class HtmlHelperExtractContentAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(EXTRACT_CONTENT)
-        .title("Send")
-        .description("Send an email to any address.")
+        .title("Extract Content")
+        .description("Extract content from the HTML content.")
         .properties(
             string(CONTENT)
                 .label("HTML content to extract content from.")
                 .description("The HTML content.")
+                .controlType(Property.ControlType.TEXT_AREA)
                 .required(true),
             string(QUERY_SELECTOR)
                 .label("CSS Selector")
@@ -57,11 +60,11 @@ public class HtmlHelperExtractContentAction {
                 .required(true),
             string(RETURN_VALUE)
                 .label("Return Value")
-                .description("the data to return.")
+                .description("The data to return.")
                 .options(
-                    option("attribute", "Attribute", "Get an attribute value like 'class' from an element."),
-                    option("html", "HTML", "Get the HTML that the element contains."),
-                    option("text", "Text", "get the text content of the element."))
+                    option("Attribute", "attribute", "Get the attribute value like 'class' from an element."),
+                    option("HTML", "html", "Get the HTML content that the element contains."),
+                    option("Text", "text", "Get the text content of the element."))
                 .required(true)
                 .defaultValue("html"),
             string(ATTRIBUTE)
@@ -73,8 +76,17 @@ public class HtmlHelperExtractContentAction {
                 .label("Return Array")
                 .description(
                     "If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string."))
-        .perform(HtmlHelperExtractContentAction::perform)
-        .outputSchema((OutputSchemaDataSource.OutputSchemaFunction) (inputParameters, connection, context) -> null);
+        .outputSchema(getOutputSchemaFunction())
+        .sampleOutput(getSampleOutputSchemaFunction())
+        .perform(HtmlHelperExtractContentAction::perform);
+
+    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
+        return null;
+    }
+
+    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+        return null;
+    }
 
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {

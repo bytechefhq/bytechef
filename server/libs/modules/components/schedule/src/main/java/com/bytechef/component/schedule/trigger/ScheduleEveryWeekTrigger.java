@@ -21,11 +21,11 @@ import static com.bytechef.component.schedule.constant.ScheduleConstants.DAY_OF_
 import static com.bytechef.component.schedule.constant.ScheduleConstants.HOUR;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.MINUTE;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIMEZONE;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;

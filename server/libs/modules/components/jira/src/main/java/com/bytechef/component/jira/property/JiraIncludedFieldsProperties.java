@@ -19,7 +19,7 @@ package com.bytechef.component.jira.property;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
 
 /**
@@ -28,7 +28,7 @@ import java.util.List;
  * @generated
  */
 public class JiraIncludedFieldsProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
         array("actuallyIncluded").items(string())
             .placeholder("Add to Actually Included")
             .label("Actually Included")

@@ -19,7 +19,7 @@ package com.bytechef.component.dropbox.action;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.ImportFormat;
 import com.dropbox.core.v2.files.PaperCreateUploader;
@@ -44,7 +44,7 @@ public class DropboxCreateNewTextFileActionTest extends AbstractDropboxActionTes
             .thenReturn(paperCreateUploader);
 
         DropboxCreateNewTextFileAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
+            parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
         ArgumentCaptor<ImportFormat> importFormatArgumentCaptor = ArgumentCaptor.forClass(ImportFormat.class);
 

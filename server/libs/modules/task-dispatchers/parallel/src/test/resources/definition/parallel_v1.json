@@ -19,6 +19,7 @@
     "type": "ARRAY",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "items": [ {
       "advancedOption": null,
       "description": "The task or task dispatcher to use.",
@@ -33,18 +34,15 @@
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "additionalProperties": null,
       "multipleValues": null,
       "objectType": "TASK",
-      "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "controlType": "OBJECT_BUILDER"
     } ],
     "multipleValues": null,
-    "options": null,
-    "controlType": "ARRAY_BUILDER",
-    "optionsDataSource": null
+    "controlType": "ARRAY_BUILDER"
   } ],
   "title": "Parallel",
   "variableProperties": null,

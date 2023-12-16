@@ -21,12 +21,12 @@ import static com.bytechef.component.datastorage.constant.DataStorageConstants.S
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.TIMEOUT;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
@@ -65,7 +65,7 @@ public class DataStorageAwaitGetValueAction {
         return null;
     }
 
-    protected static OutputSchemaFunction getOutputSchemaFunction() {
+    protected static OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction() {
         // TODO
         return (inputParameters, connectionParameters, context) -> null;
 //        object()

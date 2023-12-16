@@ -22,7 +22,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
 
 /**
@@ -31,10 +31,9 @@ import java.util.List;
  * @generated
  */
 public class PetstoreOrderProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        integer("id").label("Id")
-            .required(false)
-            .exampleValue(10),
+    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(integer("id").label("Id")
+        .required(false)
+        .exampleValue(10),
         integer("petId").label("Pet Id")
             .required(false)
             .exampleValue(198772),

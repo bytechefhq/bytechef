@@ -20,12 +20,12 @@
     "options": [ {
       "description": null,
       "displayCondition": null,
-      "name": "True",
+      "label": "True",
       "value": true
     }, {
       "description": null,
       "displayCondition": null,
-      "name": "False",
+      "label": "False",
       "value": true
     } ],
     "controlType": "CHECKBOX"
@@ -43,6 +43,7 @@
     "type": "ARRAY",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "items": [ {
       "advancedOption": null,
       "description": null,
@@ -57,10 +58,10 @@
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "additionalProperties": null,
       "multipleValues": null,
       "objectType": null,
-      "options": null,
       "properties": [ {
         "advancedOption": null,
         "description": "The boolean value to compare with the second one.",
@@ -78,12 +79,12 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
@@ -101,22 +102,21 @@
         "type": "STRING",
         "defaultValue": "EQUALS",
         "exampleValue": null,
-        "controlType": "SELECT",
-        "maxLength": null,
-        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "Equals",
+          "label": "Equals",
           "value": "EQUALS"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Not Equals",
+          "label": "Not Equals",
           "value": "NOT_EQUALS"
         } ],
-        "sampleDataType": null,
-        "optionsDataSource": null
+        "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The boolean value to compare with the first one.",
@@ -134,18 +134,17 @@
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "True",
+          "label": "True",
           "value": true
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "False",
+          "label": "False",
           "value": true
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -160,10 +159,10 @@
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "additionalProperties": null,
       "multipleValues": null,
       "objectType": null,
-      "options": null,
       "properties": [ {
         "advancedOption": null,
         "description": "The date & time value to compare with the second one.",
@@ -179,8 +178,7 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
         "description": "Compare operation to decide where to map data.",
@@ -195,22 +193,21 @@
         "type": "STRING",
         "defaultValue": "AFTER",
         "exampleValue": null,
-        "controlType": "SELECT",
-        "maxLength": null,
-        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "After",
+          "label": "After",
           "value": "AFTER"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Before",
+          "label": "Before",
           "value": "BEFORE"
         } ],
-        "sampleDataType": null,
-        "optionsDataSource": null
+        "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The date & time value to compare with the first one.",
@@ -226,11 +223,9 @@
         "defaultValue": null,
         "exampleValue": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "controlType": "DATE_TIME"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -245,10 +240,10 @@
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "additionalProperties": null,
       "multipleValues": null,
       "objectType": null,
-      "options": null,
       "properties": [ {
         "advancedOption": null,
         "description": "The number value to compare with the second one.",
@@ -263,12 +258,11 @@
         "type": "NUMBER",
         "defaultValue": 0.0,
         "exampleValue": null,
+        "options": null,
         "maxValue": null,
         "minValue": null,
         "numberPrecision": null,
-        "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
         "description": "Compare operation to decide where to map data.",
@@ -283,47 +277,46 @@
         "type": "STRING",
         "defaultValue": "LESS",
         "exampleValue": null,
-        "controlType": "SELECT",
-        "maxLength": null,
-        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "Less",
+          "label": "Less",
           "value": "LESS"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Less or Equals",
+          "label": "Less or Equals",
           "value": "LESS_EQUALS"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Equals",
+          "label": "Equals",
           "value": "EQUALS"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Not Equals",
+          "label": "Not Equals",
           "value": "NOT_EQUALS"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Greater",
+          "label": "Greater",
           "value": "GREATER"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Greater or Equals",
+          "label": "Greater or Equals",
           "value": "GREATER_EQUALS"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Empty",
+          "label": "Empty",
           "value": "EMPTY"
         } ],
-        "sampleDataType": null,
-        "optionsDataSource": null
+        "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The number value to compare with the first one.",
@@ -338,15 +331,13 @@
         "type": "NUMBER",
         "defaultValue": 0.0,
         "exampleValue": null,
+        "options": null,
         "maxValue": null,
         "minValue": null,
         "numberPrecision": null,
-        "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "controlType": "NUMBER"
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": null,
@@ -361,10 +352,10 @@
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "additionalProperties": null,
       "multipleValues": null,
       "objectType": null,
-      "options": null,
       "properties": [ {
         "advancedOption": null,
         "description": "The string value to compare with the second one.",
@@ -379,12 +370,11 @@
         "type": "STRING",
         "defaultValue": "",
         "exampleValue": null,
+        "options": null,
         "controlType": "TEXT",
         "maxLength": null,
         "minLength": null,
-        "options": null,
-        "sampleDataType": null,
-        "optionsDataSource": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "Compare operation to decide where to map data.",
@@ -399,52 +389,51 @@
         "type": "STRING",
         "defaultValue": "EQUALS",
         "exampleValue": null,
-        "controlType": "SELECT",
-        "maxLength": null,
-        "minLength": null,
         "options": [ {
           "description": null,
           "displayCondition": null,
-          "name": "Equals",
+          "label": "Equals",
           "value": "EQUALS"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Not Equals",
+          "label": "Not Equals",
           "value": "NOT_EQUALS"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Contains",
+          "label": "Contains",
           "value": "CONTAINS"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Not Contains",
+          "label": "Not Contains",
           "value": "NOT_CONTAINS"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Starts With",
+          "label": "Starts With",
           "value": "STARTS_WITH"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Ends With",
+          "label": "Ends With",
           "value": "ENDS_WITH"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Regex",
+          "label": "Regex",
           "value": "REGEX"
         }, {
           "description": null,
           "displayCondition": null,
-          "name": "Empty",
+          "label": "Empty",
           "value": "EMPTY"
         } ],
-        "sampleDataType": null,
-        "optionsDataSource": null
+        "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The string value to compare with the first one.",
@@ -459,12 +448,11 @@
         "type": "STRING",
         "defaultValue": "",
         "exampleValue": null,
+        "options": null,
         "controlType": "TEXT",
         "maxLength": null,
         "minLength": null,
-        "options": null,
-        "sampleDataType": null,
-        "optionsDataSource": null
+        "sampleDataType": null
       }, {
         "advancedOption": null,
         "description": "The regex value to compare with the first one.",
@@ -479,20 +467,16 @@
         "type": "STRING",
         "defaultValue": "",
         "exampleValue": null,
+        "options": null,
         "controlType": "TEXT",
         "maxLength": null,
         "minLength": null,
-        "options": null,
-        "sampleDataType": null,
-        "optionsDataSource": null
+        "sampleDataType": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "controlType": "OBJECT_BUILDER"
     } ],
     "multipleValues": null,
-    "options": null,
-    "controlType": "ARRAY_BUILDER",
-    "optionsDataSource": null
+    "controlType": "ARRAY_BUILDER"
   }, {
     "advancedOption": null,
     "description": "If multiple conditions are set, this setting decides if it is true as soon as ANY condition\n matches or only if ALL are met.\n",
@@ -507,22 +491,21 @@
     "type": "STRING",
     "defaultValue": "ALL",
     "exampleValue": null,
-    "controlType": "SELECT",
-    "maxLength": null,
-    "minLength": null,
     "options": [ {
       "description": "Only if all conditions are met, the workflow goes into \"true\" branch.",
       "displayCondition": null,
-      "name": "All",
+      "label": "All",
       "value": "ALL"
     }, {
       "description": "If any condition is met, the workflow goes into \"true\" branch.",
       "displayCondition": null,
-      "name": "Any",
+      "label": "Any",
       "value": "ANY"
     } ],
-    "sampleDataType": null,
-    "optionsDataSource": null
+    "controlType": "SELECT",
+    "maxLength": null,
+    "minLength": null,
+    "sampleDataType": null
   }, {
     "advancedOption": null,
     "description": "The raw expression.",
@@ -537,12 +520,11 @@
     "type": "STRING",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "controlType": "TEXT",
     "maxLength": null,
     "minLength": null,
-    "options": null,
-    "sampleDataType": null,
-    "optionsDataSource": null
+    "sampleDataType": null
   } ],
   "resources": null,
   "taskProperties": [ {
@@ -559,6 +541,7 @@
     "type": "ARRAY",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "items": [ {
       "advancedOption": null,
       "description": "The task or task dispatcher to use.",
@@ -573,18 +556,15 @@
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "additionalProperties": null,
       "multipleValues": null,
       "objectType": "TASK",
-      "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "controlType": "OBJECT_BUILDER"
     } ],
     "multipleValues": null,
-    "options": null,
-    "controlType": "ARRAY_BUILDER",
-    "optionsDataSource": null
+    "controlType": "ARRAY_BUILDER"
   }, {
     "advancedOption": null,
     "description": "The list of tasks to execute sequentially if the result of evaluating expression is false.",
@@ -599,6 +579,7 @@
     "type": "ARRAY",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "items": [ {
       "advancedOption": null,
       "description": "The task or task dispatcher to use.",
@@ -613,18 +594,15 @@
       "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "additionalProperties": null,
       "multipleValues": null,
       "objectType": "TASK",
-      "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "controlType": "OBJECT_BUILDER"
     } ],
     "multipleValues": null,
-    "options": null,
-    "controlType": "ARRAY_BUILDER",
-    "optionsDataSource": null
+    "controlType": "ARRAY_BUILDER"
   } ],
   "title": "Condition",
   "variableProperties": null,

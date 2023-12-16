@@ -18,6 +18,8 @@ package com.bytechef.component.httpclient.connection;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
 import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.ConnectionDefinition.BASE_URI;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ADD_TO;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.AUTHORIZATION_URL;
@@ -31,8 +33,6 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN_URL;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.USERNAME;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.VALUE;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;

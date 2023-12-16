@@ -21,7 +21,7 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.FIL
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;

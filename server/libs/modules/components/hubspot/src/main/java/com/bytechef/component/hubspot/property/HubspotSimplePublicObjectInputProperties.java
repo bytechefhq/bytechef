@@ -19,7 +19,7 @@ package com.bytechef.component.hubspot.property;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
 
 /**
@@ -28,8 +28,8 @@ import java.util.List;
  * @generated
  */
 public class HubspotSimplePublicObjectInputProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
-        List.of(object("properties").properties(string("company").label("Company")
+    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(object("properties")
+        .properties(string("company").label("Company")
             .required(false),
             string("email").label("Email")
                 .required(false),
@@ -41,8 +41,8 @@ public class HubspotSimplePublicObjectInputProperties {
                 .required(false),
             string("website").label("Website")
                 .required(false))
-            .additionalProperties(string())
-            .placeholder("Add to Properties")
-            .label("Properties")
-            .required(true));
+        .additionalProperties(string())
+        .placeholder("Add to Properties")
+        .label("Properties")
+        .required(true));
 }

@@ -17,12 +17,12 @@
 package com.bytechef.component.webhook.trigger;
 
 import static com.bytechef.component.webhook.constant.WebhookConstants.CSRF_TOKEN;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.component.webhook.util.WebhookUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 
 /**
@@ -46,7 +46,7 @@ public class WebhookValidateAndRespondTrigger {
         .staticWebhookRequest(WebhookUtils.getStaticWebhookRequestFunction())
         .webhookValidate(WebhookUtils.getWebhookValidateFunction());
 
-    protected static OutputSchemaFunction getOutputSchemaFunction() {
+    protected static OutputSchemaDataSource.TriggerOutputSchemaFunction getOutputSchemaFunction() {
         // TODO
         return (inputParameters, connectionParameters, context) -> null;
 //            object()

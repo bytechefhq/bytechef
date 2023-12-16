@@ -16,14 +16,13 @@
 
 package com.bytechef.component.mailchimp.util;
 
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.AUTHORIZATION;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
 
-import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
-import com.bytechef.hermes.component.definition.ComponentOptionsFunction.OptionsResponse;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
+import com.bytechef.hermes.component.definition.OptionsDataSource;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Option;
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ public class MailchimpUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static ComponentOptionsFunction getListIdOptions() {
+    public static OptionsDataSource.ActionOptionsFunction getListIdOptions() {
         return (inputParameters, connectionParameters, searchText, context) -> {
             String accessToken = connectionParameters.getRequiredString(ACCESS_TOKEN);
 
@@ -75,7 +74,7 @@ public class MailchimpUtils {
                 options.add(option((String) list.get("name"), list.get("id")));
             }
 
-            return new OptionsResponse(options);
+            return new OptionsDataSource.OptionsResponse(options);
         };
     }
 }

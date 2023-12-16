@@ -148,12 +148,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -174,12 +174,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
@@ -238,18 +238,21 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
     } ],
     "sampleOutput": null,
     "title": "Read from file",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "perform": { },
     "outputSchema": {
       "advancedOption": null,
@@ -270,10 +273,7 @@
       "options": null,
       "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
-    },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    }
   }, {
     "batch": null,
     "componentName": "csvFile",
@@ -330,12 +330,12 @@
           "options": [ {
             "description": null,
             "displayCondition": null,
-            "name": "True",
+            "label": "True",
             "value": true
           }, {
             "description": null,
             "displayCondition": null,
-            "name": "False",
+            "label": "False",
             "value": true
           } ],
           "controlType": "CHECKBOX"
@@ -431,6 +431,9 @@
     } ],
     "sampleOutput": null,
     "title": "Write to file",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "perform": { },
     "outputSchema": {
       "advancedOption": null,
@@ -533,10 +536,7 @@
       } ],
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
-    },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    }
   } ],
   "category": null,
   "connection": null,

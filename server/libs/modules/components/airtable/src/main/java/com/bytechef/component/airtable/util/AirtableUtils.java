@@ -18,23 +18,21 @@ package com.bytechef.component.airtable.util;
 
 import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
 import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
-import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.number;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ComponentOptionsFunction;
-import com.bytechef.hermes.component.definition.ComponentOptionsFunction.OptionsResponse;
-import com.bytechef.hermes.component.definition.ComponentPropertiesFunction;
-import com.bytechef.hermes.component.definition.ComponentPropertiesFunction.PropertiesResponse;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableOption;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableOption;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableValueProperty;
+import com.bytechef.hermes.component.definition.OptionsDataSource;
+import com.bytechef.hermes.component.definition.PropertiesDataSource;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Property.ControlType;
 import java.util.ArrayList;
@@ -49,7 +47,7 @@ public class AirtableUtils {
 
     private static final List<String> SKIP_FIELDS = List.of("singleCollaborator", "multipleCollaborators");
 
-    public static ComponentOptionsFunction getBaseIdOptions() {
+    public static OptionsDataSource.ActionOptionsFunction getBaseIdOptions() {
         return (inputParameters, connectionParameters, searchText, context) -> {
             Map<String, List<Map<?, ?>>> response = context
                 .http(http -> http.get("https://api.airtable.com/v0/meta/bases"))
@@ -65,7 +63,7 @@ public class AirtableUtils {
         };
     }
 
-    public static ComponentPropertiesFunction getFieldsProperties() {
+    public static PropertiesDataSource.ActionPropertiesFunction getFieldsProperties() {
         return (inputParameters, connection, context) -> {
             List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
@@ -127,7 +125,7 @@ public class AirtableUtils {
                                 : field.description()));
             }
 
-            return new PropertiesResponse(
+            return new PropertiesDataSource.PropertiesResponse(
                 List.of(
                     object("__item")
                         .label("Record")
@@ -139,7 +137,7 @@ public class AirtableUtils {
         };
     }
 
-    public static ComponentOptionsFunction getTableIdOptions() {
+    public static OptionsDataSource.ActionOptionsFunction getTableIdOptions() {
         return (inputParameters, connectionParameters, searchText, context) -> {
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
                 inputParameters.getRequiredString(BASE_ID));
@@ -155,14 +153,14 @@ public class AirtableUtils {
         };
     }
 
-    private static OptionsResponse getOptions(Map<String, List<Map<?, ?>>> response, String name) {
+    private static OptionsDataSource.OptionsResponse getOptions(Map<String, List<Map<?, ?>>> response, String name) {
         List<Option<?>> options = new ArrayList<>();
 
         for (Map<?, ?> list : response.get(name)) {
             options.add(option((String) list.get("name"), list.get("id")));
         }
 
-        return new OptionsResponse(options);
+        return new OptionsDataSource.OptionsResponse(options);
     }
 
     private static List<ModifiableOption<String>> getOptions(AirtableField field) {

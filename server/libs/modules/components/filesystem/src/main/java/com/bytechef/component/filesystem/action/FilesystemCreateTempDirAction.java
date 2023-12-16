@@ -19,7 +19,7 @@ package com.bytechef.component.filesystem.action;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.CREATE_TEMP_DIR;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;

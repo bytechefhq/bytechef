@@ -33,7 +33,9 @@
     } ],
     "sampleOutput": null,
     "title": "Convert from XML string",
-    "perform": { },
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -53,12 +55,10 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "xmlHelper",
@@ -89,16 +89,16 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "Object",
+        "label": "Object",
         "value": 1
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "Array",
+        "label": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "description": "The object to convert to XML string.",
@@ -118,8 +118,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
       "description": "The array to convert to XML string.",
@@ -137,12 +137,14 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
     "sampleOutput": null,
     "title": "Convert to XML string",
-    "perform": { },
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -164,9 +166,7 @@
       "sampleDataType": null,
       "optionsDataSource": null
     },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

@@ -19,7 +19,7 @@ package com.bytechef.component.petstore.property;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
 
 /**
@@ -28,10 +28,9 @@ import java.util.List;
  * @generated
  */
 public class PetstoreCategoryProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        integer("id").label("Id")
-            .required(false)
-            .exampleValue(1),
+    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(integer("id").label("Id")
+        .required(false)
+        .exampleValue(1),
         string("name").label("Name")
             .required(false)
             .exampleValue("Dogs"));

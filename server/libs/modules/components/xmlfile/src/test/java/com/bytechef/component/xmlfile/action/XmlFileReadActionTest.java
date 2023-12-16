@@ -22,7 +22,7 @@ import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_NUMB
 import static com.bytechef.component.xmlfile.constant.XmlFileConstants.PAGE_SIZE;
 
 import com.bytechef.component.xmlfile.XmlFileComponentHandlerIntTest;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;

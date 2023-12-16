@@ -20,7 +20,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
 
 /**
@@ -29,7 +29,7 @@ import java.util.List;
  * @generated
  */
 public class HubspotAssociationSpecProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
+    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
         string("associationCategory").label("Association Category")
             .options(option("HUBSPOT_DEFINED", "HUBSPOT_DEFINED"), option("USER_DEFINED", "USER_DEFINED"),
                 option("INTEGRATOR_DEFINED", "INTEGRATOR_DEFINED"))

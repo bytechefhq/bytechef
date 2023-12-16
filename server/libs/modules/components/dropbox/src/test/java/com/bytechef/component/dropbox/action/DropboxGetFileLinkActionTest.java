@@ -19,7 +19,7 @@ package com.bytechef.component.dropbox.action;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.GetTemporaryLinkResult;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,7 +40,7 @@ public class DropboxGetFileLinkActionTest extends AbstractDropboxActionTest {
             .thenReturn(Mockito.mock(GetTemporaryLinkResult.class));
 
         DropboxGetFileLinkAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
+            parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))

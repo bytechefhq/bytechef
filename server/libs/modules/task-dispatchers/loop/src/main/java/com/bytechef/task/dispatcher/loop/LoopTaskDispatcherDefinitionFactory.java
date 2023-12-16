@@ -16,9 +16,9 @@
 
 package com.bytechef.task.dispatcher.loop;
 
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.ITEM;

@@ -19,6 +19,7 @@
     "type": "ARRAY",
     "defaultValue": null,
     "exampleValue": null,
+    "options": null,
     "items": [ {
       "advancedOption": null,
       "description": "The list of tasks that executes sequentially.",
@@ -33,6 +34,7 @@
       "type": "ARRAY",
       "defaultValue": null,
       "exampleValue": null,
+      "options": null,
       "items": [ {
         "advancedOption": null,
         "description": "The task or task dispatcher to use.",
@@ -47,27 +49,22 @@
         "type": "OBJECT",
         "defaultValue": null,
         "exampleValue": null,
+        "options": null,
         "additionalProperties": null,
         "multipleValues": null,
         "objectType": "TASK",
-        "options": null,
         "properties": null,
-        "optionsDataSource": null,
         "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
-      "options": null,
-      "optionsDataSource": null,
       "controlType": "ARRAY_BUILDER"
     } ],
     "multipleValues": null,
-    "options": null,
-    "optionsDataSource": null,
     "controlType": "ARRAY_BUILDER"
   } ],
   "title": "Fork/Join",
   "variableProperties": null,
   "version": 1,
-  "outputSchema": null,
-  "outputSchemaDataSource": null
+  "outputSchemaDataSource": null,
+  "outputSchema": null
 }

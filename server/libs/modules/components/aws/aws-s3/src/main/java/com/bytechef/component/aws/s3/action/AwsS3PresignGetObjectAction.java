@@ -21,7 +21,7 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.PRESIGN_GET_OBJECT;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.SIGNATURE_DURATION;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;

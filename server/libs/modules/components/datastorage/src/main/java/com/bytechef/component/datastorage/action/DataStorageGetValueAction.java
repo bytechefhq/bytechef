@@ -23,21 +23,20 @@ import static com.bytechef.component.datastorage.constant.DataStorageConstants.S
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.TYPE;
 import static com.bytechef.component.datastorage.constant.DataStorageConstants.TYPE_OPTIONS;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.date;
-import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
-import static com.bytechef.hermes.definition.DefinitionDSL.number;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
-import static com.bytechef.hermes.definition.DefinitionDSL.time;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.date;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.ParameterMap;
 
 /**
@@ -124,9 +123,9 @@ public class DataStorageGetValueAction {
         return null;
     }
 
-    protected static OutputSchemaFunction getOutputSchemaFunction() {
+    protected static OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction() {
         // TODO
-        return (inputParameters, connection, context) -> new OutputSchemaResponse(
+        return (inputParameters, connection, context) -> new OutputSchemaDataSource.OutputSchemaResponse(
             switch (inputParameters.getRequiredInteger(TYPE)) {
                 case 1 -> array();
                 case 2 -> bool();

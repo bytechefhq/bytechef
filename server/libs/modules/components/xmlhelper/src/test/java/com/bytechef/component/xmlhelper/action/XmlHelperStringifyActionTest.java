@@ -19,7 +19,7 @@ package com.bytechef.component.xmlhelper.action;
 import static com.bytechef.component.xmlhelper.constant.XmlHelperConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ public class XmlHelperStringifyActionTest {
 
     @Test
     public void testPerformStringify() {
-        ActionDefinition.ActionContext context = Mockito.mock(ActionDefinition.ActionContext.class);
+        ActionContext context = Mockito.mock(ActionContext.class);
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
         Mockito.when(parameterMap.getRequired(Mockito.eq(SOURCE)))

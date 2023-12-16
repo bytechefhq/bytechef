@@ -6,7 +6,7 @@
     "componentTitle": "HTML Helper",
     "componentVersion": 1,
     "deprecated": null,
-    "description": "Send an email to any address.",
+    "description": "Extract content from the HTML content.",
     "help": null,
     "metadata": null,
     "name": "extractContent",
@@ -24,7 +24,7 @@
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
-      "controlType": "TEXT",
+      "controlType": "TEXT_AREA",
       "maxLength": null,
       "minLength": null,
       "options": null,
@@ -52,7 +52,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "the data to return.",
+      "description": "The data to return.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -68,20 +68,20 @@
       "maxLength": null,
       "minLength": null,
       "options": [ {
-        "description": "Get an attribute value like 'class' from an element.",
+        "description": "Get the attribute value like 'class' from an element.",
         "displayCondition": null,
-        "name": "attribute",
-        "value": "Attribute"
+        "label": "Attribute",
+        "value": "attribute"
       }, {
-        "description": "Get the HTML that the element contains.",
+        "description": "Get the HTML content that the element contains.",
         "displayCondition": null,
-        "name": "html",
-        "value": "HTML"
+        "label": "HTML",
+        "value": "html"
       }, {
-        "description": "get the text content of the element.",
+        "description": "Get the text content of the element.",
         "displayCondition": null,
-        "name": "text",
-        "value": "Text"
+        "label": "Text",
+        "value": "text"
       } ],
       "sampleDataType": null,
       "optionsDataSource": null
@@ -122,25 +122,28 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "name": "True",
+        "label": "True",
         "value": true
       }, {
         "description": null,
         "displayCondition": null,
-        "name": "False",
+        "label": "False",
         "value": true
       } ],
       "controlType": "CHECKBOX"
     } ],
     "sampleOutput": null,
-    "title": "Send",
+    "title": "Extract Content",
     "outputSchema": null,
     "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    }
   } ],
   "category": null,
   "connection": null,

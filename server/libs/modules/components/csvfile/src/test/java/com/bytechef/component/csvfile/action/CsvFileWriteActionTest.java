@@ -21,7 +21,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.component.csvfile.CsvFileComponentHandlerTest;
 import com.bytechef.component.csvfile.action.CsvFileReadAction.ReadConfiguration;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.ByteArrayInputStream;

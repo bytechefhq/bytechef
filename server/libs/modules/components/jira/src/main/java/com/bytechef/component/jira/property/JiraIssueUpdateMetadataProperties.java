@@ -18,7 +18,7 @@ package com.bytechef.component.jira.property;
 
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 
-import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
 
 /**
@@ -27,7 +27,7 @@ import java.util.List;
  * @generated
  */
 public class JiraIssueUpdateMetadataProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES =
+    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES =
         List.of(object("fields").additionalProperties(object().properties(JiraFieldMetadataProperties.PROPERTIES))
             .placeholder("Add to Fields")
             .label("Fields")

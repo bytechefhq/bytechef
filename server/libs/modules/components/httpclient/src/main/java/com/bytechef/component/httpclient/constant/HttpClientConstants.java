@@ -16,24 +16,24 @@
 
 package com.bytechef.component.httpclient.constant;
 
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.date;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 import static com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.hermes.component.definition.Context.Http.ResponseType;
-import static com.bytechef.hermes.definition.DefinitionDSL.array;
-import static com.bytechef.hermes.definition.DefinitionDSL.bool;
-import static com.bytechef.hermes.definition.DefinitionDSL.date;
-import static com.bytechef.hermes.definition.DefinitionDSL.dateTime;
-import static com.bytechef.hermes.definition.DefinitionDSL.integer;
-import static com.bytechef.hermes.definition.DefinitionDSL.nullable;
-import static com.bytechef.hermes.definition.DefinitionDSL.number;
-import static com.bytechef.hermes.definition.DefinitionDSL.object;
-import static com.bytechef.hermes.definition.DefinitionDSL.option;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
-import static com.bytechef.hermes.definition.DefinitionDSL.time;
 
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaFunction;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.Property.InputProperty;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -66,7 +66,7 @@ public class HttpClientConstants {
     public static final String TIMEOUT = "timeout";
     public static final String URI = "uri";
 
-    public static final List<? extends ModifiableInputProperty> BODY_CONTENT_PROPERTIES = Collections.unmodifiableList(
+    public static final List<? extends InputProperty> BODY_CONTENT_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
             object(BODY_CONTENT)
                 .label("Body Content - JSON")
@@ -101,7 +101,7 @@ public class HttpClientConstants {
                 .description("The object property which contains a reference to the file to upload.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
 
-    public static final OutputSchemaFunction OUTPUT_PROPERTIES =
+    public static final OutputSchemaDataSource.ActionOutputSchemaFunction OUTPUT_PROPERTIES =
         // TODO
         (inputParameters, connection, context) -> null;
 //        {
@@ -113,7 +113,7 @@ public class HttpClientConstants {
 //            }
 //        };
 
-    public static final List<? extends ModifiableInputProperty> COMMON_PROPERTIES = Collections.unmodifiableList(
+    public static final List<? extends InputProperty> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
 
             //

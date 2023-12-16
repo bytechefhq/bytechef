@@ -18,7 +18,7 @@ package com.bytechef.component.filesystem.action;
 
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.File;
 import java.io.IOException;

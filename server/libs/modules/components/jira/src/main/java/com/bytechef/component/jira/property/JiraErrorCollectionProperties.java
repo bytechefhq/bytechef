@@ -21,7 +21,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.definition.DefinitionDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import java.util.List;
 
 /**
@@ -30,14 +30,14 @@ import java.util.List;
  * @generated
  */
 public class JiraErrorCollectionProperties {
-    public static final List<DefinitionDSL.ModifiableProperty.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(
-        array("errorMessages").items(string().description(
+    public static final List<ComponentDSL.ModifiableValueProperty<?, ?>> PROPERTIES = List.of(array("errorMessages")
+        .items(string().description(
             "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\""))
-            .placeholder("Add to Error Messages")
-            .label("Error Messages")
-            .description(
-                "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\"")
-            .required(false),
+        .placeholder("Add to Error Messages")
+        .label("Error Messages")
+        .description(
+            "The list of error messages produced by this operation. For example, \"input parameter 'key' must be provided\"")
+        .required(false),
         object("errors").additionalProperties(string())
             .placeholder("Add to Errors")
             .label("Errors")

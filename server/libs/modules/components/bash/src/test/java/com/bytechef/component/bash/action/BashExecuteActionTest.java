@@ -21,7 +21,7 @@ package com.bytechef.component.bash.action;
 import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
 
 import com.bytechef.component.bash.BashComponentHandlerTest;
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ public class BashExecuteActionTest {
             .thenReturn(script);
 
         String output = BashExecuteAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class));
+            parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
         Assertions.assertTrue(output.contains("build/resources/test/dependencies/test.txt"));
     }
