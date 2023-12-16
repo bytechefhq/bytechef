@@ -16,18 +16,17 @@
 
 package com.bytechef.hermes.configuration.web.rest.mapper;
 
-import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
 import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
-import com.bytechef.hermes.configuration.web.rest.model.PropertiesResponseModel;
 import org.mapstruct.Mapper;
-import org.springframework.core.convert.converter.Converter;
+import org.openapitools.jackson.nullable.JsonNullable;
 
 /**
  * @author Ivica Cardic
  */
 @Mapper(config = ConfigurationMapperSpringConfig.class)
-public interface PropertiesResponseMapper extends Converter<PropertiesResponse, PropertiesResponseModel> {
+public interface JsonNullableMapper {
 
-    @Override
-    PropertiesResponseModel convert(PropertiesResponse propertiesResponse);
+    default JsonNullable<Object> mapToJsonNullable(Object value) {
+        return value == null ? JsonNullable.undefined() : JsonNullable.of(value);
+    }
 }

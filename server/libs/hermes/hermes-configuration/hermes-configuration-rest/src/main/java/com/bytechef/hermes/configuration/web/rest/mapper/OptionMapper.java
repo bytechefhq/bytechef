@@ -20,21 +20,16 @@ import com.bytechef.hermes.configuration.web.rest.mapper.config.ConfigurationMap
 import com.bytechef.hermes.configuration.web.rest.model.OptionModel;
 import com.bytechef.hermes.registry.domain.Option;
 import org.mapstruct.Mapper;
-import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
 @Mapper(config = ConfigurationMapperSpringConfig.class, uses = {
-    OptionalMapper.class
+    JsonNullableMapper.class, OptionalMapper.class
 })
 public interface OptionMapper extends Converter<Option, OptionModel> {
 
     @Override
     OptionModel convert(Option option);
-
-    default JsonNullable<Object> mapToJsonNullable(Object value) {
-        return value == null ? JsonNullable.undefined() : JsonNullable.of(value);
-    }
 }
