@@ -273,13 +273,16 @@
     } ],
     "sampleOutput": null,
     "title": "Set value",
+    "outputSchema": null,
+    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
-    "outputSchema": null,
-    "perform": { }
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    }
   } ],
   "category": null,
   "connection": null,

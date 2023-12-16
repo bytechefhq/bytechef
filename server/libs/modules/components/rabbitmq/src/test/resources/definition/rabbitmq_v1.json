@@ -54,13 +54,11 @@
     } ],
     "sampleOutput": null,
     "title": "Send Message",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": null,
     "outputSchema": null,
-    "perform": { }
+    "perform": { },
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null
   } ],
   "category": null,
   "connection": {
@@ -201,13 +199,6 @@
     "webhookRawBody": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "dynamicWebhookDisable": null,
-    "dynamicWebhookEnable": null,
-    "dynamicWebhookRefresh": null,
-    "dynamicWebhookRequest": null,
     "listenerDisable": { },
     "listenerEnable": { },
     "webhookValidate": null,
@@ -234,7 +225,14 @@
       "controlType": "OBJECT_BUILDER"
     },
     "deduplicate": null,
-    "poll": null
+    "poll": null,
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
+    "dynamicWebhookDisable": null,
+    "dynamicWebhookEnable": null,
+    "dynamicWebhookRefresh": null,
+    "dynamicWebhookRequest": null
   } ],
   "allowedConnections": null
 }

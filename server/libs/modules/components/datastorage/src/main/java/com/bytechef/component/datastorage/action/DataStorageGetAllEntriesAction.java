@@ -23,8 +23,11 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 
 /**
  * @author Ivica Cardic
@@ -42,7 +45,19 @@ public class DataStorageGetAllEntriesAction {
                 .options(SCOPE_OPTIONS)
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
+        .sampleOutput(getSampleOutputSchemaFunction())
         .perform(DataStorageGetAllEntriesAction::perform);
+
+    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
+            context.outputSchema(outputSchema -> outputSchema.get(
+                perform(inputParameters, connectionParameters, context))));
+    }
+
+    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
+            perform(inputParameters, connectionParameters, context));
+    }
 
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
@@ -50,15 +65,5 @@ public class DataStorageGetAllEntriesAction {
         // TODO
 
         return null;
-    }
-
-    protected static OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction() {
-        // TODO
-        return (inputParameters, connection, context) -> null;
-//        array("item")
-//            .items(
-//                dateTime("created"),
-//                string("key"),
-//                any("key"))
     }
 }

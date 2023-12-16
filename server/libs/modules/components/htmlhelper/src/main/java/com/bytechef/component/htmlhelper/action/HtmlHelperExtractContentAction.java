@@ -28,10 +28,12 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.hermes.definition.Property;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -81,11 +83,14 @@ public class HtmlHelperExtractContentAction {
         .perform(HtmlHelperExtractContentAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
-        return null;
+        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
+            context.outputSchema(outputSchema -> outputSchema.get(
+                perform(inputParameters, connectionParameters, context))));
     }
 
     protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
-        return null;
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
+            perform(inputParameters, connectionParameters, context));
     }
 
     protected static Object perform(

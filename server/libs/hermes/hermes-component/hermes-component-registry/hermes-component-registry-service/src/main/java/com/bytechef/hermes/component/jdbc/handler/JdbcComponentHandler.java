@@ -35,7 +35,10 @@ import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.operation.DeleteJdbcOperation;
@@ -84,6 +87,61 @@ public class JdbcComponentHandler implements ComponentHandler {
         return componentDefinition;
     }
 
+    protected ActionOutputSchemaFunction getDeleteOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
+            context.outputSchema(outputSchema -> outputSchema.get(
+                performDelete(inputParameters, connectionParameters, context))));
+    }
+
+    protected ActionSampleOutputFunction getDeleteOSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
+            performDelete(inputParameters, connectionParameters, context));
+    }
+
+    protected ActionOutputSchemaFunction getExecuteOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
+            context.outputSchema(outputSchema -> outputSchema.get(
+                performExecute(inputParameters, connectionParameters, context))));
+    }
+
+    protected ActionSampleOutputFunction getExecuteOSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
+            performExecute(inputParameters, connectionParameters, context));
+    }
+
+    protected ActionOutputSchemaFunction getInsertOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
+            context.outputSchema(outputSchema -> outputSchema.get(
+                performInsert(inputParameters, connectionParameters, context))));
+    }
+
+    protected ActionSampleOutputFunction getInsertOSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
+            performInsert(inputParameters, connectionParameters, context));
+    }
+
+    protected ActionOutputSchemaFunction getQueryOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
+            context.outputSchema(outputSchema -> outputSchema.get(
+                performQuery(inputParameters, connectionParameters, context))));
+    }
+
+    protected ActionSampleOutputFunction getQueryOSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
+            performQuery(inputParameters, connectionParameters, context));
+    }
+
+    protected ActionOutputSchemaFunction getUpdateOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
+            context.outputSchema(outputSchema -> outputSchema.get(
+                performUpdate(inputParameters, connectionParameters, context))));
+    }
+
+    protected ActionSampleOutputFunction getUpdateOSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
+            performUpdate(inputParameters, connectionParameters, context));
+    }
+
     protected Map<String, Integer> performDelete(
         Map<String, ?> inputParameters, Map<String, ?> connectionParameters, ActionContext context) {
         return deleteJdbcOperation.execute(inputParameters, connectionParameters);
@@ -110,11 +168,6 @@ public class JdbcComponentHandler implements ComponentHandler {
         Map<String, ?> inputParameters, Map<String, ?> connectionParameters, ActionContext context) {
 
         return updateJdbcOperation.execute(inputParameters, connectionParameters);
-    }
-
-    protected static OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction() {
-        // TODO
-        return (inputParameters, connection, context) -> null;
     }
 
     private ComponentDefinition getComponentDefinition(String description, String name, String icon, String title) {
@@ -154,7 +207,8 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .description(
                                 "The list of properties which should be used as query parameters.")
                             .additionalProperties(bool(), dateTime(), number(), string()))
-                    .outputSchema(getOutputSchemaFunction())
+                    .outputSchema(getQueryOutputSchemaFunction())
+                    .sampleOutput(getQueryOSampleOutputSchemaFunction())
                     .perform(this::performQuery),
                 action(JdbcConstants.INSERT)
                     .title("Insert")
@@ -180,7 +234,8 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .items(object().additionalProperties(
                                 array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                                 string(), time())))
-                    .outputSchema(object().properties(integer("rows")))
+                    .outputSchema(getInsertOutputSchemaFunction())
+                    .sampleOutput(getInsertOSampleOutputSchemaFunction())
                     .perform(this::performInsert),
                 action(JdbcConstants.UPDATE)
                     .title("Update")
@@ -211,7 +266,8 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .items(object().additionalProperties(
                                 array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                                 string(), time())))
-                    .outputSchema(object().properties(integer("rows")))
+                    .outputSchema(getUpdateOutputSchemaFunction())
+                    .sampleOutput(getUpdateOSampleOutputSchemaFunction())
                     .perform(this::performUpdate),
                 action(JdbcConstants.DELETE)
                     .title("Delete")
@@ -237,7 +293,8 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .items(object().additionalProperties(
                                 array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                                 string(), time())))
-                    .outputSchema(object().properties(integer("rows")))
+                    .outputSchema(getDeleteOutputSchemaFunction())
+                    .sampleOutput(getDeleteOSampleOutputSchemaFunction())
                     .perform(this::performDelete),
                 action(JdbcConstants.EXECUTE)
                     .title("Execute")
@@ -260,7 +317,8 @@ public class JdbcComponentHandler implements ComponentHandler {
                             .label("Parameters")
                             .description("The list of properties which should be used as parameters.")
                             .additionalProperties(bool(), dateTime(), number(), string()))
-                    .outputSchema(object().properties(integer("rows")))
+                    .outputSchema(getExecuteOutputSchemaFunction())
+                    .sampleOutput(getExecuteOSampleOutputSchemaFunction())
                     .perform(this::performExecute));
     }
 }

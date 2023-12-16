@@ -245,13 +245,16 @@
     } ],
     "sampleOutput": null,
     "title": "Java",
-    "perform": { },
-    "outputSchema": null,
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
+    "perform": { },
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "script",
@@ -498,13 +501,16 @@
     } ],
     "sampleOutput": null,
     "title": "JavaScript",
-    "perform": { },
-    "outputSchema": null,
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
+    "perform": { },
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "script",
@@ -751,13 +757,16 @@
     } ],
     "sampleOutput": null,
     "title": "Python",
-    "perform": { },
-    "outputSchema": null,
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
+    "perform": { },
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "script",
@@ -1004,13 +1013,13 @@
     } ],
     "sampleOutput": null,
     "title": "Ruby",
-    "perform": { },
-    "outputSchema": null,
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null
+    "sampleOutputDataSource": null,
+    "perform": { },
+    "outputSchema": null
   } ],
   "category": null,
   "connection": null,

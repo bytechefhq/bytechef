@@ -109,8 +109,8 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Delimiter to use when reading a csv file.",
@@ -200,8 +200,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -219,8 +219,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -253,7 +253,6 @@
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null,
-    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -271,9 +270,10 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
-    }
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
+    },
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "csvFile",
@@ -354,8 +354,8 @@
           "defaultValue": null,
           "exampleValue": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -374,8 +374,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -401,13 +401,13 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.csv\" will be used.",
@@ -433,8 +433,10 @@
     "title": "Write to file",
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -534,9 +536,10 @@
         "sampleDataType": null,
         "optionsDataSource": null
       } ],
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
-    }
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
+    },
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

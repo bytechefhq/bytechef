@@ -22,6 +22,8 @@ import com.bytechef.hermes.component.definition.OptionsDataSource.OptionsFunctio
 import com.bytechef.hermes.component.definition.PropertiesDataSource.PropertiesFunction;
 import com.bytechef.hermes.component.definition.Property.InputProperty;
 import com.bytechef.hermes.component.definition.Property.OutputProperty;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.TriggerSampleOutputFunction;
 import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Resources;
@@ -2671,7 +2673,8 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition sampleOutput(TriggerSampleOutputFunction sampleOutput) {
+        public ModifiableTriggerDefinition
+            sampleOutput(TriggerSampleOutputFunction sampleOutput) {
             this.sampleOutputFunction = sampleOutput;
 
             return this;

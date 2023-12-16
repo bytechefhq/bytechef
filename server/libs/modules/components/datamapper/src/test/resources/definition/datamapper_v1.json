@@ -116,11 +116,14 @@
     "title": "Map Keys",
     "perform": { },
     "outputSchema": null,
-    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -196,11 +199,14 @@
     "title": "Map list to object",
     "perform": { },
     "outputSchema": null,
-    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -339,11 +345,14 @@
     "title": "Map multiple values between objects\n",
     "perform": { },
     "outputSchema": null,
-    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -626,11 +635,14 @@
     "title": "Map objects",
     "perform": { },
     "outputSchema": null,
-    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -756,11 +768,14 @@
     "title": "Map objects to list",
     "perform": { },
     "outputSchema": null,
-    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -1841,11 +1856,14 @@
     "title": "Map one value",
     "perform": { },
     "outputSchema": null,
-    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -2353,11 +2371,14 @@
     "title": "Map values",
     "perform": { },
     "outputSchema": null,
-    "sampleOutputDataSource": null,
+    "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "editorDescriptionDataSource": null
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    }
   } ],
   "category": null,
   "connection": null,

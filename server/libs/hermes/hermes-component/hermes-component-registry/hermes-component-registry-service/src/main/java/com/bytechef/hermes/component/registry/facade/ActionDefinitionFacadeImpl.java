@@ -17,12 +17,12 @@
 package com.bytechef.hermes.component.registry.facade;
 
 import com.bytechef.hermes.component.definition.factory.ContextFactory;
+import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
 import com.bytechef.hermes.component.registry.domain.OptionsResponse;
 import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
 import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
 import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
-import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;

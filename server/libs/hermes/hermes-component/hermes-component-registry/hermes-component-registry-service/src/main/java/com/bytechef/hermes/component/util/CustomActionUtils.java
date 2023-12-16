@@ -40,8 +40,11 @@ import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.Body;
 import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
 import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Property.ControlType;
 import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
@@ -180,6 +183,7 @@ public class CustomActionUtils {
                     .controlType(ControlType.SCHEMA_DESIGNER)
                     .sampleDataType(SampleDataType.JSON))
             .outputSchema(getOutputSchemaFunction())
+            .sampleOutput(getSampleOutputSchemaFunction())
             .perform(CustomActionUtils::perform);
 
         return customActionDefinition.help(
@@ -223,8 +227,14 @@ public class CustomActionUtils {
         return body;
     }
 
-    protected static OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction() {
-        // TODO
-        return (inputParameters, connection, context) -> null;
+    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
+            context.outputSchema(outputSchema -> outputSchema.get(
+                perform(inputParameters, connectionParameters, context))));
+    }
+
+    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
+            perform(inputParameters, connectionParameters, context));
     }
 }

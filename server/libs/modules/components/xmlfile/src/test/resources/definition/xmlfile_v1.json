@@ -202,7 +202,10 @@
     "outputSchemaDataSource": {
       "outputSchema": { }
     },
-    "sampleOutputDataSource": null,
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
     "outputSchema": null,
     "perform": { }
   }, {
@@ -310,7 +313,10 @@
     "title": "Write to file",
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
+    "sampleOutputDataSource": {
+      "sampleOutputFunction": { },
+      "sampleOutput": { }
+    },
     "outputSchema": {
       "advancedOption": null,
       "description": null,

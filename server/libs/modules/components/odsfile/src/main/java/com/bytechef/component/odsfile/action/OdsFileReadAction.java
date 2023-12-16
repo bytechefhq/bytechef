@@ -25,7 +25,6 @@ import static com.bytechef.component.odsfile.constant.OdsFileConstants.READ;
 import static com.bytechef.component.odsfile.constant.OdsFileConstants.READ_AS_STRING;
 import static com.bytechef.component.odsfile.constant.OdsFileConstants.SHEET_NAME;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
@@ -33,7 +32,11 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
@@ -92,8 +95,20 @@ public class OdsFileReadAction {
                     "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
                 .defaultValue("Sheet")
                 .advancedOption(true))
-        .outputSchema(array())
+        .outputSchema(getOutputSchemaFunction())
+        .sampleOutput(getSampleOutputSchemaFunction())
         .perform(OdsFileReadAction::perform);
+
+    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
+            context.outputSchema(outputSchema -> outputSchema.get(
+                perform(inputParameters, connectionParameters, context))));
+    }
+
+    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
+            perform(inputParameters, connectionParameters, context));
+    }
 
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
