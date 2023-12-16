@@ -671,7 +671,7 @@ const ConnectionDialog = ({componentDefinition, connection, onClose, triggerNode
                                                 }}
                                                 redirectUri={oAuth2Properties?.redirectUri ?? ''}
                                                 responseType={isOAuth2AuthorizationType ? 'code' : 'token'}
-                                                scope={oAuth2AuthorizationParameters?.scopes?.join('_')}
+                                                scope={oAuth2AuthorizationParameters?.scopes?.join(' ')}
                                             />
                                         )}
                                 </>
