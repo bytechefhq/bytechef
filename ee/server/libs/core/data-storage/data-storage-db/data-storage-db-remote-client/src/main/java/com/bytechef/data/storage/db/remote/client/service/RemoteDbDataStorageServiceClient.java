@@ -31,51 +31,47 @@ public class RemoteDbDataStorageServiceClient implements DbDataStorageService {
 
     @Override
     public <T> Optional<T> fetch(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+        String componentName, String actionName, int scope, String scopeId, String key,
         int type) {
 
         return Optional.ofNullable(
-            get(
-                componentName, componentVersion, actionName, scope, scopeId, key, type,
-                new ParameterizedTypeReference<T>() {}));
+            get(componentName, actionName, scope, scopeId, key, type, new ParameterizedTypeReference<T>() {}));
     }
 
     @Override
     public <T> T get(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+        String componentName, String actionName, int scope, String scopeId, String key,
         int type) {
 
         return Optional.ofNullable(
-            get(
-                componentName, componentVersion, actionName, scope, scopeId, key, type,
-                new ParameterizedTypeReference<T>() {}))
+            get(componentName, actionName, scope, scopeId, key, type, new ParameterizedTypeReference<T>() {}))
             .orElseThrow();
     }
 
     @Override
     public void put(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+        String componentName, String actionName, int scope, String scopeId, String key,
         int type, Object value) {
 
         loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(DATA_STORAGE_SERVICE
-                    + "/save/{componentName}/{componentVersion}/{actionName}/{scope}/{scopeId}/{key}/{type}")
-                .build(componentName, componentVersion, actionName, scope, scopeId, key, type),
+                    + "/save/{componentName}/{actionName}/{scope}/{scopeId}/{key}/{type}")
+                .build(componentName, actionName, scope, scopeId, key, type),
             value);
     }
 
     private <T> T get(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
-        int type, ParameterizedTypeReference<T> responseTypeRef) {
+        String componentName, String actionName, int scope, String scopeId, String key, int type,
+        ParameterizedTypeReference<T> responseTypeRef) {
 
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(DATA_STORAGE_SERVICE
-                    + "/fetch-value/{componentName}/{componentVersion}/{actionName}/{scope}/{scopeId}/{key}/{type}")
-                .build(componentName, componentVersion, actionName, scope, scopeId, key, type),
+                    + "/fetch-value/{componentName}/{actionName}/{scope}/{scopeId}/{key}/{type}")
+                .build(componentName, actionName, scope, scopeId, key, type),
             responseTypeRef);
     }
 }

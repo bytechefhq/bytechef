@@ -37,32 +37,30 @@ public class RemoteDbDataStorageServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/fetch-value/{componentName}/{componentVersion}/{actionName}/{scope}/{scopeId}/{key}/{type}",
+        value = "/fetch-value/{componentName}/{actionName}/{scope}/{scopeId}/{key}/{type}",
         consumes = {
             "application/json"
         })
     public ResponseEntity<Object> fetchValue(
-        @PathVariable String componentName, @PathVariable int componentVersion, @PathVariable String actionName,
-        @PathVariable int scope, @PathVariable String scopeId, @PathVariable String key,
-        @PathVariable int type) {
+        @PathVariable String componentName, @PathVariable String actionName, @PathVariable int scope,
+        @PathVariable String scopeId, @PathVariable String key, @PathVariable int type) {
 
         return ResponseEntity.ok(
             OptionalUtils.orElse(dataStorageService.fetch(
-                componentName, componentVersion, actionName, scope, scopeId, key, type), null));
+                componentName, actionName, scope, scopeId, key, type), null));
     }
 
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/save/{componentName}/{componentVersion}/{actionName}/{scope}/{scopeId}/{key}/{type}",
+        value = "/save/{componentName}/{actionName}/{scope}/{scopeId}/{key}/{type}",
         consumes = {
             "application/json"
         })
     public ResponseEntity<Void> save(
-        @PathVariable String componentName, @PathVariable int componentVersion, @PathVariable String actionName,
-        @PathVariable int scope, @PathVariable String scopeId, @PathVariable String key,
-        @PathVariable int type, @RequestBody Object data) {
+        @PathVariable String componentName, @PathVariable String actionName, @PathVariable int scope,
+        @PathVariable String scopeId, @PathVariable String key, @PathVariable int type, @RequestBody Object data) {
 
-        dataStorageService.put(componentName, componentVersion, actionName, scope, scopeId, key, type, data);
+        dataStorageService.put(componentName, actionName, scope, scopeId, key, type, data);
 
         return ResponseEntity
             .noContent()

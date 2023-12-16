@@ -41,9 +41,6 @@ public class DataEntry implements Persistable<Long> {
     @Column("component_name")
     private String componentName;
 
-    @Column("component_version")
-    private int componentVersion = 1;
-
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -85,12 +82,10 @@ public class DataEntry implements Persistable<Long> {
     }
 
     public DataEntry(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
-        Object value, int type) {
+        String componentName, String actionName, int scope, String scopeId, String key, Object value, int type) {
 
         this.actionName = actionName;
         this.componentName = componentName;
-        this.componentVersion = componentVersion;
         this.key = key;
         this.scope = scope;
         this.scopeId = scopeId;
@@ -104,10 +99,6 @@ public class DataEntry implements Persistable<Long> {
 
     public String getComponentName() {
         return componentName;
-    }
-
-    public int getComponentVersion() {
-        return componentVersion;
     }
 
     public String getCreatedBy() {
@@ -196,7 +187,6 @@ public class DataEntry implements Persistable<Long> {
             "id=" + id +
             ", componentName='" + componentName + '\'' +
             ", actionName='" + actionName + '\'' +
-            ", componentVersion=" + componentVersion +
             ", scope=" + scope +
             ", scopeId='" + scopeId + '\'' +
             ", key='" + key + '\'' +

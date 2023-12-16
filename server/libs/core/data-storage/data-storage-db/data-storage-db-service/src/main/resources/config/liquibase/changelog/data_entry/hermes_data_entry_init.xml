@@ -11,9 +11,6 @@
                 <column name="component_name" type="VARCHAR(256)">
                     <constraints nullable="false"/>
                 </column>
-                <column name="component_version" type="INT">
-                    <constraints nullable="false"/>
-                </column>
                 <column name="action_name" type="VARCHAR(256)">
                     <constraints nullable="false"/>
                 </column>

@@ -50,26 +50,26 @@ public class RemoteDbDataStorageClientConfiguration {
 
         @Override
         public <T> Optional<T> fetch(
-            String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+            String componentName, String actionName, int scope, String scopeId, String key,
             int type) {
 
-            return dbDataStorageService.fetch(componentName, componentVersion, actionName, scope, scopeId, key, type);
+            return dbDataStorageService.fetch(componentName, actionName, scope, scopeId, key, type);
         }
 
         @Override
         public <T> T get(
-            String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+            String componentName, String actionName, int scope, String scopeId, String key,
             int type) {
 
-            return dbDataStorageService.get(componentName, componentVersion, actionName, scope, scopeId, key, type);
+            return dbDataStorageService.get(componentName, actionName, scope, scopeId, key, type);
         }
 
         @Override
         public void put(
-            String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+            String componentName, String actionName, int scope, String scopeId, String key,
             int type, Object value) {
 
-            dbDataStorageService.put(componentName, componentVersion, actionName, scope, scopeId, key, type, value);
+            dbDataStorageService.put(componentName, actionName, scope, scopeId, key, type, value);
         }
     }
 }

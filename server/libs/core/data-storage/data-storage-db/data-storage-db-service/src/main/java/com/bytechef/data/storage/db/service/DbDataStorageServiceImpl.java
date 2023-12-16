@@ -41,30 +41,30 @@ public class DbDataStorageServiceImpl implements DataStorageService, DbDataStora
     @SuppressWarnings("unchecked")
     @Transactional
     public <T> Optional<T> fetch(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+        String componentName, String actionName, int scope, String scopeId, String key,
         int type) {
 
-        return dataStorageRepository.findByComponentNameAndComponentVersionAndActionNameAndScopeAndScopeIdAndKeyAndType(
-            componentName, componentVersion, actionName, scope, scopeId, key, type)
+        return dataStorageRepository.findByComponentNameAndActionNameAndScopeAndScopeIdAndKeyAndType(
+            componentName, actionName, scope, scopeId, key, type)
             .map(dataEntry -> (T) dataEntry.getValue());
     }
 
     @Override
     public <T> T get(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+        String componentName, String actionName, int scope, String scopeId, String key,
         int type) {
 
-        return OptionalUtils.get(fetch(componentName, componentVersion, actionName, scope, scopeId, key, type));
+        return OptionalUtils.get(fetch(componentName, actionName, scope, scopeId, key, type));
     }
 
     @Override
     public void put(
-        String componentName, int componentVersion, String actionName, int scope, String scopeId, String key,
+        String componentName, String actionName, int scope, String scopeId, String key,
         int type, Object value) {
 
         dataStorageRepository
-            .findByComponentNameAndComponentVersionAndActionNameAndScopeAndScopeIdAndKeyAndType(
-                componentName, componentVersion, actionName, scope, scopeId, key, type)
+            .findByComponentNameAndActionNameAndScopeAndScopeIdAndKeyAndType(
+                componentName, actionName, scope, scopeId, key, type)
             .ifPresentOrElse(
                 dataEntry -> {
                     dataEntry.setValue(value);
@@ -72,6 +72,6 @@ public class DbDataStorageServiceImpl implements DataStorageService, DbDataStora
                     dataStorageRepository.save(dataEntry);
                 },
                 () -> dataStorageRepository.save(
-                    new DataEntry(componentName, componentVersion, actionName, scope, scopeId, key, value, type)));
+                    new DataEntry(componentName, actionName, scope, scopeId, key, value, type)));
     }
 }
