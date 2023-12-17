@@ -192,6 +192,6 @@ public class HubspotSubscribeTrigger {
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
         Context context) {
 
-        return WebhookOutput.list((List<Map<?, ?>>) body.content());
+        return WebhookOutput.list((List<Map<?, ?>>) body.getContent());
     }
 }
