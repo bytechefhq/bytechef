@@ -26,7 +26,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -47,13 +46,9 @@ public class ConnectionIntTestConfiguration {
         return new ObjectMapper();
     }
 
-    @TestConfiguration
-    public static class EncryptionIntTestConfiguration {
-
-        @Bean
-        EncryptionKey encryptionKey() {
-            return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
-        }
+    @Bean
+    EncryptionKey encryptionKey() {
+        return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
     }
 
     @EnableJdbcRepositories(basePackages = {

@@ -16,28 +16,40 @@
 
 package com.bytechef.atlas.configuration.service;
 
-import com.bytechef.atlas.configuration.config.WorkflowConfigurationIntTestConfiguration;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = WorkflowConfigurationIntTestConfiguration.class,
     properties = {
         "bytechef.workflow.repository.jdbc.enabled=true"
     })
 @Import(PostgreSQLContainerConfiguration.class)
+@EnableCaching
 public class WorkflowServiceIntTest {
 
     @Autowired
@@ -98,5 +110,42 @@ public class WorkflowServiceIntTest {
         workflow.setNew(true);
 
         return workflow;
+    }
+
+    @ComponentScan(
+        basePackages = {
+            "com.bytechef.atlas.configuration.repository.jdbc",
+            "com.bytechef.liquibase.config"
+        })
+    @EnableAutoConfiguration
+    @Configuration
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    public static class WorkflowConfigurationIntTestConfiguration {
+
+        @Bean
+        ObjectMapper objectMapper() {
+            return new ObjectMapper();
+        }
+
+        @Bean
+        MapUtils mapUtils() {
+            return new MapUtils() {
+                {
+                    objectMapper = objectMapper();
+                }
+            };
+        }
+
+        @Bean
+        WorkflowService workflowService(
+            CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+            List<WorkflowRepository> workflowRepositories) {
+
+            return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
+        }
+
+        @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.configuration.repository.jdbc")
+        public static class WorkflowIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
+        }
     }
 }

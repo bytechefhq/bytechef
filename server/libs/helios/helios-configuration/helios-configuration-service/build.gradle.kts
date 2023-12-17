@@ -11,6 +11,8 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-api"))
     implementation(project(":server:libs:hermes:hermes-execution:hermes-execution-api"))
 
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     testImplementation(project(":server:libs:core:category:category-service"))

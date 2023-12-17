@@ -32,10 +32,10 @@ import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.configuration.domain.WorkflowConnection;
 import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.hermes.execution.service.InstanceJobService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 /**
@@ -114,6 +114,6 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
 
     private static Map<String, Map<String, Map<String, Long>>> getJobTaskConnectionMap(Job job) {
         return MapUtils.getMap(
-            job.getMetadata(), MetadataConstants.CONNECTIONS, new ParameterizedTypeReference<>() {}, Map.of());
+            job.getMetadata(), MetadataConstants.CONNECTIONS, new TypeReference<>() {}, Map.of());
     }
 }

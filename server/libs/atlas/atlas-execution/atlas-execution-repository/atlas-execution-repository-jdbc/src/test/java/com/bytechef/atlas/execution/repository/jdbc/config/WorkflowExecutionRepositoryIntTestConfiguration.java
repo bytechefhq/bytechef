@@ -27,9 +27,15 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -49,16 +55,39 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
     })
 @EnableAutoConfiguration
 @Configuration
+@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class WorkflowExecutionRepositoryIntTestConfiguration {
 
     @Bean
-    ObjectMapper objectMapper() {
-        return new ObjectMapper();
+    JsonUtils jsonUtils() {
+        return new JsonUtils() {
+            {
+                objectMapper = objectMapper();
+            }
+        };
     }
 
     @Bean
-    TaskFileStorage workflowFileStorage(ObjectMapper objectMapper) {
-        return new TaskFileStorageImpl(new Base64FileStorageService(), objectMapper);
+    MapUtils mapUtils() {
+        return new MapUtils() {
+            {
+                objectMapper = objectMapper();
+            }
+        };
+    }
+
+    @Bean
+    ObjectMapper objectMapper() {
+        return new ObjectMapper()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .registerModule(new JavaTimeModule())
+            .registerModule(new Jdk8Module());
+    }
+
+    @Bean
+    TaskFileStorage workflowFileStorage() {
+        return new TaskFileStorageImpl(new Base64FileStorageService());
     }
 
     @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.execution.repository.jdbc")

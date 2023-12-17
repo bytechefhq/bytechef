@@ -64,7 +64,7 @@ public abstract class AbstractWorkerClient {
 
     private UriBuilder build(UriBuilder uriBuilder, String componentName, String path) {
         ServiceInstance serviceInstance = WorkerDiscoveryUtils.filterServiceInstance(
-            discoveryClient.getInstances(WORKER_APP), componentName, objectMapper);
+            discoveryClient.getInstances(WORKER_APP), componentName);
 
         return build(uriBuilder, serviceInstance, path);
     }

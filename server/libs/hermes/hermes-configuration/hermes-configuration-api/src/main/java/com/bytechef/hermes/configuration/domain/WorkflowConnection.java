@@ -21,11 +21,10 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
@@ -36,9 +35,6 @@ public class WorkflowConnection {
     public static final String COMPONENT_NAME = "componentName";
     public static final String COMPONENT_VERSION = "componentVersion";
     public static final String ID = "id";
-    public static final String KEY = "key";
-
-    private static final String OPERATION_NAME = "operationName";
 
     private final String componentName;
     private final int componentVersion;
@@ -65,7 +61,7 @@ public class WorkflowConnection {
         if (MapUtils.containsKey(workflowTask.getMetadata(), MetadataConstants.CONNECTIONS)) {
             workflowConnections = toList(
                 MapUtils.getMap(
-                    workflowTask.getExtensions(), MetadataConstants.CONNECTIONS, new ParameterizedTypeReference<>() {},
+                    workflowTask.getExtensions(), MetadataConstants.CONNECTIONS, new TypeReference<>() {},
                     Map.of()),
                 operationType.componentName(), operationType.componentVersion(), workflowTask.getName(),
                 connectionRequired);
@@ -83,7 +79,7 @@ public class WorkflowConnection {
         if (MapUtils.containsKey(workflowTrigger.getMetadata(), MetadataConstants.CONNECTIONS)) {
             workflowConnections = toList(
                 MapUtils.getMap(
-                    workflowTrigger.getMetadata(), MetadataConstants.CONNECTIONS, new ParameterizedTypeReference<>() {},
+                    workflowTrigger.getMetadata(), MetadataConstants.CONNECTIONS, new TypeReference<>() {},
                     Map.of()),
                 operationType.componentName(), operationType.componentVersion(), workflowTrigger.getName(),
                 connectionRequired);
@@ -164,18 +160,5 @@ public class WorkflowConnection {
             ", id=" + id +
             ", required=" + required +
             '}';
-    }
-
-    @SuppressWarnings("rawtypes")
-    public static class WorkflowConnectionConverter implements Converter<Map, WorkflowConnection> {
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public WorkflowConnection convert(Map source) {
-            return new WorkflowConnection(
-                MapUtils.getString(source, COMPONENT_NAME), MapUtils.getInteger(source, COMPONENT_VERSION),
-                MapUtils.getString(source, OPERATION_NAME), MapUtils.getString(source, KEY),
-                MapUtils.getLong(source, ID), MapUtils.getBoolean(source, AUTHORIZATION_REQUIRED));
-        }
     }
 }

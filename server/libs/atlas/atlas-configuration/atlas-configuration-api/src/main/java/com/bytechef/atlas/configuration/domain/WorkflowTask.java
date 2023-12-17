@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Arik Cohen
@@ -282,15 +281,5 @@ public class WorkflowTask implements Task, Serializable {
             ", extensions=" + extensions +
             ", metadata=" + metadata +
             '}';
-    }
-
-    @SuppressWarnings("rawtypes")
-    public static class WorkflowTaskConverter implements Converter<Map, WorkflowTask> {
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public WorkflowTask convert(Map source) {
-            return new WorkflowTask(source);
-        }
     }
 }

@@ -65,7 +65,7 @@ public class ComponentJobTestExecutor {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, jobService, objectMapper, taskExecutionService,
             MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
-            new TaskFileStorageImpl(new Base64FileStorageService(), new ObjectMapper()), workflowService);
+            new TaskFileStorageImpl(new Base64FileStorageService()), workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
     }

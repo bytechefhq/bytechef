@@ -22,7 +22,6 @@ import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.job.DynamicWebhookTriggerRefreshJob;
 import com.bytechef.hermes.scheduler.job.PollingTriggerJob;
 import com.bytechef.hermes.scheduler.job.ScheduleTriggerJob;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.text.ParseException;
 import java.time.LocalDateTime;
@@ -48,12 +47,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class TriggerSchedulerImpl implements TriggerScheduler {
 
-    private final ObjectMapper objectMapper;
     private final Scheduler scheduler;
 
     @SuppressFBWarnings("EI")
-    public TriggerSchedulerImpl(ObjectMapper objectMapper, Scheduler scheduler) {
-        this.objectMapper = objectMapper;
+    public TriggerSchedulerImpl(Scheduler scheduler) {
         this.scheduler = scheduler;
     }
 
@@ -95,7 +92,7 @@ public class TriggerSchedulerImpl implements TriggerScheduler {
 
         JobDetail jobDetail = JobBuilder.newJob(ScheduleTriggerJob.class)
             .withIdentity(JobKey.jobKey(workflowExecutionId.toString(), "ScheduleTrigger"))
-            .usingJobData("output", JsonUtils.write(output, objectMapper))
+            .usingJobData("output", JsonUtils.write(output))
             .usingJobData("workflowExecutionId", workflowExecutionId.toString())
             .build();
 

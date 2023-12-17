@@ -107,7 +107,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
         @NonNull String componentName, @NonNull Integer componentVersion) {
 
         List<CompletableFuture<List<ConnectionDefinition>>> completableFutures = CollectionUtils.map(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper),
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),
             serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
                 uriBuilder -> toUri(
                     uriBuilder, serviceInstance,
@@ -127,7 +127,7 @@ public class RemoteConnectionDefinitionServiceClient extends AbstractWorkerClien
     @Override
     public List<ConnectionDefinition> getConnectionDefinitions() {
         List<CompletableFuture<ConnectionDefinition>> completableFutures = CollectionUtils.map(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper),
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),
             serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
                 uriBuilder -> toUri(
                     uriBuilder, serviceInstance, CONNECTION_DEFINITION_SERVICE + "/get-connection-definitions"),

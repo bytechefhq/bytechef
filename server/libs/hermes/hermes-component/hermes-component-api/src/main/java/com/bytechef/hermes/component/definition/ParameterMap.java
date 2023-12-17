@@ -60,6 +60,8 @@ public interface ParameterMap extends Map<String, Object> {
 
     FileEntry getFileEntry(String key);
 
+    List<FileEntry> getFileEntries(String key, List<FileEntry> defaultValue);
+
     Float getFloat(String key);
 
     float getFloat(String key, float defaultValue);

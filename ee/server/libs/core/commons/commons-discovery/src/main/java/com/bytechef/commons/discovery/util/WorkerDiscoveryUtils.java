@@ -11,7 +11,6 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,12 +30,12 @@ import org.springframework.cloud.client.ServiceInstance;
 public class WorkerDiscoveryUtils {
 
     public static ServiceInstance filterServiceInstance(
-        List<ServiceInstance> serviceInstances, String componentName, ObjectMapper objectMapper) {
+        List<ServiceInstance> serviceInstances, String componentName) {
 
         for (ServiceInstance serviceInstance : serviceInstances) {
             Map<String, String> metadataMap = serviceInstance.getMetadata();
 
-            List<String> componentNames = getComponentNames(metadataMap, objectMapper);
+            List<String> componentNames = getComponentNames(metadataMap);
 
             for (String curComponentName : componentNames) {
                 if (curComponentName.equalsIgnoreCase(componentName)) {
@@ -48,10 +47,8 @@ public class WorkerDiscoveryUtils {
         throw new IllegalStateException("None od worker instances contains component %s ".formatted(componentName));
     }
 
-    public static Set<ServiceInstance> filterServiceInstances(
-        List<ServiceInstance> serviceInstances, ObjectMapper objectMapper) {
-
-        Set<String> instanceIds = toUniqueInstanceIds(serviceInstances, objectMapper);
+    public static Set<ServiceInstance> filterServiceInstances(List<ServiceInstance> serviceInstances) {
+        Set<String> instanceIds = toUniqueInstanceIds(serviceInstances);
 
         return instanceIds.stream()
             .map(instanceId -> serviceInstances.stream()
@@ -62,13 +59,12 @@ public class WorkerDiscoveryUtils {
             .collect(Collectors.toSet());
     }
 
-    private static List<String> getComponentNames(Map<String, String> metadataMap, ObjectMapper objectMapper) {
+    private static List<String> getComponentNames(Map<String, String> metadataMap) {
         if (metadataMap.containsKey("components")) {
             String componentsString = metadataMap.get("components");
 
             if (StringUtils.isNotBlank(componentsString)) {
-                List<Map<String, String>> components = JsonUtils.read(
-                    componentsString, new TypeReference<>() {}, objectMapper);
+                List<Map<String, String>> components = JsonUtils.read(componentsString, new TypeReference<>() {});
 
                 return CollectionUtils.map(components, componentMap -> MapUtils.getString(componentMap, "name"));
             }
@@ -77,13 +73,13 @@ public class WorkerDiscoveryUtils {
         return List.of();
     }
 
-    private static Set<String> toUniqueInstanceIds(List<ServiceInstance> serviceInstances, ObjectMapper objectMapper) {
+    private static Set<String> toUniqueInstanceIds(List<ServiceInstance> serviceInstances) {
         Map<String, Set<String>> componentNameInstanceIds = new HashMap<>();
 
         for (ServiceInstance serviceInstance : serviceInstances) {
             Map<String, String> metadataMap = serviceInstance.getMetadata();
 
-            List<String> componentNames = getComponentNames(metadataMap, objectMapper);
+            List<String> componentNames = getComponentNames(metadataMap);
 
             for (String componentName : componentNames) {
                 componentNameInstanceIds.compute(componentName, (key, instanceIds) -> {

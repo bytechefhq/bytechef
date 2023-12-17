@@ -21,7 +21,6 @@ import com.bytechef.commons.util.MimeTypeUtils;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
@@ -36,7 +35,11 @@ public class FileEntry {
     private String name;
     private String url;
 
-    protected FileEntry() {
+    private FileEntry() {
+    }
+
+    public FileEntry(Map<String, ?> source) {
+        this(MapUtils.getRequiredString(source, "name"), MapUtils.getRequiredString(source, "url"));
     }
 
     public FileEntry(String filename, String url) {
@@ -112,17 +115,5 @@ public class FileEntry {
         int lastWindowsPos = fileName.lastIndexOf(WINDOWS_NAME_SEPARATOR);
 
         return Math.max(lastUnixPos, lastWindowsPos);
-    }
-
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
-    public static class FileEntryConverter implements Converter<Map, FileEntry> {
-
-        @Override
-        public FileEntry convert(Map source) {
-            return new FileEntry(
-                MapUtils.getRequiredString(source, "name"), MapUtils.getRequiredString(source, "url"));
-        }
     }
 }

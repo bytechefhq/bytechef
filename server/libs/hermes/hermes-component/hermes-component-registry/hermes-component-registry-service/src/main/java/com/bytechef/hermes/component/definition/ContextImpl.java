@@ -36,8 +36,6 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableValueProp
 import com.bytechef.hermes.component.definition.Property.OutputProperty;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -68,13 +66,13 @@ public class ContextImpl implements Context {
     @SuppressFBWarnings("EI")
     public ContextImpl(
         String componentName, String operationName, ComponentConnection connection,
-        HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper, XmlMapper xmlMapper) {
+        HttpClientExecutor httpClientExecutor) {
 
         this.http = new HttpImpl(componentName, connection, this, httpClientExecutor);
-        this.json = new JsonImpl(objectMapper);
+        this.json = new JsonImpl();
         this.logger = new LoggerImpl(componentName, operationName);
         this.outputSchema = new OutputSchemaImpl();
-        this.xml = new XmlImpl(xmlMapper);
+        this.xml = new XmlImpl();
     }
 
     @Override
@@ -244,151 +242,151 @@ public class ContextImpl implements Context {
         }
     }
 
-    private record JsonImpl(ObjectMapper objectMapper) implements Json {
+    private record JsonImpl() implements Json {
 
         @Override
         public Object read(InputStream inputStream) {
-            return JsonUtils.read(inputStream, objectMapper);
+            return JsonUtils.read(inputStream);
         }
 
         @Override
         public <T> T read(InputStream inputStream, Class<T> valueType) {
-            return JsonUtils.read(inputStream, valueType, objectMapper);
+            return JsonUtils.read(inputStream, valueType);
         }
 
         @Override
         public <T> T read(InputStream inputStream, TypeReference<T> typeReference) {
-            return JsonUtils.read(inputStream, typeReference.getType(), objectMapper);
+            return JsonUtils.read(inputStream, typeReference.getType());
         }
 
         @Override
         public Object read(InputStream inputStream, String path) {
-            return JsonUtils.read(inputStream, path, objectMapper);
+            return JsonUtils.read(inputStream, path);
         }
 
         @Override
         public <T> T read(InputStream inputStream, String path, Class<T> valueType) {
-            return JsonUtils.read(inputStream, path, valueType, objectMapper);
+            return JsonUtils.read(inputStream, path, valueType);
         }
 
         @Override
         public <T> T read(InputStream inputStream, String path, TypeReference<T> typeReference) {
-            return JsonUtils.read(inputStream, path, typeReference.getType(), objectMapper);
+            return JsonUtils.read(inputStream, path, typeReference.getType());
         }
 
         @Override
         public Object read(String json) {
-            return JsonUtils.read(json, objectMapper);
+            return JsonUtils.read(json);
         }
 
         @Override
         public <T> T read(String json, Class<T> valueType) {
-            return JsonUtils.read(json, valueType, objectMapper);
+            return JsonUtils.read(json, valueType);
         }
 
         @Override
         public <T> T read(String json, TypeReference<T> typeReference) {
-            return JsonUtils.read(json, typeReference.getType(), objectMapper);
+            return JsonUtils.read(json, typeReference.getType());
         }
 
         @Override
         public Object read(String json, String path) {
-            return JsonUtils.read(json, path, objectMapper);
+            return JsonUtils.read(json, path);
         }
 
         @Override
         public <T> T read(String json, String path, Class<T> valueType) {
-            return JsonUtils.read(json, path, valueType, objectMapper);
+            return JsonUtils.read(json, path, valueType);
         }
 
         @Override
         public <T> T read(String json, String path, TypeReference<T> typeReference) {
-            return JsonUtils.read(json, path, typeReference.getType(), objectMapper);
+            return JsonUtils.read(json, path, typeReference.getType());
         }
 
         @Override
         public List<?> readList(InputStream inputStream) {
-            return JsonUtils.readList(inputStream, objectMapper);
+            return JsonUtils.readList(inputStream);
         }
 
         @Override
         public <T> List<T> readList(InputStream inputStream, Class<T> elementType) {
-            return JsonUtils.readList(inputStream, elementType, objectMapper);
+            return JsonUtils.readList(inputStream, elementType);
         }
 
         @Override
         public List<?> readList(InputStream inputStream, String path) {
-            return JsonUtils.readList(inputStream, path, objectMapper);
+            return JsonUtils.readList(inputStream, path);
         }
 
         @Override
         public <T> List<T> readList(InputStream inputStream, String path, Class<T> elementType) {
-            return JsonUtils.readList(inputStream, path, elementType, objectMapper);
+            return JsonUtils.readList(inputStream, path, elementType);
         }
 
         @Override
         public List<?> readList(String json) {
-            return JsonUtils.readList(json, objectMapper);
+            return JsonUtils.readList(json);
         }
 
         @Override
         public <T> List<T> readList(String json, Class<T> elementType) {
-            return JsonUtils.readList(json, elementType, objectMapper);
+            return JsonUtils.readList(json, elementType);
         }
 
         @Override
         public List<?> readList(String json, String path) {
-            return JsonUtils.readList(json, path, objectMapper);
+            return JsonUtils.readList(json, path);
         }
 
         @Override
         public <T> List<T> readList(String json, String path, Class<T> elementType) {
-            return JsonUtils.readList(json, path, elementType, objectMapper);
+            return JsonUtils.readList(json, path, elementType);
         }
 
         @Override
         public <V> Map<String, V> readMap(InputStream inputStream, Class<V> valueType) {
-            return JsonUtils.readMap(inputStream, valueType, objectMapper);
+            return JsonUtils.readMap(inputStream, valueType);
         }
 
         @Override
         public Map<String, ?> readMap(InputStream inputStream, String path) {
-            return JsonUtils.readMap(inputStream, path, objectMapper);
+            return JsonUtils.readMap(inputStream, path);
         }
 
         @Override
         public <V> Map<String, V> readMap(InputStream inputStream, String path, Class<V> valueType) {
-            return JsonUtils.readMap(inputStream, path, valueType, objectMapper);
+            return JsonUtils.readMap(inputStream, path, valueType);
         }
 
         @Override
         public Map<String, ?> readMap(String json) {
-            return JsonUtils.readMap(json, objectMapper);
+            return JsonUtils.readMap(json);
         }
 
         @Override
         public <V> Map<String, V> readMap(String json, Class<V> valueType) {
-            return JsonUtils.readMap(json, valueType, objectMapper);
+            return JsonUtils.readMap(json, valueType);
         }
 
         @Override
         public Map<String, ?> readMap(String json, String path) {
-            return JsonUtils.readMap(json, path, objectMapper);
+            return JsonUtils.readMap(json, path);
         }
 
         @Override
         public <V> Map<String, V> readMap(String json, String path, Class<V> valueType) {
-            return JsonUtils.readMap(json, path, valueType, objectMapper);
+            return JsonUtils.readMap(json, path, valueType);
         }
 
         @Override
         public Stream<Map<String, ?>> stream(InputStream inputStream) {
-            return JsonUtils.stream(inputStream, objectMapper);
+            return JsonUtils.stream(inputStream);
         }
 
         @Override
         public String write(Object object) {
-            return JsonUtils.write(object, objectMapper);
+            return JsonUtils.write(object);
         }
     }
 
@@ -569,66 +567,66 @@ public class ContextImpl implements Context {
         }
     }
 
-    private record XmlImpl(XmlMapper xmlMapper) implements Xml {
+    private record XmlImpl() implements Xml {
 
         @Override
         public Map<String, ?> read(InputStream inputStream) {
-            return XmlUtils.read(inputStream, xmlMapper);
+            return XmlUtils.read(inputStream);
         }
 
         @Override
         public <T> Map<String, T> read(InputStream inputStream, Class<T> valueType) {
-            return XmlUtils.read(inputStream, valueType, xmlMapper);
+            return XmlUtils.read(inputStream, valueType);
         }
 
         @Override
         public <T> Map<String, T> read(InputStream inputStream, TypeReference<T> valueTypeReference) {
-            return XmlUtils.read(inputStream, valueTypeReference.getType(), xmlMapper);
+            return XmlUtils.read(inputStream, valueTypeReference.getType());
         }
 
         @Override
         public Map<String, ?> read(String xml) {
-            return XmlUtils.read(xml, xmlMapper);
+            return XmlUtils.read(xml);
         }
 
         @Override
         public <T> Map<String, T> read(String xml, Class<T> valueType) {
-            return XmlUtils.read(xml, valueType, xmlMapper);
+            return XmlUtils.read(xml, valueType);
         }
 
         @Override
         public <T> Map<String, T> read(String xml, TypeReference<T> valueTypeReference) {
-            return XmlUtils.read(xml, valueTypeReference.getType(), xmlMapper);
+            return XmlUtils.read(xml, valueTypeReference.getType());
         }
 
         @Override
         public List<?> readList(InputStream inputStream, String path) {
-            return XmlUtils.readList(inputStream, path, xmlMapper);
+            return XmlUtils.readList(inputStream, path);
         }
 
         @Override
         public <T> List<T> readList(InputStream inputStream, String path, Class<T> elementType) {
-            return XmlUtils.readList(inputStream, path, elementType, xmlMapper);
+            return XmlUtils.readList(inputStream, path, elementType);
         }
 
         @Override
         public <T> List<T> readList(InputStream inputStream, String path, TypeReference<T> elementTypeReference) {
-            return XmlUtils.readList(inputStream, path, elementTypeReference.getType(), xmlMapper);
+            return XmlUtils.readList(inputStream, path, elementTypeReference.getType());
         }
 
         @Override
         public Stream<Map<String, ?>> stream(InputStream inputStream) {
-            return XmlUtils.stream(inputStream, xmlMapper);
+            return XmlUtils.stream(inputStream);
         }
 
         @Override
         public String write(Object object) {
-            return XmlUtils.write(object, xmlMapper);
+            return XmlUtils.write(object);
         }
 
         @Override
         public String write(Object object, String rootName) {
-            return XmlUtils.write(object, rootName, xmlMapper);
+            return XmlUtils.write(object, rootName);
         }
     }
 }

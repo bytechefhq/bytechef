@@ -32,7 +32,6 @@ import com.bytechef.hermes.component.registry.service.ConnectionDefinitionServic
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.Methanol;
@@ -40,6 +39,7 @@ import com.github.mizosoft.methanol.MoreBodyPublishers;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.net.ProxySelector;
 import java.net.Socket;
@@ -72,17 +72,15 @@ public class HttpClientExecutor {
     private final ConnectionDefinitionService connectionDefinitionService;
     private final FileStorageService fileStorageService;
     private final ObjectMapper objectMapper;
-    private final XmlMapper xmlMapper;
 
     @SuppressFBWarnings("EI")
     public HttpClientExecutor(
         ConnectionDefinitionService connectionDefinitionService, FileStorageService fileStorageService,
-        ObjectMapper objectMapper, XmlMapper xmlMapper) {
+        ObjectMapper objectMapper) {
 
         this.connectionDefinitionService = connectionDefinitionService;
         this.fileStorageService = fileStorageService;
         this.objectMapper = objectMapper;
-        this.xmlMapper = xmlMapper;
     }
 
     public Response execute(
@@ -230,12 +228,12 @@ public class HttpClientExecutor {
                 body = storeBinaryResponseBody(configuration, headers, (InputStream) httpResponseBody);
             } else if (responseType == Http.ResponseType.JSON) {
                 body = isEmpty(httpResponseBody) ? null
-                    : com.bytechef.commons.util.JsonUtils.read(httpResponseBody.toString(), objectMapper);
+                    : com.bytechef.commons.util.JsonUtils.read(httpResponseBody.toString());
             } else if (responseType == Http.ResponseType.TEXT) {
                 body = isEmpty(httpResponseBody) ? null : httpResponseBody.toString();
             } else {
                 body = isEmpty(httpResponseBody) ? null
-                    : com.bytechef.commons.util.XmlUtils.read(httpResponseBody.toString(), xmlMapper);
+                    : com.bytechef.commons.util.XmlUtils.read(httpResponseBody.toString());
             }
 
             response = new ResponseImpl(headers, body, httpResponse.statusCode());
@@ -378,13 +376,13 @@ public class HttpClientExecutor {
     private BodyPublisher getJsonBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
             BodyPublishers
-                .ofString(com.bytechef.commons.util.JsonUtils.write(body.getContent(), objectMapper)),
+                .ofString(com.bytechef.commons.util.JsonUtils.write(body.getContent())),
             MediaType.APPLICATION_JSON);
     }
 
     private BodyPublisher getXmlBodyPublisher(Body body) {
         return MoreBodyPublishers.ofMediaType(
-            BodyPublishers.ofString(com.bytechef.commons.util.XmlUtils.write(body.getContent(), xmlMapper)),
+            BodyPublishers.ofString(com.bytechef.commons.util.XmlUtils.write(body.getContent())),
             MediaType.APPLICATION_XML);
     }
 
@@ -406,8 +404,24 @@ public class HttpClientExecutor {
         }
 
         @Override
-        public <T> T getBody() {
+        public Object getBody() {
             return objectMapper.convertValue(body, new TypeReference<>() {});
+        }
+
+        @Override
+        public <T> T getBody(Class<T> valueType) {
+            return objectMapper.convertValue(body, valueType);
+        }
+
+        @Override
+        public <T> T getBody(Context.TypeReference<T> valueTypeRef) {
+            return objectMapper.convertValue(body, new TypeReference<>() {
+
+                @Override
+                public Type getType() {
+                    return valueTypeRef.getType();
+                }
+            });
         }
 
         @Override

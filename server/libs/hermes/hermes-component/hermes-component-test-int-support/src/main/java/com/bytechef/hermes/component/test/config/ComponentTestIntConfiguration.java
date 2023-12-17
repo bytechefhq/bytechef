@@ -37,7 +37,9 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.task.factory.TaskHandlerMapFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
@@ -52,13 +54,14 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
@@ -75,6 +78,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
         DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class
     })
 @Configuration
+@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class ComponentTestIntConfiguration {
 
     @MockBean(name = "connectionService")
@@ -83,110 +87,126 @@ public class ComponentTestIntConfiguration {
     @MockBean(name = "dataStorageService")
     private DataStorageService dataStorageService;
 
+    private final JsonComponentModule jsonComponentModule;
+
     @MockBean
     private MessageBroker messageBroker;
+
+    @SuppressFBWarnings("EI")
+    public ComponentTestIntConfiguration(JsonComponentModule jsonComponentModule) {
+        this.jsonComponentModule = jsonComponentModule;
+    }
+
+    @Bean
+    ClassPathResourceWorkflowRepository classPathResourceWorkflowRepository(
+        ResourcePatternResolver resourcePatternResolver) {
+
+        return new ClassPathResourceWorkflowRepository(
+            resourcePatternResolver, new ResourceWorkflowRepositoryProperties(
+                Map.of(0, "workflows/**/*.{json|yml|yaml}"), "classpath"));
+    }
+
+    @Bean
+    ComponentJobTestExecutor componentWorkflowTestSupport(
+        ContextService contextService, JobService jobService, ObjectMapper objectMapper,
+        TaskExecutionService taskExecutionService,
+        Map<String, TaskHandler<?>> taskHandlerMap, TaskHandlerMapFactory taskHandlerMapFactory,
+        WorkflowService workflowService) {
+
+        return new ComponentJobTestExecutor(
+            contextService, jobService, objectMapper, taskExecutionService,
+            MapUtils.concat(taskHandlerMap, taskHandlerMapFactory.getTaskHandlerMap()), workflowService);
+    }
+
+    @Bean
+    ContextService contextService() {
+        return new ContextServiceImpl(new InMemoryContextRepository());
+    }
+
+    @Bean
+    CounterService counterService() {
+        return new CounterServiceImpl(new InMemoryCounterRepository());
+    }
+
+    @Bean
+    EncryptionKey encryptionKey() {
+        return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
 
     @Bean
     FileStorageService fileStorageService() {
         return new Base64FileStorageService();
     }
 
-    @TestConfiguration
-    public static class EncryptionIntTestConfiguration {
-
-        @Bean
-        EncryptionKey encryptionKey() {
-            return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
-        }
+    @Bean
+    JobService jobService(ObjectMapper objectMapper) {
+        return new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository(), objectMapper));
     }
 
-    @TestConfiguration
-    public static class JacksonConfiguration {
-
-        @Bean
-        public ObjectMapper objectMapper() {
-            return new ObjectMapper()
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .registerModule(new JavaTimeModule())
-                .registerModule(new Jdk8Module());
-        }
-
-        @Bean
-        XmlMapper xmlMapper() {
-            return XmlMapper.xmlBuilder()
-                .serializationInclusion(JsonInclude.Include.NON_NULL)
-                .build();
-        }
+    @Bean
+    JsonUtils jsonUtils() {
+        return new JsonUtils() {
+            {
+                objectMapper = objectMapper();
+            }
+        };
     }
 
-    @TestConfiguration
-    public static class WorkflowConfiguration {
-
-        @Bean
-        ClassPathResourceWorkflowRepository classPathResourceWorkflowRepository(
-            ResourcePatternResolver resourcePatternResolver) {
-
-            return new ClassPathResourceWorkflowRepository(
-                resourcePatternResolver, new ResourceWorkflowRepositoryProperties(
-                    Map.of(0, "workflows/**/*.{json|yml|yaml}"), "classpath"));
-        }
-
-        @Bean
-        WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
-            return new WorkflowServiceImpl(
-                new ConcurrentMapCacheManager(), Collections.emptyList(), workflowRepositories);
-        }
+    @Bean
+    MapUtils mapUtils() {
+        return new MapUtils() {
+            {
+                objectMapper = objectMapper();
+            }
+        };
     }
 
-    @TestConfiguration
-    public static class WorkflowExecutionConfiguration {
-
-        @Bean
-        ComponentJobTestExecutor componentWorkflowTestSupport(
-            ContextService contextService, JobService jobService, ObjectMapper objectMapper,
-            TaskExecutionService taskExecutionService,
-            Map<String, TaskHandler<?>> taskHandlerMap, TaskHandlerMapFactory taskHandlerMapFactory,
-            WorkflowService workflowService) {
-
-            return new ComponentJobTestExecutor(
-                contextService, jobService, objectMapper, taskExecutionService,
-                MapUtils.concat(taskHandlerMap, taskHandlerMapFactory.getTaskHandlerMap()), workflowService);
-        }
-
-        @Bean
-        ContextService contextService() {
-            return new ContextServiceImpl(new InMemoryContextRepository());
-        }
-
-        @Bean
-        CounterService counterService() {
-            return new CounterServiceImpl(new InMemoryCounterRepository());
-        }
-
-        @Bean
-        JobService jobService(ObjectMapper objectMapper) {
-            return new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository(), objectMapper));
-        }
-
-        @Bean
-        TaskExecutionService taskExecutionService() {
-            return new TaskExecutionServiceImpl(taskExecutionRepository());
-        }
-
-        @Bean
-        InMemoryTaskExecutionRepository taskExecutionRepository() {
-            return new InMemoryTaskExecutionRepository();
-        }
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .registerModule(new JavaTimeModule())
+            .registerModule(new Jdk8Module())
+            .registerModule(jsonComponentModule);
     }
 
-    @TestConfiguration
-    public static class WorkflowFileStorageConfiguration {
+    @Bean
+    TaskExecutionService taskExecutionService() {
+        return new TaskExecutionServiceImpl(taskExecutionRepository());
+    }
 
-        @Bean
-        TaskFileStorage workflowFileStorageFacade(ObjectMapper objectMapper) {
-            return new TaskFileStorageImpl(new Base64FileStorageService(), objectMapper);
-        }
+    @Bean
+    InMemoryTaskExecutionRepository taskExecutionRepository() {
+        return new InMemoryTaskExecutionRepository();
+    }
+
+    @Bean
+    XmlMapper xmlMapper() {
+        return XmlMapper.xmlBuilder()
+            .serializationInclusion(JsonInclude.Include.NON_NULL)
+            .build();
+    }
+
+    @Bean
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    XmlUtils xmlUtils() {
+        return new XmlUtils() {
+            {
+                xmlMapper = xmlMapper();
+            }
+        };
+    }
+
+    @Bean
+    TaskFileStorage workflowFileStorageFacade() {
+        return new TaskFileStorageImpl(new Base64FileStorageService());
+    }
+
+    @Bean
+    WorkflowService workflowService(List<WorkflowRepository> workflowRepositories) {
+        return new WorkflowServiceImpl(
+            new ConcurrentMapCacheManager(), Collections.emptyList(), workflowRepositories);
     }
 }

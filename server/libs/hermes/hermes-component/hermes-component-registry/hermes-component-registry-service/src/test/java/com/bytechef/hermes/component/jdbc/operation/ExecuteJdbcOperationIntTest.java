@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.component.jdbc.operation;
 
+import com.bytechef.hermes.component.config.JacksonConfiguration;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
@@ -37,7 +38,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = JdbcOperationIntTestConfiguration.class)
-@Import(PostgreSQLContainerConfiguration.class)
+@Import({
+    JacksonConfiguration.class, PostgreSQLContainerConfiguration.class
+})
 public class ExecuteJdbcOperationIntTest {
 
     @Autowired

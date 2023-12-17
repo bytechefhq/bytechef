@@ -17,33 +17,33 @@
 package com.bytechef.atlas.execution.facade;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.execution.config.WorkflowExecutionIntTestConfiguration;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
  * Ivica Cardic
  */
 @SpringBootTest(
-    classes = {
-        WorkflowExecutionIntTestConfiguration.class
-    },
     properties = {
         "bytechef.workflow.repository.jdbc.enabled=true"
     })
@@ -60,8 +60,14 @@ public class JobFacadeIntTest {
             () -> jobFacade.createAsyncJob(new JobParameters("aGVsbG8x", Collections.emptyMap())));
     }
 
-    @TestConfiguration
-    public static class JobFactoryIntTestConfiguration {
+    @ComponentScan(
+        basePackages = {
+            "com.bytechef.atlas.execution.facade", "com.bytechef.atlas.execution.repository.jdbc",
+            "com.bytechef.liquibase.config"
+        })
+    @EnableAutoConfiguration
+    @Configuration
+    public static class WorkflowExecutionIntTestConfiguration {
 
         @MockBean
         private ContextService contextService;
@@ -86,6 +92,10 @@ public class JobFacadeIntTest {
         @Bean
         ObjectMapper objectMapper() {
             return new ObjectMapper();
+        }
+
+        @EnableJdbcRepositories(basePackages = "com.bytechef.atlas.execution.repository.jdbc")
+        public static class WorkflowIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
         }
     }
 }

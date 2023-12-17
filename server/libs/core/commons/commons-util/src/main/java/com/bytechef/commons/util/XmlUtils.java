@@ -19,6 +19,7 @@ package com.bytechef.commons.util;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -37,6 +38,8 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -44,13 +47,17 @@ import org.w3c.dom.NodeList;
 /**
  * @author Ivica Cardic
  */
-public final class XmlUtils {
+@Component
+public class XmlUtils {
 
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final XPathFactory X_PATH_FACTORY = XPathFactory.newInstance();
     private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
 
-    public static Map<String, ?> read(InputStream inputStream, XmlMapper xmlMapper) {
+    @SuppressFBWarnings("MS_PKGPROTECT")
+    protected static XmlMapper xmlMapper;
+
+    public static Map<String, ?> read(InputStream inputStream) {
         TypeFactory typeFactory = xmlMapper.getTypeFactory();
 
         try {
@@ -61,7 +68,7 @@ public final class XmlUtils {
         }
     }
 
-    public static <T> Map<String, T> read(InputStream inputStream, Class<T> valueType, XmlMapper xmlMapper) {
+    public static <T> Map<String, T> read(InputStream inputStream, Class<T> valueType) {
         TypeFactory typeFactory = xmlMapper.getTypeFactory();
 
         try {
@@ -71,7 +78,7 @@ public final class XmlUtils {
         }
     }
 
-    public static <T> Map<String, T> read(InputStream inputStream, Type type, XmlMapper xmlMapper) {
+    public static <T> Map<String, T> read(InputStream inputStream, Type type) {
         TypeFactory typeFactory = xmlMapper.getTypeFactory();
 
         try {
@@ -82,7 +89,7 @@ public final class XmlUtils {
     }
 
     public static <T> Map<String, T> read(
-        InputStream inputStream, TypeReference<T> typeReference, XmlMapper xmlMapper) {
+        InputStream inputStream, TypeReference<T> typeReference) {
 
         TypeFactory typeFactory = xmlMapper.getTypeFactory();
 
@@ -96,7 +103,7 @@ public final class XmlUtils {
         }
     }
 
-    public static Map<String, ?> read(String xml, XmlMapper xmlMapper) {
+    public static Map<String, ?> read(String xml) {
         TypeFactory typeFactory = xmlMapper.getTypeFactory();
 
         try {
@@ -106,7 +113,7 @@ public final class XmlUtils {
         }
     }
 
-    public static <T> Map<String, T> read(String xml, Class<T> valueType, XmlMapper xmlMapper) {
+    public static <T> Map<String, T> read(String xml, Class<T> valueType) {
         TypeFactory typeFactory = xmlMapper.getTypeFactory();
 
         try {
@@ -116,7 +123,7 @@ public final class XmlUtils {
         }
     }
 
-    public static <T> Map<String, T> read(String xml, Type type, XmlMapper xmlMapper) {
+    public static <T> Map<String, T> read(String xml, Type type) {
         TypeFactory typeFactory = xmlMapper.getTypeFactory();
 
         try {
@@ -126,7 +133,7 @@ public final class XmlUtils {
         }
     }
 
-    public static <T> Map<String, T> read(String xml, TypeReference<T> typeReference, XmlMapper xmlMapper) {
+    public static <T> Map<String, T> read(String xml, TypeReference<T> typeReference) {
         TypeFactory typeFactory = xmlMapper.getTypeFactory();
 
         try {
@@ -139,12 +146,11 @@ public final class XmlUtils {
         }
     }
 
-    public static List<?> readList(InputStream inputStream, String path, XmlMapper xmlMapper) {
-        return readList(inputStream, path, Object.class, xmlMapper);
+    public static List<?> readList(InputStream inputStream, String path) {
+        return readList(inputStream, path, Object.class);
     }
 
-    public static <T> List<T> readList(
-        InputStream inputStream, String path, Class<T> elementType, XmlMapper xmlMapper) {
+    public static <T> List<T> readList(InputStream inputStream, String path, Class<T> elementType) {
 
         TypeFactory typeFactory = xmlMapper.getTypeFactory();
 
@@ -156,7 +162,7 @@ public final class XmlUtils {
         }
     }
 
-    public static <T> List<T> readList(InputStream inputStream, String path, Type type, XmlMapper xmlMapper) {
+    public static <T> List<T> readList(InputStream inputStream, String path, Type type) {
         TypeFactory typeFactory = xmlMapper.getTypeFactory();
 
         try {
@@ -168,7 +174,7 @@ public final class XmlUtils {
         }
     }
 
-    public static Stream<Map<String, ?>> stream(InputStream inputStream, XmlMapper xmlMapper) {
+    public static Stream<Map<String, ?>> stream(InputStream inputStream) {
         Validate.notNull(inputStream, "Non null stream reference expected");
 
         try {
@@ -178,11 +184,11 @@ public final class XmlUtils {
         }
     }
 
-    public static String write(Object object, XmlMapper xmlMapper) {
-        return write(object, "root", xmlMapper);
+    public static String write(Object object) {
+        return write(object, "root");
     }
 
-    public static String write(Object object, String rootName, XmlMapper xmlMapper) {
+    public static String write(Object object, String rootName) {
         try {
             return xmlMapper.writer()
                 .withRootName(rootName)
@@ -190,6 +196,12 @@ public final class XmlUtils {
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    @Autowired
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    void setXmlMapper(XmlMapper xmlMapper) {
+        XmlUtils.xmlMapper = xmlMapper;
     }
 
     private static String parse(InputStream inputStream, String path) {

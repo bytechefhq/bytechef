@@ -17,8 +17,6 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 /**
  * @author Ivica Cardic
@@ -26,9 +24,9 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     public TriggerContextImpl(
-        String componentName, String triggerName, ComponentConnection connection, HttpClientExecutor httpClientExecutor,
-        ObjectMapper objectMapper, XmlMapper xmlMapper) {
+        String componentName, String triggerName, ComponentConnection connection,
+        HttpClientExecutor httpClientExecutor) {
 
-        super(componentName, triggerName, connection, httpClientExecutor, objectMapper, xmlMapper);
+        super(componentName, triggerName, connection, httpClientExecutor);
     }
 }

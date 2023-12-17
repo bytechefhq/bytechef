@@ -16,20 +16,20 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
-import java.util.Map;
-import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
 public class ContextFileEntryImpl implements ActionContext.FileEntry {
 
-    private final String extension;
-    private final String mimeType;
-    private final String name;
-    private final String url;
+    private String extension;
+    private String mimeType;
+    private String name;
+    private String url;
+
+    private ContextFileEntryImpl() {
+    }
 
     public ContextFileEntryImpl(FileEntry fileEntry) {
         this(fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
@@ -75,18 +75,5 @@ public class ContextFileEntryImpl implements ActionContext.FileEntry {
             ", name='" + name + '\'' +
             ", url='" + url + '\'' +
             '}';
-    }
-
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
-    public static class ContextFileEntryConverter implements Converter<Map, ActionContext.FileEntry> {
-
-        @Override
-        public ActionContext.FileEntry convert(Map source) {
-            return new ContextFileEntryImpl(
-                MapUtils.getRequiredString(source, "extension"), MapUtils.getRequiredString(source, "mimeType"),
-                MapUtils.getRequiredString(source, "name"), MapUtils.getRequiredString(source, "url"));
-        }
     }
 }

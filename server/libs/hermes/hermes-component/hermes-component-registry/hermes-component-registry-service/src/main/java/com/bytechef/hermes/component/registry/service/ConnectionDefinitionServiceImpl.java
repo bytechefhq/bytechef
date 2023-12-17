@@ -44,7 +44,6 @@ import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -70,14 +69,10 @@ import org.springframework.stereotype.Service;
 public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
-    private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI2")
-    public ConnectionDefinitionServiceImpl(
-        ComponentDefinitionRegistry componentDefinitionRegistry, ObjectMapper objectMapper) {
-
+    public ConnectionDefinitionServiceImpl(ComponentDefinitionRegistry componentDefinitionRegistry) {
         this.componentDefinitionRegistry = componentDefinitionRegistry;
-        this.objectMapper = objectMapper;
     }
 
     public static ApplyFunction getDefaultApply(AuthorizationType type) {
@@ -139,7 +134,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     public static AuthorizationCallbackFunction getDefaultAuthorizationCallbackFunction(
         ClientIdFunction clientIdFunction, Authorization.ClientSecretFunction clientSecretFunction,
-        Authorization.TokenUrlFunction tokenUrlFunction, ObjectMapper objectMapper) {
+        Authorization.TokenUrlFunction tokenUrlFunction) {
 
         return (connectionParameters, code, redirectUri, codeVerifier, context) -> {
             FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
@@ -178,7 +173,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 throw new ComponentExecutionException("Invalid claim");
             }
 
-            Map<?, ?> body = JsonUtils.read(httpResponse.body(), Map.class, objectMapper);
+            Map<?, ?> body = JsonUtils.read(httpResponse.body(), Map.class);
 
             return new AuthorizationCallbackResponse(
                 (String) body.get(AuthorizationConstants.ACCESS_TOKEN),
@@ -296,8 +291,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 OptionalUtils.orElse(
                     authorization.getTokenUrl(),
                     (connectionParameters, context1) -> getDefaultTokenUrl(
-                        connectionParameters)),
-                objectMapper));
+                        connectionParameters))));
 
         return authorizationCallbackFunction.apply(
             new ParameterMapImpl(connection.parameters()), MapUtils.getString(connection.parameters(), CODE),

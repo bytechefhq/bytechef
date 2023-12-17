@@ -18,7 +18,7 @@ package com.bytechef.hermes.component.definition;
 
 import java.util.Map;
 
-public class HttpParametersImpl extends AbstractParameters implements TriggerDefinition.HttpParameters {
+public class HttpParametersImpl extends AbstractListMap implements TriggerDefinition.HttpParameters {
 
     public HttpParametersImpl(Map<String, String[]> parameters) {
         super(parameters);

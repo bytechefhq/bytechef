@@ -38,7 +38,6 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -60,8 +59,7 @@ public class BranchTaskDispatcherTest {
     private final TaskExecutionService taskExecutionService = mock(TaskExecutionService.class);
     @SuppressWarnings("unchecked")
     private final TaskDispatcher<? super Task> taskDispatcher = mock(TaskDispatcher.class);
-    private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
-        base64FileStorageService, new ObjectMapper());
+    private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(base64FileStorageService);
 
     @Test
     public void test1() {

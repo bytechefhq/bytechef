@@ -21,8 +21,8 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWordContributor;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.FileCopyUtils;
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.LocalDateTimeUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -75,12 +75,12 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
     @Override
     public Workflow readWorkflow(WorkflowResource workflowResource, int type) {
-        return readWorkflow(workflowResource, type, objectMapper);
+        return doReadWorkflow(workflowResource, type);
     }
 
     @Override
     public Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) {
-        return readWorkflowMap(workflowResource, objectMapper);
+        return doReadWorkflowMap(workflowResource);
     }
 
     @Override
@@ -88,11 +88,11 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
         return workflowResource.getWorkflowFormat() == format ? this : null;
     }
 
-    protected Workflow readWorkflow(WorkflowResource workflowResource, int type, ObjectMapper objectMapper) {
+    protected Workflow doReadWorkflow(WorkflowResource workflowResource, int type) {
         try {
             String definition = readDefinition(workflowResource);
 
-            Map<String, Object> workflowMap = parse(definition, objectMapper);
+            Map<String, Object> workflowMap = parse(definition);
 
             return new Workflow(
                 workflowResource.getId(), definition, workflowResource.getWorkflowFormat(),
@@ -103,18 +103,18 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
         }
     }
 
-    protected Map<String, Object> readWorkflowMap(WorkflowResource workflowResource, ObjectMapper objectMapper) {
+    protected Map<String, Object> doReadWorkflowMap(WorkflowResource workflowResource) {
         try {
             String definition = readDefinition(workflowResource);
 
-            return parse(definition, objectMapper);
+            return parse(definition);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Map<String, Object> parse(String workflow, ObjectMapper objectMapper) {
-        Map<String, Object> workflowMap = JsonUtils.read(workflow, new TypeReference<>() {}, objectMapper);
+    private Map<String, Object> parse(String workflow) {
+        Map<String, Object> workflowMap = read(workflow, new TypeReference<>() {});
 
         validate(workflowMap);
 
@@ -138,6 +138,14 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
         workflowMap.put(WorkflowConstants.TASKS, tasks);
 
         return workflowMap;
+    }
+
+    private <T> T read(String json, TypeReference<T> typeReference) {
+        try {
+            return objectMapper.readValue(json, typeReference);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String readDefinition(Resource resource) throws IOException {

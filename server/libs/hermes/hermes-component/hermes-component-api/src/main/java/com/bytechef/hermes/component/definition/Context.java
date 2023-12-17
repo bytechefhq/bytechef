@@ -643,7 +643,11 @@ public interface Context {
 
             Map<String, List<String>> getHeaders();
 
-            <T> T getBody();
+            Object getBody();
+
+            <T> T getBody(Class<T> valueType);
+
+            <T> T getBody(TypeReference<T> valueTypeRef);
 
             int getStatusCode();
         }
@@ -904,36 +908,109 @@ public interface Context {
         String write(Object object);
     }
 
+    /**
+     *
+     */
     interface Logger {
 
+        /**
+         *
+         * @param message
+         */
         void debug(String message);
 
+        /**
+         *
+         * @param format
+         * @param args
+         */
         void debug(String format, Object... args);
 
+        /**
+         *
+         * @param message
+         * @param exception
+         */
         void debug(String message, Exception exception);
 
+        /**
+         *
+         * @param message
+         */
         void error(String message);
 
+        /**
+         *
+         * @param format
+         * @param args
+         */
         void error(String format, Object... args);
 
+        /**
+         *
+         * @param message
+         * @param exception
+         */
         void error(String message, Exception exception);
 
+        /**
+         *
+         * @param message
+         */
         void info(String message);
 
+        /**
+         *
+         * @param format
+         * @param args
+         */
         void info(String format, Object... args);
 
+        /**
+         *
+         * @param message
+         * @param exception
+         */
         void info(String message, Exception exception);
 
+        /**
+         *
+         * @param message
+         */
         void warn(String message);
 
+        /**
+         *
+         * @param format
+         * @param args
+         */
         void warn(String format, Object... args);
 
+        /**
+         *
+         * @param message
+         * @param exception
+         */
         void warn(String message, Exception exception);
 
+        /**
+         *
+         * @param message
+         */
         void trace(String message);
 
+        /**
+         *
+         * @param format
+         * @param args
+         */
         void trace(String format, Object... args);
 
+        /**
+         *
+         * @param message
+         * @param exception
+         */
         void trace(String message, Exception exception);
     }
 

@@ -22,7 +22,6 @@ import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.file.storage.TriggerFileStorage;
 import com.bytechef.hermes.file.storage.TriggerFileStorageImpl;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +48,6 @@ public class TriggerFileStorageConfiguration {
 
     @Bean
     TriggerFileStorage workflowTriggerFileStorageFacade(
-        ObjectMapper objectMapper,
         @Value("${bytechef.workflow.output-storage.provider}") String workflowOutputStorageProvider) {
 
         if (logger.isInfoEnabled()) {
@@ -57,7 +55,7 @@ public class TriggerFileStorageConfiguration {
                 "Workflow trigger output storage provider type enabled: %s".formatted(workflowOutputStorageProvider));
         }
 
-        return new TriggerFileStorageImpl(getFileStorageService(workflowOutputStorageProvider), objectMapper);
+        return new TriggerFileStorageImpl(getFileStorageService(workflowOutputStorageProvider));
     }
 
     private FileStorageService getFileStorageService(String workflowOutputStorageProvider) {

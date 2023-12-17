@@ -365,7 +365,7 @@ public interface TriggerDefinition {
          *
          * @return
          */
-        Map<String, List<String>> getParameters();
+        Map<String, List<String>> toMap();
     }
 
     /**
@@ -398,7 +398,7 @@ public interface TriggerDefinition {
          *
          * @return
          */
-        Map<String, List<String>> getParameters();
+        Map<String, List<String>> toMap();
     }
 
     /**
