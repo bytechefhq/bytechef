@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

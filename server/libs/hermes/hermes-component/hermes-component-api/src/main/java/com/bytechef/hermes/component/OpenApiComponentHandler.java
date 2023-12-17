@@ -20,10 +20,10 @@ import com.bytechef.hermes.component.definition.ActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.Context.Http.Response;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty;
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableInputProperty;
+import com.bytechef.hermes.component.definition.Property.InputProperty;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,12 +58,12 @@ public interface OpenApiComponentHandler extends ComponentHandler {
         return Arrays.stream(actionDefinitions)
             .map(this::modifyAction)
             .map(actionDefinition -> {
-                ModifiableInputProperty[] properties = actionDefinition.getProperties()
+                InputProperty[] properties = actionDefinition.getProperties()
                     .orElse(List.of())
                     .stream()
-                    .map(property -> (ModifiableInputProperty) modifyProperty(
+                    .map(property -> (InputProperty) modifyProperty(
                         actionDefinition, (ModifiableProperty<?>) property))
-                    .toArray(ModifiableInputProperty[]::new);
+                    .toArray(InputProperty[]::new);
 
                 return actionDefinition.properties(properties);
             })

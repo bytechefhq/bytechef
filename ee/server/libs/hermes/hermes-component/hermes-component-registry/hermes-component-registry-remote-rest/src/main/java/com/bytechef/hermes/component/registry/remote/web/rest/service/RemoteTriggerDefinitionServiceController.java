@@ -8,7 +8,7 @@
 package com.bytechef.hermes.component.registry.remote.web.rest.service;
 
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
-import com.bytechef.hermes.component.registry.dto.WebhookTriggerFlags;
+import com.bytechef.hermes.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.List;

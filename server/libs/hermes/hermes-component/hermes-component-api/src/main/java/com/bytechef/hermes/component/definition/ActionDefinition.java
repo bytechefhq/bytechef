@@ -18,12 +18,9 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Help;
-import com.bytechef.hermes.definition.Property.InputProperty;
-import com.bytechef.hermes.definition.Property.OutputProperty;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * @author Ivica Cardic
@@ -109,7 +106,7 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<OutputProperty<?>> getOutputSchema();
+    Optional<Property.OutputProperty<?>> getOutputSchema();
 
     /**
      *
@@ -121,7 +118,7 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<List<? extends InputProperty>> getProperties();
+    Optional<List<? extends Property.InputProperty>> getProperties();
 
     /**
      *
@@ -158,131 +155,4 @@ public interface ActionDefinition {
             throws ComponentExecutionException;
     }
 
-    /**
-     *
-     */
-    interface ActionContext extends Context {
-
-        /**
-         *
-         * @param dataFunction
-         * @return
-         * @param <R>
-         */
-        <R> R data(ContextFunction<Data, R> dataFunction);
-
-        /**
-         *
-         * @param eventConsumer
-         */
-        void event(Consumer<Event> eventConsumer);
-
-        /**
-         *
-         * @param fileFunction
-         * @return
-         * @param <R>
-         */
-        <R> R file(ContextFunction<File, R> fileFunction);
-
-        interface Event {
-            /**
-             *
-             * @param progress
-             */
-            void publishActionProgressEvent(int progress);
-        }
-
-        /**
-         *
-         */
-        interface Data {
-
-            enum Scope {
-                ACCOUNT(4, "Account"),
-                CURRENT_EXECUTION(1, "Current Execution"),
-                WORKFLOW(2, "Workflow"),
-                INSTANCE(3, "Instance");
-
-                private final int id;
-                private final String label;
-
-                Scope(int id, String label) {
-                    this.id = id;
-                    this.label = label;
-                }
-
-                public static Scope valueOf(int id) {
-                    return switch (id) {
-                        case 1 -> Scope.CURRENT_EXECUTION;
-                        case 2 -> Scope.WORKFLOW;
-                        case 3 -> Scope.INSTANCE;
-                        case 4 -> Scope.ACCOUNT;
-                        default -> throw new IllegalStateException("Unexpected value: %s".formatted(id));
-                    };
-                }
-
-                public int getId() {
-                    return id;
-                }
-
-                public String getLabel() {
-                    return label;
-                }
-            }
-
-            /**
-             * @param <T>
-             * @param scope
-             * @param key
-             * @return
-             */
-            <T> Optional<T> fetchValue(Scope scope, String key);
-
-            /**
-             * @param <T>
-             * @param scope
-             * @param key
-             * @return
-             */
-            <T> T getValue(Scope scope, String key);
-
-            /**
-             * @param scope
-             * @param key
-             * @param data
-             */
-            void setValue(Scope scope, String key, Object data);
-        }
-
-        /**
-         *
-         */
-        interface FileEntry {
-
-            /**
-             *
-             * @return
-             */
-            String getExtension();
-
-            /**
-             *
-             * @return
-             */
-            String getMimeType();
-
-            /**
-             *
-             * @return
-             */
-            String getName();
-
-            /**
-             *
-             * @return
-             */
-            String getUrl();
-        }
-    }
 }

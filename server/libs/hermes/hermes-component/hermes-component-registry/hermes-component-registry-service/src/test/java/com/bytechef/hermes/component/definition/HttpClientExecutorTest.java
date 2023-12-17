@@ -17,12 +17,11 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.Configuration;
 import com.bytechef.hermes.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
-import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;

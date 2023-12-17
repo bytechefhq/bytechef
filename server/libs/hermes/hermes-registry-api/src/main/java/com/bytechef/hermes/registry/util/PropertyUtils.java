@@ -16,12 +16,8 @@
 
 package com.bytechef.hermes.registry.util;
 
-import com.bytechef.hermes.definition.Property;
-import com.bytechef.hermes.definition.Property.ArrayProperty;
 import com.bytechef.hermes.definition.Property.InputProperty;
-import com.bytechef.hermes.definition.Property.ObjectProperty;
 import com.bytechef.hermes.definition.Property.OutputProperty;
-import com.bytechef.hermes.definition.Property.ValueProperty;
 import java.util.List;
 
 /**
@@ -40,10 +36,6 @@ public class PropertyUtils {
             if (name == null || name.isEmpty()) {
                 throw new IllegalStateException("Defined properties cannot to have empty names");
             }
-
-            if (property instanceof ValueProperty<?> valueProperty) {
-                checkAnyAsInputProperty(List.of(valueProperty));
-            }
         }
     }
 
@@ -56,32 +48,6 @@ public class PropertyUtils {
 
         if (name != null && !name.isEmpty()) {
             throw new IllegalStateException("Defined properties must have empty names");
-        }
-    }
-
-    private static void checkAnyAsInputProperty(List<? extends ValueProperty<?>> properties) {
-        for (Property property : properties) {
-            if (property instanceof ArrayProperty) {
-                List<? extends ValueProperty<?>> items = ((ArrayProperty) property)
-                    .getItems()
-                    .orElse(List.of());
-
-                checkAnyAsInputProperty(items);
-            }
-
-            if (property instanceof ObjectProperty) {
-                List<? extends ValueProperty<?>> objectProperties = ((ObjectProperty) property)
-                    .getProperties()
-                    .orElse(List.of());
-
-                checkAnyAsInputProperty(objectProperties);
-
-                List<? extends ValueProperty<?>> additionalProperties = ((ObjectProperty) property)
-                    .getAdditionalProperties()
-                    .orElse(List.of());
-
-                checkAnyAsInputProperty(additionalProperties);
-            }
         }
     }
 }

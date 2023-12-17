@@ -16,8 +16,8 @@
 
 package com.bytechef.hermes.task.dispatcher.registry.service;
 
-import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
+import com.bytechef.hermes.task.dispatcher.registry.domain.ValueProperty;
 import java.util.List;
 import java.util.Map;
 

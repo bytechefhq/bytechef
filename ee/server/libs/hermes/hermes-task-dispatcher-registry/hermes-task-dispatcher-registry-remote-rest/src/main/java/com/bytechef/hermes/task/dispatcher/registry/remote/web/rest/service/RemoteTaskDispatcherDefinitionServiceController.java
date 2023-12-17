@@ -7,8 +7,8 @@
 
 package com.bytechef.hermes.task.dispatcher.registry.remote.web.rest.service;
 
-import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
+import com.bytechef.hermes.task.dispatcher.registry.domain.ValueProperty;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;

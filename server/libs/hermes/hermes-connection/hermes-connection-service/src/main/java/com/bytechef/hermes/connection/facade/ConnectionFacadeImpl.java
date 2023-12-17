@@ -24,7 +24,7 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallb
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
-import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.bytechef.hermes.component.registry.facade.ConnectionDefinitionFacade;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
 import com.bytechef.hermes.configuration.domain.WorkflowConnection;

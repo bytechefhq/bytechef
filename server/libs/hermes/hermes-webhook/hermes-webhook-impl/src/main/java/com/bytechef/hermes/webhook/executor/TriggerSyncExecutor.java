@@ -95,7 +95,7 @@ public class TriggerSyncExecutor {
             operationType.componentName(), operationType.componentVersion(),
             operationType.componentOperationName(), triggerExecution.getParameters(),
             triggerExecution.getState(),
-            MapUtils.getRequired(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
+            MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
             OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
 
         triggerExecution.setBatch(triggerOutput.batch());

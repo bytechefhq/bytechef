@@ -814,6 +814,7 @@ public class OpenApiComponentTaskHandlerIntTest {
     private TaskExecution getTaskExecution(Map<String, Object> parameters) {
         return TaskExecution.builder()
             .id(1L)
+            .jobId(1L)
             .metadata(
                 connection.getId() == null
                     ? Map.of()

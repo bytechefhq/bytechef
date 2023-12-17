@@ -16,16 +16,15 @@
 
 package com.bytechef.hermes.component.registry.service;
 
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
-import com.bytechef.hermes.component.registry.dto.ComponentConnection;
-import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.registry.domain.PropertiesResponse;
-import com.bytechef.hermes.registry.domain.SampleOutputResponse;
+import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
+import com.bytechef.hermes.component.registry.domain.OptionsResponse;
+import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
+import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
+import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
@@ -39,22 +38,22 @@ public interface ActionDefinitionService {
     PropertiesResponse executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
-        @NonNull Context context);
+        @NonNull ActionContext context);
 
     EditorDescriptionResponse executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
-        @NonNull Context context);
+        @NonNull ActionContext context);
 
     OptionsResponse executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, String searchText, @Nullable ComponentConnection connection,
-        @NonNull Context context);
+        @NonNull ActionContext context);
 
     OutputSchemaResponse executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
-        @NonNull Context context);
+        @NonNull ActionContext context);
 
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
@@ -63,7 +62,8 @@ public interface ActionDefinitionService {
 
     SampleOutputResponse executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> actionParameters, @Nullable ComponentConnection connection, @NonNull Context context);
+        @NonNull Map<String, ?> actionParameters, @Nullable ComponentConnection connection,
+        @NonNull ActionContext context);
 
     ActionDefinition getActionDefinition(
         @NonNull String componentName, int componentVersion, @NonNull String actionName);

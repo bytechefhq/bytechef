@@ -18,7 +18,6 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import java.util.Map;
 import org.springframework.core.convert.converter.Converter;
 

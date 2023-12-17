@@ -22,7 +22,7 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallb
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.registry.domain.ConnectionDefinition;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
-import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.lang.NonNull;

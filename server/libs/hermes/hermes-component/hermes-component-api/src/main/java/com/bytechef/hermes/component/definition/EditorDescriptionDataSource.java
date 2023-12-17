@@ -24,19 +24,53 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public interface EditorDescriptionDataSource {
 
+    /**
+     *
+     * @return
+     */
     EditorDescriptionFunction getEditorDescription();
 
+    /**
+     *
+     */
     interface EditorDescriptionFunction {
+    }
+
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface ActionEditorDescriptionFunction extends EditorDescriptionFunction {
 
         /**
          * @param inputParameters
          * @param context
          * @return
          */
-        EditorDescriptionResponse apply(ParameterMap inputParameters, Context context)
+        EditorDescriptionResponse apply(ParameterMap inputParameters, ActionContext context)
             throws ComponentExecutionException;
     }
 
+    /**
+     *
+     */
+    @FunctionalInterface
+    interface TriggerEditorDescriptionFunction extends EditorDescriptionFunction {
+
+        /**
+         * @param inputParameters
+         * @param context
+         * @return
+         */
+        EditorDescriptionResponse apply(ParameterMap inputParameters, TriggerContext context)
+            throws ComponentExecutionException;
+    }
+
+    /**
+     *
+     * @param description
+     * @param errorMessage
+     */
     @SuppressFBWarnings("EI")
     record EditorDescriptionResponse(String description, String errorMessage) {
 

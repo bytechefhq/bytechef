@@ -9,15 +9,15 @@ package com.bytechef.hermes.component.registry.remote.client.facade;
 
 import com.bytechef.commons.restclient.DefaultRestClient;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
+import com.bytechef.hermes.component.registry.domain.OptionsResponse;
+import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
+import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
-import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.registry.domain.PropertiesResponse;
-import com.bytechef.hermes.registry.domain.SampleOutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
@@ -172,7 +172,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     @Override
     public TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, Object triggerState, @NonNull WebhookRequest webhookRequest,
+        @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         Long connectionId) {
 
         return defaultRestClient.post(

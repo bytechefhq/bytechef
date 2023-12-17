@@ -57,7 +57,7 @@ public class ComponentTaskHandler implements TaskHandler<Object> {
                 MapUtils.getInteger(taskExecution.getMetadata(), MetadataConstants.TYPE, 0),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.INSTANCE_ID),
                 MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),
-                Validate.notNull(taskExecution.getId(), "id"), taskExecution.getParameters(),
+                Validate.notNull(taskExecution.getJobId(), "jobId"), taskExecution.getParameters(),
                 OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null));
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);

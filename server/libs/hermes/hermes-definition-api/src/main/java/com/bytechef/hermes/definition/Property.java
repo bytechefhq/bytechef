@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.definition;
 
-import com.bytechef.hermes.definition.DefinitionDSL.ModifiableProperty.ModifiableDateTimeProperty;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -128,17 +127,6 @@ public interface Property {
     /**
      *
      */
-    interface DynamicPropertiesProperty extends InputProperty, Property {
-
-        /**
-         *
-         */
-        PropertiesDataSource getDynamicPropertiesDataSource();
-    }
-
-    /**
-     *
-     */
     interface ValueProperty<V> extends Property {
 
         /**
@@ -161,7 +149,7 @@ public interface Property {
      *
      */
     interface ArrayProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<Object[]>, ValueProperty<Object[]> {
+        extends InputProperty, OptionsProperty, OutputProperty<List<Object>>, ValueProperty<List<Object>> {
 
         /**
          *
@@ -177,43 +165,42 @@ public interface Property {
     /**
      *
      */
-    interface BooleanProperty
-        extends InputProperty, OutputProperty<Boolean>, OptionsProperty, ValueProperty<Boolean> {
+    interface BooleanProperty extends InputProperty, OptionsProperty, OutputProperty<Boolean>, ValueProperty<Boolean> {
     }
 
     /**
      *
      */
-    interface DateProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<LocalDate>, ValueProperty<LocalDate> {
+    interface DateProperty extends InputProperty, OptionsProperty, OutputProperty<LocalDate>, ValueProperty<LocalDate> {
     }
 
     /**
      *
      */
-    sealed interface DateTimeProperty extends
-        DynamicOptionsProperty, InputProperty, OutputProperty<LocalDateTime>, ValueProperty<LocalDateTime>
-        permits ModifiableDateTimeProperty {
+    interface DateTimeProperty
+        extends InputProperty, OptionsProperty, OutputProperty<LocalDateTime>, ValueProperty<LocalDateTime> {
     }
 
+    /**
+     *
+     */
     interface InputProperty extends Property {
     }
 
     /**
      *
      */
-    interface IntegerProperty extends
-        DynamicOptionsProperty, InputProperty, OutputProperty<Integer>, ValueProperty<Integer> {
+    interface IntegerProperty extends InputProperty, OptionsProperty, OutputProperty<Long>, ValueProperty<Long> {
 
         /**
          *
          */
-        Optional<Integer> getMaxValue();
+        Optional<Long> getMaxValue();
 
         /**
          *
          */
-        Optional<Integer> getMinValue();
+        Optional<Long> getMinValue();
     }
 
     /**
@@ -225,8 +212,7 @@ public interface Property {
     /**
      *
      */
-    interface NumberProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<Double>, ValueProperty<Double> {
+    interface NumberProperty extends InputProperty, OptionsProperty, OutputProperty<Double>, ValueProperty<Double> {
 
         /**
          *
@@ -247,8 +233,8 @@ public interface Property {
     /**
      *
      */
-    interface ObjectProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<Object>, ValueProperty<Object> {
+    interface ObjectProperty extends InputProperty, OptionsProperty, OutputProperty<Map<String, Object>>,
+        ValueProperty<Map<String, Object>> {
 
         /**
          *
@@ -271,14 +257,17 @@ public interface Property {
         Optional<List<? extends ValueProperty<?>>> getProperties();
     }
 
+    /**
+     *
+     * @param <V>
+     */
     interface OutputProperty<V> extends ValueProperty<V> {
     }
 
     /**
      *
      */
-    interface StringProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<String>, ValueProperty<String> {
+    interface StringProperty extends InputProperty, OptionsProperty, OutputProperty<String>, ValueProperty<String> {
 
         /**
          *
@@ -308,8 +297,7 @@ public interface Property {
     /**
      *
      */
-    interface TimeProperty extends
-        DynamicOptionsProperty, InputProperty, OutputProperty<LocalTime>, ValueProperty<LocalTime> {
+    interface TimeProperty extends InputProperty, OptionsProperty, OutputProperty<LocalTime>, ValueProperty<LocalTime> {
     }
 }
 // CHECKSTYLE:ON

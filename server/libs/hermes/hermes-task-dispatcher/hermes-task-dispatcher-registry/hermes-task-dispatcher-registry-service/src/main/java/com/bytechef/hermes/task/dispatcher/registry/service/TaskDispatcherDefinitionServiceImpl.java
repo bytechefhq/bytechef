@@ -17,12 +17,12 @@
 package com.bytechef.hermes.task.dispatcher.registry.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.registry.domain.Property;
-import com.bytechef.hermes.registry.domain.ValueProperty;
 import com.bytechef.hermes.task.dispatcher.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.task.dispatcher.definition.OutputSchemaDataSource.OutputSchemaFunction;
 import com.bytechef.hermes.task.dispatcher.registry.TaskDispatcherDefinitionRegistry;
+import com.bytechef.hermes.task.dispatcher.registry.domain.Property;
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
+import com.bytechef.hermes.task.dispatcher.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;

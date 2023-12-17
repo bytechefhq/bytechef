@@ -17,6 +17,7 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.hermes.component.definition.Property.OutputProperty;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -50,6 +51,10 @@ public interface Context {
      */
     <R> R json(ContextFunction<Json, R> jsonFunction);
 
+    /**
+     *
+     * @param logFunction
+     */
     void logger(ContextConsumer<Logger> logFunction);
 
     /**
@@ -70,14 +75,14 @@ public interface Context {
          * @param fileEntry
          * @return
          */
-        InputStream getStream(ActionDefinition.ActionContext.FileEntry fileEntry);
+        InputStream getStream(ActionContext.FileEntry fileEntry);
 
         /**
          *
          * @param fileEntry
          * @return
          */
-        String readToString(ActionDefinition.ActionContext.FileEntry fileEntry);
+        String readToString(ActionContext.FileEntry fileEntry);
 
         /**
          *
@@ -85,7 +90,7 @@ public interface Context {
          * @param inputStream
          * @return
          */
-        ActionDefinition.ActionContext.FileEntry storeContent(String fileName, InputStream inputStream)
+        ActionContext.FileEntry storeContent(String fileName, InputStream inputStream)
             throws IOException;
 
         /**
@@ -94,7 +99,7 @@ public interface Context {
          * @param data
          * @return
          */
-        ActionDefinition.ActionContext.FileEntry storeContent(String fileName, String data) throws IOException;
+        ActionContext.FileEntry storeContent(String fileName, String data) throws IOException;
     }
 
     @FunctionalInterface
@@ -313,7 +318,7 @@ public interface Context {
              * @param content
              * @return
              */
-            public static Body of(ActionDefinition.ActionContext.FileEntry content) {
+            public static Body of(ActionContext.FileEntry content) {
                 return new Body(content, BodyContentType.BINARY);
             }
 
@@ -323,7 +328,7 @@ public interface Context {
              * @param mimeType
              * @return
              */
-            public static Body of(ActionDefinition.ActionContext.FileEntry content, String mimeType) {
+            public static Body of(ActionContext.FileEntry content, String mimeType) {
                 Objects.requireNonNull(content);
 
                 return new Body(content, BodyContentType.BINARY, mimeType);
@@ -923,6 +928,19 @@ public interface Context {
         void trace(String format, Object... args);
 
         void trace(String message, Exception exception);
+    }
+
+    /**
+     *
+     */
+    interface OutputSchema {
+
+        /**
+         *
+         * @param value
+         * @return
+         */
+        OutputProperty<?> get(Object value);
     }
 
     /**

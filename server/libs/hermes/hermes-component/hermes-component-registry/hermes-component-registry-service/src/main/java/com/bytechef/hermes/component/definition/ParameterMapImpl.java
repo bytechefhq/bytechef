@@ -17,7 +17,7 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Type;
 import java.time.Duration;

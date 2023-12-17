@@ -17,15 +17,15 @@
 package com.bytechef.hermes.component.registry.facade;
 
 import com.bytechef.hermes.component.definition.factory.ContextFactory;
-import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
+import com.bytechef.hermes.component.registry.domain.OptionsResponse;
+import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
+import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
+import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.bytechef.hermes.component.registry.service.ActionDefinitionService;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
-import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.registry.domain.PropertiesResponse;
-import com.bytechef.hermes.registry.domain.SampleOutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.lang.NonNull;
@@ -59,8 +59,9 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeDynamicProperties(
-            componentName, componentVersion, actionName, propertyName, inputParameters,
-            componentConnection, contextFactory.createContext(componentName, componentConnection));
+            componentName, componentVersion, actionName, propertyName, inputParameters, componentConnection,
+            contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, null, componentConnection));
     }
 
     @Override
@@ -72,7 +73,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
         return actionDefinitionService.executeEditorDescription(
             componentName, componentVersion, actionName, inputParameters, componentConnection,
-            contextFactory.createContext(componentName, componentConnection));
+            contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, null, componentConnection));
     }
 
     @Override
@@ -84,7 +86,9 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
         return actionDefinitionService.executeOptions(
             componentName, componentVersion, actionName, propertyName, inputParameters, searchText,
-            componentConnection, contextFactory.createContext(componentName, componentConnection));
+            componentConnection,
+            contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, null, componentConnection));
     }
 
     @Override
@@ -96,13 +100,14 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
         return actionDefinitionService.executeOutputSchema(
             componentName, componentVersion, actionName, inputParameters, componentConnection,
-            contextFactory.createContext(componentName, componentConnection));
+            contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, null, componentConnection));
     }
 
     @Override
     public Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull int type,
-        Long instanceId, @NonNull String workflowId, long taskExecutionId, @NonNull Map<String, ?> inputParameters,
+        Long instanceId, @NonNull String workflowId, long jobId, @NonNull Map<String, ?> inputParameters,
         Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
@@ -110,7 +115,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         return actionDefinitionService.executePerform(
             componentName, componentVersion, actionName, inputParameters, componentConnection,
             contextFactory.createActionContext(
-                componentName, componentVersion, actionName, type, instanceId, workflowId, taskExecutionId,
+                componentName, componentVersion, actionName, type, instanceId, workflowId, jobId,
                 componentConnection));
     }
 
@@ -123,7 +128,8 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
         return actionDefinitionService.executeSampleOutput(
             componentName, componentVersion, actionName, inputParameters, componentConnection,
-            contextFactory.createContext(componentName, componentConnection));
+            contextFactory.createActionContext(
+                componentName, componentVersion, actionName, null, null, null, null, componentConnection));
     }
 
     private ComponentConnection getComponentConnection(Long connectionId) {
