@@ -16,6 +16,9 @@
 
 package com.bytechef.commons.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Array;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -29,36 +32,26 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.ResolvableType;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.util.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Ivica Cardic
  */
-public final class MapUtils {
+@Component
+public class MapUtils {
 
-    private static final DefaultConversionService conversionService = new DefaultConversionService();
+    private static final Logger logger = LoggerFactory.getLogger(MapUtils.class);
 
-    static {
-        @SuppressWarnings("rawtypes")
-        ServiceLoader<Converter> serviceLoader = ServiceLoader.load(Converter.class);
-
-        for (Converter<?, ?> converter : serviceLoader) {
-            conversionService.addConverter(converter);
-        }
-    }
-
-    private MapUtils() {
-    }
+    @SuppressFBWarnings("MS_PKGPROTECT")
+    protected static ObjectMapper objectMapper;
 
     public static <K> Map<K, ?> append(Map<K, ?> map, K key, Map<K, ?> values) {
         Validate.notNull(key, "'key' must not be null");
@@ -90,7 +83,7 @@ public final class MapUtils {
     }
 
     public static boolean isEmpty(Map<String, ?> map) {
-        return CollectionUtils.isEmpty(map);
+        return map == null || map.isEmpty();
     }
 
     public static <K> Object get(Map<K, ?> map, K key) {
@@ -117,6 +110,30 @@ public final class MapUtils {
         }
 
         return value;
+    }
+
+    public static <K, T> T get(Map<K, ?> map, K key, TypeReference<T> elementTypeRef) {
+        Validate.notNull(map, "'map' must not be null");
+
+        Object value = get(map, key);
+
+        if (value == null) {
+            return null;
+        }
+
+        return convert(value, elementTypeRef);
+    }
+
+    public static <K, T> T get(Map<K, ?> map, K key, TypeReference<T> elementTypeRef, T defaultValue) {
+        Validate.notNull(map, "'map' must not be null");
+
+        Object value = get(map, key);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return convert(value, elementTypeRef);
     }
 
     public static <K> Object[] getArray(Map<K, ?> map, K key) {
@@ -331,22 +348,24 @@ public final class MapUtils {
         return list;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <K, T> List<T> getList(Map<K, ?> map, K key, ParameterizedTypeReference<T> elementType) {
-        ResolvableType resolvableType = ResolvableType.forType(elementType);
+    public static <K, T> List<T> getList(Map<K, ?> map, K key, TypeReference<T> elementTypeRef) {
+        List<?> list = getList(map, key);
 
-        return getList(map, key, (Class<T>) resolvableType.getRawClass());
+        if (list == null) {
+            return null;
+        }
+
+        return CollectionUtils.map(list, item -> convert(item, elementTypeRef));
     }
 
-    @SuppressWarnings("unchecked")
-    public static <K, T> List<T> getList(
-        Map<K, ?> map, K key, ParameterizedTypeReference<T> elementType, List<T> defaultValue) {
+    public static <K, T> List<T> getList(Map<K, ?> map, K key, TypeReference<T> elementTypeRef, List<T> defaultValue) {
+        List<?> list = getList(map, key);
 
-        ResolvableType resolvableType = ResolvableType.forType(elementType);
+        if (list == null) {
+            return defaultValue;
+        }
 
-        List<T> list = getList(map, key, (Class<T>) resolvableType.getRawClass(), defaultValue);
-
-        return list != null ? list : defaultValue;
+        return CollectionUtils.map(list, item -> convert(item, elementTypeRef));
     }
 
     public static <K> LocalDate getLocalDate(Map<K, ?> map, K key) {
@@ -410,15 +429,14 @@ public final class MapUtils {
         return Collections.unmodifiableMap(toMap(value, entry -> (K2) entry.getKey(), Map.Entry::getValue));
     }
 
-    @SuppressWarnings("unchecked")
-    public static <K1, K2, V> Map<K2, V> getMap(Map<K1, ?> map, K1 key, ParameterizedTypeReference<V> elementType) {
-        ResolvableType resolvableType = ResolvableType.forType(elementType);
+    public static <K1, K2, V> Map<K2, V> getMap(Map<K1, ?> map, K1 key, TypeReference<V> elementTypeRef) {
+        Map<K2, ?> resultMap = getMap(map, key);
 
-        if (!map.containsKey(key)) {
+        if (resultMap == null) {
             return null;
         }
 
-        return getMap(map, key, (Class<V>) resolvableType.getRawClass());
+        return toMap(resultMap, Map.Entry::getKey, entry -> convert(entry.getValue(), elementTypeRef));
     }
 
     public static <K1, K2> Map<K2, ?> getMap(Map<K1, ?> map, K1 key, Map<K2, ?> defaultValue) {
@@ -452,13 +470,14 @@ public final class MapUtils {
         return value == null ? Collections.unmodifiableMap(defaultValue) : value;
     }
 
-    @SuppressWarnings("unchecked")
     public static <K1, K2, V> Map<K2, V> getMap(
-        Map<K1, ?> map, K1 key, ParameterizedTypeReference<V> elementType, Map<K2, V> defaultValue) {
+        Map<K1, ?> map, K1 key, TypeReference<V> elementTypeRef, Map<K2, V> defaultValue) {
 
-        ResolvableType resolvableType = ResolvableType.forType(elementType);
+        if (map.containsKey(key)) {
+            return defaultValue;
+        }
 
-        return getMap(map, key, (Class<V>) resolvableType.getRawClass(), defaultValue);
+        return getMap(map, key, elementTypeRef);
     }
 
     public static <K1, K2> Map<K2, ?> getMap(Map<K1, ?> map, K1 key, List<Class<?>> valueTypes) {
@@ -573,10 +592,8 @@ public final class MapUtils {
         return value;
     }
 
-    public static <K, T> List<T> getRequiredList(
-        Map<K, ?> map, K key, ParameterizedTypeReference<T> elementType) {
-
-        List<T> value = getList(map, key, elementType);
+    public static <K, T> List<T> getRequiredList(Map<K, ?> map, K key, TypeReference<T> elementTypeRef) {
+        List<T> value = getList(map, key, elementTypeRef);
 
         Validate.notNull(value, "Unknown value for : " + key);
 
@@ -615,13 +632,10 @@ public final class MapUtils {
         return value;
     }
 
-    @SuppressWarnings("unchecked")
     public static <K1, K2, V> Map<K2, V> getRequiredMap(
-        Map<K1, ?> map, K1 key, ParameterizedTypeReference<V> elementType) {
+        Map<K1, ?> map, K1 key, TypeReference<V> elementTypeRef) {
 
-        ResolvableType resolvableType = ResolvableType.forType(elementType);
-
-        Map<K2, V> value = getMap(map, key, (Class<V>) resolvableType.getRawClass());
+        Map<K2, V> value = getMap(map, key, elementTypeRef);
 
         Validate.notNull(value, "Unknown value for : " + key);
 
@@ -693,13 +707,21 @@ public final class MapUtils {
     }
 
     private static <T> T convert(Object value, Class<T> elementType) {
-        return conversionService.convert(value, elementType);
+        return objectMapper.convertValue(value, elementType);
+    }
+
+    private static <T> T convert(Object value, TypeReference<T> elementTypeRef) {
+        return objectMapper.convertValue(value, elementTypeRef);
     }
 
     private static Object convert(Object value, List<Class<?>> elementTypes) {
         for (Class<?> elementType : elementTypes) {
-            if (conversionService.canConvert(value.getClass(), elementType)) {
+            try {
                 value = convert(value, elementType);
+            } catch (Exception e) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace(e.getMessage(), e);
+                }
             }
 
             if (value.getClass() == elementType) {
@@ -718,14 +740,20 @@ public final class MapUtils {
                 Class<?> valueClass = value.getClass();
 
                 if (map.get(key) instanceof Collection<?> collection) {
-                    value = com.bytechef.commons.util.CollectionUtils.toString(collection);
+                    value = CollectionUtils.toString(collection);
                 } else if (valueClass.isArray()) {
-                    value = com.bytechef.commons.util.CollectionUtils.toString(Arrays.asList(getArray(value)));
+                    value = CollectionUtils.toString(Arrays.asList(getArray(value)));
                 }
 
                 return key + "=" + value;
             })
             .collect(Collectors.joining(", ", "{", "}"));
+    }
+
+    @Autowired
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    void setObjectMapper(ObjectMapper objectMapper) {
+        MapUtils.objectMapper = objectMapper;
     }
 
     private static Object[] getArray(Object value) {

@@ -18,16 +18,22 @@ package com.bytechef.helios.configuration.config;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.hermes.execution.service.InstanceJobService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
@@ -42,7 +48,9 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
         "com.bytechef.tag"
     })
 @EnableAutoConfiguration
+@EnableCaching
 @Configuration
+@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class ProjectIntTestConfiguration {
 
     @MockBean
@@ -66,9 +74,21 @@ public class ProjectIntTestConfiguration {
     @MockBean
     private WorkflowConnectionFacade workflowConnectionFacade;
 
-    @EnableCaching
-    @TestConfiguration
-    public static class CacheConfiguration {
+    @Bean
+    MapUtils mapUtils() {
+        return new MapUtils() {
+            {
+                objectMapper = objectMapper();
+            }
+        };
+    }
+
+    @Bean
+    ObjectMapper objectMapper() {
+        return new ObjectMapper()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .registerModule(new JavaTimeModule())
+            .registerModule(new Jdk8Module());
     }
 
     @EnableJdbcRepositories(

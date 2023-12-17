@@ -54,9 +54,7 @@ public class SyncMessageBroker implements MessageBroker {
         Validate.isTrue(receivers != null && !receivers.isEmpty(), "no listeners subscribed for: " + messageRoute);
 
         for (Receiver receiver : Validate.notNull(receivers, "receivers")) {
-            receiver.receive(
-                objectMapper.convertValue(
-                    JsonUtils.read(JsonUtils.write(message, objectMapper), objectMapper), message.getClass()));
+            receiver.receive(objectMapper.convertValue(JsonUtils.read(JsonUtils.write(message)), message.getClass()));
         }
     }
 

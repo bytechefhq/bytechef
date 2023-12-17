@@ -19,11 +19,11 @@ package com.bytechef.hermes.component.jdbc.operation;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 
 /**
@@ -43,7 +43,7 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
 
         String deleteKey = MapUtils.getString(inputParameters, JdbcConstants.DELETE_KEY, "id");
         List<Map<String, ?>> rows = MapUtils.getList(
-            inputParameters, JdbcConstants.ROWS, new ParameterizedTypeReference<>() {}, Collections.emptyList());
+            inputParameters, JdbcConstants.ROWS, new TypeReference<>() {}, Collections.emptyList());
         String schema = MapUtils.getString(inputParameters, JdbcConstants.SCHEMA, "public");
         String table = MapUtils.getRequiredString(inputParameters, JdbcConstants.TABLE);
 

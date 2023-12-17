@@ -21,6 +21,7 @@ import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.ROWS;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.SCHEMA;
 import static com.bytechef.hermes.component.jdbc.constant.JdbcConstants.TABLE;
 
+import com.bytechef.hermes.component.config.JacksonConfiguration;
 import com.bytechef.hermes.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.hermes.component.jdbc.operation.config.JdbcOperationIntTestConfiguration;
 import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
@@ -42,7 +43,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = JdbcOperationIntTestConfiguration.class)
-@Import(PostgreSQLContainerConfiguration.class)
+@Import({
+    JacksonConfiguration.class, PostgreSQLContainerConfiguration.class
+})
 public class DeleteJdbcOperationIntTest {
 
     @Autowired

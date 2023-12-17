@@ -70,6 +70,7 @@ import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,6 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.ParameterizedTypeReference;
 
 /**
  * @author Ivica Cardic
@@ -102,7 +102,7 @@ public class TestExecutorConfiguration {
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
 
         TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
-            new Base64FileStorageService(), objectMapper);
+            new Base64FileStorageService());
 
         return new JobTestExecutorImpl(
             componentDefinitionService, contextService,
@@ -166,7 +166,7 @@ public class TestExecutorConfiguration {
 
     private static Map<String, Map<String, Map<String, Long>>> getJobTaskConnectionMap(Job job) {
         return MapUtils.getMap(
-            job.getMetadata(), MetadataConstants.CONNECTIONS, new ParameterizedTypeReference<>() {}, Map.of());
+            job.getMetadata(), MetadataConstants.CONNECTIONS, new TypeReference<>() {}, Map.of());
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(

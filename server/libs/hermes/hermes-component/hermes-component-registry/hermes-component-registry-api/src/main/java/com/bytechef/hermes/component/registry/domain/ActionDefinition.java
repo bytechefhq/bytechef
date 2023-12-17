@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.registry.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -41,9 +40,7 @@ public class ActionDefinition extends ActionDefinitionBasic {
     private ActionDefinition() {
     }
 
-    public ActionDefinition(
-        com.bytechef.hermes.component.definition.ActionDefinition actionDefinition, ObjectMapper objectMapper) {
-
+    public ActionDefinition(com.bytechef.hermes.component.definition.ActionDefinition actionDefinition) {
         super(actionDefinition);
 
         this.editorDescriptionDataSource = OptionalUtils.mapOrElse(
@@ -59,9 +56,9 @@ public class ActionDefinition extends ActionDefinitionBasic {
 
         if (sampleOutput != null && sampleOutput instanceof String string) {
             try {
-                sampleOutput = JsonUtils.read(string, objectMapper);
+                sampleOutput = JsonUtils.read(string);
             } catch (Exception e) {
-                sampleOutput = JsonUtils.read(string, objectMapper);
+                sampleOutput = string;
             }
         }
 

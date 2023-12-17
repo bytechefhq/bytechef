@@ -65,7 +65,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     };
 
     private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
-        new Base64FileStorageService(), objectMapper);
+        new Base64FileStorageService());
 
     @Test
     public void test1() {

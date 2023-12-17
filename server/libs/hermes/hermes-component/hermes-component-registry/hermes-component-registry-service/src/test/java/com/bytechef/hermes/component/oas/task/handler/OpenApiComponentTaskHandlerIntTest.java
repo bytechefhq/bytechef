@@ -44,9 +44,11 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.ComponentHandler;
+import com.bytechef.hermes.component.config.JacksonConfiguration;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.Context.Http.Response;
+import com.bytechef.hermes.component.definition.Context.TypeReference;
 import com.bytechef.hermes.component.definition.ContextFileEntryImpl;
 import com.bytechef.hermes.component.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.hermes.component.oas.handler.loader.OpenApiComponentHandlerLoader;
@@ -61,12 +63,7 @@ import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.tag.service.TagService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
@@ -86,7 +83,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -99,7 +95,9 @@ import wiremock.com.fasterxml.jackson.databind.node.JsonNodeFactory;
  * @author Ivica Cardic
  */
 @SpringBootTest
-@Import(PostgreSQLContainerConfiguration.class)
+@Import({
+    JacksonConfiguration.class, PostgreSQLContainerConfiguration.class
+})
 @WireMockTest(httpPort = 9999)
 public class OpenApiComponentTaskHandlerIntTest {
 
@@ -250,7 +248,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONArray((List<?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONArray(response.getBody(new TypeReference<List<?>>() {})), true);
 
         //
 
@@ -279,7 +277,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                 "code", 400,
                 "message", "Input error: query parameter `status value `unknown` is not in the allowable values " +
                     "`[available, pending, sold]`"),
-            response.getBody());
+            response.getBody(new TypeReference<Map<String, Object>>() {}));
 
         //
 
@@ -298,7 +296,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONArray((List<?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONArray(response.getBody(new TypeReference<List<?>>() {})), true);
 
         //
 
@@ -342,7 +340,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONObject(response.getBody(new TypeReference<Map<?, ?>>() {})), true);
 
         //
 
@@ -367,7 +365,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONObject(response.getBody(Map.class)), true);
 
         //
 
@@ -396,7 +394,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONObject(response.getBody(new TypeReference<Map<?, ?>>() {})), true);
 
         //
 
@@ -459,7 +457,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONObject(response.getBody(new TypeReference<Map<?, ?>>() {})), true);
     }
 
     @Test
@@ -510,7 +508,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONObject(response.getBody(new TypeReference<Map<?, ?>>() {})), true);
 
         //
 
@@ -572,7 +570,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONObject(response.getBody(new TypeReference<Map<?, ?>>() {})), true);
 
         //
 
@@ -613,7 +611,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONObject(response.getBody(new TypeReference<Map<?, ?>>() {})), true);
 
         //
 
@@ -658,7 +656,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONObject(response.getBody(new TypeReference<Map<?, ?>>() {})), true);
 
         //
 
@@ -706,7 +704,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONArray((List<?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONArray(response.getBody(new TypeReference<List<?>>() {})), true);
     }
 
     @Test
@@ -757,7 +755,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         Response response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONObject(response.getBody(new TypeReference<Map<?, ?>>() {})), true);
 
         //
 
@@ -803,7 +801,7 @@ public class OpenApiComponentTaskHandlerIntTest {
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 
         Assertions.assertEquals(200, response.getStatusCode());
-        JSONAssert.assertEquals(json, new JSONObject((Map<?, ?>) response.getBody()), true);
+        JSONAssert.assertEquals(json, new JSONObject(response.getBody(new TypeReference<Map<?, ?>>() {})), true);
     }
 
     private OpenApiComponentTaskHandler createOpenApiComponentHandler(String actionName) {
@@ -869,41 +867,17 @@ public class OpenApiComponentTaskHandlerIntTest {
         }
 
         @Bean
-        ObjectMapper objectMapper() {
-            return new ObjectMapper() {
-                {
-                    disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-                    registerModule(new JavaTimeModule());
-                    registerModule(new Jdk8Module());
-                }
-            };
-        }
-
-        @Bean
-        XmlMapper xmlMapper() {
-            return XmlMapper.xmlBuilder()
-                .serializationInclusion(JsonInclude.Include.NON_NULL)
-                .build();
-        }
-
-        @Bean
         TaskFileStorage workflowFileStorage() {
-            return new TaskFileStorageImpl(new Base64FileStorageService(), objectMapper());
+            return new TaskFileStorageImpl(new Base64FileStorageService());
         }
 
-        @TestConfiguration
-        public static class EncryptionIntTestConfiguration {
-
-            @Bean
-            EncryptionKey encryptionKey() {
-                return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
-            }
+        @Bean
+        EncryptionKey encryptionKey() {
+            return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
         }
 
         @EnableJdbcRepositories(basePackages = "com.bytechef.hermes.connection.repository")
-        public static class ConnectionIntTestJdbcConfiguration
-            extends AbstractIntTestJdbcConfiguration {
+        public static class ConnectionIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
             private final Encryption encryption;
             private final ObjectMapper objectMapper;

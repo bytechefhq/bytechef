@@ -55,7 +55,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     public List<ComponentDefinition> getComponentDefinitions() {
 
         List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper),
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),
             serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
                 uriBuilder -> toUri(
                     uriBuilder, serviceInstance, COMPONENT_DEFINITION_SERVICE + "/get-component-definitions"),
@@ -70,7 +70,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
         Boolean triggerDefinitions, List<String> include) {
 
         List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper),
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),
             serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
                 uriBuilder -> toUri(
                     uriBuilder, serviceInstance, COMPONENT_DEFINITION_SERVICE + "/get-component-definitions",
@@ -84,7 +84,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     @Override
     public List<ComponentDefinition> getComponentDefinitionVersions(String name) {
         List<CompletableFuture<List<ComponentDefinition>>> completableFutures = CollectionUtils.map(
-            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP), objectMapper),
+            WorkerDiscoveryUtils.filterServiceInstances(discoveryClient.getInstances(WORKER_APP)),
             serviceInstance -> CompletableFuture.supplyAsync(() -> defaultRestClient.get(
                 uriBuilder -> toUri(
                     uriBuilder, serviceInstance,

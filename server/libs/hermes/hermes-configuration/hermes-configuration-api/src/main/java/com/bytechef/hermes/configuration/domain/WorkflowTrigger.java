@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
-import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
@@ -190,14 +189,5 @@ public class WorkflowTrigger implements Serializable, Trigger {
             ", extensions=" + extensions +
             ", metadata=" + metadata +
             '}';
-    }
-
-    public static class WorkflowTriggerConverter implements Converter<Map, WorkflowTrigger> {
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public WorkflowTrigger convert(Map source) {
-            return new WorkflowTrigger(source);
-        }
     }
 }

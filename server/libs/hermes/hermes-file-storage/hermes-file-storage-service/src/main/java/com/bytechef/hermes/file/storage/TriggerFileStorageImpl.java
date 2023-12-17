@@ -20,7 +20,6 @@ import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
@@ -33,12 +32,10 @@ public class TriggerFileStorageImpl implements TriggerFileStorage {
     private static final String TRIGGER_EXECUTION_FILES_DIR = "workflow_outputs_trigger_executions";
 
     private final FileStorageService fileStorageService;
-    private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public TriggerFileStorageImpl(FileStorageService fileStorageService, ObjectMapper objectMapper) {
+    public TriggerFileStorageImpl(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
-        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -48,7 +45,7 @@ public class TriggerFileStorageImpl implements TriggerFileStorage {
         return JsonUtils.read(
             CompressionUtils.decompressToString(
                 fileStorageService.readFileToBytes(TRIGGER_EXECUTION_FILES_DIR, fileEntry)),
-            Object.class, objectMapper);
+            Object.class);
     }
 
     @Override
@@ -57,6 +54,6 @@ public class TriggerFileStorageImpl implements TriggerFileStorage {
 
         return fileStorageService.storeFileContent(
             TRIGGER_EXECUTION_FILES_DIR, triggerExecutionId + ".json",
-            CompressionUtils.compress(JsonUtils.write(output, objectMapper)));
+            CompressionUtils.compress(JsonUtils.write(output)));
     }
 }

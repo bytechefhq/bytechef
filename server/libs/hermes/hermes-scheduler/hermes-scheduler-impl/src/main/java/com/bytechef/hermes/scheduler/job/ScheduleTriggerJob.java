@@ -21,8 +21,6 @@ import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.coordinator.event.TriggerListenerEvent;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Date;
 import java.util.Map;
 import org.quartz.Job;
@@ -37,7 +35,6 @@ import org.springframework.context.ApplicationEventPublisher;
 public class ScheduleTriggerJob implements Job {
 
     private ApplicationEventPublisher eventPublisher;
-    private ObjectMapper objectMapper;
 
     @Override
     public void execute(JobExecutionContext context) {
@@ -51,17 +48,11 @@ public class ScheduleTriggerJob implements Job {
                     LocalDateTimeUtils.getLocalDateTime(fireTime),
                     MapUtils.concat(
                         Map.of("datetime", fireTime.toString()),
-                        JsonUtils.readMap(jobDataMap.getString("output"), String.class, objectMapper)))));
+                        JsonUtils.readMap(jobDataMap.getString("output"), String.class)))));
     }
 
     @Autowired
     public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
-    }
-
-    @Autowired
-    @SuppressFBWarnings("EI")
-    public void setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
     }
 }

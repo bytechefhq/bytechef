@@ -33,6 +33,8 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
@@ -57,6 +59,151 @@ import java.util.Map;
 public class JdbcComponentHandler implements ComponentHandler {
 
     private static final DataSourceFactory DATA_SOURCE_FACTORY = new DataSourceFactory();
+    private static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .properties(
+            string(JdbcConstants.HOST).label("Host")
+                .required(true),
+            integer(JdbcConstants.PORT).label("Port")
+                .required(true),
+            string(JdbcConstants.DATABASE).label("Database")
+                .required(true),
+            string(JdbcConstants.USERNAME).label("Username")
+                .required(true),
+            string(JdbcConstants.PASSWORD)
+                .label("Password")
+                .controlType(Property.ControlType.PASSWORD)
+                .required(true));
+
+    private final List<ModifiableActionDefinition> actionDefinitions = List.of(
+        action(JdbcConstants.QUERY)
+            .title("Query")
+            .description("Execute an SQL query.")
+            .properties(
+                string(JdbcConstants.QUERY)
+                    .label("Query")
+                    .description(
+                        "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.")
+                    .placeholder(
+                        "SELECT id, name FROM customer WHERE age > :age AND height <= :height")
+                    .required(true),
+                object(JdbcConstants.PARAMETERS)
+                    .label("Parameters")
+                    .description(
+                        "The list of properties which should be used as query parameters.")
+                    .additionalProperties(bool(), dateTime(), number(), string()))
+            .outputSchema(getQueryOutputSchemaFunction())
+            .sampleOutput(getQueryOSampleOutputSchemaFunction())
+            .perform(this::performQuery),
+        action(JdbcConstants.INSERT)
+            .title("Insert")
+            .description("Insert rows in database.")
+            .properties(
+                string(JdbcConstants.SCHEMA)
+                    .label("Schema")
+                    .description("Name of the schema the table belongs to.")
+                    .required(true)
+                    .defaultValue("public"),
+                string(JdbcConstants.TABLE)
+                    .label("Table")
+                    .description("Name of the table in which to insert data to.")
+                    .required(true),
+                array(JdbcConstants.COLUMNS)
+                    .label("Columns")
+                    .description(
+                        "The list of the properties which should used as columns for the new rows.")
+                    .items(string()),
+                array(JdbcConstants.ROWS)
+                    .label("Rows")
+                    .description("List of rows.")
+                    .items(object().additionalProperties(
+                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
+                        string(), time())))
+            .outputSchema(getInsertOutputSchemaFunction())
+            .sampleOutput(getInsertOSampleOutputSchemaFunction())
+            .perform(this::performInsert),
+        action(JdbcConstants.UPDATE)
+            .title("Update")
+            .description("Update rows in database.")
+            .properties(
+                string(JdbcConstants.SCHEMA)
+                    .label("Schema")
+                    .description("Name of the schema the table belongs to.")
+                    .required(true)
+                    .defaultValue("public"),
+                string(JdbcConstants.TABLE)
+                    .label("Table")
+                    .description("Name of the table in which to update data in.")
+                    .required(true),
+                array(JdbcConstants.COLUMNS)
+                    .label("Columns")
+                    .description(
+                        "The list of the properties which should used as columns for the updated rows.")
+                    .items(string()),
+                string(JdbcConstants.UPDATE_KEY)
+                    .label("Update Key")
+                    .description(
+                        "The name of the property which decides which rows in the database should be updated.")
+                    .placeholder("id"),
+                array(JdbcConstants.ROWS)
+                    .label("Rows")
+                    .description("List of rows.")
+                    .items(object().additionalProperties(
+                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
+                        string(), time())))
+            .outputSchema(getUpdateOutputSchemaFunction())
+            .sampleOutput(getUpdateOSampleOutputSchemaFunction())
+            .perform(this::performUpdate),
+        action(JdbcConstants.DELETE)
+            .title("Delete")
+            .description("Delete rows from database.")
+            .properties(
+                string(JdbcConstants.SCHEMA)
+                    .label("Schema")
+                    .description("Name of the schema the table belongs to.")
+                    .required(true)
+                    .defaultValue("public"),
+                string(JdbcConstants.TABLE)
+                    .label("Table")
+                    .description("Name of the table in which to update data in.")
+                    .required(true),
+                string(JdbcConstants.DELETE_KEY)
+                    .label("Update Key")
+                    .description(
+                        "Name of the property which decides which rows in the database should be deleted.")
+                    .placeholder("id"),
+                array(JdbcConstants.ROWS)
+                    .label("Rows")
+                    .description("List of rows.")
+                    .items(object().additionalProperties(
+                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
+                        string(), time())))
+            .outputSchema(getDeleteOutputSchemaFunction())
+            .sampleOutput(getDeleteOSampleOutputSchemaFunction())
+            .perform(this::performDelete),
+        action(JdbcConstants.EXECUTE)
+            .title("Execute")
+            .description("Execute an SQL DML or DML statement.")
+            .properties(
+                string(JdbcConstants.EXECUTE)
+                    .label("Execute")
+                    .description(
+                        "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.")
+                    .placeholder(
+                        "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price")
+                    .required(true),
+                array(JdbcConstants.ROWS)
+                    .label("Rows")
+                    .description("List of rows.")
+                    .items(object().additionalProperties(
+                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
+                        string(), time())),
+                object(JdbcConstants.PARAMETERS)
+                    .label("Parameters")
+                    .description("The list of properties which should be used as parameters.")
+                    .additionalProperties(bool(), dateTime(), number(), string()))
+            .outputSchema(getExecuteOutputSchemaFunction())
+            .sampleOutput(getExecuteOSampleOutputSchemaFunction())
+            .perform(this::performExecute));
 
     private final ComponentDefinition componentDefinition;
     private final DeleteJdbcOperation deleteJdbcOperation;
@@ -175,150 +322,7 @@ public class JdbcComponentHandler implements ComponentHandler {
             .description(description)
             .icon(icon)
             .title(title)
-            .connection(
-                connection()
-                    .properties(
-                        string(JdbcConstants.HOST).label("Host")
-                            .required(true),
-                        integer(JdbcConstants.PORT).label("Port")
-                            .required(true),
-                        string(JdbcConstants.DATABASE).label("Database")
-                            .required(true),
-                        string(JdbcConstants.USERNAME).label("Username")
-                            .required(true),
-                        string(JdbcConstants.PASSWORD)
-                            .label("Password")
-                            .controlType(Property.ControlType.PASSWORD)
-                            .required(true)))
-            .actions(
-                action(JdbcConstants.QUERY)
-                    .title("Query")
-                    .description("Execute an SQL query.")
-                    .properties(
-                        string(JdbcConstants.QUERY)
-                            .label("Query")
-                            .description(
-                                "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.")
-                            .placeholder(
-                                "SELECT id, name FROM customer WHERE age > :age AND height <= :height")
-                            .required(true),
-                        object(JdbcConstants.PARAMETERS)
-                            .label("Parameters")
-                            .description(
-                                "The list of properties which should be used as query parameters.")
-                            .additionalProperties(bool(), dateTime(), number(), string()))
-                    .outputSchema(getQueryOutputSchemaFunction())
-                    .sampleOutput(getQueryOSampleOutputSchemaFunction())
-                    .perform(this::performQuery),
-                action(JdbcConstants.INSERT)
-                    .title("Insert")
-                    .description("Insert rows in database.")
-                    .properties(
-                        string(JdbcConstants.SCHEMA)
-                            .label("Schema")
-                            .description("Name of the schema the table belongs to.")
-                            .required(true)
-                            .defaultValue("public"),
-                        string(JdbcConstants.TABLE)
-                            .label("Table")
-                            .description("Name of the table in which to insert data to.")
-                            .required(true),
-                        array(JdbcConstants.COLUMNS)
-                            .label("Columns")
-                            .description(
-                                "The list of the properties which should used as columns for the new rows.")
-                            .items(string()),
-                        array(JdbcConstants.ROWS)
-                            .label("Rows")
-                            .description("List of rows.")
-                            .items(object().additionalProperties(
-                                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
-                                string(), time())))
-                    .outputSchema(getInsertOutputSchemaFunction())
-                    .sampleOutput(getInsertOSampleOutputSchemaFunction())
-                    .perform(this::performInsert),
-                action(JdbcConstants.UPDATE)
-                    .title("Update")
-                    .description("Update rows in database.")
-                    .properties(
-                        string(JdbcConstants.SCHEMA)
-                            .label("Schema")
-                            .description("Name of the schema the table belongs to.")
-                            .required(true)
-                            .defaultValue("public"),
-                        string(JdbcConstants.TABLE)
-                            .label("Table")
-                            .description("Name of the table in which to update data in.")
-                            .required(true),
-                        array(JdbcConstants.COLUMNS)
-                            .label("Columns")
-                            .description(
-                                "The list of the properties which should used as columns for the updated rows.")
-                            .items(string()),
-                        string(JdbcConstants.UPDATE_KEY)
-                            .label("Update Key")
-                            .description(
-                                "The name of the property which decides which rows in the database should be updated.")
-                            .placeholder("id"),
-                        array(JdbcConstants.ROWS)
-                            .label("Rows")
-                            .description("List of rows.")
-                            .items(object().additionalProperties(
-                                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
-                                string(), time())))
-                    .outputSchema(getUpdateOutputSchemaFunction())
-                    .sampleOutput(getUpdateOSampleOutputSchemaFunction())
-                    .perform(this::performUpdate),
-                action(JdbcConstants.DELETE)
-                    .title("Delete")
-                    .description("Delete rows from database.")
-                    .properties(
-                        string(JdbcConstants.SCHEMA)
-                            .label("Schema")
-                            .description("Name of the schema the table belongs to.")
-                            .required(true)
-                            .defaultValue("public"),
-                        string(JdbcConstants.TABLE)
-                            .label("Table")
-                            .description("Name of the table in which to update data in.")
-                            .required(true),
-                        string(JdbcConstants.DELETE_KEY)
-                            .label("Update Key")
-                            .description(
-                                "Name of the property which decides which rows in the database should be deleted.")
-                            .placeholder("id"),
-                        array(JdbcConstants.ROWS)
-                            .label("Rows")
-                            .description("List of rows.")
-                            .items(object().additionalProperties(
-                                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
-                                string(), time())))
-                    .outputSchema(getDeleteOutputSchemaFunction())
-                    .sampleOutput(getDeleteOSampleOutputSchemaFunction())
-                    .perform(this::performDelete),
-                action(JdbcConstants.EXECUTE)
-                    .title("Execute")
-                    .description("Execute an SQL DML or DML statement.")
-                    .properties(
-                        string(JdbcConstants.EXECUTE)
-                            .label("Execute")
-                            .description(
-                                "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.")
-                            .placeholder(
-                                "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price")
-                            .required(true),
-                        array(JdbcConstants.ROWS)
-                            .label("Rows")
-                            .description("List of rows.")
-                            .items(object().additionalProperties(
-                                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
-                                string(), time())),
-                        object(JdbcConstants.PARAMETERS)
-                            .label("Parameters")
-                            .description("The list of properties which should be used as parameters.")
-                            .additionalProperties(bool(), dateTime(), number(), string()))
-                    .outputSchema(getExecuteOutputSchemaFunction())
-                    .sampleOutput(getExecuteOSampleOutputSchemaFunction())
-                    .perform(this::performExecute));
+            .connection(CONNECTION_DEFINITION)
+            .actions(actionDefinitions);
     }
 }

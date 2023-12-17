@@ -22,15 +22,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
 public class FileEntryTest {
+
+    @BeforeAll
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
+    public static void beforeAll() {
+        class MapUtilsMock extends MapUtils {
+            static {
+                objectMapper = new ObjectMapper();
+            }
+        }
+
+        new MapUtilsMock();
+    }
 
     @Test
     public void testOf1() {

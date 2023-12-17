@@ -16,6 +16,8 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.Configuration;
@@ -23,6 +25,7 @@ import com.bytechef.hermes.component.definition.Context.Http.Configuration.Confi
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.bytechef.hermes.component.registry.service.ConnectionDefinitionService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.github.mizosoft.methanol.FormBodyPublisher;
@@ -32,6 +35,7 @@ import com.github.mizosoft.methanol.internal.extensions.MimeBodyPublisherAdapter
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
@@ -46,6 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.net.ssl.SSLSession;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -55,14 +60,35 @@ import org.mockito.Mockito;
  */
 public class HttpClientExecutorTest {
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     private final ActionContext context = Mockito.mock(ActionContext.class);
     private final Configuration configuration = Configuration.newConfiguration()
         .build();
     private final Base64.Encoder encoder = Base64.getEncoder();
     private final HttpClientExecutor httpClientExecutor =
         new HttpClientExecutor(
-            Mockito.mock(ConnectionDefinitionService.class), Mockito.mock(FileStorageService.class),
-            new ObjectMapper(), new XmlMapper());
+            Mockito.mock(ConnectionDefinitionService.class), Mockito.mock(FileStorageService.class), objectMapper);
+
+    @BeforeAll
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
+    public static void beforeAll() {
+        class JsonUtilsMock extends JsonUtils {
+            static {
+                objectMapper = HttpClientExecutorTest.objectMapper;
+            }
+        }
+
+        new JsonUtilsMock();
+
+        class XmlUtilsMock extends XmlUtils {
+            static {
+                xmlMapper = new XmlMapper();
+            }
+        }
+
+        new XmlUtilsMock();
+    }
 
     @Test
     public void testCreateBodyHandler() {
@@ -363,9 +389,10 @@ public class HttpClientExecutorTest {
             Mockito.mock(Context.class));
 
         Assertions.assertEquals(Http.RequestMethod.DELETE.name(), httpRequest.method());
-        Assertions.assertEquals(
-            Map.of("header1", List.of("value1")), httpRequest.headers()
-                .map());
+
+        HttpHeaders httpHeaders = httpRequest.headers();
+
+        Assertions.assertEquals(Map.of("header1", List.of("value1")), httpHeaders.map());
         Assertions.assertEquals(URI.create("http://localhost:8080?param1=value1"), httpRequest.uri());
     }
 
@@ -373,65 +400,75 @@ public class HttpClientExecutorTest {
     @Test
     public void testHandleResponse() {
         Assertions.assertNull(
-            httpClientExecutor.handleResponse(new TestHttpResponse(null), configuration)
+            httpClientExecutor
+                .handleResponse(new TestHttpResponse(null), configuration)
                 .getBody());
 
         //
 
         ActionContext.FileEntry fileEntry = Mockito.mock(ActionContext.FileEntry.class);
 
-        Mockito.when(context.file(file -> file.storeContent(Mockito.anyString(), (InputStream) Mockito.any())))
+        Mockito
+            .when(context.file(file -> file.storeContent(Mockito.anyString(), (InputStream) Mockito.any())))
             .thenReturn(fileEntry);
 
         Assertions.assertEquals(
             fileEntry,
-            httpClientExecutor.handleResponse(
-                new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
-                Http.responseType(Http.ResponseType.BINARY)
-                    .build())
+            httpClientExecutor
+                .handleResponse(
+                    new TestHttpResponse(new ByteArrayInputStream("text".getBytes(StandardCharsets.UTF_8))),
+                    Http
+                        .responseType(Http.ResponseType.BINARY)
+                        .build())
                 .getBody());
 
         //
 
         Assertions.assertEquals(
             Map.of("key1", "value1"),
-            httpClientExecutor.handleResponse(
-                new TestHttpResponse(
-                    """
-                        {
-                            "key1": "value1"
-                        }
-                        """),
-                Http.responseType(Http.ResponseType.JSON)
-                    .build())
+            httpClientExecutor
+                .handleResponse(
+                    new TestHttpResponse(
+                        """
+                            {
+                                "key1": "value1"
+                            }
+                            """),
+                    Http
+                        .responseType(Http.ResponseType.JSON)
+                        .build())
                 .getBody());
 
         //
 
         Assertions.assertEquals(
             "text",
-            httpClientExecutor.handleResponse(
-                new TestHttpResponse("text"),
-                Http.responseType(Http.ResponseType.TEXT)
-                    .build())
+            httpClientExecutor
+                .handleResponse(
+                    new TestHttpResponse("text"),
+                    Http
+                        .responseType(Http.ResponseType.TEXT)
+                        .build())
                 .getBody());
 
         //
 
         Assertions.assertEquals(
             Map.of("object", Map.of("key1", "value1")),
-            httpClientExecutor.handleResponse(
-                new TestHttpResponse(
-                    """
-                        <root>
-                            <object>
-                                <key1>value1</key1>
-                            </object>
-                        </root>
+            httpClientExecutor
+                .handleResponse(
+                    new TestHttpResponse(
+                        """
+                            <root>
+                                <object>
+                                    <key1>value1</key1>
+                                </object>
+                            </root>
 
-                        """),
-                Http.responseType(Http.ResponseType.XML)
-                    .build())
+                            """),
+                    Http
+                        .responseType(Http.ResponseType.XML)
+                        .build())
                 .getBody());
 
         //
@@ -461,9 +498,24 @@ public class HttpClientExecutorTest {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
-        public <T> T getBody() {
-            return (T) body;
+        public Object getBody() {
+            return objectMapper.convertValue(body, new TypeReference<>() {});
+        }
+
+        @Override
+        public <T> T getBody(Class<T> valueType) {
+            return objectMapper.convertValue(body, valueType);
+        }
+
+        @Override
+        public <T> T getBody(Context.TypeReference<T> valueTypeRef) {
+            return objectMapper.convertValue(body, new TypeReference<>() {
+
+                @Override
+                public Type getType() {
+                    return valueTypeRef.getType();
+                }
+            });
         }
 
         @Override

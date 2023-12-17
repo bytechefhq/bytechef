@@ -22,7 +22,6 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.filesystem.config.FilesystemFileStorageProperties;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +48,6 @@ public class TaskFileStorageConfiguration {
 
     @Bean
     TaskFileStorage workflowTaskFileStorageFacade(
-        ObjectMapper objectMapper,
         @Value("${bytechef.workflow.output-storage.provider}") String workflowOutputStorageProvider) {
 
         if (logger.isInfoEnabled()) {
@@ -57,7 +55,7 @@ public class TaskFileStorageConfiguration {
                 "Workflow task output storage provider type enabled: %s".formatted(workflowOutputStorageProvider));
         }
 
-        return new TaskFileStorageImpl(getFileStorageService(workflowOutputStorageProvider), objectMapper);
+        return new TaskFileStorageImpl(getFileStorageService(workflowOutputStorageProvider));
     }
 
     private FileStorageService getFileStorageService(String workflowOutputStorageProvider) {

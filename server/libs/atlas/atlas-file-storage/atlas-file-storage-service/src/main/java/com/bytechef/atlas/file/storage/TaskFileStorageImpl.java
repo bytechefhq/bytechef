@@ -22,7 +22,6 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -38,19 +37,17 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     private static final String TASK_EXECUTION_FILES_DIR = "workflow_outputs_task_executions";
 
     private final FileStorageService fileStorageService;
-    private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
-    public TaskFileStorageImpl(FileStorageService fileStorageService, ObjectMapper objectMapper) {
+    public TaskFileStorageImpl(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
-        this.objectMapper = objectMapper;
     }
 
     @Override
     public Map<String, ?> readContextValue(@NonNull FileEntry fileEntry) {
         return JsonUtils.read(
             CompressionUtils.decompressToString(fileStorageService.readFileToBytes(CONTEXT_FILES_DIR, fileEntry)),
-            new TypeReference<>() {}, objectMapper);
+            new TypeReference<>() {});
     }
 
     @Override
@@ -59,7 +56,7 @@ public class TaskFileStorageImpl implements TaskFileStorage {
 
         return JsonUtils.read(
             CompressionUtils.decompressToString(fileStorageService.readFileToBytes(JOB_FILES_DIR, fileEntry)),
-            new TypeReference<>() {}, objectMapper);
+            new TypeReference<>() {});
     }
 
     @Override
@@ -69,7 +66,7 @@ public class TaskFileStorageImpl implements TaskFileStorage {
         return JsonUtils.read(
             CompressionUtils.decompressToString(
                 fileStorageService.readFileToBytes(TASK_EXECUTION_FILES_DIR, fileEntry)),
-            Object.class, objectMapper);
+            Object.class);
     }
 
     @Override
@@ -81,7 +78,7 @@ public class TaskFileStorageImpl implements TaskFileStorage {
 
         return fileStorageService.storeFileContent(
             CONTEXT_FILES_DIR, classname + "_" + stackId + ".json",
-            CompressionUtils.compress(JsonUtils.write(value, objectMapper)));
+            CompressionUtils.compress(JsonUtils.write(value)));
     }
 
     @Override
@@ -93,7 +90,7 @@ public class TaskFileStorageImpl implements TaskFileStorage {
 
         return fileStorageService.storeFileContent(
             CONTEXT_FILES_DIR, classname + "_" + stackId + "_" + subStackId + ".json",
-            CompressionUtils.compress(JsonUtils.write(value, objectMapper)));
+            CompressionUtils.compress(JsonUtils.write(value)));
     }
 
     @Override
@@ -101,7 +98,7 @@ public class TaskFileStorageImpl implements TaskFileStorage {
         Validate.notNull(outputs, "'outputs' must not be null");
 
         return fileStorageService.storeFileContent(
-            JOB_FILES_DIR, jobId + ".json", CompressionUtils.compress(JsonUtils.write(outputs, objectMapper)));
+            JOB_FILES_DIR, jobId + ".json", CompressionUtils.compress(JsonUtils.write(outputs)));
     }
 
     @Override
@@ -110,6 +107,6 @@ public class TaskFileStorageImpl implements TaskFileStorage {
 
         return fileStorageService.storeFileContent(
             TASK_EXECUTION_FILES_DIR, taskExecutionId + ".json",
-            CompressionUtils.compress(JsonUtils.write(output, objectMapper)));
+            CompressionUtils.compress(JsonUtils.write(output)));
     }
 }

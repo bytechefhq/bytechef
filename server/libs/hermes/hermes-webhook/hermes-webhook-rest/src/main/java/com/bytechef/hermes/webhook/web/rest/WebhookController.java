@@ -37,8 +37,6 @@ import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.bytechef.hermes.webhook.executor.WebhookExecutor;
 import com.bytechef.hermes.webhook.web.rest.exception.WorkflowNotEnabledException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
@@ -76,26 +74,21 @@ public class WebhookController {
 
     private final FileStorageService fileStorageService;
     private final InstanceAccessorRegistry instanceAccessorRegistry;
-    private final ObjectMapper objectMapper;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WebhookExecutor webhookExecutor;
     private final WorkflowService workflowService;
-    private final XmlMapper xmlMapper;
 
     @SuppressFBWarnings("EI")
     public WebhookController(
         FileStorageService fileStorageService, InstanceAccessorRegistry instanceAccessorRegistry,
-        ObjectMapper objectMapper,
         TriggerDefinitionService triggerDefinitionService, WebhookExecutor webhookExecutor,
-        WorkflowService workflowService, XmlMapper xmlMapper) {
+        WorkflowService workflowService) {
 
         this.fileStorageService = fileStorageService;
         this.instanceAccessorRegistry = instanceAccessorRegistry;
-        this.objectMapper = objectMapper;
         this.triggerDefinitionService = triggerDefinitionService;
         this.webhookExecutor = webhookExecutor;
         this.workflowService = workflowService;
-        this.xmlMapper = xmlMapper;
     }
 
     @RequestMapping(
@@ -175,8 +168,7 @@ public class WebhookController {
                     content = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
                 } else {
                     content = JsonUtils.read(
-                        StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8),
-                        objectMapper);
+                        StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8));
                 }
 
                 body = new WebhookBodyImpl(content, ContentType.JSON, httpServletRequest.getContentType());
@@ -187,8 +179,7 @@ public class WebhookController {
                     content = StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8);
                 } else {
                     content = XmlUtils.read(
-                        StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8),
-                        xmlMapper);
+                        StreamUtils.copyToString(httpServletRequest.getInputStream(), StandardCharsets.UTF_8));
                 }
 
                 body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType());

@@ -48,11 +48,14 @@ import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -66,15 +69,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
@@ -86,6 +86,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
         "bytechef.workflow.repository.classpath.enabled=true"
     })
 @Import(PostgreSQLContainerConfiguration.class)
+@SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
 public class TaskCoordinatorIntTest {
 
     @Autowired
@@ -124,7 +125,7 @@ public class TaskCoordinatorIntTest {
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, jobService, objectMapper, taskExecutionService, taskHandlerMap::get,
-            new TaskFileStorageImpl(new Base64FileStorageService(), objectMapper), workflowService);
+            new TaskFileStorageImpl(new Base64FileStorageService()), workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, Collections.singletonMap("yourName", "me")));
     }
@@ -157,15 +158,30 @@ public class TaskCoordinatorIntTest {
         }
 
         @Bean
-        @Primary
-        ObjectMapper objectMapper() {
-            return new ObjectMapper() {
+        JsonUtils jsonUtils() {
+            return new JsonUtils() {
                 {
-                    disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-                    registerModule(new JavaTimeModule());
-                    registerModule(new Jdk8Module());
+                    objectMapper = objectMapper();
                 }
             };
+        }
+
+        @Bean
+        MapUtils mapUtils() {
+            return new MapUtils() {
+                {
+                    objectMapper = objectMapper();
+                }
+            };
+        }
+
+        @Bean
+        ObjectMapper objectMapper() {
+            return new ObjectMapper()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .registerModule(new JavaTimeModule())
+                .registerModule(new Jdk8Module());
         }
 
         @Bean
@@ -184,17 +200,12 @@ public class TaskCoordinatorIntTest {
         @EnableJdbcRepositories(basePackages = {
             "com.bytechef.atlas.configuration.repository.jdbc", "com.bytechef.atlas.execution.repository.jdbc"
         })
-        @TestConfiguration
         public static class CoordinatorIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
-        }
-
-        @TestConfiguration
-        public static class JdbcConfiguration extends AbstractJdbcConfiguration {
 
             private final ObjectMapper objectMapper;
 
             @SuppressFBWarnings("EI2")
-            public JdbcConfiguration(ObjectMapper objectMapper) {
+            public CoordinatorIntTestJdbcConfiguration(ObjectMapper objectMapper) {
                 this.objectMapper = objectMapper;
             }
 

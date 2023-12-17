@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
 
-public class AbstractParameters {
+public class AbstractListMap {
 
     private final Map<String, List<String>> parameters;
 
-    public AbstractParameters(Map<String, String[]> parameters) {
+    public AbstractListMap(Map<String, String[]> parameters) {
         this.parameters = MapUtils.toMap(parameters, Map.Entry::getKey, entry -> Arrays.asList(entry.getValue()));
     }
 
@@ -59,7 +59,7 @@ public class AbstractParameters {
             .findFirst();
     }
 
-    public Map<String, List<String>> getParameters() {
+    public Map<String, List<String>> toMap() {
         return Collections.unmodifiableMap(parameters);
     }
 }
