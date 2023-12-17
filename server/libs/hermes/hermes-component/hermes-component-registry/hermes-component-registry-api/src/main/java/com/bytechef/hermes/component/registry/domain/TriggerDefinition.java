@@ -17,7 +17,9 @@
 package com.bytechef.hermes.component.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -42,8 +44,11 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     private TriggerDefinition() {
     }
 
-    public TriggerDefinition(com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition) {
+    public TriggerDefinition(
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition, ObjectMapper objectMapper) {
+
         super(triggerDefinition);
+
         this.editorDescriptionDataSource = OptionalUtils.mapOrElse(
             triggerDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false);
         this.outputSchema = OptionalUtils.mapOrElse(
@@ -52,7 +57,17 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
             triggerDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::toProperty);
-        this.sampleOutput = triggerDefinition.getSampleOutput();
+
+        this.sampleOutput = OptionalUtils.orElse(triggerDefinition.getSampleOutput(), null);
+
+        if (sampleOutput != null && sampleOutput instanceof String string) {
+            try {
+                sampleOutput = JsonUtils.read(string, objectMapper);
+            } catch (Exception e) {
+                sampleOutput = JsonUtils.read(string, objectMapper);
+            }
+        }
+
         this.sampleOutputDataSource = OptionalUtils.mapOrElse(
             triggerDefinition.getSampleOutputDataSource(), sampleOutputDataSource -> true, false);
         this.webhookRawBody = OptionalUtils.orElse(triggerDefinition.getWebhookRawBody(), false);
