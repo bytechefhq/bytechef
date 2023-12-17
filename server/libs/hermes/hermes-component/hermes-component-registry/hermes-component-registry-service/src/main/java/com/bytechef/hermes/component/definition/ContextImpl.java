@@ -16,17 +16,40 @@
 
 package com.bytechef.hermes.component.definition;
 
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
+import static com.bytechef.hermes.component.definition.ComponentDSL.date;
+import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.number;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.ComponentDSL.time;
+
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableArrayProperty;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableValueProperty;
+import com.bytechef.hermes.component.definition.Property.OutputProperty;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
@@ -39,6 +62,7 @@ public class ContextImpl implements Context {
     private final Http http;
     private final Json json;
     private final Logger logger;
+    private final OutputSchema outputSchema;
     private final Xml xml;
 
     @SuppressFBWarnings("EI")
@@ -49,6 +73,7 @@ public class ContextImpl implements Context {
         this.http = new HttpImpl(componentName, connection, this, httpClientExecutor);
         this.json = new JsonImpl(objectMapper);
         this.logger = new LoggerImpl(componentName, operationName);
+        this.outputSchema = new OutputSchemaImpl();
         this.xml = new XmlImpl(xmlMapper);
     }
 
@@ -74,6 +99,15 @@ public class ContextImpl implements Context {
     public void logger(ContextConsumer<Logger> loggerConsumer) {
         try {
             loggerConsumer.accept(logger);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public OutputProperty<?> outputSchema(ContextFunction<OutputSchema, OutputProperty<?>> outputSchemaFunction) {
+        try {
+            return outputSchemaFunction.apply(outputSchema);
         } catch (Exception e) {
             throw new ComponentExecutionException(e.getMessage(), e);
         }
@@ -469,6 +503,69 @@ public class ContextImpl implements Context {
             if (logger.isTraceEnabled()) {
                 logger.trace(message, exception);
             }
+        }
+    }
+
+    private static class OutputSchemaImpl implements OutputSchema {
+
+        @Override
+        public OutputProperty<?> get(Object value) {
+            return getOutputSchema(null, value);
+        }
+
+        OutputProperty<?> getOutputSchema(String name, Object value) {
+            OutputProperty<?> outputProperty;
+
+            Class<?> valueClass = value.getClass();
+
+            if (value instanceof Boolean) {
+                outputProperty = bool(name);
+            } else if (value instanceof Date || value instanceof LocalDate) {
+                outputProperty = date(name);
+            } else if (value instanceof LocalDateTime) {
+                outputProperty = dateTime(name);
+            } else if (value instanceof LocalTime) {
+                outputProperty = time(name);
+            } else if (value instanceof Integer) {
+                outputProperty = integer(name);
+            } else if (value instanceof Number) {
+                outputProperty = number(name);
+            } else if (value instanceof String) {
+                outputProperty = string(name);
+            } else if (value instanceof ActionContext.FileEntry) {
+                outputProperty = fileEntry();
+            } else if (valueClass.isArray()) {
+                outputProperty = array(name);
+            } else if (value instanceof List<?> list) {
+                ModifiableArrayProperty arrayProperty = array(name);
+
+                Set<OutputProperty<?>> itemProperties =
+                    new HashSet<>();
+
+                for (Object item : list) {
+                    itemProperties.add(getOutputSchema(null, item));
+                }
+
+                outputProperty = arrayProperty.items(
+                    CollectionUtils.map(
+                        new ArrayList<>(itemProperties), property -> (ModifiableValueProperty<?, ?>) property));
+            } else if (value instanceof Map<?, ?> map) {
+                ModifiableObjectProperty objectProperty = object();
+
+                List<OutputProperty<?>> properties =
+                    new ArrayList<>();
+
+                for (Map.Entry<?, ?> entry : map.entrySet()) {
+                    properties.add(getOutputSchema((String) entry.getKey(), entry.getValue()));
+                }
+
+                outputProperty = objectProperty.properties(
+                    CollectionUtils.map(properties, property -> (ModifiableValueProperty<?, ?>) property));
+            } else {
+                outputProperty = object(name);
+            }
+
+            return outputProperty;
         }
     }
 

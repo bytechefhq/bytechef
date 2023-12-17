@@ -59,6 +59,13 @@ public interface Context {
 
     /**
      *
+     * @param outputSchemaFunction
+     * @return
+     */
+    OutputProperty<?> outputSchema(ContextFunction<OutputSchema, OutputProperty<?>> outputSchemaFunction);
+
+    /**
+     *
      * @param xmlFunction
      * @return
      * @param <R>
