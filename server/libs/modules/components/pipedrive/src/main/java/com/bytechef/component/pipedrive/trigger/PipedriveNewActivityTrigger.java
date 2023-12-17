@@ -163,8 +163,7 @@ public class PipedriveNewActivityTrigger {
                 "rec_rule": "RRULE:FREQ=WEEKLY;BYDAY=WE",
                 "rec_rule_extension": "",
                 "rec_master_activity_id": 1,
-                "series":
-                [],
+                "series": [],
                 "note": "A note for the activity",
                 "created_by_user_id": 1234,
                 "location_subpremise": "",
