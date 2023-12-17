@@ -16,11 +16,11 @@
 
 package com.bytechef.hermes.component.registry.facade;
 
-import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.registry.domain.PropertiesResponse;
-import com.bytechef.hermes.registry.domain.SampleOutputResponse;
+import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
+import com.bytechef.hermes.component.registry.domain.OptionsResponse;
+import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
+import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
 import java.util.Map;
 import org.springframework.lang.NonNull;
 
@@ -47,7 +47,7 @@ public interface ActionDefinitionFacade {
 
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, int type, Long instanceId,
-        @NonNull String workflowId, long taskExecutionId, @NonNull Map<String, ?> inputParameters, Long connectionId);
+        @NonNull String workflowId, long jobId, @NonNull Map<String, ?> inputParameters, Long connectionId);
 
     SampleOutputResponse executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,

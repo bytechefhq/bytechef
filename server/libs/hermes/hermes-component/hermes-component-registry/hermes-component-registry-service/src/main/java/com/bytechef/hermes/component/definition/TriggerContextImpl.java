@@ -16,14 +16,14 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 /**
  * @author Ivica Cardic
  */
-public class TriggerContextImpl extends ContextImpl implements TriggerDefinition.TriggerContext {
+public class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     public TriggerContextImpl(
         String componentName, String triggerName, ComponentConnection connection, HttpClientExecutor httpClientExecutor,

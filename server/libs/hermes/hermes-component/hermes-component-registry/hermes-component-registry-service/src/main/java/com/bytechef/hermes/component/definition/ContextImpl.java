@@ -18,9 +18,8 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -35,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Ivica Cardic
  */
-public class ContextImpl implements TriggerContext {
+public class ContextImpl implements Context {
 
     private final Http http;
     private final Json json;

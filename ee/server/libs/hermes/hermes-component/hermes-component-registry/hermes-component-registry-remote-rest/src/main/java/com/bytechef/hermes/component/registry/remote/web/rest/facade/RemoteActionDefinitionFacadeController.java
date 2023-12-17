@@ -7,11 +7,11 @@
 
 package com.bytechef.hermes.component.registry.remote.web.rest.facade;
 
+import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
+import com.bytechef.hermes.component.registry.domain.OptionsResponse;
+import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
+import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.hermes.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.registry.domain.OptionsResponse;
-import com.bytechef.hermes.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.registry.domain.PropertiesResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -94,7 +94,7 @@ public class RemoteActionDefinitionFacadeController {
             actionDefinitionFacade.executePerform(
                 performRequest.componentName, performRequest.componentVersion, performRequest.actionName,
                 performRequest.type, performRequest.instanceId, performRequest.workflowId,
-                performRequest.taskExecutionId, performRequest.inputParameters, performRequest.connectionId));
+                performRequest.jobId, performRequest.inputParameters, performRequest.connectionId));
     }
 
     @RequestMapping(
@@ -158,7 +158,7 @@ public class RemoteActionDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record PerformRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName, int type,
-        Long instanceId, @NonNull String workflowId, long taskExecutionId, @NotNull Map<String, ?> inputParameters,
+        Long instanceId, @NonNull String workflowId, long jobId, @NotNull Map<String, ?> inputParameters,
         Long connectionId) {
     }
 }

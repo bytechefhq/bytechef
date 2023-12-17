@@ -20,7 +20,7 @@ import static com.bytechef.hermes.component.definition.Context.Http.RequestMetho
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext.FileEntry;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.Body;

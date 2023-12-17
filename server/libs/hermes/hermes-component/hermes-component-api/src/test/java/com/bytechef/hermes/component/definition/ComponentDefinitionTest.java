@@ -86,7 +86,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"BOOLEAN","defaultValue":true,"exampleValue":null,"options":[{"description":null,"displayCondition":null,"name":"True","value":true},{"description":null,"displayCondition":null,"name":"False","value":true}],"controlType":"CHECKBOX"}
+                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"BOOLEAN","defaultValue":true,"exampleValue":null,"options":[{"description":null,"displayCondition":null,"label":"True","value":true},{"description":null,"displayCondition":null,"label":"False","value":true}],"controlType":"CHECKBOX"}
                 """,
             property);
     }
@@ -166,7 +166,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"NUMBER","defaultValue":2.0,"exampleValue":null,"maxValue":null,"minValue":null,"numberPrecision":null,"options":[{"description":null,"displayCondition":null,"name":"option1","value":1.0},{"description":null,"displayCondition":null,"name":"option2","value":2.0}],"controlType":"SELECT","optionsDataSource":null}
+                {"advancedOption":null,"description":"description","displayCondition":null,"expressionEnabled":null,"hidden":null,"label":"label","metadata":{},"placeholder":"placeholder","required":true,"name":"name","type":"NUMBER","defaultValue":2.0,"exampleValue":null,"maxValue":null,"minValue":null,"numberPrecision":null,"options":[{"description":null,"displayCondition":null,"label":"option1","value":1.0},{"description":null,"displayCondition":null,"label":"option2","value":2.0}],"controlType":"SELECT","optionsDataSource":null}
                  """,
             property);
     }
@@ -205,35 +205,35 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testPropertyOption() throws JSONException, JsonProcessingException {
-        Option option = ComponentDSL.option("name", 1);
+        Option option = ComponentDSL.option("label", 1);
 
         jsonAssertEquals(
             """
-                {"description":null,"displayCondition":null,"name":"name","value":1}
+                {"description":null,"displayCondition":null,"label":"label","value":1}
                 """,
             option);
 
-        option = ComponentDSL.option("name", "value");
+        option = ComponentDSL.option("label", "value");
 
         jsonAssertEquals(
             """
-                {"description":null,"displayCondition":null,"name":"name","value":"value"}
+                {"description":null,"displayCondition":null,"label":"label","value":"value"}
                 """,
             option);
 
-        option = ComponentDSL.option("name", 1, "description");
+        option = ComponentDSL.option("label", 1, "description");
 
         jsonAssertEquals(
             """
-                {"description":"description","displayCondition":null,"name":"name","value":1}
+                {"description":"description","displayCondition":null,"label":"label","value":1}
                 """,
             option);
 
-        option = ComponentDSL.option("name", "value", "description");
+        option = ComponentDSL.option("label", "value", "description");
 
         jsonAssertEquals(
             """
-                {"description":"description","displayCondition":null,"name":"name","value":"value"}
+                {"description":"description","displayCondition":null,"label":"label","value":"value"}
                 """,
             option);
     }

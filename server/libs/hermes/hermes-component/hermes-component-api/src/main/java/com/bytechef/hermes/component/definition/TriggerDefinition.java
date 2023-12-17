@@ -18,8 +18,6 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Help;
-import com.bytechef.hermes.definition.Property.InputProperty;
-import com.bytechef.hermes.definition.Property.OutputProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -166,7 +164,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<OutputProperty<?>> getOutputSchema();
+    Optional<Property.OutputProperty<?>> getOutputSchema();
 
     /**
      *
@@ -184,7 +182,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<List<? extends InputProperty>> getProperties();
+    Optional<List<? extends Property.InputProperty>> getProperties();
 
     /**
      *
@@ -271,7 +269,7 @@ public interface TriggerDefinition {
          */
         void accept(
             ParameterMap inputParameters, ParameterMap connectionParameters, ParameterMap outputParameters,
-            String workflowExecutionId, Context context);
+            String workflowExecutionId, TriggerContext context);
 
     }
 
@@ -291,7 +289,7 @@ public interface TriggerDefinition {
          */
         DynamicWebhookEnableOutput apply(
             ParameterMap inputParameters, ParameterMap connectionParameters, String webhookUrl,
-            String workflowExecutionId, Context context);
+            String workflowExecutionId, TriggerContext context);
 
     }
 
@@ -310,7 +308,7 @@ public interface TriggerDefinition {
     @FunctionalInterface
     interface DynamicWebhookRefreshFunction {
 
-        DynamicWebhookEnableOutput apply(ParameterMap outputParameters, Context context);
+        DynamicWebhookEnableOutput apply(ParameterMap outputParameters, TriggerContext context);
     }
 
     /**
@@ -417,7 +415,7 @@ public interface TriggerDefinition {
          */
         void accept(
             ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
-            Context context);
+            TriggerContext context);
     }
 
     /**
@@ -446,7 +444,7 @@ public interface TriggerDefinition {
          */
         void accept(
             ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
-            ListenerEmitter listenerEmitter, Context context);
+            ListenerEmitter listenerEmitter, TriggerContext context);
     }
 
     /**
@@ -505,12 +503,6 @@ public interface TriggerDefinition {
             ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
             WebhookMethod method, TriggerContext context) throws ComponentExecutionException;
 
-    }
-
-    /**
-     *
-     */
-    interface TriggerContext extends Context {
     }
 
     /**
@@ -663,6 +655,6 @@ public interface TriggerDefinition {
          */
         boolean apply(
             ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-            WebhookMethod method, Context context);
+            WebhookMethod method, TriggerContext context);
     }
 }

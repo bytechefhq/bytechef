@@ -18,14 +18,14 @@ package com.bytechef.hermes.component.definition.factory;
 
 import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContextImpl;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ContextImpl;
 import com.bytechef.hermes.component.definition.HttpClientExecutor;
+import com.bytechef.hermes.component.definition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerContextImpl;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerContext;
-import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -62,12 +62,12 @@ public class ContextFactory {
     }
 
     public ActionContext createActionContext(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, int type,
-        @Nullable Long instanceId, @Nullable String workflowId, @NonNull Long taskExecutionId,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @Nullable Integer type,
+        @Nullable Long instanceId, @Nullable String workflowId, @Nullable Long jobId,
         @Nullable ComponentConnection connection) {
 
         return new ActionContextImpl(
-            componentName, componentVersion, actionName, instanceId, type, workflowId, taskExecutionId,
+            componentName, componentVersion, actionName, instanceId, type, workflowId, jobId,
             connection, dataStorageService, eventPublisher, fileStorageService, httpClientExecutor, objectMapper,
             xmlMapper);
     }

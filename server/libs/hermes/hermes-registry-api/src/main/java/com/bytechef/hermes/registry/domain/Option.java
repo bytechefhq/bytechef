@@ -29,7 +29,7 @@ public class Option {
 
     private String description;
     private String displayCondition;
-    private String name;
+    private String label;
     private Object value;
 
     private Option() {
@@ -38,7 +38,7 @@ public class Option {
     public Option(com.bytechef.hermes.definition.Option<?> option) {
         this.description = OptionalUtils.orElse(option.getDescription(), null);
         this.displayCondition = option.getDisplayCondition();
-        this.name = option.getName();
+        this.label = option.getLabel();
         this.value = option.getValue();
     }
 
@@ -50,8 +50,8 @@ public class Option {
         return displayCondition;
     }
 
-    public String getName() {
-        return name;
+    public String getLabel() {
+        return label;
     }
 
     public Object getValue() {
@@ -65,13 +65,13 @@ public class Option {
         if (!(o instanceof Option option))
             return false;
         return Objects.equals(description, option.description)
-            && Objects.equals(displayCondition, option.displayCondition) && Objects.equals(name, option.name)
+            && Objects.equals(displayCondition, option.displayCondition) && Objects.equals(label, option.label)
             && Objects.equals(value, option.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(description, displayCondition, name, value);
+        return Objects.hash(description, displayCondition, label, value);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class Option {
         return "OptionDTO{" +
             "description='" + description + '\'' +
             ", displayCondition='" + displayCondition + '\'' +
-            ", name='" + name + '\'' +
+            ", label='" + label + '\'' +
             ", value=" + value +
             '}';
     }

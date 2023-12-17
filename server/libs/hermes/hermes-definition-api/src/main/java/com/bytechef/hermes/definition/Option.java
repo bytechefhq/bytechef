@@ -39,7 +39,7 @@ public interface Option<T> {
      *
      * @return
      */
-    String getName();
+    String getLabel();
 
     /**
      *

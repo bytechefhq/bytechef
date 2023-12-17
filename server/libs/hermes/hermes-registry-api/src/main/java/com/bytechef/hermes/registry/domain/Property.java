@@ -18,30 +18,12 @@ package com.bytechef.hermes.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.definition.Property.Type;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.Objects;
 import java.util.Optional;
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.EXISTING_PROPERTY,
-    property = "type",
-    visible = true)
-@JsonSubTypes({
-    @JsonSubTypes.Type(value = ArrayProperty.class, name = "ARRAY"),
-    @JsonSubTypes.Type(value = BooleanProperty.class, name = "BOOLEAN"),
-    @JsonSubTypes.Type(value = DateProperty.class, name = "DATE"),
-    @JsonSubTypes.Type(value = DateTimeProperty.class, name = "DATE_TIME"),
-    @JsonSubTypes.Type(value = DynamicPropertiesProperty.class, name = "DYNAMIC_PROPERTIES"),
-    @JsonSubTypes.Type(value = IntegerProperty.class, name = "INTEGER"),
-    @JsonSubTypes.Type(value = NumberProperty.class, name = "NUMBER"),
-    @JsonSubTypes.Type(value = NullProperty.class, name = "NULL"),
-    @JsonSubTypes.Type(value = ObjectProperty.class, name = "OBJECT"),
-    @JsonSubTypes.Type(value = StringProperty.class, name = "STRING"),
-    @JsonSubTypes.Type(value = TimeProperty.class, name = "TIME"),
-})
-// CHECKSTYLE:OFF
+/**
+ * @author Ivica Cardic
+ */
 public abstract class Property {
 
     private boolean advancedOption;
@@ -71,26 +53,23 @@ public abstract class Property {
         this.type = property.getType();
     }
 
-    @SuppressWarnings("unchecked")
-    public static <P extends Property> P toProperty(com.bytechef.hermes.definition.Property property) {
-        return switch (property.getType()) {
-            case ARRAY -> (P) toArrayProperty((com.bytechef.hermes.definition.Property.ArrayProperty) property);
-            case BOOLEAN -> (P) toBooleanProperty((com.bytechef.hermes.definition.Property.BooleanProperty) property);
-            case DATE -> (P) toDateProperty((com.bytechef.hermes.definition.Property.DateProperty) property);
-            case DATE_TIME ->
-                (P) toDateTimeProperty((com.bytechef.hermes.definition.Property.DateTimeProperty) property);
-            case DYNAMIC_PROPERTIES -> (P) toDynamicPropertiesProperty(
-                (com.bytechef.hermes.definition.Property.DynamicPropertiesProperty) property);
-            case INTEGER -> (P) toIntegerProperty((com.bytechef.hermes.definition.Property.IntegerProperty) property);
-            case NULL -> (P) toNullProperty((com.bytechef.hermes.definition.Property.NullProperty) property);
-            case NUMBER -> (P) toNumberProperty((com.bytechef.hermes.definition.Property.NumberProperty) property);
-            case OBJECT -> (P) toObjectProperty((com.bytechef.hermes.definition.Property.ObjectProperty) property);
-            case STRING -> (P) toStringProperty((com.bytechef.hermes.definition.Property.StringProperty) property);
-            case TIME -> (P) toTimeProperty((com.bytechef.hermes.definition.Property.TimeProperty) property);
-        };
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Property that))
+            return false;
+        return advancedOption == that.advancedOption && expressionEnabled == that.expressionEnabled
+            && hidden == that.hidden && required == that.required && Objects.equals(description, that.description)
+            && Objects.equals(displayCondition, that.displayCondition) && Objects.equals(label, that.label)
+            && Objects.equals(placeholder, that.placeholder) && Objects.equals(name, that.name) && type == that.type;
     }
 
-    public abstract Object accept(PropertyVisitor propertyVisitor);
+    @Override
+    public int hashCode() {
+        return Objects.hash(advancedOption, description, displayCondition, expressionEnabled, hidden, label,
+            placeholder, required, name, type);
+    }
 
     public boolean getAdvancedOption() {
         return advancedOption;
@@ -133,24 +112,6 @@ public abstract class Property {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Property that))
-            return false;
-        return advancedOption == that.advancedOption && expressionEnabled == that.expressionEnabled
-            && hidden == that.hidden && required == that.required && Objects.equals(description, that.description)
-            && Objects.equals(displayCondition, that.displayCondition) && Objects.equals(label, that.label)
-            && Objects.equals(placeholder, that.placeholder) && Objects.equals(name, that.name) && type == that.type;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(advancedOption, description, displayCondition, expressionEnabled, hidden, label,
-            placeholder, required, name, type);
-    }
-
-    @Override
     public String toString() {
         return "Property" +
             "advancedOption=" + advancedOption +
@@ -164,82 +125,5 @@ public abstract class Property {
             ", name='" + name + '\'' +
             ", type=" + type +
             '}';
-    }
-
-    private static ArrayProperty toArrayProperty(com.bytechef.hermes.definition.Property.ArrayProperty arrayProperty) {
-        return new ArrayProperty(arrayProperty);
-    }
-
-    private static BooleanProperty
-        toBooleanProperty(com.bytechef.hermes.definition.Property.BooleanProperty booleanProperty) {
-        return new BooleanProperty(booleanProperty);
-    }
-
-    private static DateProperty toDateProperty(com.bytechef.hermes.definition.Property.DateProperty dateProperty) {
-        return new DateProperty(dateProperty);
-    }
-
-    private static DateTimeProperty
-        toDateTimeProperty(com.bytechef.hermes.definition.Property.DateTimeProperty dateTimeProperty) {
-        return new DateTimeProperty(dateTimeProperty);
-    }
-
-    private static DynamicPropertiesProperty toDynamicPropertiesProperty(
-        com.bytechef.hermes.definition.Property.DynamicPropertiesProperty dynamicPropertiesProperty) {
-
-        return new DynamicPropertiesProperty(dynamicPropertiesProperty);
-    }
-
-    private static IntegerProperty
-        toIntegerProperty(com.bytechef.hermes.definition.Property.IntegerProperty integerProperty) {
-        return new IntegerProperty(integerProperty);
-    }
-
-    private static NullProperty toNullProperty(com.bytechef.hermes.definition.Property.NullProperty nullProperty) {
-        return new NullProperty(nullProperty);
-    }
-
-    private static NumberProperty
-        toNumberProperty(com.bytechef.hermes.definition.Property.NumberProperty numberProperty) {
-        return new NumberProperty(numberProperty);
-    }
-
-    private static ObjectProperty
-        toObjectProperty(com.bytechef.hermes.definition.Property.ObjectProperty objectProperty) {
-        return new ObjectProperty(objectProperty);
-    }
-
-    private static StringProperty
-        toStringProperty(com.bytechef.hermes.definition.Property.StringProperty stringProperty) {
-        return new StringProperty(stringProperty);
-    }
-
-    private static TimeProperty toTimeProperty(com.bytechef.hermes.definition.Property.TimeProperty timeProperty) {
-        return new TimeProperty(timeProperty);
-    }
-
-    public interface PropertyVisitor {
-
-        Object visit(ArrayProperty arrayProperty);
-
-        Object visit(BooleanProperty booleanProperty);
-
-        Object visit(DateProperty dateProperty);
-
-        Object visit(DateTimeProperty dateTimeProperty);
-
-        Object visit(DynamicPropertiesProperty dynamicPropertiesProperty);
-
-        Object visit(IntegerProperty integerProperty);
-
-        Object visit(NullProperty nullProperty);
-
-        Object visit(NumberProperty numberProperty);
-
-        Object visit(ObjectProperty objectProperty);
-
-        Object visit(StringProperty stringProperty);
-
-        Object visit(TimeProperty timeProperty);
     }
 }

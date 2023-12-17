@@ -17,9 +17,9 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.hermes.component.definition.Property.InputProperty;
+import com.bytechef.hermes.component.definition.Property.OutputProperty;
 import com.bytechef.hermes.definition.Help;
-import com.bytechef.hermes.definition.Property.InputProperty;
-import com.bytechef.hermes.definition.Property.OutputProperty;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

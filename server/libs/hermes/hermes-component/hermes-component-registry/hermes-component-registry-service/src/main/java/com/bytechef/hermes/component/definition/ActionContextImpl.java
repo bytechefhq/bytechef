@@ -19,9 +19,8 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.bytechef.hermes.component.registry.dto.ComponentConnection;
+import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -42,17 +41,17 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String componentName, Integer componentVersion, String actionName, Long instanceId, int type,
-        String workflowId, Long taskExecutionId, ComponentConnection connection, DataStorageService dataStorageService,
+        String componentName, int componentVersion, String actionName, Long instanceId, Integer type,
+        String workflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
         HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper, XmlMapper xmlMapper) {
 
         super(componentName, actionName, connection, httpClientExecutor, objectMapper, xmlMapper);
 
-        this.data = new DataImpl(
-            componentName, componentVersion, actionName, instanceId, type, workflowId, taskExecutionId,
+        this.data = type == null ? new NoOpDataImpl() : new DataImpl(
+            componentName, componentVersion, actionName, instanceId, type, workflowId, jobId,
             dataStorageService);
-        this.event = taskExecutionId == null ? null : new EventImpl(eventPublisher, taskExecutionId);
+        this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.file = new FileImpl(fileStorageService);
     }
 
@@ -81,30 +80,30 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
 
     private record DataImpl(
         String componentName, Integer componentVersion, String actionName, Long instanceId, int type, String workflowId,
-        Long taskExecutionId, DataStorageService dataStorageService) implements Data {
+        Long jobId, DataStorageService dataStorageService) implements Data {
 
         @Override
         public <T> Optional<T> fetchValue(Scope scope, String key) {
             return dataStorageService.fetch(
-                componentName, componentVersion, actionName, scope.getId(), getScopeId(scope), key, type);
+                componentName, actionName, scope.getId(), getScopeId(scope), key, type);
         }
 
         @Override
         public <T> T getValue(Scope scope, String key) {
             return dataStorageService.get(
-                componentName, componentVersion, actionName, scope.getId(), getScopeId(scope), key, type);
+                componentName, actionName, scope.getId(), getScopeId(scope), key, type);
         }
 
         @Override
         public void setValue(Scope scope, String key, Object value) {
             dataStorageService.put(
-                componentName, componentVersion, actionName, scope.getId(), getScopeId(scope), key, type, value);
+                componentName, actionName, scope.getId(), getScopeId(scope), key, type, value);
         }
 
         private String getScopeId(Scope scope) {
             return switch (scope) {
                 case ACCOUNT -> null;
-                case CURRENT_EXECUTION -> taskExecutionId + "";
+                case CURRENT_EXECUTION -> jobId + "";
                 case INSTANCE -> instanceId + "";
                 case WORKFLOW -> workflowId;
             };
@@ -147,6 +146,24 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
             } catch (Exception exception) {
                 throw new ComponentExecutionException("Unable to store file " + fileName, exception);
             }
+        }
+    }
+
+    private record NoOpDataImpl() implements Data {
+
+        @Override
+        public <T> Optional<T> fetchValue(Scope scope, String key) {
+            return Optional.empty();
+        }
+
+        @Override
+        public <T> T getValue(Scope scope, String key) {
+            return null;
+        }
+
+        @Override
+        public void setValue(Scope scope, String key, Object data) {
+
         }
     }
 }

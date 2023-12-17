@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -34,19 +33,14 @@ public interface SampleOutputDataSource {
     /**
      *
      */
-    @FunctionalInterface
     interface SampleOutputFunction {
-
-        /**
-         * @param inputParameters
-         * @param connectionParameters
-         * @param context
-         * @return
-         */
-        SampleOutputResponse apply(ParameterMap inputParameters, ParameterMap connectionParameters, Context context)
-            throws ComponentExecutionException;
     }
 
+    /**
+     *
+     * @param sampleOutput
+     * @param errorMessage
+     */
     @SuppressFBWarnings("EI")
     record SampleOutputResponse(Object sampleOutput, String errorMessage) {
 

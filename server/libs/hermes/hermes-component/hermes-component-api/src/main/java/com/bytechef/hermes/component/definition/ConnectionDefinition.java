@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.definition.Property.InputProperty;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,7 +65,7 @@ public interface ConnectionDefinition {
      *
      * @return
      */
-    Optional<List<? extends InputProperty>> getProperties();
+    Optional<List<? extends Property.InputProperty>> getProperties();
 
     /**
      * TODO
