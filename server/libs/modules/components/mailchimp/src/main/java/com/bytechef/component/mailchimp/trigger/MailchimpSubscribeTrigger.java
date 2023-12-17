@@ -119,6 +119,6 @@ public class MailchimpSubscribeTrigger {
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
         TriggerContext context) {
 
-        return WebhookOutput.map((Map<?, ?>) body.content());
+        return WebhookOutput.map((Map<?, ?>) body.getContent());
     }
 }

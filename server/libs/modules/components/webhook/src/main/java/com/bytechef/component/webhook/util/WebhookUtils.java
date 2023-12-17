@@ -53,7 +53,7 @@ public class WebhookUtils {
             } else {
                 return WebhookOutput.map(
                     Map.of(
-                        BODY, body.content(),
+                        BODY, body.getContent(),
                         METHOD, method,
                         HEADERS, headers,
                         PARAMETERS, parameters));

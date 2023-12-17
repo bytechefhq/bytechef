@@ -526,19 +526,19 @@ public interface TriggerDefinition {
          *
          * @return
          */
-        Object content();
+        Object getContent();
 
         /**
          *
          * @return
          */
-        ContentType contentType();
+        ContentType getContentType();
 
         /**
          *
          * @return
          */
-        String mimeType();
+        String getMimeType();
 
         /**
          *

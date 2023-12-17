@@ -113,5 +113,20 @@ public record WebhookRequest(
 
     public record WebhookBodyImpl(
         Object content, ContentType contentType, String mimeType) implements WebhookBody {
+
+        @Override
+        public Object getContent() {
+            return content;
+        }
+
+        @Override
+        public ContentType getContentType() {
+            return contentType;
+        }
+
+        @Override
+        public String getMimeType() {
+            return mimeType;
+        }
     }
 }

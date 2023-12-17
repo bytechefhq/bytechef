@@ -211,6 +211,6 @@ public class PipedriveNewOrganizationTrigger {
         ParameterMap inputParameters, ParameterMap connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, Context context) {
 
-        return WebhookOutput.map((Map<?, ?>) ((Map<String, ?>) body.content()).get("current"));
+        return WebhookOutput.map((Map<?, ?>) ((Map<String, ?>) body.getContent()).get("current"));
     }
 }
