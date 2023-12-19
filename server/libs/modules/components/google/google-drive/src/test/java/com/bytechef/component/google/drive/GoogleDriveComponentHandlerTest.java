@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.google.drive.constant;
+package com.bytechef.component.google.drive;
+
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
- * @author Mario Cvjetojevic
+ * @author Ivica Cardic
  */
-public final class GoogleDriveConstants {
+public class GoogleDriveComponentHandlerTest {
 
-    public static final String FILE_ENTRY = "fileEntry";
-    public static final String FOLDER = "folder";
-    public static final String GOOGLE_DRIVE = "googleDrive";
-    public static final String UPLOAD_FILE = "uploadFile";
-
-    private GoogleDriveConstants() {
+    @Test
+    public void testGetComponentDefinition() {
+        JsonFileAssert.assertEquals(
+            "definition/google-drive_v1.json", new GoogleDriveComponentHandler().getDefinition());
     }
 }
