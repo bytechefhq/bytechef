@@ -44,7 +44,6 @@ public interface Property {
         OBJECT_BUILDER,
         PASSWORD,
         PHONE,
-        SCHEMA_DESIGNER,
         SELECT,
         TEXT,
         TEXT_AREA,

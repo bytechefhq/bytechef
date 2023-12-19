@@ -46,8 +46,6 @@ import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.hermes.definition.Help;
-import com.bytechef.hermes.definition.Property.ControlType;
-import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
 import java.util.List;
 import java.util.Map;
 
@@ -170,18 +168,7 @@ public class CustomActionUtils {
                         "'%s' === '%s'".formatted(
                             Http.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
                     .defaultValue("text/plain")
-                    .placeholder("text/plain"),
-
-                //
-                // TODO Add support for using it in the editor
-                //
-
-                string(OUTPUT_SCHEMA)
-                    .label("Output Schema")
-                    .description(
-                        "Please provide a description of the desired format for the API's output schema. This format will then be utilized to generate the data tree for the output.")
-                    .controlType(ControlType.SCHEMA_DESIGNER)
-                    .sampleDataType(SampleDataType.JSON))
+                    .placeholder("text/plain"))
             .outputSchema(getOutputSchemaFunction())
             .sampleOutput(getSampleOutputSchemaFunction())
             .perform(CustomActionUtils::perform);
