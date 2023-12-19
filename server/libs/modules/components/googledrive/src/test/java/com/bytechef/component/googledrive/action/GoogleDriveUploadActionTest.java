@@ -16,7 +16,7 @@
 
 package com.bytechef.component.googledrive.action;
 
-import com.bytechef.hermes.component.definition.ActionDefinition;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,13 +25,13 @@ import org.mockito.Mockito;
 /**
  * @author Mario Cvjetojevic
  */
-public class GoogledriveUploadActionTest {
+public class GoogleDriveUploadActionTest {
 
     @Test
     public void testPerform() {
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-        Assertions.assertNull(GoogledriveUploadAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionDefinition.ActionContext.class)));
+        Assertions.assertNull(
+            GoogleDriveUploadAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class)));
     }
 }

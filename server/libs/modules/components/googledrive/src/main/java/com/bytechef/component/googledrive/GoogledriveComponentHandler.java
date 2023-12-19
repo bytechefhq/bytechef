@@ -16,11 +16,11 @@
 
 package com.bytechef.component.googledrive;
 
-import static com.bytechef.component.googledrive.connection.GoogledriveConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.googledrive.constant.GoogledriveConstants.GOOGLEDRIVE;
+import static com.bytechef.component.googledrive.connection.GoogleDriveConnection.CONNECTION_DEFINITION;
+import static com.bytechef.component.googledrive.constant.GoogleDriveConstants.GOOGLEDRIVE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
-import com.bytechef.component.googledrive.action.GoogledriveUploadAction;
+import com.bytechef.component.googledrive.action.GoogleDriveUploadAction;
 import com.bytechef.hermes.component.ComponentHandler;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -29,14 +29,14 @@ import com.google.auto.service.AutoService;
  * @author Mario Cvjetojevic
  */
 @AutoService(ComponentHandler.class)
-public class GoogledriveComponentHandler implements ComponentHandler {
+public class GoogleDriveComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(GOOGLEDRIVE)
         .title("Google Drive")
         .description("Component description.")
         .icon("path:assets/googledrive.svg")
         .connection(CONNECTION_DEFINITION)
-        .actions(GoogledriveUploadAction.ACTION_DEFINITION);
+        .actions(GoogleDriveUploadAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

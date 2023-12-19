@@ -19,11 +19,11 @@ package com.bytechef.component.googledrive.constant;
 /**
  * @author Mario Cvjetojevic
  */
-public final class GoogledriveConstants {
+public final class GoogleDriveConstants {
 
     public static final String GOOGLEDRIVE = "googledrive";
-    public static final String RESUMABLEUPLOAD = "resumableUpload";
+    public static final String UPLOAD_FILE = "uploadFile";
 
-    public GoogledriveConstants() {
+    private GoogleDriveConstants() {
     }
 }
