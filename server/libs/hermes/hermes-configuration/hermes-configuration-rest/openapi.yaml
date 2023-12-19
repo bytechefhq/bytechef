@@ -1236,7 +1236,6 @@ components:
       - "NUMBER"
       - "PASSWORD"
       - "PHONE"
-      - "SCHEMA_DESIGNER"
       - "SELECT"
       - "TEXT"
       - "TEXT_AREA"
