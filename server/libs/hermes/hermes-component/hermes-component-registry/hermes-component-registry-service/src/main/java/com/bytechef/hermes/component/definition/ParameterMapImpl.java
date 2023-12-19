@@ -487,4 +487,11 @@ public final class ParameterMapImpl implements ParameterMap {
     public Collection<Object> values() {
         return map.values();
     }
+
+    @Override
+    public String toString() {
+        return "ParameterMapImpl{" +
+            "map=" + map +
+            '}';
+    }
 }
