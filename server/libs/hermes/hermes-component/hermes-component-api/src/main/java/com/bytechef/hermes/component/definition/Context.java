@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.hermes.component.definition.Property.OutputProperty;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -82,14 +84,14 @@ public interface Context {
          * @param fileEntry
          * @return
          */
-        InputStream getStream(ActionContext.FileEntry fileEntry);
+        InputStream getStream(FileEntry fileEntry);
 
         /**
          *
          * @param fileEntry
          * @return
          */
-        String readToString(ActionContext.FileEntry fileEntry);
+        String readToString(FileEntry fileEntry);
 
         /**
          *
@@ -97,7 +99,7 @@ public interface Context {
          * @param inputStream
          * @return
          */
-        ActionContext.FileEntry storeContent(String fileName, InputStream inputStream)
+        FileEntry storeContent(String fileName, InputStream inputStream)
             throws IOException;
 
         /**
@@ -106,7 +108,21 @@ public interface Context {
          * @param data
          * @return
          */
-        ActionContext.FileEntry storeContent(String fileName, String data) throws IOException;
+        FileEntry storeContent(String fileName, String data) throws IOException;
+
+        /**
+         *
+         * @param fileEntry
+         * @return
+         */
+        java.io.File toTempFile(FileEntry fileEntry);
+
+        /**
+         *
+         * @param fileEntry
+         * @return
+         */
+        Path toTempFilePath(FileEntry fileEntry);
     }
 
     @FunctionalInterface
@@ -325,7 +341,7 @@ public interface Context {
              * @param content
              * @return
              */
-            public static Body of(ActionContext.FileEntry content) {
+            public static Body of(FileEntry content) {
                 return new Body(content, BodyContentType.BINARY);
             }
 
@@ -335,7 +351,7 @@ public interface Context {
              * @param mimeType
              * @return
              */
-            public static Body of(ActionContext.FileEntry content, String mimeType) {
+            public static Body of(FileEntry content, String mimeType) {
                 Objects.requireNonNull(content);
 
                 return new Body(content, BodyContentType.BINARY, mimeType);
