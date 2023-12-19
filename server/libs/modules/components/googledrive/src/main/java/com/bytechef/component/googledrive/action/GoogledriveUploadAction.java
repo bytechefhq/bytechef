@@ -16,38 +16,35 @@
 
 package com.bytechef.component.googledrive.action;
 
-import static com.bytechef.component.googledrive.constant.GoogledriveConstants.RESUMABLEUPLOAD;
+import static com.bytechef.component.googledrive.constant.GoogleDriveConstants.UPLOAD_FILE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
-import static com.bytechef.hermes.definition.DefinitionDSL.string;
 
 import com.bytechef.component.googledrive.util.OAuthAuthentication;
-import com.bytechef.hermes.component.definition.ActionDefinition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
-
 import java.io.IOException;
-
 
 /**
  * @author Mario Cvjetojevic
  */
-public final class GoogledriveUploadAction {
+public final class GoogleDriveUploadAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(RESUMABLEUPLOAD)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPLOAD_FILE)
         .title("Upload file")
         .description("Uploads a file to google drive.")
         .properties()
         .outputSchema(string())
-        .perform(GoogledriveUploadAction::perform);
+        .perform(GoogleDriveUploadAction::perform);
 
     protected static String perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
@@ -61,28 +58,27 @@ public final class GoogledriveUploadAction {
         // Specify media type and file-path for file.
         FileContent mediaContent = new FileContent("image/jpeg", filePath);
 
-        System.out.println("EXECUTING RESUMABLE UPLOAD !!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
         // Build a new authorized API client service.
         Drive service = new Drive.Builder(new NetHttpTransport(),
             GsonFactory.getDefaultInstance(),
             new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
-            .setApplicationName("Drive samples")
-            .build();
-
+                .setApplicationName("Drive samples")
+                .build();
 
         try {
-            File file = service.files().create(fileMetadata, mediaContent)
+            File file = service.files()
+                .create(fileMetadata, mediaContent)
                 .setFields("id")
                 .execute();
             return file.getId();
         } catch (GoogleJsonResponseException googleJsonResponseException) {
-            throw new ComponentExecutionException("Unable to upload file " + inputParameters, googleJsonResponseException);
+            throw new ComponentExecutionException("Unable to upload file " + inputParameters,
+                googleJsonResponseException);
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to upload file " + inputParameters, ioException);
         }
     }
 
-    public GoogledriveUploadAction() {
+    private GoogleDriveUploadAction() {
     }
 }
