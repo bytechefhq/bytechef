@@ -37,6 +37,8 @@ import com.bytechef.component.xlsxfile.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -77,7 +79,23 @@ public class XlsxFileWriteAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(fileEntry())
+        .sampleOutput(getSampleOutputSchemaFunction())
         .perform(XlsxFileWriteAction::perform);
+
+    private static String getaDefaultFileName() {
+        String xlsxName = XlsxFileConstants.FileFormat.XLSX.name();
+
+        return "file." + xlsxName.toLowerCase();
+    }
+
+    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
+            perform(inputParameters, connectionParameters, context));
+    }
+
+    private static Workbook getWorkbook() {
+        return new XSSFWorkbook();
+    }
 
     @SuppressWarnings({
         "rawtypes", "unchecked"
@@ -91,16 +109,6 @@ public class XlsxFileWriteAction {
 
         return context.file(file -> file.storeContent(
             fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))));
-    }
-
-    private static String getaDefaultFileName() {
-        String xlsxName = XlsxFileConstants.FileFormat.XLSX.name();
-
-        return "file." + xlsxName.toLowerCase();
-    }
-
-    private static Workbook getWorkbook() {
-        return new XSSFWorkbook();
     }
 
     private static byte[] write(List<Map<String, ?>> rows, WriteConfiguration configuration) throws IOException {

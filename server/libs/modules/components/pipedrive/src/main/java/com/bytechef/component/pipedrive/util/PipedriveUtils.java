@@ -44,7 +44,7 @@ public class PipedriveUtils {
                         "subscription_url", webhookUrl)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody();
+            .getBody(new Context.TypeReference<>() {});
 
         return (String) result.get("id");
     }
@@ -67,7 +67,7 @@ public class PipedriveUtils {
                         : Map.of(dependsOn, List.of(inputParameters.getString(dependsOn, ""))))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
-                .getBody();
+                .getBody(new Context.TypeReference<>() {});
 
             context.logger(logger -> logger.debug("Response for path='%s': %s".formatted(path, response)));
 

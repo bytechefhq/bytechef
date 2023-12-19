@@ -31,6 +31,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -71,7 +72,13 @@ public class XmlFileWriteAction {
                 .defaultValue("file.xml")
                 .advancedOption(true))
         .outputSchema(fileEntry())
+        .sampleOutput(getSampleOutputSchemaFunction())
         .perform(XmlFileWriteAction::perform);
+
+    protected static SampleOutputDataSource.ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
+            perform(inputParameters, connectionParameters, context));
+    }
 
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {

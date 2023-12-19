@@ -36,6 +36,8 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
@@ -77,22 +79,8 @@ public class OdsFileWriteAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(fileEntry())
+        .sampleOutput(getSampleOutputSchemaFunction())
         .perform(OdsFileWriteAction::perform);
-
-    @SuppressWarnings({
-        "rawtypes", "unchecked"
-    })
-    protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
-
-        String fileName = inputParameters.getString(FILENAME, "file.ods");
-        List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, List.of());
-        String sheetName = inputParameters.getString(SHEET_NAME, "Sheet");
-
-        return context.file(
-            file -> file.storeContent(
-                fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))));
-    }
 
     private static Object[] getHeaderValues(Set<String> names) {
         Validate.notNull(names, "'names' must not be null");
@@ -110,6 +98,26 @@ public class OdsFileWriteAction {
         }
 
         return values;
+    }
+
+    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
+            perform(inputParameters, connectionParameters, context));
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    protected static Object perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+
+        String fileName = inputParameters.getString(FILENAME, "file.ods");
+        List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, List.of());
+        String sheetName = inputParameters.getString(SHEET_NAME, "Sheet");
+
+        return context.file(
+            file -> file.storeContent(
+                fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))));
     }
 
     private static byte[] write(List<Map<String, ?>> rows, WriteConfiguration configuration) throws IOException {

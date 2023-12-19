@@ -26,6 +26,8 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 
 /**
  * @author Ivica Cardic
@@ -46,7 +48,13 @@ public class FileStorageWriteAction {
                     "Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
         .outputSchema(fileEntry())
+        .sampleOutput(getSampleOutputSchemaFunction())
         .perform(FileStorageWriteAction::perform);
+
+    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
+            perform(inputParameters, connectionParameters, context));
+    }
 
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {

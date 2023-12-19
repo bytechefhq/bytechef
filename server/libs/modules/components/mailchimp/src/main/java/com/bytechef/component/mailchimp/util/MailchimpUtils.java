@@ -39,7 +39,7 @@ public class MailchimpUtils {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .header(AUTHORIZATION, "OAuth " + accessToken)
             .execute()
-            .getBody());
+            .getBody(new Context.TypeReference<>() {}));
 
         if (!response.containsKey("dc")) {
             throw new ComponentExecutionException(
@@ -64,7 +64,7 @@ public class MailchimpUtils {
                         "count", List.of("1000")))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
-                .getBody();
+                .getBody(new Context.TypeReference<>() {});
 
             context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, response)));
 

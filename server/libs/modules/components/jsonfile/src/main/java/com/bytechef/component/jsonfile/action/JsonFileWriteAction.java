@@ -33,6 +33,8 @@ import com.bytechef.component.jsonfile.constant.JsonFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -84,7 +86,19 @@ public class JsonFileWriteAction {
                 .defaultValue("file.json")
                 .advancedOption(true))
         .outputSchema(fileEntry())
+        .sampleOutput(getSampleOutputSchemaFunction())
         .perform(JsonFileWriteAction::perform);
+
+    private static String getDefaultFileName(JsonFileConstants.FileType fileType, String defaultFilename) {
+        return defaultFilename == null
+            ? "file." + (fileType == JsonFileConstants.FileType.JSON ? "json" : "jsonl")
+            : defaultFilename;
+    }
+
+    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+        return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
+            perform(inputParameters, connectionParameters, context));
+    }
 
     @SuppressWarnings("unchecked")
     protected static Object perform(
@@ -114,11 +128,5 @@ public class JsonFileWriteAction {
         } catch (IOException ioException) {
             throw new ComponentExecutionException("Unable to create json file", ioException);
         }
-    }
-
-    private static String getDefaultFileName(JsonFileConstants.FileType fileType, String defaultFilename) {
-        return defaultFilename == null
-            ? "file." + (fileType == JsonFileConstants.FileType.JSON ? "json" : "jsonl")
-            : defaultFilename;
     }
 }
