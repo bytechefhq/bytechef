@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.googledrive.action;
+package com.bytechef.component.google.drive.action;
 
-import static com.bytechef.component.googledrive.constant.GoogleDriveConstants.UPLOAD_FILE;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.UPLOAD_FILE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 
-import com.bytechef.component.googledrive.util.OAuthAuthentication;
+import com.bytechef.component.google.drive.util.OAuthAuthentication;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;

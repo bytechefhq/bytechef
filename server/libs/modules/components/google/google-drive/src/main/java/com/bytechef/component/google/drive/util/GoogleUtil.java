@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.googledrive.util;
+package com.bytechef.component.google.drive.util;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.http.HttpRequest;

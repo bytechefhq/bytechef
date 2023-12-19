@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.googledrive.action;
+package com.bytechef.component.google.drive.action;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;

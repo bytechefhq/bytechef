@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.googledrive.connection;
+package com.bytechef.component.google.drive.connection;
 
 import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
