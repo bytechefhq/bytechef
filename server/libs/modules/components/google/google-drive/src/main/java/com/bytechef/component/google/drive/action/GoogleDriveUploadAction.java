@@ -16,69 +16,110 @@
 
 package com.bytechef.component.google.drive.action;
 
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.UPLOAD_FILE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 
-import com.bytechef.component.google.drive.util.OAuthAuthentication;
+import com.bytechef.component.google.drive.util.GoogleUtils;
 import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
+import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.hermes.component.definition.OptionsDataSource.OptionsResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.bytechef.hermes.definition.Option;
 import com.google.api.client.http.FileContent;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Mario Cvjetojevic
+ * @author Ivica Cardic
  */
 public final class GoogleDriveUploadAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPLOAD_FILE)
         .title("Upload file")
         .description("Uploads a file to google drive.")
-        .properties()
-        .outputSchema(string())
+        .properties(
+            fileEntry(FILE_ENTRY)
+                .label("File")
+                .description(
+                    "The object property which contains a reference to the file to upload.")
+                .required(true),
+            string(FOLDER)
+                .label("Folder")
+                .description(
+                    "The directory where the file is uploaded.")
+                .options(getOptionsFunction())
+                .required(true))
+        .outputSchema(
+            object()
+                .properties(
+                    string("id")))
+        .sampleOutput(Map.of("id", "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"))
         .perform(GoogleDriveUploadAction::perform);
 
-    protected static String perform(
+    private GoogleDriveUploadAction() {
+    }
+
+    public static ActionOptionsFunction getOptionsFunction() {
+        return (inputParameters, connectionParameters, searchText, context) -> {
+            List<Option<String>> options;
+
+            Drive service = GoogleUtils.getDrive(connectionParameters);
+
+            try {
+                List<com.google.api.services.drive.model.Drive> drives = service
+                    .drives()
+                    .list()
+                    .execute()
+                    .getDrives();
+
+                options = drives.stream()
+                    .filter(drive -> !StringUtils.isNotEmpty(searchText) ||
+                        StringUtils.startsWith(drive.getName(), searchText))
+                    .map(drive -> (Option<String>)option(drive.getName(), drive.getId()))
+                    .toList();
+            } catch (IOException e) {
+                throw new ComponentExecutionException(e);
+            }
+
+            return new OptionsResponse(options);
+        };
+    }
+
+    public static File perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
         throws ComponentExecutionException {
 
-        // Upload file photo.jpg on drive.
-        File fileMetadata = new File();
-        fileMetadata.setName("photo.jpg");
-
-        java.io.File filePath = new java.io.File(new java.io.File("").getAbsolutePath());
-        // Specify media type and file-path for file.
-        FileContent mediaContent = new FileContent("image/jpeg", filePath);
-
-        // Build a new authorized API client service.
-        Drive service = new Drive.Builder(new NetHttpTransport(),
-            GsonFactory.getDefaultInstance(),
-            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
-                .setApplicationName("Drive samples")
-                .build();
+        Drive drive = GoogleUtils.getDrive(connectionParameters);
+        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
         try {
-            File file = service.files()
-                .create(fileMetadata, mediaContent)
+            return drive
+                .files()
+                .create(
+                    new File().setName(fileEntry.getName() + "." + fileEntry.getExtension()),
+                    new FileContent(
+                        fileEntry.getMimeType(),
+                        actionContext.file(file -> file.toTempFile(fileEntry))))
                 .setFields("id")
                 .execute();
-            return file.getId();
-        } catch (GoogleJsonResponseException googleJsonResponseException) {
-            throw new ComponentExecutionException("Unable to upload file " + inputParameters,
-                googleJsonResponseException);
         } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to upload file " + inputParameters, ioException);
+            throw new ComponentExecutionException(ioException.getMessage(), ioException);
         }
-    }
-
-    private GoogleDriveUploadAction() {
     }
 }
