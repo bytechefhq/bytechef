@@ -5,8 +5,8 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 type ComponentActionsType = Array<{
-    componentName: string;
     actionName: string;
+    componentName: string;
     workflowAlias?: string;
 }>;
 

@@ -60,6 +60,7 @@ import {ProjectCategoryKeys} from '@/queries/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/projectTags.quries';
 import {ProjectKeys, useGetProjectQuery, useGetProjectWorkflowsQuery} from '@/queries/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
+import {WorkflowDefinitionType} from '@/types/types';
 import {ChevronDownIcon, DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {
@@ -81,6 +82,7 @@ import ProjectWorkflow from './components/ProjectWorkflow';
 import ToggleGroup, {IToggleItem} from './components/ToggleGroup';
 import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
+import useWorkflowDefinitionStore from './stores/useWorkflowDefinitionStore';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -110,6 +112,8 @@ const Project = () => {
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {setComponentDefinitions, setTaskDispatcherDefinitions} = useWorkflowDataStore();
+    const {setWorkflowDefinitions, workflowDefinitions} = useWorkflowDefinitionStore();
 
     const {toast} = useToast();
 
@@ -158,8 +162,6 @@ const Project = () => {
         error: taskDispatcherDefinitionsError,
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
-
-    const {setComponentDefinitions, setTaskDispatcherDefinitions} = useWorkflowDataStore();
 
     useEffect(() => {
         if (componentDefinitions) {
@@ -269,7 +271,13 @@ const Project = () => {
 
     useEffect(() => {
         if (projectWorkflows) {
-            setCurrentWorkflow(projectWorkflows.find((workflow: WorkflowModel) => workflow.id === workflowId)!);
+            const workflow = projectWorkflows.find((workflow) => workflow.id === workflowId);
+
+            setCurrentWorkflow(workflow);
+
+            if (workflow?.id && !workflowDefinitions[workflow.id]) {
+                setWorkflowDefinitions({...workflowDefinitions, [workflow.id]: workflow} as WorkflowDefinitionType);
+            }
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -369,7 +377,17 @@ const Project = () => {
     };
 
     const handleProjectWorkflowValueChange = (id: string) => {
-        setCurrentWorkflow(projectWorkflows!.find((workflow: WorkflowModel) => workflow.id === id)!);
+        if (!projectWorkflows) {
+            return;
+        }
+
+        const newWorkflow = projectWorkflows.find((workflow: WorkflowModel) => workflow.id === id);
+
+        setCurrentWorkflow(newWorkflow);
+
+        if (newWorkflow?.id && !workflowDefinitions[newWorkflow.id]) {
+            setWorkflowDefinitions({...workflowDefinitions, [newWorkflow.id]: newWorkflow});
+        }
 
         navigate(`/automation/projects/${projectId}/workflows/${id}`);
     };
@@ -633,9 +651,10 @@ const Project = () => {
                     errors={[componentsError, taskDispatcherDefinitionsError, projectWorkflowsError]}
                     loading={componentsIsLoading || taskDispatcherDefinitionsLoading || projectWorkflowsLoading}
                 >
-                    {componentDefinitions && !!taskDispatcherDefinitions && (
+                    {componentDefinitions && !!taskDispatcherDefinitions && currentWorkflow && (
                         <ProjectWorkflow
                             componentDefinitions={componentDefinitions}
+                            currentWorkflow={currentWorkflow}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                         />
                     )}

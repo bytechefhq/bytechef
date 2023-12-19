@@ -1,11 +1,12 @@
+import {WorkflowModel} from '@/middleware/helios/configuration';
 import {useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/hermes/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
-import ReactFlow, {Controls, MiniMap, useReactFlow, useStore} from 'reactflow';
+import InlineSVG from 'react-inlinesvg';
+import ReactFlow, {Controls, Edge, MiniMap, Node, useReactFlow, useStore} from 'reactflow';
 
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
-import defaultEdges from '../edges/defaultEdges';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
 import usePrevious from '../hooks/usePrevious';
@@ -13,14 +14,16 @@ import PlaceholderNode from '../nodes/PlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import defaultNodes from '../nodes/defaultNodes';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 
 export type WorkflowEditorProps = {
     componentDefinitions: ComponentDefinitionBasicModel[];
+    currentWorkflow: WorkflowModel;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
 };
 
-const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: WorkflowEditorProps) => {
+const WorkflowEditor = ({componentDefinitions, currentWorkflow, taskDispatcherDefinitions}: WorkflowEditorProps) => {
     const [latestNodeName, setLatestNodeName] = useState('');
     const [nodeNames, setNodeNames] = useState<Array<string>>([]);
     const [viewportWidth, setViewportWidth] = useState(0);
@@ -28,6 +31,10 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
     const previousNodeNames: Array<string> | undefined = usePrevious(nodeNames);
 
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {componentActions, setComponentActions, setComponentNames} = useWorkflowDataStore();
+    const {workflowDefinitions} = useWorkflowDefinitionStore();
+
+    const currentWorkflowDefinition = workflowDefinitions[currentWorkflow.id!];
 
     const nodeTypes = useMemo(
         () => ({
@@ -77,6 +84,89 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
     const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
 
+    const defaultNodesWithWorkflowNodes = useMemo(() => {
+        const workflowNodes = currentWorkflowDefinition.tasks?.map((workflowNode) => {
+            const componentName = workflowNode.type?.split('/')[0];
+            const actionName = workflowNode.type?.split('/')[2];
+
+            const componentDefinition = componentDefinitions.find(
+                (componentDefinition) => componentDefinition.name === componentName
+            );
+
+            if (componentDefinition) {
+                return {
+                    data: {
+                        ...componentDefinition,
+                        ...workflowNode,
+                        actionName,
+                        icon: <InlineSVG className="h-9 w-9" src={componentDefinition.icon!} />,
+                        id: componentDefinition.name,
+                        label: componentDefinition.name,
+                        name: workflowNode.name,
+                        originNodeName: componentDefinition.name,
+                        type: 'workflow',
+                    },
+                    id: workflowNode.name,
+                    position: {x: 0, y: 0},
+                    type: 'workflow',
+                };
+            }
+        });
+
+        if (workflowNodes) {
+            setComponentNames(workflowNodes.map((node) => node!.data.name));
+
+            setComponentActions(
+                workflowNodes.map((node) => ({
+                    actionName: node!.data.actionName!,
+                    componentName: node!.data.originNodeName!,
+                    workflowAlias: node?.data.name,
+                }))
+            );
+
+            const nodes = [...defaultNodes, ...workflowNodes];
+
+            nodes.splice(1, 1);
+
+            return nodes;
+        }
+    }, [componentDefinitions, currentWorkflowDefinition.tasks, setComponentActions, setComponentNames]);
+
+    const defaultEdgesWithWorkflowEdges = useMemo(() => {
+        const workflowEdges: Array<Edge> = [];
+
+        if (defaultNodesWithWorkflowNodes) {
+            defaultNodesWithWorkflowNodes.forEach((node, index) => {
+                const nextNode = defaultNodesWithWorkflowNodes[index + 1];
+
+                if (nextNode) {
+                    workflowEdges.push({
+                        id: `${node!.id}=>${nextNode.id}`,
+                        source: node!.id,
+                        target: nextNode.id,
+                        type: 'workflow',
+                    });
+                } else {
+                    defaultNodesWithWorkflowNodes.push({
+                        data: {label: '+'},
+                        id: 'lastNode',
+                        position: {x: 0, y: 0},
+                        type: 'placeholder',
+                    });
+
+                    workflowEdges.push({
+                        id: `${node!.id}=>lastNode`,
+                        source: node!.id,
+                        target: 'lastNode',
+                        type: 'placeholder',
+                    });
+                }
+            });
+
+            return workflowEdges;
+        }
+    }, [defaultNodesWithWorkflowNodes]);
+
     const nodes = getNodes();
 
     useEffect(() => {
@@ -85,8 +175,6 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         setNodeNames(workflowNodes.map((node) => node.data.originNodeName));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [nodes.length]);
-
-    const {componentActions, setComponentActions} = useWorkflowDataStore();
 
     useEffect(() => {
         if (workflowComponentWithAlias?.actions) {
@@ -173,8 +261,9 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
     return (
         <div className="flex h-full flex-1 flex-col">
             <ReactFlow
-                defaultEdges={defaultEdges}
-                defaultNodes={defaultNodes}
+                defaultEdges={defaultEdgesWithWorkflowEdges}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                defaultNodes={defaultNodesWithWorkflowNodes as Node<any, string | undefined>[]}
                 defaultViewport={{
                     x: viewportWidth / 2,
                     y: 50,
