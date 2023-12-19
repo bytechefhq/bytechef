@@ -38,7 +38,9 @@ public class LoggerDebugAction {
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
-        context.logger(logger -> logger.debug(inputParameters.getString(TEXT)));
+        Object text = inputParameters.get(TEXT);
+
+        context.logger(logger -> logger.debug(text.toString()));
 
         return null;
     }

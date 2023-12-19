@@ -38,7 +38,9 @@ public class LoggerWarnAction {
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
-        context.logger(logger -> logger.warn(inputParameters.getString(TEXT)));
+        Object text = inputParameters.get(TEXT);
+
+        context.logger(logger -> logger.warn(text.toString()));
 
         return null;
     }
