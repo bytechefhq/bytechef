@@ -100,10 +100,10 @@ const Property = ({
         (formState?.errors[path] as never)[propertyName];
 
     const formattedOptions = options?.map(
-        ({name}) =>
+        ({label, value}) =>
             ({
-                label: name,
-                value: name,
+                label,
+                value,
             }) as ISelectOption
     );
 
