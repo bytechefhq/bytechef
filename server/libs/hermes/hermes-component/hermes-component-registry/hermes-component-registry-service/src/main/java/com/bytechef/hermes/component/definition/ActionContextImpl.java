@@ -18,12 +18,18 @@ package com.bytechef.hermes.component.definition;
 
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.data.storage.service.DataStorageService;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.springframework.context.ApplicationEventPublisher;
@@ -137,6 +143,32 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         }
 
         @Override
+        public java.io.File toTempFile(FileEntry fileEntry) {
+            Path path = toTempFilePath(fileEntry);
+
+            return path.toFile();
+        }
+
+        @Override
+        public Path toTempFilePath(FileEntry fileEntry) {
+            Path tempFilePath;
+
+            try {
+                tempFilePath = Files.createTempFile(
+                    "action_context_", fileEntry.getName() + "." + fileEntry.getExtension());
+
+                Files.copy(
+                    fileStorageService.getFileStream(FileEntryConstants.FILES_DIR, toFileEntry(fileEntry)),
+                    tempFilePath,
+                    StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new ComponentExecutionException(e);
+            }
+
+            return tempFilePath;
+        }
+
+        @Override
         public FileEntry storeContent(String fileName, InputStream inputStream) {
             try {
                 return new ContextFileEntryImpl(
@@ -144,6 +176,11 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
             } catch (Exception exception) {
                 throw new ComponentExecutionException("Unable to store file " + fileName, exception);
             }
+        }
+
+        private static com.bytechef.file.storage.domain.FileEntry toFileEntry(FileEntry fileEntry) {
+            return new com.bytechef.file.storage.domain.FileEntry(
+                fileEntry.getName(), fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getUrl());
         }
     }
 
