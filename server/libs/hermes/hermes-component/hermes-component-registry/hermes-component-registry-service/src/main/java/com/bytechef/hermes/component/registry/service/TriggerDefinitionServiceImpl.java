@@ -17,6 +17,7 @@
 package com.bytechef.hermes.component.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.DynamicOptionsProperty;
@@ -248,7 +249,17 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             new ParameterMapImpl(inputParameters),
             connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
 
-        return new SampleOutputResponse(sampleOutputResponse.sampleOutput(), sampleOutputResponse.errorMessage());
+        Object sampleOutput = sampleOutputResponse.sampleOutput();
+
+        if (sampleOutput instanceof String string) {
+            try {
+                sampleOutput = JsonUtils.read(string);
+            } catch (Exception e) {
+                //
+            }
+        }
+
+        return new SampleOutputResponse(sampleOutput, sampleOutputResponse.errorMessage());
     }
 
     @Override
