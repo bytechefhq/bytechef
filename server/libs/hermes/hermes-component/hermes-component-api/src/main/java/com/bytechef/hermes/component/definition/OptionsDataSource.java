@@ -93,9 +93,9 @@ public interface OptionsDataSource {
      * @param errorMessage
      */
     @SuppressFBWarnings("EI")
-    record OptionsResponse(List<Option<?>> options, String errorMessage) {
+    record OptionsResponse(List<? extends Option<?>> options, String errorMessage) {
 
-        public OptionsResponse(List<Option<?>> options) {
+        public OptionsResponse(List<? extends Option<?>> options) {
             this(options, null);
         }
     }
