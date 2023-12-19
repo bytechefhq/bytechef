@@ -9,7 +9,7 @@ export type DataPillType = {
 };
 
 export type ComponentDataType = {
-    action: string;
+    action?: string;
     name: string;
     connection?: object;
     notes?: string;
@@ -19,6 +19,7 @@ export type ComponentDataType = {
         };
     };
     title?: string;
+    type?: string;
     version?: number;
     workflowAlias?: string;
 };
@@ -29,3 +30,15 @@ export type CurrentComponentType = {
     properties?: object;
     workflowAlias?: string;
 } & ComponentDefinitionModel;
+
+interface WorkflowDefinitionModel {
+    action?: string;
+    name?: string;
+    components?: Array<ComponentDataType>;
+    flowControls?: Array<ComponentDataType>;
+    tasks?: Array<ComponentDataType>;
+}
+
+export type WorkflowDefinitionType = {
+    [workflowId: string]: WorkflowDefinitionModel;
+};
