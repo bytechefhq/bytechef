@@ -277,13 +277,15 @@ public class WorkflowServiceImpl implements WorkflowService {
         return CollectionUtils.getFirst(
             workflowCrudRepositories,
             workflowCrudRepository -> OptionalUtils.isPresent(workflowCrudRepository.findById(id)),
-            workflowCrudRepository -> {
-                workflow.setDefinition(definition);
+            workflowCrudRepository -> update(definition, workflowCrudRepository, workflow));
+    }
 
-                workflowCrudRepository.save(workflow);
+    private Workflow update(String definition, WorkflowCrudRepository workflowCrudRepository, Workflow workflow) {
+        workflow.setDefinition(definition);
 
-                return updateCache(OptionalUtils.get(workflowCrudRepository.findById(workflow.getId())));
-            });
+        workflowCrudRepository.save(workflow);
+
+        return updateCache(OptionalUtils.get(workflowCrudRepository.findById(workflow.getId())));
     }
 
     private Workflow updateCache(Workflow workflow) {
