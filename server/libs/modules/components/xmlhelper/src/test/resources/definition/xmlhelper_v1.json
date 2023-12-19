@@ -28,7 +28,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
@@ -163,7 +162,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     },
     "perform": { }

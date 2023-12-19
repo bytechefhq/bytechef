@@ -28,7 +28,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -48,7 +47,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -83,7 +81,6 @@
         "label": "Text",
         "value": "text"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -103,7 +100,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,

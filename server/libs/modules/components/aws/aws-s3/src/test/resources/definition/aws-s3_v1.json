@@ -28,7 +28,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -48,7 +47,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
@@ -89,7 +87,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -109,7 +106,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -129,7 +125,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -149,7 +144,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
@@ -188,7 +182,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
@@ -211,7 +204,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     },
     "perform": { },
@@ -247,7 +239,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
@@ -302,7 +293,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -322,7 +312,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -342,7 +331,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -386,7 +374,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -406,7 +393,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
@@ -429,7 +415,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     },
     "perform": { },
@@ -483,7 +468,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -503,7 +487,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -523,7 +506,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -543,7 +525,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
@@ -566,7 +547,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -621,7 +601,6 @@
         "label": "public-read-write",
         "value": "public-read-write"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
@@ -644,7 +623,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     },
     "perform": { },
@@ -676,7 +654,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -696,7 +673,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -861,7 +837,6 @@
         "label": "China (Ningxia) [cn-northwest-1]",
         "value": "cn-northwest-1"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -881,7 +856,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "version": 1,

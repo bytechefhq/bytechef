@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.registry.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.Property;
-import com.bytechef.hermes.definition.Property.StringProperty.SampleDataType;
 import com.bytechef.hermes.registry.domain.Option;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +34,6 @@ public class StringProperty extends ValueProperty<String> {
     private Integer minLength;
     private List<Option> options;
     private OptionsDataSource optionsDataSource;
-    private SampleDataType sampleDataType;
 
     private StringProperty() {
     }
@@ -49,7 +47,6 @@ public class StringProperty extends ValueProperty<String> {
             OptionalUtils.orElse(stringProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
             stringProperty.getOptionsDataSource(), OptionsDataSource::new, null);
-        this.sampleDataType = OptionalUtils.orElse(stringProperty.getSampleDataType(), SampleDataType.JSON);
     }
 
     @Override
@@ -73,10 +70,6 @@ public class StringProperty extends ValueProperty<String> {
         return Optional.ofNullable(optionsDataSource);
     }
 
-    public SampleDataType getSampleDataType() {
-        return sampleDataType;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -85,13 +78,12 @@ public class StringProperty extends ValueProperty<String> {
             return false;
         if (!super.equals(o))
             return false;
-        return Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource)
-            && sampleDataType == that.sampleDataType;
+        return Objects.equals(options, that.options) && Objects.equals(optionsDataSource, that.optionsDataSource);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), options, optionsDataSource, sampleDataType);
+        return Objects.hash(super.hashCode(), options, optionsDataSource);
     }
 
     @Override
@@ -101,7 +93,6 @@ public class StringProperty extends ValueProperty<String> {
             ", minLength=" + minLength +
             ", options=" + options +
             ", optionsDataSource=" + optionsDataSource +
-            ", sampleDataType=" + sampleDataType +
             ", controlType=" + controlType +
             ", defaultValue=" + defaultValue +
             ", exampleValue=" + exampleValue +

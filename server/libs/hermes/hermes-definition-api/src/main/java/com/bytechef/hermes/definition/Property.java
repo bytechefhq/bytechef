@@ -270,13 +270,6 @@ public interface Property {
 
         /**
          *
-         */
-        enum SampleDataType {
-            CSV, JSON, XML
-        }
-
-        /**
-         *
          * @return
          */
         Optional<Integer> getMaxLength();
@@ -286,11 +279,6 @@ public interface Property {
          * @return
          */
         Optional<Integer> getMinLength();
-
-        /**
-         * TODO
-         */
-        Optional<SampleDataType> getSampleDataType();
     }
 
     /**

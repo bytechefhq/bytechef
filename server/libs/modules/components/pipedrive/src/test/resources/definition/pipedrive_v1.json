@@ -130,7 +130,6 @@
         "label": "All_not_deleted",
         "value": "all_not_deleted"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -194,7 +193,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -526,7 +524,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -565,7 +562,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -585,7 +581,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -605,7 +600,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -644,7 +638,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -722,7 +715,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -742,7 +734,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -847,7 +838,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -867,7 +857,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -977,7 +966,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -997,7 +985,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -1043,7 +1030,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -1147,7 +1133,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1251,7 +1236,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1271,7 +1255,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1291,7 +1274,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1330,7 +1312,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1395,7 +1376,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1415,7 +1395,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1461,7 +1440,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1481,7 +1459,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1501,7 +1478,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1521,7 +1497,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1579,7 +1554,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1599,7 +1573,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1619,7 +1592,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1639,7 +1611,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1659,7 +1630,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1679,7 +1649,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1699,7 +1668,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1738,7 +1706,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1796,7 +1763,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1816,7 +1782,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1856,7 +1821,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1896,7 +1860,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -1961,7 +1924,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -2000,7 +1962,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -2046,7 +2007,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -2085,7 +2045,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -2105,7 +2064,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -2292,7 +2250,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -2312,7 +2269,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -2358,7 +2314,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -2425,7 +2380,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -2483,7 +2437,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -2529,7 +2482,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -2596,7 +2548,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -2648,7 +2599,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -2668,7 +2618,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -2754,7 +2703,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -2774,7 +2722,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -2950,7 +2897,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -2970,7 +2916,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -3029,7 +2974,6 @@
           "label": "7",
           "value": "7"
         } ],
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -3087,7 +3031,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -3107,7 +3050,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -3127,7 +3069,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -3186,7 +3127,6 @@
           "label": "Deleted",
           "value": "deleted"
         } ],
-        "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
@@ -3449,7 +3389,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -3488,7 +3427,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -3508,7 +3446,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -3528,7 +3465,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -3567,7 +3503,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -3645,7 +3580,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -3665,7 +3599,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -3770,7 +3703,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -3790,7 +3722,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -3900,7 +3831,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -3920,7 +3850,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -3966,7 +3895,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -4070,7 +3998,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4174,7 +4101,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4194,7 +4120,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4214,7 +4139,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4253,7 +4177,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4318,7 +4241,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4338,7 +4260,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4384,7 +4305,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4404,7 +4324,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4424,7 +4343,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4444,7 +4362,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4502,7 +4419,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4522,7 +4438,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4542,7 +4457,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4562,7 +4476,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4582,7 +4495,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4602,7 +4514,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4622,7 +4533,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4661,7 +4571,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4719,7 +4628,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4739,7 +4647,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4779,7 +4686,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4819,7 +4725,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4884,7 +4789,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4923,7 +4827,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -4969,7 +4872,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -5008,7 +4910,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -5028,7 +4929,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -5122,7 +5022,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -5142,7 +5041,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -5188,7 +5086,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -5255,7 +5152,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -5313,7 +5209,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -5359,7 +5254,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -5426,7 +5320,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -5478,7 +5371,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -5498,7 +5390,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -5584,7 +5475,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -5604,7 +5494,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -5704,7 +5593,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -5741,7 +5629,6 @@
         "label": "Title",
         "value": "title"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -5851,7 +5738,6 @@
         "label": "Lost",
         "value": "lost"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -5878,7 +5764,6 @@
         "label": "Deal.cc_email",
         "value": "deal.cc_email"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -6121,7 +6006,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -6141,7 +6025,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -6180,7 +6063,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -6200,7 +6082,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -6316,7 +6197,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "optionsDataSource": null,
@@ -6376,7 +6256,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "optionsDataSource": null,
@@ -6436,7 +6315,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "optionsDataSource": null,
@@ -6473,7 +6351,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
@@ -6512,7 +6389,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
@@ -7153,7 +7029,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -7272,7 +7147,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -7292,7 +7166,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -7312,7 +7185,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -7351,7 +7223,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -7429,7 +7300,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -7449,7 +7319,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -7554,7 +7423,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -7574,7 +7442,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -7684,7 +7551,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -7704,7 +7570,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -7750,7 +7615,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -7854,7 +7718,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -7958,7 +7821,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -7978,7 +7840,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -7998,7 +7859,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8037,7 +7897,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8102,7 +7961,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8122,7 +7980,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8168,7 +8025,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8188,7 +8044,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8208,7 +8063,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8248,7 +8102,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8306,7 +8159,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8326,7 +8178,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8346,7 +8197,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8366,7 +8216,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8386,7 +8235,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8406,7 +8254,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8580,7 +8427,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8619,7 +8465,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8719,7 +8564,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8739,7 +8583,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8779,7 +8622,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8819,7 +8661,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8884,7 +8725,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8923,7 +8763,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -8969,7 +8808,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -9008,7 +8846,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -9028,7 +8865,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -9239,7 +9075,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -9317,7 +9152,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -9337,7 +9171,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -9383,7 +9216,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -9450,7 +9282,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -9508,7 +9339,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -9554,7 +9384,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -9621,7 +9450,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -9673,7 +9501,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -9693,7 +9520,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -9779,7 +9605,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -9799,7 +9624,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -9956,7 +9780,6 @@
         "label": "All",
         "value": "all"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -10116,7 +9939,6 @@
         "label": "Update_time",
         "value": "update_time"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": {
@@ -10244,7 +10066,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -10264,7 +10085,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -10336,7 +10156,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             } ],
             "multipleValues": null,
@@ -10399,7 +10218,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -10509,7 +10327,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             } ],
             "optionsDataSource": null,
@@ -10622,7 +10439,6 @@
               "label": "7",
               "value": "7"
             } ],
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -10642,7 +10458,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -10796,7 +10611,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -10849,7 +10663,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "multipleValues": null,
@@ -10950,7 +10763,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -11010,7 +10822,6 @@
           "label": "7",
           "value": "7"
         } ],
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -11153,7 +10964,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -11173,7 +10983,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -11245,7 +11054,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "multipleValues": null,
@@ -11308,7 +11116,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -11418,7 +11225,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -11531,7 +11337,6 @@
             "label": "7",
             "value": "7"
           } ],
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -11551,7 +11356,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -11595,7 +11399,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": {
@@ -11690,7 +11493,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -11734,7 +11536,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": {
@@ -11848,7 +11649,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -11868,7 +11668,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -11940,7 +11739,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "multipleValues": null,
@@ -12003,7 +11801,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -12113,7 +11910,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -12226,7 +12022,6 @@
             "label": "7",
             "value": "7"
           } ],
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -12246,7 +12041,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -12290,7 +12084,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -12327,7 +12120,6 @@
         "label": "Title",
         "value": "title"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -12427,7 +12219,6 @@
         "label": "Lead.was_seen",
         "value": "lead.was_seen"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -12652,7 +12443,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -12672,7 +12462,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -12692,7 +12481,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -12789,7 +12577,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "optionsDataSource": null,
@@ -12849,7 +12636,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "optionsDataSource": null,
@@ -12886,7 +12672,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
@@ -12925,7 +12710,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
@@ -12964,7 +12748,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
@@ -13003,7 +12786,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
@@ -13047,7 +12829,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -13346,7 +13127,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -13410,7 +13190,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": {
@@ -13729,7 +13508,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -13787,7 +13565,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -13890,7 +13667,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -13910,7 +13686,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -13930,7 +13705,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -13969,7 +13743,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14027,7 +13800,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14047,7 +13819,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14085,7 +13856,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -14105,7 +13875,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             } ],
             "optionsDataSource": null,
@@ -14166,7 +13935,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14205,7 +13973,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14244,7 +14011,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14264,7 +14030,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14284,7 +14049,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14323,7 +14087,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14362,7 +14125,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14382,7 +14144,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14421,7 +14182,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14441,7 +14201,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14499,7 +14258,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14519,7 +14277,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14615,7 +14372,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14635,7 +14391,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14693,7 +14448,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14713,7 +14467,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14752,7 +14505,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14835,7 +14587,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14874,7 +14625,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -14932,7 +14682,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -14973,7 +14722,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -15078,7 +14826,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -15098,7 +14845,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -15139,7 +14885,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -15197,7 +14942,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -15262,7 +15006,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -15300,7 +15043,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -15320,7 +15062,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             } ],
             "optionsDataSource": null,
@@ -15416,7 +15157,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -15436,7 +15176,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -15476,7 +15215,6 @@
           "label": "7",
           "value": "7"
         } ],
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -15652,7 +15390,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -15710,7 +15447,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -15813,7 +15549,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -15833,7 +15568,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -15853,7 +15587,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -15892,7 +15625,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -15950,7 +15682,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -15970,7 +15701,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16008,7 +15738,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -16028,7 +15757,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -16089,7 +15817,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16128,7 +15855,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16167,7 +15893,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16187,7 +15912,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16207,7 +15931,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16246,7 +15969,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16311,7 +16033,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16331,7 +16052,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16370,7 +16090,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16390,7 +16109,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16448,7 +16166,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16468,7 +16185,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16564,7 +16280,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16584,7 +16299,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16642,7 +16356,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16662,7 +16375,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16701,7 +16413,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -16776,7 +16487,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -16815,7 +16525,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -16873,7 +16582,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -16914,7 +16622,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -17019,7 +16726,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -17039,7 +16745,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -17080,7 +16785,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -17138,7 +16842,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -17203,7 +16906,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -17241,7 +16943,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -17261,7 +16962,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             } ],
             "optionsDataSource": null,
@@ -17337,7 +17037,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -17379,7 +17078,6 @@
         "label": "Name",
         "value": "name"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -17628,7 +17326,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -17648,7 +17345,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -17668,7 +17364,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -17761,7 +17456,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
@@ -17800,7 +17494,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
@@ -18431,7 +18124,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -18489,7 +18181,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -18509,7 +18200,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -18532,7 +18222,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -18555,7 +18244,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -18613,7 +18301,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -18716,7 +18403,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -18736,7 +18422,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -18756,7 +18441,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -18814,7 +18498,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -18834,7 +18517,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -18854,7 +18536,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -18874,7 +18555,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -18894,7 +18574,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -18952,7 +18631,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -18972,7 +18650,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19011,7 +18688,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19031,7 +18707,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19070,7 +18745,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19109,7 +18783,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19129,7 +18802,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19187,7 +18859,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19207,7 +18878,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19245,7 +18915,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -19265,7 +18934,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -19387,7 +19055,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19426,7 +19093,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19491,7 +19157,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19511,7 +19176,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19531,7 +19195,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19646,7 +19309,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -19721,7 +19383,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -19760,7 +19421,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -19818,7 +19478,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -19859,7 +19518,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -19964,7 +19622,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -19984,7 +19641,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -20025,7 +19681,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -20083,7 +19738,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -20148,7 +19802,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -20186,7 +19839,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -20206,7 +19858,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             } ],
             "optionsDataSource": null,
@@ -20330,7 +19981,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -20394,7 +20044,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": {
@@ -20766,7 +20415,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -20786,7 +20434,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -20889,7 +20536,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -20909,7 +20555,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -20948,7 +20593,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -20968,7 +20612,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21026,7 +20669,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21046,7 +20688,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21084,7 +20725,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -21104,7 +20744,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             } ],
             "optionsDataSource": null,
@@ -21146,7 +20785,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21185,7 +20823,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21205,7 +20842,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21257,7 +20893,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -21303,7 +20938,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               } ],
               "optionsDataSource": null,
@@ -21350,7 +20984,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21427,7 +21060,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21447,7 +21079,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21505,7 +21136,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21525,7 +21155,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21653,7 +21282,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -21699,7 +21327,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               } ],
               "optionsDataSource": null,
@@ -21727,7 +21354,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21747,7 +21373,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21862,7 +21487,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21945,7 +21569,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -21984,7 +21607,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -22042,7 +21664,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -22083,7 +21704,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -22188,7 +21808,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -22208,7 +21827,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -22249,7 +21867,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -22307,7 +21924,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -22372,7 +21988,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -22410,7 +22025,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -22430,7 +22044,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             } ],
             "optionsDataSource": null,
@@ -22546,7 +22159,6 @@
           "label": "Archived",
           "value": "archived"
         } ],
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -22598,7 +22210,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -22644,7 +22255,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -22692,7 +22302,6 @@
           "label": "7",
           "value": "7"
         } ],
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -22750,7 +22359,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -22770,7 +22378,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -22822,7 +22429,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -22868,7 +22474,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -23060,7 +22665,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23080,7 +22684,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23183,7 +22786,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23203,7 +22805,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23242,7 +22843,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23262,7 +22862,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23320,7 +22919,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23340,7 +22938,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23378,7 +22975,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -23398,7 +22994,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -23440,7 +23035,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23479,7 +23073,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23499,7 +23092,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23551,7 +23143,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -23597,7 +23188,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -23644,7 +23234,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23721,7 +23310,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23741,7 +23329,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23799,7 +23386,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23819,7 +23405,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -23947,7 +23532,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -23993,7 +23577,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -24021,7 +23604,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -24041,7 +23623,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -24156,7 +23737,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -24231,7 +23811,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -24336,7 +23915,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -24356,7 +23934,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -24429,7 +24006,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -24476,7 +24052,6 @@
         "label": "Name",
         "value": "name"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -24552,7 +24127,6 @@
         "label": "Person.picture",
         "value": "person.picture"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -24779,7 +24353,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -24799,7 +24372,6 @@
                 "maxLength": null,
                 "minLength": null,
                 "options": null,
-                "sampleDataType": null,
                 "optionsDataSource": null
               }, {
                 "advancedOption": null,
@@ -24833,7 +24405,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
@@ -24872,7 +24443,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
@@ -24993,7 +24563,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "optionsDataSource": null,
@@ -25030,7 +24599,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
@@ -25069,7 +24637,6 @@
                   "maxLength": null,
                   "minLength": null,
                   "options": null,
-                  "sampleDataType": null,
                   "optionsDataSource": null
                 } ],
                 "multipleValues": null,
@@ -25606,7 +25173,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -25667,7 +25233,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -25687,7 +25252,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -25790,7 +25354,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -25810,7 +25373,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -25849,7 +25411,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -25869,7 +25430,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -25927,7 +25487,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -25947,7 +25506,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -25985,7 +25543,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -26005,7 +25562,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -26047,7 +25603,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -26086,7 +25641,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -26106,7 +25660,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -26158,7 +25711,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -26204,7 +25756,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -26251,7 +25802,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -26328,7 +25878,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -26348,7 +25897,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -26406,7 +25954,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -26426,7 +25973,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -26554,7 +26100,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -26600,7 +26145,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -26628,7 +26172,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -26648,7 +26191,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -26763,7 +26305,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -26838,7 +26379,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -26877,7 +26417,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -26935,7 +26474,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -26976,7 +26514,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -27081,7 +26618,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -27101,7 +26637,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -27142,7 +26677,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -27200,7 +26734,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -27265,7 +26798,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -27303,7 +26835,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -27323,7 +26854,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             } ],
             "optionsDataSource": null,
@@ -27390,7 +26920,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -27410,7 +26939,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "refreshOn": null,
@@ -27449,7 +26977,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -27469,7 +26996,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "refreshOn": null,
@@ -27650,7 +27176,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -27670,7 +27195,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -27709,7 +27233,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -27729,7 +27252,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -27749,7 +27271,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -27769,7 +27290,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -27938,7 +27458,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -27958,7 +27477,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -27978,7 +27496,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -27998,7 +27515,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28075,7 +27591,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28157,7 +27672,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28177,7 +27691,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28197,7 +27710,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28217,7 +27729,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28237,7 +27748,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28257,7 +27767,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28315,7 +27824,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28354,7 +27862,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28374,7 +27881,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28394,7 +27900,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28414,7 +27919,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28434,7 +27938,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28454,7 +27957,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28474,7 +27976,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28494,7 +27995,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28514,7 +28014,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28534,7 +28033,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28586,7 +28084,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -28625,7 +28122,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -28664,7 +28160,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -28684,7 +28179,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -28797,7 +28291,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28817,7 +28310,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28837,7 +28329,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28857,7 +28348,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28877,7 +28367,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28897,7 +28386,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -28954,7 +28442,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -28974,7 +28461,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -28994,7 +28480,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         } ],
         "optionsDataSource": null,
@@ -29125,7 +28610,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -29145,7 +28629,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -29191,7 +28674,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -29296,7 +28778,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -29316,7 +28797,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -29362,7 +28842,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -29474,7 +28953,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -29526,7 +29004,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -29546,7 +29023,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -29632,7 +29108,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -29652,7 +29127,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -29746,7 +29220,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -29804,7 +29277,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -29850,7 +29322,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -29911,7 +29382,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -29950,7 +29420,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30073,7 +29542,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30129,7 +29597,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30204,7 +29671,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30224,7 +29690,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30244,7 +29709,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30317,7 +29781,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30597,7 +30060,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30617,7 +30079,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30637,7 +30098,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30657,7 +30117,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30677,7 +30136,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30697,7 +30155,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30717,7 +30174,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30756,7 +30212,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30776,7 +30231,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30796,7 +30250,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30816,7 +30269,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30836,7 +30288,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -30856,7 +30307,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -31029,7 +30479,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -31049,7 +30498,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -31088,7 +30536,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -31156,7 +30603,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -31524,7 +30970,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -31660,7 +31105,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -31680,7 +31124,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -31725,7 +31168,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -31745,7 +31187,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -31799,7 +31240,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -31927,7 +31367,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -31947,7 +31386,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -31967,7 +31405,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -31987,7 +31424,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -32007,7 +31443,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -32027,7 +31462,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -32047,7 +31481,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -32067,7 +31500,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -32087,7 +31519,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -32107,7 +31538,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -32127,7 +31557,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -32147,7 +31576,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -32167,7 +31595,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
@@ -32314,7 +31741,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -32334,7 +31760,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -32373,7 +31798,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -32516,7 +31940,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -32562,7 +31985,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -32604,7 +32026,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -32624,7 +32045,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -32644,7 +32064,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -33045,7 +32464,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -33065,7 +32483,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -33151,7 +32568,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -33171,7 +32587,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -33225,7 +32640,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -33245,7 +32659,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -33299,7 +32712,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -33319,7 +32731,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -33357,7 +32768,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -33493,7 +32903,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -33513,7 +32922,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -33700,7 +33108,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -33720,7 +33127,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -33740,7 +33146,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
@@ -33868,7 +33273,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -33888,7 +33292,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -33934,7 +33337,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -34039,7 +33441,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -34059,7 +33460,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -34105,7 +33505,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -34217,7 +33616,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -34269,7 +33667,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -34289,7 +33686,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -34375,7 +33771,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -34395,7 +33790,6 @@
               "maxLength": null,
               "minLength": null,
               "options": null,
-              "sampleDataType": null,
               "optionsDataSource": null
             }, {
               "advancedOption": null,
@@ -34489,7 +33883,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -34547,7 +33940,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -34593,7 +33985,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -34654,7 +34045,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -34693,7 +34083,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -34816,7 +34205,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -34872,7 +34260,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -34947,7 +34334,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -34967,7 +34353,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -34987,7 +34372,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35060,7 +34444,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35340,7 +34723,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35360,7 +34742,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35380,7 +34761,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35400,7 +34780,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35420,7 +34799,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35440,7 +34818,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35460,7 +34837,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35499,7 +34875,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35519,7 +34894,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35539,7 +34913,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35559,7 +34932,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35579,7 +34951,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35599,7 +34970,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -35772,7 +35142,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -35792,7 +35161,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -35831,7 +35199,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -35899,7 +35266,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36267,7 +35633,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -36403,7 +35768,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -36423,7 +35787,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -36468,7 +35831,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36488,7 +35850,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36542,7 +35903,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36670,7 +36030,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36690,7 +36049,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36710,7 +36068,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36730,7 +36087,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36750,7 +36106,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36770,7 +36125,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36790,7 +36144,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36810,7 +36163,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36830,7 +36182,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36850,7 +36201,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36870,7 +36220,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36890,7 +36239,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -36910,7 +36258,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
@@ -37057,7 +36404,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -37077,7 +36423,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -37116,7 +36461,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -37259,7 +36603,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -37305,7 +36648,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -37347,7 +36689,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -37367,7 +36708,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -37387,7 +36727,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -37788,7 +37127,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -37808,7 +37146,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -37894,7 +37231,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -37914,7 +37250,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -37968,7 +37303,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -37988,7 +37322,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -38042,7 +37375,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -38062,7 +37394,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -38100,7 +37431,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -38236,7 +37566,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           }, {
             "advancedOption": null,
@@ -38256,7 +37585,6 @@
             "maxLength": null,
             "minLength": null,
             "options": null,
-            "sampleDataType": null,
             "optionsDataSource": null
           } ],
           "optionsDataSource": null,
@@ -38443,7 +37771,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -38463,7 +37790,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -38483,7 +37809,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "optionsDataSource": null,
