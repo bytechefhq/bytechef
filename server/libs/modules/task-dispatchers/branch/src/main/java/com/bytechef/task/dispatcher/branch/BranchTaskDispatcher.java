@@ -36,6 +36,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -44,7 +45,6 @@ import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.ParameterizedTypeReference;
 
 /**
  * @author Arik Cohen
@@ -145,7 +145,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
     private Map<String, ?> resolveCase(TaskExecution taskExecution) {
         Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
         List<Map<String, Object>> cases = MapUtils.getList(
-            taskExecution.getParameters(), CASES, new ParameterizedTypeReference<>() {});
+            taskExecution.getParameters(), CASES, new TypeReference<>() {});
 
         Validate.notNull(cases, "you must specify 'cases' in a branch statement");
 

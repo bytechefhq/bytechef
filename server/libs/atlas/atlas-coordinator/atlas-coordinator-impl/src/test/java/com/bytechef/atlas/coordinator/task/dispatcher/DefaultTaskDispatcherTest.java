@@ -22,10 +22,14 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.message.event.MessageEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,6 +37,18 @@ import org.junit.jupiter.api.Test;
  * @author Ivica Cardic
  */
 public class DefaultTaskDispatcherTest {
+
+    @BeforeAll
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
+    public static void beforeAll() {
+        class MapUtilsMock extends MapUtils {
+            static {
+                objectMapper = new ObjectMapper();
+            }
+        }
+
+        new MapUtilsMock();
+    }
 
     @Test
     public void test1() {
