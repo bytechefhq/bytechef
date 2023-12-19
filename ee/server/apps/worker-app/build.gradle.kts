@@ -56,7 +56,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:json-file"))
     implementation(project(":server:libs:modules:components:logger"))
     implementation(project(":server:libs:modules:components:filesystem"))
-    implementation(project(":server:libs:modules:components:googledrive"))
+    implementation(project(":server:libs:modules:components:google:google-drive"))
     implementation(project(":server:libs:modules:components:map"))
     implementation(project(":server:libs:modules:components:mailchimp"))
     implementation(project(":server:libs:modules:components:mysql"))

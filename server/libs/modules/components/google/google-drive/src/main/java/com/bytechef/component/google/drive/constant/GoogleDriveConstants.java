@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.googledrive.constant;
+package com.bytechef.component.google.drive.constant;
 
 /**
  * @author Mario Cvjetojevic
  */
 public final class GoogleDriveConstants {
 
-    public static final String GOOGLEDRIVE = "googledrive";
+    public static final String GOOGLE_DRIVE = "googleDrive";
     public static final String UPLOAD_FILE = "uploadFile";
 
     private GoogleDriveConstants() {

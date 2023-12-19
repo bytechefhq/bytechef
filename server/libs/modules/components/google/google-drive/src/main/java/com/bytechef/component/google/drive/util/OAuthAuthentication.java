@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.googledrive.util;
+package com.bytechef.component.google.drive.util;
 
 import com.google.api.client.http.HttpExecuteInterceptor;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.util.Preconditions;
@@ -35,7 +36,8 @@ public class OAuthAuthentication implements HttpRequestInitializer, HttpExecuteI
     }
 
     public void intercept(HttpRequest request) throws IOException {
-        request.getHeaders()
-            .set("Authorization", "Bearer " + token);
+        HttpHeaders httpHeaders = request.getHeaders();
+
+        httpHeaders.set("Authorization", "Bearer " + token);
     }
 }
