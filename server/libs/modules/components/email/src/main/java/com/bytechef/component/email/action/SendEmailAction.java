@@ -56,7 +56,7 @@ import java.util.Properties;
 /**
  * @author Ivica Cardic
  */
-public class EmailSendAction {
+public class SendEmailAction {
 
     private static final String FROM = "from";
     private static final String TO = "to";
@@ -103,7 +103,7 @@ public class EmailSendAction {
                 .label("Attachments")
                 .description("A list of attachments to send with the email.")
                 .items(fileEntry()))
-        .perform(EmailSendAction::perform);
+        .perform(SendEmailAction::perform);
 
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
