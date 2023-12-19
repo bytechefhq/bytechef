@@ -509,6 +509,10 @@ public final class TaskExecution
 
     public void setWorkflowTask(WorkflowTask workflowTask) {
         this.workflowTask = workflowTask;
+
+        if (workflowTask != null) {
+            this.maxRetries = workflowTask.getMaxRetries();
+        }
     }
 
     @Override

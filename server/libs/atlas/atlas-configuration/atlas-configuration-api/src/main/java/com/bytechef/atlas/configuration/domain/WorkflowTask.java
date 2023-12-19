@@ -40,6 +40,7 @@ public class WorkflowTask implements Task, Serializable {
     private List<WorkflowTask> finalize = Collections.emptyList();
     private String label;
     private final Map<String, Object> extensions = new HashMap<>();
+    private int maxRetries;
     private Map<String, ?> metadata = new HashMap<>();
     private String name;
     private String node;
@@ -62,6 +63,8 @@ public class WorkflowTask implements Task, Serializable {
                     source, WorkflowConstants.FINALIZE, WorkflowTask.class, Collections.emptyList());
             } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
                 this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
+            } else if (WorkflowConstants.MAX_RETRIES.equals(entry.getKey())) {
+                this.maxRetries = MapUtils.getInteger(source, WorkflowConstants.MAX_RETRIES);
             } else if (WorkflowConstants.METADATA.equals(entry.getKey())) {
                 this.metadata = MapUtils.getMap(source, WorkflowConstants.METADATA, Collections.emptyMap());
             } else if (WorkflowConstants.NAME.equals(entry.getKey())) {
@@ -119,6 +122,11 @@ public class WorkflowTask implements Task, Serializable {
             && Objects.equals(type, that.type);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(finalize, label, name, node, parameters, post, pre, taskNumber, timeout, type);
+    }
+
     public <T> T getExtension(String name, Class<T> elementType, T defaultValue) {
         return MapUtils.get(extensions, name, elementType, defaultValue);
     }
@@ -129,11 +137,6 @@ public class WorkflowTask implements Task, Serializable {
 
     public <T> List<T> getExtensions(String name, Class<T> elementType, List<T> defaultValue) {
         return MapUtils.getList(extensions, name, elementType, defaultValue);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(finalize, label, name, node, parameters, post, pre, taskNumber, timeout, type);
     }
 
     /**
@@ -154,6 +157,10 @@ public class WorkflowTask implements Task, Serializable {
      */
     public String getLabel() {
         return label;
+    }
+
+    public int getMaxRetries() {
+        return maxRetries;
     }
 
     /**
@@ -279,6 +286,7 @@ public class WorkflowTask implements Task, Serializable {
             ", finalize=" + finalize +
             ", parameters=" + parameters +
             ", extensions=" + extensions +
+            ", maxRetries=" + maxRetries +
             ", metadata=" + metadata +
             '}';
     }
