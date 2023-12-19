@@ -398,8 +398,6 @@ const Property = ({
                             />
                         )}
 
-                        {controlType === 'SCHEMA_DESIGNER' && <span>Schema designer</span>}
-
                         {!controlType && type === 'ANY' && (
                             <span>
                                 {controlType} - {type}
