@@ -38,7 +38,6 @@
         "label": "JSON Line",
         "value": "JSONL"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -76,7 +75,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -96,7 +94,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -116,7 +113,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -136,7 +132,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "controlType": "OBJECT_BUILDER",
@@ -185,7 +180,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": true,
@@ -277,7 +271,6 @@
         "label": "JSON Line",
         "value": "JSONL"
       } ],
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -366,7 +359,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,
@@ -414,7 +406,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -434,7 +425,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -454,7 +444,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       }, {
         "advancedOption": null,
@@ -474,7 +463,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "controlType": "OBJECT_BUILDER",

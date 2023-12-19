@@ -88,8 +88,7 @@
     "options": null,
     "controlType": "TEXT",
     "maxLength": null,
-    "minLength": null,
-    "sampleDataType": null
+    "minLength": null
   }, {
     "advancedOption": null,
     "description": null,
@@ -107,8 +106,7 @@
     "options": null,
     "controlType": "TEXT",
     "maxLength": null,
-    "minLength": null,
-    "sampleDataType": null
+    "minLength": null
   } ],
   "version": 1,
   "outputSchema": null,

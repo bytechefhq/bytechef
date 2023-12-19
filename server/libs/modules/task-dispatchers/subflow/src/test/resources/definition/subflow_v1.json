@@ -20,8 +20,7 @@
     "options": null,
     "controlType": "TEXT",
     "maxLength": null,
-    "minLength": null,
-    "sampleDataType": null
+    "minLength": null
   } ],
   "resources": null,
   "taskProperties": null,

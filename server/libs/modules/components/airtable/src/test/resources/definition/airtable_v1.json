@@ -35,7 +35,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": {
         "loadOptionsDependsOn": null,
         "options": { }
@@ -60,7 +59,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": {
         "loadOptionsDependsOn": [ "baseId" ],
         "options": { }
@@ -310,7 +308,6 @@
           "maxLength": null,
           "minLength": null,
           "options": null,
-          "sampleDataType": null,
           "optionsDataSource": null
         }, {
           "advancedOption": null,
@@ -368,7 +365,6 @@
         "maxLength": null,
         "minLength": null,
         "options": null,
-        "sampleDataType": null,
         "optionsDataSource": null
       } ],
       "refreshOn": null,
@@ -433,7 +429,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -453,7 +448,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -473,7 +467,6 @@
       "maxLength": null,
       "minLength": null,
       "options": null,
-      "sampleDataType": null,
       "optionsDataSource": null
     } ],
     "sampleOutput": null,

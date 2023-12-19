@@ -288,8 +288,6 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableActionDefinition
-            editorDescription(EditorDescriptionDataSource.ActionEditorDescriptionFunction editorDescription) {
         public ModifiableActionDefinition editorDescription(ActionEditorDescriptionFunction editorDescription) {
             this.editorDescriptionFunction = editorDescription;
 
@@ -2294,7 +2292,6 @@ public final class ComponentDSL {
         private Integer minLength;
         private List<Option<?>> options;
         private OptionsFunction optionsFunction;
-        private SampleDataType sampleDataType;
 
         protected ModifiableStringProperty() {
             this(null);
@@ -2363,12 +2360,6 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableStringProperty sampleDataType(SampleDataType sampleDataType) {
-            this.sampleDataType = sampleDataType;
-
-            return this;
-        }
-
         @Override
         public ControlType getControlType() {
             if (this.controlType == null) {
@@ -2403,11 +2394,6 @@ public final class ComponentDSL {
                 optionsFunction == null
                     ? null
                     : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
-        }
-
-        @Override
-        public Optional<SampleDataType> getSampleDataType() {
-            return Optional.ofNullable(sampleDataType);
         }
     }
 

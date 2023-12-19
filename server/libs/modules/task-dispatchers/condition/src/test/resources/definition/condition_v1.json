@@ -115,8 +115,7 @@
         } ],
         "controlType": "SELECT",
         "maxLength": null,
-        "minLength": null,
-        "sampleDataType": null
+        "minLength": null
       }, {
         "advancedOption": null,
         "description": "The boolean value to compare with the first one.",
@@ -206,8 +205,7 @@
         } ],
         "controlType": "SELECT",
         "maxLength": null,
-        "minLength": null,
-        "sampleDataType": null
+        "minLength": null
       }, {
         "advancedOption": null,
         "description": "The date & time value to compare with the first one.",
@@ -315,8 +313,7 @@
         } ],
         "controlType": "SELECT",
         "maxLength": null,
-        "minLength": null,
-        "sampleDataType": null
+        "minLength": null
       }, {
         "advancedOption": null,
         "description": "The number value to compare with the first one.",
@@ -373,8 +370,7 @@
         "options": null,
         "controlType": "TEXT",
         "maxLength": null,
-        "minLength": null,
-        "sampleDataType": null
+        "minLength": null
       }, {
         "advancedOption": null,
         "description": "Compare operation to decide where to map data.",
@@ -432,8 +428,7 @@
         } ],
         "controlType": "SELECT",
         "maxLength": null,
-        "minLength": null,
-        "sampleDataType": null
+        "minLength": null
       }, {
         "advancedOption": null,
         "description": "The string value to compare with the first one.",
@@ -451,8 +446,7 @@
         "options": null,
         "controlType": "TEXT",
         "maxLength": null,
-        "minLength": null,
-        "sampleDataType": null
+        "minLength": null
       }, {
         "advancedOption": null,
         "description": "The regex value to compare with the first one.",
@@ -470,8 +464,7 @@
         "options": null,
         "controlType": "TEXT",
         "maxLength": null,
-        "minLength": null,
-        "sampleDataType": null
+        "minLength": null
       } ],
       "controlType": "OBJECT_BUILDER"
     } ],
@@ -504,8 +497,7 @@
     } ],
     "controlType": "SELECT",
     "maxLength": null,
-    "minLength": null,
-    "sampleDataType": null
+    "minLength": null
   }, {
     "advancedOption": null,
     "description": "The raw expression.",
@@ -523,8 +515,7 @@
     "options": null,
     "controlType": "TEXT",
     "maxLength": null,
-    "minLength": null,
-    "sampleDataType": null
+    "minLength": null
   } ],
   "resources": null,
   "taskProperties": [ {

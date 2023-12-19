@@ -1053,7 +1053,6 @@ public final class TaskDispatcherDSL {
         private ControlType controlType;
         private Integer maxLength;
         private Integer minLength;
-        private SampleDataType sampleDataType;
 
         private ModifiableStringProperty() {
             this(null);
@@ -1108,12 +1107,6 @@ public final class TaskDispatcherDSL {
             return this;
         }
 
-        public ModifiableStringProperty sampleDataType(SampleDataType sampleDataType) {
-            this.sampleDataType = sampleDataType;
-
-            return this;
-        }
-
         @Override
         public ControlType getControlType() {
             if (this.controlType == null) {
@@ -1140,11 +1133,6 @@ public final class TaskDispatcherDSL {
         @Override
         public Optional<List<Option<?>>> getOptions() {
             return Optional.ofNullable(options == null ? null : new ArrayList<>(options));
-        }
-
-        @Override
-        public Optional<SampleDataType> getSampleDataType() {
-            return Optional.ofNullable(sampleDataType);
         }
     }
 

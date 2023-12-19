@@ -20,8 +20,7 @@
     "options": null,
     "controlType": "TEXT",
     "maxLength": null,
-    "minLength": null,
-    "sampleDataType": null
+    "minLength": null
   } ],
   "resources": null,
   "taskProperties": [ {
@@ -74,8 +73,7 @@
         "options": null,
         "controlType": "TEXT",
         "maxLength": null,
-        "minLength": null,
-        "sampleDataType": null
+        "minLength": null
       }, {
         "advancedOption": null,
         "description": "The list of tasks.",
