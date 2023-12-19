@@ -473,7 +473,7 @@ public class MapUtils {
     public static <K1, K2, V> Map<K2, V> getMap(
         Map<K1, ?> map, K1 key, TypeReference<V> elementTypeRef, Map<K2, V> defaultValue) {
 
-        if (map.containsKey(key)) {
+        if (!map.containsKey(key)) {
             return defaultValue;
         }
 
