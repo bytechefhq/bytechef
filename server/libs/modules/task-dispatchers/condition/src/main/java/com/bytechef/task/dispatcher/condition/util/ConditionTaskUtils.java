@@ -23,12 +23,12 @@ import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispa
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
@@ -49,7 +49,7 @@ public class ConditionTaskUtils {
         } else {
             List<Map<String, Map<String, ?>>> conditions = MapUtils.getList(
                 conditionTaskExecution.getParameters(), ConditionTaskDispatcherConstants.CONDITIONS,
-                new ParameterizedTypeReference<>() {}, Collections.emptyList());
+                new TypeReference<>() {}, Collections.emptyList());
             String combineOperation = MapUtils.getRequiredString(
                 conditionTaskExecution.getParameters(), COMBINE_OPERATION);
 

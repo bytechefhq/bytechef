@@ -34,13 +34,13 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
-import org.springframework.core.ParameterizedTypeReference;
 
 /**
  * Handles {@link TaskExecution} completions which are the child execution tasks of a parent <code>
@@ -110,7 +110,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
 
         TaskExecution forkJoinTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
         List<List<Map<String, Object>>> branches = MapUtils.getRequiredList(
-            forkJoinTaskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
+            forkJoinTaskExecution.getParameters(), BRANCHES, new TypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
             .map(curList -> CollectionUtils.map(curList, WorkflowTask::of))

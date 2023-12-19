@@ -36,6 +36,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,7 +44,6 @@ import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.ParameterizedTypeReference;
 
 /**
  * Implements a Fork/Join construct.
@@ -109,7 +109,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
     @Override
     public void dispatch(TaskExecution taskExecution) {
         List<List<Map<String, Object>>> branches = MapUtils.getRequiredList(
-            taskExecution.getParameters(), BRANCHES, new ParameterizedTypeReference<>() {});
+            taskExecution.getParameters(), BRANCHES, new TypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
             .map(source -> CollectionUtils.map(source, WorkflowTask::of))
