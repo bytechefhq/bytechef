@@ -53,7 +53,7 @@ public class AirtableUtils {
                 .http(http -> http.get("https://api.airtable.com/v0/meta/bases"))
                 .configuration(Http.responseType(ResponseType.JSON))
                 .execute()
-                .getBody();
+                .getBody(new Context.TypeReference<>() {});
 
             context
                 .logger(
@@ -74,7 +74,7 @@ public class AirtableUtils {
                 (String) context.http(http -> http.get(url)
                     .configuration(Http.responseType(ResponseType.TEXT))
                     .execute()
-                    .getBody()),
+                    .getBody(new Context.TypeReference<String>() {})),
                 new Context.TypeReference<>() {}));
 
             context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, tablesMap)));
@@ -145,7 +145,7 @@ public class AirtableUtils {
             Map<String, List<Map<?, ?>>> response = context.http(http -> http.get(url)
                 .configuration(Http.responseType(ResponseType.JSON))
                 .execute()
-                .getBody());
+                .getBody(new Context.TypeReference<>() {}));
 
             context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, response)));
 

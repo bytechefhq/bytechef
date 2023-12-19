@@ -49,6 +49,7 @@ import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.util.ByteArrayDataSource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -172,7 +173,7 @@ public class EmailSendAction {
             if (inputParameters.containsKey(ATTACHMENTS)) {
                 MimeBodyPart attachmentBodyPart = new MimeBodyPart();
 
-                for (FileEntry fileEntry : inputParameters.getList(ATTACHMENTS, FileEntry.class)) {
+                for (FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
                     attachmentBodyPart.setDataHandler(
                         new DataHandler(new ByteArrayDataSource(
                             (InputStream) context.file(file -> file.getStream(fileEntry)), fileEntry.getMimeType())));

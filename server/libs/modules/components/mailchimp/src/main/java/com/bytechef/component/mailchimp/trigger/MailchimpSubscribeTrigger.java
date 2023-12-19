@@ -109,7 +109,7 @@ public class MailchimpSubscribeTrigger {
                         "api", true))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody();
+            .getBody(new Context.TypeReference<>() {});
 
         return new DynamicWebhookEnableOutput(Map.of("id", response.get("id")), null);
     }

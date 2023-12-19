@@ -35,6 +35,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.TaskWorker;
 import com.bytechef.atlas.worker.event.TaskExecutionEvent;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
@@ -44,11 +45,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -56,7 +59,7 @@ import org.junit.jupiter.api.Test;
  */
 public class MapTaskDispatcherAdapterTaskHandlerTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper() {
+    private static final ObjectMapper objectMapper = new ObjectMapper() {
         {
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             registerModule(new JavaTimeModule());
@@ -66,6 +69,26 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
     private final TaskFileStorage taskFileStorage = new TaskFileStorageImpl(
         new Base64FileStorageService());
+
+    @BeforeAll
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
+    public static void beforeAll() {
+        class JsonUtilsMock extends JsonUtils {
+            static {
+                objectMapper = MapTaskDispatcherAdapterTaskHandlerTest.objectMapper;
+            }
+        }
+
+        new JsonUtilsMock();
+
+        class MapUtilsMock extends MapUtils {
+            static {
+                objectMapper = MapTaskDispatcherAdapterTaskHandlerTest.objectMapper;
+            }
+        }
+
+        new MapUtilsMock();
+    }
 
     @Test
     public void test1() {
@@ -77,7 +100,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             .workflowTask(
                 WorkflowTask.of(
                     Map.of(
-                        NAME, "name",
+                        NAME, "map1",
                         TYPE, "type",
                         PARAMETERS, Map.of(
                             "list", List.of(1, 2, 3),
@@ -85,7 +108,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
                             Map.of(
                                 NAME, "name",
                                 TYPE, "var",
-                                PARAMETERS, Map.of("value", "${item}"))))))
+                                PARAMETERS, Map.of("value", "${map1.item}"))))))
             .build();
 
         taskExecution.setJobId(4567L);

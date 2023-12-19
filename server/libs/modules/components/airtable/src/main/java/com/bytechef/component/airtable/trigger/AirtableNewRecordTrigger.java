@@ -20,6 +20,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
 
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
+import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerContext;
@@ -80,7 +81,7 @@ public class AirtableNewRecordTrigger {
                                 startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody();
+            .getBody(new Context.TypeReference<>() {});
 
         return new PollOutput(records, Map.of(LAST_TIME_CHECKED, endDate), false);
     }

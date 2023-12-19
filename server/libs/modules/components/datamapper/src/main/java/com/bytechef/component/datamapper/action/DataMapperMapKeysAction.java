@@ -23,13 +23,15 @@ import static com.bytechef.component.datamapper.constant.DataMapperConstants.TO;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.OutputSchemaDataSource.*;
-import static com.bytechef.hermes.component.definition.SampleOutputDataSource.*;
+import static com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
+import static com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 
 /**
  * @author Ivica Cardic
