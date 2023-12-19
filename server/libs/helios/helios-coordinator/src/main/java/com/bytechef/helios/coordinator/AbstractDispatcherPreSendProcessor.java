@@ -16,11 +16,11 @@
 
 package com.bytechef.helios.coordinator;
 
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.configuration.domain.WorkflowConnection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -36,10 +36,10 @@ public abstract class AbstractDispatcherPreSendProcessor {
     protected Map<String, Long> getConnectionIdMap(
         Long projectInstanceId, String workflowId, List<WorkflowConnection> workflowConnections) {
 
-        return workflowConnections.stream()
-            .collect(Collectors.toMap(
-                WorkflowConnection::getKey,
-                workflowConnection -> getConnectionId(projectInstanceId, workflowId, workflowConnection)));
+        return MapUtils.toMap(
+            workflowConnections,
+            WorkflowConnection::getKey,
+            workflowConnection -> getConnectionId(projectInstanceId, workflowId, workflowConnection));
     }
 
     private Long getConnectionId(Long projectInstanceId, String workflowId, WorkflowConnection workflowConnection) {
