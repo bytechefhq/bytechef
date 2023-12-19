@@ -38,7 +38,9 @@ public class LoggerInfoAction {
     protected static Object perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
 
-        context.logger(logger -> logger.info(inputParameters.getString(TEXT)));
+        Object text = inputParameters.get(TEXT);
+
+        context.logger(logger -> logger.info(text.toString()));
 
         return null;
     }
