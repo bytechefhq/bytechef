@@ -98,7 +98,7 @@ public class FilesystemComponentHandlerIntTest {
     private File getFile() {
         return new File(FilesystemComponentHandlerIntTest.class
             .getClassLoader()
-            .getResource("dependencies/sample.txt")
+            .getResource("dependencies/filesystem/sample.txt")
             .getFile());
     }
 }

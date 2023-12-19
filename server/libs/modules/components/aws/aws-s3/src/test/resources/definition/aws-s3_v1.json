@@ -1,7 +1,7 @@
 {
   "actions": [ {
     "batch": null,
-    "componentName": "aws-s3",
+    "componentName": "awsS3",
     "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
     "componentTitle": "AWS S3",
     "componentVersion": 1,
@@ -51,6 +51,9 @@
     } ],
     "sampleOutput": null,
     "title": "Get Object",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -149,13 +152,10 @@
       "optionsDataSource": null,
       "controlType": "OBJECT_BUILDER"
     },
-    "perform": { },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "perform": { }
   }, {
     "batch": null,
-    "componentName": "aws-s3",
+    "componentName": "awsS3",
     "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
     "componentTitle": "AWS S3",
     "componentVersion": 1,
@@ -186,6 +186,9 @@
     } ],
     "sampleOutput": null,
     "title": "Get URL",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -206,13 +209,10 @@
       "options": null,
       "optionsDataSource": null
     },
-    "perform": { },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "perform": { }
   }, {
     "batch": null,
-    "componentName": "aws-s3",
+    "componentName": "awsS3",
     "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
     "componentTitle": "AWS S3",
     "componentVersion": 1,
@@ -243,6 +243,9 @@
     } ],
     "sampleOutput": null,
     "title": "List Objects",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -341,13 +344,10 @@
       "optionsDataSource": null,
       "controlType": "ARRAY_BUILDER"
     },
-    "perform": { },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "perform": { }
   }, {
     "batch": null,
-    "componentName": "aws-s3",
+    "componentName": "awsS3",
     "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
     "componentTitle": "AWS S3",
     "componentVersion": 1,
@@ -397,6 +397,9 @@
     } ],
     "sampleOutput": null,
     "title": "Get Pre-signed Object",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -417,13 +420,10 @@
       "options": null,
       "optionsDataSource": null
     },
-    "perform": { },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "perform": { }
   }, {
     "batch": null,
-    "componentName": "aws-s3",
+    "componentName": "awsS3",
     "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
     "componentTitle": "AWS S3",
     "componentVersion": 1,
@@ -605,6 +605,9 @@
     } ],
     "sampleOutput": null,
     "title": "Put Object",
+    "editorDescriptionDataSource": null,
+    "outputSchemaDataSource": null,
+    "sampleOutputDataSource": null,
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -625,15 +628,12 @@
       "options": null,
       "optionsDataSource": null
     },
-    "perform": { },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "perform": { }
   } ],
   "category": null,
   "connection": {
     "authorizations": null,
-    "componentName": "aws-s3",
+    "componentName": "awsS3",
     "componentDescription": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
     "componentTitle": "AWS S3",
     "properties": [ {
@@ -866,10 +866,10 @@
   "customAction": null,
   "customActionHelp": null,
   "description": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
-  "icon": "path:assets/awss3.svg",
+  "icon": "path:assets/aws-s3.svg",
   "tags": null,
   "metadata": null,
-  "name": "aws-s3",
+  "name": "awsS3",
   "resources": null,
   "version": 1,
   "title": "AWS S3",

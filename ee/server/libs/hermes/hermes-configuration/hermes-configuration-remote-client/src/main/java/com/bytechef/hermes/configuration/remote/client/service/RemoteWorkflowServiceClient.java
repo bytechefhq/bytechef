@@ -9,7 +9,7 @@ package com.bytechef.hermes.configuration.remote.client.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.ParameterizedTypeReference;

@@ -11,7 +11,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import org.springframework.data.domain.Page;

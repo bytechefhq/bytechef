@@ -10,7 +10,7 @@ package com.bytechef.hermes.execution.remote.client.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;

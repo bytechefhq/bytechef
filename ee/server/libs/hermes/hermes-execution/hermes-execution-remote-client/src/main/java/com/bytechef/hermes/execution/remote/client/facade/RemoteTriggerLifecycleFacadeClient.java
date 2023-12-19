@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.execution.remote.client.facade;
 
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;

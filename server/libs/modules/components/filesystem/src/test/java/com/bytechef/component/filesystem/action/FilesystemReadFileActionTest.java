@@ -58,7 +58,7 @@ public class FilesystemReadFileActionTest {
     private File getSampleFile() {
         return new File(FilesystemComponentHandlerTest.class
             .getClassLoader()
-            .getResource("dependencies/sample.txt")
+            .getResource("dependencies/filesystem/sample.txt")
             .getFile());
     }
 }

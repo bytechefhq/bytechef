@@ -98,7 +98,7 @@ public class FilesystemLsActionTest {
     private static File getLsFile() {
         return new File(FilesystemComponentHandlerTest.class
             .getClassLoader()
-            .getResource("dependencies/ls")
+            .getResource("dependencies/filesystem/ls")
             .getFile());
     }
 }

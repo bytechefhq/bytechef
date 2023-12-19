@@ -3,5 +3,5 @@ dependencies {
 
     implementation("org.springframework:spring-context")
 
-    implementation(project(":ee:server:libs:core:commons:commons-restclient"))
+    implementation(project(":ee:server:libs:core:commons:commons-rest-client"))
 }

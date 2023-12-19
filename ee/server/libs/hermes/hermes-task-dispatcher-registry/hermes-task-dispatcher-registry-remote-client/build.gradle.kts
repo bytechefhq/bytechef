@@ -5,5 +5,5 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-task-dispatcher:hermes-task-dispatcher-registry:hermes-task-dispatcher-registry-api"))
 
     implementation(project(":ee:server:libs:core:commons:commons-discovery"))
-    implementation(project(":ee:server:libs:core:commons:commons-restclient"))
+    implementation(project(":ee:server:libs:core:commons:commons-rest-client"))
 }

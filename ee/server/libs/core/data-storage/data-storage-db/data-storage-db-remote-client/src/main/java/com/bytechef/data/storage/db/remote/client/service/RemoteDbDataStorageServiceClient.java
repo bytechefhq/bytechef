@@ -7,7 +7,7 @@
 
 package com.bytechef.data.storage.db.remote.client.service;
 
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.data.storage.db.service.DbDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;

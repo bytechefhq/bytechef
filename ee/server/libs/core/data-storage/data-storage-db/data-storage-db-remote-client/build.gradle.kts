@@ -5,5 +5,5 @@ dependencies {
     implementation(project(":server:libs:core:data-storage:data-storage-db:data-storage-db-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
 
-    implementation(project(":ee:server:libs:core:commons:commons-restclient"))
+    implementation(project(":ee:server:libs:core:commons:commons-rest-client"))
 }

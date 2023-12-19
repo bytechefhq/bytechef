@@ -23,7 +23,7 @@ public class AwsS3Constants {
 
     public static final String ACCESS_KEY_ID = "accessKeyId";
     public static final String ACL = "acl";
-    public static final String AWS_S3 = "aws-s3";
+    public static final String AWS_S3 = "awsS3";
     public static final String BUCKET_NAME = "bucketName";
     public static final String FILE_ENTRY = "fileEntry";
     public static final String FILENAME = "filename";
@@ -36,6 +36,5 @@ public class AwsS3Constants {
     public static final String PUT_OBJECT = "putObject";
     public static final String REGION = "region";
     public static final String SECRET_ACCESS_KEY = "secretAccessKey";
-
     public static final String SIGNATURE_DURATION = "signatureDuration";
 }

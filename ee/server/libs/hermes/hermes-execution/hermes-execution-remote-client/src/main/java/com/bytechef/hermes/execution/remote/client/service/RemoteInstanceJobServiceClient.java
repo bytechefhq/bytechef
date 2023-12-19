@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.execution.remote.client.service;
 
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.hermes.execution.domain.InstanceJob;
 import com.bytechef.hermes.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

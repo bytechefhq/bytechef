@@ -4,5 +4,5 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-api"))
 
     implementation(project(":ee:server:libs:core:commons:commons-discovery"))
-    implementation(project(":ee:server:libs:core:commons:commons-restclient"))
+    implementation(project(":ee:server:libs:core:commons:commons-rest-client"))
 }

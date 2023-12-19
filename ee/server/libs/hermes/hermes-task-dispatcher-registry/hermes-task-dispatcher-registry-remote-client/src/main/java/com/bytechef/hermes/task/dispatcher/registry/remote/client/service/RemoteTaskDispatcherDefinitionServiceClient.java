@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.task.dispatcher.registry.remote.client.service;
 
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.hermes.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.hermes.task.dispatcher.registry.domain.ValueProperty;
 import com.bytechef.hermes.task.dispatcher.registry.service.TaskDispatcherDefinitionService;

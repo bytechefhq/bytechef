@@ -37,7 +37,7 @@ public class BashExecuteActionTest {
     public void testPerform() {
         String script = "ls -l " + BashComponentHandlerTest.class
             .getClassLoader()
-            .getResource("dependencies/test.txt")
+            .getResource("dependencies/bash/test.txt")
             .getFile();
 
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
@@ -48,6 +48,6 @@ public class BashExecuteActionTest {
         String output = BashExecuteAction.perform(
             parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
-        Assertions.assertTrue(output.contains("build/resources/test/dependencies/test.txt"));
+        Assertions.assertTrue(output.contains("build/resources/test/dependencies/bash/test.txt"));
     }
 }

@@ -7,7 +7,7 @@
 
 package com.bytechef.data.storage.db.remote.client.config;
 
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.data.storage.db.remote.client.service.RemoteDbDataStorageServiceClient;
 import com.bytechef.data.storage.db.service.DbDataStorageService;
 import com.bytechef.data.storage.service.DataStorageService;

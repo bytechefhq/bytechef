@@ -9,7 +9,7 @@ package com.bytechef.atlas.execution.remote.client.facade;
 
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 

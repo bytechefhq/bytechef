@@ -8,7 +8,7 @@
 package com.bytechef.hermes.component.registry.remote.client.service;
 
 import com.bytechef.commons.discovery.util.WorkerDiscoveryUtils;
-import com.bytechef.commons.restclient.DefaultRestClient;
+import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;

@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.scheduler.remote.client;
 
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

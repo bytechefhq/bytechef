@@ -6,5 +6,5 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-api"))
 
     implementation(project(":ee:server:libs:core:commons:commons-discovery"))
-    implementation(project(":ee:server:libs:core:commons:commons-restclient"))
+    implementation(project(":ee:server:libs:core:commons:commons-rest-client"))
 }

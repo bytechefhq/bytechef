@@ -38,7 +38,7 @@ public class AwsS3ComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(AWS_S3)
         .title("AWS S3")
         .description("AWS S3 is a simple object storage service provided by Amazon Web Services.")
-        .icon("path:assets/awss3.svg")
+        .icon("path:assets/aws-s3.svg")
         .actions(
             AwsS3GetObjectAction.ACTION_DEFINITION, AwsS3GetUrlAction.ACTION_DEFINITION,
             AwsS3ListObjectsAction.ACTION_DEFINITION,

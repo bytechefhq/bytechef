@@ -8,7 +8,7 @@
 package com.bytechef.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.service.CounterService;
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 

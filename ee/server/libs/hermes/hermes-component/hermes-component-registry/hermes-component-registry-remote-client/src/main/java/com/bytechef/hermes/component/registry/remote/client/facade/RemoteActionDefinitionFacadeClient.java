@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.component.registry.remote.client.facade;
 
-import com.bytechef.commons.restclient.DefaultRestClient;
+import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
 import com.bytechef.hermes.component.registry.domain.OptionsResponse;
 import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;

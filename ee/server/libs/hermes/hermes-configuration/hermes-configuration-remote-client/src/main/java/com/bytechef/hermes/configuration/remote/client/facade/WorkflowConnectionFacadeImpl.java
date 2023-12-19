@@ -8,7 +8,7 @@
 package com.bytechef.hermes.configuration.remote.client.facade;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.hermes.configuration.domain.WorkflowConnection;
 import com.bytechef.hermes.configuration.domain.WorkflowTrigger;
 import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;

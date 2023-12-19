@@ -7,7 +7,7 @@
 
 package com.bytechef.helios.configuration.remote.client.service;
 
-import com.bytechef.commons.restclient.LoadBalancedRestClient;
+import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

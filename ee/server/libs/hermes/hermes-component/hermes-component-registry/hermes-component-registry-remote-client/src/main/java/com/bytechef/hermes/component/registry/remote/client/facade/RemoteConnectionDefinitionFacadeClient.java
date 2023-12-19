@@ -7,7 +7,7 @@
 
 package com.bytechef.hermes.component.registry.remote.client.facade;
 
-import com.bytechef.commons.restclient.DefaultRestClient;
+import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParameters;
