@@ -26,8 +26,8 @@ import com.bytechef.hermes.component.definition.HttpHeadersImpl;
 import com.bytechef.hermes.component.definition.HttpParametersImpl;
 import com.bytechef.hermes.component.definition.OptionsDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
-import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.definition.ParameterMapImpl;
+import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.hermes.component.definition.ParametersImpl;
 import com.bytechef.hermes.component.definition.PropertiesDataSource;
 import com.bytechef.hermes.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
@@ -105,8 +105,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             propertiesResponse = propertiesFunction.apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
@@ -128,9 +128,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentName, componentVersion, triggerName);
 
         dynamicWebhookDisableConsumer.accept(
-            new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()),
-            new ParameterMapImpl(outputParameters), workflowExecutionId, context);
+            new ParametersImpl(inputParameters),
+            connection == null ? null : new ParametersImpl(connection.parameters()),
+            new ParametersImpl(outputParameters), workflowExecutionId, context);
     }
 
     @Override
@@ -143,8 +143,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentName, componentVersion, triggerName);
 
         return dynamicWebhookEnableFunction.apply(
-            new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()),
+            new ParametersImpl(inputParameters),
+            connection == null ? null : new ParametersImpl(connection.parameters()),
             webhookUrl, workflowExecutionId, context);
     }
 
@@ -157,7 +157,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentName, componentVersion, triggerName);
 
         return dynamicWebhookRefreshFunction.apply(
-            new ParameterMapImpl(outputParameters), context);
+            new ParametersImpl(outputParameters), context);
     }
 
     @Override
@@ -173,7 +173,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             editorDescriptionResponse = editorDescriptionFunction
-                .apply(new ParameterMapImpl(inputParameters), context);
+                .apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
@@ -193,8 +193,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             listenerDisableConsumer.accept(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()), workflowExecutionId,
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()), workflowExecutionId,
                 context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
@@ -212,8 +212,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             listenerEnableConsumer.accept(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()),
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()),
                 workflowExecutionId,
                 output -> eventPublisher.publishEvent(
                     new TriggerListenerEvent(
@@ -237,8 +237,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         OptionsDataSource.OptionsResponse optionsResponse = null;
         try {
             optionsResponse = optionsFunction.apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()), searchText, context);
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()), searchText, context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
@@ -259,8 +259,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             outputSchemaResponse = outputSchemaFunction.apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
@@ -281,8 +281,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             sampleOutputResponse = sampleOutputFunction.apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
@@ -315,7 +315,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         if ((TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) &&
             !executeWebhookValidate(
-                triggerDefinition, new ParameterMapImpl(inputParameters), webhookRequest, context)) {
+                triggerDefinition, new ParametersImpl(inputParameters), webhookRequest, context)) {
 
             throw new IllegalStateException("Invalid trigger signature.");
         }
@@ -354,7 +354,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return executeWebhookValidate(
-            triggerDefinition, new ParameterMapImpl(inputParameters), webhookRequest, context);
+            triggerDefinition, new ParametersImpl(inputParameters), webhookRequest, context);
     }
 
     @Override
@@ -411,8 +411,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             webhookOutput = dynamicWebhookRequestFunction.apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()),
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()),
                 new HttpHeadersImpl(webhookRequest.headers()),
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
                 output, triggerContext);
@@ -432,7 +432,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             pollOutput = pollFunction.apply(
-                new ParameterMapImpl(inputParameters), new ParameterMapImpl(closureParameters), triggerContext);
+                new ParametersImpl(inputParameters), new ParametersImpl(closureParameters), triggerContext);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
@@ -443,7 +443,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         while (pollOutput.pollImmediately()) {
             try {
                 pollOutput = pollFunction.apply(
-                    new ParameterMapImpl(inputParameters), new ParameterMapImpl(pollOutput.closureParameters()),
+                    new ParametersImpl(inputParameters), new ParametersImpl(pollOutput.closureParameters()),
                     triggerContext);
             } catch (Exception e) {
                 throw new ComponentExecutionException(e, inputParameters);
@@ -465,7 +465,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         try {
             webhookOutput = staticWebhookRequestFunction.apply(
-                new ParameterMapImpl(inputParameters), new HttpHeadersImpl(webhookRequest.headers()),
+                new ParametersImpl(inputParameters), new HttpHeadersImpl(webhookRequest.headers()),
                 new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
                 triggerContext);
         } catch (Exception e) {
@@ -476,7 +476,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     private boolean executeWebhookValidate(
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition, ParameterMap inputParameters,
+        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition, Parameters inputParameters,
         WebhookRequest webhookRequest, TriggerContext context) {
 
         return triggerDefinition.getWebhookValidate()

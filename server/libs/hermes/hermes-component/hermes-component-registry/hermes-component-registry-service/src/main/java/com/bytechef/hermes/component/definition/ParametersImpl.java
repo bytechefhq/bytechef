@@ -36,12 +36,12 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-public final class ParameterMapImpl implements ParameterMap {
+public final class ParametersImpl implements Parameters {
 
     private final Map<String, Object> map;
 
     @SuppressFBWarnings("EI")
-    public ParameterMapImpl(Map<String, ?> map) {
+    public ParametersImpl(Map<String, ?> map) {
         this.map = Collections.unmodifiableMap(map);
     }
 

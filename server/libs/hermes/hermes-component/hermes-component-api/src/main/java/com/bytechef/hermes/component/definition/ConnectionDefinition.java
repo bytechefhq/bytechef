@@ -92,7 +92,7 @@ public interface ConnectionDefinition {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context);
+        String apply(Parameters connectionParameters, Context context);
     }
 
     /**
@@ -105,6 +105,6 @@ public interface ConnectionDefinition {
          * @param connectionParameters
          * @param context
          */
-        void accept(ParameterMap connectionParameters, Context context);
+        void accept(Parameters connectionParameters, Context context);
     }
 }

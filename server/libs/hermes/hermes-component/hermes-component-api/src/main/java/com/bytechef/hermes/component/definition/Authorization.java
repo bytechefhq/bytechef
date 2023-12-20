@@ -170,7 +170,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws Exception;
+        String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -184,7 +184,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        ApplyResponse apply(ParameterMap connectionParameters, Context context) throws Exception;
+        ApplyResponse apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -202,7 +202,7 @@ public interface Authorization {
          * @return
          */
         AuthorizationCallbackResponse apply(
-            ParameterMap connectionParameters, String code, String redirectUri, String codeVerifier, Context context)
+            Parameters connectionParameters, String code, String redirectUri, String codeVerifier, Context context)
             throws Exception;
     }
 
@@ -217,7 +217,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws Exception;
+        String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -231,7 +231,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws Exception;
+        String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -245,7 +245,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws Exception;
+        String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -269,7 +269,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws Exception;
+        String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -283,7 +283,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws Exception;
+        String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -297,7 +297,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        List<String> apply(ParameterMap connectionParameters, Context context) throws Exception;
+        List<String> apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -311,7 +311,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws Exception;
+        String apply(Parameters connectionParameters, Context context) throws Exception;
     }
 
     /**

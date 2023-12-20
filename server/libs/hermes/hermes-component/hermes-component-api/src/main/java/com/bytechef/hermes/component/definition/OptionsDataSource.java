@@ -62,7 +62,7 @@ public interface OptionsDataSource {
          * @throws Exception
          */
         OptionsResponse apply(
-            ParameterMap inputParameters, ParameterMap connectionParameters, String searchText, ActionContext context)
+            Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
             throws Exception;
     }
 
@@ -82,7 +82,7 @@ public interface OptionsDataSource {
          * @throws Exception
          */
         OptionsResponse apply(
-            ParameterMap inputParameters, ParameterMap connectionParameters, String searchText, TriggerContext context)
+            Parameters inputParameters, Parameters connectionParameters, String searchText, TriggerContext context)
             throws Exception;
     }
 
