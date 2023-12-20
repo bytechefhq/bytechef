@@ -65,7 +65,9 @@ const DataPillPanel = ({
         }
 
         const outputSchemaContent =
-            (action.outputSchema as PropertyType)?.properties || (action.outputSchema as PropertyType)?.items;
+            (action.outputSchema as PropertyType)?.properties ||
+            (action.outputSchema as PropertyType)?.items ||
+            action.outputSchemaDataSource;
 
         return action.workflowAlias !== currentNode.name && action.componentDefinition && outputSchemaContent;
     });
