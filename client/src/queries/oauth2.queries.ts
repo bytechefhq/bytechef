@@ -18,7 +18,7 @@ export const OAuth2Keys = {
 
 export const useGetOAuth2AuthorizationParametersQuery = (
     request: GetOAuth2AuthorizationParametersRequestModel,
-    enabled: boolean
+    enabled?: boolean
 ) =>
     useQuery<OAuth2AuthorizationParametersModel, Error>({
         queryKey: OAuth2Keys.oAuth2AuthorizationParameters(request),
@@ -26,7 +26,7 @@ export const useGetOAuth2AuthorizationParametersQuery = (
             new Oauth2Api().getOAuth2AuthorizationParameters({
                 getOAuth2AuthorizationParametersRequestModel: request,
             }),
-        enabled,
+        enabled: enabled === undefined ? true : enabled,
     });
 
 export const useGetOAuth2PropertiesQuery = () =>

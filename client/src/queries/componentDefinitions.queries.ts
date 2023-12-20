@@ -20,16 +20,16 @@ export const ComponentDefinitionKeys = {
     ],
 };
 
-export const useGetComponentDefinitionQuery = (request: GetComponentDefinitionRequest, enabledCondition?: boolean) =>
+export const useGetComponentDefinitionQuery = (request: GetComponentDefinitionRequest, enabled?: boolean) =>
     useQuery<ComponentDefinitionModel, Error>({
         queryKey: ComponentDefinitionKeys.componentDefinition(request),
         queryFn: () => new ComponentDefinitionApi().getComponentDefinition(request),
-        enabled: false || enabledCondition,
+        enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetComponentDefinitionsQuery = (request?: GetComponentDefinitionsRequest, enabledCondition?: boolean) =>
+export const useGetComponentDefinitionsQuery = (request?: GetComponentDefinitionsRequest, enabled?: boolean) =>
     useQuery<ComponentDefinitionBasicModel[], Error>({
         queryKey: ComponentDefinitionKeys.filteredComponentDefinitions(request),
         queryFn: () => new ComponentDefinitionApi().getComponentDefinitions(request),
-        enabled: false || enabledCondition,
+        enabled: enabled === undefined ? true : enabled,
     });
