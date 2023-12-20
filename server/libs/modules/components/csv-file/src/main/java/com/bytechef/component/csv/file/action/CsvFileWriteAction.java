@@ -30,7 +30,7 @@ import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.fasterxml.jackson.databind.SequenceWriter;
@@ -74,7 +74,7 @@ public class CsvFileWriteAction {
     }
 
     protected static FileEntry perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         List<Map<String, ?>> rows =
             inputParameters.getList(CsvFileConstants.ROWS, new Context.TypeReference<>() {}, List.of());

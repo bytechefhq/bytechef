@@ -22,7 +22,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.PollOutput;
@@ -60,7 +60,7 @@ public class AirtableNewRecordTrigger {
         .poll(AirtableNewRecordTrigger::poll);
 
     protected static PollOutput poll(
-        ParameterMap inputParameters, ParameterMap closureParameters, TriggerContext context) {
+        Parameters inputParameters, Parameters closureParameters, TriggerContext context) {
 
         LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
         LocalDateTime endDate = LocalDateTime.now();

@@ -40,7 +40,7 @@ public class DropboxGetFileLinkActionTest extends AbstractDropboxActionTest {
             .thenReturn(Mockito.mock(GetTemporaryLinkResult.class));
 
         DropboxGetFileLinkAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+            parameters, parameters, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))

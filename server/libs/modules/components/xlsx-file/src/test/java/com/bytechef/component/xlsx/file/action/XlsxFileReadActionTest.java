@@ -27,7 +27,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.bytechef.component.xlsx.file.XlsxFileComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.FileInputStream;
@@ -138,24 +138,24 @@ public class XlsxFileReadActionTest {
     }
 
     @SuppressFBWarnings("OBL")
-    private ParameterMap getReadParameters(
+    private Parameters getReadParameters(
         String extension, boolean headerRow, boolean includeEmptyCells, Integer pageNumber, Integer pageSize,
-        boolean readAsString, File file, ParameterMap parameterMap, ActionContext context)
+        boolean readAsString, File file, Parameters parameters, ActionContext context)
         throws FileNotFoundException {
 
         FileEntry fileEntry = Mockito.mock(FileEntry.class);
 
-        Mockito.when(parameterMap.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
+        Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
             .thenReturn(fileEntry);
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(HEADER_ROW), Mockito.eq(true)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(HEADER_ROW), Mockito.eq(true)))
             .thenReturn(headerRow);
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(INCLUDE_EMPTY_CELLS), Mockito.eq(false)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(INCLUDE_EMPTY_CELLS), Mockito.eq(false)))
             .thenReturn(includeEmptyCells);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_NUMBER)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_NUMBER)))
             .thenReturn(pageNumber);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_SIZE)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_SIZE)))
             .thenReturn(pageSize);
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(READ_AS_STRING), Mockito.eq(false)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(READ_AS_STRING), Mockito.eq(false)))
             .thenReturn(readAsString);
 
         Mockito.when(fileEntry.getExtension())
@@ -166,12 +166,12 @@ public class XlsxFileReadActionTest {
                 .thenReturn(new FileInputStream(file));
         }
 
-        return parameterMap;
+        return parameters;
     }
 
     private void readFile(String extension) throws IOException, JSONException {
         ActionContext context = Mockito.mock(ActionContext.class);
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
@@ -180,8 +180,8 @@ public class XlsxFileReadActionTest {
             new JSONArray((List<?>) XlsxFileReadAction.perform(
                 getReadParameters(
                     extension, true, false, null, null, false, getFile("sample_header." + extension),
-                    parameterMap, context),
-                parameterMap, context)),
+                    parameters, context),
+                parameters, context)),
             true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: false
@@ -191,8 +191,8 @@ public class XlsxFileReadActionTest {
             new JSONArray((List<?>) XlsxFileReadAction.perform(
                 getReadParameters(
                     extension, true, true, null, null, false, getFile("sample_header." + extension),
-                    parameterMap, context),
-                parameterMap, context)),
+                    parameters, context),
+                parameters, context)),
             true);
 
         // headerRow: true, includeEmptyCells: false, readAsString: true
@@ -202,8 +202,8 @@ public class XlsxFileReadActionTest {
             new JSONArray((List<?>) XlsxFileReadAction.perform(
                 getReadParameters(
                     extension, true, false, null, null, true, getFile("sample_header." + extension),
-                    parameterMap, context),
-                parameterMap, context)),
+                    parameters, context),
+                parameters, context)),
             true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: true
@@ -213,8 +213,8 @@ public class XlsxFileReadActionTest {
             new JSONArray((List<?>) XlsxFileReadAction.perform(
                 getReadParameters(
                     extension, true, true, null, null, true, getFile("sample_header." + extension),
-                    parameterMap, context),
-                parameterMap, context)),
+                    parameters, context),
+                parameters, context)),
             true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: false
@@ -224,8 +224,8 @@ public class XlsxFileReadActionTest {
             new JSONArray((List<?>) XlsxFileReadAction.perform(
                 getReadParameters(
                     extension, false, false, null, null, false, getFile("sample_no_header." + extension),
-                    parameterMap, context),
-                parameterMap, context)),
+                    parameters, context),
+                parameters, context)),
             true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: true
@@ -235,8 +235,8 @@ public class XlsxFileReadActionTest {
             new JSONArray((List<?>) XlsxFileReadAction.perform(
                 getReadParameters(
                     extension, false, false, null, null, true, getFile("sample_no_header." + extension),
-                    parameterMap, context),
-                parameterMap, context)),
+                    parameters, context),
+                parameters, context)),
             true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: false
@@ -246,8 +246,8 @@ public class XlsxFileReadActionTest {
             new JSONArray((List<?>) XlsxFileReadAction.perform(
                 getReadParameters(
                     extension, false, true, null, null, false, getFile("sample_no_header." + extension),
-                    parameterMap, context),
-                parameterMap, context)),
+                    parameters, context),
+                parameters, context)),
             true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: true
@@ -257,8 +257,8 @@ public class XlsxFileReadActionTest {
             new JSONArray((List<?>) XlsxFileReadAction.perform(
                 getReadParameters(
                     extension, false, true, null, null, true, getFile("sample_no_header." + extension),
-                    parameterMap, context),
-                parameterMap, context)),
+                    parameters, context),
+                parameters, context)),
             true);
 
         // paging
@@ -267,8 +267,8 @@ public class XlsxFileReadActionTest {
             new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
             new JSONArray((List<?>) XlsxFileReadAction.perform(
                 getReadParameters(extension, true, false, 1, 3, false, getFile("sample_header." + extension),
-                    parameterMap, context),
-                parameterMap, context)),
+                    parameters, context),
+                parameters, context)),
             true);
     }
 }

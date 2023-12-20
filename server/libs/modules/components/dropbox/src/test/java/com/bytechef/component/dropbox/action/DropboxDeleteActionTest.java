@@ -32,7 +32,7 @@ public class DropboxDeleteActionTest extends AbstractDropboxActionTest {
 
     @Test
     public void testPerform() throws DbxException {
-        DropboxDeleteAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+        DropboxDeleteAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))

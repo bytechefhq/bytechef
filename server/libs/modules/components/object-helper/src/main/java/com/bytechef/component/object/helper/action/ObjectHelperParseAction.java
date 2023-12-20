@@ -24,7 +24,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDef
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 
@@ -56,7 +56,7 @@ public class ObjectHelperParseAction {
     }
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         Object input = inputParameters.getRequired(ObjectHelperConstants.SOURCE);
 

@@ -21,7 +21,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.bytechef.component.ods.file.OdsFileComponentHandlerTest;
 import com.bytechef.component.ods.file.constant.OdsFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,7 +44,7 @@ public class OdsFileReadActionTest {
     @Test
     public void testPerformReadODS() throws IOException, JSONException {
         ActionContext context = Mockito.mock(ActionContext.class);
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
@@ -53,8 +53,8 @@ public class OdsFileReadActionTest {
             new JSONArray(
                 (List) OdsFileReadAction.perform(
                     getReadParameters(
-                        true, false, null, null, false, getFile("sample_header.ods"), parameterMap, context),
-                    parameterMap, context)),
+                        true, false, null, null, false, getFile("sample_header.ods"), parameters, context),
+                    parameters, context)),
             true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: false
@@ -64,8 +64,8 @@ public class OdsFileReadActionTest {
             new JSONArray(
                 (List) OdsFileReadAction.perform(
                     getReadParameters(
-                        true, true, null, null, false, getFile("sample_header.ods"), parameterMap, context),
-                    parameterMap, context)),
+                        true, true, null, null, false, getFile("sample_header.ods"), parameters, context),
+                    parameters, context)),
             true);
 
         // headerRow: true, includeEmptyCells: false, readAsString: true
@@ -75,8 +75,8 @@ public class OdsFileReadActionTest {
             new JSONArray(
                 (List) OdsFileReadAction.perform(
                     getReadParameters(
-                        true, false, null, null, true, getFile("sample_header.ods"), parameterMap, context),
-                    parameterMap, context)),
+                        true, false, null, null, true, getFile("sample_header.ods"), parameters, context),
+                    parameters, context)),
             true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: true
@@ -86,8 +86,8 @@ public class OdsFileReadActionTest {
             new JSONArray(
                 (List) OdsFileReadAction.perform(
                     getReadParameters(
-                        true, true, null, null, true, getFile("sample_header.ods"), parameterMap, context),
-                    parameterMap, context)),
+                        true, true, null, null, true, getFile("sample_header.ods"), parameters, context),
+                    parameters, context)),
             true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: false
@@ -97,8 +97,8 @@ public class OdsFileReadActionTest {
             new JSONArray(
                 (List) OdsFileReadAction.perform(
                     getReadParameters(
-                        false, false, null, null, false, getFile("sample_no_header.ods"), parameterMap, context),
-                    parameterMap, context)),
+                        false, false, null, null, false, getFile("sample_no_header.ods"), parameters, context),
+                    parameters, context)),
             true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: true
@@ -108,8 +108,8 @@ public class OdsFileReadActionTest {
             new JSONArray(
                 (List) OdsFileReadAction.perform(
                     getReadParameters(
-                        false, false, null, null, true, getFile("sample_no_header.ods"), parameterMap, context),
-                    parameterMap, context)),
+                        false, false, null, null, true, getFile("sample_no_header.ods"), parameters, context),
+                    parameters, context)),
             true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: false
@@ -119,8 +119,8 @@ public class OdsFileReadActionTest {
             new JSONArray(
                 (List) OdsFileReadAction.perform(
                     getReadParameters(
-                        false, true, null, null, false, getFile("sample_no_header.ods"), parameterMap, context),
-                    parameterMap, context)),
+                        false, true, null, null, false, getFile("sample_no_header.ods"), parameters, context),
+                    parameters, context)),
             true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: true
@@ -130,8 +130,8 @@ public class OdsFileReadActionTest {
             new JSONArray(
                 (List) OdsFileReadAction.perform(
                     getReadParameters(
-                        false, true, null, null, true, getFile("sample_no_header.ods"), parameterMap, context),
-                    parameterMap, context)),
+                        false, true, null, null, true, getFile("sample_no_header.ods"), parameters, context),
+                    parameters, context)),
             true);
 
         // paging
@@ -140,8 +140,8 @@ public class OdsFileReadActionTest {
             new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
             new JSONArray(
                 (List) OdsFileReadAction.perform(
-                    getReadParameters(true, false, 1, 3, false, getFile("sample_header.ods"), parameterMap, context),
-                    parameterMap, context)),
+                    getReadParameters(true, false, 1, 3, false, getFile("sample_header.ods"), parameters, context),
+                    parameters, context)),
             true);
     }
 
@@ -226,24 +226,24 @@ public class OdsFileReadActionTest {
     }
 
     @SuppressFBWarnings("OBL")
-    private ParameterMap getReadParameters(
+    private Parameters getReadParameters(
         boolean headerRow, boolean includeEmptyCells, Integer pageNumber, Integer pageSize, boolean readAsString,
-        File file, ParameterMap parameterMap, ActionContext context)
+        File file, Parameters parameters, ActionContext context)
         throws FileNotFoundException {
 
         Mockito
-            .when(parameterMap.getRequired(Mockito.eq(OdsFileConstants.FILE_ENTRY),
+            .when(parameters.getRequired(Mockito.eq(OdsFileConstants.FILE_ENTRY),
                 Mockito.eq(ActionContext.FileEntry.class)))
             .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(OdsFileConstants.HEADER_ROW), Mockito.eq(true)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(OdsFileConstants.HEADER_ROW), Mockito.eq(true)))
             .thenReturn(headerRow);
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(OdsFileConstants.INCLUDE_EMPTY_CELLS), Mockito.eq(false)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(OdsFileConstants.INCLUDE_EMPTY_CELLS), Mockito.eq(false)))
             .thenReturn(includeEmptyCells);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(OdsFileConstants.PAGE_NUMBER)))
+        Mockito.when(parameters.getInteger(Mockito.eq(OdsFileConstants.PAGE_NUMBER)))
             .thenReturn(pageNumber);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(OdsFileConstants.PAGE_SIZE)))
+        Mockito.when(parameters.getInteger(Mockito.eq(OdsFileConstants.PAGE_SIZE)))
             .thenReturn(pageSize);
-        Mockito.when(parameterMap.getBoolean(
+        Mockito.when(parameters.getBoolean(
             Mockito.eq(OdsFileConstants.READ_AS_STRING), Mockito.eq(false)))
             .thenReturn(readAsString);
 
@@ -252,6 +252,6 @@ public class OdsFileReadActionTest {
                 .thenReturn(new FileInputStream(file));
         }
 
-        return parameterMap;
+        return parameters;
     }
 }

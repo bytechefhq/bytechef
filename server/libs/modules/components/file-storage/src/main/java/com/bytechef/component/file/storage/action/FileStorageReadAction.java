@@ -24,7 +24,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 
@@ -52,7 +52,7 @@ public class FileStorageReadAction {
     }
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context.file(file -> file.readToString(inputParameters.getRequiredFileEntry(FILE_ENTRY)));
     }

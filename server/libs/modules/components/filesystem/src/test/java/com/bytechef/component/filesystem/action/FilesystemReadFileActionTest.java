@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,12 +40,12 @@ public class FilesystemReadFileActionTest {
     public void testPerformReadFile() throws IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getSampleFile();
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getRequiredString(Mockito.eq(FILENAME)))
+        Mockito.when(parameters.getRequiredString(Mockito.eq(FILENAME)))
             .thenReturn(file.getAbsolutePath());
 
-        FilesystemReadFileAction.perform(parameterMap, parameterMap, context);
+        FilesystemReadFileAction.perform(parameters, parameters, context);
 
         ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 

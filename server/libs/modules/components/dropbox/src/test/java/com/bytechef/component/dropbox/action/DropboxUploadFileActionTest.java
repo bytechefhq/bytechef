@@ -37,7 +37,7 @@ public class DropboxUploadFileActionTest extends AbstractDropboxActionTest {
     @Test
     public void testPerform() throws IOException, DbxException {
         Mockito
-            .when(parameterMap.getRequiredString(FILE_ENTRY))
+            .when(parameters.getRequiredString(FILE_ENTRY))
             .thenReturn(SOURCE_STUB);
 
         UploadBuilder uploadBuilder = Mockito.mock(UploadBuilder.class);
@@ -46,7 +46,7 @@ public class DropboxUploadFileActionTest extends AbstractDropboxActionTest {
             .when(filesRequests.uploadBuilder(DESTINATION_STUB))
             .thenReturn(uploadBuilder);
 
-        DropboxUploadFileAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+        DropboxUploadFileAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))

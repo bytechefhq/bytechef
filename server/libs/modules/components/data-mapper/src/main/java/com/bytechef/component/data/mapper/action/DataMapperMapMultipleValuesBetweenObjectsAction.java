@@ -30,7 +30,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 
@@ -81,7 +81,7 @@ public class DataMapperMapMultipleValuesBetweenObjectsAction {
     }
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         // TODO
         return null;

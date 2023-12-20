@@ -21,7 +21,7 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FI
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 
 import com.bytechef.component.dropbox.util.DropboxUtils;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +38,7 @@ public abstract class AbstractDropboxActionTest {
 
     protected MockedStatic<DropboxUtils> dropboxUtils;
     protected DbxUserFilesRequests filesRequests;
-    protected ParameterMap parameterMap;
+    protected Parameters parameters;
     protected ArgumentCaptor<String> stringArgumentCaptorA;
     protected ArgumentCaptor<String> stringArgumentCaptorB;
 
@@ -52,20 +52,20 @@ public abstract class AbstractDropboxActionTest {
             .when(() -> DropboxUtils.getDbxUserFilesRequests(""))
             .thenReturn(filesRequests);
 
-        parameterMap = Mockito.mock(ParameterMap.class);
+        parameters = Mockito.mock(Parameters.class);
         stringArgumentCaptorA = ArgumentCaptor.forClass(String.class);
         stringArgumentCaptorB = ArgumentCaptor.forClass(String.class);
 
         Mockito
-            .when(parameterMap.getRequiredString(ACCESS_TOKEN))
+            .when(parameters.getRequiredString(ACCESS_TOKEN))
             .thenReturn("");
 
         Mockito
-            .when(parameterMap.getRequiredString(SOURCE_FILENAME))
+            .when(parameters.getRequiredString(SOURCE_FILENAME))
             .thenReturn(SOURCE_STUB);
 
         Mockito
-            .when(parameterMap.getRequiredString(DESTINATION_FILENAME))
+            .when(parameters.getRequiredString(DESTINATION_FILENAME))
             .thenReturn(DESTINATION_STUB);
     }
 

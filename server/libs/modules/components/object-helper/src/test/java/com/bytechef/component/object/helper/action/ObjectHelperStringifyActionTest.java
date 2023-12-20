@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.component.object.helper.constant.ObjectHelperConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,9 @@ public class ObjectHelperStringifyActionTest {
     @Test
     public void testPerformStringify() {
         Context context = Mockito.mock(Context.class);
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getRequired(Mockito.eq(ObjectHelperConstants.SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(ObjectHelperConstants.SOURCE)))
             .thenReturn(Map.of("key", 3));
         Mockito.when(context.json(Mockito.any()))
             .thenReturn("""
@@ -47,7 +47,7 @@ public class ObjectHelperStringifyActionTest {
                 }
                 """);
 
-        assertThat(ObjectHelperStringifyAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class)))
+        assertThat(ObjectHelperStringifyAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)))
             .isEqualTo("""
                 {
                     "key": 3

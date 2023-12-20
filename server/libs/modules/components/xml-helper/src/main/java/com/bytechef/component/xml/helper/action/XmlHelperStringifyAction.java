@@ -26,7 +26,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.component.xml.helper.constant.XmlHelperConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 
 /**
  * @author Ivica Cardic
@@ -57,7 +57,7 @@ public class XmlHelperStringifyAction {
         .perform(XmlHelperStringifyAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context.xml(xml -> xml.write(inputParameters.getRequired(XmlHelperConstants.SOURCE)));
     }

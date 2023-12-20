@@ -27,7 +27,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.bytechef.component.json.file.JsonFileComponentHandlerTest;
 import com.bytechef.component.json.file.constant.JsonFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,33 +56,33 @@ public class JsonFileReadActionTest {
     public void testPerformReadJSON() throws JSONException, IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getFile("sample.json");
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
         Mockito.when(context.file(file1 -> file1.readToString(Mockito.any(ActionContext.FileEntry.class))))
             .thenReturn(java.nio.file.Files.readString(Path.of(file.getAbsolutePath())));
 
-        Mockito.when(parameterMap.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
+        Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
             .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
-        Mockito.when(parameterMap.getString(
+        Mockito.when(parameters.getString(
             Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
             .thenReturn("JSON");
         Mockito
-            .when(parameterMap.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(false)))
+            .when(parameters.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(false)))
             .thenReturn(true);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_NUMBER)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_NUMBER)))
             .thenReturn(null);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_SIZE)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_SIZE)))
             .thenReturn(null);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_NUMBER)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_NUMBER)))
             .thenReturn(null);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_SIZE)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_SIZE)))
             .thenReturn(null);
         Mockito.when(context.json(Mockito.any()))
             .thenReturn(new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)).toMap());
 
         assertEquals(
             new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)),
-            new JSONObject((Map<String, ?>) JsonFileReadAction.perform(parameterMap, parameterMap, context)),
+            new JSONObject((Map<String, ?>) JsonFileReadAction.perform(parameters, parameters, context)),
             true);
     }
 
@@ -91,22 +91,22 @@ public class JsonFileReadActionTest {
     public void testPerformReadJSONArray() throws JSONException, IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getFile("sample_array.json");
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
         Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(ActionContext.FileEntry.class))))
             .thenReturn(new FileInputStream(file));
-        Mockito.when(parameterMap.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
+        Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
             .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
-        Mockito.when(parameterMap.getString(
+        Mockito.when(parameters.getString(
             Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
             .thenReturn("JSON");
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(true)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(true)))
             .thenReturn(true);
-        Mockito.when(parameterMap.getString(Mockito.eq(PATH)))
+        Mockito.when(parameters.getString(Mockito.eq(PATH)))
             .thenReturn(null);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_NUMBER)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_NUMBER)))
             .thenReturn(null);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_SIZE)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_SIZE)))
             .thenReturn(null);
         Mockito.when(context.json(Mockito.any()))
             .thenReturn(
@@ -116,20 +116,20 @@ public class JsonFileReadActionTest {
 
         assertEquals(
             new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)),
-            new JSONArray((List<?>) JsonFileReadAction.perform(parameterMap, parameterMap, context)), true);
+            new JSONArray((List<?>) JsonFileReadAction.perform(parameters, parameters, context)), true);
 
         Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(ActionContext.FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
-        Mockito.when(parameterMap.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
+        Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
             .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
-        Mockito.when(parameterMap.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
             .thenReturn("JSON");
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(true)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(true)))
             .thenReturn(true);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_NUMBER)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_NUMBER)))
             .thenReturn(1);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_SIZE)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_SIZE)))
             .thenReturn(2);
         Mockito.when(context.json(Mockito.any()))
             .thenReturn(
@@ -137,7 +137,7 @@ public class JsonFileReadActionTest {
                     .toList()
                     .stream());
 
-        Assertions.assertThat(((List<?>) JsonFileReadAction.perform(parameterMap, parameterMap, context)).size())
+        Assertions.assertThat(((List<?>) JsonFileReadAction.perform(parameters, parameters, context)).size())
             .isEqualTo(2);
     }
 
@@ -146,20 +146,20 @@ public class JsonFileReadActionTest {
     public void testPerformReadJSONL() throws JSONException, IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getFile("sample.jsonl");
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
         Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(ActionContext.FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
-        Mockito.when(parameterMap.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
+        Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
             .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
-        Mockito.when(parameterMap.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
             .thenReturn("JSONL");
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(true)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(true)))
             .thenReturn(true);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_NUMBER)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_NUMBER)))
             .thenReturn(null);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_SIZE)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_SIZE)))
             .thenReturn(null);
 
         for (String line : Files.linesOf(file, StandardCharsets.UTF_8)) {
@@ -169,20 +169,20 @@ public class JsonFileReadActionTest {
 
         assertEquals(
             new JSONArray(Files.contentOf(getFile("sample_array.json"), StandardCharsets.UTF_8)),
-            new JSONArray((List<?>) JsonFileReadAction.perform(parameterMap, parameterMap, context)), true);
+            new JSONArray((List<?>) JsonFileReadAction.perform(parameters, parameters, context)), true);
 
         Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(ActionContext.FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
-        Mockito.when(parameterMap.getRequired(Mockito.eq(FILE_ENTRY), Mockito.eq(ActionContext.FileEntry.class)))
+        Mockito.when(parameters.getRequired(Mockito.eq(FILE_ENTRY), Mockito.eq(ActionContext.FileEntry.class)))
             .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
-        Mockito.when(parameterMap.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
             .thenReturn("JSONL");
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(true)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(true)))
             .thenReturn(true);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_NUMBER)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_NUMBER)))
             .thenReturn(1);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(PAGE_SIZE)))
+        Mockito.when(parameters.getInteger(Mockito.eq(PAGE_SIZE)))
             .thenReturn(2);
 
         for (String line : Files.linesOf(file, StandardCharsets.UTF_8)) {
@@ -190,7 +190,7 @@ public class JsonFileReadActionTest {
                 .thenReturn(new JSONObject(line).toMap());
         }
 
-        Assertions.assertThat(((List<?>) JsonFileReadAction.perform(parameterMap, parameterMap, context)).size())
+        Assertions.assertThat(((List<?>) JsonFileReadAction.perform(parameters, parameters, context)).size())
             .isEqualTo(2);
     }
 

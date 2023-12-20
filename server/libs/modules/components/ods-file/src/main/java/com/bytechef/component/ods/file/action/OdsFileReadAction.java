@@ -27,7 +27,7 @@ import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.github.miachm.sods.Range;
@@ -103,7 +103,7 @@ public class OdsFileReadAction {
     }
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         boolean headerRow = inputParameters.getBoolean(OdsFileConstants.HEADER_ROW, true);
         boolean includeEmptyCells = inputParameters.getBoolean(OdsFileConstants.INCLUDE_EMPTY_CELLS, false);

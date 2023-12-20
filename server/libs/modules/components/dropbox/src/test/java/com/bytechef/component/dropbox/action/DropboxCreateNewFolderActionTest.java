@@ -33,7 +33,7 @@ public class DropboxCreateNewFolderActionTest extends AbstractDropboxActionTest 
     @Test
     public void testPerform() throws DbxException {
         DropboxCreateNewFolderAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+            parameters, parameters, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))

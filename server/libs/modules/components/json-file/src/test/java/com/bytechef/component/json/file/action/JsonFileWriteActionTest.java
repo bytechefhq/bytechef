@@ -24,7 +24,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.bytechef.component.json.file.JsonFileComponentHandlerTest;
 import com.bytechef.component.json.file.constant.JsonFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -50,18 +50,18 @@ public class JsonFileWriteActionTest {
     public void testPerformWriteJSON() throws JSONException, IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getFile("sample.json");
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getString(Mockito.eq(FILENAME)))
+        Mockito.when(parameters.getString(Mockito.eq(FILENAME)))
             .thenReturn(null);
-        Mockito.when(parameterMap.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
             .thenReturn("JSON");
-        Mockito.when(parameterMap.getRequired(Mockito.eq(SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)).toMap());
         Mockito.when(context.json(Mockito.any()))
             .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
 
-        JsonFileWriteAction.perform(parameterMap, parameterMap, context);
+        JsonFileWriteAction.perform(parameters, parameters, context);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(
             ByteArrayInputStream.class);
@@ -84,18 +84,18 @@ public class JsonFileWriteActionTest {
     public void testPerformWriteJSONArray() throws JSONException, IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getFile("sample_array.json");
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getString(Mockito.eq(FILENAME)))
+        Mockito.when(parameters.getString(Mockito.eq(FILENAME)))
             .thenReturn(null);
-        Mockito.when(parameterMap.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
             .thenReturn("JSON");
-        Mockito.when(parameterMap.getRequired(Mockito.eq(SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
         Mockito.when(context.json(Mockito.any()))
             .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
 
-        JsonFileWriteAction.perform(parameterMap, parameterMap, context);
+        JsonFileWriteAction.perform(parameters, parameters, context);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
             .forClass(ByteArrayInputStream.class);
@@ -114,19 +114,19 @@ public class JsonFileWriteActionTest {
             .isEqualTo("file.json");
 
         Mockito.reset(context);
-        Mockito.reset(parameterMap);
+        Mockito.reset(parameters);
 
-        Mockito.when(parameterMap.getString(Mockito.eq(FILENAME)))
+        Mockito.when(parameters.getString(Mockito.eq(FILENAME)))
             .thenReturn("test.json");
-        Mockito.when(parameterMap.getString(
+        Mockito.when(parameters.getString(
             Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
             .thenReturn("JSON");
-        Mockito.when(parameterMap.getRequired(Mockito.eq(SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
         Mockito.when(context.json(Mockito.any()))
             .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
 
-        JsonFileWriteAction.perform(parameterMap, parameterMap, context);
+        JsonFileWriteAction.perform(parameters, parameters, context);
 
         Mockito.verify(context)
             .file(file1 -> file1.storeContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class)));
@@ -139,14 +139,14 @@ public class JsonFileWriteActionTest {
     public void testPerformWriteJSONL() throws JSONException, IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getFile("sample.jsonl");
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getString(Mockito.eq(FILENAME)))
+        Mockito.when(parameters.getString(Mockito.eq(FILENAME)))
             .thenReturn(null);
-        Mockito.when(parameterMap.getString(
+        Mockito.when(parameters.getString(
             Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
             .thenReturn("JSONL");
-        Mockito.when(parameterMap.getRequired(Mockito.eq(SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
         Mockito.when(context.json(Mockito.any()))
             .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
@@ -156,7 +156,7 @@ public class JsonFileWriteActionTest {
                 .thenReturn(line);
         }
 
-        JsonFileWriteAction.perform(parameterMap, parameterMap, context);
+        JsonFileWriteAction.perform(parameters, parameters, context);
 
         ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor
@@ -175,14 +175,14 @@ public class JsonFileWriteActionTest {
             .isEqualTo("file.jsonl");
 
         Mockito.reset(context);
-        Mockito.reset(parameterMap);
+        Mockito.reset(parameters);
 
-        Mockito.when(parameterMap.getString(Mockito.eq(FILENAME)))
+        Mockito.when(parameters.getString(Mockito.eq(FILENAME)))
             .thenReturn("test.jsonl");
-        Mockito.when(parameterMap.getString(
+        Mockito.when(parameters.getString(
             Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
             .thenReturn("JSONL");
-        Mockito.when(parameterMap.getRequired(Mockito.eq(SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
 
         for (String line : Files.linesOf(file, StandardCharsets.UTF_8)) {
@@ -190,7 +190,7 @@ public class JsonFileWriteActionTest {
                 .thenReturn(line);
         }
 
-        JsonFileWriteAction.perform(parameterMap, parameterMap, context);
+        JsonFileWriteAction.perform(parameters, parameters, context);
 
         Mockito.verify(context)
             .file(file1 -> file1.storeContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class)));

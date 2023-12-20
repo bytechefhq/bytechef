@@ -29,7 +29,7 @@ import com.bytechef.hermes.component.definition.Context.Http.Body;
 import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
 import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
 import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.Property.InputProperty;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -115,7 +115,7 @@ public class HttpClientActionUtils {
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    public static Object execute(ParameterMap inputParameters, RequestMethod requestMethod, Context context) {
+    public static Object execute(Parameters inputParameters, RequestMethod requestMethod, Context context) {
         Http.Response response =
             context
                 .http(http -> http.exchange(inputParameters.getRequiredString(HttpClientConstants.URI), requestMethod))
@@ -152,7 +152,7 @@ public class HttpClientActionUtils {
         return allProperties.toArray(InputProperty[]::new);
     }
 
-    private static BodyContentType getBodyContentType(ParameterMap inputParameters) {
+    private static BodyContentType getBodyContentType(Parameters inputParameters) {
         String bodyContentTypeParameter = inputParameters.getString(HttpClientConstants.BODY_CONTENT_TYPE);
 
         return bodyContentTypeParameter == null
@@ -160,7 +160,7 @@ public class HttpClientActionUtils {
             : Http.BodyContentType.valueOf(bodyContentTypeParameter.toUpperCase());
     }
 
-    private static Body getPayload(ParameterMap inputParameters, BodyContentType bodyContentType) {
+    private static Body getPayload(Parameters inputParameters, BodyContentType bodyContentType) {
         Body body = null;
 
         if (inputParameters.containsKey(HttpClientConstants.BODY_CONTENT)) {
@@ -188,7 +188,7 @@ public class HttpClientActionUtils {
         return body;
     }
 
-    private static ResponseType getResponseType(ParameterMap inputParameters) {
+    private static ResponseType getResponseType(Parameters inputParameters) {
         return inputParameters.containsKey(HttpClientConstants.RESPONSE_FORMAT)
             ? Http.ResponseType.valueOf(inputParameters.getString(HttpClientConstants.RESPONSE_FORMAT))
             : null;

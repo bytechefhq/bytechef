@@ -17,7 +17,7 @@
 package com.bytechef.component.googledrive.action;
 
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,9 +29,9 @@ public class ExampleDummyActionTest {
 
     @Test
     public void testPerform() {
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
         Assertions.assertNull(
-            ExampleDummyAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class)));
+            ExampleDummyAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)));
     }
 }

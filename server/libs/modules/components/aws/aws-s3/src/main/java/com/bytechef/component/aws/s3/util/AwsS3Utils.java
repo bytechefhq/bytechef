@@ -20,7 +20,7 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.ACCESS_KEY_I
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.REGION;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.SECRET_ACCESS_KEY;
 
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -33,7 +33,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
  */
 public class AwsS3Utils {
 
-    public static S3Client buildS3Client(ParameterMap connectionParameters) {
+    public static S3Client buildS3Client(Parameters connectionParameters) {
         S3ClientBuilder builder = S3Client.builder()
             .credentialsProvider(getCredentialsProvider(connectionParameters))
             .region(Region.of(connectionParameters.getRequiredString(REGION)));
@@ -41,7 +41,7 @@ public class AwsS3Utils {
         return builder.build();
     }
 
-    public static S3Presigner buildS3Presigner(ParameterMap connectionParameters) {
+    public static S3Presigner buildS3Presigner(Parameters connectionParameters) {
         S3Presigner.Builder builder = S3Presigner.builder()
             .credentialsProvider(getCredentialsProvider(connectionParameters))
             .region(Region.of(connectionParameters.getRequiredString(REGION)));
@@ -49,7 +49,7 @@ public class AwsS3Utils {
         return builder.build();
     }
 
-    private static StaticCredentialsProvider getCredentialsProvider(ParameterMap connectionParameters) {
+    private static StaticCredentialsProvider getCredentialsProvider(Parameters connectionParameters) {
         return StaticCredentialsProvider.create(AwsBasicCredentials.create(
             connectionParameters.getRequiredString(ACCESS_KEY_ID),
             connectionParameters.getRequiredString(SECRET_ACCESS_KEY)));

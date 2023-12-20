@@ -21,7 +21,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.bytechef.component.csv.file.CsvFileComponentHandlerTest;
 import com.bytechef.component.csv.file.constant.CsvFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,13 +46,13 @@ public class CsvFileReadActionTest {
     public void testPerformReadCSV() throws Exception {
         // headerRow: true, includeEmptyCells: false, readAsString: false
 
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, false)),
             new JSONArray(CsvFileReadAction.perform(
-                getReadParameters(true, false, null, null, false, getFile("sample_header.csv"), parameterMap),
-                parameterMap, context)),
+                getReadParameters(true, false, null, null, false, getFile("sample_header.csv"), parameters),
+                parameters, context)),
             true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: false
@@ -60,8 +60,8 @@ public class CsvFileReadActionTest {
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(true, false)),
             new JSONArray(CsvFileReadAction.perform(
-                getReadParameters(true, true, null, null, false, getFile("sample_header.csv"), parameterMap),
-                parameterMap, context)),
+                getReadParameters(true, true, null, null, false, getFile("sample_header.csv"), parameters),
+                parameters, context)),
             true);
 
         // headerRow: true, includeEmptyCells: false, readAsString: true
@@ -69,8 +69,8 @@ public class CsvFileReadActionTest {
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, true)),
             new JSONArray(CsvFileReadAction.perform(
-                getReadParameters(true, false, null, null, true, getFile("sample_header.csv"), parameterMap),
-                parameterMap, context)),
+                getReadParameters(true, false, null, null, true, getFile("sample_header.csv"), parameters),
+                parameters, context)),
             true);
 
         // headerRow: true, includeEmptyCells: true, readAsString: true
@@ -78,8 +78,8 @@ public class CsvFileReadActionTest {
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(true, true)),
             new JSONArray(CsvFileReadAction.perform(
-                getReadParameters(true, true, null, null, true, getFile("sample_header.csv"), parameterMap),
-                parameterMap, context)),
+                getReadParameters(true, true, null, null, true, getFile("sample_header.csv"), parameters),
+                parameters, context)),
             true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: false
@@ -87,8 +87,8 @@ public class CsvFileReadActionTest {
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(false, false)),
             new JSONArray(CsvFileReadAction.perform(
-                getReadParameters(false, false, null, null, false, getFile("sample_no_header.csv"), parameterMap),
-                parameterMap, context)),
+                getReadParameters(false, false, null, null, false, getFile("sample_no_header.csv"), parameters),
+                parameters, context)),
             true);
 
         // headerRow: false, includeEmptyCells: false, readAsString: true
@@ -96,8 +96,8 @@ public class CsvFileReadActionTest {
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(false, true)),
             new JSONArray(CsvFileReadAction.perform(
-                getReadParameters(false, false, null, null, true, getFile("sample_no_header.csv"), parameterMap),
-                parameterMap, context)),
+                getReadParameters(false, false, null, null, true, getFile("sample_no_header.csv"), parameters),
+                parameters, context)),
             true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: false
@@ -105,8 +105,8 @@ public class CsvFileReadActionTest {
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(true, false)),
             new JSONArray(CsvFileReadAction.perform(
-                getReadParameters(false, true, null, null, false, getFile("sample_no_header.csv"), parameterMap),
-                parameterMap, context)),
+                getReadParameters(false, true, null, null, false, getFile("sample_no_header.csv"), parameters),
+                parameters, context)),
             true);
 
         // headerRow: false, includeEmptyCells: true, readAsString: true
@@ -114,8 +114,8 @@ public class CsvFileReadActionTest {
         assertEquals(
             new JSONArray(getJSONArrayWithoutNamedColumns(true, true)),
             new JSONArray(CsvFileReadAction.perform(
-                getReadParameters(false, true, null, null, true, getFile("sample_no_header.csv"), parameterMap),
-                parameterMap, context)),
+                getReadParameters(false, true, null, null, true, getFile("sample_no_header.csv"), parameters),
+                parameters, context)),
             true);
 
         // paging
@@ -123,8 +123,8 @@ public class CsvFileReadActionTest {
         assertEquals(
             new JSONArray(getJSONObjectsWithNamedColumns(false, false).subList(0, 3)),
             new JSONArray(CsvFileReadAction.perform(
-                getReadParameters(true, false, 1, 3, false, getFile("sample_header.csv"), parameterMap),
-                parameterMap, context)),
+                getReadParameters(true, false, 1, 3, false, getFile("sample_header.csv"), parameters),
+                parameters, context)),
             true);
     }
 
@@ -265,24 +265,24 @@ public class CsvFileReadActionTest {
     }
 
     @SuppressFBWarnings("OBL")
-    private ParameterMap getReadParameters(
+    private Parameters getReadParameters(
         boolean headerRow, boolean includeEmptyCells, Integer pageNumber, Integer pageSize, boolean readAsString,
-        File file, ParameterMap parameterMap)
+        File file, Parameters parameters)
         throws FileNotFoundException {
 
-        Mockito.when(parameterMap.getString(Mockito.eq(CsvFileConstants.DELIMITER), Mockito.eq(",")))
+        Mockito.when(parameters.getString(Mockito.eq(CsvFileConstants.DELIMITER), Mockito.eq(",")))
             .thenReturn(",");
-        Mockito.when(parameterMap.getRequiredFileEntry(Mockito.eq(CsvFileConstants.FILE_ENTRY)))
+        Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(CsvFileConstants.FILE_ENTRY)))
             .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(CsvFileConstants.HEADER_ROW), Mockito.eq(true)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(CsvFileConstants.HEADER_ROW), Mockito.eq(true)))
             .thenReturn(headerRow);
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(CsvFileConstants.INCLUDE_EMPTY_CELLS), Mockito.eq(false)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(CsvFileConstants.INCLUDE_EMPTY_CELLS), Mockito.eq(false)))
             .thenReturn(includeEmptyCells);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(CsvFileConstants.PAGE_NUMBER)))
+        Mockito.when(parameters.getInteger(Mockito.eq(CsvFileConstants.PAGE_NUMBER)))
             .thenReturn(pageNumber);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(CsvFileConstants.PAGE_SIZE)))
+        Mockito.when(parameters.getInteger(Mockito.eq(CsvFileConstants.PAGE_SIZE)))
             .thenReturn(pageSize);
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(CsvFileConstants.READ_AS_STRING), Mockito.eq(false)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(CsvFileConstants.READ_AS_STRING), Mockito.eq(false)))
             .thenReturn(readAsString);
 
         if (file != null) {
@@ -290,7 +290,7 @@ public class CsvFileReadActionTest {
                 .thenReturn(new FileInputStream(file));
         }
 
-        return parameterMap;
+        return parameters;
     }
 
     private File getFile(String fileName) {

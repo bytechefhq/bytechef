@@ -30,7 +30,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
 import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
@@ -112,14 +112,14 @@ public class ScheduleEveryDayTrigger {
     }
 
     protected void listenerDisable(
-        ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
+        Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
         Context context) {
 
         triggerScheduler.cancelScheduleTrigger(workflowExecutionId);
     }
 
     protected void listenerEnable(
-        ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
+        Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
         ListenerEmitter listenerEmitter, TriggerContext context) {
 
         triggerScheduler.scheduleScheduleTrigger(
@@ -134,7 +134,7 @@ public class ScheduleEveryDayTrigger {
             WorkflowExecutionId.parse(workflowExecutionId));
     }
 
-    private static String getDayOfWeek(ParameterMap inputParameters) {
+    private static String getDayOfWeek(Parameters inputParameters) {
         return inputParameters.getMap(DAY_OF_WEEK)
             .entrySet()
             .stream()

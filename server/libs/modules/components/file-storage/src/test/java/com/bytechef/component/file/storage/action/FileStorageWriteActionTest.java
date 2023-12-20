@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.file.storage.FileStorageComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import org.assertj.core.util.Files;
@@ -42,14 +42,14 @@ public class FileStorageWriteActionTest {
     @Test
     public void testPerformWrite() {
         File file = getFile();
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getRequired(Mockito.eq(CONTENT)))
+        Mockito.when(parameters.getRequired(Mockito.eq(CONTENT)))
             .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
-        Mockito.when(parameterMap.getString(Mockito.eq(FILENAME), Mockito.eq("file.txt")))
+        Mockito.when(parameters.getString(Mockito.eq(FILENAME), Mockito.eq("file.txt")))
             .thenReturn("file.txt");
 
-        FileStorageWriteAction.perform(parameterMap, parameterMap, context);
+        FileStorageWriteAction.perform(parameters, parameters, context);
 
         ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> contentArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -61,14 +61,14 @@ public class FileStorageWriteActionTest {
         assertThat(filenameArgumentCaptor.getValue()).isEqualTo("file.txt");
 
         Mockito.reset(context);
-        Mockito.reset(parameterMap);
+        Mockito.reset(parameters);
 
-        Mockito.when(parameterMap.getRequired(Mockito.eq(CONTENT)))
+        Mockito.when(parameters.getRequired(Mockito.eq(CONTENT)))
             .thenReturn(Files.contentOf(file, StandardCharsets.UTF_8));
-        Mockito.when(parameterMap.getString(Mockito.eq(FILENAME), Mockito.eq("file.txt")))
+        Mockito.when(parameters.getString(Mockito.eq(FILENAME), Mockito.eq("file.txt")))
             .thenReturn("test.txt");
 
-        FileStorageWriteAction.perform(parameterMap, parameterMap, context);
+        FileStorageWriteAction.perform(parameters, parameters, context);
 
         Mockito.verify(context)
             .file(file1 -> file1.storeContent(filenameArgumentCaptor.capture(), Mockito.anyString()));

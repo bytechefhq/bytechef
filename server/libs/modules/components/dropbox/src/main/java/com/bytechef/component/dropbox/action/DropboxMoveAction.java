@@ -27,7 +27,7 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.RelocationResult;
@@ -80,7 +80,7 @@ public final class DropboxMoveAction {
     }
 
     public static RelocationResult perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws DbxException {
 
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(

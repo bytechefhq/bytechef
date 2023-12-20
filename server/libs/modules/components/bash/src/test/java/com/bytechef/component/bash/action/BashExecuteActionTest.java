@@ -22,7 +22,7 @@ import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
 
 import com.bytechef.component.bash.BashComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Assertions;
@@ -42,13 +42,13 @@ public class BashExecuteActionTest {
             .getResource("dependencies/bash/test.txt")
             .getFile();
 
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getRequiredString(Mockito.eq(SCRIPT)))
+        Mockito.when(parameters.getRequiredString(Mockito.eq(SCRIPT)))
             .thenReturn(script);
 
         String output = BashExecuteAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+            parameters, parameters, Mockito.mock(ActionContext.class));
 
         Assertions.assertTrue(output.contains("build/resources/test/dependencies/bash/test.txt"));
     }

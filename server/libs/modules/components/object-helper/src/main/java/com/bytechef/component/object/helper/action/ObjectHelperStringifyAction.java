@@ -28,7 +28,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 
 /**
  * @author Ivica Cardic
@@ -59,7 +59,7 @@ public class ObjectHelperStringifyAction {
         .perform(ObjectHelperStringifyAction::perform);
 
     protected static String perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Object input = inputParameters.getRequired(SOURCE);
 

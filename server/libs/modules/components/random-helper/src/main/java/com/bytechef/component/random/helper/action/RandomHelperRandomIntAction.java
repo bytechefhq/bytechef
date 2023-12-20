@@ -22,7 +22,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import com.bytechef.component.random.helper.constant.RandomHelperConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 
 /**
  * @author Ivica Cardic
@@ -47,7 +47,7 @@ public class RandomHelperRandomIntAction {
      * Generates a random integer.
      */
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         int startInclusive = inputParameters.getInteger(RandomHelperConstants.START_INCLUSIVE, 0);
         int endInclusive = inputParameters.getInteger(RandomHelperConstants.END_INCLUSIVE, 100);

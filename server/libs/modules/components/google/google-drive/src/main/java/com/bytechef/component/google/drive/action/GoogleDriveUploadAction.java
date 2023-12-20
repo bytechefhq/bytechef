@@ -31,7 +31,7 @@ import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.hermes.component.definition.OptionsDataSource.OptionsResponse;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.definition.Option;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
@@ -92,7 +92,7 @@ public final class GoogleDriveUploadAction {
     }
 
     public static File perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws Exception {
 
         Drive drive = GoogleUtils.getDrive(connectionParameters);

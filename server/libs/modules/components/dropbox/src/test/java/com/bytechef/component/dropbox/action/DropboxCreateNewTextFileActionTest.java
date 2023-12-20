@@ -44,7 +44,7 @@ public class DropboxCreateNewTextFileActionTest extends AbstractDropboxActionTes
             .thenReturn(paperCreateUploader);
 
         DropboxCreateNewTextFileAction.perform(
-            parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+            parameters, parameters, Mockito.mock(ActionContext.class));
 
         ArgumentCaptor<ImportFormat> importFormatArgumentCaptor = ArgumentCaptor.forClass(ImportFormat.class);
 

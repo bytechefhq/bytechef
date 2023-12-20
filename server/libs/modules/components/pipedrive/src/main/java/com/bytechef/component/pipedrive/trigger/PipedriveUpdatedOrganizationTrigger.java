@@ -28,7 +28,7 @@ import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
@@ -192,14 +192,14 @@ public class PipedriveUpdatedOrganizationTrigger {
         .dynamicWebhookRequest(PipedriveUpdatedOrganizationTrigger::dynamicWebhookRequest);
 
     protected static void dynamicWebhookDisable(
-        ParameterMap inputParameters, ParameterMap connectionParameters, Map<String, ?> outputParameters,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, ?> outputParameters,
         String workflowExecutionId, Context context) {
 
         PipedriveUtils.unsubscribeWebhook((String) outputParameters.get("id"), context);
     }
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
-        ParameterMap inputParameters, ParameterMap connectionParameters, String webhookUrl,
+        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, Context context) {
 
         return new DynamicWebhookEnableOutput(
@@ -208,7 +208,7 @@ public class PipedriveUpdatedOrganizationTrigger {
 
     @SuppressWarnings("unchecked")
     protected static WebhookOutput dynamicWebhookRequest(
-        ParameterMap inputParameters, ParameterMap connectionParameters, HttpHeaders headers, HttpParameters parameters,
+        Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, Context context) {
 
         return WebhookOutput.map((Map<?, ?>) ((Map<String, ?>) body.getContent()).get("current"));

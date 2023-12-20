@@ -22,7 +22,7 @@ import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
 import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
 
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpParameters;
@@ -41,7 +41,7 @@ public class WebhookUtils {
 
     public static StaticWebhookRequestFunction getStaticWebhookRequestFunction() {
         return (
-            ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+            Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
             WebhookMethod method, TriggerContext triggerContext) -> {
 
             if (body == null) {

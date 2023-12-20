@@ -19,7 +19,7 @@ package com.bytechef.component.delay.action;
 import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
 
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Assertions;
@@ -33,16 +33,16 @@ public class DelaySleepActionTest {
 
     @Test
     public void test1() throws InterruptedException {
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.containsKey(Mockito.eq("duration")))
+        Mockito.when(parameters.containsKey(Mockito.eq("duration")))
             .thenReturn(true);
-        Mockito.when(parameterMap.getDuration(Mockito.eq("duration")))
+        Mockito.when(parameters.getDuration(Mockito.eq("duration")))
             .thenReturn(Duration.of(1500, ChronoUnit.MILLIS));
 
         long now = System.currentTimeMillis();
 
-        DelaySleepAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+        DelaySleepAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
 
         long delta = System.currentTimeMillis() - now;
 
@@ -52,16 +52,16 @@ public class DelaySleepActionTest {
 
     @Test
     public void test2() throws InterruptedException {
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.containsKey(Mockito.eq(MILLIS)))
+        Mockito.when(parameters.containsKey(Mockito.eq(MILLIS)))
             .thenReturn(true);
-        Mockito.when(parameterMap.getLong(Mockito.eq(MILLIS)))
+        Mockito.when(parameters.getLong(Mockito.eq(MILLIS)))
             .thenReturn(500L);
 
         long now = System.currentTimeMillis();
 
-        DelaySleepAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+        DelaySleepAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
 
         long delta = System.currentTimeMillis() - now;
 
@@ -74,7 +74,7 @@ public class DelaySleepActionTest {
         long now = System.currentTimeMillis();
 
         DelaySleepAction.perform(
-            Mockito.mock(ParameterMap.class), Mockito.mock(ParameterMap.class), Mockito.mock(ActionContext.class));
+            Mockito.mock(Parameters.class), Mockito.mock(Parameters.class), Mockito.mock(ActionContext.class));
 
         long delta = System.currentTimeMillis() - now;
 

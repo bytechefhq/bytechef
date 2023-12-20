@@ -27,7 +27,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDe
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.Body;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
@@ -77,7 +77,7 @@ public class MailchimpSubscribeTrigger {
         .dynamicWebhookRequest(MailchimpSubscribeTrigger::dynamicWebhookRequest);
 
     protected static void dynamicWebhookDisable(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ParameterMap outputParameters,
+        Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, Context context) {
 
         String server = MailchimpUtils.getMailChimpServer(
@@ -90,7 +90,7 @@ public class MailchimpSubscribeTrigger {
     }
 
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
-        ParameterMap inputParameters, ParameterMap connectionParameters, String webhookUrl,
+        Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, Context context) {
 
         String server = MailchimpUtils.getMailChimpServer(
@@ -115,7 +115,7 @@ public class MailchimpSubscribeTrigger {
     }
 
     protected static WebhookOutput dynamicWebhookRequest(
-        Map<String, ?> inputParameters, ParameterMap connectionParameters, HttpHeaders headers,
+        Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
         TriggerContext context) {
 

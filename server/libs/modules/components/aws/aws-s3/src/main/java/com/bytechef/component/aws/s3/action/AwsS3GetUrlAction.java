@@ -25,7 +25,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 
@@ -45,7 +45,7 @@ public class AwsS3GetUrlAction {
         .outputSchema(string())
         .perform(AwsS3GetUrlAction::perform);
 
-    protected static String perform(ParameterMap inputParameters, ParameterMap connectionParameters, Context context) {
+    protected static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connectionParameters)) {
             return s3Client.utilities()
                 .getUrl(GetUrlRequest.builder()

@@ -20,7 +20,7 @@ import static com.bytechef.component.xml.helper.constant.XmlHelperConstants.SOUR
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -33,9 +33,9 @@ public class XmlHelperStringifyActionTest {
     @Test
     public void testPerformStringify() {
         ActionContext context = Mockito.mock(ActionContext.class);
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getRequired(Mockito.eq(SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(Map.of("id", 45, "name", "Poppy"));
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn("""
@@ -44,7 +44,7 @@ public class XmlHelperStringifyActionTest {
                 }
                 """);
 
-        assertThat(XmlHelperStringifyAction.perform(parameterMap, parameterMap, context))
+        assertThat(XmlHelperStringifyAction.perform(parameters, parameters, context))
             .isEqualTo("""
                 {
                     "key": 3

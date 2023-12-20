@@ -27,7 +27,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,7 +56,7 @@ public class AwsS3ListObjectsAction {
         .perform(AwsS3ListObjectsAction::perform);
 
     protected static List<S3ObjectDescription> perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, Context context) {
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connectionParameters)) {
             ListObjectsResponse response = s3Client.listObjects(ListObjectsRequest.builder()

@@ -27,7 +27,7 @@ import com.bytechef.component.csv.file.constant.CsvFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -90,7 +90,7 @@ public class CsvFileReadAction {
         .perform(CsvFileReadAction::perform);
 
     protected static List<Map<String, Object>> perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         String delimiter = inputParameters.getString(CsvFileConstants.DELIMITER, ",");
         boolean headerRow = inputParameters.getBoolean(CsvFileConstants.HEADER_ROW, true);

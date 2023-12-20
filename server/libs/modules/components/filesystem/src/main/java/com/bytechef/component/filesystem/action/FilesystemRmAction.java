@@ -23,7 +23,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -55,7 +55,7 @@ public class FilesystemRmAction {
      * </p>
      */
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         File file = new File(inputParameters.getRequiredString(PATH));
 
