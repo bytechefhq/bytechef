@@ -46,7 +46,7 @@ public interface EditorDescriptionDataSource {
          * @param context
          * @return
          */
-        EditorDescriptionResponse apply(ParameterMap inputParameters, ActionContext context)
+        EditorDescriptionResponse apply(Parameters inputParameters, ActionContext context)
             throws Exception;
     }
 
@@ -61,7 +61,7 @@ public interface EditorDescriptionDataSource {
          * @param context
          * @return
          */
-        EditorDescriptionResponse apply(ParameterMap inputParameters, TriggerContext context)
+        EditorDescriptionResponse apply(Parameters inputParameters, TriggerContext context)
             throws Exception;
     }
 

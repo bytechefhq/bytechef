@@ -267,7 +267,7 @@ public interface TriggerDefinition {
          * @param workflowExecutionId
          */
         void accept(
-            ParameterMap inputParameters, ParameterMap connectionParameters, ParameterMap outputParameters,
+            Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
             String workflowExecutionId, TriggerContext context);
 
     }
@@ -287,7 +287,7 @@ public interface TriggerDefinition {
          * @return
          */
         DynamicWebhookEnableOutput apply(
-            ParameterMap inputParameters, ParameterMap connectionParameters, String webhookUrl,
+            Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
             String workflowExecutionId, TriggerContext context);
 
     }
@@ -307,7 +307,7 @@ public interface TriggerDefinition {
     @FunctionalInterface
     interface DynamicWebhookRefreshFunction {
 
-        DynamicWebhookEnableOutput apply(ParameterMap outputParameters, TriggerContext context);
+        DynamicWebhookEnableOutput apply(Parameters outputParameters, TriggerContext context);
     }
 
     /**
@@ -329,7 +329,7 @@ public interface TriggerDefinition {
          * @return
          */
         WebhookOutput apply(
-            ParameterMap inputParameters, ParameterMap connectionParameters, HttpHeaders headers,
+            Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
             HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
             TriggerContext context) throws Exception;
     }
@@ -413,7 +413,7 @@ public interface TriggerDefinition {
          * @param workflowExecutionId
          */
         void accept(
-            ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
+            Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
             TriggerContext context) throws Exception;
     }
 
@@ -442,7 +442,7 @@ public interface TriggerDefinition {
          * @param listenerEmitter
          */
         void accept(
-            ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
+            Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
             ListenerEmitter listenerEmitter, TriggerContext context) throws Exception;
     }
 
@@ -460,7 +460,7 @@ public interface TriggerDefinition {
          * @return
          */
         PollOutput apply(
-            ParameterMap inputParameters, ParameterMap closureParameters, TriggerContext context)
+            Parameters inputParameters, Parameters closureParameters, TriggerContext context)
             throws Exception;
 
     }
@@ -499,7 +499,7 @@ public interface TriggerDefinition {
          * @return
          */
         WebhookOutput apply(
-            ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+            Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
             WebhookMethod method, TriggerContext context) throws Exception;
 
     }
@@ -653,7 +653,7 @@ public interface TriggerDefinition {
          * @return
          */
         boolean apply(
-            ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+            Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
             WebhookMethod method, TriggerContext context);
     }
 }

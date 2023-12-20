@@ -150,7 +150,7 @@ public interface ActionDefinition {
          * @param context
          * @return
          */
-        Object apply(ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
+        Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
 

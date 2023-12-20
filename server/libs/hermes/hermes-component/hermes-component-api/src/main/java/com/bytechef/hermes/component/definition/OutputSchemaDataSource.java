@@ -50,7 +50,7 @@ public interface OutputSchemaDataSource {
          * @return
          */
         OutputSchemaResponse apply(
-            ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
+            Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
 
@@ -67,7 +67,7 @@ public interface OutputSchemaDataSource {
          * @return
          */
         OutputSchemaResponse apply(
-            ParameterMap inputParameters, ParameterMap connectionParameters, TriggerContext context)
+            Parameters inputParameters, Parameters connectionParameters, TriggerContext context)
             throws Exception;
     }
 

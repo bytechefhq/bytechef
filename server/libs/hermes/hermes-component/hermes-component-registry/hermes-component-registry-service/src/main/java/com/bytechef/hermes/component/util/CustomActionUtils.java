@@ -42,7 +42,7 @@ import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
 import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.hermes.definition.Help;
@@ -183,7 +183,7 @@ public class CustomActionUtils {
     }
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Map<String, ?> headers = MapUtils.getMap(inputParameters, HEADERS, Map.of());
         Map<String, ?> queryParameters = MapUtils.getMap(inputParameters, QUERY_PARAMETERS, Map.of());

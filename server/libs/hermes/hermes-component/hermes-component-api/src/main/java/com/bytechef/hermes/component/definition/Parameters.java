@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public interface ParameterMap extends Map<String, Object> {
+public interface Parameters extends Map<String, Object> {
 
     <T> T get(String key, Class<T> returnType);
 

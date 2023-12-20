@@ -25,7 +25,7 @@ import com.bytechef.hermes.component.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource;
 import com.bytechef.hermes.component.definition.OptionsDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
-import com.bytechef.hermes.component.definition.ParameterMapImpl;
+import com.bytechef.hermes.component.definition.ParametersImpl;
 import com.bytechef.hermes.component.definition.PropertiesDataSource;
 import com.bytechef.hermes.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
@@ -74,8 +74,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             propertiesResponse = propertiesFunction.apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
@@ -99,7 +99,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         EditorDescriptionDataSource.EditorDescriptionResponse editorDescriptionResponse;
 
         try {
-            editorDescriptionResponse = editorDescriptionFunction.apply(new ParameterMapImpl(inputParameters), context);
+            editorDescriptionResponse = editorDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
@@ -121,8 +121,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             optionsResponse = optionsFunction.apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()), searchText, context);
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()), searchText, context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
@@ -143,8 +143,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             outputSchemaResponse = outputSchemaFunction.apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
@@ -165,8 +165,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             actionDefinition.getPerform(), performFunction -> {
                 try {
                     return performFunction.apply(
-                        new ParameterMapImpl(inputParameters),
-                        connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+                        new ParametersImpl(inputParameters),
+                        connection == null ? null : new ParametersImpl(connection.parameters()), context);
                 } catch (Exception e) {
                     throw new ComponentExecutionException(e, inputParameters);
                 }
@@ -186,8 +186,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         try {
             sampleOutputResponse = sampleOutputFunction.apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+                new ParametersImpl(inputParameters),
+                connection == null ? null : new ParametersImpl(connection.parameters()), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }

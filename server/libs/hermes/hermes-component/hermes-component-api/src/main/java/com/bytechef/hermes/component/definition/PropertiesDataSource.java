@@ -58,7 +58,7 @@ public interface PropertiesDataSource {
          * @throws Exception
          */
         PropertiesResponse apply(
-            ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
+            Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
 
@@ -77,7 +77,7 @@ public interface PropertiesDataSource {
          * @throws Exception
          */
         PropertiesResponse apply(
-            ParameterMap inputParameters, ParameterMap connectionParameters, TriggerContext context)
+            Parameters inputParameters, Parameters connectionParameters, TriggerContext context)
             throws Exception;
     }
 
