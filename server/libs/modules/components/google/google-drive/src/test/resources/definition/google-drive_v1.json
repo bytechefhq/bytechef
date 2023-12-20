@@ -109,15 +109,15 @@
       "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
-      "description": "The directory where the file is uploaded.",
+      "description": "The id of a folder where the file is uploaded.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
       "label": "Folder",
       "metadata": { },
       "placeholder": null,
-      "required": true,
-      "name": "folder",
+      "required": null,
+      "name": "driveId",
       "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,

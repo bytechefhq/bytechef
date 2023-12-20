@@ -24,7 +24,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -44,7 +43,8 @@ public class DelaySleepAction {
         .perform(DelaySleepAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
+        throws InterruptedException {
 
         if (inputParameters.containsKey(MILLIS)) {
             sleep(inputParameters.getLong(MILLIS));
@@ -59,11 +59,7 @@ public class DelaySleepAction {
         return null;
     }
 
-    protected static void sleep(long millis) {
-        try {
-            TimeUnit.MILLISECONDS.sleep(millis);
-        } catch (InterruptedException interruptedException) {
-            throw new ComponentExecutionException("Unable to handle delay action", interruptedException);
-        }
+    protected static void sleep(long millis) throws InterruptedException {
+        TimeUnit.MILLISECONDS.sleep(millis);
     }
 }

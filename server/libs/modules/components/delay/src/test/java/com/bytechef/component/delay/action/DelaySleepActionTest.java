@@ -32,7 +32,7 @@ import org.mockito.Mockito;
 public class DelaySleepActionTest {
 
     @Test
-    public void test1() {
+    public void test1() throws InterruptedException {
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
         Mockito.when(parameterMap.containsKey(Mockito.eq("duration")))
@@ -51,7 +51,7 @@ public class DelaySleepActionTest {
     }
 
     @Test
-    public void test2() {
+    public void test2() throws InterruptedException {
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
         Mockito.when(parameterMap.containsKey(Mockito.eq(MILLIS)))
@@ -70,7 +70,7 @@ public class DelaySleepActionTest {
     }
 
     @Test
-    public void test3() {
+    public void test3() throws InterruptedException {
         long now = System.currentTimeMillis();
 
         DelaySleepAction.perform(

@@ -27,6 +27,7 @@ import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.assertj.core.api.Assertions;
@@ -46,7 +47,7 @@ import org.mockito.Mockito;
 public class JsonFileWriteActionTest {
 
     @Test
-    public void testPerformWriteJSON() throws JSONException {
+    public void testPerformWriteJSON() throws JSONException, IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getFile("sample.json");
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
@@ -80,7 +81,7 @@ public class JsonFileWriteActionTest {
     }
 
     @Test
-    public void testPerformWriteJSONArray() throws JSONException {
+    public void testPerformWriteJSONArray() throws JSONException, IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getFile("sample_array.json");
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
@@ -103,9 +104,10 @@ public class JsonFileWriteActionTest {
         Mockito.verify(context)
             .file(file1 -> file1.storeContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture()));
 
+        ByteArrayInputStream byteArrayInputStream = inputStreamArgumentCaptor.getValue();
+
         assertEquals(
-            new JSONArray(new String(inputStreamArgumentCaptor.getValue()
-                .readAllBytes(), StandardCharsets.UTF_8)),
+            new JSONArray(new String(byteArrayInputStream.readAllBytes(), StandardCharsets.UTF_8)),
             new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)),
             true);
         Assertions.assertThat(filenameArgumentCaptor.getValue())
@@ -127,15 +129,14 @@ public class JsonFileWriteActionTest {
         JsonFileWriteAction.perform(parameterMap, parameterMap, context);
 
         Mockito.verify(context)
-            .file(
-                file1 -> file1.storeContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class)));
+            .file(file1 -> file1.storeContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class)));
 
         Assertions.assertThat(filenameArgumentCaptor.getValue())
             .isEqualTo("test.json");
     }
 
     @Test
-    public void testPerformWriteJSONL() throws JSONException {
+    public void testPerformWriteJSONL() throws JSONException, IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getFile("sample.jsonl");
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
@@ -162,8 +163,7 @@ public class JsonFileWriteActionTest {
             .forClass(ByteArrayInputStream.class);
 
         Mockito.verify(context)
-            .file(
-                file1 -> file1.storeContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture()));
+            .file(file1 -> file1.storeContent(filenameArgumentCaptor.capture(), inputStreamArgumentCaptor.capture()));
 
         ByteArrayInputStream byteArrayInputStream = inputStreamArgumentCaptor.getValue();
 
@@ -193,18 +193,18 @@ public class JsonFileWriteActionTest {
         JsonFileWriteAction.perform(parameterMap, parameterMap, context);
 
         Mockito.verify(context)
-            .file(
-                file1 -> file1.storeContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class)));
+            .file(file1 -> file1.storeContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class)));
 
         Assertions.assertThat(filenameArgumentCaptor.getValue())
             .isEqualTo("test.jsonl");
     }
 
     private File getFile(String filename) {
-        return new File(JsonFileComponentHandlerTest.class
-            .getClassLoader()
-            .getResource("dependencies/json-file/" + filename)
-            .getFile());
+        return new File(
+            JsonFileComponentHandlerTest.class
+                .getClassLoader()
+                .getResource("dependencies/json-file/" + filename)
+                .getFile());
     }
 
     private static JSONArray linesOf(String jsonl) {

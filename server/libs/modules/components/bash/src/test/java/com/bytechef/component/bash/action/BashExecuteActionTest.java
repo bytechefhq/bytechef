@@ -23,6 +23,8 @@ import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
 import com.bytechef.component.bash.BashComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -34,7 +36,7 @@ import org.mockito.Mockito;
 public class BashExecuteActionTest {
 
     @Test
-    public void testPerform() {
+    public void testPerform() throws IOException, InterruptedException, TimeoutException {
         String script = "ls -l " + BashComponentHandlerTest.class
             .getClassLoader()
             .getResource("dependencies/bash/test.txt")

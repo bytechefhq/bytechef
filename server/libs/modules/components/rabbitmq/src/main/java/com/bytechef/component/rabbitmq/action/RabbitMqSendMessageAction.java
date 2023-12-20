@@ -30,9 +30,10 @@ import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.rabbitmq.client.Channel;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Ivica Cardic
@@ -52,7 +53,8 @@ public class RabbitMqSendMessageAction {
         .perform(RabbitMqSendMessageAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
+        throws IOException, TimeoutException {
 
         try (com.rabbitmq.client.Connection rabbitMqConnection = RabbitMqUtils.getConnection(
             connectionParameters.getString(HOSTNAME),
@@ -69,8 +71,6 @@ public class RabbitMqSendMessageAction {
             channel.basicPublish("", queueName, null, message.getBytes(StandardCharsets.UTF_8));
 
             channel.close();
-        } catch (Exception e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
         }
 
         return null;

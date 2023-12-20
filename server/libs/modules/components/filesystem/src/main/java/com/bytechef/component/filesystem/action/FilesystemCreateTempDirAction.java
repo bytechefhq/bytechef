@@ -22,7 +22,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,17 +38,13 @@ public class FilesystemCreateTempDirAction {
         .perform(FilesystemCreateTempDirAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
 
-        try {
-            Path path = Files.createTempDirectory("createTempDir_");
+        Path path = Files.createTempDirectory("createTempDir_");
 
-            File file = path.toFile();
+        File file = path.toFile();
 
-            return file.getAbsolutePath();
-        } catch (IOException ioException) {
-            throw new ComponentExecutionException(
-                "Unable to create temporary directory " + inputParameters, ioException);
-        }
+        return file.getAbsolutePath();
+
     }
 }

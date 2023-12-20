@@ -30,7 +30,6 @@ import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -97,7 +96,7 @@ public class ScheduleIntervalTrigger {
                 case 2 -> "0 0 */%s ? * *".formatted(interval);
                 case 3 -> "0 0 0 */%s * ?".formatted(interval);
                 case 4 -> "0 0 0 1 */%s ?".formatted(interval);
-                default -> throw new ComponentExecutionException("Unexpected time unit value.");
+                default -> throw new IllegalArgumentException("Unexpected time unit value.");
             }, zoneId.getId(), Map.of(
                 INTERVAL, inputParameters.getInteger(INTERVAL),
                 TIME_UNIT, inputParameters.getInteger(TIME_UNIT)),

@@ -28,7 +28,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -58,7 +57,7 @@ public class FilesystemWriteFileAction {
         .perform(FilesystemWriteFileAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
 
         String fileName = inputParameters.getRequiredString(FILENAME);
 
@@ -66,8 +65,6 @@ public class FilesystemWriteFileAction {
             file -> file.getStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {
 
             return Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
-        } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to create file " + inputParameters, ioException);
         }
     }
 }

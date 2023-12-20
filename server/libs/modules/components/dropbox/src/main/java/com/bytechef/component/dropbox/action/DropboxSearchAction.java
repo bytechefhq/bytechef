@@ -29,7 +29,6 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.SearchV2Result;
@@ -81,15 +80,11 @@ public final class DropboxSearchAction {
 
     public static SearchV2Result perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
-        throws ComponentExecutionException {
+        throws DbxException {
 
-        try {
-            DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
-                connectionParameters.getRequiredString(ACCESS_TOKEN));
+        DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
+            connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-            return dbxUserFilesRequests.searchV2(inputParameters.getRequiredString(SEARCH_STRING));
-        } catch (DbxException dbxException) {
-            throw new ComponentExecutionException("Unable to search " + inputParameters, dbxException);
-        }
+        return dbxUserFilesRequests.searchV2(inputParameters.getRequiredString(SEARCH_STRING));
     }
 }

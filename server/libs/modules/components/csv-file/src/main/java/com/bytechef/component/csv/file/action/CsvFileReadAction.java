@@ -28,7 +28,6 @@ import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -91,8 +90,7 @@ public class CsvFileReadAction {
         .perform(CsvFileReadAction::perform);
 
     protected static List<Map<String, Object>> perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
-        throws ComponentExecutionException {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
 
         String delimiter = inputParameters.getString(CsvFileConstants.DELIMITER, ",");
         boolean headerRow = inputParameters.getBoolean(CsvFileConstants.HEADER_ROW, true);
@@ -119,8 +117,6 @@ public class CsvFileReadAction {
                     delimiter, headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
                     rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString),
                 context);
-        } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to stream CSV file", ioException);
         }
     }
 

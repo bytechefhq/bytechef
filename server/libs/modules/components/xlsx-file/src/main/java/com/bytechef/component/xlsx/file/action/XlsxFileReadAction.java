@@ -41,7 +41,6 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSch
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -121,7 +120,7 @@ public class XlsxFileReadAction {
     }
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
 
         FileEntry fileEntry = inputParameters.getRequired(FILE_ENTRY, FileEntry.class);
         boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
@@ -146,14 +145,11 @@ public class XlsxFileReadAction {
             }
 
             return read(
-                fileFormat,
-                inputStream,
+                fileFormat, inputStream,
                 new ReadConfiguration(
                     headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
                     rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString, sheetName),
                 context);
-        } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to handle action " + inputParameters, ioException);
         }
     }
 
@@ -281,7 +277,7 @@ public class XlsxFileReadAction {
                     yield numericValue;
                 }
                 case STRING -> cell.getStringCellValue();
-                default -> throw new ComponentExecutionException("Unexpected value: %s".formatted(cell.getCellType()));
+                default -> throw new IllegalArgumentException("Unexpected value: %s".formatted(cell.getCellType()));
             };
         }
 

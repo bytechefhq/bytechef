@@ -33,7 +33,6 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.FileMetadata;
@@ -155,7 +154,7 @@ public final class DropboxUploadFileAction {
 
     public static FileMetadata perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
-        throws ComponentExecutionException {
+        throws DbxException, IOException {
 
         String fileName = inputParameters.getRequiredString(DESTINATION_FILENAME);
 
@@ -168,8 +167,6 @@ public final class DropboxUploadFileAction {
             UploadBuilder uploadBuilder = dbxUserFilesRequests.uploadBuilder(fileName);
 
             return uploadBuilder.uploadAndFinish(inputStream);
-        } catch (IOException | DbxException exception) {
-            throw new ComponentExecutionException("Unable to upload file " + inputParameters, exception);
         }
     }
 }

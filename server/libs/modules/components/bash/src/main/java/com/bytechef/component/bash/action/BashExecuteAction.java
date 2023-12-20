@@ -24,7 +24,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -35,6 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.TimeoutException;
 import org.zeroturnaround.exec.ProcessExecutor;
 
 /**
@@ -54,33 +54,30 @@ public class BashExecuteAction {
 
     protected static String perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
-        throws ComponentExecutionException {
+        throws IOException, InterruptedException, TimeoutException {
+
+        File scriptFile = File.createTempFile("_script", ".sh");
+
+        writeStringToFile(scriptFile, inputParameters.getRequiredString(SCRIPT));
 
         try {
-            File scriptFile = File.createTempFile("_script", ".sh");
+            Runtime runtime = Runtime.getRuntime();
 
-            writeStringToFile(scriptFile, inputParameters.getRequiredString(SCRIPT));
+            Process chmodProcess = runtime.exec(String.format("chmod u+x %s", scriptFile.getAbsolutePath()));
 
-            try {
-                Runtime runtime = Runtime.getRuntime();
+            int chmodRetCode = chmodProcess.waitFor();
 
-                Process chmodProcess = runtime.exec(String.format("chmod u+x %s", scriptFile.getAbsolutePath()));
-
-                int chmodRetCode = chmodProcess.waitFor();
-
-                if (chmodRetCode != 0) {
-                    throw new ComponentExecutionException("Failed to chmod %s".formatted(chmodRetCode));
-                }
-
-                return new ProcessExecutor().command(scriptFile.getAbsolutePath())
-                    .readOutput(true)
-                    .execute()
-                    .outputUTF8();
-            } finally {
-                deleteRecursively(scriptFile.toPath());
+            if (chmodRetCode != 0) {
+                throw new IllegalStateException("Failed to chmod %s".formatted(chmodRetCode));
             }
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to handle action " + inputParameters, exception);
+
+            return new ProcessExecutor()
+                .command(scriptFile.getAbsolutePath())
+                .readOutput(true)
+                .execute()
+                .outputUTF8();
+        } finally {
+            deleteRecursively(scriptFile.toPath());
         }
     }
 
@@ -108,11 +105,9 @@ public class BashExecuteAction {
         return true;
     }
 
-    private static void writeStringToFile(File file, String str) throws ComponentExecutionException {
+    private static void writeStringToFile(File file, String str) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.write(str);
-        } catch (IOException e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
         }
     }
 }

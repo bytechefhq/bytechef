@@ -26,13 +26,13 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
@@ -56,8 +56,8 @@ public class FilesystemLsAction {
                 .defaultValue(false))
         .perform(FilesystemLsAction::perform);
 
-    protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+    protected static List<FileInfo> perform(
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
 
         Path root = Paths.get(inputParameters.getRequiredString(PATH));
         boolean recursive = inputParameters.getBoolean(RECURSIVE, false);
@@ -71,8 +71,6 @@ public class FilesystemLsAction {
                 .filter(Files::isRegularFile)
                 .map(p -> new FileInfo(root, p))
                 .collect(Collectors.toList());
-        } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to list directory entries", ioException);
         }
     }
 
@@ -93,7 +91,7 @@ public class FilesystemLsAction {
             File file = path.toFile();
 
             if (!file.exists() || !file.isFile()) {
-                throw new ComponentExecutionException("Path does not pint to valid file");
+                throw new IllegalArgumentException("Path does not pint to valid file");
             }
 
             size = file.length();

@@ -23,6 +23,7 @@ import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ import org.mockito.Mockito;
 public class FilesystemReadFileActionTest {
 
     @Test
-    public void testPerformReadFile() {
+    public void testPerformReadFile() throws IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getSampleFile();
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
@@ -49,16 +50,16 @@ public class FilesystemReadFileActionTest {
         ArgumentCaptor<String> filenameArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
         Mockito.verify(context)
-            .file(
-                file1 -> file1.storeContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class)));
+            .file(file1 -> file1.storeContent(filenameArgumentCaptor.capture(), Mockito.any(InputStream.class)));
 
         assertThat(filenameArgumentCaptor.getValue()).isEqualTo(file.getAbsolutePath());
     }
 
     private File getSampleFile() {
-        return new File(FilesystemComponentHandlerTest.class
-            .getClassLoader()
-            .getResource("dependencies/filesystem/sample.txt")
-            .getFile());
+        return new File(
+            FilesystemComponentHandlerTest.class
+                .getClassLoader()
+                .getResource("dependencies/filesystem/sample.txt")
+                .getFile());
     }
 }

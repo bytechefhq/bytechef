@@ -16,8 +16,8 @@
 
 package com.bytechef.component.google.drive.action;
 
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.DRIVE_ID;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.UPLOAD_FILE;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
@@ -28,18 +28,14 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.component.google.drive.util.GoogleUtils;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
-import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.hermes.component.definition.OptionsDataSource.OptionsResponse;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Option;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -59,12 +55,11 @@ public final class GoogleDriveUploadAction {
                 .description(
                     "The object property which contains a reference to the file to upload.")
                 .required(true),
-            string(FOLDER)
+            string(DRIVE_ID)
                 .label("Folder")
                 .description(
-                    "The directory where the file is uploaded.")
-                .options(getOptionsFunction())
-                .required(true))
+                    "The id of a folder where the file is uploaded.")
+                .options(getOptionsFunction()))
         .outputSchema(
             object()
                 .properties(
@@ -81,21 +76,16 @@ public final class GoogleDriveUploadAction {
 
             Drive service = GoogleUtils.getDrive(connectionParameters);
 
-            try {
-                List<com.google.api.services.drive.model.Drive> drives = service
-                    .drives()
-                    .list()
-                    .execute()
-                    .getDrives();
+            List<com.google.api.services.drive.model.Drive> drives = service.drives()
+                .list()
+                .execute()
+                .getDrives();
 
-                options = drives.stream()
-                    .filter(drive -> !StringUtils.isNotEmpty(searchText) ||
-                        StringUtils.startsWith(drive.getName(), searchText))
-                    .map(drive -> (Option<String>)option(drive.getName(), drive.getId()))
-                    .toList();
-            } catch (IOException e) {
-                throw new ComponentExecutionException(e);
-            }
+            options = drives.stream()
+                .filter(drive -> !StringUtils.isNotEmpty(searchText) ||
+                    StringUtils.startsWith(drive.getName(), searchText))
+                .map(drive -> (Option<String>) option(drive.getName(), drive.getId()))
+                .toList();
 
             return new OptionsResponse(options);
         };
@@ -103,23 +93,24 @@ public final class GoogleDriveUploadAction {
 
     public static File perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
-        throws ComponentExecutionException {
+        throws Exception {
 
         Drive drive = GoogleUtils.getDrive(connectionParameters);
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
-        try {
-            return drive
-                .files()
-                .create(
-                    new File().setName(fileEntry.getName() + "." + fileEntry.getExtension()),
-                    new FileContent(
-                        fileEntry.getMimeType(),
-                        actionContext.file(file -> file.toTempFile(fileEntry))))
-                .setFields("id")
-                .execute();
-        } catch (IOException ioException) {
-            throw new ComponentExecutionException(ioException.getMessage(), ioException);
+        File file = new File().setName(fileEntry.getName());
+
+        if (inputParameters.containsKey(DRIVE_ID)) {
+            file.setDriveId(inputParameters.getString(DRIVE_ID));
         }
+
+        return drive.files()
+            .create(
+                file,
+                new FileContent(
+                    fileEntry.getMimeType(),
+                    actionContext.file(actionContextFile -> actionContextFile.toTempFile(fileEntry))))
+            .setFields("id")
+            .execute();
     }
 }

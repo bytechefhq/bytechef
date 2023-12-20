@@ -29,7 +29,6 @@ import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -78,7 +77,7 @@ public class XmlFileWriteAction {
     }
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
 
         Object source = inputParameters.getRequired(XmlFileConstants.SOURCE);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -91,8 +90,6 @@ public class XmlFileWriteAction {
             return context.file(
                 file -> file.storeContent(inputParameters.getString(XmlFileConstants.FILENAME, "file.xml"),
                     inputStream));
-        } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to handle action " + inputParameters, ioException);
         }
     }
 }

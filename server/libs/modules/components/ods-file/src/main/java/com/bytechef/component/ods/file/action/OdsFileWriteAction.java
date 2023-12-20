@@ -33,9 +33,8 @@ import com.bytechef.component.ods.file.constant.OdsFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
+import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -83,7 +82,7 @@ public class OdsFileWriteAction {
         Validate.notNull(names, "'names' must not be null");
 
         if (names.isEmpty()) {
-            throw new ComponentExecutionException("Unable to create header values with empty names collection");
+            throw new IllegalArgumentException("Unable to create header values with empty names collection");
         }
 
         Object[] values = new Object[names.size()];
@@ -98,7 +97,7 @@ public class OdsFileWriteAction {
     }
 
     protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
+        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }
 

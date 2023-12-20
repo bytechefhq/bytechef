@@ -22,7 +22,7 @@ package com.bytechef.component.google.drive.constant;
 public final class GoogleDriveConstants {
 
     public static final String FILE_ENTRY = "fileEntry";
-    public static final String FOLDER = "folder";
+    public static final String DRIVE_ID = "driveId";
     public static final String GOOGLE_DRIVE = "googleDrive";
     public static final String UPLOAD_FILE = "uploadFile";
 

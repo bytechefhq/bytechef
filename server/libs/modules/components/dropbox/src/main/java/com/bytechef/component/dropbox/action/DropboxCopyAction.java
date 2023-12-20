@@ -28,7 +28,6 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.RelocationResult;
@@ -79,17 +78,13 @@ public final class DropboxCopyAction {
 
     public static RelocationResult perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
-        throws ComponentExecutionException {
+        throws DbxException {
 
-        try {
-            DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
-                connectionParameters.getRequiredString(ACCESS_TOKEN));
+        DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
+            connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-            return dbxUserFilesRequests.copyV2(
-                inputParameters.getRequiredString(SOURCE_FILENAME),
-                inputParameters.getRequiredString(DESTINATION_FILENAME));
-        } catch (DbxException dbxException) {
-            throw new ComponentExecutionException("Unable to copy " + inputParameters, dbxException);
-        }
+        return dbxUserFilesRequests.copyV2(
+            inputParameters.getRequiredString(SOURCE_FILENAME),
+            inputParameters.getRequiredString(DESTINATION_FILENAME));
     }
 }
