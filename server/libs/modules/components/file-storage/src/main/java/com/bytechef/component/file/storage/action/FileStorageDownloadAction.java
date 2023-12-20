@@ -25,7 +25,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.component.file.storage.constant.FileStorageConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,7 +63,7 @@ public class FileStorageDownloadAction {
      * performs the download of a file (given its URL).
      */
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         URL url = new URL(inputParameters.getRequiredString(FileStorageConstants.URL));
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();

@@ -23,7 +23,7 @@ import com.bytechef.component.csv.file.action.CsvFileReadAction.ReadConfiguratio
 import com.bytechef.component.csv.file.constant.CsvFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -54,10 +54,10 @@ public class CsvFileWriteActionTest {
     public void testPerformWriteCSV() throws IOException {
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
         CsvFileWriteAction.perform(
-            getWriteParameters((List) new JSONArray(jsonContent).toList(), parameterMap), parameterMap, context);
+            getWriteParameters((List) new JSONArray(jsonContent).toList(), parameters), parameters, context);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(
             ByteArrayInputStream.class);
@@ -80,13 +80,13 @@ public class CsvFileWriteActionTest {
             .getFile());
     }
 
-    private ParameterMap getWriteParameters(List<Map<?, ?>> items, ParameterMap parameterMap) {
+    private Parameters getWriteParameters(List<Map<?, ?>> items, Parameters parameters) {
         Mockito.when(
-            parameterMap.getList(Mockito.eq(CsvFileConstants.ROWS), Mockito.any(Context.TypeReference.class),
+            parameters.getList(Mockito.eq(CsvFileConstants.ROWS), Mockito.any(Context.TypeReference.class),
                 Mockito.eq(List.of())))
             .thenReturn(items);
 
-        return parameterMap;
+        return parameters;
     }
 
     private List<Map<String, Object>> read(InputStream inputStream, Context context) throws IOException {

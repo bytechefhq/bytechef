@@ -22,7 +22,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 
 /**
  * @author Mario Cvjetojevic
@@ -40,7 +40,7 @@ public final class ExampleDummyAction {
     }
 
     public static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return null;
     }

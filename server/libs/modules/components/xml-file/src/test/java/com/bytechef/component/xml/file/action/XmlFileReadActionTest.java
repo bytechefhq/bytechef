@@ -19,7 +19,7 @@ package com.bytechef.component.xml.file.action;
 import com.bytechef.component.xml.file.XmlFileComponentHandlerIntTest;
 import com.bytechef.component.xml.file.constant.XmlFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,11 +52,11 @@ public class XmlFileReadActionTest {
                 "color", "RED",
                 "petals", "9",
                 "Florists", Map.of("Florist", List.of(Map.of("name", "Joe"), Map.of("name", "Mark")))));
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getRequiredFileEntry(Mockito.eq(XmlFileConstants.FILE_ENTRY)))
+        Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(XmlFileConstants.FILE_ENTRY)))
             .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
-        Mockito.when(parameterMap.getBoolean(Mockito.eq(XmlFileConstants.IS_ARRAY), Mockito.eq(true)))
+        Mockito.when(parameters.getBoolean(Mockito.eq(XmlFileConstants.IS_ARRAY), Mockito.eq(true)))
             .thenReturn(false);
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(map);
@@ -64,7 +64,7 @@ public class XmlFileReadActionTest {
         Mockito.when(context.file(file1 -> file1.readToString(Mockito.any(ActionContext.FileEntry.class))))
             .thenReturn(java.nio.file.Files.readString(Path.of(file.getAbsolutePath())));
 
-        Assertions.assertThat((Map<String, ?>) XmlFileReadAction.perform(parameterMap, parameterMap, context))
+        Assertions.assertThat((Map<String, ?>) XmlFileReadAction.perform(parameters, parameters, context))
             .isEqualTo(map);
     }
 
@@ -85,17 +85,17 @@ public class XmlFileReadActionTest {
                 "name", "Rose",
                 "color", "YELLOW",
                 "petals", "5"));
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getRequired(
+        Mockito.when(parameters.getRequired(
             Mockito.eq(XmlFileConstants.FILE_ENTRY), Mockito.eq(ActionContext.FileEntry.class)))
             .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
-        Mockito.when(parameterMap.getBoolean(
+        Mockito.when(parameters.getBoolean(
             Mockito.eq(XmlFileConstants.IS_ARRAY), Mockito.eq(true)))
             .thenReturn(true);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(XmlFileConstants.PAGE_NUMBER)))
+        Mockito.when(parameters.getInteger(Mockito.eq(XmlFileConstants.PAGE_NUMBER)))
             .thenReturn(null);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(XmlFileConstants.PAGE_SIZE)))
+        Mockito.when(parameters.getInteger(Mockito.eq(XmlFileConstants.PAGE_SIZE)))
             .thenReturn(null);
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(list.stream());
@@ -103,18 +103,18 @@ public class XmlFileReadActionTest {
         Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(ActionContext.FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
-        Assertions.assertThat((List<?>) XmlFileReadAction.perform(parameterMap, parameterMap, context))
+        Assertions.assertThat((List<?>) XmlFileReadAction.perform(parameters, parameters, context))
             .isEqualTo(list);
 
-        Mockito.when(parameterMap.getRequired(
+        Mockito.when(parameters.getRequired(
             Mockito.eq(XmlFileConstants.FILE_ENTRY), Mockito.eq(ActionContext.FileEntry.class)))
             .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
-        Mockito.when(parameterMap.getBoolean(
+        Mockito.when(parameters.getBoolean(
             Mockito.eq(XmlFileConstants.IS_ARRAY), Mockito.eq(true)))
             .thenReturn(true);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(XmlFileConstants.PAGE_NUMBER)))
+        Mockito.when(parameters.getInteger(Mockito.eq(XmlFileConstants.PAGE_NUMBER)))
             .thenReturn(1);
-        Mockito.when(parameterMap.getInteger(Mockito.eq(XmlFileConstants.PAGE_SIZE)))
+        Mockito.when(parameters.getInteger(Mockito.eq(XmlFileConstants.PAGE_SIZE)))
             .thenReturn(2);
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(list.stream());
@@ -122,7 +122,7 @@ public class XmlFileReadActionTest {
         Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(ActionContext.FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
-        Assertions.assertThat(((List<?>) XmlFileReadAction.perform(parameterMap, parameterMap, context))
+        Assertions.assertThat(((List<?>) XmlFileReadAction.perform(parameters, parameters, context))
             .size())
             .isEqualTo(2);
     }

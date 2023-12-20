@@ -22,7 +22,7 @@ import com.bytechef.component.ods.file.OdsFileComponentHandlerTest;
 import com.bytechef.component.ods.file.constant.OdsFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -48,13 +48,13 @@ public class OdsFileWriteActionTest {
     @Test
     public void testPerformWriteODS() throws JSONException, IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
 
-        ParameterMap inputParameters = getWriteParameters(new JSONArray(jsonContent).toList(), parameterMap);
+        Parameters inputParameters = getWriteParameters(new JSONArray(jsonContent).toList(), parameters);
 
-        OdsFileWriteAction.perform(inputParameters, parameterMap, context);
+        OdsFileWriteAction.perform(inputParameters, parameters, context);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(
             ByteArrayInputStream.class);
@@ -77,7 +77,7 @@ public class OdsFileWriteActionTest {
             .getFile());
     }
 
-    private ParameterMap getWriteParameters(List<?> items, ParameterMap inputParameters) {
+    private Parameters getWriteParameters(List<?> items, Parameters inputParameters) {
         Mockito.when(inputParameters.getString(Mockito.eq(OdsFileConstants.FILENAME), Mockito.eq("file.ods")))
             .thenReturn("file.ods");
         Mockito.when(inputParameters.getList(

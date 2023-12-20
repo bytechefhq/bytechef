@@ -34,10 +34,10 @@ public class DropboxSearchActionTest extends AbstractDropboxActionTest {
     @Test
     public void testPerform() throws DbxException {
         Mockito
-            .when(parameterMap.getRequiredString(SEARCH_STRING))
+            .when(parameters.getRequiredString(SEARCH_STRING))
             .thenReturn(SOURCE_STUB);
 
-        DropboxSearchAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+        DropboxSearchAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))

@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,17 +42,17 @@ public class FilesystemWriteFileActionTest {
     public void testPerformWriteFile() throws IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getSampleFile();
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
         Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(ActionContext.FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
-        Mockito.when(parameterMap.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
+        Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
             .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
-        Mockito.when(parameterMap.getRequiredString(Mockito.eq(FILENAME)))
+        Mockito.when(parameters.getRequiredString(Mockito.eq(FILENAME)))
             .thenReturn(file.getAbsolutePath());
 
-        assertThat(FilesystemWriteFileAction.perform(parameterMap, parameterMap, context))
+        assertThat(FilesystemWriteFileAction.perform(parameters, parameters, context))
             .hasFieldOrPropertyWithValue("bytes", 5L);
     }
 

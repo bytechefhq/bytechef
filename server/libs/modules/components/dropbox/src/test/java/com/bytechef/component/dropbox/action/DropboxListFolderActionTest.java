@@ -32,7 +32,7 @@ public class DropboxListFolderActionTest extends AbstractDropboxActionTest {
 
     @Test
     public void testPerform() throws DbxException {
-        DropboxListFolderAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+        DropboxListFolderAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))

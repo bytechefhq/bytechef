@@ -19,7 +19,7 @@ package com.bytechef.component.filesystem.action;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.File;
 import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
@@ -33,16 +33,16 @@ public class FilesystemRmActionTest {
 
     @Test
     public void testDelete() throws IOException {
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
         File tempDir = java.nio.file.Files.createTempDirectory("rm_")
             .toFile();
 
         Assertions.assertTrue(tempDir.exists());
 
-        Mockito.when(parameterMap.getRequiredString(Mockito.eq(PATH)))
+        Mockito.when(parameters.getRequiredString(Mockito.eq(PATH)))
             .thenReturn(tempDir.getAbsolutePath());
 
-        FilesystemRmAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+        FilesystemRmAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
 
         Assertions.assertFalse(tempDir.exists());
     }

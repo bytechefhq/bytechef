@@ -36,7 +36,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 import com.bytechef.component.xlsx.file.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import java.io.ByteArrayInputStream;
@@ -101,7 +101,7 @@ public class XlsxFileWriteAction {
         "rawtypes", "unchecked"
     })
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String fileName = inputParameters.getString(FILENAME, getaDefaultFileName());
         List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, List.of());

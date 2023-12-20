@@ -26,7 +26,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.net.URL;
 import java.time.Duration;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -52,7 +52,7 @@ public class AwsS3PresignGetObjectAction {
         .outputSchema(string())
         .perform(AwsS3PresignGetObjectAction::perform);
 
-    protected static String perform(ParameterMap inputParameters, ParameterMap connectionParameters, Context context) {
+    protected static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         try (S3Presigner s3Presigner = AwsS3Utils.buildS3Presigner(connectionParameters)) {
             PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(
                 presignedObjectBuilder -> presignedObjectBuilder

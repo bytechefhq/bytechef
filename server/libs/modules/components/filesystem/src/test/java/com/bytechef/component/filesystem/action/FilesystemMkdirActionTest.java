@@ -19,7 +19,7 @@ package com.bytechef.component.filesystem.action;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
@@ -34,28 +34,28 @@ public class FilesystemMkdirActionTest {
 
     @Test
     public void testCreateDir1() throws IOException {
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
         String tempDir = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID()
             .toString()
             .replace("-", "");
 
-        Mockito.when(parameterMap.getRequiredString(Mockito.eq(PATH)))
+        Mockito.when(parameters.getRequiredString(Mockito.eq(PATH)))
             .thenReturn(tempDir);
 
-        FilesystemMkdirAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+        FilesystemMkdirAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
 
         Assertions.assertTrue(new File(tempDir).exists());
     }
 
     @Test
     public void testCreateDir2() {
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
         Assertions.assertThrows(IOException.class, () -> {
-            Mockito.when(parameterMap.getRequiredString(Mockito.eq(PATH)))
+            Mockito.when(parameters.getRequiredString(Mockito.eq(PATH)))
                 .thenReturn("/no/such/thing");
 
-            FilesystemMkdirAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+            FilesystemMkdirAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
         });
 
     }

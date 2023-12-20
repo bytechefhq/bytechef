@@ -25,7 +25,7 @@ import com.bytechef.component.xlsx.file.action.XlsxFileReadAction.ReadConfigurat
 import com.bytechef.component.xlsx.file.constant.XlsxFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -54,9 +54,9 @@ public class XlsxFileWriteActionTest {
     public void testPerformWriteXLSX() throws IOException, JSONException {
         ActionContext context = Mockito.mock(ActionContext.class);
         String jsonContent = Files.contentOf(getFile("sample.json"), StandardCharsets.UTF_8);
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        ParameterMap inputParameters = getWriteParameters(new JSONArray(jsonContent).toList(), parameterMap);
+        Parameters inputParameters = getWriteParameters(new JSONArray(jsonContent).toList(), parameters);
 
         XlsxFileWriteAction.perform(inputParameters, inputParameters, context);
 
@@ -85,16 +85,16 @@ public class XlsxFileWriteActionTest {
             .getFile());
     }
 
-    private ParameterMap getWriteParameters(List<?> items, ParameterMap parameterMap) {
-        Mockito.when(parameterMap.getString(Mockito.eq(FILENAME), Mockito.anyString()))
+    private Parameters getWriteParameters(List<?> items, Parameters parameters) {
+        Mockito.when(parameters.getString(Mockito.eq(FILENAME), Mockito.anyString()))
             .thenReturn("file.xlsx");
         Mockito.when(
-            parameterMap.getList(Mockito.eq(ROWS), Mockito.any(Context.TypeReference.class), Mockito.eq(List.of())))
+            parameters.getList(Mockito.eq(ROWS), Mockito.any(Context.TypeReference.class), Mockito.eq(List.of())))
             .thenReturn(items);
-        Mockito.when(parameterMap.getString(Mockito.eq(SHEET_NAME), Mockito.eq("Sheet")))
+        Mockito.when(parameters.getString(Mockito.eq(SHEET_NAME), Mockito.eq("Sheet")))
             .thenReturn("Sheet");
 
-        return parameterMap;
+        return parameters;
     }
 
     private static List<Map<String, ?>> read(InputStream inputStream, Context context) throws IOException {

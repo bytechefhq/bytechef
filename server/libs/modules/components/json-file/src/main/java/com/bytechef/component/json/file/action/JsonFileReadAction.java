@@ -36,7 +36,7 @@ import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import java.io.BufferedReader;
@@ -95,7 +95,7 @@ public class JsonFileReadAction {
         .sampleOutput(getSampleOutputSchemaFunction())
         .perform(JsonFileReadAction::perform);
 
-    protected static JsonFileConstants.FileType getFileType(ParameterMap inputParameters) {
+    protected static JsonFileConstants.FileType getFileType(Parameters inputParameters) {
         String fileType = inputParameters.getString(FILE_TYPE, JsonFileConstants.FileType.JSON.name());
 
         return JsonFileConstants.FileType.valueOf(fileType.toUpperCase());
@@ -114,7 +114,7 @@ public class JsonFileReadAction {
 
     @SuppressWarnings("unchecked")
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         JsonFileConstants.FileType fileType = getFileType(inputParameters);
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);

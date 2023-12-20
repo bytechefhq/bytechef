@@ -25,7 +25,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +57,7 @@ public class FilesystemLsAction {
         .perform(FilesystemLsAction::perform);
 
     protected static List<FileInfo> perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         Path root = Paths.get(inputParameters.getRequiredString(PATH));
         boolean recursive = inputParameters.getBoolean(RECURSIVE, false);

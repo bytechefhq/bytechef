@@ -18,7 +18,7 @@ package com.bytechef.component.xml.file.action;
 
 import com.bytechef.component.xml.file.constant.XmlFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,17 +61,17 @@ public class XmlFileWriteActionTest {
                                 new LinkedHashMap<>(Map.of("name", "Mark")))));
                 }
             });
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getString(Mockito.eq(XmlFileConstants.FILENAME), Mockito.eq("file.xml")))
+        Mockito.when(parameters.getString(Mockito.eq(XmlFileConstants.FILENAME), Mockito.eq("file.xml")))
             .thenReturn("file.xml");
-        Mockito.when(parameterMap.getRequired(Mockito.eq(XmlFileConstants.SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(XmlFileConstants.SOURCE)))
             .thenReturn(source);
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(
                 "<root><Flower><id>45</id><name>Poppy</name><color>RED</color><petals>9</petals><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists></Flower></root>");
 
-        XmlFileWriteAction.perform(parameterMap, parameterMap, context);
+        XmlFileWriteAction.perform(parameters, parameters, context);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(
             ByteArrayInputStream.class);
@@ -90,17 +90,17 @@ public class XmlFileWriteActionTest {
             .isEqualTo(FILE_XML);
 
         Mockito.reset(context);
-        Mockito.reset(parameterMap);
+        Mockito.reset(parameters);
 
-        Mockito.when(parameterMap.getString(Mockito.eq(XmlFileConstants.FILENAME), Mockito.eq("file.xml")))
+        Mockito.when(parameters.getString(Mockito.eq(XmlFileConstants.FILENAME), Mockito.eq("file.xml")))
             .thenReturn(TEST_XML);
-        Mockito.when(parameterMap.getRequired(Mockito.eq(XmlFileConstants.SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(XmlFileConstants.SOURCE)))
             .thenReturn(source);
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(
                 "<root><Flower><id>45</id><name>Poppy</name><color>RED</color><petals>9</petals><Florists><Florist><name>Joe</name></Florist><Florist><name>Mark</name></Florist></Florists></Flower></root>");
 
-        XmlFileWriteAction.perform(parameterMap, parameterMap, context);
+        XmlFileWriteAction.perform(parameters, parameters, context);
 
         Mockito.verify(context)
             .file(
@@ -126,17 +126,17 @@ public class XmlFileWriteActionTest {
                     put("name", "Rose");
                 }
             });
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getString(Mockito.eq(XmlFileConstants.FILENAME), Mockito.eq("file.xml")))
+        Mockito.when(parameters.getString(Mockito.eq(XmlFileConstants.FILENAME), Mockito.eq("file.xml")))
             .thenReturn("file.xml");
-        Mockito.when(parameterMap.getRequired(Mockito.eq(XmlFileConstants.SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(XmlFileConstants.SOURCE)))
             .thenReturn(source);
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(
                 "<root><item><id>45</id><name>Poppy</name></item><item><id>50</id><name>Rose</name></item></root>");
 
-        XmlFileWriteAction.perform(parameterMap, parameterMap, context);
+        XmlFileWriteAction.perform(parameters, parameters, context);
 
         ArgumentCaptor<ByteArrayInputStream> inputStreamArgumentCaptor = ArgumentCaptor.forClass(
             ByteArrayInputStream.class);
@@ -156,17 +156,17 @@ public class XmlFileWriteActionTest {
             .isEqualTo(FILE_XML);
 
         Mockito.reset(context);
-        Mockito.reset(parameterMap);
+        Mockito.reset(parameters);
 
-        Mockito.when(parameterMap.getString(Mockito.eq(XmlFileConstants.FILENAME), Mockito.eq("file.xml")))
+        Mockito.when(parameters.getString(Mockito.eq(XmlFileConstants.FILENAME), Mockito.eq("file.xml")))
             .thenReturn(TEST_XML);
-        Mockito.when(parameterMap.getRequired(Mockito.eq(XmlFileConstants.SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(XmlFileConstants.SOURCE)))
             .thenReturn(source);
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(
                 "<root><item><id>45</id><name>Poppy</name></item><item><id>50</id><name>Rose</name></item></root>");
 
-        XmlFileWriteAction.perform(parameterMap, parameterMap, context);
+        XmlFileWriteAction.perform(parameters, parameters, context);
 
         Mockito.verify(context)
             .file(

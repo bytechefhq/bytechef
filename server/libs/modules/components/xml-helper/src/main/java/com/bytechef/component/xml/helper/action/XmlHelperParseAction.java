@@ -24,7 +24,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.util.Map;
 
 /**
@@ -44,7 +44,7 @@ public class XmlHelperParseAction {
         .perform(XmlHelperParseAction::perform);
 
     protected static Map<String, ?> perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context.xml(xml -> xml.read(inputParameters.getRequiredString(SOURCE)));
     }

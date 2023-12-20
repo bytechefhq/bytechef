@@ -34,7 +34,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDef
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import java.io.InputStream;
@@ -92,7 +92,7 @@ public class XmlFileReadAction {
     }
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         FileEntry fileEntry = inputParameters.getRequired(FILE_ENTRY, FileEntry.class);
         boolean isArray = inputParameters.getBoolean(IS_ARRAY, true);

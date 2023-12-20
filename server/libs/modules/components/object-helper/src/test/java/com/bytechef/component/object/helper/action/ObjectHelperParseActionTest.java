@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.object.helper.constant.ObjectHelperConstants;
 import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -34,9 +34,9 @@ public class ObjectHelperParseActionTest {
     @Test
     public void testPerformParse() {
         Context context = Mockito.mock(Context.class);
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getRequired(Mockito.eq(ObjectHelperConstants.SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(ObjectHelperConstants.SOURCE)))
             .thenReturn(
                 """
                     {
@@ -46,10 +46,10 @@ public class ObjectHelperParseActionTest {
         Mockito.when(context.json(Mockito.any()))
             .thenReturn(Map.of("key", 3));
 
-        assertThat(ObjectHelperParseAction.perform(parameterMap, parameterMap, context))
+        assertThat(ObjectHelperParseAction.perform(parameters, parameters, context))
             .isEqualTo(Map.of("key", 3));
 
-        Mockito.when(parameterMap.getRequired(Mockito.eq(ObjectHelperConstants.SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(ObjectHelperConstants.SOURCE)))
             .thenReturn(
                 """
                     [
@@ -61,7 +61,7 @@ public class ObjectHelperParseActionTest {
         Mockito.when(context.json(Mockito.any()))
             .thenReturn(List.of(Map.of("key", 3)));
 
-        assertThat(ObjectHelperParseAction.perform(parameterMap, parameterMap, context))
+        assertThat(ObjectHelperParseAction.perform(parameters, parameters, context))
             .isEqualTo(List.of(Map.of("key", 3)));
     }
 }

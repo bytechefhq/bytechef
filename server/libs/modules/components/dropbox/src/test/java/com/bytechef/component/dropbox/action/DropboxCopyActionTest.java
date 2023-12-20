@@ -32,7 +32,7 @@ public class DropboxCopyActionTest extends AbstractDropboxActionTest {
 
     @Test
     public void testPerform() throws DbxException {
-        DropboxCopyAction.perform(parameterMap, parameterMap, Mockito.mock(ActionContext.class));
+        DropboxCopyAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
 
         then(filesRequests)
             .should(times(1))

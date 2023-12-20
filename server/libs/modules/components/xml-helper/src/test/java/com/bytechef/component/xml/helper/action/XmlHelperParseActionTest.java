@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.xml.helper.constant.XmlHelperConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -34,9 +34,9 @@ public class XmlHelperParseActionTest {
     @Test
     public void testPerformParse() {
         ActionContext context = Mockito.mock(ActionContext.class);
-        ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
+        Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameterMap.getRequiredString(
+        Mockito.when(parameters.getRequiredString(
             Mockito.eq(XmlHelperConstants.SOURCE)))
             .thenReturn("""
                 <Flower id="45">
@@ -46,10 +46,10 @@ public class XmlHelperParseActionTest {
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(Map.of("id", "45", "name", "Poppy"));
 
-        assertThat((Map<String, ?>) XmlHelperParseAction.perform(parameterMap, parameterMap, context))
+        assertThat((Map<String, ?>) XmlHelperParseAction.perform(parameters, parameters, context))
             .isEqualTo(Map.of("id", "45", "name", "Poppy"));
 
-        Mockito.when(parameterMap.getRequiredString(
+        Mockito.when(parameters.getRequiredString(
             Mockito.eq(XmlHelperConstants.SOURCE)))
             .thenReturn("""
                 <Flowers>
@@ -65,7 +65,7 @@ public class XmlHelperParseActionTest {
             .thenReturn(
                 Map.of("Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
 
-        assertThat(XmlHelperParseAction.perform(parameterMap, parameterMap, context))
+        assertThat(XmlHelperParseAction.perform(parameters, parameters, context))
             .isEqualTo(
                 Map.of("Flower", List.of(Map.of("id", "45", "name", "Poppy"), Map.of("id", "50", "name", "Rose"))));
     }

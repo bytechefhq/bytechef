@@ -18,7 +18,7 @@ package com.bytechef.component.google.drive.util;
 
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.google.api.client.http.HttpExecuteInterceptor;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
@@ -34,7 +34,7 @@ import com.google.api.services.drive.Drive;
  */
 public class GoogleUtils {
 
-    public static Drive getDrive(ParameterMap connectionParameters) {
+    public static Drive getDrive(Parameters connectionParameters) {
         return new Drive.Builder(
             new NetHttpTransport(),
             GsonFactory.getDefaultInstance(),

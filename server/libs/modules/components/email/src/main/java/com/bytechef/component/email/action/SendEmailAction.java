@@ -31,7 +31,7 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import jakarta.activation.DataHandler;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
@@ -105,7 +105,7 @@ public class SendEmailAction {
         .perform(SendEmailAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws MessagingException, IOException {
 
         Properties properties = new Properties();

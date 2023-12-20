@@ -23,7 +23,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -43,7 +43,7 @@ public class DelaySleepAction {
         .perform(DelaySleepAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws InterruptedException {
 
         if (inputParameters.containsKey(MILLIS)) {

@@ -19,7 +19,7 @@ package com.bytechef.component.script.engine;
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
 
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.util.Map;
 import java.util.function.Function;
 import org.graalvm.polyglot.Context;
@@ -36,7 +36,7 @@ public class PolyglotEngine {
         .build();
 
     @SuppressWarnings("unchecked")
-    public Object execute(String languageId, ParameterMap inputParameters) {
+    public Object execute(String languageId, Parameters inputParameters) {
         try (Context polyglotContext = Context.newBuilder()
             .engine(engine)
             .allowAllAccess(true)

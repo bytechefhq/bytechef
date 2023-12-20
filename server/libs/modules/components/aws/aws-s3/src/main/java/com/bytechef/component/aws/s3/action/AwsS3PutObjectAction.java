@@ -30,7 +30,7 @@ import com.bytechef.component.aws.s3.util.AwsS3Utils;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -72,7 +72,7 @@ public class AwsS3PutObjectAction {
         .perform(AwsS3PutObjectAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 

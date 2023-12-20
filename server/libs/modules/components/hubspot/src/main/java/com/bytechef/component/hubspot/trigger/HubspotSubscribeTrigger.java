@@ -26,7 +26,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.Body;
-import com.bytechef.hermes.component.definition.ParameterMap;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.HttpHeaders;
@@ -149,7 +149,7 @@ public class HubspotSubscribeTrigger {
         .dynamicWebhookRequest(HubspotSubscribeTrigger::dynamicWebhookRequest);
 
     protected static void dynamicWebhookDisable(
-        ParameterMap inputParameters, ParameterMap connectionParameters, Map<String, ?> outputParameters,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, ?> outputParameters,
         String workflowExecutionId, Context context) {
 
         context
@@ -159,7 +159,7 @@ public class HubspotSubscribeTrigger {
 
     @SuppressFBWarnings("RV")
     protected static DynamicWebhookEnableOutput dynamicWebhookEnable(
-        ParameterMap inputParameters, ParameterMap connectionParameters, String webhookUrl, String workflowExecutionId,
+        Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
         Context context) {
 
         context
@@ -188,7 +188,7 @@ public class HubspotSubscribeTrigger {
 
     @SuppressWarnings("unchecked")
     protected static WebhookOutput dynamicWebhookRequest(
-        Map<String, ?> inputParameters, ParameterMap connectionParameters, HttpHeaders headers,
+        Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
         Context context) {
 
