@@ -36,6 +36,7 @@ import com.bytechef.hermes.definition.Option;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -59,7 +60,7 @@ public final class GoogleDriveUploadAction {
                 .label("Folder")
                 .description(
                     "The id of a folder where the file is uploaded.")
-                .options(getOptionsFunction()))
+                .options((ActionOptionsFunction) GoogleDriveUploadAction::getOptionsFunction))
         .outputSchema(
             object()
                 .properties(
@@ -70,25 +71,26 @@ public final class GoogleDriveUploadAction {
     private GoogleDriveUploadAction() {
     }
 
-    public static ActionOptionsFunction getOptionsFunction() {
-        return (inputParameters, connectionParameters, searchText, context) -> {
-            List<Option<String>> options;
+    public static OptionsResponse getOptionsFunction(
+        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        throws IOException {
 
-            Drive service = GoogleUtils.getDrive(connectionParameters);
+        List<Option<String>> options;
 
-            List<com.google.api.services.drive.model.Drive> drives = service.drives()
-                .list()
-                .execute()
-                .getDrives();
+        Drive service = GoogleUtils.getDrive(connectionParameters);
 
-            options = drives.stream()
-                .filter(drive -> !StringUtils.isNotEmpty(searchText) ||
-                    StringUtils.startsWith(drive.getName(), searchText))
-                .map(drive -> (Option<String>) option(drive.getName(), drive.getId()))
-                .toList();
+        List<com.google.api.services.drive.model.Drive> drives = service.drives()
+            .list()
+            .execute()
+            .getDrives();
 
-            return new OptionsResponse(options);
-        };
+        options = drives.stream()
+            .filter(drive -> !StringUtils.isNotEmpty(searchText) ||
+                StringUtils.startsWith(drive.getName(), searchText))
+            .map(drive -> (Option<String>) option(drive.getName(), drive.getId()))
+            .toList();
+
+        return new OptionsResponse(options);
     }
 
     public static File perform(
