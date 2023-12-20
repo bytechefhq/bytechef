@@ -18,9 +18,7 @@ package com.bytechef.hermes.test.executor.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
-import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
-import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryCounterRepository;
 import com.bytechef.atlas.execution.repository.memory.InMemoryJobRepository;
@@ -40,17 +38,14 @@ import com.bytechef.atlas.worker.task.factory.TaskDispatcherAdapterFactory;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
-import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.hermes.configuration.domain.WorkflowConnection;
 import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.hermes.test.executor.JobTestExecutor;
 import com.bytechef.hermes.test.executor.JobTestExecutorImpl;
+import com.bytechef.hermes.test.executor.coordinator.task.dispatcher.TestTaskDispatcherPreSendProcessor;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
@@ -70,11 +65,8 @@ import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
 import com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher;
 import com.bytechef.task.dispatcher.sequence.completion.SequenceTaskCompletionHandler;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -111,62 +103,15 @@ public class TestExecutorConfiguration {
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(objectMapper),
-                getTaskDispatcherPreSendProcessors(jobService, workflowConnectionFacade),
+                List.of(new TestTaskDispatcherPreSendProcessor(jobService, workflowConnectionFacade)),
                 getTaskDispatcherResolverFactories(
                     syncMessageBroker, contextService, counterService, taskExecutionService, taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
             taskExecutionService, taskFileStorage);
     }
 
-    private List<TaskDispatcherPreSendProcessor> getTaskDispatcherPreSendProcessors(
-        JobService jobService, WorkflowConnectionFacade workflowConnectionFacade) {
-
-        return List.of(
-            taskExecution -> {
-                Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
-
-                Map<String, Long> connectionIdMap;
-                Map<String, Map<String, Map<String, Long>>> jobTaskConnectionMap = getJobTaskConnectionMap(job);
-
-                if (jobTaskConnectionMap.containsKey(taskExecution.getName())) {
-
-                    // directly coming from .../workflow-tests POST endpoint
-
-                    connectionIdMap = getConnectionIdMap(jobTaskConnectionMap.get(taskExecution.getName()));
-                } else {
-
-                    // defined in the workflow definition
-
-                    connectionIdMap = getConnectionIdMap(
-                        workflowConnectionFacade.getWorkflowConnections(taskExecution.getWorkflowTask()));
-                }
-
-                if (connectionIdMap != null) {
-                    taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
-                }
-
-                return taskExecution;
-            });
-    }
-
-    private static Map<String, Long> getConnectionIdMap(Map<String, Map<String, Long>> taskConnectionMap) {
-        return MapUtils.toMap(
-            taskConnectionMap, Map.Entry::getKey, entry -> MapUtils.getLong(entry.getValue(), WorkflowConnection.ID));
-    }
-
-    private static Map<String, Long> getConnectionIdMap(List<WorkflowConnection> workflowConnections) {
-        return MapUtils.toMap(
-            workflowConnections, WorkflowConnection::getKey,
-            workflowConnection -> OptionalUtils.get(workflowConnection.getId()));
-    }
-
     private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {
         return event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event);
-    }
-
-    private static Map<String, Map<String, Map<String, Long>>> getJobTaskConnectionMap(Job job) {
-        return MapUtils.getMap(
-            job.getMetadata(), MetadataConstants.CONNECTIONS, new TypeReference<>() {}, Map.of());
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
