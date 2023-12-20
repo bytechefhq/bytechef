@@ -53,7 +53,7 @@ const WorkflowExecutionDetailsAccordion = ({workflowExecution}: {workflowExecuti
                 </div>
             </div>
 
-            <div className="overflow-y-auto">
+            <div>
                 <Accordion collapsible defaultValue={workflowExecution.triggerExecution?.id || ''} type="single">
                     {workflowExecution.triggerExecution && (
                         <WorkflowExecutionDetailsTriggerAccordionItem
@@ -61,11 +61,13 @@ const WorkflowExecutionDetailsAccordion = ({workflowExecution}: {workflowExecuti
                         />
                     )}
 
-                    {workflowExecution.job?.taskExecutions && (
-                        <WorkflowExecutionDetailsTaskAccordionItem
-                            taskExecutions={workflowExecution.job.taskExecutions}
-                        />
-                    )}
+                    {workflowExecution.job?.taskExecutions &&
+                        workflowExecution.job?.taskExecutions.map((taskExecution) => (
+                            <WorkflowExecutionDetailsTaskAccordionItem
+                                key={taskExecution.id}
+                                taskExecution={taskExecution}
+                            />
+                        ))}
                 </Accordion>
             </div>
         </>

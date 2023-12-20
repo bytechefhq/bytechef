@@ -14,65 +14,67 @@ const WorkflowExecutionDetailsTriggerAccordionItem = ({
     const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
 
     return (
-        <>
-            {workflowTrigger?.label && (
-                <AccordionItem key={id} value={id || ''}>
-                    <AccordionTrigger className="flex w-full items-center justify-between border-gray-100 bg-white px-2 py-3 data-[state=closed]:border-b">
-                        <div className="flex items-center text-sm">
-                            {triggerExecution?.component?.icon && (
-                                <InlineSVG className="mr-1 h-6 w-6" src={triggerExecution?.component?.icon} />
-                            )}
+        <AccordionItem key={id} value={id || ''}>
+            <AccordionTrigger className="flex w-full items-center justify-between border-gray-100 bg-white px-2 py-3 data-[state=closed]:border-b">
+                <div className="flex items-center text-sm">
+                    {triggerExecution?.component?.icon && (
+                        <InlineSVG className="mr-1 h-6 w-6" src={triggerExecution?.component?.icon} />
+                    )}
 
-                            {workflowTrigger?.name || workflowTrigger?.type}
-                        </div>
+                    {workflowTrigger?.name || workflowTrigger?.type}
+                </div>
 
-                        <div className="flex items-center">
-                            <span className="ml-auto mr-2 text-xs">{duration}ms</span>
+                <div className="flex items-center">
+                    <span className="ml-auto mr-2 text-xs">{duration}ms</span>
 
-                            {triggerExecution.status === 'COMPLETED' && (
-                                <CheckCircledIcon className="h-5 w-5 text-green-500" />
-                            )}
+                    {triggerExecution.status === 'COMPLETED' && <CheckCircledIcon className="h-5 w-5 text-green-500" />}
 
-                            {triggerExecution.status === 'FAILED' && (
-                                <CrossCircledIcon className="h-5 w-5 text-red-500" />
-                            )}
-                        </div>
-                    </AccordionTrigger>
+                    {triggerExecution.status === 'FAILED' && <CrossCircledIcon className="h-5 w-5 text-red-500" />}
+                </div>
+            </AccordionTrigger>
 
-                    <AccordionContent className="space-y-4 border-b border-gray-100 p-3">
-                        <div className="rounded-lg">
-                            <header className="flex items-center justify-between rounded-md bg-gray-100 px-2 py-1">
-                                <span className="text-sm font-medium uppercase">Input</span>
+            <AccordionContent className="space-y-4 border-b border-gray-100 p-3">
+                <div className="space-y-2 rounded-lg">
+                    <header className="flex items-center justify-between rounded-md bg-gray-100 px-2 py-1">
+                        <span className="text-sm font-medium uppercase">Input</span>
 
-                                <span className="text-xs">{startDate?.toLocaleString()}</span>
-                            </header>
+                        <span className="text-xs">{startDate?.toLocaleString()}</span>
+                    </header>
 
-                            {input && typeof input === 'object' ? (
+                    <div className="overflow-x-auto">
+                        {input ? (
+                            typeof input === 'object' ? (
                                 <ReactJson enableClipboard={false} src={input as object} />
                             ) : (
-                                <pre className="mt-2 text-xs">{input}</pre>
-                            )}
-                        </div>
+                                input
+                            )
+                        ) : (
+                            <span className="text-xs">No input data.</span>
+                        )}
+                    </div>
+                </div>
 
-                        <div className="rounded-lg">
-                            <header className="flex items-center justify-between rounded-md bg-gray-100 px-2 py-1">
-                                <span className="text-sm font-medium uppercase">Output</span>
+                <div className="space-y-2 rounded-lg">
+                    <header className="flex items-center justify-between rounded-md bg-gray-100 px-2 py-1">
+                        <span className="text-sm font-medium uppercase">Output</span>
 
-                                <span className="text-xs">{endDate?.toLocaleString()}</span>
-                            </header>
+                        <span className="text-xs">{endDate?.toLocaleString()}</span>
+                    </header>
 
-                            <pre className="mt-2 text-sm">
-                                {output && typeof output === 'object' ? (
-                                    <ReactJson enableClipboard={false} src={output as object} />
-                                ) : (
-                                    <pre className="mt-2 text-xs">{output || 'No output data.'}</pre>
-                                )}
-                            </pre>
-                        </div>
-                    </AccordionContent>
-                </AccordionItem>
-            )}
-        </>
+                    <div className="overflow-x-auto">
+                        {output ? (
+                            typeof output === 'object' ? (
+                                <ReactJson enableClipboard={false} src={output as object} />
+                            ) : (
+                                output
+                            )
+                        ) : (
+                            <span className="text-xs">No output data.</span>
+                        )}
+                    </div>
+                </div>
+            </AccordionContent>
+        </AccordionItem>
     );
 };
 

@@ -289,10 +289,6 @@ const Project = () => {
         }
     }, [currentWorkflow, navigate, projectId, setWorkflowNodeDetailsPanelOpen]);
 
-    useEffect(() => {
-        setWorkflowIsRunning(false);
-    }, [setWorkflowIsRunning, workflowExecution, setWorkflowExecution]);
-
     const handleDeleteProjectAlertDialogClick = () => {
         if (project?.id) {
             deleteProjectMutation.mutate(project.id);
@@ -345,7 +341,10 @@ const Project = () => {
                         workflowId: currentWorkflow?.id,
                     },
                 })
-                .then(setWorkflowExecution)
+                .then((workflowExecution) => {
+                    setWorkflowExecution(workflowExecution);
+                    setWorkflowIsRunning(false);
+                })
                 .catch(() => setWorkflowIsRunning(false));
         }
     };
@@ -372,7 +371,10 @@ const Project = () => {
                     workflowId: currentWorkflow?.id,
                 },
             })
-            .then(setWorkflowExecution)
+            .then((workflowExecution) => {
+                setWorkflowExecution(workflowExecution);
+                setWorkflowIsRunning(false);
+            })
             .catch(() => setWorkflowIsRunning(false));
     };
 
