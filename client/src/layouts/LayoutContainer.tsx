@@ -10,7 +10,7 @@ type SidebarContentLayoutProps = {
     leftSidebarBody?: ReactNode;
     leftSidebarHeader?: ReactNode;
     leftSidebarOpen?: boolean;
-    leftSidebarWidth?: '56' | '64' | '72' | '96';
+    leftSidebarWidth?: '56' | '64' | '72' | '96' | '112';
     rightSidebarBody?: ReactNode;
     rightSidebarHeader?: ReactNode;
     rightSidebarOpen?: boolean;
@@ -24,6 +24,7 @@ const leftSidebarWidths = {
     64: ['md:w-64', 'md:pl-64'],
     72: ['md:w-72', 'md:pl-72'],
     96: ['md:w-96', 'md:pl-96'],
+    112: ['md:w-[432px]', 'md:pl-[432px]'],
 };
 
 const rightSidebarWidths = {
