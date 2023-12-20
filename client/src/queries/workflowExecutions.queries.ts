@@ -24,9 +24,9 @@ export const useGetWorkflowExecutionsQuery = (request: GetWorkflowExecutionsRequ
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecutions(request),
     });
 
-export const useGetWorkflowExecutionQuery = (request: GetWorkflowExecutionRequest, isEnabled: boolean) =>
+export const useGetWorkflowExecutionQuery = (request: GetWorkflowExecutionRequest, enabled?: boolean) =>
     useQuery<WorkflowExecutionModel, Error>({
         queryKey: WorkflowExecutionKeys.workflowExecution(request.id),
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecution(request),
-        enabled: isEnabled,
+        enabled: enabled === undefined ? true : enabled,
     });

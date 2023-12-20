@@ -15,11 +15,11 @@ export const ConnectionKeys = {
     connections: ['connections'] as const,
 };
 
-export const useGetConnectionsQuery = (filters: GetConnectionsRequest, enabledCondition?: boolean) =>
+export const useGetConnectionsQuery = (filters: GetConnectionsRequest, enabled?: boolean) =>
     useQuery<ConnectionModel[], Error>({
         queryKey: ConnectionKeys.connectionList(filters),
         queryFn: () => new ConnectionApi().getConnections(filters),
-        enabled: false || enabledCondition,
+        enabled: enabled === undefined ? true : enabled,
     });
 
 export const useGetConnectionTagsQuery = () =>
