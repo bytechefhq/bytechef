@@ -1,14 +1,8 @@
 /* eslint-disable sort-keys */
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/hermes/configuration';
-import {DataPillType} from '@/types/types';
+import {ComponentActionType, DataPillType} from '@/types/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
-
-type ComponentActionsType = Array<{
-    actionName: string;
-    componentName: string;
-    workflowAlias?: string;
-}>;
 
 interface WorkflowDefinitionState {
     componentDefinitions: Array<ComponentDefinitionBasicModel>;
@@ -17,8 +11,8 @@ interface WorkflowDefinitionState {
     componentNames: string[];
     setComponentNames: (componentNames: string[]) => void;
 
-    componentActions: ComponentActionsType;
-    setComponentActions: (componentActions: ComponentActionsType) => void;
+    componentActions: Array<ComponentActionType>;
+    setComponentActions: (componentActions: Array<ComponentActionType>) => void;
 
     dataPills: Array<DataPillType>;
     setDataPills: (dataPills: Array<DataPillType>) => void;

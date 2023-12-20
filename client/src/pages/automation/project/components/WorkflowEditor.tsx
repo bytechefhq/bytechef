@@ -1,5 +1,6 @@
 import {WorkflowModel} from '@/middleware/helios/configuration';
 import {useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
+import {ComponentActionType} from '@/types/types';
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/hermes/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -25,6 +26,7 @@ export type WorkflowEditorProps = {
 
 const WorkflowEditor = ({componentDefinitions, currentWorkflow, taskDispatcherDefinitions}: WorkflowEditorProps) => {
     const [latestNodeName, setLatestNodeName] = useState('');
+    const [nodeActions, setNodeActions] = useState<Array<ComponentActionType>>([]);
     const [nodeNames, setNodeNames] = useState<Array<string>>([]);
     const [viewportWidth, setViewportWidth] = useState(0);
 
@@ -61,6 +63,14 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflow, taskDispatcherDe
             }
         }
     }, [nodeNames, previousNodeNames]);
+
+    useEffect(() => {
+        setComponentActions(nodeActions);
+    }, [nodeActions, setComponentActions]);
+
+    useEffect(() => {
+        setComponentNames(nodeNames);
+    }, [nodeNames, setComponentNames]);
 
     const {data: workflowComponent} = useGetComponentDefinitionQuery(
         {
@@ -114,9 +124,9 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflow, taskDispatcherDe
         });
 
         if (workflowNodes) {
-            setComponentNames(workflowNodes.map((node) => node!.data.name));
+            setNodeNames(workflowNodes.map((node) => node!.data.name));
 
-            setComponentActions(
+            setNodeActions(
                 workflowNodes.map((node) => ({
                     actionName: node!.data.actionName!,
                     componentName: node!.data.originNodeName!,
@@ -130,7 +140,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflow, taskDispatcherDe
 
             return nodes;
         }
-    }, [componentDefinitions, currentWorkflowDefinition.tasks, setComponentActions, setComponentNames]);
+    }, [componentDefinitions, currentWorkflowDefinition.tasks]);
 
     const defaultEdgesWithWorkflowEdges = useMemo(() => {
         const workflowEdges: Array<Edge> = [];

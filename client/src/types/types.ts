@@ -8,6 +8,12 @@ export type DataPillType = {
     value: string;
 };
 
+export type ComponentActionType = {
+    actionName: string;
+    componentName: string;
+    workflowAlias?: string;
+};
+
 export type ComponentDataType = {
     action?: string;
     name: string;
