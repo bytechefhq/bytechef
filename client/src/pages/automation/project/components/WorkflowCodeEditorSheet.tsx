@@ -23,6 +23,7 @@ const WorkflowCodeEditorSheet = ({
     workflow,
     workflowIsRunning,
 }: WorkflowExecutionDetailsSheetProps) => {
+    const [dirty, setDirty] = useState<boolean>(false);
     const [definition, setDefinition] = useState<string>(workflow.definition!);
 
     return (
@@ -41,12 +42,23 @@ const WorkflowCodeEditorSheet = ({
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
-                                            onClick={() => onSave(definition)}
+                                            onClick={() => {
+                                                onSave(definition);
+                                                setDirty(false);
+                                            }}
                                             size="icon"
                                             type="submit"
                                             variant="ghost"
                                         >
-                                            <SaveIcon className="h-5" />
+                                            <div className="relative">
+                                                <SaveIcon className="h-5" />
+
+                                                {dirty && (
+                                                    <span className="absolute right-[-5px] top-[-10px] text-lg text-gray-500">
+                                                        *
+                                                    </span>
+                                                )}
+                                            </div>
                                         </Button>
                                     </TooltipTrigger>
 
@@ -103,7 +115,10 @@ const WorkflowCodeEditorSheet = ({
                         <Editor
                             defaultLanguage={workflow.format?.toLowerCase()}
                             defaultValue={definition}
-                            onChange={(value) => setDefinition(value as string)}
+                            onChange={(value) => {
+                                setDefinition(value as string);
+                                setDirty(true);
+                            }}
                         />
                     </div>
                 </div>
