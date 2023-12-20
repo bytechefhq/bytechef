@@ -53,25 +53,35 @@ const DataPillPanelBodyItem = ({
                 className="h-full w-full space-y-2 border-b border-gray-100 px-4 pb-4"
                 key={`accordion-content-${componentAction.workflowAlias}`}
             >
-                <DataPill
-                    componentAlias={componentAction.workflowAlias}
-                    componentIcon={componentAction.componentDefinition.icon}
-                />
+                {filteredProperties.length ? (
+                    <>
+                        <DataPill
+                            componentAlias={componentAction.workflowAlias}
+                            componentIcon={componentAction.componentDefinition.icon}
+                        />
 
-                {(componentAction.outputSchema as PropertyType)?.objectType !== 'FILE_ENTRY' && (
-                    <ul
-                        className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full"
-                        data-property="foo"
-                    >
-                        {filteredProperties?.map((property) => (
-                            <DataPill
-                                componentAlias={componentAction.workflowAlias}
-                                componentIcon={componentAction.componentDefinition.icon}
-                                key={property.name}
-                                property={property}
-                            />
-                        ))}
-                    </ul>
+                        {(componentAction.outputSchema as PropertyType)?.objectType !== 'FILE_ENTRY' && (
+                            <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">
+                                {filteredProperties?.map((property) => (
+                                    <DataPill
+                                        componentAlias={componentAction.workflowAlias}
+                                        componentIcon={componentAction.componentDefinition.icon}
+                                        key={property.name}
+                                        property={property}
+                                    />
+                                ))}
+                            </ul>
+                        )}
+                    </>
+                ) : (
+                    <div className="flex flex-col gap-2 px-6 py-4">
+                        <div className="font-semibold">Test component</div>
+
+                        <div className="text-sm">
+                            This component needs to be tested, to generate schema and sample data. Please go to the
+                            &quot;Output&quot; tab of the component.
+                        </div>
+                    </div>
                 )}
             </AccordionContent>
         </>

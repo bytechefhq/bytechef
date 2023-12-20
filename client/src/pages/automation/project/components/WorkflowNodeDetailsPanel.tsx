@@ -7,7 +7,11 @@ import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/typ
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Properties from 'components/Properties/Properties';
-import {useGetActionDefinitionQuery, useGetActionDefinitionsQuery} from 'queries/actionDefinitions.queries';
+import {
+    useGetActionDefinitionsQuery,
+    useGetComponentActionDefinitionQuery,
+    useGetComponentActionOutputSchemaQuery,
+} from 'queries/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery, useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -113,7 +117,7 @@ const WorkflowNodeDetailsPanel = ({
             : (currentComponent?.actions?.[0]?.name as string);
     };
 
-    const {data: currentAction, isFetched: currentActionFetched} = useGetActionDefinitionQuery(
+    const {data: currentAction, isFetched: currentActionFetched} = useGetComponentActionDefinitionQuery(
         {
             actionName: getActionName(),
             componentName: currentComponent?.name as string,
@@ -159,6 +163,19 @@ const WorkflowNodeDetailsPanel = ({
             properties,
         };
     });
+
+    const {data: outputSchemaResponse} = useGetComponentActionOutputSchemaQuery(
+        {
+            actionName: getActionName(),
+            componentName: currentComponent?.name as string,
+            componentOperationRequestModel: {
+                connectionId: undefined,
+                parameters: {},
+            },
+            componentVersion: currentComponent?.version as number,
+        },
+        !!currentAction?.outputSchemaDataSource
+    );
 
     const getExistingProperties = (properties: Array<PropertyType>): Array<PropertyType> =>
         properties.filter((property) => {
@@ -224,7 +241,8 @@ const WorkflowNodeDetailsPanel = ({
         if (name === 'output') {
             return (
                 (currentAction?.outputSchema as PropertyType)?.properties?.length ||
-                (currentAction?.outputSchema as PropertyType)?.items?.length
+                (currentAction?.outputSchema as PropertyType)?.items?.length ||
+                currentAction?.outputSchemaDataSource
             );
         }
 
@@ -246,6 +264,8 @@ const WorkflowNodeDetailsPanel = ({
             return true;
         }
     });
+
+    const outputSchemaProperty = currentAction?.outputSchema || (outputSchemaResponse && outputSchemaResponse.property);
 
     // Set currentActionName depending on the currentComponentAction.actionName
     useEffect(() => {
@@ -313,10 +333,6 @@ const WorkflowNodeDetailsPanel = ({
     useEffect(() => {
         if (currentActionFetched) {
             if (!currentActionProperties?.length) {
-                setActiveTab('description');
-            }
-
-            if (activeTab === 'output' && !currentAction?.outputSchema) {
                 setActiveTab('description');
             }
         }
@@ -532,8 +548,8 @@ const WorkflowNodeDetailsPanel = ({
                                                 </div>
                                             ))}
 
-                                        {activeTab === 'output' && currentAction?.outputSchema && (
-                                            <OutputTab outputSchema={currentAction.outputSchema} />
+                                        {activeTab === 'output' && outputSchemaProperty && (
+                                            <OutputTab outputSchema={outputSchemaProperty} />
                                         )}
                                     </div>
                                 </div>
@@ -547,10 +563,6 @@ const WorkflowNodeDetailsPanel = ({
 
                                     <SelectContent>
                                         <SelectItem value="1">v1</SelectItem>
-
-                                        <SelectItem value="2">v2</SelectItem>
-
-                                        <SelectItem value="3">v3</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </footer>
