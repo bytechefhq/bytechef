@@ -256,4 +256,4 @@ cd bytechef
 ```
 
 ## Questions?
-Contact us on [Discord](https://discord.gg/PybnUM3Y) or mail us at [support@bytechef.io](mailto:support@bytechef.io).
+Contact us on [Discord](https://discord.gg/CBAC2rCDsq) or mail us at [support@bytechef.io](mailto:support@bytechef.io).
