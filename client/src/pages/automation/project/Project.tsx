@@ -632,7 +632,7 @@ const Project = () => {
                     </div>
                 }
                 leftSidebarOpen={leftSidebarOpen}
-                leftSidebarWidth="96"
+                leftSidebarWidth="112"
                 rightSidebarBody={
                     componentDefinitions &&
                     taskDispatcherDefinitions && (
