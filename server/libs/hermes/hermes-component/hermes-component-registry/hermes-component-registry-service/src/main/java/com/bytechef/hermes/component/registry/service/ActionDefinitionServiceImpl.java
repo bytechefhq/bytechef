@@ -30,6 +30,7 @@ import com.bytechef.hermes.component.definition.PropertiesDataSource;
 import com.bytechef.hermes.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
@@ -69,11 +70,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         PropertiesDataSource.ActionPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, actionName, propertyName);
 
-        PropertiesDataSource.PropertiesResponse propertiesResponse =
-            propertiesFunction.apply(
+        PropertiesDataSource.PropertiesResponse propertiesResponse = null;
+
+        try {
+            propertiesResponse = propertiesFunction.apply(
                 new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()),
-                context);
+                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         return new PropertiesResponse(
             CollectionUtils.map(
@@ -91,9 +96,13 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             getEditorDescriptionFunction(
                 componentName, componentVersion, actionName);
 
-        EditorDescriptionDataSource.EditorDescriptionResponse editorDescriptionResponse =
-            editorDescriptionFunction
-                .apply(new ParameterMapImpl(inputParameters), context);
+        EditorDescriptionDataSource.EditorDescriptionResponse editorDescriptionResponse;
+
+        try {
+            editorDescriptionResponse = editorDescriptionFunction.apply(new ParameterMapImpl(inputParameters), context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         return new EditorDescriptionResponse(
             editorDescriptionResponse.description(), editorDescriptionResponse.errorMessage());
@@ -108,9 +117,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         OptionsDataSource.ActionOptionsFunction optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, actionName, propertyName);
 
-        OptionsDataSource.OptionsResponse optionsResponse = optionsFunction.apply(
-            new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()), searchText, context);
+        OptionsDataSource.OptionsResponse optionsResponse;
+
+        try {
+            optionsResponse = optionsFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.parameters()), searchText, context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         return new OptionsResponse(
             CollectionUtils.map(optionsResponse.options(), Option::new), optionsResponse.errorMessage());
@@ -124,9 +139,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         OutputSchemaDataSource.ActionOutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
             componentName, componentVersion, actionName);
 
-        OutputSchemaDataSource.OutputSchemaResponse outputSchemaResponse = outputSchemaFunction.apply(
-            new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+        OutputSchemaDataSource.OutputSchemaResponse outputSchemaResponse;
+
+        try {
+            outputSchemaResponse = outputSchemaFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         return new OutputSchemaResponse(
             Property.toProperty(outputSchemaResponse.property()), outputSchemaResponse.errorMessage());
@@ -141,23 +162,35 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             resolveActionDefinition(componentName, componentVersion, actionName);
 
         return OptionalUtils.mapOrElse(
-            actionDefinition.getPerform(), performFunction -> performFunction.apply(
-                new ParameterMapImpl(inputParameters),
-                connection == null ? null : new ParameterMapImpl(connection.parameters()), context),
+            actionDefinition.getPerform(), performFunction -> {
+                try {
+                    return performFunction.apply(
+                        new ParameterMapImpl(inputParameters),
+                        connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+                } catch (Exception e) {
+                    throw new ComponentExecutionException(e, inputParameters);
+                }
+            },
             null);
     }
 
     @Override
     public SampleOutputResponse executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> actionParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
         ActionSampleOutputFunction sampleOutputFunction = getSampleOutputFunction(
             componentName, componentVersion, actionName);
 
-        SampleOutputDataSource.SampleOutputResponse sampleOutputResponse = sampleOutputFunction.apply(
-            new ParameterMapImpl(actionParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+        SampleOutputDataSource.SampleOutputResponse sampleOutputResponse;
+
+        try {
+            sampleOutputResponse = sampleOutputFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         Object sampleOutput = sampleOutputResponse.sampleOutput();
 

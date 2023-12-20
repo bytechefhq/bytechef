@@ -17,7 +17,6 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.definition.Property.OutputProperty;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -52,7 +51,7 @@ public interface OutputSchemaDataSource {
          */
         OutputSchemaResponse apply(
             ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
-            throws ComponentExecutionException;
+            throws Exception;
     }
 
     /**
@@ -69,7 +68,7 @@ public interface OutputSchemaDataSource {
          */
         OutputSchemaResponse apply(
             ParameterMap inputParameters, ParameterMap connectionParameters, TriggerContext context)
-            throws ComponentExecutionException;
+            throws Exception;
     }
 
     /**

@@ -17,7 +17,6 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -171,7 +170,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
+        String apply(ParameterMap connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -185,7 +184,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        ApplyResponse apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
+        ApplyResponse apply(ParameterMap connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -204,7 +203,7 @@ public interface Authorization {
          */
         AuthorizationCallbackResponse apply(
             ParameterMap connectionParameters, String code, String redirectUri, String codeVerifier, Context context)
-            throws ComponentExecutionException;
+            throws Exception;
     }
 
     /**
@@ -218,7 +217,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
+        String apply(ParameterMap connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -232,7 +231,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
+        String apply(ParameterMap connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -246,7 +245,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
+        String apply(ParameterMap connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -256,7 +255,7 @@ public interface Authorization {
     interface PkceFunction {
 
         Pkce apply(String verifier, String challenge, String challengeMethod, Context context)
-            throws ComponentExecutionException;
+            throws Exception;
     }
 
     /**
@@ -270,7 +269,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
+        String apply(ParameterMap connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -284,7 +283,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
+        String apply(ParameterMap connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -298,7 +297,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        List<String> apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
+        List<String> apply(ParameterMap connectionParameters, Context context) throws Exception;
     }
 
     /**
@@ -312,7 +311,7 @@ public interface Authorization {
          * @param context
          * @return
          */
-        String apply(ParameterMap connectionParameters, Context context) throws ComponentExecutionException;
+        String apply(ParameterMap connectionParameters, Context context) throws Exception;
     }
 
     /**

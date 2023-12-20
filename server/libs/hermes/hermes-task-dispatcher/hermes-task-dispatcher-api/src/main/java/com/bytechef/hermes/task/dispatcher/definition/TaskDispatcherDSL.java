@@ -29,7 +29,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -207,88 +206,88 @@ public final class TaskDispatcherDSL {
             super(name, Type.ARRAY);
         }
 
-        public ModifiableArrayProperty defaultValue(Boolean... defaultValue) {
-            this.defaultValue = Arrays.asList(defaultValue);
+        public ModifiableArrayProperty defaultValue(boolean... defaultValue) {
+            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty defaultValue(Integer... defaultValue) {
-            this.defaultValue = Arrays.asList(defaultValue);
+        public ModifiableArrayProperty defaultValue(int... defaultValue) {
+            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty defaultValue(Long... defaultValue) {
-            this.defaultValue = Arrays.asList(defaultValue);
+        public ModifiableArrayProperty defaultValue(long... defaultValue) {
+            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty defaultValue(Float... defaultValue) {
-            this.defaultValue = Arrays.asList(defaultValue);
+        public ModifiableArrayProperty defaultValue(float... defaultValue) {
+            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty defaultValue(Double... defaultValue) {
-            this.defaultValue = Arrays.asList(defaultValue);
+        public ModifiableArrayProperty defaultValue(double... defaultValue) {
+            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
 
             return this;
         }
 
         public ModifiableArrayProperty defaultValue(String... defaultValue) {
-            this.defaultValue = Arrays.asList(defaultValue);
+            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
 
             return this;
         }
 
         @SafeVarargs
         public final ModifiableArrayProperty defaultValue(Map<String, ?>... defaultValue) {
-            this.defaultValue = Arrays.asList(defaultValue);
+            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty exampleValue(Boolean... exampleValue) {
-            this.exampleValue = Arrays.asList(exampleValue);
+        public ModifiableArrayProperty exampleValue(boolean... exampleValue) {
+            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty exampleValue(Integer... exampleValue) {
-            this.exampleValue = Arrays.asList(exampleValue);
+        public ModifiableArrayProperty exampleValue(int... exampleValue) {
+            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty exampleValue(Long... exampleValue) {
-            this.exampleValue = Arrays.asList(exampleValue);
+        public ModifiableArrayProperty exampleValue(long... exampleValue) {
+            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty exampleValue(Float... exampleValue) {
-            this.exampleValue = Arrays.asList(exampleValue);
+        public ModifiableArrayProperty exampleValue(float... exampleValue) {
+            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty exampleValue(Double... exampleValue) {
-            this.exampleValue = Arrays.asList(exampleValue);
+        public ModifiableArrayProperty exampleValue(double... exampleValue) {
+            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
 
             return this;
         }
 
         public ModifiableArrayProperty exampleValue(String... exampleValue) {
-            this.exampleValue = Arrays.asList(exampleValue);
+            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
 
             return this;
         }
 
         @SafeVarargs
         public final ModifiableArrayProperty exampleValue(Map<String, ?>... exampleValue) {
-            this.exampleValue = Arrays.asList(exampleValue);
+            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
 
             return this;
         }

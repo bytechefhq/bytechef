@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Help;
 import java.util.List;
 import java.util.Map;
@@ -152,7 +151,7 @@ public interface ActionDefinition {
          * @return
          */
         Object apply(ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
-            throws ComponentExecutionException;
+            throws Exception;
     }
 
 }

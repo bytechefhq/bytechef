@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
@@ -56,11 +55,11 @@ public interface PropertiesDataSource {
          * @param connectionParameters
          * @param context
          * @return
-         * @throws ComponentExecutionException
+         * @throws Exception
          */
         PropertiesResponse apply(
             ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
-            throws ComponentExecutionException;
+            throws Exception;
     }
 
     /**
@@ -75,11 +74,11 @@ public interface PropertiesDataSource {
          * @param connectionParameters
          * @param context
          * @return
-         * @throws ComponentExecutionException
+         * @throws Exception
          */
         PropertiesResponse apply(
             ParameterMap inputParameters, ParameterMap connectionParameters, TriggerContext context)
-            throws ComponentExecutionException;
+            throws Exception;
     }
 
     /**

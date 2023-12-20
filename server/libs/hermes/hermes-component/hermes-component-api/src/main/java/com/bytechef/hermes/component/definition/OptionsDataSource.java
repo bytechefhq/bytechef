@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -60,11 +59,11 @@ public interface OptionsDataSource {
          * @param searchText
          * @param context
          * @return
-         * @throws ComponentExecutionException
+         * @throws Exception
          */
         OptionsResponse apply(
             ParameterMap inputParameters, ParameterMap connectionParameters, String searchText, ActionContext context)
-            throws ComponentExecutionException;
+            throws Exception;
     }
 
     /**
@@ -80,11 +79,11 @@ public interface OptionsDataSource {
          * @param searchText
          * @param context
          * @return
-         * @throws ComponentExecutionException
+         * @throws Exception
          */
         OptionsResponse apply(
             ParameterMap inputParameters, ParameterMap connectionParameters, String searchText, TriggerContext context)
-            throws ComponentExecutionException;
+            throws Exception;
     }
 
     /**

@@ -16,10 +16,15 @@
 
 package com.bytechef.hermes.component.exception;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * @author Igor Beslic
  */
 public class ComponentExecutionException extends RuntimeException {
+
+    private Map<String, ?> inputParameters;
 
     /**
      *
@@ -27,6 +32,12 @@ public class ComponentExecutionException extends RuntimeException {
      */
     public ComponentExecutionException(String message) {
         super(message);
+    }
+
+    public ComponentExecutionException(String message, Map<String, ?> inputParameters) {
+        super(message);
+
+        this.inputParameters = Collections.unmodifiableMap(inputParameters);
     }
 
     /**
@@ -37,6 +48,12 @@ public class ComponentExecutionException extends RuntimeException {
         super(cause);
     }
 
+    public ComponentExecutionException(Throwable cause, Map<String, ?> inputParameters) {
+        super(cause);
+
+        this.inputParameters = Collections.unmodifiableMap(inputParameters);
+    }
+
     /**
      *
      * @param message
@@ -44,5 +61,23 @@ public class ComponentExecutionException extends RuntimeException {
      */
     public ComponentExecutionException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public ComponentExecutionException(String message, Throwable cause, Map<String, ?> inputParameters) {
+        super(message, cause);
+
+        this.inputParameters = Collections.unmodifiableMap(inputParameters);
+    }
+
+    public Map<String, ?> getInputParameters() {
+        return Collections.unmodifiableMap(inputParameters);
+    }
+
+    @Override
+    public String toString() {
+        return "ComponentExecutionException{" +
+            "inputParameters=" + inputParameters + ", " +
+            "message=" + super.toString() +
+            "} ";
     }
 }

@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -48,7 +47,7 @@ public interface EditorDescriptionDataSource {
          * @return
          */
         EditorDescriptionResponse apply(ParameterMap inputParameters, ActionContext context)
-            throws ComponentExecutionException;
+            throws Exception;
     }
 
     /**
@@ -63,7 +62,7 @@ public interface EditorDescriptionDataSource {
          * @return
          */
         EditorDescriptionResponse apply(ParameterMap inputParameters, TriggerContext context)
-            throws ComponentExecutionException;
+            throws Exception;
     }
 
     /**

@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Help;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -332,7 +331,7 @@ public interface TriggerDefinition {
         WebhookOutput apply(
             ParameterMap inputParameters, ParameterMap connectionParameters, HttpHeaders headers,
             HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
-            TriggerContext context) throws ComponentExecutionException;
+            TriggerContext context) throws Exception;
     }
 
     /**
@@ -415,7 +414,7 @@ public interface TriggerDefinition {
          */
         void accept(
             ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
-            TriggerContext context);
+            TriggerContext context) throws Exception;
     }
 
     /**
@@ -444,7 +443,7 @@ public interface TriggerDefinition {
          */
         void accept(
             ParameterMap inputParameters, ParameterMap connectionParameters, String workflowExecutionId,
-            ListenerEmitter listenerEmitter, TriggerContext context);
+            ListenerEmitter listenerEmitter, TriggerContext context) throws Exception;
     }
 
     /**
@@ -462,7 +461,7 @@ public interface TriggerDefinition {
          */
         PollOutput apply(
             ParameterMap inputParameters, ParameterMap closureParameters, TriggerContext context)
-            throws ComponentExecutionException;
+            throws Exception;
 
     }
 
@@ -501,7 +500,7 @@ public interface TriggerDefinition {
          */
         WebhookOutput apply(
             ParameterMap inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-            WebhookMethod method, TriggerContext context) throws ComponentExecutionException;
+            WebhookMethod method, TriggerContext context) throws Exception;
 
     }
 
