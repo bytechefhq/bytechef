@@ -55,39 +55,13 @@ public class WorkflowConnection {
     }
 
     public static List<WorkflowConnection> of(WorkflowTask workflowTask, boolean connectionRequired) {
-        List<WorkflowConnection> workflowConnections;
-        OperationType operationType = OperationType.ofType(workflowTask.getType());
-
-        if (MapUtils.containsKey(workflowTask.getMetadata(), MetadataConstants.CONNECTIONS)) {
-            workflowConnections = toList(
-                MapUtils.getMap(
-                    workflowTask.getExtensions(), MetadataConstants.CONNECTIONS, new TypeReference<>() {},
-                    Map.of()),
-                operationType.componentName(), operationType.componentVersion(), workflowTask.getName(),
-                connectionRequired);
-        } else {
-            workflowConnections = getWorkflowConnections(workflowTask.getName(), operationType, connectionRequired);
-        }
-
-        return workflowConnections;
+        return getWorkflowConnections(
+            workflowTask.getName(), workflowTask.getType(), workflowTask.getMetadata(), connectionRequired);
     }
 
     public static List<WorkflowConnection> of(WorkflowTrigger workflowTrigger, boolean connectionRequired) {
-        List<WorkflowConnection> workflowConnections;
-        OperationType operationType = OperationType.ofType(workflowTrigger.getType());
-
-        if (MapUtils.containsKey(workflowTrigger.getMetadata(), MetadataConstants.CONNECTIONS)) {
-            workflowConnections = toList(
-                MapUtils.getMap(
-                    workflowTrigger.getMetadata(), MetadataConstants.CONNECTIONS, new TypeReference<>() {},
-                    Map.of()),
-                operationType.componentName(), operationType.componentVersion(), workflowTrigger.getName(),
-                connectionRequired);
-        } else {
-            workflowConnections = getWorkflowConnections(workflowTrigger.getName(), operationType, connectionRequired);
-        }
-
-        return workflowConnections;
+        return getWorkflowConnections(
+            workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getMetadata(), connectionRequired);
     }
 
     private static List<WorkflowConnection> getWorkflowConnections(
@@ -96,8 +70,24 @@ public class WorkflowConnection {
         return List.of(
             new WorkflowConnection(
                 operationType.componentName(), operationType.componentVersion(), operationName,
-                operationType.componentName(), null,
-                connectionRequired));
+                operationType.componentName(), null, connectionRequired));
+    }
+
+    private static List<WorkflowConnection> getWorkflowConnections(
+        String name, String type, Map<String, Object> metadata, boolean connectionRequired) {
+
+        List<WorkflowConnection> workflowConnections;
+        OperationType operationType = OperationType.ofType(type);
+
+        if (MapUtils.containsKey(metadata, MetadataConstants.CONNECTIONS)) {
+            workflowConnections = toList(
+                MapUtils.getMap(metadata, MetadataConstants.CONNECTIONS, new TypeReference<>() {}, Map.of()),
+                operationType.componentName(), operationType.componentVersion(), name, connectionRequired);
+        } else {
+            workflowConnections = getWorkflowConnections(name, operationType, connectionRequired);
+        }
+
+        return workflowConnections;
     }
 
     private static List<WorkflowConnection> toList(
@@ -118,8 +108,7 @@ public class WorkflowConnection {
 
                 return new WorkflowConnection(
                     MapUtils.getString(connectionMap, COMPONENT_NAME, componentName),
-                    MapUtils.getInteger(
-                        connectionMap, COMPONENT_VERSION, componentVersion),
+                    MapUtils.getInteger(connectionMap, COMPONENT_VERSION, componentVersion),
                     operationName, entry.getKey(),
                     MapUtils.getLong(connectionMap, ID),
                     MapUtils.getBoolean(connectionMap, AUTHORIZATION_REQUIRED, false) || connectionRequired);
