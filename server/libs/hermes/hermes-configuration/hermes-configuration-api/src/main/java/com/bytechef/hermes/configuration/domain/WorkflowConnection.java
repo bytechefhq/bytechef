@@ -56,12 +56,12 @@ public class WorkflowConnection {
 
     public static List<WorkflowConnection> of(WorkflowTask workflowTask, boolean connectionRequired) {
         return getWorkflowConnections(
-            workflowTask.getName(), workflowTask.getType(), workflowTask.getMetadata(), connectionRequired);
+            workflowTask.getName(), workflowTask.getType(), workflowTask.getExtensions(), connectionRequired);
     }
 
     public static List<WorkflowConnection> of(WorkflowTrigger workflowTrigger, boolean connectionRequired) {
         return getWorkflowConnections(
-            workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getMetadata(), connectionRequired);
+            workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getExtensions(), connectionRequired);
     }
 
     private static List<WorkflowConnection> getWorkflowConnections(

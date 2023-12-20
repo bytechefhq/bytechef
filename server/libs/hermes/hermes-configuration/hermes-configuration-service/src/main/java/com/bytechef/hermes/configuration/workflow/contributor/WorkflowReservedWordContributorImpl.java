@@ -22,10 +22,10 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public class TriggerWorkflowReservedWordContributor implements WorkflowReservedWordContributor {
+public class WorkflowReservedWordContributorImpl implements WorkflowReservedWordContributor {
 
     @Override
     public List<String> getReservedWords() {
-        return List.of("triggers");
+        return List.of("connections", "triggers");
     }
 }
