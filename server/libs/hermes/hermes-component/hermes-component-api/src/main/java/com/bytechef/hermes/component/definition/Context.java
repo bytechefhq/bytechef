@@ -19,7 +19,6 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.hermes.component.definition.Property.OutputProperty;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -651,7 +650,7 @@ public interface Context {
              *
              * @return
              */
-            Response execute() throws ComponentExecutionException;
+            Response execute();
         }
 
         @SuppressFBWarnings("EI")

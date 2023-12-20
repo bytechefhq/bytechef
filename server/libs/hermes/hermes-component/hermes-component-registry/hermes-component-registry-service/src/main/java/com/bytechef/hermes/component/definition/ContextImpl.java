@@ -34,7 +34,6 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableArrayProp
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.hermes.component.definition.Property.OutputProperty;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
@@ -80,7 +79,7 @@ public class ContextImpl implements Context {
         try {
             return httpFunction.apply(http);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -89,7 +88,7 @@ public class ContextImpl implements Context {
         try {
             return jsonFunction.apply(json);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -98,7 +97,7 @@ public class ContextImpl implements Context {
         try {
             loggerConsumer.accept(logger);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -107,7 +106,7 @@ public class ContextImpl implements Context {
         try {
             return outputSchemaFunction.apply(outputSchema);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -116,7 +115,7 @@ public class ContextImpl implements Context {
         try {
             return xmlFunction.apply(xml);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -230,13 +229,13 @@ public class ContextImpl implements Context {
             }
 
             @Override
-            public Response execute() throws ComponentExecutionException {
+            public Response execute() {
                 try {
                     return httpClientExecutor.execute(
                         url, headers, queryParameters, body, configuration, requestMethod, componentName, connection,
                         context);
                 } catch (Exception e) {
-                    throw new ComponentExecutionException("Unable to execute HTTP request", e);
+                    throw new RuntimeException("Unable to execute HTTP request", e);
                 }
             }
         }

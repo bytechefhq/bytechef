@@ -62,7 +62,7 @@ public interface ActionDefinitionService {
 
     SampleOutputResponse executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> actionParameters, @Nullable ComponentConnection connection,
+        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull ActionContext context);
 
     ActionDefinition getActionDefinition(

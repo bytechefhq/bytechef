@@ -92,7 +92,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     @Override
     public SampleOutputResponse executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> actionParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
         throw new UnsupportedOperationException();
     }

@@ -34,6 +34,7 @@ import com.bytechef.hermes.component.definition.Authorization.AuthorizationUrlFu
 import com.bytechef.hermes.component.definition.Authorization.ClientIdFunction;
 import com.bytechef.hermes.component.definition.Authorization.PkceFunction;
 import com.bytechef.hermes.component.definition.Authorization.ScopesFunction;
+import com.bytechef.hermes.component.definition.Authorization.TokenUrlFunction;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.ParameterMap;
@@ -47,7 +48,6 @@ import com.bytechef.hermes.component.registry.domain.OAuth2AuthorizationParamete
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -134,7 +134,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     public static AuthorizationCallbackFunction getDefaultAuthorizationCallbackFunction(
         ClientIdFunction clientIdFunction, Authorization.ClientSecretFunction clientSecretFunction,
-        Authorization.TokenUrlFunction tokenUrlFunction) {
+        TokenUrlFunction tokenUrlFunction) {
 
         return (connectionParameters, code, redirectUri, codeVerifier, context) -> {
             FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
@@ -149,35 +149,31 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 builder.query("code_verifier", codeVerifier);
             }
 
-            HttpClient httpClient = Methanol.newBuilder()
+            try (HttpClient httpClient = Methanol.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
-                .build();
-            HttpResponse<String> httpResponse;
+                .build()) {
 
-            try {
-                httpResponse = httpClient.send(
+                HttpResponse<String> httpResponse = httpClient.send(
                     HttpRequest.newBuilder()
                         .POST(builder.build())
                         .uri(URI.create(tokenUrlFunction.apply(connectionParameters, context)))
                         .build(),
                     HttpResponse.BodyHandlers.ofString());
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
+
+                if (httpResponse.statusCode() != 200) {
+                    throw new ComponentExecutionException("Invalid claim");
+                }
+
+                if (httpResponse.body() == null) {
+                    throw new ComponentExecutionException("Invalid claim");
+                }
+
+                Map<?, ?> body = JsonUtils.read(httpResponse.body(), Map.class);
+
+                return new AuthorizationCallbackResponse(
+                    (String) body.get(AuthorizationConstants.ACCESS_TOKEN),
+                    (String) body.get(AuthorizationConstants.REFRESH_TOKEN));
             }
-
-            if (httpResponse.statusCode() != 200) {
-                throw new ComponentExecutionException("Invalid claim");
-            }
-
-            if (httpResponse.body() == null) {
-                throw new ComponentExecutionException("Invalid claim");
-            }
-
-            Map<?, ?> body = JsonUtils.read(httpResponse.body(), Map.class);
-
-            return new AuthorizationCallbackResponse(
-                (String) body.get(AuthorizationConstants.ACCESS_TOKEN),
-                (String) body.get(AuthorizationConstants.REFRESH_TOKEN));
         };
     }
 
@@ -204,12 +200,16 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     public static String getDefaultRefreshUrl(
-        ParameterMap connectionParameters, Authorization.TokenUrlFunction tokenUrlFunction, Context context) {
+        ParameterMap connectionParameters, TokenUrlFunction tokenUrlFunction, Context context) {
 
         String refreshUrl = MapUtils.getString(connectionParameters, AuthorizationConstants.REFRESH_URL);
 
         if (refreshUrl == null) {
-            refreshUrl = tokenUrlFunction.apply(connectionParameters, context);
+            try {
+                refreshUrl = tokenUrlFunction.apply(connectionParameters, context);
+            } catch (Exception e) {
+                throw new ComponentExecutionException(e);
+            }
         }
 
         return refreshUrl;
@@ -255,7 +255,11 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ApplyFunction applyFunction = OptionalUtils.orElse(
             authorization.getApply(), getDefaultApply(authorization.getType()));
 
-        return applyFunction.apply(new ParameterMapImpl(connection.parameters()), context);
+        try {
+            return applyFunction.apply(new ParameterMapImpl(connection.parameters()), context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e);
+        }
     }
 
     @Override
@@ -272,7 +276,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 authorization.getPkce(), getDefaultPkce());
 
             // TODO pkce
-            Authorization.Pkce pkce = pkceFunction.apply(null, null, "SHA256", context);
+            Authorization.Pkce pkce;
+
+            try {
+                pkce = pkceFunction.apply(null, null, "SHA256", context);
+            } catch (Exception e) {
+                throw new ComponentExecutionException(e);
+            }
 
             verifier = pkce.verifier();
         }
@@ -293,9 +303,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     (connectionParameters, context1) -> getDefaultTokenUrl(
                         connectionParameters))));
 
-        return authorizationCallbackFunction.apply(
-            new ParameterMapImpl(connection.parameters()), MapUtils.getString(connection.parameters(), CODE),
-            redirectUri, verifier, context);
+        try {
+            return authorizationCallbackFunction.apply(
+                new ParameterMapImpl(connection.parameters()), MapUtils.getString(connection.parameters(), CODE),
+                redirectUri, verifier, context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e);
+        }
     }
 
     @Override
@@ -367,9 +381,14 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
         ParameterMapImpl connectionParameters = new ParameterMapImpl(connection.parameters());
 
-        return new OAuth2AuthorizationParameters(
-            authorizationUrlFunction.apply(connectionParameters, context),
-            clientIdFunction.apply(connectionParameters, context), scopesFunction.apply(connectionParameters, context));
+        try {
+            return new OAuth2AuthorizationParameters(
+                authorizationUrlFunction.apply(connectionParameters, context),
+                clientIdFunction.apply(connectionParameters, context),
+                scopesFunction.apply(connectionParameters, context));
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e);
+        }
     }
 
     @Override

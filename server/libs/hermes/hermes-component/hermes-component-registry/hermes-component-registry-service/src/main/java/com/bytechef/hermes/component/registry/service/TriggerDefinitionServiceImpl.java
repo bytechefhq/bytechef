@@ -45,6 +45,7 @@ import com.bytechef.hermes.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
+import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
@@ -100,9 +101,15 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         PropertiesDataSource.TriggerPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, triggerName, propertyName);
 
-        PropertiesDataSource.PropertiesResponse propertiesResponse = propertiesFunction.apply(
-            new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+        PropertiesDataSource.PropertiesResponse propertiesResponse;
+
+        try {
+            propertiesResponse = propertiesFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         return new PropertiesResponse(
             CollectionUtils.map(
@@ -162,9 +169,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             getEditorDescriptionFunction(
                 componentName, componentVersion, triggerName);
 
-        EditorDescriptionDataSource.EditorDescriptionResponse editorDescriptionResponse =
-            editorDescriptionFunction
+        EditorDescriptionDataSource.EditorDescriptionResponse editorDescriptionResponse;
+
+        try {
+            editorDescriptionResponse = editorDescriptionFunction
                 .apply(new ParameterMapImpl(inputParameters), context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         return new EditorDescriptionResponse(
             editorDescriptionResponse.description(), editorDescriptionResponse.errorMessage());
@@ -179,9 +191,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         ListenerDisableConsumer listenerDisableConsumer = getListenerDisableConsumer(
             componentName, componentVersion, triggerName);
 
-        listenerDisableConsumer.accept(
-            new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()), workflowExecutionId, context);
+        try {
+            listenerDisableConsumer.accept(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.parameters()), workflowExecutionId,
+                context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
     }
 
     @Override
@@ -193,15 +210,19 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         ListenerEnableConsumer listenerEnableConsumer = getListenerEnableConsumer(
             componentName, componentVersion, triggerName);
 
-        listenerEnableConsumer.accept(
-            new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()),
-            workflowExecutionId,
-            output -> eventPublisher.publishEvent(
-                new TriggerListenerEvent(
-                    new TriggerListenerEvent.ListenerParameters(
-                        WorkflowExecutionId.parse(workflowExecutionId), LocalDateTime.now(), output))),
-            context);
+        try {
+            listenerEnableConsumer.accept(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.parameters()),
+                workflowExecutionId,
+                output -> eventPublisher.publishEvent(
+                    new TriggerListenerEvent(
+                        new TriggerListenerEvent.ListenerParameters(
+                            WorkflowExecutionId.parse(workflowExecutionId), LocalDateTime.now(), output))),
+                context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
     }
 
     @Override
@@ -213,9 +234,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         OptionsDataSource.TriggerOptionsFunction optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, triggerName, propertyName);
 
-        OptionsDataSource.OptionsResponse optionsResponse = optionsFunction.apply(
-            new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()), searchText, context);
+        OptionsDataSource.OptionsResponse optionsResponse = null;
+        try {
+            optionsResponse = optionsFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.parameters()), searchText, context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         return new OptionsResponse(
             CollectionUtils.map(optionsResponse.options(), Option::new), optionsResponse.errorMessage());
@@ -229,9 +255,15 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         OutputSchemaDataSource.TriggerOutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
             componentName, componentVersion, triggerName);
 
-        OutputSchemaDataSource.OutputSchemaResponse outputSchemaResponse = outputSchemaFunction.apply(
-            new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+        OutputSchemaDataSource.OutputSchemaResponse outputSchemaResponse;
+
+        try {
+            outputSchemaResponse = outputSchemaFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         return new OutputSchemaResponse(
             Property.toProperty(outputSchemaResponse.property()), outputSchemaResponse.errorMessage());
@@ -245,9 +277,15 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         TriggerSampleOutputFunction sampleOutputFunction = getSampleOutputFunction(
             componentName, componentVersion, triggerName);
 
-        SampleOutputDataSource.SampleOutputResponse sampleOutputResponse = sampleOutputFunction.apply(
-            new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+        SampleOutputDataSource.SampleOutputResponse sampleOutputResponse;
+
+        try {
+            sampleOutputResponse = sampleOutputFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.parameters()), context);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         Object sampleOutput = sampleOutputResponse.sampleOutput();
 
@@ -369,12 +407,18 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         ComponentConnection connection, TriggerContext triggerContext,
         DynamicWebhookRequestFunction dynamicWebhookRequestFunction) {
 
-        WebhookOutput webhookOutput = dynamicWebhookRequestFunction.apply(
-            new ParameterMapImpl(inputParameters),
-            connection == null ? null : new ParameterMapImpl(connection.parameters()),
-            new HttpHeadersImpl(webhookRequest.headers()),
-            new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
-            output, triggerContext);
+        WebhookOutput webhookOutput;
+
+        try {
+            webhookOutput = dynamicWebhookRequestFunction.apply(
+                new ParameterMapImpl(inputParameters),
+                connection == null ? null : new ParameterMapImpl(connection.parameters()),
+                new HttpHeadersImpl(webhookRequest.headers()),
+                new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
+                output, triggerContext);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         return new TriggerOutput(webhookOutput.getValue(), null, false);
     }
@@ -384,16 +428,26 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         Map<String, ?> inputParameters, Map<String, ?> closureParameters, TriggerContext triggerContext,
         PollFunction pollFunction) {
 
-        PollOutput pollOutput = pollFunction.apply(
-            new ParameterMapImpl(inputParameters), new ParameterMapImpl(closureParameters), triggerContext);
+        PollOutput pollOutput;
+
+        try {
+            pollOutput = pollFunction.apply(
+                new ParameterMapImpl(inputParameters), new ParameterMapImpl(closureParameters), triggerContext);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         List<Map<?, ?>> records = new ArrayList<>(
             pollOutput.records() == null ? Collections.emptyList() : pollOutput.records());
 
         while (pollOutput.pollImmediately()) {
-            pollOutput = pollFunction.apply(
-                new ParameterMapImpl(inputParameters), new ParameterMapImpl(pollOutput.closureParameters()),
-                triggerContext);
+            try {
+                pollOutput = pollFunction.apply(
+                    new ParameterMapImpl(inputParameters), new ParameterMapImpl(pollOutput.closureParameters()),
+                    triggerContext);
+            } catch (Exception e) {
+                throw new ComponentExecutionException(e, inputParameters);
+            }
 
             records.addAll(pollOutput.records());
         }
@@ -407,10 +461,16 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         Map<String, ?> inputParameters, WebhookRequest webhookRequest, TriggerContext triggerContext,
         StaticWebhookRequestFunction staticWebhookRequestFunction) {
 
-        WebhookOutput webhookOutput = staticWebhookRequestFunction.apply(
-            new ParameterMapImpl(inputParameters), new HttpHeadersImpl(webhookRequest.headers()),
-            new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
-            triggerContext);
+        WebhookOutput webhookOutput;
+
+        try {
+            webhookOutput = staticWebhookRequestFunction.apply(
+                new ParameterMapImpl(inputParameters), new HttpHeadersImpl(webhookRequest.headers()),
+                new HttpParametersImpl(webhookRequest.parameters()), webhookRequest.body(), webhookRequest.method(),
+                triggerContext);
+        } catch (Exception e) {
+            throw new ComponentExecutionException(e, inputParameters);
+        }
 
         return new TriggerOutput(webhookOutput.getValue(), null, false);
     }
