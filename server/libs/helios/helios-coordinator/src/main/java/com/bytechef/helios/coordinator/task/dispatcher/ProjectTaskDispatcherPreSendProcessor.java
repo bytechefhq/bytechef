@@ -92,10 +92,10 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
                 connectionIdMap = getConnectionIdMap(jobTaskConnectionMap.get(taskExecution.getName()));
             } else {
 
-                // defined in the workflow definition or component has required authorization
+                // defined in the workflow definition or is stored connection in workflow connections
 
                 connectionIdMap = getConnectionIdMap(
-                    Validate.notNull(projectInstanceId, "id"), job.getWorkflowId(),
+                    projectInstanceId, job.getWorkflowId(),
                     workflowConnectionFacade.getWorkflowConnections(workflowTask));
             }
         }
