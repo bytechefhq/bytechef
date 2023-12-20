@@ -154,8 +154,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
             Path tempFilePath;
 
             try {
-                tempFilePath = Files.createTempFile(
-                    "action_context_", fileEntry.getName() + "." + fileEntry.getExtension());
+                tempFilePath = Files.createTempFile("action_context_", fileEntry.getName());
 
                 Files.copy(
                     fileStorageService.getFileStream(FileEntryConstants.FILES_DIR, toFileEntry(fileEntry)),
