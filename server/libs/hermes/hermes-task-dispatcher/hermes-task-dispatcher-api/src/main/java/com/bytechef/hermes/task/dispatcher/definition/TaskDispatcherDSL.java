@@ -206,31 +206,31 @@ public final class TaskDispatcherDSL {
             super(name, Type.ARRAY);
         }
 
-        public ModifiableArrayProperty defaultValue(boolean... defaultValue) {
+        public ModifiableArrayProperty defaultValue(Boolean... defaultValue) {
             this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty defaultValue(int... defaultValue) {
+        public ModifiableArrayProperty defaultValue(Integer... defaultValue) {
             this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty defaultValue(long... defaultValue) {
+        public ModifiableArrayProperty defaultValue(Long... defaultValue) {
             this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty defaultValue(float... defaultValue) {
+        public ModifiableArrayProperty defaultValue(Float... defaultValue) {
             this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty defaultValue(double... defaultValue) {
+        public ModifiableArrayProperty defaultValue(Double... defaultValue) {
             this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
 
             return this;
@@ -249,31 +249,31 @@ public final class TaskDispatcherDSL {
             return this;
         }
 
-        public ModifiableArrayProperty exampleValue(boolean... exampleValue) {
+        public ModifiableArrayProperty exampleValue(Boolean... exampleValue) {
             this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty exampleValue(int... exampleValue) {
+        public ModifiableArrayProperty exampleValue(Integer... exampleValue) {
             this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty exampleValue(long... exampleValue) {
+        public ModifiableArrayProperty exampleValue(Long... exampleValue) {
             this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty exampleValue(float... exampleValue) {
+        public ModifiableArrayProperty exampleValue(Float... exampleValue) {
             this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
 
             return this;
         }
 
-        public ModifiableArrayProperty exampleValue(double... exampleValue) {
+        public ModifiableArrayProperty exampleValue(Double... exampleValue) {
             this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
 
             return this;
