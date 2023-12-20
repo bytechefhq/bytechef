@@ -31,7 +31,6 @@ import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -73,8 +72,7 @@ public class AwsS3PutObjectAction {
         .perform(AwsS3PutObjectAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
-        throws ComponentExecutionException {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
 
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
@@ -94,8 +92,6 @@ public class AwsS3PutObjectAction {
                 tempFilePath);
 
             return null;
-        } catch (IOException ioe) {
-            throw new ComponentExecutionException(ioe.getMessage(), ioe);
         }
     }
 }

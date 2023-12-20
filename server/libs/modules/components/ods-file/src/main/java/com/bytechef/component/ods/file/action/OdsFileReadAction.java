@@ -30,7 +30,6 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSch
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -104,7 +103,7 @@ public class OdsFileReadAction {
     }
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
 
         boolean headerRow = inputParameters.getBoolean(OdsFileConstants.HEADER_ROW, true);
         boolean includeEmptyCells = inputParameters.getBoolean(OdsFileConstants.INCLUDE_EMPTY_CELLS, false);
@@ -117,7 +116,7 @@ public class OdsFileReadAction {
             file -> file.getStream(inputParameters.getRequiredFileEntry(OdsFileConstants.FILE_ENTRY)))) {
 
             if (inputStream == null) {
-                throw new ComponentExecutionException("Unable to get file content from task " + inputParameters);
+                throw new IllegalArgumentException("Unable to get file content from task " + inputParameters);
             }
 
             Integer rangeStartRow = null;
@@ -132,14 +131,8 @@ public class OdsFileReadAction {
             return read(
                 inputStream,
                 new ReadConfiguration(
-                    headerRow,
-                    includeEmptyCells,
-                    rangeStartRow == null ? 0 : rangeStartRow,
-                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow,
-                    readAsString,
-                    sheetName));
-        } catch (Exception exception) {
-            throw new ComponentExecutionException("Unable to handle action " + inputParameters, exception);
+                    headerRow, includeEmptyCells, rangeStartRow == null ? 0 : rangeStartRow,
+                    rangeEndRow == null ? Integer.MAX_VALUE : rangeEndRow, readAsString, sheetName));
         }
     }
 

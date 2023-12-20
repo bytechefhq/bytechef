@@ -29,7 +29,6 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.CreateFolderResult;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
@@ -99,15 +98,11 @@ public final class DropboxCreateNewFolderAction {
 
     public static CreateFolderResult perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
-        throws ComponentExecutionException {
+        throws DbxException {
 
-        try {
-            DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
-                connectionParameters.getRequiredString(ACCESS_TOKEN));
+        DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
+            connectionParameters.getRequiredString(ACCESS_TOKEN));
 
-            return dbxUserFilesRequests.createFolderV2(inputParameters.getRequiredString(DESTINATION_FILENAME));
-        } catch (DbxException dbxException) {
-            throw new ComponentExecutionException("Unable to create new folder " + inputParameters, dbxException);
-        }
+        return dbxUserFilesRequests.createFolderV2(inputParameters.getRequiredString(DESTINATION_FILENAME));
     }
 }

@@ -38,7 +38,6 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -122,7 +121,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
     public void test2() {
         Assertions.assertThrows(RuntimeException.class, () -> {
             TaskHandlerResolver taskHandlerResolver = task -> taskExecution -> {
-                throw new ComponentExecutionException("i'm rogue");
+                throw new IllegalStateException("i'm rogue");
             };
             MapTaskDispatcherAdapterTaskHandler taskHandler = new MapTaskDispatcherAdapterTaskHandler(
                 objectMapper, taskHandlerResolver);
@@ -175,7 +174,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
             if ("map".equals(type)) {
                 return mapAdapterTaskHandlerRefs[0];
             } else {
-                throw new ComponentExecutionException("unknown type: " + type);
+                throw new IllegalArgumentException("unknown type: " + type);
             }
         };
 

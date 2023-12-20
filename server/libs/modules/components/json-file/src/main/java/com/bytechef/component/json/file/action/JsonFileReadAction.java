@@ -39,7 +39,6 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSch
 import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -115,7 +114,7 @@ public class JsonFileReadAction {
 
     @SuppressWarnings("unchecked")
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
 
         JsonFileConstants.FileType fileType = getFileType(inputParameters);
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
@@ -144,8 +143,6 @@ public class JsonFileReadAction {
                         .lines()
                         .map(line -> (Map<String, ?>) context.json(json -> json.read(line)))
                         .collect(Collectors.toList());
-                } catch (IOException ioException) {
-                    throw new ComponentExecutionException("Unable to open json file " + inputParameters, ioException);
                 }
             }
 

@@ -30,7 +30,7 @@ public class GoogleDriveUploadActionTest {
 
     @Disabled
     @Test
-    public void testPerform() {
+    public void testPerform() throws Exception {
         // TODO
 
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);

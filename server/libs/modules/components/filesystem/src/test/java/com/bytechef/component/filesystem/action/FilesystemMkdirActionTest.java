@@ -20,8 +20,8 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.PAT
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import org.mockito.Mockito;
 public class FilesystemMkdirActionTest {
 
     @Test
-    public void testCreateDir1() {
+    public void testCreateDir1() throws IOException {
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
         String tempDir = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID()
             .toString()
@@ -51,7 +51,7 @@ public class FilesystemMkdirActionTest {
     public void testCreateDir2() {
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
-        Assertions.assertThrows(ComponentExecutionException.class, () -> {
+        Assertions.assertThrows(IOException.class, () -> {
             Mockito.when(parameterMap.getRequiredString(Mockito.eq(PATH)))
                 .thenReturn("/no/such/thing");
 

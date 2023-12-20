@@ -31,7 +31,6 @@ import com.bytechef.hermes.component.definition.ParameterMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -89,7 +88,7 @@ public class JsonFileReadActionTest {
 
     @Test
     @SuppressFBWarnings("OBL")
-    public void testPerformReadJSONArray() throws JSONException, FileNotFoundException {
+    public void testPerformReadJSONArray() throws JSONException, IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         File file = getFile("sample_array.json");
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
@@ -196,9 +195,10 @@ public class JsonFileReadActionTest {
     }
 
     private File getFile(String filename) {
-        return new File(JsonFileComponentHandlerTest.class
-            .getClassLoader()
-            .getResource("dependencies/json-file/" + filename)
-            .getFile());
+        return new File(
+            JsonFileComponentHandlerTest.class
+                .getClassLoader()
+                .getResource("dependencies/json-file/" + filename)
+                .getFile());
     }
 }

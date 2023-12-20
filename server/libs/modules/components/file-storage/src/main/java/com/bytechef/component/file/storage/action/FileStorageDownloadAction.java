@@ -26,7 +26,6 @@ import com.bytechef.component.file.storage.constant.FileStorageConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,35 +63,31 @@ public class FileStorageDownloadAction {
      * performs the download of a file (given its URL).
      */
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) throws IOException {
 
-        try {
-            URL url = new URL(inputParameters.getRequiredString(FileStorageConstants.URL));
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        URL url = new URL(inputParameters.getRequiredString(FileStorageConstants.URL));
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            connection.connect();
+        connection.connect();
 
-            if (connection.getResponseCode() / 100 == 2) {
-                File downloadedFile = File.createTempFile("download-", "", null);
-                int contentLength = connection.getContentLength();
+        if (connection.getResponseCode() / 100 == 2) {
+            File downloadedFile = File.createTempFile("download-", "", null);
+            int contentLength = connection.getContentLength();
 
-                try (BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
-                    OutputStream outputStream = new ProgressingOutputStream(
-                        new FileOutputStream(downloadedFile), contentLength, progress -> context.event(
-                            event -> event.publishActionProgressEvent(progress)))) {
-                    copy(inputStream, outputStream);
-                }
-
-                try (FileInputStream fileInputStream = new FileInputStream(downloadedFile)) {
-                    return context.file(file -> file.storeContent(
-                        inputParameters.getRequiredString(FILENAME), fileInputStream));
-                }
+            try (BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                OutputStream outputStream = new ProgressingOutputStream(
+                    new FileOutputStream(downloadedFile), contentLength, progress -> context.event(
+                        event -> event.publishActionProgressEvent(progress)))) {
+                copy(inputStream, outputStream);
             }
 
-            throw new ComponentExecutionException("Server returned: %s".formatted(connection.getResponseCode()));
-        } catch (IOException e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
+            try (FileInputStream fileInputStream = new FileInputStream(downloadedFile)) {
+                return context.file(file -> file.storeContent(
+                    inputParameters.getRequiredString(FILENAME), fileInputStream));
+            }
         }
+
+        throw new IllegalStateException("Server returned: %s".formatted(connection.getResponseCode()));
     }
 
     private static long copy(final InputStream inputStream, final OutputStream outputStream) throws IOException {

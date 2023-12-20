@@ -28,7 +28,6 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.ImportFormat;
@@ -72,7 +71,7 @@ public final class DropboxCreateNewTextFileAction {
 
     public static PaperCreateResult perform(
         ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
-        throws ComponentExecutionException {
+        throws DbxException, IOException {
 
         DbxUserFilesRequests dbxUserFilesRequests = getDbxUserFilesRequests(
             connectionParameters.getRequiredString(ACCESS_TOKEN));
@@ -81,8 +80,6 @@ public final class DropboxCreateNewTextFileAction {
             inputParameters.getRequiredString(DESTINATION_FILENAME), ImportFormat.PLAIN_TEXT)) {
 
             return paperCreateUploader.uploadAndFinish(InputStream.nullInputStream());
-        } catch (IOException | DbxException exception) {
-            throw new ComponentExecutionException("Unable to create new text file " + inputParameters, exception);
         }
     }
 }

@@ -23,6 +23,7 @@ import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,7 +37,7 @@ import org.mockito.Mockito;
 public class FilesystemLsActionTest {
 
     @Test
-    public void testLs1() {
+    public void testLs1() throws IOException {
         File file = getLsFile();
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
@@ -45,7 +46,7 @@ public class FilesystemLsActionTest {
         Mockito.when(parameterMap.getBoolean(Mockito.eq(RECURSIVE), Mockito.eq(false)))
             .thenReturn(true);
 
-        List<FilesystemLsAction.FileInfo> files = (List<FilesystemLsAction.FileInfo>) FilesystemLsAction.perform(
+        List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.perform(
             parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
         Assertions.assertEquals(
@@ -56,7 +57,7 @@ public class FilesystemLsActionTest {
     }
 
     @Test
-    public void testLs2() {
+    public void testLs2() throws IOException {
         File file = getLsFile();
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
@@ -65,7 +66,7 @@ public class FilesystemLsActionTest {
         Mockito.when(parameterMap.getBoolean(Mockito.eq(RECURSIVE), Mockito.eq(false)))
             .thenReturn(true);
 
-        List<FilesystemLsAction.FileInfo> files = (List<FilesystemLsAction.FileInfo>) FilesystemLsAction.perform(
+        List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.perform(
             parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
         Assertions.assertEquals(
@@ -76,7 +77,7 @@ public class FilesystemLsActionTest {
     }
 
     @Test
-    public void testLs3() {
+    public void testLs3() throws IOException {
         File file = getLsFile();
         ParameterMap parameterMap = Mockito.mock(ParameterMap.class);
 
@@ -85,7 +86,7 @@ public class FilesystemLsActionTest {
         Mockito.when(parameterMap.getBoolean(Mockito.eq(RECURSIVE), Mockito.eq(false)))
             .thenReturn(false);
 
-        List<FilesystemLsAction.FileInfo> files = (List<FilesystemLsAction.FileInfo>) FilesystemLsAction.perform(
+        List<FilesystemLsAction.FileInfo> files = FilesystemLsAction.perform(
             parameterMap, parameterMap, Mockito.mock(ActionContext.class));
 
         Assertions.assertEquals(

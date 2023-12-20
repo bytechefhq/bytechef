@@ -25,7 +25,6 @@ import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,14 +45,13 @@ public class FilesystemReadFileAction {
         .perform(FilesystemReadFileAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
+        throws IOException {
 
         String filename = inputParameters.getRequiredString(FILENAME);
 
         try (InputStream inputStream = new FileInputStream(filename)) {
             return context.file(file -> file.storeContent(filename, inputStream));
-        } catch (IOException ioException) {
-            throw new ComponentExecutionException("Unable to open file " + inputParameters, ioException);
         }
     }
 }

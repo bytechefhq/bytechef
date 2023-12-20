@@ -20,6 +20,7 @@ import com.bytechef.component.xml.file.constant.XmlFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ParameterMap;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
@@ -41,7 +42,7 @@ public class XmlFileWriteActionTest {
     private static final String FILE_XML = "file.xml";
 
     @Test
-    public void testPerformWrite() {
+    public void testPerformWrite() throws IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         Map<String, Object> source = Map.of(
             "Flower",
@@ -110,7 +111,7 @@ public class XmlFileWriteActionTest {
     }
 
     @Test
-    public void testPerformWriteArray() {
+    public void testPerformWriteArray() throws IOException {
         ActionContext context = Mockito.mock(ActionContext.class);
         List<Map<String, Object>> source = List.of(
             new LinkedHashMap<>() {

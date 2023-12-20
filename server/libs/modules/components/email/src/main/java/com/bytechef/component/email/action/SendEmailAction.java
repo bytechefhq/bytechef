@@ -32,7 +32,6 @@ import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import jakarta.activation.DataHandler;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
@@ -106,7 +105,8 @@ public class SendEmailAction {
         .perform(SendEmailAction::perform);
 
     protected static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context) {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext context)
+        throws MessagingException, IOException {
 
         Properties properties = new Properties();
 
@@ -137,61 +137,57 @@ public class SendEmailAction {
 
         Message message = new MimeMessage(session);
 
-        try {
-            message.setFrom(new InternetAddress(inputParameters.getRequiredString(FROM)));
+        message.setFrom(new InternetAddress(inputParameters.getRequiredString(FROM)));
 
-            message.setRecipients(RecipientType.TO, InternetAddress.parse(
-                String.join(",", inputParameters.getRequiredList(TO, String.class))));
+        message.setRecipients(RecipientType.TO, InternetAddress.parse(
+            String.join(",", inputParameters.getRequiredList(TO, String.class))));
 
-            if (inputParameters.containsKey(CC)) {
-                message.setRecipients(RecipientType.CC, InternetAddress.parse(
-                    String.join(",", inputParameters.getRequiredList(CC, String.class))));
-            }
-
-            if (inputParameters.containsKey(BCC)) {
-                message.setRecipients(RecipientType.BCC, InternetAddress.parse(
-                    String.join(",", inputParameters.getRequiredList(BCC, String.class))));
-            }
-
-            if (inputParameters.containsKey(REPLY_TO)) {
-                message.setReplyTo(InternetAddress.parse(
-                    String.join(",", inputParameters.getRequiredList(REPLY_TO, String.class))));
-            }
-
-            if (inputParameters.containsKey(SUBJECT)) {
-                message.setSubject(inputParameters.getString(SUBJECT));
-            }
-
-            MimeBodyPart mimeBodyPart = new MimeBodyPart();
-
-            mimeBodyPart.setContent(inputParameters.getRequiredString(CONTENT), "text/html; charset=utf-8");
-
-            Multipart multipart = new MimeMultipart();
-
-            multipart.addBodyPart(mimeBodyPart);
-
-            if (inputParameters.containsKey(ATTACHMENTS)) {
-                MimeBodyPart attachmentBodyPart = new MimeBodyPart();
-
-                for (FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
-                    attachmentBodyPart.setDataHandler(
-                        new DataHandler(new ByteArrayDataSource(
-                            (InputStream) context.file(file -> file.getStream(fileEntry)), fileEntry.getMimeType())));
-
-                    multipart.addBodyPart(attachmentBodyPart);
-                }
-            }
-
-            message.setContent(multipart);
-
-            Transport.send(message);
-
-            context.logger(logger -> logger.debug(
-                "Message sent: from:{}, to:{}, subject:{}",
-                message.getFrom(), message.getRecipients(RecipientType.TO), message.getSubject()));
-        } catch (MessagingException | IOException e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
+        if (inputParameters.containsKey(CC)) {
+            message.setRecipients(RecipientType.CC, InternetAddress.parse(
+                String.join(",", inputParameters.getRequiredList(CC, String.class))));
         }
+
+        if (inputParameters.containsKey(BCC)) {
+            message.setRecipients(RecipientType.BCC, InternetAddress.parse(
+                String.join(",", inputParameters.getRequiredList(BCC, String.class))));
+        }
+
+        if (inputParameters.containsKey(REPLY_TO)) {
+            message.setReplyTo(InternetAddress.parse(
+                String.join(",", inputParameters.getRequiredList(REPLY_TO, String.class))));
+        }
+
+        if (inputParameters.containsKey(SUBJECT)) {
+            message.setSubject(inputParameters.getString(SUBJECT));
+        }
+
+        MimeBodyPart mimeBodyPart = new MimeBodyPart();
+
+        mimeBodyPart.setContent(inputParameters.getRequiredString(CONTENT), "text/html; charset=utf-8");
+
+        Multipart multipart = new MimeMultipart();
+
+        multipart.addBodyPart(mimeBodyPart);
+
+        if (inputParameters.containsKey(ATTACHMENTS)) {
+            MimeBodyPart attachmentBodyPart = new MimeBodyPart();
+
+            for (FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
+                attachmentBodyPart.setDataHandler(
+                    new DataHandler(new ByteArrayDataSource(
+                        (InputStream) context.file(file -> file.getStream(fileEntry)), fileEntry.getMimeType())));
+
+                multipart.addBodyPart(attachmentBodyPart);
+            }
+        }
+
+        message.setContent(multipart);
+
+        Transport.send(message);
+
+        context.logger(logger -> logger.debug(
+            "Message sent: from:{}, to:{}, subject:{}",
+            message.getFrom(), message.getRecipients(RecipientType.TO), message.getSubject()));
 
         return null;
     }

@@ -17,6 +17,8 @@
 package com.bytechef.component.rabbitmq.util;
 
 import com.rabbitmq.client.ConnectionFactory;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Ivica Cardic
@@ -24,7 +26,7 @@ import com.rabbitmq.client.ConnectionFactory;
 public class RabbitMqUtils {
 
     public static com.rabbitmq.client.Connection getConnection(
-        String hostname, int port, String username, String password) throws Exception {
+        String hostname, int port, String username, String password) throws IOException, TimeoutException {
 
         ConnectionFactory connectionFactory = new ConnectionFactory();
 

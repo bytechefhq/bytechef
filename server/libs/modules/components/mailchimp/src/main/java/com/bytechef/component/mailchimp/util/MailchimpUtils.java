@@ -23,7 +23,6 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.OptionsDataSource;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ public class MailchimpUtils {
             .getBody(new Context.TypeReference<>() {}));
 
         if (!response.containsKey("dc")) {
-            throw new ComponentExecutionException(
+            throw new IllegalStateException(
                 "%s: %s".formatted(response.get("error"), response.get("error_description")));
         }
 

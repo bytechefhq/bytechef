@@ -26,7 +26,6 @@ import com.bytechef.hermes.component.definition.ParameterMap;
 import com.bytechef.hermes.component.definition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.PollOutput;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -61,8 +60,7 @@ public class AirtableNewRecordTrigger {
         .poll(AirtableNewRecordTrigger::poll);
 
     protected static PollOutput poll(
-        ParameterMap inputParameters, ParameterMap closureParameters, TriggerContext context)
-        throws ComponentExecutionException {
+        ParameterMap inputParameters, ParameterMap closureParameters, TriggerContext context) {
 
         LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
         LocalDateTime endDate = LocalDateTime.now();

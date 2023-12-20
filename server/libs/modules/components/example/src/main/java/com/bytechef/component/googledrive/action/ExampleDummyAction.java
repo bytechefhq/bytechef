@@ -23,7 +23,6 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ParameterMap;
-import com.bytechef.hermes.component.exception.ComponentExecutionException;
 
 /**
  * @author Mario Cvjetojevic
@@ -41,8 +40,7 @@ public final class ExampleDummyAction {
     }
 
     public static Object perform(
-        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext)
-        throws ComponentExecutionException {
+        ParameterMap inputParameters, ParameterMap connectionParameters, ActionContext actionContext) {
 
         return null;
     }
