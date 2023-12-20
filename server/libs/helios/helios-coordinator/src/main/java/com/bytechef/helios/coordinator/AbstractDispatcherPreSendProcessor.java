@@ -37,14 +37,22 @@ public abstract class AbstractDispatcherPreSendProcessor {
         Long projectInstanceId, String workflowId, List<WorkflowConnection> workflowConnections) {
 
         return MapUtils.toMap(
-            workflowConnections,
-            WorkflowConnection::getKey,
+            workflowConnections, WorkflowConnection::getKey,
             workflowConnection -> getConnectionId(projectInstanceId, workflowId, workflowConnection));
     }
 
     private Long getConnectionId(Long projectInstanceId, String workflowId, WorkflowConnection workflowConnection) {
-        return projectInstanceWorkflowService.getProjectInstanceWorkflowConnectionId(
-            projectInstanceId, workflowId, workflowConnection.getOperationName(),
-            workflowConnection.getKey());
+        return workflowConnection.getId()
+            .orElseGet(() -> getConnectionId(
+                projectInstanceId, workflowId, workflowConnection.getOperationName(), workflowConnection.getKey()));
+    }
+
+    private Long getConnectionId(Long projectInstanceId, String workflowId, String operationName, String key) {
+        if (projectInstanceId != null) {
+            return projectInstanceWorkflowService.getProjectInstanceWorkflowConnectionId(
+                projectInstanceId, workflowId, operationName, key);
+        }
+
+        return null;
     }
 }
