@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
+public class RemoteWorkflowConnectionFacadeClient implements WorkflowConnectionFacade {
 
     private static final String CONFIGURATION_APP = "configuration-app";
     private static final String WORKFLOW_CONNECTION_FACADE = "/remote/workflow-connection-facade";
@@ -31,7 +31,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
     private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public WorkflowConnectionFacadeImpl(LoadBalancedRestClient loadBalancedRestClient) {
+    public RemoteWorkflowConnectionFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
         this.loadBalancedRestClient = loadBalancedRestClient;
     }
 

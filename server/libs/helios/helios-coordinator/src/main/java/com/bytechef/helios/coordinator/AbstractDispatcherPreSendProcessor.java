@@ -17,6 +17,7 @@
 package com.bytechef.helios.coordinator;
 
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.configuration.domain.WorkflowConnection;
 import java.util.List;
@@ -42,17 +43,17 @@ public abstract class AbstractDispatcherPreSendProcessor {
     }
 
     private Long getConnectionId(Long projectInstanceId, String workflowId, WorkflowConnection workflowConnection) {
-        return workflowConnection.getId()
-            .orElseGet(() -> getConnectionId(
-                projectInstanceId, workflowId, workflowConnection.getOperationName(), workflowConnection.getKey()));
-    }
+        Long connectionId = null;
 
-    private Long getConnectionId(Long projectInstanceId, String workflowId, String operationName, String key) {
         if (projectInstanceId != null) {
-            return projectInstanceWorkflowService.getProjectInstanceWorkflowConnectionId(
-                projectInstanceId, workflowId, operationName, key);
+            connectionId = projectInstanceWorkflowService.getProjectInstanceWorkflowConnectionId(
+                projectInstanceId, workflowId, workflowConnection.getOperationName(), workflowConnection.getKey());
         }
 
-        return null;
+        if (connectionId == null) {
+            connectionId = OptionalUtils.orElse(workflowConnection.getId(), null);
+        }
+
+        return connectionId;
     }
 }
