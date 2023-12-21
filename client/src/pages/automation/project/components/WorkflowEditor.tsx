@@ -187,7 +187,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
                     defaultNodesWithWorkflowNodes.push({
                         data: {label: '+'},
                         id: 'lastNode',
-                        position: {x: 0, y: 0},
+                        position: {x: 0, y: 150},
                         type: 'placeholder',
                     });
 
