@@ -44,19 +44,20 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
 
 1. Fork the repo and create a new branch from the `develop` branch.
 2. Branches are named as `bug/fix-name` or `feature/feature-name`
-3. Please add tests for your changes. Client-side changes require Cypress/Jest tests while server-side changes require JUnit tests.
-4. When you finish adding your changes, run the following commands on all directories you worked on:
-```bash
-./gradlew spotlessApply
-./gradlew spotbugsMain spotbugsTest
-./gradlew pmdMain pmdTest
-./gradlew checkstyleMain checkstyleTest
-```
-5. Once you are confident in your code changes, create a pull request in your fork to the `develop` branch in the bytechefhq/bytechef base repository.
-6. If you've changed any APIs, please call this out in the pull request and ensure backward compatibility.
-7. Link the issue of the base repository in your Pull request description. [Guide](https://docs.github.com/en/free-pro-team@latest/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue)
-8. When you raise a pull request, we automatically run tests on our CI. Please ensure that all the tests are passing for your code change. We will not be able to accept your change if the test suite doesn't pass.
-9. Documentation: When new features are added or there are changes to existing features that require updates to documentation, we encourage you to add/update any missing documentation in the [`/docs` folder](https://github.com/bytechefhq/bytechef/tree/master/docs). To update an existing documentation page, you can simply click on the `Edit this page` button on the bottom left corner of the documentation page.
+3. Development environment setup: to work on client codebase go through [Client Side](#client-side) and [Setup with Docker](#setup-with-docker), to work on server codebase go through [Client Side](#client-side) and [Local Setup](#local-setup)
+4. Implement your code changes and please add tests for them. Client-side changes require Cypress/Jest tests while server-side changes require JUnit tests.
+5. When you finish adding your changes, run the following commands on all directories you worked on:
+    ```bash
+    ./gradlew spotlessApply
+    ./gradlew spotbugsMain spotbugsTest
+    ./gradlew pmdMain pmdTest
+    ./gradlew checkstyleMain checkstyleTest
+    ```
+6. Once you are confident in your code changes, create a pull request in your fork to the `develop` branch in the bytechefhq/bytechef base repository.
+7. If you've changed any APIs, please call this out in the pull request and ensure backward compatibility.
+8. Link the issue of the base repository in your Pull request description. [Guide](https://docs.github.com/en/free-pro-team@latest/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue)
+9. When you raise a pull request, we automatically run tests on our CI. Please ensure that all the tests are passing for your code change. We will not be able to accept your change if the test suite doesn't pass.
+10. Documentation: When new features are added or there are changes to existing features that require updates to documentation, we encourage you to add/update any missing documentation in the [`/docs` folder](https://github.com/bytechefhq/bytechef/tree/master/docs). To update an existing documentation page, you can simply click on the `Edit this page` button on the bottom left corner of the documentation page.
 
 
 # Setup for local development
@@ -74,33 +75,30 @@ This section explains how you can setup a development environment for ByteChef c
 
 1. Clone the ByteChef repository(if you haven't already), open terminal and `cd` into it
 
-```bash
-git clone https://github.com/bytechefhq/bytechef.git
-cd bytechef
-```
+    ```bash
+    git clone https://github.com/bytechefhq/bytechef.git
+    cd bytechef
+    ```
 
 2. Change your directory to the `client` folder.
 
-```bash
-cd client
-```
+    ```bash
+    cd client
+    ```
 
 2. Install dependencies.
 
-```bash
-npm install
-```
+    ```bash
+    npm install
+    ```
 
 3. Serve with hot reload.
 
-```bash
-npm run dev
-```
+    ```bash
+    npm run dev
+    ```
 
-Your ByteChef client is now running on <http://localhost:5173>.
-
-#### Note:
-By default, your client app points to the local API server - http://localhost:5173. If you don't have the API server running on your local system, your page will load with errors. To set up the API server on your local system, please follow the instructions [here](#setup-with-docker).
+4. Your ByteChef client is now running on <http://localhost:5173>. If you don't have the API server running on your local system, your page will load with errors. To set up the API server on your local system, please follow the [Server Side](#server-side) instructions .
 
 ### Running Lint
 
@@ -142,22 +140,22 @@ Build and run the server codebase in a Docker container. This is the easiest way
 
 1. Clone the ByteChef repository(if you haven't already), open terminal and `cd` into it
 
-```bash
-git clone https://github.com/bytechefhq/bytechef.git
-cd bytechef
-```
+    ```bash
+    git clone https://github.com/bytechefhq/bytechef.git
+    cd bytechef
+    ```
 
 2. Change your directory to the `server` folder.
 
-```bash
-cd server
-```
+    ```bash
+    cd server
+    ```
 
 3. Start up the container
 
-```bash
-docker compose -f docker-compose.dev.server.yml up -d
-```
+    ```bash
+    docker compose -f docker-compose.dev.server.yml up -d
+    ```
 
 #### Other useful Commands
 
@@ -167,21 +165,11 @@ Stop locally built server instance.
 docker compose -f docker-compose.dev.server.yml down
 ```
 
-Rebuild a docker image of the locally built server instance.
+Rebuild a docker image of the locally built server instance.([troubleshooting](#Troubleshooting))
 
 ```bash
 docker compose -f docker-compose.dev.server.yml down --rmi local
 docker compose -f docker-compose.dev.server.yml up -d
-```
-
-#### Troubleshooting
-
-Out of date schema
-
-If you see `Either revert the changes to the migration, or run repair to update the schema history` in the terminal log when experiencing errors, execute the following command which will remove the out of date schemas:
-
-```bash
-docker compose -f deploy/docker/docker-compose.dev.server.yml down -v
 ```
 
 
@@ -201,44 +189,44 @@ This section doesn't provide instructions to install Java and Gradle because the
 
 1. Clone the ByteChef repository, open terminal and `cd` into it
 
-```bash
-git clone https://github.com/bytechefhq/bytechef.git
-cd bytechef
-```
+    ```bash
+    git clone https://github.com/bytechefhq/bytechef.git
+    cd bytechef
+    ```
 
 #### Setting up local development infrastructure using Docker
 
 2. Change your directory to th `server` folder.
 
-```bash
-cd server
-```
+    ```bash
+    cd server
+    ```
 
-3. Use `docker-compose.dev.infra.yml` for running required infrastructure(PostgreSQL, Redis):
+3. Use `docker-compose.dev.infra.yml` for running required infrastructure(PostgreSQL, Redis) ([troubleshooting](#Troubleshooting)):
 
-```bash
-docker compose -f docker-compose.dev.infra.yml up -d
-```
+    ```bash
+    docker compose -f docker-compose.dev.infra.yml up -d
+    ```
 
 #### Building and running the code
 
-3. Run the following command to compile codebase:
+4. Run the following command to compile codebase:
 
-```bash
-../gradlew clean compileJava
-```
+    ```bash
+    ../gradlew clean compileJava
+    ```
 
-4. Change your directory to th `apps/server-app` folder.
+5. Change your directory to th `apps/server-app` folder.
 
-```bash
-cd apps/server-app
-```
+    ```bash
+    cd apps/server-app
+    ```
 
-5. Start the ByteChef server instance by running :
+6. Start the ByteChef server instance by running :
 
-```bash
-../../../gradlew bootRun
-```
+    ```bash
+    ../../../gradlew bootRun
+    ```
 
 By default, the server will start on port 9555.
 
@@ -246,13 +234,28 @@ When the server starts, it automatically runs migrations on PostgreSQL and popul
 
 You can check the status of the server by hitting the endpoint: http://localhost:9555/swagger-ui/index.html on your browser to get Swagger UI with the list of API endpoints.
 
-### Running Tests
+#### Running Tests
 
-1. Run the command to execute tests
+Run the command to execute tests
 
 ```bash
 cd bytechef
 ./gradlew test && gw testIntegration
+```
+
+### Troubleshooting
+
+#### Out of date schema
+
+If you see `Either revert the changes to the migration, or run repair to update the schema history` in the terminal log when experiencing errors, execute the following command which will remove the out of date schemas:
+
+Server Setup with Docker
+```bash
+docker compose -f server/docker-compose.dev.server.yml down -v
+```
+Server Local Setup
+```bash
+docker compose -f server/docker-compose.dev.infra.yml down -v
 ```
 
 ## Questions?
