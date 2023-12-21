@@ -190,6 +190,8 @@ const Project = () => {
             });
 
             setCurrentWorkflow(workflow);
+
+            setWorkflowDefinitions({...workflowDefinitions, [workflow.id!]: workflow} as WorkflowDefinitionType);
         },
     });
 
