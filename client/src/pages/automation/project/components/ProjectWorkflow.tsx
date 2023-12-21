@@ -16,7 +16,7 @@ import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetails
 import DataPillPanel from './DataPillPanel';
 import WorkflowEditor, {WorkflowEditorProps} from './WorkflowEditor';
 
-const ProjectWorkflow = ({componentDefinitions, currentWorkflow, taskDispatcherDefinitions}: WorkflowEditorProps) => {
+const ProjectWorkflow = ({componentDefinitions, currentWorkflowId, taskDispatcherDefinitions}: WorkflowEditorProps) => {
     const [actionData, setActionData] = useState<Array<ActionDefinitionModel>>([]);
 
     const {componentActions, componentNames} = useWorkflowDataStore();
@@ -57,7 +57,7 @@ const ProjectWorkflow = ({componentDefinitions, currentWorkflow, taskDispatcherD
         <ReactFlowProvider>
             <WorkflowEditor
                 componentDefinitions={componentDefinitions}
-                currentWorkflow={currentWorkflow}
+                currentWorkflowId={currentWorkflowId}
                 taskDispatcherDefinitions={taskDispatcherDefinitions}
             />
 

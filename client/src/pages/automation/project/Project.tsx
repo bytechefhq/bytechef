@@ -649,10 +649,10 @@ const Project = () => {
                     errors={[componentsError, taskDispatcherDefinitionsError, projectWorkflowsError]}
                     loading={componentsIsLoading || taskDispatcherDefinitionsLoading || projectWorkflowsLoading}
                 >
-                    {componentDefinitions && !!taskDispatcherDefinitions && currentWorkflow && (
+                    {componentDefinitions && !!taskDispatcherDefinitions && currentWorkflow?.id && (
                         <ProjectWorkflow
                             componentDefinitions={componentDefinitions}
-                            currentWorkflow={currentWorkflow}
+                            currentWorkflowId={currentWorkflow.id}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                         />
                     )}
