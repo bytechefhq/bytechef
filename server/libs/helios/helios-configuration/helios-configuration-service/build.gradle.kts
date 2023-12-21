@@ -18,6 +18,7 @@ dependencies {
     testImplementation(project(":server:libs:core:category:category-service"))
     testImplementation(project(":server:libs:core:tag:tag-service"))
     testImplementation(project(":server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-service"))
+    testImplementation(project(":server:libs:hermes:hermes-configuration:hermes-configuration-service"))
     testImplementation(project(":server:libs:hermes:hermes-connection:hermes-connection-api"))
     testImplementation(project(":server:libs:core:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
