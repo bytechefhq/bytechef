@@ -1,0 +1,161 @@
+/*
+ * Copyright 2023-present ByteChef Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.component.openai.action;
+
+import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_ASSISTANT;
+import static com.bytechef.component.openai.constant.OpenAIConstants.DESCRIPTION;
+import static com.bytechef.component.openai.constant.OpenAIConstants.FILE_IDS;
+import static com.bytechef.component.openai.constant.OpenAIConstants.FUNCTION;
+import static com.bytechef.component.openai.constant.OpenAIConstants.INSTRUCTIONS;
+import static com.bytechef.component.openai.constant.OpenAIConstants.METADATA;
+import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
+import static com.bytechef.component.openai.constant.OpenAIConstants.NAME;
+import static com.bytechef.component.openai.constant.OpenAIConstants.PARAMETERS;
+import static com.bytechef.component.openai.constant.OpenAIConstants.TOOLS;
+import static com.bytechef.component.openai.constant.OpenAIConstants.TYPE;
+import static com.bytechef.hermes.component.definition.ComponentDSL.action;
+import static com.bytechef.hermes.component.definition.ComponentDSL.array;
+import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
+import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN;
+
+import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.Parameters;
+import com.theokanning.openai.assistants.Assistant;
+import com.theokanning.openai.assistants.AssistantRequest;
+import com.theokanning.openai.assistants.Tool;
+import com.theokanning.openai.service.OpenAiService;
+import java.util.List;
+
+/**
+ * @author Monika Domiter
+ */
+public class OpenAICreateAssistantAction {
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ASSISTANT)
+        .title("Create assistant")
+        .description("Create an assistant with a model and instructions.")
+        .properties(
+            string(MODEL)
+                .label("Model")
+                .description("ID of the model to use.")
+                .required(true),
+            string(NAME)
+                .label("Name")
+                .description("The name of the assistant.")
+                .maxLength(256)
+                .required(false),
+            string(DESCRIPTION)
+                .label("Description")
+                .description("The description of the assistant.")
+                .maxLength(512)
+                .required(false),
+            string(INSTRUCTIONS)
+                .label("Instructions")
+                .description("The system instructions that the assistant uses.")
+                .maxLength(32768)
+                .required(false),
+            array(TOOLS)
+                .label("Tools")
+                .description("A list of tool enabled on the assistant.")
+                .items(
+                    object().properties(
+                        string(TYPE)
+                            .label("Type")
+                            .description("The type of tool being defined.")
+                            .required(true),
+                        object(FUNCTION)
+                            .label("Function")
+                            .displayCondition("%s === '%s'".formatted(TYPE, "function"))
+                            .properties(
+                                string(DESCRIPTION)
+                                    .label("Description")
+                                    .description("A description of what the function does, " +
+                                        "used by the model to choose when and how to call the function.")
+                                    .required(false),
+                                string(NAME)
+                                    .label("Name")
+                                    .description("")
+                                    .maxLength(64)
+                                    .required(true),
+                                object(PARAMETERS)
+                                    .label("Parameters")
+                                    .description("")
+                                    .required(true))
+                            .required(false))
+
+                )
+                .required(false),
+            array(FILE_IDS)
+                .label("File ids")
+                .description("A list of file IDs attached to this assistant. ")
+                .required(false),
+            object(METADATA)
+                .label("Metadata")
+                .description("")
+                .required(false))
+        .outputSchema(
+            object()
+                .properties(
+                    string("id"),
+                    string("object"),
+                    integer("createdAt"),
+                    string("name"),
+                    string("description"),
+                    string("model"),
+                    string("instructions"),
+                    array("tools")
+                        .items(
+                            object()
+                                .properties(
+                                    string("type"),
+                                    object("function")
+                                        .properties(
+                                            string("description"),
+                                            string("name"),
+                                            object("parameters")))),
+                    array("fileIds")
+                        .items(
+                            string("fileId")),
+                    object("metadata"))
+
+        )
+        .perform(OpenAICreateAssistantAction::perform);
+
+    private OpenAICreateAssistantAction() {
+    }
+
+    public static Assistant perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        OpenAiService openAiService = new OpenAiService((String) connectionParameters.get(TOKEN));
+
+        AssistantRequest assistantRequest = new AssistantRequest();
+
+        assistantRequest.setModel(inputParameters.getRequiredString(MODEL));
+        assistantRequest.setName(inputParameters.getString(NAME));
+        assistantRequest.setDescription(inputParameters.getString(DESCRIPTION));
+        assistantRequest.setInstructions(inputParameters.getString(INSTRUCTIONS));
+        assistantRequest.setTools((List<Tool>) inputParameters.getList(TOOLS));
+        assistantRequest.setFileIds((List<String>) inputParameters.getList(FILE_IDS));
+
+        return openAiService.createAssistant(assistantRequest);
+
+    }
+
+}
