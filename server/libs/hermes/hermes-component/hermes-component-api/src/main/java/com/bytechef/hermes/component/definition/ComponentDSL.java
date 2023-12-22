@@ -497,6 +497,34 @@ public final class ComponentDSL {
         public Optional<String> getTitle() {
             return Optional.ofNullable(title);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            ModifiableActionDefinition that = (ModifiableActionDefinition) o;
+            return componentVersion == that.componentVersion && Objects.equals(batch, that.batch)
+                && Objects.equals(componentName, that.componentName)
+                && Objects.equals(componentDescription, that.componentDescription)
+                && Objects.equals(componentTitle, that.componentTitle) && Objects.equals(deprecated, that.deprecated)
+                && Objects.equals(description, that.description)
+                && Objects.equals(editorDescriptionFunction, that.editorDescriptionFunction)
+                && Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help)
+                && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
+                && Objects.equals(outputSchemaProperty, that.outputSchemaProperty)
+                && Objects.equals(outputSchemaFunction, that.outputSchemaFunction)
+                && Objects.equals(properties, that.properties) && Objects.equals(sampleOutput, that.sampleOutput)
+                && Objects.equals(sampleOutputFunction, that.sampleOutputFunction) && Objects.equals(title, that.title);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
+                deprecated, description, editorDescriptionFunction, performFunction, help, metadata, name,
+                outputSchemaProperty, outputSchemaFunction, properties, sampleOutput, sampleOutputFunction, title);
+        }
     }
 
     public static final class ModifiableArrayProperty
@@ -681,6 +709,26 @@ public final class ComponentDSL {
                 optionsFunction == null
                     ? null
                     : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            if (!super.equals(o))
+                return false;
+            ModifiableArrayProperty that = (ModifiableArrayProperty) o;
+            return Objects.equals(items, that.items) && Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(multipleValues, that.multipleValues) && Objects.equals(options, that.options)
+                && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), items, loadOptionsDependsOn, multipleValues, options,
+                optionsFunction);
         }
     }
 
@@ -902,6 +950,35 @@ public final class ComponentDSL {
         public AuthorizationType getType() {
             return type;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            ModifiableAuthorization that = (ModifiableAuthorization) o;
+            return Objects.equals(acquireFunction, that.acquireFunction)
+                && Objects.equals(applyFunction, that.applyFunction)
+                && Objects.equals(authorizationCallbackFunction, that.authorizationCallbackFunction)
+                && Objects.equals(authorizationUrlFunction, that.authorizationUrlFunction)
+                && Objects.equals(clientIdFunction, that.clientIdFunction)
+                && Objects.equals(clientSecretFunction, that.clientSecretFunction)
+                && Objects.equals(detectOn, that.detectOn) && Objects.equals(description, that.description)
+                && Objects.equals(name, that.name) && Objects.equals(properties, that.properties)
+                && Objects.equals(refreshFunction, that.refreshFunction) && Objects.equals(refreshOn, that.refreshOn)
+                && Objects.equals(refreshUrlFunction, that.refreshUrlFunction)
+                && Objects.equals(scopesFunction, that.scopesFunction)
+                && Objects.equals(pkceFunction, that.pkceFunction) && Objects.equals(title, that.title)
+                && Objects.equals(tokenUrlFunction, that.tokenUrlFunction) && type == that.type;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(acquireFunction, applyFunction, authorizationCallbackFunction, authorizationUrlFunction,
+                clientIdFunction, clientSecretFunction, detectOn, description, name, properties, refreshFunction,
+                refreshOn, refreshUrlFunction, scopesFunction, pkceFunction, title, tokenUrlFunction, type);
+        }
     }
 
     public static final class ModifiableBooleanProperty
@@ -940,6 +1017,23 @@ public final class ComponentDSL {
         @Override
         public Optional<List<Option<?>>> getOptions() {
             return Optional.of(options);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            if (!super.equals(o))
+                return false;
+            ModifiableBooleanProperty that = (ModifiableBooleanProperty) o;
+            return Objects.equals(options, that.options);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), options);
         }
     }
 
@@ -1199,6 +1293,31 @@ public final class ComponentDSL {
         public int getVersion() {
             return version;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            ModifiableComponentDefinition that = (ModifiableComponentDefinition) o;
+            return version == that.version && Objects.equals(actions, that.actions)
+                && Objects.equals(category, that.category) && Objects.equals(connection, that.connection)
+                && Objects.equals(customAction, that.customAction)
+                && Objects.equals(customActionHelp, that.customActionHelp)
+                && Objects.equals(description, that.description) && Objects.equals(icon, that.icon)
+                && Objects.equals(tags, that.tags)
+                && Objects.equals(allowedConnectionDefinitionsFunction, that.allowedConnectionDefinitionsFunction)
+                && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
+                && Objects.equals(resources, that.resources) && Objects.equals(title, that.title)
+                && Objects.equals(triggers, that.triggers);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(actions, category, connection, customAction, customActionHelp, description, icon, tags,
+                allowedConnectionDefinitionsFunction, metadata, name, resources, version, title, triggers);
+        }
     }
 
     public static final class ModifiableConnectionDefinition implements ConnectionDefinition {
@@ -1329,6 +1448,28 @@ public final class ComponentDSL {
         public int getVersion() {
             return version;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            ModifiableConnectionDefinition that = (ModifiableConnectionDefinition) o;
+            return version == that.version && Objects.equals(authorizations, that.authorizations)
+                && Objects.equals(baseUriFunction, that.baseUriFunction)
+                && Objects.equals(componentName, that.componentName)
+                && Objects.equals(componentDescription, that.componentDescription)
+                && Objects.equals(componentTitle, that.componentTitle) && Objects.equals(properties, that.properties)
+                && Objects.equals(testConsumer, that.testConsumer)
+                && Objects.equals(authorizationRequired, that.authorizationRequired);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(authorizations, baseUriFunction, componentName, componentDescription, componentTitle,
+                properties, testConsumer, version, authorizationRequired);
+        }
     }
 
     public static final class ModifiableDynamicPropertiesProperty
@@ -1371,6 +1512,24 @@ public final class ComponentDSL {
             }
 
             return new PropertiesDataSourceImpl(loadPropertiesDependsOn, propertiesFunction);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            if (!super.equals(o))
+                return false;
+            ModifiableDynamicPropertiesProperty that = (ModifiableDynamicPropertiesProperty) o;
+            return Objects.equals(loadPropertiesDependsOn, that.loadPropertiesDependsOn)
+                && Objects.equals(propertiesFunction, that.propertiesFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadPropertiesDependsOn, propertiesFunction);
         }
     }
 
@@ -1477,6 +1636,25 @@ public final class ComponentDSL {
                 optionsFunction == null
                     ? null
                     : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            if (!super.equals(o))
+                return false;
+            ModifiableIntegerProperty that = (ModifiableIntegerProperty) o;
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(maxValue, that.maxValue) && Objects.equals(minValue, that.minValue)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadOptionsDependsOn, maxValue, minValue, options, optionsFunction);
         }
     }
 
@@ -1591,6 +1769,25 @@ public final class ComponentDSL {
         public int getVersion() {
             return version;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            ModifiableJdbcComponentDefinition that = (ModifiableJdbcComponentDefinition) o;
+            return version == that.version && Objects.equals(databaseJdbcName, that.databaseJdbcName)
+                && Objects.equals(icon, that.icon) && Objects.equals(jdbcDriverClassName, that.jdbcDriverClassName)
+                && Objects.equals(description, that.description) && Objects.equals(name, that.name)
+                && Objects.equals(resources, that.resources) && Objects.equals(title, that.title);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(databaseJdbcName, icon, jdbcDriverClassName, description, name, resources, title,
+                version);
+        }
     }
 
     public static final class ModifiableDateProperty
@@ -1665,6 +1862,24 @@ public final class ComponentDSL {
                     ? null
                     : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            if (!super.equals(o))
+                return false;
+            ModifiableDateProperty that = (ModifiableDateProperty) o;
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
+        }
     }
 
     public static final class ModifiableDateTimeProperty
@@ -1738,6 +1953,24 @@ public final class ComponentDSL {
                 optionsFunction == null
                     ? null
                     : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            if (!super.equals(o))
+                return false;
+            ModifiableDateTimeProperty that = (ModifiableDateTimeProperty) o;
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
         }
     }
 
@@ -1903,6 +2136,27 @@ public final class ComponentDSL {
                     ? null
                     : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            if (!super.equals(o))
+                return false;
+            ModifiableNumberProperty that = (ModifiableNumberProperty) o;
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(maxValue, that.maxValue) && Objects.equals(minValue, that.minValue)
+                && Objects.equals(numberPrecision, that.numberPrecision) && Objects.equals(options, that.options)
+                && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadOptionsDependsOn, maxValue, minValue, numberPrecision, options,
+                optionsFunction);
+        }
     }
 
     public static final class ModifiableObjectProperty
@@ -2056,6 +2310,28 @@ public final class ComponentDSL {
         public Optional<List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>>> getProperties() {
             return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            if (!super.equals(o))
+                return false;
+            ModifiableObjectProperty that = (ModifiableObjectProperty) o;
+            return Objects.equals(additionalProperties, that.additionalProperties)
+                && Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(multipleValues, that.multipleValues) && Objects.equals(objectType, that.objectType)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction)
+                && Objects.equals(properties, that.properties);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), additionalProperties, loadOptionsDependsOn, multipleValues,
+                objectType, options, optionsFunction, properties);
+        }
     }
 
     public static final class ModifiableOption<T> implements Option<T> {
@@ -2106,6 +2382,23 @@ public final class ComponentDSL {
         @Override
         public T getValue() {
             return value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            ModifiableOption<?> that = (ModifiableOption<?>) o;
+            return Objects.equals(description, that.description)
+                && Objects.equals(displayCondition, that.displayCondition) && Objects.equals(label, that.label)
+                && Objects.equals(value, that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(description, displayCondition, label, value);
         }
     }
 
@@ -2360,6 +2653,26 @@ public final class ComponentDSL {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            if (!super.equals(o))
+                return false;
+            ModifiableStringProperty that = (ModifiableStringProperty) o;
+            return controlType == that.controlType && Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(maxLength, that.maxLength) && Objects.equals(minLength, that.minLength)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), controlType, loadOptionsDependsOn, maxLength, minLength, options,
+                optionsFunction);
+        }
+
+        @Override
         public ControlType getControlType() {
             if (this.controlType == null) {
                 if ((options == null || options.isEmpty()) && optionsFunction == null) {
@@ -2463,6 +2776,24 @@ public final class ComponentDSL {
                 optionsFunction == null
                     ? null
                     : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            if (!super.equals(o))
+                return false;
+            ModifiableTimeProperty that = (ModifiableTimeProperty) o;
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
         }
     }
 
@@ -2915,6 +3246,22 @@ public final class ComponentDSL {
         public OptionsFunction getOptions() {
             return options;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            OptionsDataSourceImpl that = (OptionsDataSourceImpl) o;
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(options, that.options);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(loadOptionsDependsOn, options);
+        }
     }
 
     private record OutputSchemaDataSourceImpl(OutputSchemaFunction outputSchema) implements OutputSchemaDataSource {
@@ -2922,6 +3269,21 @@ public final class ComponentDSL {
         @Override
         public OutputSchemaFunction getOutputSchema() {
             return outputSchema;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+            OutputSchemaDataSourceImpl that = (OutputSchemaDataSourceImpl) o;
+            return Objects.equals(outputSchema, that.outputSchema);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(outputSchema);
         }
     }
 
