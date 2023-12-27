@@ -83,8 +83,6 @@ public class OpenAICreateTranslationActionTest extends AbstractOpenAIActionTest 
 
             OpenAiService openAiService = openAiServices.getFirst();
 
-            verify(openAiService).createTranslation(
-                createTranslationRequestArgumentCaptor.capture(), fileArgumentCaptor.capture());
             verify(openAiService, times(1)).createTranslation(
                 createTranslationRequestArgumentCaptor.capture(), fileArgumentCaptor.capture());
 

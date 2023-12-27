@@ -80,11 +80,9 @@ public class OpenAICreateTranscriptionActionTest extends AbstractOpenAIActionTes
             assertEquals(1, openAiServices.size());
             assertEquals(mockedTranscriptionResult, transcriptionResult);
 
-            OpenAiService mock = openAiServices.getFirst();
+            OpenAiService openAiService = openAiServices.getFirst();
 
-            verify(mock).createTranscription(
-                createTranscriptionRequestArgumentCaptor.capture(), fileArgumentCaptor.capture());
-            verify(mock, times(1)).createTranscription(
+            verify(openAiService, times(1)).createTranscription(
                 createTranscriptionRequestArgumentCaptor.capture(), fileArgumentCaptor.capture());
 
             CreateTranscriptionRequest createTranscriptionRequest = createTranscriptionRequestArgumentCaptor.getValue();

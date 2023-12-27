@@ -142,7 +142,6 @@ public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
 
             OpenAiService openAiService = openAiServices.getFirst();
 
-            verify(openAiService).streamChatCompletion(chatCompletionRequestArgumentCaptor.capture());
             verify(openAiService, times(1)).streamChatCompletion(chatCompletionRequestArgumentCaptor.capture());
 
             ChatCompletionRequest chatCompletionRequest = chatCompletionRequestArgumentCaptor.getValue();

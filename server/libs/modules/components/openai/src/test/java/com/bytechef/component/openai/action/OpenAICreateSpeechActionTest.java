@@ -77,7 +77,6 @@ public class OpenAICreateSpeechActionTest extends AbstractOpenAIActionTest {
 
             OpenAiService mock = openAiServices.getFirst();
 
-            verify(mock).createSpeech(createSpeechRequestArgumentCaptor.capture());
             verify(mock, times(1)).createSpeech(createSpeechRequestArgumentCaptor.capture());
 
             CreateSpeechRequest createSpeechRequest = createSpeechRequestArgumentCaptor.getValue();

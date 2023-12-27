@@ -81,7 +81,6 @@ public class OpenAICreateAssistantActionTest extends AbstractOpenAIActionTest {
 
             OpenAiService openAiService = openAiServices.getFirst();
 
-            verify(openAiService).createAssistant(assistantRequestArgumentCaptor.capture());
             verify(openAiService, times(1)).createAssistant(assistantRequestArgumentCaptor.capture());
 
             AssistantRequest assistantRequest = assistantRequestArgumentCaptor.getValue();

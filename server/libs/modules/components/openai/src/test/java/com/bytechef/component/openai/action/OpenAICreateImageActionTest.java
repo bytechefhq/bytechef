@@ -82,7 +82,6 @@ public class OpenAICreateImageActionTest extends AbstractOpenAIActionTest {
 
             OpenAiService openAiService = openAiServices.getFirst();
 
-            verify(openAiService).createImage(createImageRequestArgumentCaptor.capture());
             verify(openAiService, times(1)).createImage(createImageRequestArgumentCaptor.capture());
 
             CreateImageRequest createImageRequest = createImageRequestArgumentCaptor.getValue();
