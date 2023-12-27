@@ -36,7 +36,6 @@ import com.bytechef.hermes.component.definition.PropertiesDataSource.PropertiesR
 import com.bytechef.hermes.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author Monika Domiter
@@ -99,22 +98,6 @@ public class OpenAIUtils {
     private static final String DEFAULT_SIZE = "1024x1024";
 
     private OpenAIUtils() {
-    }
-
-    public static List<Option<String>> getLanguageOptions() {
-        List<Option<String>> options = new ArrayList<>();
-
-        String[] isoLanguages = Locale.getISOLanguages();
-
-        for (String language : isoLanguages) {
-            Locale locale = Locale.of(language);
-
-            String displayLanguage = locale.getDisplayLanguage();
-
-            options.add(option(displayLanguage, language));
-        }
-
-        return options;
     }
 
     public static OptionsResponse getSizeOptions(

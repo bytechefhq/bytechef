@@ -38,7 +38,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
 
 /**
  * @author Monika Domiter
@@ -71,7 +70,7 @@ public class OpenAICreateTranslationActionTest extends AbstractOpenAIActionTest 
         try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
             OpenAiService.class,
             (openAiService, context) -> when(openAiService.createTranslation(any(), any(File.class)))
-                    .thenReturn(mockedTranslationResult))) {
+                .thenReturn(mockedTranslationResult))) {
 
             TranslationResult translationResult =
                 OpenAICreateTranslationAction.perform(mockedParameters, mockedParameters, mockedContext);

@@ -27,9 +27,6 @@ import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.OptionsDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 import com.bytechef.hermes.component.definition.PropertiesDataSource;
-import com.bytechef.hermes.definition.Option;
-import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,15 +35,6 @@ import org.junit.jupiter.api.Test;
  * @author Monika Domiter
  */
 public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
-
-    @Test
-    public void testGetLanguageOptions() {
-        String[] isoLanguages = Locale.getISOLanguages();
-
-        List<Option<String>> languageOptions = OpenAIUtils.getLanguageOptions();
-
-        Assertions.assertEquals(isoLanguages.length, languageOptions.size());
-    }
 
     @Test
     public void testGetSizeOptionsForDallE2() {

@@ -120,13 +120,13 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "ID of the model to use.",
@@ -164,8 +164,8 @@
       "minValue": -2.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Modify the likelihood of specified tokens appearing in the completion.",
@@ -185,8 +185,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The maximum number of tokens to generate in the chat completion.",
@@ -204,8 +204,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "How many chat completion choices to generate for each input message.",
@@ -223,8 +223,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
@@ -243,8 +243,8 @@
       "minValue": -2.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "An object specifying the format that the model must output.",
@@ -264,8 +264,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "",
@@ -283,8 +283,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Up to 4 sequences where the API will stop generating further tokens.",
@@ -304,8 +304,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "",
@@ -350,8 +350,8 @@
       "minValue": 0.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -370,8 +370,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "",
@@ -498,19 +498,19 @@
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "",
@@ -530,8 +530,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.",
@@ -554,8 +554,8 @@
     } ],
     "sampleOutput": null,
     "title": "Ask ChatGPT",
-    "outputSchema": null,
     "perform": { },
+    "outputSchema": null,
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
@@ -774,19 +774,19 @@
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "A list of file IDs attached to this assistant. ",
@@ -804,8 +804,8 @@
       "items": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "",
@@ -825,11 +825,12 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Create assistant",
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -903,8 +904,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1107,19 +1108,19 @@
               "objectType": null,
               "options": null,
               "properties": null,
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1156,8 +1157,8 @@
         } ],
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1177,13 +1178,12 @@
         "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     },
-    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
@@ -1390,6 +1390,7 @@
     } ],
     "sampleOutput": null,
     "title": "Create image",
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -1425,8 +1426,8 @@
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -1517,18 +1518,17 @@
             "options": null,
             "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     },
-    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
@@ -1697,11 +1697,12 @@
       "minValue": 0.25,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Create speech",
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -1797,10 +1798,9 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     },
-    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
@@ -1910,8 +1910,8 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "ID of the model to use",
@@ -1956,38 +1956,8 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "label": "Afar",
-        "value": "aa"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Abkhazian",
-        "value": "ab"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Avestan",
-        "value": "ae"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Afrikaans",
         "value": "af"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Akan",
-        "value": "ak"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Amharic",
-        "value": "am"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Aragonese",
-        "value": "an"
       }, {
         "description": null,
         "displayCondition": null,
@@ -1996,18 +1966,8 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Assamese",
-        "value": "as"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Avaric",
-        "value": "av"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Aymara",
-        "value": "ay"
+        "label": "Armenian",
+        "value": "hy"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2016,48 +1976,8 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Bashkir",
-        "value": "ba"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Belarusian",
         "value": "be"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Bulgarian",
-        "value": "bg"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Bihari",
-        "value": "bh"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Bislama",
-        "value": "bi"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Bambara",
-        "value": "bm"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Bangla",
-        "value": "bn"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Tibetan",
-        "value": "bo"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Breton",
-        "value": "br"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2066,28 +1986,23 @@
       }, {
         "description": null,
         "displayCondition": null,
+        "label": "Bulgarian",
+        "value": "bg"
+      }, {
+        "description": null,
+        "displayCondition": null,
         "label": "Catalan",
         "value": "ca"
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Chechen",
-        "value": "ce"
+        "label": "Chinese (Simplified)",
+        "value": "zh"
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Chamorro",
-        "value": "ch"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Corsican",
-        "value": "co"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Cree",
-        "value": "cr"
+        "label": "Croatian",
+        "value": "hr"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2096,43 +2011,13 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Church Slavic",
-        "value": "cu"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Chuvash",
-        "value": "cv"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Welsh",
-        "value": "cy"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Danish",
         "value": "da"
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "German",
-        "value": "de"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Divehi",
-        "value": "dv"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Dzongkha",
-        "value": "dz"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Ewe",
-        "value": "ee"
+        "label": "Dutch",
+        "value": "nl"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2141,38 +2026,13 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "English",
-        "value": "en"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Esperanto",
-        "value": "eo"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Spanish",
-        "value": "es"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Estonian",
         "value": "et"
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Basque",
-        "value": "eu"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Persian",
-        "value": "fa"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Fulah",
-        "value": "ff"
+        "label": "English",
+        "value": "en"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2181,33 +2041,8 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Fijian",
-        "value": "fj"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Faroese",
-        "value": "fo"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "French",
         "value": "fr"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Western Frisian",
-        "value": "fy"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Irish",
-        "value": "ga"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Scottish Gaelic",
-        "value": "gd"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2216,23 +2051,8 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Guarani",
-        "value": "gn"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Gujarati",
-        "value": "gu"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Manx",
-        "value": "gv"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Hausa",
-        "value": "ha"
+        "label": "German",
+        "value": "de"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2246,73 +2066,8 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Hiri Motu",
-        "value": "ho"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Croatian",
-        "value": "hr"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Haitian Creole",
-        "value": "ht"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Hungarian",
         "value": "hu"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Armenian",
-        "value": "hy"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Herero",
-        "value": "hz"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Interlingua",
-        "value": "ia"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Indonesian",
-        "value": "id"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Interlingue",
-        "value": "ie"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Igbo",
-        "value": "ig"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Sichuan Yi",
-        "value": "ii"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Inupiaq",
-        "value": "ik"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Indonesian",
-        "value": "in"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Ido",
-        "value": "io"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2321,18 +2076,13 @@
       }, {
         "description": null,
         "displayCondition": null,
+        "label": "Indonesian",
+        "value": "id"
+      }, {
+        "description": null,
+        "displayCondition": null,
         "label": "Italian",
         "value": "it"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Inuktitut",
-        "value": "iu"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Hebrew",
-        "value": "iw"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2341,48 +2091,8 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Yiddish",
-        "value": "ji"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Javanese",
-        "value": "jv"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Georgian",
-        "value": "ka"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Kongo",
-        "value": "kg"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Kikuyu",
-        "value": "ki"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Kuanyama",
-        "value": "kj"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Kazakh",
         "value": "kk"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Kalaallisut",
-        "value": "kl"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Khmer",
-        "value": "km"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2396,73 +2106,8 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Kanuri",
-        "value": "kr"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Kashmiri",
-        "value": "ks"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Kurdish",
-        "value": "ku"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Komi",
-        "value": "kv"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Cornish",
-        "value": "kw"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Kyrgyz",
-        "value": "ky"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Latin",
-        "value": "la"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Luxembourgish",
-        "value": "lb"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Ganda",
-        "value": "lg"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Limburgish",
-        "value": "li"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Lingala",
-        "value": "ln"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Lao",
-        "value": "lo"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Lithuanian",
         "value": "lt"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Luba-Katanga",
-        "value": "lu"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2471,38 +2116,13 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Malagasy",
-        "value": "mg"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Marshallese",
-        "value": "mh"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Māori",
-        "value": "mi"
+        "label": "Maori",
+        "value": "ma"
       }, {
         "description": null,
         "displayCondition": null,
         "label": "Macedonian",
         "value": "mk"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Malayalam",
-        "value": "ml"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Mongolian",
-        "value": "mn"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Moldavian",
-        "value": "mo"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2516,48 +2136,8 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Maltese",
-        "value": "mt"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Burmese",
-        "value": "my"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Nauru",
-        "value": "na"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Norwegian Bokmål",
-        "value": "nb"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "North Ndebele",
-        "value": "nd"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Nepali",
         "value": "ne"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Ndonga",
-        "value": "ng"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Dutch",
-        "value": "nl"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Norwegian Nynorsk",
-        "value": "nn"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2566,53 +2146,8 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "South Ndebele",
-        "value": "nr"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Navajo",
-        "value": "nv"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Nyanja",
-        "value": "ny"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Occitan",
-        "value": "oc"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Ojibwa",
-        "value": "oj"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Oromo",
-        "value": "om"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Odia",
-        "value": "or"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Ossetic",
-        "value": "os"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Punjabi",
-        "value": "pa"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Pali",
-        "value": "pi"
+        "label": "Persian",
+        "value": "fa"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2621,28 +2156,8 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Pashto",
-        "value": "ps"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Portuguese",
         "value": "pt"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Quechua",
-        "value": "qu"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Romansh",
-        "value": "rm"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Rundi",
-        "value": "rn"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2656,41 +2171,6 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Kinyarwanda",
-        "value": "rw"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Sanskrit",
-        "value": "sa"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Sardinian",
-        "value": "sc"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Sindhi",
-        "value": "sd"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Northern Sami",
-        "value": "se"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Sango",
-        "value": "sg"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Sinhala",
-        "value": "si"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Slovak",
         "value": "sk"
       }, {
@@ -2701,43 +2181,13 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Samoan",
-        "value": "sm"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Shona",
-        "value": "sn"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Somali",
-        "value": "so"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Albanian",
-        "value": "sq"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Serbian",
         "value": "sr"
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Swati",
-        "value": "ss"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Southern Sotho",
-        "value": "st"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Sundanese",
-        "value": "su"
+        "label": "Spanish",
+        "value": "es"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2756,13 +2206,8 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Telugu",
-        "value": "te"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Tajik",
-        "value": "tg"
+        "label": "Tagalog",
+        "value": "tl"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2771,58 +2216,8 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Tigrinya",
-        "value": "ti"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Turkmen",
-        "value": "tk"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Tagalog",
-        "value": "tl"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Tswana",
-        "value": "tn"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Tongan",
-        "value": "to"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Turkish",
         "value": "tr"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Tsonga",
-        "value": "ts"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Tatar",
-        "value": "tt"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Twi",
-        "value": "tw"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Tahitian",
-        "value": "ty"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Uyghur",
-        "value": "ug"
       }, {
         "description": null,
         "displayCondition": null,
@@ -2836,63 +2231,13 @@
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Uzbek",
-        "value": "uz"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Venda",
-        "value": "ve"
-      }, {
-        "description": null,
-        "displayCondition": null,
         "label": "Vietnamese",
         "value": "vi"
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "Volapük",
-        "value": "vo"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Walloon",
-        "value": "wa"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Wolof",
-        "value": "wo"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Xhosa",
-        "value": "xh"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Yiddish",
-        "value": "yi"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Yoruba",
-        "value": "yo"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Zhuang",
-        "value": "za"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Chinese",
-        "value": "zh"
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "Zulu",
-        "value": "zu"
+        "label": "Welsh",
+        "value": "cy"
       } ],
       "optionsDataSource": null
     }, {
@@ -2976,11 +2321,12 @@
       "minValue": 0.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Create transcriptions",
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -3074,8 +2420,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3125,8 +2471,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3144,8 +2490,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3164,8 +2510,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3184,8 +2530,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3236,13 +2582,13 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3261,8 +2607,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3281,8 +2627,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3301,8 +2647,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3321,8 +2667,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3350,18 +2696,17 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     },
-    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
@@ -3471,8 +2816,8 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "ID of the model to use",
@@ -3578,11 +2923,12 @@
       "minValue": 0.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     } ],
     "sampleOutput": null,
     "title": "Create translation",
+    "perform": { },
     "outputSchema": {
       "advancedOption": null,
       "description": null,
@@ -3676,8 +3022,8 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
         "description": null,
@@ -3727,8 +3073,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3746,8 +3092,8 @@
             "maxValue": null,
             "minValue": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "INTEGER"
+            "controlType": "INTEGER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3766,8 +3112,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3786,8 +3132,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3838,13 +3184,13 @@
               "maxValue": null,
               "minValue": null,
               "options": null,
-              "optionsDataSource": null,
-              "controlType": "INTEGER"
+              "controlType": "INTEGER",
+              "optionsDataSource": null
             } ],
             "multipleValues": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "ARRAY_BUILDER"
+            "controlType": "ARRAY_BUILDER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3863,8 +3209,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3883,8 +3229,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3903,8 +3249,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3923,8 +3269,8 @@
             "minValue": null,
             "numberPrecision": null,
             "options": null,
-            "optionsDataSource": null,
-            "controlType": "NUMBER"
+            "controlType": "NUMBER",
+            "optionsDataSource": null
           }, {
             "advancedOption": null,
             "description": null,
@@ -3952,18 +3298,17 @@
             } ],
             "controlType": "CHECKBOX"
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     },
-    "perform": { },
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": null,
     "sampleOutputDataSource": null
@@ -4118,16 +3463,16 @@
                 "options": null,
                 "optionsDataSource": null
               } ],
-              "optionsDataSource": null,
-              "controlType": "OBJECT_BUILDER"
+              "controlType": "OBJECT_BUILDER",
+              "optionsDataSource": null
             } ],
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
           "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "ARRAY_BUILDER"
+          "controlType": "ARRAY_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": "The role of the messages author",
@@ -4187,13 +3532,13 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "ID of the model to use.",
@@ -4231,8 +3576,8 @@
       "minValue": -2.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Modify the likelihood of specified tokens appearing in the completion.",
@@ -4252,8 +3597,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The maximum number of tokens to generate in the chat completion.",
@@ -4271,8 +3616,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "How many chat completion choices to generate for each input message.",
@@ -4290,8 +3635,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
@@ -4310,8 +3655,8 @@
       "minValue": -2.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "An object specifying the format that the model must output.",
@@ -4331,8 +3676,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "",
@@ -4350,8 +3695,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Up to 4 sequences where the API will stop generating further tokens.",
@@ -4371,8 +3716,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "",
@@ -4417,8 +3762,8 @@
       "minValue": 0.0,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "",
@@ -4437,8 +3782,8 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "",
@@ -4565,19 +3910,19 @@
             "objectType": null,
             "options": null,
             "properties": null,
-            "optionsDataSource": null,
-            "controlType": "OBJECT_BUILDER"
+            "controlType": "OBJECT_BUILDER",
+            "optionsDataSource": null
           } ],
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
+      "controlType": "ARRAY_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "",
@@ -4597,8 +3942,8 @@
       "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse.",
@@ -4621,8 +3966,8 @@
     } ],
     "sampleOutput": null,
     "title": "Vision Prompt",
-    "outputSchema": null,
     "perform": { },
+    "outputSchema": null,
     "editorDescriptionDataSource": null,
     "outputSchemaDataSource": {
       "outputSchema": { }
@@ -4659,15 +4004,15 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
+      "apply": null,
+      "clientId": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "apply": null,
-      "clientId": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "authorizationCallback": null
     } ],
     "componentName": "openai",
