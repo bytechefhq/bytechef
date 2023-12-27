@@ -35,6 +35,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableObjectPro
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.hermes.component.definition.Property.OutputProperty;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -65,12 +66,12 @@ public class ContextImpl implements Context {
     @SuppressFBWarnings("EI")
     public ContextImpl(
         String componentName, String operationName, ComponentConnection connection,
-        HttpClientExecutor httpClientExecutor) {
+        HttpClientExecutor httpClientExecutor,  ObjectMapper objectMapper) {
 
         this.http = new HttpImpl(componentName, connection, this, httpClientExecutor);
         this.json = new JsonImpl();
         this.logger = new LoggerImpl(componentName, operationName);
-        this.outputSchema = new OutputSchemaImpl();
+        this.outputSchema = new OutputSchemaImpl(objectMapper);
         this.xml = new XmlImpl();
     }
 
@@ -505,12 +506,20 @@ public class ContextImpl implements Context {
 
     private static class OutputSchemaImpl implements OutputSchema {
 
+        private static final org.slf4j.Logger logger = LoggerFactory.getLogger(OutputSchemaImpl.class);
+
+        private final ObjectMapper objectMapper;
+
+        private OutputSchemaImpl(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
+
         @Override
         public OutputProperty<?> get(Object value) {
             return getOutputSchema(null, value);
         }
 
-        OutputProperty<?> getOutputSchema(String name, Object value) {
+        private OutputProperty<?> getOutputSchema(String name, Object value) {
             OutputProperty<?> outputProperty;
 
             Class<?> valueClass = value.getClass();
@@ -536,8 +545,7 @@ public class ContextImpl implements Context {
             } else if (value instanceof List<?> list) {
                 ModifiableArrayProperty arrayProperty = array(name);
 
-                Set<OutputProperty<?>> itemProperties =
-                    new HashSet<>();
+                Set<OutputProperty<?>> itemProperties = new HashSet<>();
 
                 for (Object item : list) {
                     itemProperties.add(getOutputSchema(null, item));
@@ -549,8 +557,7 @@ public class ContextImpl implements Context {
             } else if (value instanceof Map<?, ?> map) {
                 ModifiableObjectProperty objectProperty = object();
 
-                List<OutputProperty<?>> properties =
-                    new ArrayList<>();
+                List<OutputProperty<?>> properties = new ArrayList<>();
 
                 for (Map.Entry<?, ?> entry : map.entrySet()) {
                     properties.add(getOutputSchema((String) entry.getKey(), entry.getValue()));
@@ -559,7 +566,15 @@ public class ContextImpl implements Context {
                 outputProperty = objectProperty.properties(
                     CollectionUtils.map(properties, property -> (ModifiableValueProperty<?, ?>) property));
             } else {
-                outputProperty = object(name);
+                try {
+                    outputProperty = get(objectMapper.convertValue(value, Map.class));
+                } catch (IllegalArgumentException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(e.getMessage(), e);
+                    }
+
+                    outputProperty = object(name);
+                }
             }
 
             return outputProperty;

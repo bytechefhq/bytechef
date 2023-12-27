@@ -23,6 +23,7 @@ import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
@@ -48,9 +49,9 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         String componentName, int componentVersion, String actionName, Long instanceId, Integer type,
         String workflowId, Long jobId, ComponentConnection connection, DataStorageService dataStorageService,
         ApplicationEventPublisher eventPublisher, FileStorageService fileStorageService,
-        HttpClientExecutor httpClientExecutor) {
+        HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper) {
 
-        super(componentName, actionName, connection, httpClientExecutor);
+        super(componentName, actionName, connection, httpClientExecutor, objectMapper);
 
         this.data = type == null ? new NoOpDataImpl() : new DataImpl(
             componentName, componentVersion, actionName, instanceId, type, workflowId, jobId,

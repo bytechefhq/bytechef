@@ -26,6 +26,7 @@ import com.bytechef.hermes.component.definition.HttpClientExecutor;
 import com.bytechef.hermes.component.definition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerContextImpl;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
@@ -42,16 +43,18 @@ public class ContextFactory {
     private final ApplicationEventPublisher eventPublisher;
     private final FileStorageService fileStorageService;
     private final HttpClientExecutor httpClientExecutor;
+    private final ObjectMapper objectMapper;
 
     @SuppressFBWarnings("EI")
     public ContextFactory(
         DataStorageService dataStorageService, ApplicationEventPublisher eventPublisher,
-        FileStorageService fileStorageService, HttpClientExecutor httpClientExecutor) {
+        FileStorageService fileStorageService, HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper) {
 
         this.dataStorageService = dataStorageService;
         this.eventPublisher = eventPublisher;
         this.fileStorageService = fileStorageService;
         this.httpClientExecutor = httpClientExecutor;
+        this.objectMapper = objectMapper;
     }
 
     public ActionContext createActionContext(
@@ -61,17 +64,16 @@ public class ContextFactory {
 
         return new ActionContextImpl(
             componentName, componentVersion, actionName, instanceId, type, workflowId, jobId,
-            connection, dataStorageService, eventPublisher, fileStorageService, httpClientExecutor);
+            connection, dataStorageService, eventPublisher, fileStorageService, httpClientExecutor, objectMapper);
     }
 
     public Context createContext(@NonNull String componentName, @Nullable ComponentConnection connection) {
-        return new ContextImpl(componentName, null, connection, httpClientExecutor);
+        return new ContextImpl(componentName, null, connection, httpClientExecutor, objectMapper);
     }
 
     public TriggerContext createTriggerContext(
         @NonNull String componentName, @NonNull String triggerName, @Nullable ComponentConnection connection) {
 
-        return new TriggerContextImpl(
-            componentName, triggerName, connection, httpClientExecutor);
+        return new TriggerContextImpl(componentName, triggerName, connection, httpClientExecutor, objectMapper);
     }
 }
