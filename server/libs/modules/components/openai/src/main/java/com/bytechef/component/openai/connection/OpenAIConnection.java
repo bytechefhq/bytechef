@@ -28,6 +28,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectio
  * @author Monika Domiter
  */
 public final class OpenAIConnection {
+
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.openai.com/v1")
         .authorizations(authorization(

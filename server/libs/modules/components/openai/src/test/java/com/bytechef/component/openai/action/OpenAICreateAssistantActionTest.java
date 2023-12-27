@@ -22,16 +22,19 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.INSTRUCTION
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.NAME;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOOLS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.hermes.component.definition.Context.TypeReference;
 import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.assistants.AssistantRequest;
 import com.theokanning.openai.assistants.Tool;
 import com.theokanning.openai.service.OpenAiService;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
@@ -44,55 +47,51 @@ public class OpenAICreateAssistantActionTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testPerform() {
-        Assistant assistant = Mockito.mock(Assistant.class);
-        ArgumentCaptor<AssistantRequest> assistantRequestArgumentCaptor =
-            ArgumentCaptor.forClass(AssistantRequest.class);
+        Assistant mockedAssistant = Mockito.mock(Assistant.class);
+        ArgumentCaptor<AssistantRequest> assistantRequestArgumentCaptor = ArgumentCaptor.forClass(
+            AssistantRequest.class);
+        List<Tool> tools = List.of(new Tool());
+        List<String> strings = List.of("a");
 
-        List<Tool> toolList = List.of(new Tool());
-        List<String> stringList = List.of("a");
-
-        Mockito.when(parameterMap.getRequiredString(MODEL))
+        when(mockedParameters.getRequiredString(MODEL))
             .thenReturn("MODEL");
-        Mockito.when(parameterMap.getString(NAME))
+        when(mockedParameters.getString(NAME))
             .thenReturn("NAME");
-        Mockito.when(parameterMap.getString(DESCRIPTION))
+        when(mockedParameters.getString(DESCRIPTION))
             .thenReturn("DESCRIPTION");
-        Mockito.when(parameterMap.getString(INSTRUCTIONS))
+        when(mockedParameters.getString(INSTRUCTIONS))
             .thenReturn("INSTRUCTIONS");
-        Mockito.when((List<Tool>) parameterMap.getList(TOOLS))
-            .thenReturn(toolList);
-        Mockito.when((List<String>) parameterMap.getList(FILE_IDS))
-            .thenReturn(stringList);
+        when(mockedParameters.getList(eq(TOOLS), any(TypeReference.class)))
+            .thenReturn(tools);
+        when(mockedParameters.getList(eq(FILE_IDS), any(TypeReference.class)))
+            .thenReturn(strings);
 
-        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction =
-            Mockito.mockConstruction(OpenAiService.class,
-                (mock, context) -> when(mock.createAssistant(assistantRequestArgumentCaptor.capture()))
-                    .thenReturn(assistant))) {
+        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = Mockito.mockConstruction(
+            OpenAiService.class,
+            (mock, context) -> when(mock.createAssistant(assistantRequestArgumentCaptor.capture()))
+                .thenReturn(mockedAssistant))) {
 
-            Assistant perform = OpenAICreateAssistantAction.perform(parameterMap, parameterMap, context);
+            Assistant assistant = OpenAICreateAssistantAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
 
-            Assertions.assertEquals(1, openAiServiceMockedConstruction.constructed()
-                .size());
-            Assertions.assertEquals(assistant, perform);
+            List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
 
-            OpenAiService mock = openAiServiceMockedConstruction.constructed()
-                .get(0);
-            verify(mock).createAssistant(assistantRequestArgumentCaptor.capture());
-            verify(mock, times(1)).createAssistant(assistantRequestArgumentCaptor.capture());
+            assertEquals(1, openAiServices.size());
+            assertEquals(mockedAssistant, assistant);
 
-            Assertions.assertEquals("MODEL", assistantRequestArgumentCaptor.getValue()
-                .getModel());
-            Assertions.assertEquals("NAME", assistantRequestArgumentCaptor.getValue()
-                .getName());
-            Assertions.assertEquals("DESCRIPTION", assistantRequestArgumentCaptor.getValue()
-                .getDescription());
-            Assertions.assertEquals("INSTRUCTIONS", assistantRequestArgumentCaptor.getValue()
-                .getInstructions());
-            Assertions.assertEquals(toolList, assistantRequestArgumentCaptor.getValue()
-                .getTools());
-            Assertions.assertEquals(stringList, assistantRequestArgumentCaptor.getValue()
-                .getFileIds());
+            OpenAiService openAiService = openAiServices.getFirst();
+
+            verify(openAiService).createAssistant(assistantRequestArgumentCaptor.capture());
+            verify(openAiService, times(1)).createAssistant(assistantRequestArgumentCaptor.capture());
+
+            AssistantRequest assistantRequest = assistantRequestArgumentCaptor.getValue();
+
+            assertEquals("MODEL", assistantRequest.getModel());
+            assertEquals("NAME", assistantRequest.getName());
+            assertEquals("DESCRIPTION", assistantRequest.getDescription());
+            assertEquals("INSTRUCTIONS", assistantRequest.getInstructions());
+            assertEquals(tools, assistantRequest.getTools());
+            assertEquals(strings, assistantRequest.getFileIds());
         }
     }
-
 }

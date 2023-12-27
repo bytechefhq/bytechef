@@ -36,17 +36,17 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.Context.TypeReference;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.assistants.AssistantRequest;
-import com.theokanning.openai.assistants.Tool;
 import com.theokanning.openai.service.OpenAiService;
-import java.util.List;
 
 /**
  * @author Monika Domiter
  */
 public class OpenAICreateAssistantAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ASSISTANT)
         .title("Create assistant")
         .description("Create an assistant with a model and instructions.")
@@ -85,8 +85,9 @@ public class OpenAICreateAssistantAction {
                             .properties(
                                 string(DESCRIPTION)
                                     .label("Description")
-                                    .description("A description of what the function does, " +
-                                        "used by the model to choose when and how to call the function.")
+                                    .description(
+                                        "A description of what the function does, used by the model to choose when " +
+                                            "and how to call the function.")
                                     .required(false),
                                 string(NAME)
                                     .label("Name")
@@ -151,11 +152,9 @@ public class OpenAICreateAssistantAction {
         assistantRequest.setName(inputParameters.getString(NAME));
         assistantRequest.setDescription(inputParameters.getString(DESCRIPTION));
         assistantRequest.setInstructions(inputParameters.getString(INSTRUCTIONS));
-        assistantRequest.setTools((List<Tool>) inputParameters.getList(TOOLS));
-        assistantRequest.setFileIds((List<String>) inputParameters.getList(FILE_IDS));
+        assistantRequest.setTools(inputParameters.getList(TOOLS, new TypeReference<>() {}));
+        assistantRequest.setFileIds(inputParameters.getList(FILE_IDS, new TypeReference<>() {}));
 
         return openAiService.createAssistant(assistantRequest);
-
     }
-
 }

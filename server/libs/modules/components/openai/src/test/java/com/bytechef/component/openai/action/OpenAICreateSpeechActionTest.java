@@ -21,20 +21,22 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.SPEED;
 import static com.bytechef.component.openai.constant.OpenAIConstants.VOICE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.theokanning.openai.audio.CreateSpeechRequest;
 import com.theokanning.openai.service.OpenAiService;
+import java.util.List;
 import okhttp3.ResponseBody;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
 
 /**
  * @author Monika Domiter
@@ -43,52 +45,48 @@ public class OpenAICreateSpeechActionTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testPerform() {
-        ResponseBody responseBody = Mockito.mock(ResponseBody.class);
-        ActionContext.FileEntry fileEntry = Mockito.mock(ActionContext.FileEntry.class);
-
+        ResponseBody mockedResponseBody = mock(ResponseBody.class);
+        FileEntry mockedFileEntry = mock(FileEntry.class);
         ArgumentCaptor<CreateSpeechRequest> createSpeechRequestArgumentCaptor = ArgumentCaptor.forClass(
             CreateSpeechRequest.class);
 
-        Mockito.when(parameterMap.getRequiredString(MODEL))
+        when(mockedParameters.getRequiredString(MODEL))
             .thenReturn("MODEL");
-        Mockito.when(parameterMap.getRequiredString(INPUT))
+        when(mockedParameters.getRequiredString(INPUT))
             .thenReturn("INPUT");
-        Mockito.when(parameterMap.getRequiredString(VOICE))
+        when(mockedParameters.getRequiredString(VOICE))
             .thenReturn("VOICE");
-        Mockito.when(parameterMap.getString(RESPONSE_FORMAT))
+        when(mockedParameters.getString(RESPONSE_FORMAT))
             .thenReturn("RESPONSE_FORMAT");
-        Mockito.when(parameterMap.getDouble(SPEED))
+        when(mockedParameters.getDouble(SPEED))
             .thenReturn(1.0);
-        Mockito.when(context.file(any()))
-            .thenReturn(fileEntry);
+        when(mockedContext.file(any()))
+            .thenReturn(mockedFileEntry);
 
-        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction =
-            Mockito.mockConstruction(OpenAiService.class,
-                (mock, context) -> when(mock.createSpeech(createSpeechRequestArgumentCaptor.capture()))
-                    .thenReturn(responseBody))) {
+        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
+            OpenAiService.class,
+            (mock, context) -> when(mock.createSpeech(createSpeechRequestArgumentCaptor.capture()))
+                .thenReturn(mockedResponseBody))) {
 
-            ActionContext.FileEntry perform = OpenAICreateSpeechAction.perform(parameterMap, parameterMap, context);
+            FileEntry fileEntry = OpenAICreateSpeechAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-            Assertions.assertEquals(1, openAiServiceMockedConstruction.constructed()
-                .size());
-            Assertions.assertEquals(fileEntry, perform);
+            List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
 
-            OpenAiService mock = openAiServiceMockedConstruction.constructed()
-                .get(0);
+            assertEquals(1, openAiServices.size());
+            assertEquals(mockedFileEntry, fileEntry);
+
+            OpenAiService mock = openAiServices.getFirst();
+
             verify(mock).createSpeech(createSpeechRequestArgumentCaptor.capture());
             verify(mock, times(1)).createSpeech(createSpeechRequestArgumentCaptor.capture());
 
-            Assertions.assertEquals("MODEL", createSpeechRequestArgumentCaptor.getValue()
-                .getModel());
-            Assertions.assertEquals("INPUT", createSpeechRequestArgumentCaptor.getValue()
-                .getInput());
-            Assertions.assertEquals("VOICE", createSpeechRequestArgumentCaptor.getValue()
-                .getVoice());
-            Assertions.assertEquals("RESPONSE_FORMAT", createSpeechRequestArgumentCaptor.getValue()
-                .getResponseFormat());
-            Assertions.assertEquals(1.0, createSpeechRequestArgumentCaptor.getValue()
-                .getSpeed());
+            CreateSpeechRequest createSpeechRequest = createSpeechRequestArgumentCaptor.getValue();
 
+            assertEquals("MODEL", createSpeechRequest.getModel());
+            assertEquals("INPUT", createSpeechRequest.getInput());
+            assertEquals("VOICE", createSpeechRequest.getVoice());
+            assertEquals("RESPONSE_FORMAT", createSpeechRequest.getResponseFormat());
+            assertEquals(1.0, createSpeechRequest.getSpeed());
         }
     }
 }

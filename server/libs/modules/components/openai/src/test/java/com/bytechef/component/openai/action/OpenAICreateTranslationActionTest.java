@@ -21,17 +21,19 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.theokanning.openai.audio.CreateTranslationRequest;
 import com.theokanning.openai.audio.TranslationResult;
 import com.theokanning.openai.service.OpenAiService;
 import java.io.File;
-import org.junit.jupiter.api.Assertions;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
@@ -44,56 +46,54 @@ public class OpenAICreateTranslationActionTest extends AbstractOpenAIActionTest 
 
     @Test
     public void testPerform() {
-        TranslationResult translationResult = Mockito.mock(TranslationResult.class);
-        File file = Mockito.mock(File.class);
-        ActionContext.FileEntry fileEntry = Mockito.mock(ActionContext.FileEntry.class);
+        TranslationResult mockedTranslationResult = mock(TranslationResult.class);
+        File mockedFile = mock(File.class);
+        FileEntry mockedFileEntry = mock(FileEntry.class);
 
-        ArgumentCaptor<CreateTranslationRequest> createTranslationRequestArgumentCaptor =
-            ArgumentCaptor.forClass(CreateTranslationRequest.class);
+        ArgumentCaptor<CreateTranslationRequest> createTranslationRequestArgumentCaptor = ArgumentCaptor.forClass(
+            CreateTranslationRequest.class);
         ArgumentCaptor<File> fileArgumentCaptor = ArgumentCaptor.forClass(File.class);
 
-        Mockito.when(parameterMap.getRequiredString(MODEL))
+        when(mockedParameters.getRequiredString(MODEL))
             .thenReturn("MODEL");
-        Mockito.when(parameterMap.getString(PROMPT))
+        when(mockedParameters.getString(PROMPT))
             .thenReturn("PROMPT");
-        Mockito.when(parameterMap.getString(RESPONSE_FORMAT))
+        when(mockedParameters.getString(RESPONSE_FORMAT))
             .thenReturn("RESPONSE_FORMAT");
-        Mockito.when(parameterMap.getDouble(TEMPERATURE))
+        when(mockedParameters.getDouble(TEMPERATURE))
             .thenReturn(0.0);
-        Mockito.when(parameterMap.getRequiredFileEntry(FILE))
-            .thenReturn(fileEntry);
-        Mockito.when(context.file(any()))
-            .thenReturn(file);
+        when(mockedParameters.getRequiredFileEntry(FILE))
+            .thenReturn(mockedFileEntry);
+        when(mockedContext.file(any()))
+            .thenReturn(mockedFile);
 
-        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction =
-            Mockito.mockConstruction(OpenAiService.class, (mock, context) -> when(
+        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = Mockito.mockConstruction(
+            OpenAiService.class,
+            (mock, context) -> when(
                 mock.createTranslation(createTranslationRequestArgumentCaptor.capture(), fileArgumentCaptor.capture()))
-                    .thenReturn(translationResult))) {
+                    .thenReturn(mockedTranslationResult))) {
 
-            TranslationResult translationResult1 =
-                OpenAICreateTranslationAction.perform(parameterMap, parameterMap, context);
+            TranslationResult translationResult =
+                OpenAICreateTranslationAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-            Assertions.assertEquals(1, openAiServiceMockedConstruction.constructed()
-                .size());
-            Assertions.assertEquals(translationResult, translationResult1);
+            List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
 
-            OpenAiService mock = openAiServiceMockedConstruction.constructed()
-                .get(0);
+            assertEquals(1, openAiServices.size());
+            assertEquals(mockedTranslationResult, translationResult);
 
-            verify(mock).createTranslation(createTranslationRequestArgumentCaptor.capture(),
-                fileArgumentCaptor.capture());
-            verify(mock, times(1)).createTranslation(createTranslationRequestArgumentCaptor.capture(),
-                fileArgumentCaptor.capture());
+            OpenAiService openAiService = openAiServices.getFirst();
 
-            Assertions.assertEquals("MODEL", createTranslationRequestArgumentCaptor.getValue()
-                .getModel());
-            Assertions.assertEquals("PROMPT", createTranslationRequestArgumentCaptor.getValue()
-                .getPrompt());
-            Assertions.assertEquals("RESPONSE_FORMAT", createTranslationRequestArgumentCaptor.getValue()
-                .getResponseFormat());
-            Assertions.assertEquals(0.0, createTranslationRequestArgumentCaptor.getValue()
-                .getTemperature());
+            verify(openAiService).createTranslation(
+                createTranslationRequestArgumentCaptor.capture(), fileArgumentCaptor.capture());
+            verify(openAiService, times(1)).createTranslation(
+                createTranslationRequestArgumentCaptor.capture(), fileArgumentCaptor.capture());
+
+            CreateTranslationRequest createTranslationRequest = createTranslationRequestArgumentCaptor.getValue();
+
+            assertEquals("MODEL", createTranslationRequest.getModel());
+            assertEquals("PROMPT", createTranslationRequest.getPrompt());
+            assertEquals("RESPONSE_FORMAT", createTranslationRequest.getResponseFormat());
+            assertEquals(0.0, createTranslationRequest.getTemperature());
         }
-
     }
 }

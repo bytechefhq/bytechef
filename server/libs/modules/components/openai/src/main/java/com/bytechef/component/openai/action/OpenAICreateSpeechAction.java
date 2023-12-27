@@ -30,6 +30,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN;
 
 import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.theokanning.openai.audio.CreateSpeechRequest;
@@ -40,6 +41,7 @@ import okhttp3.ResponseBody;
  * @author Monika Domiter
  */
 public class OpenAICreateSpeechAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_SPEECH)
         .title("Create speech")
         .description("Generate an audio recording from the input text")
@@ -90,7 +92,7 @@ public class OpenAICreateSpeechAction {
     private OpenAICreateSpeechAction() {
     }
 
-    public static ActionContext.FileEntry perform(
+    public static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String token = (String) connectionParameters.get(TOKEN);
@@ -105,10 +107,9 @@ public class OpenAICreateSpeechAction {
         createSpeechRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
         createSpeechRequest.setSpeed(inputParameters.getDouble(SPEED));
 
-        ResponseBody speech = openAiService.createSpeech(createSpeechRequest);
-
-        return context
-            .file(file -> file.storeContent("file." + inputParameters.getString(RESPONSE_FORMAT), speech.byteStream()));
+        try (ResponseBody speech = openAiService.createSpeech(createSpeechRequest)) {
+            return context.file(file -> file.storeContent(
+                "file." + inputParameters.getString(RESPONSE_FORMAT), speech.byteStream()));
+        }
     }
-
 }

@@ -50,11 +50,11 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testGetSizeOptionsForDallE2() {
-        when(parameterMap.getRequiredString(MODEL))
+        when(mockedParameters.getRequiredString(MODEL))
             .thenReturn(DALL_E_2);
 
         OptionsDataSource.OptionsResponse sizeOptions =
-            OpenAIUtils.getSizeOptions(parameterMap, parameterMap, "", context);
+            OpenAIUtils.getSizeOptions(mockedParameters, mockedParameters, "", mockedContext);
 
         Assertions.assertEquals(3, sizeOptions.options()
             .size());
@@ -80,11 +80,11 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testGetSizeOptionsForDallE3() {
-        when(parameterMap.getRequiredString(MODEL))
+        when(mockedParameters.getRequiredString(MODEL))
             .thenReturn(DALL_E_3);
 
         OptionsDataSource.OptionsResponse sizeOptions =
-            OpenAIUtils.getSizeOptions(parameterMap, parameterMap, "", context);
+            OpenAIUtils.getSizeOptions(mockedParameters, mockedParameters, "", mockedContext);
 
         Assertions.assertEquals(3, sizeOptions.options()
             .size());
@@ -110,11 +110,11 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testGetModelPropertiesForDallE2() {
-        when(parameterMap.getRequiredString(MODEL))
+        when(mockedParameters.getRequiredString(MODEL))
             .thenReturn(DALL_E_2);
 
         PropertiesDataSource.PropertiesResponse modelProperties =
-            OpenAIUtils.getModelProperties(parameterMap, parameterMap, context);
+            OpenAIUtils.getModelProperties(mockedParameters, mockedParameters, mockedContext);
 
         Assertions.assertEquals(1, modelProperties.properties()
             .size());
@@ -137,11 +137,11 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testGetModelPropertiesForDallE3() {
-        when(parameterMap.getRequiredString(MODEL))
+        when(mockedParameters.getRequiredString(MODEL))
             .thenReturn(DALL_E_3);
 
         PropertiesDataSource.PropertiesResponse modelProperties =
-            OpenAIUtils.getModelProperties(parameterMap, parameterMap, context);
+            OpenAIUtils.getModelProperties(mockedParameters, mockedParameters, mockedContext);
 
         Assertions.assertEquals(1, modelProperties.properties()
             .size());
@@ -164,11 +164,11 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testGetNumberOfImagesPropertiesForDallE2() {
-        when(parameterMap.getRequiredString(MODEL))
+        when(mockedParameters.getRequiredString(MODEL))
             .thenReturn("dall-e-2");
 
         PropertiesDataSource.PropertiesResponse numberOfImagesProperties =
-            OpenAIUtils.getNumberOfImagesProperties(parameterMap, parameterMap, context);
+            OpenAIUtils.getNumberOfImagesProperties(mockedParameters, mockedParameters, mockedContext);
 
         Assertions.assertEquals(1, numberOfImagesProperties.properties()
             .size());
@@ -196,16 +196,15 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         Assertions.assertEquals(1, ((ComponentDSL.ModifiableIntegerProperty) numberOfImagesProperties.properties()
             .getFirst()).getMinValue()
             .get());
-
     }
 
     @Test
     public void testGetNumberOfImagesPropertiesForDallE3() {
-        when(parameterMap.getRequiredString(MODEL))
+        when(mockedParameters.getRequiredString(MODEL))
             .thenReturn("dall-e-3");
 
         PropertiesDataSource.PropertiesResponse numberOfImagesProperties =
-            OpenAIUtils.getNumberOfImagesProperties(parameterMap, parameterMap, context);
+            OpenAIUtils.getNumberOfImagesProperties(mockedParameters, mockedParameters, mockedContext);
 
         Assertions.assertEquals(1, numberOfImagesProperties.properties()
             .size());
@@ -233,29 +232,25 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         Assertions.assertEquals(Optional.empty(),
             ((ComponentDSL.ModifiableIntegerProperty) numberOfImagesProperties.properties()
                 .getFirst()).getMinValue());
-
     }
 
     @Test
     public void testGetOutputSchemaFunctionForStream() {
-        when(parameterMap.getBoolean(STREAM)).thenReturn(true);
+        when(mockedParameters.getBoolean(STREAM)).thenReturn(true);
 
         OutputSchemaDataSource.OutputSchemaResponse outputSchemaFunction =
-            OpenAIUtils.getOutputSchemaResponse(parameterMap, parameterMap, context);
+            OpenAIUtils.getOutputSchemaResponse(mockedParameters, mockedParameters, mockedContext);
 
         Assertions.assertEquals(OpenAIUtils.outputSchemaResponseForStream, outputSchemaFunction);
-
     }
 
     @Test
     public void testGetOutputSchemaFunction() {
-        when(parameterMap.getBoolean(STREAM)).thenReturn(false);
+        when(mockedParameters.getBoolean(STREAM)).thenReturn(false);
 
         OutputSchemaDataSource.OutputSchemaResponse outputSchemaFunction =
-            OpenAIUtils.getOutputSchemaResponse(parameterMap, parameterMap, context);
+            OpenAIUtils.getOutputSchemaResponse(mockedParameters, mockedParameters, mockedContext);
 
         Assertions.assertEquals(OpenAIUtils.outputSchemaResponse, outputSchemaFunction);
-
     }
-
 }

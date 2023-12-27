@@ -50,6 +50,7 @@ import com.theokanning.openai.service.OpenAiService;
  * @author Monika Domiter
  */
 public class OpenAICreateImageAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_IMAGE)
         .title("Create image")
         .description("Create an image using text-to-image models")
@@ -106,8 +107,9 @@ public class OpenAICreateImageAction {
                 .required(false),
             string(USER)
                 .label("User")
-                .description("A unique identifier representing your end-user, " +
-                    "which can help OpenAI to monitor and detect abuse.")
+                .description(
+                    "A unique identifier representing your end-user, which can help OpenAI to monitor and detect " +
+                        "abuse.")
                 .required(false))
         .outputSchema(
             object().properties(
@@ -129,6 +131,7 @@ public class OpenAICreateImageAction {
 
     public static ImageResult perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         String token = (String) connectionParameters.get(TOKEN);
 
         OpenAiService openAiService = new OpenAiService(token);
@@ -146,5 +149,4 @@ public class OpenAICreateImageAction {
 
         return openAiService.createImage(createImageRequest);
     }
-
 }

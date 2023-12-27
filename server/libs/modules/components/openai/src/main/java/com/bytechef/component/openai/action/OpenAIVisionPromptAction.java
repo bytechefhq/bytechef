@@ -57,6 +57,7 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
  * @author Monika Domiter
  */
 public class OpenAIVisionPromptAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(VISION_PROMPT)
         .title("Vision Prompt")
         .description("Ask GPT a question about an image")
@@ -99,8 +100,9 @@ public class OpenAIVisionPromptAction {
                             .required(true),
                         string(NAME)
                             .label("Name")
-                            .description("An optional name for the participant. " +
-                                "Provides the model information to differentiate between participants of the same role.")
+                            .description(
+                                "An optional name for the participant. Provides the model information to " +
+                                    "differentiate between participants of the same role.")
                             .required(false)))
                 .required(true),
             string(MODEL)
@@ -109,9 +111,10 @@ public class OpenAIVisionPromptAction {
                 .required(true),
             number(FREQUENCY_PENALTY)
                 .label("Frequency penalty")
-                .description("Number between -2.0 and 2.0. " +
-                    "Positive values penalize new tokens based on their existing frequency in the text so far, " +
-                    "decreasing the model's likelihood to repeat the same line verbatim.")
+                .description(
+                    "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing " +
+                        "frequency in the text so far, decreasing the model's likelihood to repeat the same line " +
+                        "verbatim.")
                 .defaultValue(0)
                 .minValue(-2)
                 .maxValue(2)
@@ -132,9 +135,9 @@ public class OpenAIVisionPromptAction {
                 .required(false),
             number(PRESENCE_PENALTY)
                 .label("Presence penalty")
-                .description("Number between -2.0 and 2.0. " +
-                    "Positive values penalize new tokens based on whether they appear in the text so far," +
-                    " increasing the model's likelihood to talk about new topics.")
+                .description(
+                    "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear " +
+                        "in the text so far, increasing the model's likelihood to talk about new topics.")
                 .defaultValue(0)
                 .minValue(-2)
                 .maxValue(2)
@@ -159,8 +162,9 @@ public class OpenAIVisionPromptAction {
                 .required(false),
             number(TEMPERATURE)
                 .label("Temperature")
-                .description("Controls randomness:  Higher values will make the output more random, " +
-                    "while lower values like will make it more focused and deterministic.")
+                .description(
+                    "Controls randomness:  Higher values will make the output more random, while lower values like " +
+                        "will make it more focused and deterministic.")
                 .defaultValue(1)
                 .minValue(0)
                 .maxValue(2)
@@ -185,13 +189,15 @@ public class OpenAIVisionPromptAction {
                             .properties(
                                 string("description")
                                     .label("Description")
-                                    .description("A description of what the function does, " +
-                                        "used by the model to choose when and how to call the function.")
+                                    .description(
+                                        "A description of what the function does, used by the model to choose when " +
+                                            "and how to call the function.")
                                     .required(false),
                                 string("name")
                                     .label("Name")
-                                    .description("The name of the function to be called. " +
-                                        "Must be a-z, A-Z, 0-9, or contain underscores and dashes")
+                                    .description(
+                                        "The name of the function to be called. " +
+                                            "Must be a-z, A-Z, 0-9, or contain underscores and dashes")
                                     .maxLength(64)
                                     .required(true),
                                 object("parameters")
@@ -212,5 +218,4 @@ public class OpenAIVisionPromptAction {
 
     private OpenAIVisionPromptAction() {
     }
-
 }

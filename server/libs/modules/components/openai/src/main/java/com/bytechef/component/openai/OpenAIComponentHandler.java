@@ -40,8 +40,8 @@ public class OpenAIComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(OPENAI)
         .title("OpenAI")
         .description(
-            "OpenAI is a research organization that aims to develop and " +
-                "direct artificial intelligence (AI) in ways that benefit humanity as a whole.")
+            "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways " +
+                "that benefit humanity as a whole.")
         .icon("path:assets/openai.svg")
         .connection(OpenAIConnection.CONNECTION_DEFINITION)
         .actions(

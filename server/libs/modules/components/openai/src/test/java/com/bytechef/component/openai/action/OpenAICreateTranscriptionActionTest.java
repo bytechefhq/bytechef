@@ -21,21 +21,23 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.theokanning.openai.audio.CreateTranscriptionRequest;
 import com.theokanning.openai.audio.TranscriptionResult;
 import com.theokanning.openai.service.OpenAiService;
 import java.io.File;
-import org.junit.jupiter.api.Assertions;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
 
 /**
  * @author Monika Domiter
@@ -44,55 +46,53 @@ public class OpenAICreateTranscriptionActionTest extends AbstractOpenAIActionTes
 
     @Test
     public void testPerform() {
-        TranscriptionResult transcriptionResult = Mockito.mock(TranscriptionResult.class);
-        File file = Mockito.mock(File.class);
-        ActionContext.FileEntry fileEntry = Mockito.mock(ActionContext.FileEntry.class);
+        TranscriptionResult mockedTranscriptionResult = mock(TranscriptionResult.class);
+        File mockedFile = mock(File.class);
+        FileEntry mockedFileEntry = mock(FileEntry.class);
 
-        ArgumentCaptor<CreateTranscriptionRequest> createTranscriptionRequestArgumentCaptor =
-            ArgumentCaptor.forClass(CreateTranscriptionRequest.class);
+        ArgumentCaptor<CreateTranscriptionRequest> createTranscriptionRequestArgumentCaptor = ArgumentCaptor.forClass(
+            CreateTranscriptionRequest.class);
         ArgumentCaptor<File> fileArgumentCaptor = ArgumentCaptor.forClass(File.class);
 
-        Mockito.when(parameterMap.getRequiredString(MODEL))
+        when(mockedParameters.getRequiredString(MODEL))
             .thenReturn("MODEL");
-        Mockito.when(parameterMap.getString(PROMPT))
+        when(mockedParameters.getString(PROMPT))
             .thenReturn("PROMPT");
-        Mockito.when(parameterMap.getString(RESPONSE_FORMAT))
+        when(mockedParameters.getString(RESPONSE_FORMAT))
             .thenReturn("RESPONSE_FORMAT");
-        Mockito.when(parameterMap.getDouble(TEMPERATURE))
+        when(mockedParameters.getDouble(TEMPERATURE))
             .thenReturn(0.0);
-        Mockito.when(parameterMap.getRequiredFileEntry(FILE))
-            .thenReturn(fileEntry);
-        Mockito.when(context.file(any()))
-            .thenReturn(file);
+        when(mockedParameters.getRequiredFileEntry(FILE))
+            .thenReturn(mockedFileEntry);
+        when(mockedContext.file(any()))
+            .thenReturn(mockedFile);
 
-        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction =
-            Mockito.mockConstruction(OpenAiService.class,
-                (mock, context) -> when(mock.createTranscription(createTranscriptionRequestArgumentCaptor.capture(),
-                    fileArgumentCaptor.capture())).thenReturn(transcriptionResult))) {
+        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
+            OpenAiService.class,
+            (mock, context) -> when(mock.createTranscription(createTranscriptionRequestArgumentCaptor.capture(),
+                fileArgumentCaptor.capture())).thenReturn(mockedTranscriptionResult))) {
 
-            TranscriptionResult perform = OpenAICreateTranscriptionAction.perform(parameterMap, parameterMap, context);
+            TranscriptionResult transcriptionResult = OpenAICreateTranscriptionAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
 
-            Assertions.assertEquals(1, openAiServiceMockedConstruction.constructed()
-                .size());
-            Assertions.assertEquals(transcriptionResult, perform);
+            List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
 
-            OpenAiService mock = openAiServiceMockedConstruction.constructed()
-                .get(0);
+            assertEquals(1, openAiServices.size());
+            assertEquals(mockedTranscriptionResult, transcriptionResult);
 
-            verify(mock).createTranscription(createTranscriptionRequestArgumentCaptor.capture(),
-                fileArgumentCaptor.capture());
-            verify(mock, times(1)).createTranscription(createTranscriptionRequestArgumentCaptor.capture(),
-                fileArgumentCaptor.capture());
+            OpenAiService mock = openAiServices.getFirst();
 
-            Assertions.assertEquals("MODEL", createTranscriptionRequestArgumentCaptor.getValue()
-                .getModel());
-            Assertions.assertEquals("PROMPT", createTranscriptionRequestArgumentCaptor.getValue()
-                .getPrompt());
-            Assertions.assertEquals("RESPONSE_FORMAT", createTranscriptionRequestArgumentCaptor.getValue()
-                .getResponseFormat());
-            Assertions.assertEquals(0.0, createTranscriptionRequestArgumentCaptor.getValue()
-                .getTemperature());
+            verify(mock).createTranscription(
+                createTranscriptionRequestArgumentCaptor.capture(), fileArgumentCaptor.capture());
+            verify(mock, times(1)).createTranscription(
+                createTranscriptionRequestArgumentCaptor.capture(), fileArgumentCaptor.capture());
+
+            CreateTranscriptionRequest createTranscriptionRequest = createTranscriptionRequestArgumentCaptor.getValue();
+
+            assertEquals("MODEL", createTranscriptionRequest.getModel());
+            assertEquals("PROMPT", createTranscriptionRequest.getPrompt());
+            assertEquals("RESPONSE_FORMAT", createTranscriptionRequest.getResponseFormat());
+            assertEquals(0.0, createTranscriptionRequest.getTemperature());
         }
     }
-
 }

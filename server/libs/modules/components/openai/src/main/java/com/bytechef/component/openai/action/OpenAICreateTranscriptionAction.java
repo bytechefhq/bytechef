@@ -48,15 +48,15 @@ import java.io.File;
  * @author Monika Domiter
  */
 public class OpenAICreateTranscriptionAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TRANSCRIPTION)
         .title("Create transcriptions")
         .description("Transcribes audio into the input language.")
         .properties(
             fileEntry(FILE)
                 .label("File")
-                .description("The audio file object to transcribe," +
-                    " in one of these formats: " +
-                    "flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.")
+                .description("The audio file object to transcribe, in one of these formats: flac, mp3, mp4, mpeg, " +
+                    "mpga, m4a, ogg, wav, or webm.")
                 .required(true),
             string(MODEL)
                 .label("Model")
@@ -72,8 +72,9 @@ public class OpenAICreateTranscriptionAction {
                 .required(false),
             string(PROMPT)
                 .label("Prompt")
-                .description("An optional text to guide the model's style or continue a previous audio segment. " +
-                    "The prompt should match the audio language.")
+                .description(
+                    "An optional text to guide the model's style or continue a previous audio segment. The prompt " +
+                        "should match the audio language.")
                 .required(false),
             string(RESPONSE_FORMAT)
                 .label("Response format")
@@ -88,9 +89,9 @@ public class OpenAICreateTranscriptionAction {
                 .required(false),
             number(TEMPERATURE)
                 .label("Temperature")
-                .description("The sampling temperature, between 0 and 1." +
-                    " Higher values like will make the output more random," +
-                    " while lower values will make it more focused and deterministic. ")
+                .description(
+                    "The sampling temperature, between 0 and 1. Higher values like will make the output more random, " +
+                        "while lower values will make it more focused and deterministic. ")
                 .defaultValue(0)
                 .minValue(0)
                 .maxValue(1)
@@ -141,5 +142,4 @@ public class OpenAICreateTranscriptionAction {
         return openAiService.createTranscription(
             createTranscriptionRequest, (File) context.file(file -> file.toTempFile(fileEntry)));
     }
-
 }

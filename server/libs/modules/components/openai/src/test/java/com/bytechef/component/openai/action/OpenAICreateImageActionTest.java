@@ -24,6 +24,9 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.RESPONSE_FO
 import static com.bytechef.component.openai.constant.OpenAIConstants.SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STYLE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,11 +34,10 @@ import static org.mockito.Mockito.when;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.service.OpenAiService;
-import org.junit.jupiter.api.Assertions;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
 
 /**
  * @author Monika Domiter
@@ -44,61 +46,55 @@ public class OpenAICreateImageActionTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testPerform() {
-        ImageResult imageResult = Mockito.mock(ImageResult.class);
-
+        ImageResult mockedImageResult = mock(ImageResult.class);
         ArgumentCaptor<CreateImageRequest> createImageRequestArgumentCaptor = ArgumentCaptor.forClass(
             CreateImageRequest.class);
 
-        Mockito.when(parameterMap.getRequiredString(PROMPT))
+        when(mockedParameters.getRequiredString(PROMPT))
             .thenReturn("PROMPT");
-        Mockito.when(parameterMap.getString(MODEL))
+        when(mockedParameters.getString(MODEL))
             .thenReturn("MODEL");
-        Mockito.when(parameterMap.getInteger(N))
+        when(mockedParameters.getInteger(N))
             .thenReturn(1);
-        Mockito.when(parameterMap.getString(QUALITY))
+        when(mockedParameters.getString(QUALITY))
             .thenReturn("QUALITY");
-        Mockito.when(parameterMap.getString(RESPONSE_FORMAT))
+        when(mockedParameters.getString(RESPONSE_FORMAT))
             .thenReturn("RESPONSE_FORMAT");
-        Mockito.when(parameterMap.getString(SIZE))
+        when(mockedParameters.getString(SIZE))
             .thenReturn("SIZE");
-        Mockito.when(parameterMap.getString(STYLE))
+        when(mockedParameters.getString(STYLE))
             .thenReturn("STYLE");
-        Mockito.when(parameterMap.getString(USER))
+        when(mockedParameters.getString(USER))
             .thenReturn("USER");
 
-        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction =
-            Mockito.mockConstruction(OpenAiService.class,
-                (mock, context) -> when(mock.createImage(createImageRequestArgumentCaptor.capture()))
-                    .thenReturn(imageResult))) {
+        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
+            OpenAiService.class,
+            (mock, context) -> when(mock.createImage(createImageRequestArgumentCaptor.capture()))
+                .thenReturn(mockedImageResult))) {
 
-            ImageResult perform = OpenAICreateImageAction.perform(parameterMap, parameterMap, context);
+            ImageResult imageResult = OpenAICreateImageAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
 
-            Assertions.assertEquals(1, openAiServiceMockedConstruction.constructed()
-                .size());
-            Assertions.assertEquals(imageResult, perform);
+            List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
 
-            OpenAiService mock = openAiServiceMockedConstruction.constructed()
-                .get(0);
-            verify(mock).createImage(createImageRequestArgumentCaptor.capture());
-            verify(mock, times(1)).createImage(createImageRequestArgumentCaptor.capture());
+            assertEquals(1, openAiServices.size());
+            assertEquals(mockedImageResult, imageResult);
 
-            Assertions.assertEquals("PROMPT", createImageRequestArgumentCaptor.getValue()
-                .getPrompt());
-            Assertions.assertEquals("MODEL", createImageRequestArgumentCaptor.getValue()
-                .getModel());
-            Assertions.assertEquals(1, createImageRequestArgumentCaptor.getValue()
-                .getN());
-            Assertions.assertEquals("QUALITY", createImageRequestArgumentCaptor.getValue()
-                .getQuality());
-            Assertions.assertEquals("RESPONSE_FORMAT", createImageRequestArgumentCaptor.getValue()
-                .getResponseFormat());
-            Assertions.assertEquals("SIZE", createImageRequestArgumentCaptor.getValue()
-                .getSize());
-            Assertions.assertEquals("STYLE", createImageRequestArgumentCaptor.getValue()
-                .getStyle());
-            Assertions.assertEquals("USER", createImageRequestArgumentCaptor.getValue()
-                .getUser());
+            OpenAiService openAiService = openAiServices.getFirst();
+
+            verify(openAiService).createImage(createImageRequestArgumentCaptor.capture());
+            verify(openAiService, times(1)).createImage(createImageRequestArgumentCaptor.capture());
+
+            CreateImageRequest createImageRequest = createImageRequestArgumentCaptor.getValue();
+
+            assertEquals("PROMPT", createImageRequest.getPrompt());
+            assertEquals("MODEL", createImageRequest.getModel());
+            assertEquals(1, createImageRequest.getN());
+            assertEquals("QUALITY", createImageRequest.getQuality());
+            assertEquals("RESPONSE_FORMAT", createImageRequest.getResponseFormat());
+            assertEquals("SIZE", createImageRequest.getSize());
+            assertEquals("STYLE", createImageRequest.getStyle());
+            assertEquals("USER", createImageRequest.getUser());
         }
-
     }
 }

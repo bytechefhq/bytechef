@@ -30,9 +30,9 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.OptionsDataSource.OptionsResponse;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.PropertiesDataSource;
+import com.bytechef.hermes.component.definition.PropertiesDataSource.PropertiesResponse;
 import com.bytechef.hermes.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,63 @@ import java.util.Locale;
  */
 public class OpenAIUtils {
 
+    public static final OutputSchemaResponse outputSchemaResponseForStream =
+        new OutputSchemaResponse(
+            array()
+                .items(
+                    string("id"),
+                    string("object"),
+                    integer("created"),
+                    string("model"),
+                    array("choices")
+                        .items(
+                            object()
+                                .properties(
+                                    integer("index"),
+                                    object("message")
+                                        .properties(
+                                            string("role"),
+                                            string("content"),
+                                            string("name"),
+                                            object("functionCall")
+                                                .properties(
+                                                    string("name"),
+                                                    object("arguments"))),
+                                    string("finishReason")))));
+
+    public static final OutputSchemaResponse outputSchemaResponse =
+        new OutputSchemaResponse(
+            object()
+                .properties(
+                    string("id"),
+                    string("object"),
+                    integer("created"),
+                    string("model"),
+                    array("choices")
+                        .items(
+                            object()
+                                .properties(
+                                    integer("index"),
+                                    object("message")
+                                        .properties(
+                                            string("role"),
+                                            string("content"),
+                                            string("name"),
+                                            object("functionCall")
+                                                .properties(
+                                                    string("name"),
+                                                    object("arguments"))),
+                                    string("finishReason"))),
+                    object("usage")
+                        .properties(
+                            integer("promptTokens"),
+                            integer("completionTokens"),
+                            integer("totalTokens"))));
+
     private static final String DEFAULT_SIZE = "1024x1024";
+
+    private OpenAIUtils() {
+    }
 
     public static List<Option<String>> getLanguageOptions() {
         List<Option<String>> options = new ArrayList<>();
@@ -80,7 +136,7 @@ public class OpenAIUtils {
         return new OptionsResponse(options);
     }
 
-    public static PropertiesDataSource.PropertiesResponse getModelProperties(
+    public static PropertiesResponse getModelProperties(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         String model = inputParameters.getRequiredString(MODEL);
 
@@ -95,11 +151,10 @@ public class OpenAIUtils {
             string.maxLength(4000);
         }
 
-        return new PropertiesDataSource.PropertiesResponse(List.of(string));
-
+        return new PropertiesResponse(List.of(string));
     }
 
-    public static PropertiesDataSource.PropertiesResponse getNumberOfImagesProperties(
+    public static PropertiesResponse getNumberOfImagesProperties(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String model = inputParameters.getRequiredString(MODEL);
@@ -117,12 +172,12 @@ public class OpenAIUtils {
             n.maxValue(10);
         }
 
-        return new PropertiesDataSource.PropertiesResponse(List.of(n));
-
+        return new PropertiesResponse(List.of(n));
     }
 
-    public static OutputSchemaDataSource.OutputSchemaResponse getOutputSchemaResponse(
+    public static OutputSchemaResponse getOutputSchemaResponse(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         boolean stream = inputParameters.getBoolean(STREAM);
 
         if (stream) {
@@ -130,63 +185,5 @@ public class OpenAIUtils {
         } else {
             return outputSchemaResponse;
         }
-
     }
-
-    private OpenAIUtils() {
-    }
-
-    public static final OutputSchemaDataSource.OutputSchemaResponse outputSchemaResponseForStream =
-        new OutputSchemaDataSource.OutputSchemaResponse(
-            array()
-                .items(
-                    string("id"),
-                    string("object"),
-                    integer("created"),
-                    string("model"),
-                    array("choices")
-                        .items(
-                            object()
-                                .properties(
-                                    integer("index"),
-                                    object("message")
-                                        .properties(
-                                            string("role"),
-                                            string("content"),
-                                            string("name"),
-                                            object("functionCall")
-                                                .properties(
-                                                    string("name"),
-                                                    object("arguments"))),
-                                    string("finishReason")))));
-
-    public static final OutputSchemaDataSource.OutputSchemaResponse outputSchemaResponse =
-        new OutputSchemaDataSource.OutputSchemaResponse(
-            object()
-                .properties(
-                    string("id"),
-                    string("object"),
-                    integer("created"),
-                    string("model"),
-                    array("choices")
-                        .items(
-                            object()
-                                .properties(
-                                    integer("index"),
-                                    object("message")
-                                        .properties(
-                                            string("role"),
-                                            string("content"),
-                                            string("name"),
-                                            object("functionCall")
-                                                .properties(
-                                                    string("name"),
-                                                    object("arguments"))),
-                                    string("finishReason"))),
-                    object("usage")
-                        .properties(
-                            integer("promptTokens"),
-                            integer("completionTokens"),
-                            integer("totalTokens"))));
-
 }

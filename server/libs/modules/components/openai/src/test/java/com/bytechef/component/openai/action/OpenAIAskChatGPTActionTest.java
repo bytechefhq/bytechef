@@ -28,10 +28,14 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.STREAM;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOP_P;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.hermes.component.definition.Context.TypeReference;
 import com.theokanning.openai.completion.chat.ChatCompletionChunk;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
@@ -42,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -54,65 +57,67 @@ import org.mockito.Mockito;
  */
 public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
 
-    ArgumentCaptor<ChatCompletionRequest> chatCompletionRequestArgumentCaptor =
+    private final ArgumentCaptor<ChatCompletionRequest> chatCompletionRequestArgumentCaptor =
         ArgumentCaptor.forClass(ChatCompletionRequest.class);
-    List<ChatMessage> chatMessageList = List.of(new ChatMessage());
-    Map<String, Integer> map = new HashMap<>();
-    List<String> stringList = List.of("a");
+    private final List<ChatMessage> chatMessages = List.of(new ChatMessage());
+    private final Map<String, Integer> map = new HashMap<>();
+    private final List<String> strings = List.of("a");
 
     @BeforeEach
     public void before() {
-        Mockito.when((List<ChatMessage>) parameterMap.getList(MESSAGES))
-            .thenReturn(chatMessageList);
-        Mockito.when(parameterMap.getRequiredString(MODEL))
+        when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
+            .thenReturn(chatMessages);
+        when(mockedParameters.getRequiredString(MODEL))
             .thenReturn("MODEL");
-        Mockito.when(parameterMap.getDouble(FREQUENCY_PENALTY))
+        when(mockedParameters.getDouble(FREQUENCY_PENALTY))
             .thenReturn(0.0);
-        Mockito.when((Map<String, Integer>) parameterMap.getMap(LOGIT_BIAS))
+        when(mockedParameters.getMap(eq(LOGIT_BIAS), any(TypeReference.class)))
             .thenReturn(map);
-        Mockito.when(parameterMap.getInteger(MAX_TOKENS))
+        when(mockedParameters.getInteger(MAX_TOKENS))
             .thenReturn(1);
-        Mockito.when(parameterMap.getInteger(N))
+        when(mockedParameters.getInteger(N))
             .thenReturn(1);
-        Mockito.when(parameterMap.getDouble(PRESENCE_PENALTY))
+        when(mockedParameters.getDouble(PRESENCE_PENALTY))
             .thenReturn(0.0);
-        Mockito.when((List<String>) parameterMap.getList(STOP))
-            .thenReturn(stringList);
-        Mockito.when(parameterMap.getDouble(TEMPERATURE))
+        when(mockedParameters.getList(eq(STOP), any(TypeReference.class)))
+            .thenReturn(strings);
+        when(mockedParameters.getDouble(TEMPERATURE))
             .thenReturn(1.0);
-        Mockito.when(parameterMap.getDouble(TOP_P))
+        when(mockedParameters.getDouble(TOP_P))
             .thenReturn(1.0);
-        Mockito.when(parameterMap.getString(USER))
+        when(mockedParameters.getString(USER))
             .thenReturn("USER");
     }
 
     @Test
     public void testPerformIsNotStream() {
-        ChatCompletionResult chatCompletionResult = Mockito.mock(ChatCompletionResult.class);
+        ChatCompletionResult mockedChatCompletionResult = Mockito.mock(ChatCompletionResult.class);
 
-        Mockito.when(parameterMap.getBoolean(STREAM))
+        when(mockedParameters.getBoolean(STREAM))
             .thenReturn(false);
 
         try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction =
-            Mockito.mockConstruction(OpenAiService.class,
-                (mock, context) -> when(mock.createChatCompletion(chatCompletionRequestArgumentCaptor.capture()))
-                    .thenReturn(chatCompletionResult))) {
+            Mockito.mockConstruction(
+                OpenAiService.class,
+                (mock, context) -> when(
+                    mock.createChatCompletion(chatCompletionRequestArgumentCaptor.capture()))
+                        .thenReturn(mockedChatCompletionResult))) {
 
-            Object perform = OpenAIAskChatGPTAction.perform(parameterMap, parameterMap, context);
+            Object result = OpenAIAskChatGPTAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-            Assertions.assertEquals(1, openAiServiceMockedConstruction.constructed()
-                .size());
-            Assertions.assertEquals(chatCompletionResult, perform);
+            List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
 
-            OpenAiService mock = openAiServiceMockedConstruction.constructed()
-                .get(0);
+            assertEquals(1, openAiServices.size());
+            assertEquals(mockedChatCompletionResult, result);
 
-            verify(mock).createChatCompletion(chatCompletionRequestArgumentCaptor.capture());
-            verify(mock, times(1)).createChatCompletion(chatCompletionRequestArgumentCaptor.capture());
+            OpenAiService openAiService = openAiServices.getFirst();
 
-            Assertions.assertEquals(false, chatCompletionRequestArgumentCaptor.getValue()
-                .getStream());
+            verify(openAiService).createChatCompletion(chatCompletionRequestArgumentCaptor.capture());
+            verify(openAiService, times(1)).createChatCompletion(chatCompletionRequestArgumentCaptor.capture());
 
+            ChatCompletionRequest chatCompletionRequest = chatCompletionRequestArgumentCaptor.getValue();
+
+            assertEquals(false, chatCompletionRequest.getStream());
         }
     }
 
@@ -120,54 +125,46 @@ public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
     public void testPerformIsStream() {
         Flowable<ChatCompletionChunk> chatCompletionChunkFlowable = Mockito.mock(Flowable.class);
 
-        Mockito.when(parameterMap.getBoolean(STREAM))
+        when(mockedParameters.getBoolean(STREAM))
             .thenReturn(true);
 
-        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction =
-            Mockito.mockConstruction(OpenAiService.class,
-                (mock, context) -> when(mock.streamChatCompletion(chatCompletionRequestArgumentCaptor.capture()))
-                    .thenReturn(chatCompletionChunkFlowable))) {
+        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = Mockito.mockConstruction(
+            OpenAiService.class,
+            (mock, context) -> when(mock.streamChatCompletion(chatCompletionRequestArgumentCaptor.capture()))
+                .thenReturn(chatCompletionChunkFlowable))) {
 
-            Object perform = OpenAIAskChatGPTAction.perform(parameterMap, parameterMap, context);
+            Object result = OpenAIAskChatGPTAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-            Assertions.assertEquals(1, openAiServiceMockedConstruction.constructed()
-                .size());
-            Assertions.assertEquals(chatCompletionChunkFlowable.toList(), perform);
+            List<OpenAiService> openAiServices = openAiServiceMockedConstruction.constructed();
 
-            OpenAiService mock = openAiServiceMockedConstruction.constructed()
-                .get(0);
+            assertEquals(1, openAiServices.size());
+            assertEquals(chatCompletionChunkFlowable.toList(), result);
 
-            verify(mock).streamChatCompletion(chatCompletionRequestArgumentCaptor.capture());
-            verify(mock, times(1)).streamChatCompletion(chatCompletionRequestArgumentCaptor.capture());
+            OpenAiService openAiService = openAiServices.getFirst();
 
-            Assertions.assertEquals(true, chatCompletionRequestArgumentCaptor.getValue()
-                .getStream());
+            verify(openAiService).streamChatCompletion(chatCompletionRequestArgumentCaptor.capture());
+            verify(openAiService, times(1)).streamChatCompletion(chatCompletionRequestArgumentCaptor.capture());
+
+            ChatCompletionRequest chatCompletionRequest = chatCompletionRequestArgumentCaptor.getValue();
+
+            assertEquals(true, chatCompletionRequest.getStream());
         }
     }
 
     @AfterEach
     public void afterEach() {
-        Assertions.assertEquals(chatMessageList, chatCompletionRequestArgumentCaptor.getValue()
-            .getMessages());
-        Assertions.assertEquals("MODEL", chatCompletionRequestArgumentCaptor.getValue()
-            .getModel());
-        Assertions.assertEquals(0.0, chatCompletionRequestArgumentCaptor.getValue()
-            .getFrequencyPenalty());
-        Assertions.assertEquals(map, chatCompletionRequestArgumentCaptor.getValue()
-            .getLogitBias());
-        Assertions.assertEquals(1, chatCompletionRequestArgumentCaptor.getValue()
-            .getMaxTokens());
-        Assertions.assertEquals(1, chatCompletionRequestArgumentCaptor.getValue()
-            .getN());
-        Assertions.assertEquals(0.0, chatCompletionRequestArgumentCaptor.getValue()
-            .getPresencePenalty());
-        Assertions.assertEquals(stringList, chatCompletionRequestArgumentCaptor.getValue()
-            .getStop());
-        Assertions.assertEquals(1.0, chatCompletionRequestArgumentCaptor.getValue()
-            .getTemperature());
-        Assertions.assertEquals(1.0, chatCompletionRequestArgumentCaptor.getValue()
-            .getTopP());
-        Assertions.assertEquals("USER", chatCompletionRequestArgumentCaptor.getValue()
-            .getUser());
+        ChatCompletionRequest chatCompletionRequest = chatCompletionRequestArgumentCaptor.getValue();
+
+        assertEquals(chatMessages, chatCompletionRequest.getMessages());
+        assertEquals("MODEL", chatCompletionRequest.getModel());
+        assertEquals(0.0, chatCompletionRequest.getFrequencyPenalty());
+        assertEquals(map, chatCompletionRequest.getLogitBias());
+        assertEquals(1, chatCompletionRequest.getMaxTokens());
+        assertEquals(1, chatCompletionRequest.getN());
+        assertEquals(0.0, chatCompletionRequest.getPresencePenalty());
+        assertEquals(strings, chatCompletionRequest.getStop());
+        assertEquals(1.0, chatCompletionRequest.getTemperature());
+        assertEquals(1.0, chatCompletionRequest.getTopP());
+        assertEquals("USER", chatCompletionRequest.getUser());
     }
 }

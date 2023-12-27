@@ -35,6 +35,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN;
 
 import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.theokanning.openai.audio.CreateTranslationRequest;
@@ -46,15 +47,16 @@ import java.io.File;
  * @author Monika Domiter
  */
 public class OpenAICreateTranslationAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TRANSLATION)
         .title("Create translation")
         .description("Translates audio into English.")
         .properties(
             fileEntry(FILE)
                 .label("File")
-                .description("The audio file object translate, " +
-                    "in one of these formats: " +
-                    "flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.")
+                .description(
+                    "The audio file object translate, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, " +
+                        "wav, or webm.")
                 .required(true),
             string(MODEL)
                 .label("Model")
@@ -64,8 +66,9 @@ public class OpenAICreateTranslationAction {
                 .required(true),
             string(PROMPT)
                 .label("Prompt")
-                .description("An optional text to guide the model's style or continue a previous audio segment." +
-                    "The prompt should be in English.")
+                .description(
+                    "An optional text to guide the model's style or continue a previous audio segment. The prompt " +
+                        "should be in English.")
                 .required(false),
             string(RESPONSE_FORMAT)
                 .label("Response format")
@@ -80,9 +83,9 @@ public class OpenAICreateTranslationAction {
                 .required(false),
             number(TEMPERATURE)
                 .label("Temperature")
-                .description("The sampling temperature, between 0 and 1." +
-                    " Higher values like will make the output more random," +
-                    " while lower values will make it more focused and deterministic.")
+                .description(
+                    "The sampling temperature, between 0 and 1. Higher values like will make the output more random, " +
+                        "while lower values will make it more focused and deterministic.")
                 .defaultValue(0)
                 .minValue(0)
                 .maxValue(1)
@@ -127,7 +130,7 @@ public class OpenAICreateTranslationAction {
         createTranslationRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
         createTranslationRequest.setTemperature(inputParameters.getDouble(TEMPERATURE));
 
-        ActionContext.FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
+        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
 
         return openAiService.createTranslation(
             createTranslationRequest, (File) context.file(file1 -> file1.toTempFile(fileEntry)));

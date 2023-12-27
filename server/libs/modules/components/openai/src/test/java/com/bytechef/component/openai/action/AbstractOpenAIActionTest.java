@@ -17,28 +17,27 @@
 package com.bytechef.component.openai.action;
 
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.Parameters;
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mockito;
 
 /**
  * @author Monika Domiter
  */
 public abstract class AbstractOpenAIActionTest {
-    protected Parameters parameterMap;
 
-    protected ActionContext context;
+    protected Parameters mockedParameters;
+    protected ActionContext mockedContext;
 
     @BeforeEach
     public void beforeEach() {
-        parameterMap = Mockito.mock(Parameters.class);
-        context = Mockito.mock(ActionContext.class);
+        mockedParameters = mock(Parameters.class);
+        mockedContext = mock(ActionContext.class);
 
-        Mockito.when(parameterMap.get(TOKEN))
+        when(mockedParameters.get(TOKEN))
             .thenReturn("");
-
     }
-
 }
