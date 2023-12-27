@@ -52,11 +52,11 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
     ./npm run format
     ./npm run check
     ```
-   and/or inside the `server` directory if you worked on the server codebase: 
+   and/or inside the `server` directory if you worked on the server codebase:
     ```bash
     ./gradlew spotlessApply
     ./gradlew check
-    ``` 
+    ```
 6. Once you are confident in your code changes, create a pull request in your fork to the `develop` branch in the bytechefhq/bytechef base repository.
 7. If you've changed any APIs, please call this out in the pull request and ensure backward compatibility.
 8. Link the issue of the base repository in your Pull request description. [Guide](https://docs.github.com/en/free-pro-team@latest/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue)
