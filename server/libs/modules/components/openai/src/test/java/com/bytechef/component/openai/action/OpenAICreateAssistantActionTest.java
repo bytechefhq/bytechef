@@ -25,6 +25,7 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.TOOLS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,9 +67,9 @@ public class OpenAICreateAssistantActionTest extends AbstractOpenAIActionTest {
         when(mockedParameters.getList(eq(FILE_IDS), any(TypeReference.class)))
             .thenReturn(strings);
 
-        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = Mockito.mockConstruction(
+        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
             OpenAiService.class,
-            (mock, context) -> when(mock.createAssistant(assistantRequestArgumentCaptor.capture()))
+            (openAiService, context) -> when(openAiService.createAssistant(any()))
                 .thenReturn(mockedAssistant))) {
 
             Assistant assistant = OpenAICreateAssistantAction.perform(

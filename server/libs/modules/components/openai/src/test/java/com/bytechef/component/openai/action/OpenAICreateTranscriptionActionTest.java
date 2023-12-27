@@ -69,8 +69,8 @@ public class OpenAICreateTranscriptionActionTest extends AbstractOpenAIActionTes
 
         try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
             OpenAiService.class,
-            (mock, context) -> when(mock.createTranscription(createTranscriptionRequestArgumentCaptor.capture(),
-                fileArgumentCaptor.capture())).thenReturn(mockedTranscriptionResult))) {
+            (openAiService, context) -> when(openAiService.createTranscription(any(), any(File.class)))
+                .thenReturn(mockedTranscriptionResult))) {
 
             TranscriptionResult transcriptionResult = OpenAICreateTranscriptionAction.perform(
                 mockedParameters, mockedParameters, mockedContext);

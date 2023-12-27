@@ -65,7 +65,7 @@ public class OpenAICreateSpeechActionTest extends AbstractOpenAIActionTest {
 
         try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
             OpenAiService.class,
-            (mock, context) -> when(mock.createSpeech(createSpeechRequestArgumentCaptor.capture()))
+            (openAiService, context) -> when(openAiService.createSpeech(any()))
                 .thenReturn(mockedResponseBody))) {
 
             FileEntry fileEntry = OpenAICreateSpeechAction.perform(mockedParameters, mockedParameters, mockedContext);

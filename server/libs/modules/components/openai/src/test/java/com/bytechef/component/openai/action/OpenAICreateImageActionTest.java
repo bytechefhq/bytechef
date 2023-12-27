@@ -25,6 +25,7 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STYLE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.times;
@@ -69,7 +70,7 @@ public class OpenAICreateImageActionTest extends AbstractOpenAIActionTest {
 
         try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
             OpenAiService.class,
-            (mock, context) -> when(mock.createImage(createImageRequestArgumentCaptor.capture()))
+            (openAiService, context) -> when(openAiService.createImage(any()))
                 .thenReturn(mockedImageResult))) {
 
             ImageResult imageResult = OpenAICreateImageAction.perform(

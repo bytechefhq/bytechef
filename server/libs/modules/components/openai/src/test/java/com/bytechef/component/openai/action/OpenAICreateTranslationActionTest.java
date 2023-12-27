@@ -24,6 +24,7 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,10 +68,9 @@ public class OpenAICreateTranslationActionTest extends AbstractOpenAIActionTest 
         when(mockedContext.file(any()))
             .thenReturn(mockedFile);
 
-        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = Mockito.mockConstruction(
+        try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
             OpenAiService.class,
-            (mock, context) -> when(
-                mock.createTranslation(createTranslationRequestArgumentCaptor.capture(), fileArgumentCaptor.capture()))
+            (openAiService, context) -> when(openAiService.createTranslation(any(), any(File.class)))
                     .thenReturn(mockedTranslationResult))) {
 
             TranslationResult translationResult =
