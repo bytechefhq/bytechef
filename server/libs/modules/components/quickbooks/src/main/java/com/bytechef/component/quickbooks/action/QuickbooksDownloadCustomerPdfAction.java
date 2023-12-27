@@ -17,23 +17,24 @@
 package com.bytechef.component.quickbooks.action;
 
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CUSTOMER_ID;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DOWNLOADCUSTOMERPDF;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DOWNLOAD_CUSTOMER_PDF;
 import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OptionsDataSource;
+import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.hermes.component.definition.OptionsDataSource.OptionsResponse;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.intuit.ipp.data.Customer;
 import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.services.DataService;
+import com.intuit.ipp.services.QueryResult;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -41,15 +42,14 @@ import java.io.InputStream;
  */
 public final class QuickbooksDownloadCustomerPdfAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DOWNLOADCUSTOMERPDF)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DOWNLOAD_CUSTOMER_PDF)
         .title("Download customer pdf")
         .description("Downloads the pdf file of a customer.")
         .properties(
             string(CUSTOMER_ID)
                 .label("Customer")
                 .description("The id of a customer to download the pdf for.")
-                .options(
-                    (OptionsDataSource.ActionOptionsFunction) QuickbooksDownloadCustomerPdfAction::getAllCustomers))
+                .options((ActionOptionsFunction) QuickbooksDownloadCustomerPdfAction::getAllCustomerOptions))
         .outputSchema(fileEntry())
         .perform(QuickbooksDownloadCustomerPdfAction::perform);
 
@@ -57,29 +57,32 @@ public final class QuickbooksDownloadCustomerPdfAction {
     }
 
     public static FileEntry perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws FMSException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
+        throws FMSException, IOException {
 
-        DataService service = QuickbooksUtils.getDataService(connectionParameters.getRequiredString(ACCESS_TOKEN));
+        DataService service = QuickbooksUtils.getDataService(connectionParameters);
 
         Customer customer = new Customer();
 
         customer.setId(inputParameters.getRequiredString(CUSTOMER_ID));
 
-        InputStream inputStream = service.downloadPDF(customer);
-
-        return actionContext.file(file -> file.storeContent(
-            "QuickbooksCustomer " + customer.getId(), inputStream));
+        try (InputStream inputStream = service.downloadPDF(customer)) {
+            return actionContext.file(file -> file.storeContent("QuickbooksCustomer " + customer.getId(), inputStream));
+        }
     }
 
-    private static OptionsResponse getAllCustomers(
+    private static OptionsResponse getAllCustomerOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws FMSException {
-        return new OptionsResponse(QuickbooksUtils
-            .getDataService(connectionParameters.getRequiredString(ACCESS_TOKEN))
-            .executeQuery("select * from Customer")
-            .getEntities()
-            .stream()
-            .map(entity -> option(((Customer) entity).getDisplayName(), ((Customer) entity).getId()))
-            .toList());
+
+        DataService dataService = QuickbooksUtils.getDataService(connectionParameters);
+
+        QueryResult queryResult = dataService.executeQuery("select * from Customer");
+
+        return new OptionsResponse(
+            queryResult.getEntities()
+                .stream()
+                .map(entity -> option(((Customer) entity).getDisplayName(), ((Customer) entity).getId()))
+                .toList());
     }
 }

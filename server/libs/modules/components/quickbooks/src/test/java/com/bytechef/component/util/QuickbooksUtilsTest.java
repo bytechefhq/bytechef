@@ -16,42 +16,44 @@
 
 package com.bytechef.component.util;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
+import com.bytechef.hermes.component.definition.Parameters;
 import com.intuit.ipp.core.Context;
+import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.security.OAuth2Authorizer;
 import com.intuit.ipp.services.DataService;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
 
 public class QuickbooksUtilsTest {
 
     @Test
-    public void getDataServiceTest() {
-        try (MockedConstruction<OAuth2Authorizer> oAuth2AuthorizerMockedConstruction =
-            Mockito.mockConstruction(OAuth2Authorizer.class)) {
-            try (MockedConstruction<Context> intuitContextMockedConstruction =
-                Mockito.mockConstruction(Context.class)) {
-                try (MockedConstruction<DataService> dataServiceMockedConstruction =
-                    Mockito.mockConstruction(DataService.class)) {
+    public void getDataServiceTest() throws FMSException {
+        try (MockedConstruction<OAuth2Authorizer> oAuth2AuthorizerMockedConstruction = mockConstruction(
+            OAuth2Authorizer.class)) {
 
-                    QuickbooksUtils.getDataService("");
+            try (MockedConstruction<Context> contextMockedConstruction = mockConstruction(Context.class)) {
+                try (MockedConstruction<DataService> dataServiceMockedConstruction = mockConstruction(
+                    DataService.class)) {
 
-                    List<OAuth2Authorizer> oAuth2AuthorizerList = oAuth2AuthorizerMockedConstruction.constructed();
-                    List<Context> intuitContextList = intuitContextMockedConstruction.constructed();
-                    List<DataService> dataServiceList = dataServiceMockedConstruction.constructed();
+                    QuickbooksUtils.getDataService(mock(Parameters.class));
 
-                    Assertions.assertEquals(
-                        1, oAuth2AuthorizerList.size(),
-                        "One instance of com.intuit.ipp.security.OAuth2Authorizer is enough!");
-                    Assertions.assertEquals(
-                        1, intuitContextList.size(),
-                        "One instance of com.intuit.ipp.core.Context is enough!");
-                    Assertions.assertEquals(
-                        1, dataServiceList.size(),
-                        "One instance of com.intuit.ipp.services.DataService is enough!");
+                    List<OAuth2Authorizer> oAuth2Authorizers = oAuth2AuthorizerMockedConstruction.constructed();
+
+                    Assertions.assertEquals(1, oAuth2Authorizers.size());
+
+                    List<Context> contexts = contextMockedConstruction.constructed();
+
+                    Assertions.assertEquals(1, contexts.size());
+
+                    List<DataService> dataServices = dataServiceMockedConstruction.constructed();
+
+                    Assertions.assertEquals(1, dataServices.size());
                 }
             }
         }

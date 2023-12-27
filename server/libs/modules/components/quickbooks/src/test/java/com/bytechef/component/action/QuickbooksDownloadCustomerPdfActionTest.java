@@ -17,14 +17,15 @@
 package com.bytechef.component.action;
 
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CUSTOMER_ID;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.component.quickbooks.action.QuickbooksDownloadCustomerPdfAction;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.intuit.ipp.data.Customer;
 import com.intuit.ipp.exception.FMSException;
+import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -34,22 +35,23 @@ import org.mockito.Mockito;
  */
 public class QuickbooksDownloadCustomerPdfActionTest extends AbstractQuickbooksActionTest {
 
+    private static final String ID = "ID";
+
     @Test
-    public void testPerform() throws FMSException {
+    public void testPerform() throws FMSException, IOException {
         Mockito
-            .when(parameters.getRequiredString(CUSTOMER_ID))
-            .thenReturn(ID_STUB);
+            .when(mockedParameters.getRequiredString(CUSTOMER_ID))
+            .thenReturn(ID);
 
-        QuickbooksDownloadCustomerPdfAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
+        QuickbooksDownloadCustomerPdfAction.perform(mockedParameters, mockedParameters, mock(ActionContext.class));
 
-        then(dataService)
-            .should(times(1))
+        verify(mockedDataService, times(1))
             .downloadPDF(entityArgumentCaptor.capture());
 
-        verifyNoMoreInteractions(dataService);
+        Customer customer = (Customer) entityArgumentCaptor.getValue();
 
-        Assertions.assertEquals(ID_STUB, ((Customer) entityArgumentCaptor.getValue()).getId());
-        Assertions.assertInstanceOf(Customer.class, entityArgumentCaptor.getValue());
+        Assertions.assertInstanceOf(Customer.class, customer);
+        Assertions.assertEquals(ID, customer.getId());
 
     }
 }

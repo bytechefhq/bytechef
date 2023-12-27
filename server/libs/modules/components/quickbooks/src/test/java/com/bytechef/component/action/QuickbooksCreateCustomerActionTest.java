@@ -16,17 +16,23 @@
 
 package com.bytechef.component.action;
 
-import static org.mockito.BDDMockito.then;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.FAMILY_NAME;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.GIVEN_NAME;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.MIDDLE_NAME;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SUFFIX;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TITLE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.quickbooks.action.QuickbooksCreateCustomerAction;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.intuit.ipp.data.Customer;
 import com.intuit.ipp.exception.FMSException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
@@ -35,15 +41,31 @@ public class QuickbooksCreateCustomerActionTest extends AbstractQuickbooksAction
 
     @Test
     public void testPerform() throws FMSException {
-        QuickbooksCreateCustomerAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
+        when(mockedParameters.getRequiredString(DISPLAY_NAME))
+            .thenReturn("DISPLAY_NAME");
+        when(mockedParameters.getRequiredString(FAMILY_NAME))
+            .thenReturn("FAMILY_NAME");
+        when(mockedParameters.getRequiredString(GIVEN_NAME))
+            .thenReturn("GIVEN_NAME");
+        when(mockedParameters.getRequiredString(MIDDLE_NAME))
+            .thenReturn("MIDDLE_NAME");
+        when(mockedParameters.getRequiredString(SUFFIX))
+            .thenReturn("SUFFIX");
+        when(mockedParameters.getRequiredString(TITLE))
+            .thenReturn("TITLE");
 
-        then(dataService)
-            .should(times(1))
+        QuickbooksCreateCustomerAction.perform(mockedParameters, mockedParameters, mock(ActionContext.class));
+
+        verify(mockedDataService, times(1))
             .add(entityArgumentCaptor.capture());
 
-        verifyNoMoreInteractions(dataService);
+        Customer customer = (Customer) entityArgumentCaptor.getValue();
 
-        Assertions.assertInstanceOf(Customer.class, entityArgumentCaptor.getValue(),
-            "Created entity must be of type Customer!");
+        assertEquals("DISPLAY_NAME", customer.getDisplayName());
+        assertEquals("FAMILY_NAME", customer.getFamilyName());
+        assertEquals("GIVEN_NAME", customer.getGivenName());
+        assertEquals("MIDDLE_NAME", customer.getMiddleName());
+        assertEquals("SUFFIX", customer.getSuffix());
+        assertEquals("TITLE", customer.getTitle());
     }
 }

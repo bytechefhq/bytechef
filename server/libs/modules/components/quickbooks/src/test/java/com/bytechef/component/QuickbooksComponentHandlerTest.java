@@ -27,7 +27,6 @@ class QuickbooksComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/quickbooks_v1.json", new QuickbooksComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/quickbooks_v1.json", new QuickbooksComponentHandler().getDefinition());
     }
 }

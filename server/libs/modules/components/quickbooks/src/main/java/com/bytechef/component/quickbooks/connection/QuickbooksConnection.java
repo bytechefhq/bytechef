@@ -24,12 +24,18 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
 
 import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.intuit.ipp.util.Config;
 import java.util.List;
 
 /**
  * @author Mario Cvjetojevic
  */
 public class QuickbooksConnection {
+
+    static {
+        Config.setProperty(Config.BASE_URL_QBO, "https://sandbox-quickbooks.api.intuit.com/v3/company");
+    }
+
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(authorization(
             AuthorizationType.OAUTH2_AUTHORIZATION_CODE.toLowerCase(), AuthorizationType.OAUTH2_AUTHORIZATION_CODE)

@@ -17,6 +17,9 @@
 package com.bytechef.component.action;
 
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
 import com.bytechef.hermes.component.definition.Parameters;
@@ -32,31 +35,31 @@ import org.mockito.Mockito;
  * @author Mario Cvjetojevic
  */
 public abstract class AbstractQuickbooksActionTest {
-    protected static final String ID_STUB = "idStub";
-    protected MockedStatic<QuickbooksUtils> quickbooksUtils;
-    protected DataService dataService;
-    protected Parameters parameters;
+
+    protected DataService mockedDataService;
     protected ArgumentCaptor<IEntity> entityArgumentCaptor;
+    protected Parameters mockedParameters;
+
+    private MockedStatic<QuickbooksUtils> mockedQuickbooksUtils;
 
     @BeforeEach
     public void beforeEach() {
+        mockedDataService = mock(DataService.class);
         entityArgumentCaptor = ArgumentCaptor.forClass(IEntity.class);
-
-        quickbooksUtils = Mockito.mockStatic(QuickbooksUtils.class);
-        dataService = Mockito.mock(DataService.class);
-        parameters = Mockito.mock(Parameters.class);
+        mockedParameters = mock(Parameters.class);
+        mockedQuickbooksUtils = mockStatic(QuickbooksUtils.class);
 
         Mockito
-            .when(parameters.getRequiredString(ACCESS_TOKEN))
+            .when(mockedParameters.getRequiredString(ACCESS_TOKEN))
             .thenReturn("");
 
-        quickbooksUtils
-            .when(() -> QuickbooksUtils.getDataService(""))
-            .thenReturn(dataService);
+        mockedQuickbooksUtils
+            .when(() -> QuickbooksUtils.getDataService(any()))
+            .thenReturn(mockedDataService);
     }
 
     @AfterEach
     public void afterEach() {
-        quickbooksUtils.close();
+        mockedQuickbooksUtils.close();
     }
 }

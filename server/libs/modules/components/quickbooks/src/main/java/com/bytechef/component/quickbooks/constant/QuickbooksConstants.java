@@ -21,30 +21,24 @@ package com.bytechef.component.quickbooks.constant;
  */
 public final class QuickbooksConstants {
 
-    public static final String QUICKBOOKS = "quickbooks";
-
-    // action input property names
-
+    public static final String ASSET_ACCOUNT_ID = "assetAccountId";
+    public static final String CREATE_CUSTOMER = "createCustomer";
+    public static final String CREATE_ITEM = "createItem";
+    public static final String CUSTOMER_ID = "customerId";
     public static final String DISPLAY_NAME = "displayName";
-    public static final String SUFFIX = "suffix";
-    public static final String TITLE = "title";
-    public static final String MIDDLE_NAME = "middleName";
+    public static final String DOWNLOAD_CUSTOMER_PDF = "downloadCustomerPdf";
+    public static final String EXPENSE_ACCOUNT_ID = "expenseAccountId";
     public static final String FAMILY_NAME = "familyName";
     public static final String GIVEN_NAME = "givenName";
+    public static final String MIDDLE_NAME = "middleName";
+    public static final String INCOME_ACCOUNT_ID = "incomeAccountId";
+    public static final String INVENTORY_START_DATE = "inventoryStartDate";
     public static final String ITEM_NAME = "itemName";
     public static final String QUANTITY_ON_HAND = "quantityOnHand";
-    public static final String INCOME_ACCOUNT_ID = "incomeAccountId";
-    public static final String ASSET_ACCOUNT_ID = "assetAccountId";
-    public static final String EXPENSE_ACCOUNT_ID = "expenseAccountId";
-    public static final String CUSTOMER_ID = "customerId";
+    public static final String QUICKBOOKS = "quickbooks";
+    public static final String SUFFIX = "suffix";
+    public static final String TITLE = "title";
     public static final String TYPE = "type";
-    public static final String INVENTORY_START_DATE = "inventoryStartDate";
-
-    // actions
-
-    public static final String CREATECUSTOMER = "createCustomer";
-    public static final String CREATEITEM = "createItem";
-    public static final String DOWNLOADCUSTOMERPDF = "downloadCustomerPdf";
 
     private QuickbooksConstants() {
     }

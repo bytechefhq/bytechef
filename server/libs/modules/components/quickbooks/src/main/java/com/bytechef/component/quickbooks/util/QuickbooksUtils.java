@@ -16,30 +16,24 @@
 
 package com.bytechef.component.quickbooks.util;
 
+import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+
+import com.bytechef.hermes.component.definition.Parameters;
 import com.intuit.ipp.core.Context;
 import com.intuit.ipp.core.ServiceType;
 import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.security.OAuth2Authorizer;
 import com.intuit.ipp.services.DataService;
-import com.intuit.ipp.util.Config;
 
 /**
  * @author Mario Cvjetojevic
  */
 public class QuickbooksUtils {
 
-    public static DataService getDataService(String accessToken) {
-        Config.setProperty(Config.BASE_URL_QBO, "https://sandbox-quickbooks.api.intuit.com/v3/company");
-
-        OAuth2Authorizer oauth = new OAuth2Authorizer(accessToken);
-
-        Context context = null;
-        try {
-            context = new Context(oauth, ServiceType.QBO, "4620816365371134710");
-        } catch (FMSException e) {
-            throw new RuntimeException(e);
-        }
-
-        return new DataService(context);
+    public static DataService getDataService(Parameters connectionParameters) throws FMSException {
+        return new DataService(
+            new Context(
+                new OAuth2Authorizer(connectionParameters.getRequiredString(ACCESS_TOKEN)),
+                ServiceType.QBO, "4620816365371134710"));
     }
 }

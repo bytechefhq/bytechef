@@ -16,18 +16,28 @@
 
 package com.bytechef.component.action;
 
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ASSET_ACCOUNT_ID;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.EXPENSE_ACCOUNT_ID;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INCOME_ACCOUNT_ID;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INVENTORY_START_DATE;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ITEM_NAME;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QUANTITY_ON_HAND;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
-import static org.mockito.BDDMockito.then;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.quickbooks.action.QuickbooksCreateItemAction;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.intuit.ipp.data.Item;
+import com.intuit.ipp.data.ItemTypeEnum;
+import com.intuit.ipp.data.ReferenceType;
 import com.intuit.ipp.exception.FMSException;
-import org.junit.jupiter.api.Assertions;
+import java.math.BigDecimal;
+import java.util.Date;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 /**
  * @author Mario Cvjetojevic
@@ -36,19 +46,47 @@ public class QuickbooksCreateItemActionTest extends AbstractQuickbooksActionTest
 
     @Test
     public void testPerform() throws FMSException {
-        Mockito
-            .when(parameters.getRequiredString(TYPE))
+        when(mockedParameters.getRequiredString(ASSET_ACCOUNT_ID))
+            .thenReturn("ASSET_ACCOUNT_ID");
+        when(mockedParameters.getRequiredString(EXPENSE_ACCOUNT_ID))
+            .thenReturn("EXPENSE_ACCOUNT_ID");
+        when(mockedParameters.getRequiredString(INCOME_ACCOUNT_ID))
+            .thenReturn("INCOME_ACCOUNT_ID");
+
+        Date invenoryStartDate = new Date();
+
+        when(mockedParameters.getDate(INVENTORY_START_DATE))
+            .thenReturn(invenoryStartDate);
+        when(mockedParameters.getRequiredString(ITEM_NAME))
+            .thenReturn("ITEM_NAME");
+        when(mockedParameters.getRequiredInteger(QUANTITY_ON_HAND))
+            .thenReturn(11);
+        when(mockedParameters.getRequiredString(TYPE))
             .thenReturn("inventory");
 
-        QuickbooksCreateItemAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));
+        QuickbooksCreateItemAction.perform(mockedParameters, mockedParameters, mock(ActionContext.class));
 
-        then(dataService)
-            .should(times(1))
+        verify(mockedDataService, times(1))
             .add(entityArgumentCaptor.capture());
 
-        verifyNoMoreInteractions(dataService);
+        Item item = (Item) entityArgumentCaptor.getValue();
 
-        Assertions.assertInstanceOf(Item.class, entityArgumentCaptor.getValue(),
-            "Created entity must be of type Item!");
+        ReferenceType referenceType = item.getAssetAccountRef();
+
+        assertEquals("ASSET_ACCOUNT_ID", referenceType.getValue());
+
+        referenceType = item.getExpenseAccountRef();
+
+        assertEquals("EXPENSE_ACCOUNT_ID", referenceType.getValue());
+
+        referenceType = item.getIncomeAccountRef();
+
+        assertEquals("INCOME_ACCOUNT_ID", referenceType.getValue());
+
+        assertEquals(invenoryStartDate, item.getInvStartDate());
+        assertEquals("ITEM_NAME", item.getName());
+        assertEquals(new BigDecimal(11), item.getQtyOnHand());
+        assertEquals(true, item.isTrackQtyOnHand());
+        assertEquals(ItemTypeEnum.INVENTORY, item.getType());
     }
 }

@@ -17,7 +17,7 @@
 package com.bytechef.component.quickbooks.action;
 
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ASSET_ACCOUNT_ID;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATEITEM;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_ITEM;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.EXPENSE_ACCOUNT_ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INCOME_ACCOUNT_ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INVENTORY_START_DATE;
@@ -30,13 +30,12 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OptionsDataSource;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableOption;
+import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.hermes.component.definition.OptionsDataSource.OptionsResponse;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.intuit.ipp.data.Account;
@@ -46,6 +45,7 @@ import com.intuit.ipp.data.ItemTypeEnum;
 import com.intuit.ipp.data.ReferenceType;
 import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.services.DataService;
+import com.intuit.ipp.services.QueryResult;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -53,9 +53,8 @@ import java.util.List;
  * @author Mario Cvjetojevic
  */
 public final class QuickbooksCreateItemAction {
-    private static List<Account> allAccountsList;
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATEITEM)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ITEM)
         .title("Create item")
         .description("Creates a new item.")
         .properties(
@@ -67,12 +66,12 @@ public final class QuickbooksCreateItemAction {
             string(QUANTITY_ON_HAND)
                 .label("Quantity on hand")
                 .description(
-                    "Current quantity of the Inventory items available for sale. Not used for Service or" +
-                        " NonInventory type items.Required for Inventory type items."),
+                    "Current quantity of the Inventory items available for sale. Not used for Service or " +
+                        "NonInventory type items.Required for Inventory type items."),
             string(INCOME_ACCOUNT_ID)
                 .label("Income account ID")
                 .description("Income account id.")
-                .options((OptionsDataSource.ActionOptionsFunction) QuickbooksCreateItemAction::getIncomeAccountIdList),
+                .options((ActionOptionsFunction) QuickbooksCreateItemAction::getIncomeAccountIdOptions),
             string(TYPE)
                 .label("Type")
                 .description("Type of item.")
@@ -83,16 +82,16 @@ public final class QuickbooksCreateItemAction {
             string(ASSET_ACCOUNT_ID)
                 .label("Asset account ID")
                 .description("Asset account id.")
-                .options((OptionsDataSource.ActionOptionsFunction) QuickbooksCreateItemAction::getAssetAccountIdList),
+                .options((ActionOptionsFunction) QuickbooksCreateItemAction::getAssetAccountIdOptions),
             date(INVENTORY_START_DATE)
                 .label("Inventory start date")
                 .description(
-                    "Date of opening balance for the inventory transaction. Required when creating an" +
-                        " Item.Type=Inventory. Required for Inventory item types."),
+                    "Date of opening balance for the inventory transaction. Required when creating an " +
+                        "Item.Type=Inventory. Required for Inventory item types."),
             string(EXPENSE_ACCOUNT_ID)
                 .label("Expense account ID")
                 .description("Expense account id")
-                .options((OptionsDataSource.ActionOptionsFunction) QuickbooksCreateItemAction::getExpenseAccountIdList))
+                .options((ActionOptionsFunction) QuickbooksCreateItemAction::getExpenseAccountIdOptions))
         .outputSchema(
             object()
                 .properties(
@@ -113,104 +112,90 @@ public final class QuickbooksCreateItemAction {
     public static Item perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws FMSException {
 
-        DataService service = QuickbooksUtils.getDataService(connectionParameters.getRequiredString(ACCESS_TOKEN));
+        DataService dataService = QuickbooksUtils.getDataService(connectionParameters);
 
-        Item createdItem;
+        Item item = new Item();
 
-        Item toBeCreatedItem = new Item();
-        ReferenceType tempReference;
+        ReferenceType referenceType = new ReferenceType();
 
-        toBeCreatedItem.setName(inputParameters.getRequiredString(ITEM_NAME));
-        toBeCreatedItem.setQtyOnHand(new BigDecimal(inputParameters.getRequiredInteger(QUANTITY_ON_HAND)));
+        referenceType.setValue(inputParameters.getRequiredString(ASSET_ACCOUNT_ID));
 
-        tempReference = new ReferenceType();
-        tempReference.setValue(inputParameters.getRequiredString(INCOME_ACCOUNT_ID));
-        toBeCreatedItem.setIncomeAccountRef(tempReference);
+        item.setAssetAccountRef(referenceType);
 
-        ItemTypeEnum type = switch (inputParameters.getRequiredString(TYPE)) {
-            case "inventory" -> ItemTypeEnum.INVENTORY;
-            case "service" -> ItemTypeEnum.SERVICE;
-            case "nonInventory" -> ItemTypeEnum.NON_INVENTORY;
-            default -> throw new IllegalArgumentException(
-                "Invalid Quickbooks item type input: " + inputParameters.getRequiredString(TYPE));
-        };
-        toBeCreatedItem.setType(type);
+        referenceType = new ReferenceType();
 
-        tempReference = new ReferenceType();
-        tempReference.setValue(inputParameters.getRequiredString(ASSET_ACCOUNT_ID));
-        toBeCreatedItem.setAssetAccountRef(tempReference);
+        referenceType.setValue(inputParameters.getRequiredString(EXPENSE_ACCOUNT_ID));
 
-        toBeCreatedItem.setInvStartDate(inputParameters.getDate(INVENTORY_START_DATE));
+        item.setExpenseAccountRef(referenceType);
 
-        tempReference = new ReferenceType();
-        tempReference.setValue(inputParameters.getRequiredString(EXPENSE_ACCOUNT_ID));
-        toBeCreatedItem.setExpenseAccountRef(tempReference);
+        referenceType = new ReferenceType();
 
-        toBeCreatedItem.setTrackQtyOnHand(true);
+        referenceType.setValue(inputParameters.getRequiredString(INCOME_ACCOUNT_ID));
 
-        createdItem = service.add(toBeCreatedItem);
+        item.setIncomeAccountRef(referenceType);
 
-        return createdItem;
+        item.setInvStartDate(inputParameters.getDate(INVENTORY_START_DATE));
+        item.setName(inputParameters.getRequiredString(ITEM_NAME));
+        item.setQtyOnHand(new BigDecimal(inputParameters.getRequiredInteger(QUANTITY_ON_HAND)));
+        item.setTrackQtyOnHand(true);
+
+        item.setType(
+            switch (inputParameters.getRequiredString(TYPE)) {
+                case "inventory" -> ItemTypeEnum.INVENTORY;
+                case "service" -> ItemTypeEnum.SERVICE;
+                case "nonInventory" -> ItemTypeEnum.NON_INVENTORY;
+                default -> throw new IllegalArgumentException(
+                    "Invalid Quickbooks item type input: " + inputParameters.getRequiredString(TYPE));
+            });
+
+        return dataService.add(item);
     }
 
-    private static OptionsResponse getIncomeAccountIdList(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws FMSException {
-
-        List<ComponentDSL.ModifiableOption<String>> options =
-            getAllAccounts(connectionParameters).stream()
-                .filter(account -> account.getAccountType()
-                    .equals(AccountTypeEnum.INCOME))
-                .map(account -> option(account.getName(), account.getId()))
-                .toList();
-
-        return new OptionsResponse(options);
-    }
-
-    private static OptionsResponse getAssetAccountIdList(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws FMSException {
-
-        List<ComponentDSL.ModifiableOption<String>> options =
-            lazyGetAllAccounts(connectionParameters).stream()
-                .filter(account -> account.getAccountType()
-                    .equals(AccountTypeEnum.OTHER_CURRENT_ASSET))
-                .map(account -> option(account.getName(), account.getId()))
-                .toList();
-
-        return new OptionsResponse(options);
-    }
-
-    private static OptionsResponse getExpenseAccountIdList(
-        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
-        throws FMSException {
-
-        List<ComponentDSL.ModifiableOption<String>> options =
-            lazyGetAllAccounts(connectionParameters).stream()
-                .filter(account -> account.getAccountType()
-                    .equals(AccountTypeEnum.COST_OF_GOODS_SOLD))
-                .map(account -> option(account.getName(), account.getId()))
-                .toList();
-
-        return new OptionsResponse(options);
-    }
-
+    @SuppressWarnings("unchecked")
     private static List<Account> getAllAccounts(Parameters connectionParameters) throws FMSException {
-        fetchAllAccounts(connectionParameters);
-        return allAccountsList;
+        DataService dataService = QuickbooksUtils.getDataService(connectionParameters);
+
+        QueryResult queryResult = dataService.executeQuery("select * from Account");
+
+        return (List<Account>) queryResult.getEntities();
     }
 
-    private static List<Account> lazyGetAllAccounts(Parameters connectionParameters) throws FMSException {
-        if (allAccountsList == null) {
-            fetchAllAccounts(connectionParameters);
-        }
-        return allAccountsList;
+    private static OptionsResponse getAssetAccountIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        throws FMSException {
+
+        List<ModifiableOption<String>> options = getAllAccounts(connectionParameters)
+            .stream()
+            .filter(account -> AccountTypeEnum.OTHER_CURRENT_ASSET.equals(account.getAccountType()))
+            .map(account -> option(account.getName(), account.getId()))
+            .toList();
+
+        return new OptionsResponse(options);
     }
 
-    private static void fetchAllAccounts(Parameters connectionParameters) throws FMSException {
-        allAccountsList = (List<Account>) (QuickbooksUtils
-            .getDataService(connectionParameters.getRequiredString(ACCESS_TOKEN))
-            .executeQuery("select * from Account")
-            .getEntities());
+    private static OptionsResponse getExpenseAccountIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        throws FMSException {
+
+        List<ModifiableOption<String>> options = getAllAccounts(connectionParameters)
+            .stream()
+            .filter(account -> AccountTypeEnum.COST_OF_GOODS_SOLD.equals(account.getAccountType()))
+            .map(account -> option(account.getName(), account.getId()))
+            .toList();
+
+        return new OptionsResponse(options);
+    }
+
+    private static OptionsResponse getIncomeAccountIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        throws FMSException {
+
+        List<ModifiableOption<String>> options = getAllAccounts(connectionParameters)
+            .stream()
+            .filter(account -> AccountTypeEnum.INCOME.equals(account.getAccountType()))
+            .map(account -> option(account.getName(), account.getId()))
+            .toList();
+
+        return new OptionsResponse(options);
     }
 }
