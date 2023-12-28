@@ -235,6 +235,12 @@ const ConnectionDialog = ({componentDefinition, connection, onClose, triggerNode
         }
     }
 
+    async function handleTokenSuccess(payload: TokenPayload) {
+        if (payload.access_token) {
+            await saveConnection(payload);
+        }
+    }
+
     function getAuthorizationType() {
         let authorizationType = '';
 
@@ -664,11 +670,7 @@ const ConnectionDialog = ({componentDefinition, connection, onClose, triggerNode
                                                 }}
                                                 onCodeSuccess={handleCodeSuccess}
                                                 onError={(error: string) => setOAuth2Error(error)}
-                                                onTokenSuccess={(payload: TokenPayload) => {
-                                                    if (payload.access_token) {
-                                                        return saveConnection(payload);
-                                                    }
-                                                }}
+                                                onTokenSuccess={handleTokenSuccess}
                                                 redirectUri={oAuth2Properties?.redirectUri ?? ''}
                                                 responseType={isOAuth2AuthorizationType ? 'code' : 'token'}
                                                 scope={oAuth2AuthorizationParameters?.scopes?.join(' ')}
