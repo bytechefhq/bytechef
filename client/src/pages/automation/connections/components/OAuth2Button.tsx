@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 
-import useOAuth2, {AuthTokenPayload} from '../oauth2/useOAuth2';
+import useOAuth2, {CodePayload, TokenPayload} from '../oauth2/useOAuth2';
 
 const LoadingIcon = () => (
     <svg
@@ -26,9 +26,9 @@ type OAuth2ButtonProps = {
     responseType: 'code' | 'token';
     scope?: string;
     onClick: (getAuth: () => void) => void;
-    onCodeSuccess?: (code: string) => void;
+    onCodeSuccess?: (payload: CodePayload) => void;
     onError?: (error: string) => void;
-    onTokenSuccess?: (payload: AuthTokenPayload) => void;
+    onTokenSuccess?: (payload: TokenPayload) => void;
 };
 
 const OAuth2Button = ({

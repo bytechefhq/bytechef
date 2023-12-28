@@ -3,7 +3,7 @@ import {useCallback, useRef, useState} from 'react';
 import {OAUTH_RESPONSE, OAUTH_STATE_KEY} from './constants';
 import {objectToQuery} from './tools';
 
-export type AuthTokenPayload = {
+export type TokenPayload = {
     token_type: string;
     expires_in: number;
     access_token: string;
@@ -11,7 +11,12 @@ export type AuthTokenPayload = {
     refresh_token: string;
 };
 
-export type Oauth2Props<TData = AuthTokenPayload> = {
+export type CodePayload = {
+    code: string;
+    [key: string]: string;
+};
+
+export type Oauth2Props = {
     authorizationUrl: string;
     clientId: string;
     redirectUri: string;
@@ -19,9 +24,9 @@ export type Oauth2Props<TData = AuthTokenPayload> = {
     scope?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     extraQueryParameters?: Record<string, any>;
-    onCodeSuccess?: (code: string) => void;
+    onCodeSuccess?: (payload: CodePayload) => void;
     onError?: (error: string) => void;
-    onTokenSuccess?: (payload: TData) => void;
+    onTokenSuccess?: (payload: TokenPayload) => void;
 };
 
 const POPUP_HEIGHT = 800;
@@ -94,7 +99,7 @@ const cleanup = (
     window.removeEventListener('message', handleMessageListener);
 };
 
-const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
+const useOAuth2 = (props: Oauth2Props) => {
     const {
         authorizationUrl,
         clientId,
@@ -168,7 +173,7 @@ const useOAuth2 = <TData = AuthTokenPayload>(props: Oauth2Props<TData>) => {
                     const payload = message?.data?.payload;
 
                     if (responseType === 'code' && onCodeSuccess) {
-                        await onCodeSuccess(payload?.code);
+                        await onCodeSuccess(payload);
                     } else {
                         if (payload) {
                             delete payload['state'];

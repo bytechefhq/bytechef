@@ -17,6 +17,7 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {TokenPayload} from '@/pages/automation/connections/oauth2/useOAuth2';
 import {useGetOAuth2AuthorizationParametersQuery, useGetOAuth2PropertiesQuery} from '@/queries/oauth2.queries';
 import {Cross2Icon, QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -37,7 +38,6 @@ import {ConnectionKeys, useGetConnectionTagsQuery} from 'queries/connections.que
 import {ReactNode, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
-import {AuthTokenPayload} from '../oauth2/useOAuth2';
 import OAuth2Button from './OAuth2Button';
 
 interface ConnectionDialogProps {
@@ -229,9 +229,9 @@ const ConnectionDialog = ({componentDefinition, connection, onClose, triggerNode
         }, 300);
     }
 
-    async function handleCodeSuccess(code: string) {
-        if (code) {
-            await saveConnection({code: code});
+    async function handleCodeSuccess(payload: {code: string; [key: string]: string}) {
+        if (payload.code) {
+            await saveConnection(payload);
         }
     }
 
@@ -664,7 +664,7 @@ const ConnectionDialog = ({componentDefinition, connection, onClose, triggerNode
                                                 }}
                                                 onCodeSuccess={handleCodeSuccess}
                                                 onError={(error: string) => setOAuth2Error(error)}
-                                                onTokenSuccess={(payload: AuthTokenPayload) => {
+                                                onTokenSuccess={(payload: TokenPayload) => {
                                                     if (payload.access_token) {
                                                         return saveConnection(payload);
                                                     }
@@ -723,9 +723,9 @@ const RedirectUriInput = ({redirectUri}: {redirectUri?: string}) => {
 };
 
 const Scopes = ({scopes}: {scopes: string[]}) => (
-    <div className="py-2">
-        <div className="flex">
-            <span className="mb-2 mr-1 text-sm font-semibold">Scopes</span>
+    <div className="space-y-2 py-2">
+        <div className="flex items-center space-x-1">
+            <span className="text-sm font-semibold">Scopes</span>
 
             <Tooltip>
                 <TooltipTrigger>
@@ -738,7 +738,7 @@ const Scopes = ({scopes}: {scopes: string[]}) => (
 
         <div className="space-y-1">
             {scopes.map((scope) => (
-                <div className="flex items-center" key={scope}>
+                <div className="flex items-center space-x-1" key={scope}>
                     <Checkbox checked disabled id={scope} />
 
                     <Label htmlFor={scope}>{scope}</Label>
