@@ -34,6 +34,6 @@ public class QuickbooksUtils {
         return new DataService(
             new Context(
                 new OAuth2Authorizer(connectionParameters.getRequiredString(ACCESS_TOKEN)),
-                ServiceType.QBO, "4620816365371134710"));
+                ServiceType.QBO, connectionParameters.getRequiredString("realmId")));
     }
 }
