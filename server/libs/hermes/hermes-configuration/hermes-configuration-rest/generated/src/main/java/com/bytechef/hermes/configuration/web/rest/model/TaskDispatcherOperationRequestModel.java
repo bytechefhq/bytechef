@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("TaskDispatcherOperationRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-16T09:58:38.027629+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-28T18:24:23.377490+01:00[Europe/Zagreb]")
 public class TaskDispatcherOperationRequestModel {
 
   @Valid
