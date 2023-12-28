@@ -175,10 +175,6 @@ const useOAuth2 = (props: Oauth2Props) => {
                     if (responseType === 'code' && onCodeSuccess) {
                         await onCodeSuccess(payload);
                     } else {
-                        if (payload) {
-                            delete payload['state'];
-                        }
-
                         if (onTokenSuccess) {
                             await onTokenSuccess(payload);
                         }
