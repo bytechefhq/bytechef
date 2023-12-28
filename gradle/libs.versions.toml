@@ -21,15 +21,15 @@ spring-boot = "3.2.1"
 [libraries]
 ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback" }
 ch-qos-logback-logback-core = { module = "ch.qos.logback:logback-core", version.ref = "ch-qos-logback" }
-com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.6.6"
+com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.6.7"
 com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.7.0"
-com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.8.2"
+com-github-spotbugs-spotbugs-annotations = "com.github.spotbugs:spotbugs-annotations:4.8.3"
 com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-service", version.ref = "com-google-auto-service" }
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
 com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 info-picocli = { module = "info.picocli:picocli", version.ref = "info-picocli" }
 info-picocli-picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "info-picocli" }
-io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.19"
+io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.20"
 io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.19"
 jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.1.0-M1"
 org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.31.2"
@@ -50,10 +50,10 @@ org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:sprin
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.3.1"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.21.41"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.22.7"
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.50.0"
-nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.1"
-org-openapi-generator = "org.openapi.generator:7.1.0"
+nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.3"
+org-openapi-generator = "org.openapi.generator:7.2.0"
 org-sonarqube = "org.sonarqube:4.2.1.3168"
