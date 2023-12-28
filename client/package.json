@@ -99,6 +99,7 @@
         "tailwind-merge": "^2.2.0",
         "tailwindcss-animate": "^1.0.7",
         "vite-plugin-svgr": "^4.2.0",
+        "whatwg-fetch": "^3.6.20",
         "zod": "^3.22.4",
         "zustand": "^4.4.7"
     },
