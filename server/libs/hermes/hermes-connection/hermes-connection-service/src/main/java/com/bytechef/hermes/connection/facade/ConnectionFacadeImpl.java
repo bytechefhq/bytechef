@@ -41,7 +41,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -109,6 +111,13 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 connection.putAllParameters(authorizationCallbackResponse.toMap());
             }
         }
+
+        Map<String, ?> parameters = new HashMap<>(connection.getParameters());
+
+        parameters.remove("clientId");
+        parameters.remove("clientSecret");
+
+        connection.setParameters(parameters);
 
         List<Tag> tags = checkTags(connectionDTO.tags());
 
