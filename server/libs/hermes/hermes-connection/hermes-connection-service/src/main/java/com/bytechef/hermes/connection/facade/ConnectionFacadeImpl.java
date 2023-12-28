@@ -116,6 +116,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         parameters.remove("clientId");
         parameters.remove("clientSecret");
+        parameters.remove("state");
 
         connection.setParameters(parameters);
 
