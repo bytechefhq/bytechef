@@ -5,8 +5,8 @@ import {WorkflowModel} from '@/middleware/helios/configuration';
 import Editor from '@monaco-editor/react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
-import {PlayIcon, SaveIcon, SquareIcon} from 'lucide-react';
-import {useState} from 'react';
+import {PlayIcon, SquareIcon} from 'lucide-react';
+import {useEffect, useState} from 'react';
 
 interface WorkflowExecutionDetailsSheetProps {
     onClose: () => void;
@@ -23,13 +23,22 @@ const WorkflowCodeEditorSheet = ({
     workflow,
     workflowIsRunning,
 }: WorkflowExecutionDetailsSheetProps) => {
-    const [dirty, setDirty] = useState<boolean>(false);
     const [definition, setDefinition] = useState<string>(workflow.definition!);
+
+    useEffect(() => {
+        const getData = setTimeout(() => {
+            if (workflow.definition !== definition) {
+                onSave(definition);
+            }
+        }, 500);
+
+        return () => clearTimeout(getData);
+    }, [definition, onSave, workflow.definition]);
 
     return (
         <Sheet modal={false} onOpenChange={onClose} open={true}>
             <SheetContent
-                className="flex w-11/12 flex-col gap-2 p-4 sm:max-w-[700px]"
+                className="flex w-11/12 flex-col gap-2 p-4 sm:max-w-[800px]"
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
@@ -39,32 +48,6 @@ const WorkflowCodeEditorSheet = ({
                             <div>Edit Workflow</div>
 
                             <div className="flex items-center">
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            onClick={() => {
-                                                onSave(definition);
-                                                setDirty(false);
-                                            }}
-                                            size="icon"
-                                            type="submit"
-                                            variant="ghost"
-                                        >
-                                            <div className="relative">
-                                                <SaveIcon className="h-5" />
-
-                                                {dirty && (
-                                                    <span className="absolute right-[-5px] top-[-10px] text-lg text-gray-500">
-                                                        *
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </Button>
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>Save current workflow</TooltipContent>
-                                </Tooltip>
-
                                 {!workflowIsRunning && (
                                     <Tooltip>
                                         <TooltipTrigger asChild>
@@ -117,7 +100,6 @@ const WorkflowCodeEditorSheet = ({
                             defaultValue={definition}
                             onChange={(value) => {
                                 setDefinition(value as string);
-                                setDirty(true);
                             }}
                         />
                     </div>
