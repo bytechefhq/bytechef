@@ -16,8 +16,15 @@
 
 package com.bytechef.task.dispatcher.subflow;
 
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.date;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.dateTime;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.integer;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.number;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.object;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
+import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.time;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
@@ -37,9 +44,14 @@ public class SubflowTaskDispatcherDefinitionFactory implements TaskDispatcherDef
             .description(
                 "Starts a new job as a sub-flow of the current job. Output of the sub-flow job is the output of the task.")
             .icon("path:assets/subflow.svg")
-            .properties(string(WorkflowConstants.WORKFLOW_ID)
-                .label("Workflow Id")
-                .description("The id of sub-workflow to execute."));
+            .properties(
+                string(WorkflowConstants.WORKFLOW_ID)
+                    .label("Workflow Id")
+                    .description("The id of sub-workflow to execute."),
+                object(WorkflowConstants.INPUTS)
+                    .label("Inputs")
+                    .description("The inputs of a workflow.")
+                    .additionalProperties(bool(), date(), dateTime(), integer(), number(), string(), time()));
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
