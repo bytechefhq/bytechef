@@ -117,7 +117,12 @@ const WorkflowCodeEditorSheet = ({
                             defaultValue={definition}
                             onChange={(value) => {
                                 setDefinition(value as string);
-                                setDirty(true);
+
+                                if (value === workflow.definition) {
+                                    setDirty(false);
+                                } else {
+                                    setDirty(true);
+                                }
                             }}
                         />
                     </div>
