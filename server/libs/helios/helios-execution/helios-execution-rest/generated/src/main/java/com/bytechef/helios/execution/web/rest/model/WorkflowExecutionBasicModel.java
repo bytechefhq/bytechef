@@ -2,8 +2,6 @@ package com.bytechef.helios.execution.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.helios.execution.web.rest.model.JobBasicModel;
-import com.bytechef.helios.execution.web.rest.model.WorkflowBasicModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -18,23 +16,23 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Contains basic information about execution of a project workflow.
+ * Contains information about execution of a Integration workflow.
  */
 
-@Schema(name = "WorkflowExecutionBasic", description = "Contains basic information about execution of a project workflow.")
+@Schema(name = "WorkflowExecutionBasic", description = "Contains information about execution of a Integration workflow.")
 @JsonTypeName("WorkflowExecutionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-28T18:24:22.622648+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-02T08:27:08.064355+01:00[Europe/Zagreb]")
 public class WorkflowExecutionBasicModel {
 
   private Long id;
 
-  private com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance;
-
-  private JobBasicModel job;
-
   private com.bytechef.helios.configuration.web.rest.model.ProjectBasicModel project;
 
-  private WorkflowBasicModel workflow;
+  private com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance;
+
+  private com.bytechef.hermes.execution.web.rest.model.JobBasicModel job;
+
+  private com.bytechef.hermes.configuration.web.rest.model.WorkflowBasicModel workflow;
 
   public WorkflowExecutionBasicModel id(Long id) {
     this.id = id;
@@ -54,46 +52,6 @@ public class WorkflowExecutionBasicModel {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public WorkflowExecutionBasicModel projectInstance(com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
-    this.projectInstance = projectInstance;
-    return this;
-  }
-
-  /**
-   * Get projectInstance
-   * @return projectInstance
-  */
-  @Valid 
-  @Schema(name = "projectInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectInstance")
-  public com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel getProjectInstance() {
-    return projectInstance;
-  }
-
-  public void setProjectInstance(com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
-    this.projectInstance = projectInstance;
-  }
-
-  public WorkflowExecutionBasicModel job(JobBasicModel job) {
-    this.job = job;
-    return this;
-  }
-
-  /**
-   * Get job
-   * @return job
-  */
-  @Valid 
-  @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("job")
-  public JobBasicModel getJob() {
-    return job;
-  }
-
-  public void setJob(JobBasicModel job) {
-    this.job = job;
   }
 
   public WorkflowExecutionBasicModel project(com.bytechef.helios.configuration.web.rest.model.ProjectBasicModel project) {
@@ -116,7 +74,47 @@ public class WorkflowExecutionBasicModel {
     this.project = project;
   }
 
-  public WorkflowExecutionBasicModel workflow(WorkflowBasicModel workflow) {
+  public WorkflowExecutionBasicModel projectInstance(com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
+    this.projectInstance = projectInstance;
+    return this;
+  }
+
+  /**
+   * Get projectInstance
+   * @return projectInstance
+  */
+  @Valid 
+  @Schema(name = "projectInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectInstance")
+  public com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel getProjectInstance() {
+    return projectInstance;
+  }
+
+  public void setProjectInstance(com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
+    this.projectInstance = projectInstance;
+  }
+
+  public WorkflowExecutionBasicModel job(com.bytechef.hermes.execution.web.rest.model.JobBasicModel job) {
+    this.job = job;
+    return this;
+  }
+
+  /**
+   * Get job
+   * @return job
+  */
+  @Valid 
+  @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("job")
+  public com.bytechef.hermes.execution.web.rest.model.JobBasicModel getJob() {
+    return job;
+  }
+
+  public void setJob(com.bytechef.hermes.execution.web.rest.model.JobBasicModel job) {
+    this.job = job;
+  }
+
+  public WorkflowExecutionBasicModel workflow(com.bytechef.hermes.configuration.web.rest.model.WorkflowBasicModel workflow) {
     this.workflow = workflow;
     return this;
   }
@@ -128,11 +126,11 @@ public class WorkflowExecutionBasicModel {
   @Valid 
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflow")
-  public WorkflowBasicModel getWorkflow() {
+  public com.bytechef.hermes.configuration.web.rest.model.WorkflowBasicModel getWorkflow() {
     return workflow;
   }
 
-  public void setWorkflow(WorkflowBasicModel workflow) {
+  public void setWorkflow(com.bytechef.hermes.configuration.web.rest.model.WorkflowBasicModel workflow) {
     this.workflow = workflow;
   }
 
@@ -146,15 +144,15 @@ public class WorkflowExecutionBasicModel {
     }
     WorkflowExecutionBasicModel workflowExecutionBasic = (WorkflowExecutionBasicModel) o;
     return Objects.equals(this.id, workflowExecutionBasic.id) &&
+        Objects.equals(this.project, workflowExecutionBasic.project) &&
         Objects.equals(this.projectInstance, workflowExecutionBasic.projectInstance) &&
         Objects.equals(this.job, workflowExecutionBasic.job) &&
-        Objects.equals(this.project, workflowExecutionBasic.project) &&
         Objects.equals(this.workflow, workflowExecutionBasic.workflow);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, projectInstance, job, project, workflow);
+    return Objects.hash(id, project, projectInstance, job, workflow);
   }
 
   @Override
@@ -162,9 +160,9 @@ public class WorkflowExecutionBasicModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowExecutionBasicModel {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    project: ").append(toIndentedString(project)).append("\n");
     sb.append("    projectInstance: ").append(toIndentedString(projectInstance)).append("\n");
     sb.append("    job: ").append(toIndentedString(job)).append("\n");
-    sb.append("    project: ").append(toIndentedString(project)).append("\n");
     sb.append("    workflow: ").append(toIndentedString(workflow)).append("\n");
     sb.append("}");
     return sb.toString();

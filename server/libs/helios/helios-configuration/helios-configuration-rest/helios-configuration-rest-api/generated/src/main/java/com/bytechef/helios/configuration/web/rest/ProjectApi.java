@@ -6,8 +6,6 @@
 package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
-import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.helios.configuration.web.rest.model.WorkflowRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-28T18:24:26.204142+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-05T07:50:53.784118+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project", description = "The Automation Project API")
 public interface ProjectApi {
@@ -90,7 +88,7 @@ public interface ProjectApi {
      * Create new workflow and adds it to an existing project.
      *
      * @param id The id of a project. (required)
-     * @param workflowRequestModel  (required)
+     * @param comBytechefHermesConfigurationWebRestModelWorkflowModel  (required)
      * @return The updated project object. (status code 200)
      */
     @Operation(
@@ -100,7 +98,7 @@ public interface ProjectApi {
         tags = { "project" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated project object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.hermes.configuration.web.rest.model.WorkflowModel.class))
             })
         }
     )
@@ -111,14 +109,14 @@ public interface ProjectApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<WorkflowModel> createProjectWorkflow(
+    default ResponseEntity<com.bytechef.hermes.configuration.web.rest.model.WorkflowModel> createProjectWorkflow(
         @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "WorkflowRequestModel", description = "", required = true) @Valid @RequestBody WorkflowRequestModel workflowRequestModel
+        @Parameter(name = "com.bytechef.hermes.configuration.web.rest.model.WorkflowModel", description = "", required = true) @Valid @RequestBody com.bytechef.hermes.configuration.web.rest.model.WorkflowModel comBytechefHermesConfigurationWebRestModelWorkflowModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"outputs\" : [ { \"name\" : \"name\", \"value\" : \"{}\" }, { \"name\" : \"name\", \"value\" : \"{}\" } ], \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : false }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"required\" : false } ], \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"label\" : \"label\", \"triggers\" : [ { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"operationName\" : \"operationName\", \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"id\" : 1, \"key\" : \"key\", \"required\" : true }, { \"operationName\" : \"operationName\", \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"id\" : 1, \"key\" : \"key\", \"required\" : true } ], \"timeout\" : \"timeout\" }, { \"name\" : \"name\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"operationName\" : \"operationName\", \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"id\" : 1, \"key\" : \"key\", \"required\" : true }, { \"operationName\" : \"operationName\", \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"id\" : 1, \"key\" : \"key\", \"required\" : true } ], \"timeout\" : \"timeout\" } ], \"__version\" : 5, \"maxRetries\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"sourceType\" : \"CLASSPATH\", \"definition\" : \"definition\", \"id\" : \"id\", \"tasks\" : [ { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"operationName\" : \"operationName\", \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"id\" : 1, \"key\" : \"key\", \"required\" : true }, { \"operationName\" : \"operationName\", \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"id\" : 1, \"key\" : \"key\", \"required\" : true } ], \"timeout\" : \"timeout\" }, { \"node\" : \"node\", \"pre\" : [ null, null ], \"post\" : [ null, null ], \"name\" : \"name\", \"finalize\" : [ null, null ], \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"{}\" }, \"connections\" : [ { \"operationName\" : \"operationName\", \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"id\" : 1, \"key\" : \"key\", \"required\" : true }, { \"operationName\" : \"operationName\", \"componentName\" : \"componentName\", \"componentVersion\" : 6, \"id\" : 1, \"key\" : \"key\", \"required\" : true } ], \"timeout\" : \"timeout\" } ] }";
+                    String exampleString = "null";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

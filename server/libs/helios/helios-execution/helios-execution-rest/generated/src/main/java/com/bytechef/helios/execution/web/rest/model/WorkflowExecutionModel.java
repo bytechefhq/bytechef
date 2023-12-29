@@ -2,9 +2,6 @@ package com.bytechef.helios.execution.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.helios.execution.web.rest.model.JobModel;
-import com.bytechef.helios.execution.web.rest.model.TriggerExecutionModel;
-import com.bytechef.helios.execution.web.rest.model.WorkflowBasicModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -24,20 +21,20 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a project workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-12-28T18:24:22.622648+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-02T08:27:08.064355+01:00[Europe/Zagreb]")
 public class WorkflowExecutionModel {
 
   private Long id;
 
-  private JobModel job;
+  private com.bytechef.hermes.execution.web.rest.model.JobModel job;
 
   private com.bytechef.helios.configuration.web.rest.model.ProjectModel project;
 
   private com.bytechef.helios.configuration.web.rest.model.ProjectInstanceModel projectInstance;
 
-  private TriggerExecutionModel triggerExecution;
+  private com.bytechef.hermes.execution.web.rest.model.TriggerExecutionModel triggerExecution;
 
-  private WorkflowBasicModel workflow;
+  private com.bytechef.hermes.configuration.web.rest.model.WorkflowBasicModel workflow;
 
   public WorkflowExecutionModel id(Long id) {
     this.id = id;
@@ -59,7 +56,7 @@ public class WorkflowExecutionModel {
     this.id = id;
   }
 
-  public WorkflowExecutionModel job(JobModel job) {
+  public WorkflowExecutionModel job(com.bytechef.hermes.execution.web.rest.model.JobModel job) {
     this.job = job;
     return this;
   }
@@ -71,11 +68,11 @@ public class WorkflowExecutionModel {
   @Valid 
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("job")
-  public JobModel getJob() {
+  public com.bytechef.hermes.execution.web.rest.model.JobModel getJob() {
     return job;
   }
 
-  public void setJob(JobModel job) {
+  public void setJob(com.bytechef.hermes.execution.web.rest.model.JobModel job) {
     this.job = job;
   }
 
@@ -119,7 +116,7 @@ public class WorkflowExecutionModel {
     this.projectInstance = projectInstance;
   }
 
-  public WorkflowExecutionModel triggerExecution(TriggerExecutionModel triggerExecution) {
+  public WorkflowExecutionModel triggerExecution(com.bytechef.hermes.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
     this.triggerExecution = triggerExecution;
     return this;
   }
@@ -131,15 +128,15 @@ public class WorkflowExecutionModel {
   @Valid 
   @Schema(name = "triggerExecution", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggerExecution")
-  public TriggerExecutionModel getTriggerExecution() {
+  public com.bytechef.hermes.execution.web.rest.model.TriggerExecutionModel getTriggerExecution() {
     return triggerExecution;
   }
 
-  public void setTriggerExecution(TriggerExecutionModel triggerExecution) {
+  public void setTriggerExecution(com.bytechef.hermes.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
     this.triggerExecution = triggerExecution;
   }
 
-  public WorkflowExecutionModel workflow(WorkflowBasicModel workflow) {
+  public WorkflowExecutionModel workflow(com.bytechef.hermes.configuration.web.rest.model.WorkflowBasicModel workflow) {
     this.workflow = workflow;
     return this;
   }
@@ -151,11 +148,11 @@ public class WorkflowExecutionModel {
   @Valid 
   @Schema(name = "workflow", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflow")
-  public WorkflowBasicModel getWorkflow() {
+  public com.bytechef.hermes.configuration.web.rest.model.WorkflowBasicModel getWorkflow() {
     return workflow;
   }
 
-  public void setWorkflow(WorkflowBasicModel workflow) {
+  public void setWorkflow(com.bytechef.hermes.configuration.web.rest.model.WorkflowBasicModel workflow) {
     this.workflow = workflow;
   }
 
