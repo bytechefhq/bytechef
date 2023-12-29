@@ -244,12 +244,16 @@ const Project = () => {
     });
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
-        onSuccess: () => {
+        onSuccess: (workflow: WorkflowModel) => {
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projectWorkflows(+projectId!),
             });
 
             setShowEditWorkflowDialog(false);
+
+            toast({
+                description: `The workflow ${workflow.label} is saved.`,
+            });
         },
     });
 
