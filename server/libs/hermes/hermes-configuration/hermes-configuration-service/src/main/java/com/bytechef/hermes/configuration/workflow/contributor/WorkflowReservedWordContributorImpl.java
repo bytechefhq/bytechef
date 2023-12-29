@@ -17,6 +17,8 @@
 package com.bytechef.hermes.configuration.workflow.contributor;
 
 import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWordContributor;
+import com.bytechef.hermes.configuration.domain.WorkflowConnection;
+import com.bytechef.hermes.configuration.domain.WorkflowTrigger;
 import java.util.List;
 
 /**
@@ -26,6 +28,6 @@ public class WorkflowReservedWordContributorImpl implements WorkflowReservedWord
 
     @Override
     public List<String> getReservedWords() {
-        return List.of("connections", "triggers");
+        return List.of(WorkflowConnection.CONNECTIONS, WorkflowTrigger.TRIGGERS);
     }
 }

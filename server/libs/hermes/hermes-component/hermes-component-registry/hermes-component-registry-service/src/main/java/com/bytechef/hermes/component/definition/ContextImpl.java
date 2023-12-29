@@ -66,7 +66,7 @@ public class ContextImpl implements Context {
     @SuppressFBWarnings("EI")
     public ContextImpl(
         String componentName, String operationName, ComponentConnection connection,
-        HttpClientExecutor httpClientExecutor,  ObjectMapper objectMapper) {
+        HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper) {
 
         this.http = new HttpImpl(componentName, connection, this, httpClientExecutor);
         this.json = new JsonImpl();

@@ -35,6 +35,7 @@ import org.apache.commons.lang3.Validate;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class WorkflowTrigger implements Serializable, Trigger {
 
+    public static final String TRIGGERS = "triggers";
     private final Map<String, Object> extensions = new HashMap<>();
     private Map<String, ?> metadata = new HashMap<>();
     private String name;
@@ -76,12 +77,12 @@ public class WorkflowTrigger implements Serializable, Trigger {
     }
 
     public static List<WorkflowTrigger> of(Workflow workflow) {
-        return workflow.getExtensions("triggers", WorkflowTrigger.class, List.of());
+        return workflow.getExtensions(TRIGGERS, WorkflowTrigger.class, List.of());
     }
 
     public static WorkflowTrigger of(String triggerName, Workflow workflow) {
         return CollectionUtils.getFirst(
-            workflow.getExtensions("triggers", WorkflowTrigger.class, List.of()),
+            workflow.getExtensions(TRIGGERS, WorkflowTrigger.class, List.of()),
             workflowTrigger -> Objects.equals(triggerName, workflowTrigger.name));
     }
 

@@ -20,7 +20,6 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.hermes.component.registry.OperationType;
-import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +34,7 @@ public class WorkflowConnection {
     public static final String COMPONENT_NAME = "componentName";
     public static final String COMPONENT_VERSION = "componentVersion";
     public static final String ID = "id";
+    public static final String CONNECTIONS = "connections";
 
     private final String componentName;
     private final int componentVersion;
@@ -65,23 +65,22 @@ public class WorkflowConnection {
     }
 
     private static List<WorkflowConnection> getWorkflowConnections(
-        String operationName, OperationType operationType, boolean connectionRequired) {
+        String name, OperationType operationType, boolean connectionRequired) {
 
         return List.of(
             new WorkflowConnection(
-                operationType.componentName(), operationType.componentVersion(), operationName,
-                operationType.componentName(), null, connectionRequired));
+                operationType.componentName(), operationType.componentVersion(), name, name, null, connectionRequired));
     }
 
     private static List<WorkflowConnection> getWorkflowConnections(
-        String name, String type, Map<String, Object> metadata, boolean connectionRequired) {
+        String name, String type, Map<String, Object> extensions, boolean connectionRequired) {
 
         List<WorkflowConnection> workflowConnections;
         OperationType operationType = OperationType.ofType(type);
 
-        if (MapUtils.containsKey(metadata, MetadataConstants.CONNECTIONS)) {
+        if (MapUtils.containsKey(extensions, CONNECTIONS)) {
             workflowConnections = toList(
-                MapUtils.getMap(metadata, MetadataConstants.CONNECTIONS, new TypeReference<>() {}, Map.of()),
+                MapUtils.getMap(extensions, CONNECTIONS, new TypeReference<>() {}, Map.of()),
                 operationType.componentName(), operationType.componentVersion(), name, connectionRequired);
         } else {
             workflowConnections = getWorkflowConnections(name, operationType, connectionRequired);

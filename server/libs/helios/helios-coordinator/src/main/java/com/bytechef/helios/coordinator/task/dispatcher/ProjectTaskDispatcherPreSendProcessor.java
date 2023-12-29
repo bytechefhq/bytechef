@@ -92,7 +92,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
                 connectionIdMap = getConnectionIdMap(jobTaskConnectionMap.get(taskExecution.getName()));
             } else {
 
-                // defined in the workflow definition or is stored connection in workflow connections
+                // stored in workflow connections or defined in the workflow definition
 
                 connectionIdMap = getConnectionIdMap(
                     projectInstanceId, job.getWorkflowId(),
