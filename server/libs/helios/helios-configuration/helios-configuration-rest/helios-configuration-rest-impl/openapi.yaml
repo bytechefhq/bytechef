@@ -570,7 +570,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WorkflowRequest'
+              $ref: '#/components/schemas/Workflow'
         required: true
       responses:
         "200":
@@ -685,7 +685,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WorkflowRequest'
+              $ref: '#/components/schemas/Workflow'
         required: true
       responses:
         "200":
@@ -1229,14 +1229,6 @@ components:
       enum:
       - "JSON"
       - "YAML"
-    WorkflowRequest:
-      type: "object"
-      required:
-        - "definition"
-      properties:
-        definition:
-          description: "The definition of a workflow."
-          type: "string"
     WorkflowTask:
       description: "Represents a definition of a workflow task."
       type: "object"
