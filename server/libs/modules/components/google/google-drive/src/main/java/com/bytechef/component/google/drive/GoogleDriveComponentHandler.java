@@ -22,6 +22,9 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.google.drive.action.GoogleDriveCreateNewFolderAction;
+import com.bytechef.component.google.drive.action.GoogleDriveCreateNewTextFileAction;
+import com.bytechef.component.google.drive.action.GoogleDriveReadFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveUploadFileAction;
 import com.google.auto.service.AutoService;
 
@@ -33,10 +36,16 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(GOOGLE_DRIVE)
         .title("Google Drive")
-        .description("Component description.")
+        .description(
+            "Google Drive is a file storage and synchronization service developed by Google. Google Drive allows " +
+                "users to store files in the cloud, synchronize files across devices, and share files.")
         .icon("path:assets/google-drive.svg")
         .connection(CONNECTION_DEFINITION)
-        .actions(GoogleDriveUploadFileAction.ACTION_DEFINITION);
+        .actions(
+            GoogleDriveUploadFileAction.ACTION_DEFINITION,
+            GoogleDriveReadFileAction.ACTION_DEFINITION,
+            GoogleDriveCreateNewFolderAction.ACTION_DEFINITION,
+            GoogleDriveCreateNewTextFileAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

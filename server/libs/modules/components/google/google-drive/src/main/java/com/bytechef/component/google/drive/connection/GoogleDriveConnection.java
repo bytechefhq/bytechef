@@ -26,6 +26,9 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import com.bytechef.component.definition.ComponentDSL;
 import java.util.List;
 
+/**
+ * @author Mario Cvjetojevic
+ */
 public class GoogleDriveConnection {
 
     public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()

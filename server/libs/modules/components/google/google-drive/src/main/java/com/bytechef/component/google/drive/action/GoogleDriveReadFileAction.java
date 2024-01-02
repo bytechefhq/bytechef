@@ -17,58 +17,58 @@
 package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.UPLOAD_FILE;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.DRIVE_ID;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.IGNORE_DEFAULT_VISIBILITY;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.ACKNOWLEDGE_ABUSE;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.READ_FILE;
 import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.INCLUDE_LABELS;
 import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.INCLUDE_PERMISSIONS_FOR_VIEW;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.KEEP_REVISION_FOREVER;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.OCR_LANGUAGE;
 import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.SUPPORTS_ALL_DRIVES;
-import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.USE_CONTENT_AS_INDEXABLE_TEXT;
 import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.propertyMap;
 import static com.bytechef.component.google.drive.properties.GoogleDriveOutputProperties.FILE_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.drive.util.GoogleDriveUtils;
-import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
- * @author Ivica Cardic
  */
-public final class GoogleDriveUploadFileAction {
+public final class GoogleDriveReadFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPLOAD_FILE)
-        .title("Upload file")
-        .description("Uploads a file to google drive.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ_FILE)
+        .title("Read file")
+        .description("Read a selected file from google drive file.")
         .properties(
-            fileEntry(FILE_ENTRY)
+            string(FILE_ID)
                 .label("File")
                 .description(
-                    "The object property which contains a reference to the file to upload.")
+                    "The id of a file to read.")
+                .options((ActionOptionsFunction) GoogleDriveReadFileAction::getFileOptions)
                 .required(true),
-            propertyMap.get(DRIVE_ID),
-            propertyMap.get(IGNORE_DEFAULT_VISIBILITY),
-            propertyMap.get(KEEP_REVISION_FOREVER),
-            propertyMap.get(OCR_LANGUAGE),
+            bool(ACKNOWLEDGE_ABUSE)
+                .label("Acknowledge abuse")
+                .description(
+                    "Whether the user is acknowledging the risk of downloading known malware or other " +
+                        "abusive files. This is only applicable when alt=media."),
             propertyMap.get(SUPPORTS_ALL_DRIVES),
-            propertyMap.get(USE_CONTENT_AS_INDEXABLE_TEXT),
             propertyMap.get(INCLUDE_PERMISSIONS_FOR_VIEW),
             propertyMap.get(INCLUDE_LABELS))
         .outputSchema(FILE_PROPERTY)
         .sampleOutput(Map.of("id", "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"))
-        .perform(GoogleDriveUploadFileAction::perform);
+        .perform(GoogleDriveReadFileAction::perform);
 
-    private GoogleDriveUploadFileAction() {
+    private GoogleDriveReadFileAction() {
     }
 
     public static File perform(
@@ -76,28 +76,29 @@ public final class GoogleDriveUploadFileAction {
         throws Exception {
 
         Drive drive = GoogleDriveUtils.getDrive(connectionParameters);
-        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
-
-        File file = new File().setName(fileEntry.getName());
-
-        if (inputParameters.containsKey(DRIVE_ID)) {
-            file.setDriveId(inputParameters.getString(DRIVE_ID));
-        }
 
         return drive.files()
-            .create(
-                file,
-                new FileContent(
-                    fileEntry.getMimeType(),
-                    actionContext.file(actionContextFile -> actionContextFile.toTempFile(fileEntry))))
-            .setFields("id")
-            .setIgnoreDefaultVisibility(inputParameters.getBoolean(IGNORE_DEFAULT_VISIBILITY))
-            .setKeepRevisionForever(inputParameters.getBoolean(KEEP_REVISION_FOREVER))
-            .setOcrLanguage(inputParameters.getString(OCR_LANGUAGE))
+            .get(inputParameters.getRequiredString(FILE_ID))
+            .setAcknowledgeAbuse(inputParameters.getBoolean(ACKNOWLEDGE_ABUSE))
             .setSupportsAllDrives(inputParameters.getBoolean(SUPPORTS_ALL_DRIVES))
-            .setUseContentAsIndexableText(inputParameters.getBoolean(USE_CONTENT_AS_INDEXABLE_TEXT))
             .setIncludePermissionsForView(inputParameters.getString(INCLUDE_PERMISSIONS_FOR_VIEW))
             .setIncludeLabels(inputParameters.getString(INCLUDE_LABELS))
             .execute();
+    }
+
+    private static List<ComponentDSL.ModifiableOption<String>> getFileOptions(
+        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
+        throws IOException {
+
+        Drive drive = GoogleDriveUtils.getDrive(connectionParameters);
+
+        return drive
+            .files()
+            .list()
+            .execute()
+            .getFiles()
+            .stream()
+            .map(file -> option(file.getName(), file.getId()))
+            .toList();
     }
 }

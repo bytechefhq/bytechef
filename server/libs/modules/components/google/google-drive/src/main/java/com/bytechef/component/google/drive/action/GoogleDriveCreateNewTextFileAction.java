@@ -17,9 +17,12 @@
 package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.UPLOAD_FILE;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.CREATE_NEW_TEXT_FILE;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_NAME;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.TEXT;
 import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.DRIVE_ID;
 import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.IGNORE_DEFAULT_VISIBILITY;
 import static com.bytechef.component.google.drive.properties.GoogleDriveInputProperties.INCLUDE_LABELS;
@@ -33,29 +36,44 @@ import static com.bytechef.component.google.drive.properties.GoogleDriveOutputPr
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
  * @author Mario Cvjetojevic
- * @author Ivica Cardic
  */
-public final class GoogleDriveUploadFileAction {
+public final class GoogleDriveCreateNewTextFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPLOAD_FILE)
-        .title("Upload file")
-        .description("Uploads a file to google drive.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_NEW_TEXT_FILE)
+        .title("Create new text file")
+        .description("Creates a new text file in google drive.")
         .properties(
-            fileEntry(FILE_ENTRY)
-                .label("File")
+            string(FILE_NAME)
+                .label("File name")
                 .description(
-                    "The object property which contains a reference to the file to upload.")
+                    "The name of the new text file.")
                 .required(true),
+            string(TEXT)
+                .label("Text")
+                .description(
+                    "The text content to add to file."),
+            string(MIME_TYPE)
+                .label("Content type")
+                .description(
+                    "Select file type.")
+                .options(
+                    option("Text", "plain/text"),
+                    option("CSV", "text/csv"),
+                    option("XML", "text/xml"))
+                .defaultValue("plain/text"),
             propertyMap.get(DRIVE_ID),
             propertyMap.get(IGNORE_DEFAULT_VISIBILITY),
             propertyMap.get(KEEP_REVISION_FOREVER),
@@ -66,9 +84,9 @@ public final class GoogleDriveUploadFileAction {
             propertyMap.get(INCLUDE_LABELS))
         .outputSchema(FILE_PROPERTY)
         .sampleOutput(Map.of("id", "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"))
-        .perform(GoogleDriveUploadFileAction::perform);
+        .perform(GoogleDriveCreateNewTextFileAction::perform);
 
-    private GoogleDriveUploadFileAction() {
+    private GoogleDriveCreateNewTextFileAction() {
     }
 
     public static File perform(
@@ -76,20 +94,28 @@ public final class GoogleDriveUploadFileAction {
         throws Exception {
 
         Drive drive = GoogleDriveUtils.getDrive(connectionParameters);
-        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
 
-        File file = new File().setName(fileEntry.getName());
+        File googleFile = new File().setName(inputParameters.getRequiredString(FILE_NAME));
 
-        if (inputParameters.containsKey(DRIVE_ID)) {
-            file.setDriveId(inputParameters.getString(DRIVE_ID));
+        String suffix = switch (inputParameters.getString(MIME_TYPE)) {
+            case "text/csv" -> ".csv";
+            case "text/xml" -> ".xml";
+            default -> ".txt";
+        };
+
+        java.io.File file = java.io.File.createTempFile("New File", suffix);
+
+        try (BufferedWriter bufferedWriter = new BufferedWriter(
+            new OutputStreamWriter(
+                new FileOutputStream(file), StandardCharsets.UTF_8))) {
+            bufferedWriter.write(inputParameters.getString(TEXT));
         }
 
         return drive.files()
             .create(
-                file,
+                googleFile,
                 new FileContent(
-                    fileEntry.getMimeType(),
-                    actionContext.file(actionContextFile -> actionContextFile.toTempFile(fileEntry))))
+                    inputParameters.getString(MIME_TYPE), file))
             .setFields("id")
             .setIgnoreDefaultVisibility(inputParameters.getBoolean(IGNORE_DEFAULT_VISIBILITY))
             .setKeepRevisionForever(inputParameters.getBoolean(KEEP_REVISION_FOREVER))

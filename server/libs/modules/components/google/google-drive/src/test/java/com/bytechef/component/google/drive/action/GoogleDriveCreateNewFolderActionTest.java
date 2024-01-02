@@ -16,43 +16,30 @@
 
 package com.bytechef.component.google.drive.action;
 
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FOLDER_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.FileEntry;
-import java.io.File;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Mario Cvjetojevic
  */
-public class GoogleDriveUploadFileActionTest extends AbstractGoogleDriveCreateActionTest {
-    private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final File mockedFile = mock(File.class);
+public class GoogleDriveCreateNewFolderActionTest extends AbstractGoogleDriveCreateActionTest {
 
     @Test
     public void testPerform() throws Exception {
-        when(mockedParameters.getRequiredFileEntry(FILE_ENTRY))
-            .thenReturn(mockedFileEntry);
-        when(mockedFileEntry.getName())
-            .thenReturn("fileName");
-        when(mockedFileEntry.getMimeType())
-            .thenReturn("mimeType");
+        when(mockedParameters.getRequiredString(FOLDER_NAME))
+            .thenReturn("folderName");
 
-        when(mockedContext.file(any()))
-            .thenReturn(mockedFile);
-
-        GoogleDriveUploadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+        GoogleDriveCreateNewFolderAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         verify(mockedFiles, times(1))
             .create(fileArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
 
-        assertEquals("fileName", fileArgumentCaptor.getValue().getName());
-        assertEquals("mimeType", inputStreamArgumentCaptor.getValue().getType());
+        assertEquals("folderName", fileArgumentCaptor.getValue().getName());
+        assertEquals("application/vnd.google-apps.folder", inputStreamArgumentCaptor.getValue().getType());
     }
 }
