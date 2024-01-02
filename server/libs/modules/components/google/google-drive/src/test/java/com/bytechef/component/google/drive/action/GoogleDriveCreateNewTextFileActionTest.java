@@ -16,43 +16,48 @@
 
 package com.bytechef.component.google.drive.action;
 
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_NAME;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.TEXT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.FileEntry;
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Mario Cvjetojevic
  */
-public class GoogleDriveUploadFileActionTest extends AbstractGoogleDriveCreateActionTest {
-    private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final File mockedFile = mock(File.class);
+public class GoogleDriveCreateNewTextFileActionTest extends AbstractGoogleDriveCreateActionTest {
 
     @Test
     public void testPerform() throws Exception {
-        when(mockedParameters.getRequiredFileEntry(FILE_ENTRY))
-            .thenReturn(mockedFileEntry);
-        when(mockedFileEntry.getName())
+        when(mockedParameters.getRequiredString(FILE_NAME))
             .thenReturn("fileName");
-        when(mockedFileEntry.getMimeType())
+        when(mockedParameters.getString(TEXT))
+            .thenReturn("text");
+        when(mockedParameters.getString(MIME_TYPE))
             .thenReturn("mimeType");
 
-        when(mockedContext.file(any()))
-            .thenReturn(mockedFile);
-
-        GoogleDriveUploadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+        GoogleDriveCreateNewTextFileAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         verify(mockedFiles, times(1))
             .create(fileArgumentCaptor.capture(), inputStreamArgumentCaptor.capture());
 
         assertEquals("fileName", fileArgumentCaptor.getValue().getName());
         assertEquals("mimeType", inputStreamArgumentCaptor.getValue().getType());
+
+        try (InputStreamReader inputStreamReader = new InputStreamReader(
+            inputStreamArgumentCaptor.getValue()
+            .getInputStream(), StandardCharsets.UTF_8);
+             BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+            assertEquals("text", bufferedReader.lines()
+                    .collect(Collectors.joining("\n")));
+        }
     }
 }

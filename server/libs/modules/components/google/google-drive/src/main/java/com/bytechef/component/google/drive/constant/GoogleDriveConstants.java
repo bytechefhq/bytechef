@@ -22,9 +22,17 @@ package com.bytechef.component.google.drive.constant;
 public final class GoogleDriveConstants {
 
     public static final String FILE_ENTRY = "fileEntry";
-    public static final String DRIVE_ID = "driveId";
+    public static final String FILE_ID = "fileId";
     public static final String GOOGLE_DRIVE = "googleDrive";
     public static final String UPLOAD_FILE = "uploadFile";
+    public static final String CREATE_NEW_TEXT_FILE = "createNewTextFile";
+    public static final String CREATE_NEW_FOLDER = "createNewFolder";
+    public static final String READ_FILE = "readFile";
+    public static final String FILE_NAME = "fileName";
+    public static final String FOLDER_NAME = "folderName";
+    public static final String TEXT = "text";
+    public static final String MIME_TYPE = "mimeType";
+    public static final String ACKNOWLEDGE_ABUSE = "acknowledgeAbuse";
 
     private GoogleDriveConstants() {
     }

@@ -32,7 +32,7 @@ import com.google.api.services.drive.Drive;
  * @author Mario Cvjetojevic
  * @author Ivica Cardic
  */
-public class GoogleUtils {
+public class GoogleDriveUtils {
 
     public static Drive getDrive(Parameters connectionParameters) {
         return new Drive.Builder(
