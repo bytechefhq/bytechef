@@ -24,5 +24,4 @@
 
         <addPrimaryKey tableName="scheduled_tasks" columnNames="task_name, task_instance" constraintName="pk_scheduled_tasks" />
     </changeSet>
-
 </databaseChangeLog>
