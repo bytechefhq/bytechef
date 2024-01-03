@@ -242,7 +242,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
         if (defaultNodesWithWorkflowNodes) {
             const workflowNodes = defaultNodesWithWorkflowNodes.filter((node) => node?.data.originNodeName);
 
-            setNodeNames(workflowNodes.map((node) => node?.data.originNodeName));
+            setNodeNames(workflowNodes.map((node) => node?.data.name));
 
             setNodes(defaultNodesWithWorkflowNodes as Array<Node>);
         }
