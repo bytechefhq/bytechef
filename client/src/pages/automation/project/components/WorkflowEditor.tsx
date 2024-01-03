@@ -1,9 +1,16 @@
-import {useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
+import {ComponentDefinitionKeys, useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
 import {ComponentActionType} from '@/types/types';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/hermes/configuration';
+import getRandomId from '@/utils/getRandomId';
+import {Component1Icon} from '@radix-ui/react-icons';
+import {QueryClient} from '@tanstack/react-query';
+import {
+    ComponentDefinitionApi,
+    ComponentDefinitionBasicModel,
+    TaskDispatcherDefinitionBasicModel,
+} from 'middleware/hermes/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import ReactFlow, {Controls, Edge, MiniMap, Node, useReactFlow, useStore} from 'reactflow';
+import ReactFlow, {Controls, Edge, MiniMap, Node, NodeDimensionChange, useReactFlow, useStore} from 'reactflow';
 
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
@@ -32,13 +39,15 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
     const [nodes, setNodes] = useState(defaultNodes);
     const [viewportWidth, setViewportWidth] = useState(0);
 
+    const queryClient = new QueryClient();
+
     const previousNodeNames: Array<string> | undefined = usePrevious(nodeNames);
 
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {componentActions, setComponentActions, setComponentNames} = useWorkflowDataStore();
-    const {workflowDefinitions} = useWorkflowDefinitionStore();
+    const {setWorkflowDefinitions, workflowDefinitions} = useWorkflowDefinitionStore();
 
-    const {getEdge, getNode, setViewport} = useReactFlow();
+    const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge] = useHandleDrop();
 
@@ -60,10 +69,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
         []
     );
 
-    const {width} = useStore((store) => ({
-        height: store.height,
-        width: store.width,
-    }));
+    const width = useStore((store) => store.width);
 
     const {data: workflowComponent} = useGetComponentDefinitionQuery(
         {
@@ -122,7 +128,9 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
     }, [nodeNames, workflowComponent]);
 
     const defaultNodesWithWorkflowNodes = useMemo(() => {
-        const workflowNodes = currentWorkflowDefinition.tasks?.map((workflowNode) => {
+        const workflowTasks = currentWorkflowDefinition?.tasks?.filter((task) => task.name);
+
+        const workflowNodes = workflowTasks?.map((workflowNode, index) => {
             const componentName = workflowNode.type?.split('/')[0];
             const actionName = workflowNode.type?.split('/')[2];
 
@@ -136,7 +144,13 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
                         ...componentDefinition,
                         ...workflowNode,
                         actionName,
-                        icon: <InlineSVG className="h-9 w-9" src={componentDefinition.icon!} />,
+                        icon: (
+                            <InlineSVG
+                                className="h-9 w-9"
+                                loader={<Component1Icon className="h-9 w-9 flex-none text-gray-900" />}
+                                src={componentDefinition.icon!}
+                            />
+                        ),
                         id: componentDefinition.name,
                         label: componentDefinition.name,
                         name: workflowNode.name,
@@ -144,7 +158,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
                         type: 'workflow',
                     },
                     id: workflowNode.name,
-                    position: {x: 0, y: 0},
+                    position: {x: 0, y: 150 * (index + 1)},
                     type: 'workflow',
                 };
             }
@@ -178,23 +192,25 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
                 if (nextNode) {
                     workflowEdges.push({
-                        id: `${node!.id}=>${nextNode.id}`,
+                        id: `${node!.id}=>${nextNode?.id}`,
                         source: node!.id,
-                        target: nextNode.id,
+                        target: nextNode?.id,
                         type: 'workflow',
                     });
                 } else {
+                    const lastNodeId = getRandomId();
+
                     defaultNodesWithWorkflowNodes.push({
                         data: {label: '+'},
-                        id: 'lastNode',
-                        position: {x: 0, y: 150},
+                        id: lastNodeId,
+                        position: {x: 0, y: 150 * (index + 1)},
                         type: 'placeholder',
                     });
 
                     workflowEdges.push({
-                        id: `${node!.id}=>lastNode`,
+                        id: `${node!.id}=>${lastNodeId}`,
                         source: node!.id,
-                        target: 'lastNode',
+                        target: lastNodeId,
                         type: 'placeholder',
                     });
                 }
@@ -275,6 +291,60 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
         });
     }, [workflowNodeDetailsPanelOpen, setViewport, width]);
 
+    const handleNodeChange = async (changes: NodeDimensionChange[]) => {
+        const changesIds = changes.map((change) => change.id);
+
+        const changesIncludeExistingNodes = defaultNodesWithWorkflowNodes?.some((node) =>
+            changesIds.includes(node?.data.id)
+        );
+
+        if (changesIncludeExistingNodes) {
+            return;
+        }
+
+        const workflowNodes = getNodes();
+
+        const newNode = workflowNodes.find((node) => node.id === changes[0].id);
+
+        if (!newNode?.data.originNodeName) {
+            return;
+        }
+
+        const {label, name, originNodeName, parameters} = newNode.data;
+
+        const newNodeComponentDefinition = await queryClient.fetchQuery({
+            queryFn: () => new ComponentDefinitionApi().getComponentDefinition({componentName: originNodeName}),
+            queryKey: ComponentDefinitionKeys.componentDefinition({componentName: originNodeName}),
+        });
+
+        if (!newNodeComponentDefinition) {
+            return;
+        }
+
+        const newWorkflowNode = {
+            label,
+            name,
+            parameters,
+            type: `${originNodeName}/v1/${newNodeComponentDefinition.actions?.[0].name}`,
+        };
+
+        const workflowNodeAlreadyExists = currentWorkflowDefinition.tasks?.some(
+            (task) => task.name === newWorkflowNode.name
+        );
+
+        if (workflowNodeAlreadyExists) {
+            return;
+        }
+
+        setWorkflowDefinitions({
+            ...workflowDefinitions,
+            [currentWorkflowId]: {
+                ...currentWorkflowDefinition,
+                tasks: [...(currentWorkflowDefinition.tasks || []), newWorkflowNode],
+            },
+        });
+    };
+
     useLayout();
 
     return (
@@ -298,6 +368,11 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
                 nodesConnectable={false}
                 nodesDraggable={false}
                 onDrop={onDrop}
+                onNodesChange={(changes) => {
+                    if (changes.length > 1) {
+                        handleNodeChange(changes as NodeDimensionChange[]);
+                    }
+                }}
                 panOnDrag
                 panOnScroll
                 proOptions={{hideAttribution: true}}
