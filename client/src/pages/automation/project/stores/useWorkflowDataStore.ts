@@ -14,6 +14,9 @@ interface WorkflowDefinitionState {
     componentActions: Array<ComponentActionType>;
     setComponentActions: (componentActions: Array<ComponentActionType>) => void;
 
+    currentWorkflowId: string;
+    setCurrentWorkflowId: (currentWorkflowId: string) => void;
+
     dataPills: Array<DataPillType>;
     setDataPills: (dataPills: Array<DataPillType>) => void;
 
@@ -32,6 +35,9 @@ const useWorkflowDataStore = create<WorkflowDefinitionState>()(
 
             componentActions: [],
             setComponentActions: (componentActions) => set((state) => ({...state, componentActions})),
+
+            currentWorkflowId: '',
+            setCurrentWorkflowId: (currentWorkflowId) => set((state) => ({...state, currentWorkflowId})),
 
             dataPills: [],
             setDataPills: (dataPills) => set((state) => ({...state, dataPills})),

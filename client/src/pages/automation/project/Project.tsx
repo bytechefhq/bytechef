@@ -112,7 +112,7 @@ const Project = () => {
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {setComponentDefinitions, setTaskDispatcherDefinitions} = useWorkflowDataStore();
+    const {setComponentDefinitions, setCurrentWorkflowId, setTaskDispatcherDefinitions} = useWorkflowDataStore();
     const {setWorkflowDefinitions, workflowDefinitions} = useWorkflowDefinitionStore();
 
     const {toast} = useToast();
@@ -284,8 +284,10 @@ const Project = () => {
     useEffect(() => {
         if (currentWorkflow?.id) {
             navigate(`/automation/projects/${projectId}/workflows/${currentWorkflow.id}`);
+
+            setCurrentWorkflowId(currentWorkflow.id);
         }
-    }, [currentWorkflow, navigate, projectId, setWorkflowNodeDetailsPanelOpen]);
+    }, [currentWorkflow, navigate, projectId, setCurrentWorkflowId, setWorkflowNodeDetailsPanelOpen]);
 
     const handleDeleteProjectAlertDialogClick = () => {
         if (project?.id) {
