@@ -7,6 +7,7 @@ import {twMerge} from 'tailwind-merge';
 
 import useNodeClickHandler from '../hooks/useNodeClick';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 import styles from './NodeTypes.module.css';
 
@@ -14,8 +15,8 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-
-    const {componentNames, setComponentNames} = useWorkflowDataStore();
+    const {setWorkflowDefinitions, workflowDefinitions} = useWorkflowDefinitionStore();
+    const {componentNames, currentWorkflowId, setComponentNames} = useWorkflowDataStore();
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
@@ -72,6 +73,16 @@ const WorkflowNode = ({data, id}: NodeProps) => {
         }
 
         setComponentNames(componentNames.filter((componentName) => componentName !== data.name));
+
+        const updatedTasks = workflowDefinitions[currentWorkflowId].tasks?.filter((task) => task.name !== data.name);
+
+        setWorkflowDefinitions({
+            ...workflowDefinitions,
+            [currentWorkflowId]: {
+                ...workflowDefinitions[currentWorkflowId],
+                tasks: updatedTasks,
+            },
+        });
     };
 
     return (
