@@ -169,6 +169,8 @@ include("server:libs:modules:components:random-helper")
 include("server:libs:modules:components:rabbitmq")
 include("server:libs:modules:components:schedule")
 include("server:libs:modules:components:script")
+include("server:libs:modules:components:twilio")
+
 //include("server:libs:modules:components:shopify")
 include("server:libs:modules:components:var")
 include("server:libs:modules:components:xlsx-file")
