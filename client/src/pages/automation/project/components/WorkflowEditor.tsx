@@ -123,7 +123,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
         return {
             ...workflowComponent,
-            workflowAlias: `${workflowComponent.name}-${workflowNodes.length}`,
+            workflowNodeName: `${workflowComponent.name}-${workflowNodes.length}`,
         };
     }, [nodeNames, workflowComponent]);
 
@@ -154,7 +154,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
                         id: componentDefinition.name,
                         label: componentDefinition.name,
                         name: workflowNode.name,
-                        originNodeName: componentDefinition.name,
+                        componentName: componentDefinition.name,
                         type: 'workflow',
                     },
                     id: workflowNode.name,
@@ -170,8 +170,8 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
             setNodeActions(
                 workflowNodes.map((node) => ({
                     actionName: node!.data.actionName!,
-                    componentName: node!.data.originNodeName!,
-                    workflowAlias: node?.data.name,
+                    componentName: node!.data.componentName!,
+                    workflowNodeName: node?.data.name,
                 }))
             );
 
@@ -240,7 +240,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
     useEffect(() => {
         if (defaultNodesWithWorkflowNodes) {
-            const workflowNodes = defaultNodesWithWorkflowNodes.filter((node) => node?.data.originNodeName);
+            const workflowNodes = defaultNodesWithWorkflowNodes.filter((node) => node?.data.componentName);
 
             setNodeNames(workflowNodes.map((node) => node?.data.name));
 
@@ -258,11 +258,11 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
         if (workflowComponentWithAlias?.actions) {
             const {actions, name} = workflowComponentWithAlias;
 
-            let workflowAlias = `${name}_1`;
+            let workflowNodeName = `${name}_1`;
             let index = 2;
 
-            while (componentActions.some((action) => action.workflowAlias === workflowAlias)) {
-                workflowAlias = `${name}_${index}`;
+            while (componentActions.some((action) => action.workflowNodeName === workflowNodeName)) {
+                workflowNodeName = `${name}_${index}`;
 
                 index++;
             }
@@ -272,12 +272,12 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
                 {
                     actionName: actions[0].name,
                     componentName: name,
-                    workflowAlias,
+                    workflowNodeName,
                 },
             ]);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowComponentWithAlias?.workflowAlias]);
+    }, [workflowComponentWithAlias?.workflowNodeName]);
 
     useEffect(() => {
         setViewportWidth(width);
@@ -306,15 +306,15 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
         const newNode = workflowNodes.find((node) => node.id === changes[0].id);
 
-        if (!newNode?.data.originNodeName) {
+        if (!newNode?.data.componentName) {
             return;
         }
 
-        const {label, name, originNodeName, parameters} = newNode.data;
+        const {componentName, label, name, parameters} = newNode.data;
 
         const newNodeComponentDefinition = await queryClient.fetchQuery({
-            queryFn: () => new ComponentDefinitionApi().getComponentDefinition({componentName: originNodeName}),
-            queryKey: ComponentDefinitionKeys.componentDefinition({componentName: originNodeName}),
+            queryFn: () => new ComponentDefinitionApi().getComponentDefinition({componentName}),
+            queryKey: ComponentDefinitionKeys.componentDefinition({componentName}),
         });
 
         if (!newNodeComponentDefinition) {
@@ -325,7 +325,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
             label,
             name,
             parameters,
-            type: `${originNodeName}/v1/${newNodeComponentDefinition.actions?.[0].name}`,
+            type: `${componentName}/v1/${newNodeComponentDefinition.actions?.[0].name}`,
         };
 
         const workflowNodeAlreadyExists = currentWorkflowDefinition.tasks?.some(

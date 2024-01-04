@@ -4,12 +4,12 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface Node {
-    name: string;
-    version: number;
-    type: 'component' | 'flowControl';
+    componentName?: string;
     icon?: ReactNode;
-    originNodeName?: string;
     label?: string;
+    name: string;
+    type: 'component' | 'flowControl';
+    version: number;
 }
 
 interface WorkflowNodeDetailsPanelState {

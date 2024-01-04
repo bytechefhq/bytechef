@@ -7,7 +7,7 @@ import DataPillPanelBodyItem from './DataPillPanelBodyItem';
 
 export type ComponentActionData = {
     componentDefinition: ComponentDefinitionBasicModel;
-    workflowAlias: string;
+    workflowNodeName: string;
 } & ActionDefinitionModel;
 
 type DataPillPanelBodyProps = {
@@ -42,7 +42,7 @@ const DataPillPanelBody = ({componentData, dataPillFilterQuery}: DataPillPanelBo
                                 controlType: outputSchema.controlType,
                                 description: outputSchema.description,
                                 label: outputSchema.label,
-                                name: outputSchema.name || componentAction.workflowAlias || 'fileEntry',
+                                name: outputSchema.name || componentAction.workflowNodeName || 'fileEntry',
                                 objectType: outputSchema.objectType,
                                 required: outputSchema.required,
                                 type: outputSchema.type,
@@ -60,8 +60,8 @@ const DataPillPanelBody = ({componentData, dataPillFilterQuery}: DataPillPanelBo
                     return (
                         <AccordionItem
                             className="group"
-                            key={`accordion-item-${componentAction.workflowAlias}`}
-                            value={componentAction.workflowAlias}
+                            key={`accordion-item-${componentAction.workflowNodeName}`}
+                            value={componentAction.workflowNodeName}
                         >
                             <DataPillPanelBodyItem
                                 componentAction={componentAction}

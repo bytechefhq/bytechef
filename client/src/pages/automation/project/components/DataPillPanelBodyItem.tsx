@@ -19,14 +19,14 @@ const DataPillPanelBodyItem = ({
     const {componentActions} = useWorkflowDataStore();
 
     const currentComponentAction = componentActions.find(
-        (action) => action.workflowAlias === componentAction.workflowAlias
+        (action) => action.workflowNodeName === componentAction.workflowNodeName
     );
 
     return (
         <>
             <AccordionTrigger
                 className="group flex w-full items-center justify-between border-gray-100 bg-white p-4 group-data-[state=closed]:border-b"
-                key={`accordion-trigger-${componentAction.workflowAlias}`}
+                key={`accordion-trigger-${componentAction.workflowNodeName}`}
             >
                 <div className="flex items-center space-x-4">
                     {icon && (
@@ -38,7 +38,7 @@ const DataPillPanelBodyItem = ({
                     <span className="text-sm">
                         {title}
 
-                        <span className="pl-1 text-xs text-gray-400">({componentAction.workflowAlias})</span>
+                        <span className="pl-1 text-xs text-gray-400">({componentAction.workflowNodeName})</span>
                     </span>
                 </div>
 
@@ -51,12 +51,12 @@ const DataPillPanelBodyItem = ({
 
             <AccordionContent
                 className="h-full w-full space-y-2 border-b border-gray-100 px-4 pb-4"
-                key={`accordion-content-${componentAction.workflowAlias}`}
+                key={`accordion-content-${componentAction.workflowNodeName}`}
             >
                 {filteredProperties.length ? (
                     <>
                         <DataPill
-                            componentAlias={componentAction.workflowAlias}
+                            componentAlias={componentAction.workflowNodeName}
                             componentIcon={componentAction.componentDefinition.icon}
                         />
 
@@ -64,7 +64,7 @@ const DataPillPanelBodyItem = ({
                             <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">
                                 {filteredProperties?.map((property) => (
                                     <DataPill
-                                        componentAlias={componentAction.workflowAlias}
+                                        componentAlias={componentAction.workflowNodeName}
                                         componentIcon={componentAction.componentDefinition.icon}
                                         key={property.name}
                                         property={property}

@@ -37,12 +37,12 @@ const DataPillPanel = ({
 
         return {
             ...action,
-            workflowAlias: `${action.componentName}_${sameNameIndex + 1}`,
+            workflowNodeName: `${action.componentName}_${sameNameIndex + 1}`,
         };
     });
 
     const previousActions = actionDataWithComponentAlias?.filter((action) =>
-        previousComponentNames.includes(action.workflowAlias!)
+        previousComponentNames.includes(action.workflowNodeName!)
     );
 
     const componentActionData = previousActions?.map((action, index) => {
@@ -50,11 +50,11 @@ const DataPillPanel = ({
             (currentComponentDefinition) => currentComponentDefinition.name === normalizedPreviousComponentNames[index]
         );
 
-        if (previousComponentNames.includes(action.workflowAlias!)) {
+        if (previousComponentNames.includes(action.workflowNodeName!)) {
             return {
                 ...action,
                 componentDefinition,
-                workflowAlias: componentNames[index],
+                workflowNodeName: componentNames[index],
             };
         }
     });
@@ -69,7 +69,7 @@ const DataPillPanel = ({
             (action.outputSchema as PropertyType)?.items ||
             action.outputSchemaDataSource;
 
-        return action.workflowAlias !== currentNode.name && action.componentDefinition && outputSchemaContent;
+        return action.workflowNodeName !== currentNode.name && action.componentDefinition && outputSchemaContent;
     });
 
     return (
