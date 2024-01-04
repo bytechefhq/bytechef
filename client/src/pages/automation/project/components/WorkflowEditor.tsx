@@ -33,23 +33,23 @@ export type WorkflowEditorProps = {
 
 const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcherDefinitions}: WorkflowEditorProps) => {
     const [edges, setEdges] = useState(defaultEdges);
-    const [latestNodeName, setLatestNodeName] = useState('');
+    const [latestComponentName, setLatestComponentName] = useState('');
     const [nodeActions, setNodeActions] = useState<Array<ComponentActionType>>([]);
     const [nodeNames, setNodeNames] = useState<Array<string>>([]);
     const [nodes, setNodes] = useState(defaultNodes);
     const [viewportWidth, setViewportWidth] = useState(0);
 
-    const queryClient = new QueryClient();
-
-    const previousNodeNames: Array<string> | undefined = usePrevious(nodeNames);
-
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {componentActions, setComponentActions, setComponentNames} = useWorkflowDataStore();
+    const {componentActions, componentNames, setComponentActions, setComponentNames} = useWorkflowDataStore();
     const {setWorkflowDefinitions, workflowDefinitions} = useWorkflowDefinitionStore();
 
     const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge] = useHandleDrop();
+
+    const queryClient = new QueryClient();
+
+    const previousComponentNames: Array<string> | undefined = usePrevious(componentNames);
 
     const currentWorkflowDefinition = workflowDefinitions[currentWorkflowId!];
 
@@ -73,9 +73,9 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
     const {data: workflowComponent} = useGetComponentDefinitionQuery(
         {
-            componentName: latestNodeName || nodeNames[nodeNames.length - 1],
+            componentName: latestComponentName || componentNames[componentNames.length - 1],
         },
-        !!nodeNames.length
+        !!componentNames.length
     );
 
     const onDrop: DragEventHandler = (event) => {
@@ -123,7 +123,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
         return {
             ...workflowComponent,
-            workflowNodeName: `${workflowComponent.name}-${workflowNodes.length}`,
+            workflowNodeName: `${workflowComponent.name}_${workflowNodes.length + 1}`,
         };
     }, [nodeNames, workflowComponent]);
 
@@ -144,6 +144,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
                         ...componentDefinition,
                         ...workflowNode,
                         actionName,
+                        componentName: componentDefinition.name,
                         icon: (
                             <InlineSVG
                                 className="h-9 w-9"
@@ -152,9 +153,8 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
                             />
                         ),
                         id: componentDefinition.name,
-                        label: componentDefinition.name,
+                        label: componentDefinition.title,
                         name: workflowNode.name,
-                        componentName: componentDefinition.name,
                         type: 'workflow',
                     },
                     id: workflowNode.name,
@@ -221,22 +221,18 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
     }, [defaultNodesWithWorkflowNodes]);
 
     useEffect(() => {
-        if (nodeNames && previousNodeNames?.length) {
-            const latest = nodeNames.find((nodeName) => !previousNodeNames?.includes(nodeName));
+        if (componentNames && previousComponentNames?.length) {
+            const latestName = componentNames.find((componentName) => !previousComponentNames?.includes(componentName));
 
-            if (latest) {
-                setLatestNodeName(latest);
+            if (latestName) {
+                setLatestComponentName(latestName);
             }
         }
-    }, [nodeNames, previousNodeNames]);
+    }, [componentNames, previousComponentNames]);
 
     useEffect(() => {
         setComponentActions(nodeActions);
     }, [nodeActions, setComponentActions]);
-
-    useEffect(() => {
-        setComponentNames(nodeNames);
-    }, [nodeNames, setComponentNames]);
 
     useEffect(() => {
         if (defaultNodesWithWorkflowNodes) {
@@ -244,9 +240,11 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
             setNodeNames(workflowNodes.map((node) => node?.data.name));
 
+            setComponentNames(workflowNodes.map((node) => node?.data.componentName));
+
             setNodes(defaultNodesWithWorkflowNodes as Array<Node>);
         }
-    }, [defaultNodesWithWorkflowNodes, currentWorkflowId]);
+    }, [defaultNodesWithWorkflowNodes, currentWorkflowId, setComponentNames]);
 
     useEffect(() => {
         if (defaultEdgesWithWorkflowEdges) {
@@ -322,6 +320,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
         }
 
         const newWorkflowNode = {
+            componentName,
             label,
             name,
             parameters,
