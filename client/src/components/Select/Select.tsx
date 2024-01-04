@@ -117,7 +117,7 @@ const Select = ({
                             {options.map((option) => (
                                 <Item
                                     className={twMerge(
-                                        'radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none',
+                                        'radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md px-2 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none',
                                         option.value === (value || defaultValue) && 'px-2'
                                     )}
                                     key={option.value}

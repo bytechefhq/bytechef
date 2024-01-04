@@ -87,13 +87,18 @@ const Property = ({
         formState?.errors[path] &&
         (formState?.errors[path] as never)[propertyName];
 
-    const formattedOptions = options?.map(
-        ({label, value}) =>
-            ({
+    const formattedOptions = options
+        ?.map(({label, value}) => {
+            if (value === '') {
+                return null;
+            }
+
+            return {
                 label,
                 value,
-            }) as ISelectOption
-    );
+            } as ISelectOption;
+        })
+        .filter((option) => option !== null);
 
     const isValidPropertyType = inputPropertyControlTypes.includes(controlType!);
 
