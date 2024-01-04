@@ -103,12 +103,12 @@ const WorkflowNodesPopoverMenuList = memo(
                     const previousWorkflowNode = nodes.find((node) => node.id === clickedEdge.source);
 
                     const previousComponentNameIndex = componentNames.findIndex(
-                        (name) => name === previousWorkflowNode?.data.name
+                        (name) => name === previousWorkflowNode?.data.componentName
                     );
 
                     const tempComponentNames = [...componentNames];
 
-                    tempComponentNames.splice(previousComponentNameIndex + 1, 0, newWorkflowNode.data.name);
+                    tempComponentNames.splice(previousComponentNameIndex + 1, 0, newWorkflowNode.data.componentName);
 
                     setComponentNames(tempComponentNames);
 
@@ -156,7 +156,7 @@ const WorkflowNodesPopoverMenuList = memo(
                             if (node.id === placeholderId) {
                                 const formattedNodeName = getFormattedName(clickedItem.name!, nodes);
 
-                                setComponentNames([...componentNames, formattedNodeName]);
+                                setComponentNames([...componentNames, clickedItem.name]);
 
                                 return {
                                     ...node,
