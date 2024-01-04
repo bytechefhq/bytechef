@@ -73,7 +73,7 @@ const WorkflowNodesPopoverMenuList = memo(
                         ),
                         label: clickedItem?.title,
                         name: getFormattedName(clickedItem.name!, nodes),
-                        originNodeName: clickedItem.name,
+                        componentName: clickedItem.name,
                     },
                     id: getRandomId(),
                     position: {
@@ -161,6 +161,7 @@ const WorkflowNodesPopoverMenuList = memo(
                                 return {
                                     ...node,
                                     data: {
+                                        componentName: clickedItem.name,
                                         icon: (
                                             <>
                                                 {clickedItem.icon ? (
@@ -175,7 +176,6 @@ const WorkflowNodesPopoverMenuList = memo(
                                         ),
                                         label: clickedItem?.title,
                                         name: formattedNodeName,
-                                        originNodeName: clickedItem.name,
                                         type: node.data?.type,
                                     },
                                     type: 'workflow',

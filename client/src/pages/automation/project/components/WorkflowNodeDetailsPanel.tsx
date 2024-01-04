@@ -57,7 +57,7 @@ const WorkflowNodeDetailsPanel = ({
         useWorkflowNodeDetailsPanelStore();
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery({
-        componentName: currentNode.originNodeName || currentNode.name,
+        componentName: currentNode.componentName || currentNode.name,
     });
 
     const {componentData, setComponentData} = useWorkflowDefinitionStore();
@@ -69,7 +69,7 @@ const WorkflowNodeDetailsPanel = ({
     if (currentComponentDefinition) {
         currentComponent = currentComponentDefinition;
 
-        currentComponent.workflowAlias = currentNode.name;
+        currentComponent.workflowNodeName = currentNode.name;
     }
 
     const handleActionSelectChange = (value: string) => {
@@ -77,7 +77,7 @@ const WorkflowNodeDetailsPanel = ({
 
         setComponentActions(
             componentActions.map((componentAction) => {
-                if (componentAction.workflowAlias === currentNode.name) {
+                if (componentAction.workflowNodeName === currentNode.name) {
                     return {
                         ...componentAction,
                         actionName: value,
@@ -91,7 +91,7 @@ const WorkflowNodeDetailsPanel = ({
         if (currentComponent) {
             setComponentData([
                 ...componentData.filter(
-                    (component) => component.workflowAlias !== currentNode.name || component.action !== value
+                    (component) => component.workflowNodeName !== currentNode.name || component.action !== value
                 ),
                 {
                     action: value,
@@ -103,7 +103,7 @@ const WorkflowNodeDetailsPanel = ({
                     },
                     title: currentComponent?.title,
                     version: currentComponent?.version,
-                    workflowAlias: currentComponent?.workflowAlias,
+                    workflowNodeName: currentComponent?.workflowNodeName,
                 },
             ]);
         }
@@ -256,7 +256,7 @@ const WorkflowNodeDetailsPanel = ({
     let currentComponentData: ComponentDataType | undefined;
 
     const otherComponentData = componentData.filter((component) => {
-        if (component.workflowAlias === currentComponent?.workflowAlias) {
+        if (component.workflowNodeName === currentComponent?.workflowNodeName) {
             currentComponentData = component;
 
             return false;
@@ -270,7 +270,9 @@ const WorkflowNodeDetailsPanel = ({
     // Set currentActionName depending on the currentComponentAction.actionName
     useEffect(() => {
         if (componentActions?.length) {
-            const currentComponentAction = componentActions.find((action) => action.workflowAlias === currentNode.name);
+            const currentComponentAction = componentActions.find(
+                (action) => action.workflowNodeName === currentNode.name
+            );
 
             if (currentComponentAction) {
                 setCurrentActionName(currentComponentAction.actionName);
@@ -307,7 +309,7 @@ const WorkflowNodeDetailsPanel = ({
                         ...currentComponentData,
                         action: currentComponentData.action,
                         name: currentComponent.name,
-                        workflowAlias: currentComponent.workflowAlias,
+                        workflowNodeName: currentComponent.workflowNodeName,
                     },
                 ]);
             }
@@ -321,13 +323,13 @@ const WorkflowNodeDetailsPanel = ({
                         ...currentComponentData,
                         action: currentComponent.actions[0].name,
                         name: currentComponent.name,
-                        workflowAlias: currentComponent.workflowAlias,
+                        workflowNodeName: currentComponent.workflowNodeName,
                     },
                 ]);
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentComponent?.workflowAlias, currentComponentData?.workflowAlias]);
+    }, [currentComponent?.workflowNodeName, currentComponentData?.workflowNodeName]);
 
     // Tab switching logic
     useEffect(() => {
@@ -370,31 +372,32 @@ const WorkflowNodeDetailsPanel = ({
                     {
                         ...currentComponentData,
                         action: currentAction.name,
-                        workflowAlias: currentComponent.workflowAlias,
+                        workflowNodeName: currentComponent.workflowNodeName,
                     },
                 ]);
             }
 
             if (componentActions && currentComponent) {
-                const {name, workflowAlias} = currentComponent;
+                const {name, workflowNodeName} = currentComponent;
 
                 const duplicateComponentActionIndex = componentActions.findIndex(
                     (action) =>
-                        action.workflowAlias?.match(new RegExp(/_\d$/)) && action.workflowAlias === workflowAlias
+                        action.workflowNodeName?.match(new RegExp(/_\d$/)) &&
+                        action.workflowNodeName === workflowNodeName
                 );
 
                 if (duplicateComponentActionIndex !== -1) {
                     componentActions.splice(duplicateComponentActionIndex, 1, {
                         actionName: currentAction.name,
                         componentName: name,
-                        workflowAlias,
+                        workflowNodeName,
                     });
 
                     setComponentActions(componentActions);
                 } else {
                     const orderedComponentActions = componentNames.map((componentName) => {
                         const componentActionIndex = componentActions.findIndex(
-                            (componentAction) => componentAction.workflowAlias === componentName
+                            (componentAction) => componentAction.workflowNodeName === componentName
                         );
 
                         return componentActions[componentActionIndex];
@@ -405,7 +408,7 @@ const WorkflowNodeDetailsPanel = ({
                         {
                             actionName: currentAction.name,
                             componentName: name,
-                            workflowAlias,
+                            workflowNodeName,
                         },
                         ...orderedComponentActions.slice(currentNodeIndex + 1),
                     ];
@@ -415,17 +418,17 @@ const WorkflowNodeDetailsPanel = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentComponent?.workflowAlias, currentAction?.name, currentActionFetched]);
+    }, [currentComponent?.workflowNodeName, currentAction?.name, currentActionFetched]);
 
     useEffect(() => {
         if (currentAction?.name) {
             const componentDataIndex = componentData.findIndex(
-                (component) => component.workflowAlias === currentComponent?.workflowAlias
+                (component) => component.workflowNodeName === currentComponent?.workflowNodeName
             );
 
             if (!componentDataIndex && currentComponent) {
                 setComponentData([
-                    ...componentData.filter((item) => item.workflowAlias !== currentComponent!.workflowAlias),
+                    ...componentData.filter((item) => item.workflowNodeName !== currentComponent!.workflowNodeName),
                     {
                         action: currentAction.name,
                         connection: currentComponent.connection,
@@ -436,13 +439,13 @@ const WorkflowNodeDetailsPanel = ({
                         },
                         title: currentComponent.title,
                         version: currentComponent.version,
-                        workflowAlias: currentComponent.workflowAlias,
+                        workflowNodeName: currentComponent.workflowNodeName,
                     },
                 ]);
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentAction?.name, currentComponent?.workflowAlias]);
+    }, [currentAction?.name, currentComponent?.workflowNodeName]);
 
     useEffect(() => {
         if (!componentNames.includes(currentNode.name)) {

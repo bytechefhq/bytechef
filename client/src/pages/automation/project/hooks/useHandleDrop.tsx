@@ -26,6 +26,7 @@ export default function useHandleDrop(): [
         const newWorkflowNode = {
             ...targetNode,
             data: {
+                componentName: droppedNode.name,
                 icon: droppedNode?.icon ? (
                     <InlineSVG className="h-9 w-9 text-gray-700" src={droppedNode?.icon} />
                 ) : (
@@ -33,7 +34,6 @@ export default function useHandleDrop(): [
                 ),
                 label: droppedNode?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
-                originNodeName: droppedNode.name,
             },
             name: droppedNode.name,
             type: 'workflow',
@@ -105,6 +105,7 @@ export default function useHandleDrop(): [
 
         const draggedNode = {
             data: {
+                componentName: droppedNode.name,
                 icon: droppedNode?.icon ? (
                     <InlineSVG className="h-9 w-9 text-gray-700" src={droppedNode.icon} />
                 ) : (
@@ -112,7 +113,6 @@ export default function useHandleDrop(): [
                 ),
                 label: droppedNode?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
-                originNodeName: droppedNode.name,
             },
             id: getRandomId(),
             name: droppedNode.name,
