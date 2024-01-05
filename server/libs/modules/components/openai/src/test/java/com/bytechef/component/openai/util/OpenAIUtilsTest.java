@@ -18,6 +18,7 @@ package com.bytechef.component.openai.util;
 
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_3;
+import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STREAM;
 import static org.mockito.Mockito.when;
@@ -59,10 +60,10 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         Assertions.assertEquals("512x512", sizeOptions
             .get(1)
             .getValue());
-        Assertions.assertEquals("1024x1024", sizeOptions
+        Assertions.assertEquals(DEFAULT_SIZE, sizeOptions.options()
             .get(2)
             .getLabel());
-        Assertions.assertEquals("1024x1024", sizeOptions
+        Assertions.assertEquals(DEFAULT_SIZE, sizeOptions.options()
             .get(2)
             .getValue());
     }
@@ -77,10 +78,10 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
         Assertions.assertEquals(3, sizeOptions
             .size());
-        Assertions.assertEquals("1024x1024", sizeOptions
+        Assertions.assertEquals(DEFAULT_SIZE, sizeOptions.options()
             .get(0)
             .getLabel());
-        Assertions.assertEquals("1024x1024", sizeOptions
+        Assertions.assertEquals(DEFAULT_SIZE, sizeOptions.options()
             .get(0)
             .getValue());
         Assertions.assertEquals("1792x1024", sizeOptions
@@ -105,18 +106,43 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         List<ModifiableStringProperty> modelProperties =
             OpenAIUtils.getModelProperties(mockedParameters, mockedParameters, mockedContext);
 
-        Assertions.assertEquals(1, modelProperties.size());
+        Assertions.assertEquals(2, modelProperties.properties()
         Assertions.assertEquals("Prompt", modelProperties.getFirst()
             .getLabel()
             .get());
         Assertions.assertEquals("A text description of the desired image(s).", modelProperties.getFirst()
             .getDescription()
             .get());
-        Assertions.assertEquals(true, modelProperties.getFirst()
+        Assertions.assertEquals(true, modelProperties.properties()
+            .getFirst()
             .getRequired()
             .get());
-        Assertions.assertEquals(1000, ((ModifiableStringProperty) modelProperties.getFirst())
-            .getMaxLength()
+        Assertions.assertEquals(1000, ((ComponentDSL.ModifiableStringProperty) modelProperties.properties()
+            .getFirst()).getMaxLength()
+            .get());
+        Assertions.assertEquals("n", modelProperties.properties()
+            .get(1)
+            .getLabel()
+            .get());
+        Assertions.assertEquals(
+            "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.",
+            modelProperties.properties()
+                .get(1)
+                .getDescription()
+                .get());
+        Assertions.assertEquals(1L, modelProperties.properties()
+            .get(1)
+            .getDefaultValue()
+            .get());
+        Assertions.assertEquals(false, modelProperties.properties()
+            .get(1)
+            .getRequired()
+            .get());
+        Assertions.assertEquals(10, ((ComponentDSL.ModifiableIntegerProperty) modelProperties.properties()
+            .get(1)).getMaxValue()
+            .get());
+        Assertions.assertEquals(1, ((ComponentDSL.ModifiableIntegerProperty) modelProperties.properties()
+            .get(1)).getMinValue()
             .get());
     }
 
@@ -128,7 +154,7 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         List<ModifiableStringProperty> modelProperties =
             OpenAIUtils.getModelProperties(mockedParameters, mockedParameters, mockedContext);
 
-        Assertions.assertEquals(1, modelProperties
+        Assertions.assertEquals(2, modelProperties.properties()
             .size());
         Assertions.assertEquals("Prompt", modelProperties.getFirst()
             .getLabel()
@@ -142,71 +168,36 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         Assertions.assertEquals(4000, ((ModifiableStringProperty) modelProperties.getFirst())
             .getMaxLength()
             .get());
-    }
-
-    @Test
-    public void testGetNumberOfImagesPropertiesForDallE2() {
-        when(mockedParameters.getRequiredString(MODEL))
-            .thenReturn("dall-e-2");
-
-        List<ComponentDSL.ModifiableIntegerProperty> numberOfImagesProperties =
-            OpenAIUtils.getNumberOfImagesProperties(mockedParameters, mockedParameters, mockedContext);
-
-        Assertions.assertEquals(1, numberOfImagesProperties.size());
+        Assertions.assertEquals("n", modelProperties.properties()
+            .get(1)
         Assertions.assertEquals("n", numberOfImagesProperties.getFirst()
             .getLabel()
             .get());
         Assertions.assertEquals(
             "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.",
-            numberOfImagesProperties.getFirst()
+            modelProperties.properties()
+                .get(1)
                 .getDescription()
                 .get());
-        Assertions.assertEquals(1L, numberOfImagesProperties.getFirst()
+        Assertions.assertEquals(1L, modelProperties.properties()
+            .get(1)
             .getDefaultValue()
             .get());
-        Assertions.assertEquals(false, numberOfImagesProperties.getFirst()
-            .getRequired()
-            .get());
-        Assertions.assertEquals(10, ((ComponentDSL.ModifiableIntegerProperty) numberOfImagesProperties.getFirst())
-            .getMaxValue()
-            .get());
-        Assertions.assertEquals(1, ((ComponentDSL.ModifiableIntegerProperty) numberOfImagesProperties.getFirst())
-            .getMinValue()
-            .get());
-    }
-
-    @Test
-    public void testGetNumberOfImagesPropertiesForDallE3() {
-        when(mockedParameters.getRequiredString(MODEL))
-            .thenReturn("dall-e-3");
-
-        List<ComponentDSL.ModifiableIntegerProperty> numberOfImagesProperties =
-            OpenAIUtils.getNumberOfImagesProperties(mockedParameters, mockedParameters, mockedContext);
-
-        Assertions.assertEquals(1, numberOfImagesProperties.size());
-        Assertions.assertEquals("n", numberOfImagesProperties.getFirst()
-            .getLabel()
-            .get());
-        Assertions.assertEquals(
-            "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.",
-            numberOfImagesProperties.getFirst()
-                .getDescription()
-                .get());
-        Assertions.assertEquals(1L, numberOfImagesProperties .getFirst()
-            .getDefaultValue()
-            .get());
-        Assertions.assertEquals(false, numberOfImagesProperties.getFirst()
+        Assertions.assertEquals(false, modelProperties.properties()
+            .get(1)
             .getRequired()
             .get());
         Assertions.assertEquals(Optional.empty(),
-            ((ComponentDSL.ModifiableIntegerProperty) numberOfImagesProperties.getFirst()).getMaxValue());
+            ((ComponentDSL.ModifiableIntegerProperty) modelProperties.properties()
+                .get(1)).getMaxValue());
         Assertions.assertEquals(Optional.empty(),
-            ((ComponentDSL.ModifiableIntegerProperty) numberOfImagesProperties.getFirst()).getMinValue());
+            ((ComponentDSL.ModifiableIntegerProperty) modelProperties.properties()
+                .get(1)).getMinValue());
     }
 
     @Test
     public void testGetOutputSchemaFunctionForStream() {
-        when(mockedParameters.getBoolean(STREAM)).thenReturn(true);
+        when(mockedParameters.getRequiredBoolean(STREAM)).thenReturn(true);
 
         OutputProperty<?> outputProperty =
             OpenAIUtils.getOutputSchemaResponse(mockedParameters, mockedParameters, mockedContext);
@@ -216,7 +207,7 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testGetOutputSchemaFunction() {
-        when(mockedParameters.getBoolean(STREAM)).thenReturn(false);
+        when(mockedParameters.getRequiredBoolean(STREAM)).thenReturn(false);
 
         OutputProperty<?> outputProperty =
             OpenAIUtils.getOutputSchemaResponse(mockedParameters, mockedParameters, mockedContext);
