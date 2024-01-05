@@ -19,6 +19,7 @@ package com.bytechef.component.openai.action;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DESCRIPTION;
 import static com.bytechef.component.openai.constant.OpenAIConstants.FILE_IDS;
 import static com.bytechef.component.openai.constant.OpenAIConstants.INSTRUCTIONS;
+import static com.bytechef.component.openai.constant.OpenAIConstants.METADATA;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.NAME;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOOLS;
@@ -36,6 +37,7 @@ import com.theokanning.openai.assistants.AssistantRequest;
 import com.theokanning.openai.assistants.Tool;
 import com.theokanning.openai.service.OpenAiService;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
@@ -53,6 +55,7 @@ public class OpenAICreateAssistantActionTest extends AbstractOpenAIActionTest {
             AssistantRequest.class);
         List<Tool> tools = List.of(new Tool());
         List<String> strings = List.of("a");
+        Map<String, String> metadata = Map.of();
 
         when(mockedParameters.getRequiredString(MODEL))
             .thenReturn("MODEL");
@@ -66,6 +69,8 @@ public class OpenAICreateAssistantActionTest extends AbstractOpenAIActionTest {
             .thenReturn(tools);
         when(mockedParameters.getList(eq(FILE_IDS), any(TypeReference.class)))
             .thenReturn(strings);
+        when(mockedParameters.getMap(eq(METADATA), any(TypeReference.class)))
+            .thenReturn(metadata);
 
         try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(
             OpenAiService.class,
@@ -92,6 +97,7 @@ public class OpenAICreateAssistantActionTest extends AbstractOpenAIActionTest {
             assertEquals("INSTRUCTIONS", assistantRequest.getInstructions());
             assertEquals(tools, assistantRequest.getTools());
             assertEquals(strings, assistantRequest.getFileIds());
+            assertEquals(metadata, assistantRequest.getMetadata());
         }
     }
 }
