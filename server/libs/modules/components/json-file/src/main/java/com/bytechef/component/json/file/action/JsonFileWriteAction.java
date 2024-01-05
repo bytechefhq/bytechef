@@ -85,7 +85,7 @@ public class JsonFileWriteAction {
                 .defaultValue("file.json")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(JsonFileWriteAction::perform);
 
     private static String getDefaultFileName(JsonFileConstants.FileType fileType, String defaultFilename) {
@@ -94,7 +94,7 @@ public class JsonFileWriteAction {
             : defaultFilename;
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

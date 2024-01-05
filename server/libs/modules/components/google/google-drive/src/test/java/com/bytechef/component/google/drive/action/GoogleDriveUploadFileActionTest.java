@@ -26,7 +26,7 @@ import org.mockito.Mockito;
 /**
  * @author Mario Cvjetojevic
  */
-public class GoogleDriveUploadActionTest {
+public class GoogleDriveUploadFileActionTest {
 
     @Disabled
     @Test
@@ -36,6 +36,6 @@ public class GoogleDriveUploadActionTest {
         Parameters parameters = Mockito.mock(Parameters.class);
 
         Assertions.assertNull(
-            GoogleDriveUploadAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)));
+            GoogleDriveUploadFileAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)));
     }
 }

@@ -41,7 +41,7 @@ public class ObjectHelperParseAction {
             .description("The JSON string to convert to the data.")
             .required(true))
         .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(ObjectHelperParseAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
@@ -50,7 +50,7 @@ public class ObjectHelperParseAction {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

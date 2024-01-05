@@ -79,7 +79,7 @@ public class XlsxFileWriteAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(XlsxFileWriteAction::perform);
 
     private static String getaDefaultFileName() {
@@ -88,7 +88,7 @@ public class XlsxFileWriteAction {
         return "file." + xlsxName.toLowerCase();
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

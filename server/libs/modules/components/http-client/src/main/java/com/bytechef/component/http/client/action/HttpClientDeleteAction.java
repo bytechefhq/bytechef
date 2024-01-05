@@ -50,7 +50,7 @@ public class HttpClientDeleteAction {
 
                 HttpClientActionUtils.options(false)))
         .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(HttpClientDeleteAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
@@ -59,7 +59,7 @@ public class HttpClientDeleteAction {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

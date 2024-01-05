@@ -65,10 +65,10 @@ public class CsvFileWriteAction {
                 .defaultValue("file.csv")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(CsvFileWriteAction::perform);
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

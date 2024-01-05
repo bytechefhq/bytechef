@@ -170,7 +170,7 @@ public class CustomActionUtils {
                     .defaultValue("text/plain")
                     .placeholder("text/plain"))
             .outputSchema(getOutputSchemaFunction())
-            .sampleOutput(getSampleOutputSchemaFunction())
+            .sampleOutput(getSampleOutputFunction())
             .perform(CustomActionUtils::perform);
 
         return customActionDefinition.help(
@@ -220,7 +220,7 @@ public class CustomActionUtils {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

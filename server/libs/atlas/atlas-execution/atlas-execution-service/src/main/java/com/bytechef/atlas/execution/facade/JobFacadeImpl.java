@@ -65,7 +65,7 @@ public class JobFacadeImpl implements JobFacade {
     // the job id is missing.
     @Override
     @Transactional(propagation = Propagation.NEVER)
-    public long createAsyncJob(JobParameters jobParameters) {
+    public long createJob(JobParameters jobParameters) {
         Job job = jobService.create(jobParameters, workflowService.getWorkflow(jobParameters.getWorkflowId()));
 
         long jobId = Validate.notNull(job.getId(), "id");

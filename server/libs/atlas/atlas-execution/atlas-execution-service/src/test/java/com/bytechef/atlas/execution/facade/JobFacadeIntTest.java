@@ -57,7 +57,7 @@ public class JobFacadeIntTest {
     public void testRequiredParameters() {
         Assertions.assertThrows(
             NullPointerException.class,
-            () -> jobFacade.createAsyncJob(new JobParameters("aGVsbG8x", Collections.emptyMap())));
+            () -> jobFacade.createJob(new JobParameters("aGVsbG8x", Collections.emptyMap())));
     }
 
     @ComponentScan(

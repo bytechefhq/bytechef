@@ -114,7 +114,7 @@ public class VarSetAction {
                 .displayCondition("type === 10")
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(VarSetAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
@@ -123,7 +123,7 @@ public class VarSetAction {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

@@ -68,10 +68,10 @@ public class XmlFileWriteAction {
                 .defaultValue("file.xml")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(XmlFileWriteAction::perform);
 
-    protected static SampleOutputDataSource.ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static SampleOutputDataSource.ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

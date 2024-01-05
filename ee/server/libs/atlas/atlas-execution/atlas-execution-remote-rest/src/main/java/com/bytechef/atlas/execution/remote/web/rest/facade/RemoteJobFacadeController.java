@@ -39,6 +39,6 @@ public class RemoteJobFacadeController {
         method = RequestMethod.POST,
         value = "/create-async-job")
     public ResponseEntity<Long> create(@Valid @RequestBody JobParameters jobParameters) {
-        return ResponseEntity.ok(jobFacade.createAsyncJob(jobParameters));
+        return ResponseEntity.ok(jobFacade.createJob(jobParameters));
     }
 }

@@ -257,7 +257,7 @@ public class DataMapperMapOneValueAction {
                             .required(true)))
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(DataMapperMapOneValueAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
@@ -266,7 +266,7 @@ public class DataMapperMapOneValueAction {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

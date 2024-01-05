@@ -29,7 +29,7 @@ public class RemoteJobFacadeClient implements JobFacade {
     }
 
     @Override
-    public long createAsyncJob(JobParameters jobParameters) {
+    public long createJob(JobParameters jobParameters) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host("execution-app")

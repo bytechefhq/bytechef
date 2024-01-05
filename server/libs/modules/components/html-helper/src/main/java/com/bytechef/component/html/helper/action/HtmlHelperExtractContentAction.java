@@ -79,7 +79,7 @@ public class HtmlHelperExtractContentAction {
                 .description(
                     "If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string."))
         .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(HtmlHelperExtractContentAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
@@ -88,7 +88,7 @@ public class HtmlHelperExtractContentAction {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

@@ -50,7 +50,7 @@ public class HttpClientHeadAction {
 
             HttpClientActionUtils.options(false)))
         .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(HttpClientHeadAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
@@ -59,7 +59,7 @@ public class HttpClientHeadAction {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

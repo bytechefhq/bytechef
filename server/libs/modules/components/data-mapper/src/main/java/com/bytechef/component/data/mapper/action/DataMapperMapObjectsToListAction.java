@@ -67,7 +67,7 @@ public class DataMapperMapObjectsToListAction {
                 .label("Value key")
                 .description("The key name to which values should be mapped."))
         .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(DataMapperMapObjectsToListAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
@@ -76,7 +76,7 @@ public class DataMapperMapObjectsToListAction {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

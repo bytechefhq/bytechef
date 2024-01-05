@@ -56,7 +56,7 @@ public class HttpClientPostAction {
 
                 HttpClientActionUtils.options(true)))
         .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(HttpClientPostAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
@@ -65,7 +65,7 @@ public class HttpClientPostAction {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

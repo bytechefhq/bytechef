@@ -95,7 +95,7 @@ public class DataMapperMapObjectsAction {
                 .description("A list of fields that are required on the mapped object.")
                 .items(string()))
         .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(DataMapperMapObjectsAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
@@ -104,7 +104,7 @@ public class DataMapperMapObjectsAction {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

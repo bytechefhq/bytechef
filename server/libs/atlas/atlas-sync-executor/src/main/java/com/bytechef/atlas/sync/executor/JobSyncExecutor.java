@@ -177,15 +177,15 @@ public class JobSyncExecutor {
     }
 
     public Job execute(JobParameters jobParameters) {
-        return jobService.getJob(jobFacade.createAsyncJob(jobParameters));
+        return jobService.getJob(jobFacade.createJob(jobParameters));
     }
 
     public Job execute(JobParameters jobParameters, JobFactoryFunction jobFactoryFunction) {
         JobFacade jobFacade = new JobFacadeImpl(
-            eventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction),
-            taskFileStorage, workflowService);
+            eventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction), taskFileStorage,
+            workflowService);
 
-        return jobService.getJob(jobFacade.createAsyncJob(jobParameters));
+        return jobService.getJob(jobFacade.createJob(jobParameters));
     }
 
     private static ApplicationEventPublisher createEventPublisher(SyncMessageBroker syncMessageBroker) {
@@ -208,7 +208,7 @@ public class JobSyncExecutor {
     @FunctionalInterface
     public interface JobFactoryFunction {
 
-        Job apply(JobParameters jobParameters, Workflow workflow);
+        Job apply(JobParameters jobParameters);
     }
 
     private record JobServiceWrapper(JobFactoryFunction jobFactoryFunction)
@@ -231,7 +231,7 @@ public class JobSyncExecutor {
 
         @Override
         public Job create(JobParameters jobParameters, Workflow workflow) {
-            return jobFactoryFunction.apply(jobParameters, workflow);
+            return jobFactoryFunction.apply(jobParameters);
         }
 
         @Override

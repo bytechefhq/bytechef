@@ -43,10 +43,10 @@ public class FileStorageReadAction {
             .required(true))
         .outputSchema(string())
         .sampleOutput("Sample string")
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(FileStorageReadAction::perform);
 
-    protected static SampleOutputDataSource.ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static SampleOutputDataSource.ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

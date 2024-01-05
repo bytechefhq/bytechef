@@ -45,7 +45,7 @@ public class DataStorageGetAllEntriesAction {
                 .options(SCOPE_OPTIONS)
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(DataStorageGetAllEntriesAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
@@ -54,7 +54,7 @@ public class DataStorageGetAllEntriesAction {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

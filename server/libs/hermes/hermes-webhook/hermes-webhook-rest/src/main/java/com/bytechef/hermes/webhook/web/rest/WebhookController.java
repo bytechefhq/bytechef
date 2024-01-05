@@ -205,7 +205,7 @@ public class WebhookController {
         }
 
         if (webhookTriggerFlags.workflowSyncExecution()) {
-            responseEntity = ResponseEntity.ok(webhookExecutor.execute(workflowExecutionId, webhookRequest));
+            responseEntity = ResponseEntity.ok(webhookExecutor.executeSync(workflowExecutionId, webhookRequest));
         } else if (webhookTriggerFlags.workflowSyncValidation()) {
             if (webhookExecutor.validateAndExecuteAsync(workflowExecutionId, webhookRequest)) {
                 responseEntity = getResponseEntity(ResponseEntity.ok());
@@ -213,7 +213,7 @@ public class WebhookController {
                 responseEntity = getResponseEntity(ResponseEntity.badRequest());
             }
         } else {
-            webhookExecutor.executeAsync(workflowExecutionId, webhookRequest);
+            webhookExecutor.execute(workflowExecutionId, webhookRequest);
 
             responseEntity = getResponseEntity(ResponseEntity.ok());
         }

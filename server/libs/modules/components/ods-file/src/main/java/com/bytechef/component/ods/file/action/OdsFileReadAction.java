@@ -88,7 +88,7 @@ public class OdsFileReadAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(OdsFileReadAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
@@ -97,7 +97,7 @@ public class OdsFileReadAction {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }

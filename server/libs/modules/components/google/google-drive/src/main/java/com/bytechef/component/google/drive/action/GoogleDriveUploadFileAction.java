@@ -45,7 +45,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author Mario Cvjetojevic
  * @author Ivica Cardic
  */
-public final class GoogleDriveUploadAction {
+public final class GoogleDriveUploadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPLOAD_FILE)
         .title("Upload file")
@@ -60,15 +60,15 @@ public final class GoogleDriveUploadAction {
                 .label("Folder")
                 .description(
                     "The id of a folder where the file is uploaded.")
-                .options((ActionOptionsFunction) GoogleDriveUploadAction::getOptionsFunction))
+                .options((ActionOptionsFunction) GoogleDriveUploadFileAction::getOptionsFunction))
         .outputSchema(
             object()
                 .properties(
                     string("id")))
         .sampleOutput(Map.of("id", "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"))
-        .perform(GoogleDriveUploadAction::perform);
+        .perform(GoogleDriveUploadFileAction::perform);
 
-    private GoogleDriveUploadAction() {
+    private GoogleDriveUploadFileAction() {
     }
 
     public static OptionsResponse getOptionsFunction(

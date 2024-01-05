@@ -66,7 +66,7 @@ public class DataMapperMapMultipleValuesBetweenObjectsAction {
                                 .label("To")))
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputSchemaFunction())
+        .sampleOutput(getSampleOutputFunction())
         .perform(DataMapperMapMultipleValuesBetweenObjectsAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
@@ -75,7 +75,7 @@ public class DataMapperMapMultipleValuesBetweenObjectsAction {
                 perform(inputParameters, connectionParameters, context))));
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputSchemaFunction() {
+    protected static ActionSampleOutputFunction getSampleOutputFunction() {
         return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
             perform(inputParameters, connectionParameters, context));
     }
