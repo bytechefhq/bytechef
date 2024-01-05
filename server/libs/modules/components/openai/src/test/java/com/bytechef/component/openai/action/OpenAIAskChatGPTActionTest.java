@@ -94,7 +94,7 @@ public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
     public void testPerformIsNotStream() {
         ChatCompletionResult mockedChatCompletionResult = mock(ChatCompletionResult.class);
 
-        when(mockedParameters.getBoolean(STREAM))
+        when(mockedParameters.getRequiredBoolean(STREAM))
             .thenReturn(false);
 
         try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction =
@@ -126,7 +126,7 @@ public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
     public void testPerformIsStream() {
         Flowable<ChatCompletionChunk> chatCompletionChunkFlowable = mock(Flowable.class);
 
-        when(mockedParameters.getBoolean(STREAM))
+        when(mockedParameters.getRequiredBoolean(STREAM))
             .thenReturn(true);
 
         try (MockedConstruction<OpenAiService> openAiServiceMockedConstruction = mockConstruction(

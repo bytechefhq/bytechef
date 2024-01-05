@@ -19,6 +19,7 @@ package com.bytechef.component.openai.action;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_IMAGE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_3;
+import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
@@ -67,10 +68,6 @@ public class OpenAICreateImageAction {
                     option(DALL_E_2, DALL_E_2))
                 .defaultValue(DALL_E_2)
                 .required(false),
-            dynamicProperties(N)
-                .loadPropertiesDependsOn(MODEL)
-                .properties(OpenAIUtils::getNumberOfImagesProperties)
-                .required(false),
             string(QUALITY)
                 .label("Quality")
                 .description("The quality of the image that will be generated.")
@@ -90,16 +87,15 @@ public class OpenAICreateImageAction {
                 .label("Size")
                 .description("The size of the generated images.")
                 .options((ActionOptionsFunction) OpenAIUtils::getSizeOptions)
-                .defaultValue("1024x1024")
+                .defaultValue(DEFAULT_SIZE)
                 .required(false),
             string(STYLE)
                 .label("Style")
-                .options()
                 .description("The style of the generated images.")
                 .options(
                     option("vivid", "vivid"),
                     option("natural", "natural"))
-                .displayCondition("%s === '%s'".formatted(MODEL, "dall-e-3"))
+                .displayCondition("%s === '%s'".formatted(MODEL, DALL_E_3))
                 .required(false),
             string(USER)
                 .label("User")
