@@ -111,7 +111,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             forkJoinTaskExecution.getParameters(), ForkJoinTaskDispatcherConstants.BRANCHES, new TypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
-            .map(curList -> CollectionUtils.map(curList, WorkflowTask::of))
+            .map(curList -> CollectionUtils.map(curList, WorkflowTask::new))
             .toList();
 
         List<WorkflowTask> branchWorkflowTasks = branchesWorkflowTasks.get(
@@ -130,7 +130,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
                 .priority(taskExecution.getPriority())
                 .taskNumber(taskExecution.getTaskNumber() + 1)
                 .workflowTask(
-                    WorkflowTask.of(
+                    new WorkflowTask(
                         MapUtils.append(
                             branchWorkflowTask.toMap(), WorkflowConstants.PARAMETERS,
                             Map.of(ForkJoinTaskDispatcherConstants.BRANCH, branch))))

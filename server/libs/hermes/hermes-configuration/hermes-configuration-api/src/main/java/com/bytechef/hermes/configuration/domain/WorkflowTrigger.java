@@ -45,9 +45,6 @@ public class WorkflowTrigger implements Serializable, Trigger {
     private String timeout;
     private String type;
 
-    private WorkflowTrigger() {
-    }
-
     public WorkflowTrigger(Map<String, ?> source) {
         Validate.notNull(source, "'source' must not be null");
 
@@ -73,8 +70,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
         Validate.notNull(type, "'type' must not be null");
     }
 
-    public static WorkflowTrigger of(Map<String, Object> source) {
-        return new WorkflowTrigger(source);
+    private WorkflowTrigger() {
     }
 
     public static List<WorkflowTrigger> of(Workflow workflow) {

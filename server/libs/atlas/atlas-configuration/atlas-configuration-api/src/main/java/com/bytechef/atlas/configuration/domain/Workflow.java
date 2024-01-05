@@ -207,7 +207,7 @@ public final class Workflow implements Persistable<String>, Serializable {
             } else if (WorkflowConstants.TASKS.equals(entry.getKey())) {
                 this.tasks = CollectionUtils.map(
                     MapUtils.getList(sourceMap, WorkflowConstants.TASKS, Map.class, List.of()),
-                    WorkflowTask::of);
+                    WorkflowTask::new);
             } else {
                 extensions.put(entry.getKey(), entry.getValue());
             }

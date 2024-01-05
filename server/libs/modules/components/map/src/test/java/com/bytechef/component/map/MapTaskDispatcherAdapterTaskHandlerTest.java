@@ -97,7 +97,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
-                WorkflowTask.of(
+                new WorkflowTask(
                     Map.of(
                         NAME, "map1",
                         TYPE, "type",
@@ -128,7 +128,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
             TaskExecution taskExecution = TaskExecution.builder()
                 .workflowTask(
-                    WorkflowTask.of(
+                    new WorkflowTask(
                         Map.of(
                             PARAMETERS,
                             Map.of("list", List.of(1, 2, 3), "iteratee", Map.of("type", "rogue")))))
@@ -187,7 +187,7 @@ public class MapTaskDispatcherAdapterTaskHandlerTest {
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
-                WorkflowTask.of(
+                new WorkflowTask(
                     Map.of(
                         NAME, "name",
                         TYPE, "pass",

@@ -115,7 +115,7 @@ public class TaskWorkerTest {
                 task -> taskExecution -> "done", taskFileStorage);
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution.setId(1234L);
@@ -144,7 +144,7 @@ public class TaskWorkerTest {
             }, taskFileStorage);
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution.setId(1234L);
@@ -186,7 +186,7 @@ public class TaskWorkerTest {
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
-                WorkflowTask.of(
+                new WorkflowTask(
                     Map.of(
                         NAME, "name",
                         TYPE, "var",
@@ -244,7 +244,7 @@ public class TaskWorkerTest {
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
-                WorkflowTask.of(
+                new WorkflowTask(
                     Map.of(
                         NAME, "name",
                         TYPE, "pass",
@@ -307,7 +307,7 @@ public class TaskWorkerTest {
 
         TaskExecution taskExecution = TaskExecution.builder()
             .workflowTask(
-                WorkflowTask.of(
+                new WorkflowTask(
                     Map.of(
                         NAME, "name",
                         TYPE, "rogue",
@@ -350,7 +350,7 @@ public class TaskWorkerTest {
             }, taskFileStorage);
 
         TaskExecution taskExecution = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution.setId(1234L);
@@ -396,7 +396,7 @@ public class TaskWorkerTest {
             }, taskFileStorage);
 
         TaskExecution taskExecution1 = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution1.setId(1111L);
@@ -406,7 +406,7 @@ public class TaskWorkerTest {
         executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution1)));
 
         TaskExecution taskExecution2 = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution2.setId(3333L);
@@ -452,7 +452,7 @@ public class TaskWorkerTest {
             }, taskFileStorage);
 
         TaskExecution taskExecution1 = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution1.setId(1111L);
@@ -462,7 +462,7 @@ public class TaskWorkerTest {
         executorService.submit(() -> worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution1)));
 
         TaskExecution taskExecution2 = TaskExecution.builder()
-            .workflowTask(WorkflowTask.of(Map.of(NAME, "name", TYPE, "type")))
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
             .build();
 
         taskExecution2.setId(3333L);

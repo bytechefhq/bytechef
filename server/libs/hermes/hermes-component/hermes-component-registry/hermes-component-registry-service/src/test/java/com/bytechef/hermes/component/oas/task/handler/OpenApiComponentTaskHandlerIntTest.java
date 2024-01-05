@@ -818,7 +818,7 @@ public class OpenApiComponentTaskHandlerIntTest {
                     ? Map.of()
                     : Map.of(MetadataConstants.CONNECTION_IDS, Map.of("petstore", connection.getId())))
             .workflowTask(
-                WorkflowTask.of(
+                new WorkflowTask(
                     Map.of(
                         WorkflowConstants.NAME, "name",
                         WorkflowConstants.TYPE, "type",

@@ -60,7 +60,7 @@ public class DefaultTaskDispatcherTest {
         defaultTaskDispatcher.dispatch(
             TaskExecution.builder()
                 .workflowTask(
-                    WorkflowTask.of(
+                    new WorkflowTask(
                         Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "type", "test", "value")))
                 .build());
     }
@@ -70,7 +70,7 @@ public class DefaultTaskDispatcherTest {
         TaskExecution taskExecution =
             TaskExecution.builder()
                 .workflowTask(
-                    WorkflowTask.of(
+                    new WorkflowTask(
                         Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "test", "node", "encoder")))
                 .build();
 
@@ -87,7 +87,7 @@ public class DefaultTaskDispatcherTest {
         TaskExecution taskExecution =
             TaskExecution.builder()
                 .workflowTask(
-                    WorkflowTask.of(
+                    new WorkflowTask(
                         Map.of(
                             WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "test", "node", "encoder.xlarge")))
                 .build();

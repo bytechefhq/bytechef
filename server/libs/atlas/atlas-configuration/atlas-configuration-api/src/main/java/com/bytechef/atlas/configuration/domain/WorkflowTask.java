@@ -94,10 +94,6 @@ public class WorkflowTask implements Task, Serializable {
     private WorkflowTask() {
     }
 
-    public static WorkflowTask of(Map<String, ?> source) {
-        return new WorkflowTask(source);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

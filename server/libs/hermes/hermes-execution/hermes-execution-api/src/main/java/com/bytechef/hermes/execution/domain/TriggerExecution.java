@@ -173,7 +173,7 @@ public class TriggerExecution implements Cloneable, Errorable, Persistable<Long>
 
         Map<String, Object> map = Evaluator.evaluate(workflowTrigger.toMap(), context);
 
-        setWorkflowTrigger(WorkflowTrigger.of(map));
+        setWorkflowTrigger(new WorkflowTrigger(map));
 
         return this;
     }

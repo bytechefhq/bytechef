@@ -63,8 +63,7 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
 
         ProjectInstanceWorkflowConnection that = (ProjectInstanceWorkflowConnection) o;
 
-        return Objects.equals(id, that.id) && Objects.equals(connectionId, that.connectionId)
-            && Objects.equals(key, that.key) && Objects.equals(operationName, that.operationName);
+        return Objects.equals(id, that.id);
     }
 
     @Override

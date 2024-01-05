@@ -95,7 +95,7 @@ public class BranchTaskDispatcherTest {
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
-            WorkflowTask.of(
+            new WorkflowTask(
                 Map.of(
                     WorkflowConstants.NAME, "name",
                     WorkflowConstants.TYPE, "type",
@@ -106,7 +106,7 @@ public class BranchTaskDispatcherTest {
                             Map.of(
                                 "key", "k1",
                                 "tasks",
-                                List.of(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))),
+                                List.of(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))),
                         "expression", "k1")
                 )
             )
@@ -120,7 +120,7 @@ public class BranchTaskDispatcherTest {
                 TaskExecution.builder()
                     .id(2L)
                     .workflowTask(
-                        WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "print")))
+                        new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "print")))
                     .build());
 
         when(taskExecutionService.update(any())).thenReturn(taskExecution);
@@ -146,7 +146,7 @@ public class BranchTaskDispatcherTest {
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
             .workflowTask(
-                WorkflowTask.of(
+                new WorkflowTask(
                     Map.of(
                         WorkflowConstants.NAME, "name",
                         WorkflowConstants.TYPE, "type",
@@ -157,7 +157,7 @@ public class BranchTaskDispatcherTest {
                                 Map.of(
                                     "key", "k1",
                                     "tasks",
-                                    List.of(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))),
+                                    List.of(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))),
                             "expression", "k2"))))
             .build();
 
@@ -177,7 +177,7 @@ public class BranchTaskDispatcherTest {
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
         TaskExecution taskExecution = TaskExecution.builder().workflowTask(
-            WorkflowTask.of(
+            new WorkflowTask(
                 Map.of(
                     WorkflowConstants.NAME, "name",
                     WorkflowConstants.TYPE, "type",
@@ -187,11 +187,11 @@ public class BranchTaskDispatcherTest {
                             Map.of(
                                 "key", "k1",
                                 "tasks", List.of(
-                                    WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", "type", "print")))),
+                                    new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print")))),
                             Map.of(
                                 "key", "k2",
                                 "tasks", List.of(
-                                    WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", "type", "sleep"))))),
+                                    new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "sleep"))))),
                         "expression", "k2")))).build();
 
         taskExecution.setId(1L);
@@ -203,7 +203,7 @@ public class BranchTaskDispatcherTest {
             .thenReturn(
                 TaskExecution.builder()
                     .id(2L)
-                    .workflowTask(WorkflowTask.of(Map.of(WorkflowConstants.NAME, "name", "type", "sleep"))).build());
+                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "sleep"))).build());
 
         branchTaskDispatcher.dispatch(taskExecution);
 
@@ -226,7 +226,7 @@ public class BranchTaskDispatcherTest {
         TaskExecution taskExecution = TaskExecution.builder()
             .id(1L)
             .workflowTask(
-                WorkflowTask.of(
+                new WorkflowTask(
                     Map.of(
                         WorkflowConstants.NAME, "name",
                         WorkflowConstants.TYPE, "type",

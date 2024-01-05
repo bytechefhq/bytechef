@@ -109,7 +109,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             taskExecution.getParameters(), ForkJoinTaskDispatcherConstants.BRANCHES, new TypeReference<>() {});
 
         List<List<WorkflowTask>> branchesWorkflowTasks = branches.stream()
-            .map(source -> CollectionUtils.map(source, WorkflowTask::of))
+            .map(source -> CollectionUtils.map(source, WorkflowTask::new))
             .toList();
 
         taskExecution.setStartDate(LocalDateTime.now());
@@ -141,7 +141,7 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
                     .priority(taskExecution.getPriority())
                     .taskNumber(1)
                     .workflowTask(
-                        WorkflowTask.of(
+                        new WorkflowTask(
                             MapUtils.append(
                                 branchWorkflowTask.toMap(), WorkflowConstants.PARAMETERS,
                                 Map.of(ForkJoinTaskDispatcherConstants.BRANCH, i))))

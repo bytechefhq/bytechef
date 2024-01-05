@@ -28,8 +28,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.Resource;
@@ -42,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
 @DependsOn("mapUtils")
-public class DemoProjectConfiguration implements InitializingBean {
+public class DemoProjectConfiguration {
 
     private final ProjectService projectService;
     private final ResourcePatternResolver resourcePatternResolver;
@@ -60,28 +61,30 @@ public class DemoProjectConfiguration implements InitializingBean {
         this.workflowService = workflowService;
     }
 
-    @Override
+    @Bean
     @Transactional
-    public void afterPropertiesSet() throws Exception {
-        if (projectService.countProjects() == 0) {
-            Project project = projectService.create(
-                Project.builder()
-                    .name("Demo")
-                    .status(Project.Status.PUBLISHED)
-                    .tagIds(
-                        tagService.save(List.of(new Tag("demo")))
-                            .stream()
-                            .map(Tag::getId)
-                            .toList())
-                    .build());
+    ApplicationRunner demoProjectApplicationRunner() {
+        return args -> {
+            if (projectService.countProjects() == 0) {
+                Project project = projectService.create(
+                    Project.builder()
+                        .name("Demo")
+                        .status(Project.Status.PUBLISHED)
+                        .tagIds(
+                            tagService.save(List.of(new Tag("demo")))
+                                .stream()
+                                .map(Tag::getId)
+                                .toList())
+                        .build());
 
-            for (Resource resource : resourcePatternResolver.getResources("classpath:demo/*.yaml")) {
-                Workflow workflow = workflowService.create(
-                    resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.YAML, SourceType.JDBC,
-                    ProjectConstants.PROJECT_TYPE);
+                for (Resource resource : resourcePatternResolver.getResources("classpath:demo/*.yaml")) {
+                    Workflow workflow = workflowService.create(
+                        resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.YAML, SourceType.JDBC,
+                        ProjectConstants.PROJECT_TYPE);
 
-                projectService.addWorkflow(Validate.notNull(project.getId(), "id"), workflow.getId());
+                    projectService.addWorkflow(Validate.notNull(project.getId(), "id"), workflow.getId());
+                }
             }
-        }
+        };
     }
 }

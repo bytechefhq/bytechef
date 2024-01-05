@@ -98,7 +98,7 @@ public class MapTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDis
                     .parentId(taskExecution.getId())
                     .priority(taskExecution.getPriority())
                     .taskNumber(i + 1)
-                    .workflowTask(WorkflowTask.of(iteratee))
+                    .workflowTask(new WorkflowTask(iteratee))
                     .build();
 
                 Map<String, Object> newContext = new HashMap<>(

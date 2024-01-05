@@ -14,8 +14,9 @@ import com.bytechef.hermes.component.registry.service.ComponentDefinitionService
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
@@ -28,7 +29,7 @@ import org.springframework.context.annotation.DependsOn;
 @DependsOn({
     "jsonUtils", "taskWorkerConfiguration"
 })
-public class ComponentMetadataRegistryConfiguration implements InitializingBean {
+public class ComponentMetadataRegistryConfiguration {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ServiceMetadataRegistry serviceMetadataRegistry;
@@ -42,16 +43,18 @@ public class ComponentMetadataRegistryConfiguration implements InitializingBean 
         this.serviceMetadataRegistry = serviceMetadataRegistry;
     }
 
-    @Override
-    public void afterPropertiesSet() {
-        List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
+    @Bean
+    ApplicationRunner componentMetadataRegistryApplicationRunner() {
+        return args -> {
+            List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
 
-        serviceMetadataRegistry.registerMetadata(
-            Map.of(
-                "components",
-                JsonUtils.write(
-                    componentDefinitions.stream()
-                        .map(componentDefinition -> Map.of("name", componentDefinition.getName()))
-                        .toList())));
+            serviceMetadataRegistry.registerMetadata(
+                Map.of(
+                    "components",
+                    JsonUtils.write(
+                        componentDefinitions.stream()
+                            .map(componentDefinition -> Map.of("name", componentDefinition.getName()))
+                            .toList())));
+        };
     }
 }
