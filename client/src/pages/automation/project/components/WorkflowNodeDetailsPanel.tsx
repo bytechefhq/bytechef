@@ -57,7 +57,7 @@ const WorkflowNodeDetailsPanel = ({
         useWorkflowNodeDetailsPanelStore();
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery({
-        componentName: currentNode.componentName || currentNode.name,
+        componentName: currentNode.componentName || currentNode.id,
     });
 
     const {componentData, setComponentData} = useWorkflowDefinitionStore();
@@ -448,10 +448,10 @@ const WorkflowNodeDetailsPanel = ({
     }, [currentAction?.name, currentComponent?.workflowNodeName]);
 
     useEffect(() => {
-        if (!componentNames.includes(currentNode.name)) {
+        if (currentNode.componentName && !componentNames.includes(currentNode.componentName)) {
             setWorkflowNodeDetailsPanelOpen(false);
         }
-    }, [componentNames, currentNode.name, setWorkflowNodeDetailsPanelOpen]);
+    }, [componentNames, currentNode.componentName, setWorkflowNodeDetailsPanelOpen]);
 
     return (
         <Dialog.Root modal={false} open={workflowNodeDetailsPanelOpen}>
