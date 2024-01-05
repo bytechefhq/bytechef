@@ -75,6 +75,18 @@ export interface ArrayPropertyModel extends ValuePropertyModel {
      */
     items?: Array<PropertyModel>;
     /**
+     * 
+     * @type {number}
+     * @memberof ArrayPropertyModel
+     */
+    maxItems?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ArrayPropertyModel
+     */
+    minItems?: number;
+    /**
      * If the array can contain multiple items.
      * @type {boolean}
      * @memberof ArrayPropertyModel
@@ -116,6 +128,8 @@ export function ArrayPropertyModelFromJSONTyped(json: any, ignoreDiscriminator: 
         'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
         'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
         'items': !exists(json, 'items') ? undefined : ((json['items'] as Array<any>).map(PropertyModelFromJSON)),
+        'maxItems': !exists(json, 'maxItems') ? undefined : json['maxItems'],
+        'minItems': !exists(json, 'minItems') ? undefined : json['minItems'],
         'multipleValues': !exists(json, 'multipleValues') ? undefined : json['multipleValues'],
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
         'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
@@ -134,6 +148,8 @@ export function ArrayPropertyModelToJSON(value?: ArrayPropertyModel | null): any
         'defaultValue': value.defaultValue,
         'exampleValue': value.exampleValue,
         'items': value.items === undefined ? undefined : ((value.items as Array<any>).map(PropertyModelToJSON)),
+        'maxItems': value.maxItems,
+        'minItems': value.minItems,
         'multipleValues': value.multipleValues,
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
         'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),

@@ -57,11 +57,23 @@ export interface NumberPropertyModel extends PropertyModel {
      */
     exampleValue?: number;
     /**
+     * The number value precision.
+     * @type {number}
+     * @memberof NumberPropertyModel
+     */
+    maxNumberPrecision?: number;
+    /**
      * The maximum property value.
      * @type {number}
      * @memberof NumberPropertyModel
      */
     maxValue?: number;
+    /**
+     * The number value precision.
+     * @type {number}
+     * @memberof NumberPropertyModel
+     */
+    minNumberPrecision?: number;
     /**
      * The minimum property value.
      * @type {number}
@@ -109,7 +121,9 @@ export function NumberPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
         'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
         'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
+        'maxNumberPrecision': !exists(json, 'maxNumberPrecision') ? undefined : json['maxNumberPrecision'],
         'maxValue': !exists(json, 'maxValue') ? undefined : json['maxValue'],
+        'minNumberPrecision': !exists(json, 'minNumberPrecision') ? undefined : json['minNumberPrecision'],
         'minValue': !exists(json, 'minValue') ? undefined : json['minValue'],
         'numberPrecision': !exists(json, 'numberPrecision') ? undefined : json['numberPrecision'],
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
@@ -128,7 +142,9 @@ export function NumberPropertyModelToJSON(value?: NumberPropertyModel | null): a
         ...PropertyModelToJSON(value),
         'defaultValue': value.defaultValue,
         'exampleValue': value.exampleValue,
+        'maxNumberPrecision': value.maxNumberPrecision,
         'maxValue': value.maxValue,
+        'minNumberPrecision': value.minNumberPrecision,
         'minValue': value.minValue,
         'numberPrecision': value.numberPrecision,
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),

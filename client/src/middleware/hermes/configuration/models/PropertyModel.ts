@@ -71,23 +71,11 @@ export interface PropertyModel {
      */
     hidden?: boolean;
     /**
-     * The property label.
-     * @type {string}
-     * @memberof PropertyModel
-     */
-    label?: string;
-    /**
      * The property name.
      * @type {string}
      * @memberof PropertyModel
      */
     name?: string;
-    /**
-     * The property placeholder.
-     * @type {string}
-     * @memberof PropertyModel
-     */
-    placeholder?: string;
     /**
      * If the property is required or not.
      * @type {boolean}
@@ -161,9 +149,7 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         'displayCondition': !exists(json, 'displayCondition') ? undefined : json['displayCondition'],
         'expressionEnabled': !exists(json, 'expressionEnabled') ? undefined : json['expressionEnabled'],
         'hidden': !exists(json, 'hidden') ? undefined : json['hidden'],
-        'label': !exists(json, 'label') ? undefined : json['label'],
         'name': !exists(json, 'name') ? undefined : json['name'],
-        'placeholder': !exists(json, 'placeholder') ? undefined : json['placeholder'],
         'required': !exists(json, 'required') ? undefined : json['required'],
         'type': !exists(json, 'type') ? undefined : PropertyTypeModelFromJSON(json['type']),
     };
@@ -183,9 +169,7 @@ export function PropertyModelToJSON(value?: PropertyModel | null): any {
         'displayCondition': value.displayCondition,
         'expressionEnabled': value.expressionEnabled,
         'hidden': value.hidden,
-        'label': value.label,
         'name': value.name,
-        'placeholder': value.placeholder,
         'required': value.required,
         'type': PropertyTypeModelToJSON(value.type),
     };

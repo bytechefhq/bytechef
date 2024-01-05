@@ -44,6 +44,18 @@ export interface ValuePropertyModel extends PropertyModel {
      * @memberof ValuePropertyModel
      */
     controlType?: ControlTypeModel;
+    /**
+     * The property label.
+     * @type {string}
+     * @memberof ValuePropertyModel
+     */
+    label?: string;
+    /**
+     * The property placeholder.
+     * @type {string}
+     * @memberof ValuePropertyModel
+     */
+    placeholder?: string;
 }
 
 /**
@@ -66,6 +78,8 @@ export function ValuePropertyModelFromJSONTyped(json: any, ignoreDiscriminator: 
     return {
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
         'controlType': !exists(json, 'controlType') ? undefined : ControlTypeModelFromJSON(json['controlType']),
+        'label': !exists(json, 'label') ? undefined : json['label'],
+        'placeholder': !exists(json, 'placeholder') ? undefined : json['placeholder'],
     };
 }
 
@@ -79,6 +93,8 @@ export function ValuePropertyModelToJSON(value?: ValuePropertyModel | null): any
     return {
         ...PropertyModelToJSON(value),
         'controlType': ControlTypeModelToJSON(value.controlType),
+        'label': value.label,
+        'placeholder': value.placeholder,
     };
 }
 

@@ -39,6 +39,12 @@ import {
  */
 export interface DynamicPropertiesPropertyModel extends PropertyModel {
     /**
+     * The dynamic property header.
+     * @type {string}
+     * @memberof DynamicPropertiesPropertyModel
+     */
+    header?: string;
+    /**
      * 
      * @type {PropertiesDataSourceModel}
      * @memberof DynamicPropertiesPropertyModel
@@ -65,6 +71,7 @@ export function DynamicPropertiesPropertyModelFromJSONTyped(json: any, ignoreDis
     }
     return {
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
+        'header': !exists(json, 'header') ? undefined : json['header'],
         'propertiesDataSource': !exists(json, 'propertiesDataSource') ? undefined : PropertiesDataSourceModelFromJSON(json['propertiesDataSource']),
     };
 }
@@ -78,6 +85,7 @@ export function DynamicPropertiesPropertyModelToJSON(value?: DynamicPropertiesPr
     }
     return {
         ...PropertyModelToJSON(value),
+        'header': value.header,
         'propertiesDataSource': PropertiesDataSourceModelToJSON(value.propertiesDataSource),
     };
 }
