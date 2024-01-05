@@ -138,7 +138,7 @@ const Select = ({
                                                 {option.description}
                                             </span>
                                         )}
-                                    </div>  
+                                    </div>
                                 </Item>
                             ))}
                         </Group>
