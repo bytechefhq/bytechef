@@ -25,6 +25,7 @@ public final class OpenAIConstants {
     public static final String CONTENT = "content";
     public static final String DALL_E_3 = "dall-e-3";
     public static final String DALL_E_2 = "dall-e-2";
+    public static final String DEFAULT_SIZE = "1024x1024";
     public static final String DESCRIPTION = "description";
     public static final String DETAIL = "detail";
     public static final String FILE = "file";

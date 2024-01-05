@@ -31,6 +31,7 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.action;
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN;
 
@@ -78,10 +79,14 @@ public class OpenAICreateAssistantAction {
                         string(TYPE)
                             .label("Type")
                             .description("The type of tool being defined.")
+                            .options(
+                                option("Code interpreter", "code_interpreter"),
+                                option("Retrieval", "retrieval"),
+                                option("Function", FUNCTION))
                             .required(true),
                         object(FUNCTION)
                             .label("Function")
-                            .displayCondition("%s === '%s'".formatted(TYPE, "function"))
+                            .displayCondition("%s === '%s'".formatted(TYPE, FUNCTION))
                             .properties(
                                 string(DESCRIPTION)
                                     .label("Description")
@@ -91,12 +96,13 @@ public class OpenAICreateAssistantAction {
                                     .required(false),
                                 string(NAME)
                                     .label("Name")
-                                    .description("")
+                                    .description("The name of the function to be called.")
                                     .maxLength(64)
                                     .required(true),
                                 object(PARAMETERS)
                                     .label("Parameters")
-                                    .description("")
+                                    .description(
+                                        "The parameters the functions accepts, described as a JSON Schema object.")
                                     .required(true))
                             .required(false))
 
@@ -108,7 +114,12 @@ public class OpenAICreateAssistantAction {
                 .required(false),
             object(METADATA)
                 .label("Metadata")
-                .description("")
+                .description(
+                    "Set of 16 key-value pairs that can be attached to an object. This can be useful for storing " +
+                        "additional information about the object in a structured format. Keys can be a maximum of 64 " +
+                        "characters long and values can be a maxium of 512 characters long.")
+                .additionalProperties(
+                    string())
                 .required(false))
         .outputSchema(
             object()
@@ -154,6 +165,7 @@ public class OpenAICreateAssistantAction {
         assistantRequest.setInstructions(inputParameters.getString(INSTRUCTIONS));
         assistantRequest.setTools(inputParameters.getList(TOOLS, new TypeReference<>() {}));
         assistantRequest.setFileIds(inputParameters.getList(FILE_IDS, new TypeReference<>() {}));
+        assistantRequest.setMetadata(inputParameters.getMap(METADATA, new TypeReference<>() {}));
 
         return openAiService.createAssistant(assistantRequest);
     }

@@ -17,6 +17,7 @@
 package com.bytechef.component.openai.util;
 
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
+import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
@@ -95,8 +96,6 @@ public class OpenAIUtils {
                             integer("completionTokens"),
                             integer("totalTokens"))));
 
-    private static final String DEFAULT_SIZE = "1024x1024";
-
     private OpenAIUtils() {
     }
 
@@ -128,40 +127,28 @@ public class OpenAIUtils {
             .description("A text description of the desired image(s).")
             .required(true);
 
+        ComponentDSL.ModifiableIntegerProperty n = integer(N)
+            .label("n")
+            .description(
+                "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
+            .defaultValue(1)
+            .required(false);
+
         if (model.equals(DALL_E_2)) {
             string.maxLength(1000);
+            n.minValue(1);
+            n.maxValue(10);
         } else {
             string.maxLength(4000);
         }
 
-        return new PropertiesResponse(List.of(string));
-    }
-
-    public static PropertiesResponse getNumberOfImagesProperties(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        String model = inputParameters.getRequiredString(MODEL);
-
-        ComponentDSL.ModifiableIntegerProperty n = integer(N)
-            .label("n")
-            .description("The number of images to generate." +
-                " Must be between 1 and 10. " +
-                "For dall-e-3, only n=1 is supported.")
-            .defaultValue(1)
-            .required(false);
-
-        if (model.equals("dall-e-2")) {
-            n.minValue(1);
-            n.maxValue(10);
-        }
-
-        return new PropertiesResponse(List.of(n));
+        return new PropertiesResponse(List.of(string, n));
     }
 
     public static OutputSchemaResponse getOutputSchemaResponse(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        boolean stream = inputParameters.getBoolean(STREAM);
+        boolean stream = inputParameters.getRequiredBoolean(STREAM);
 
         if (stream) {
             return outputSchemaResponseForStream;
