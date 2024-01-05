@@ -16,8 +16,6 @@ tags:
   description: "The Automation Project Tag API"
 - name: "project"
   description: "The Automation Project API"
-- name: "workflow"
-  description: "The Automation Workflow API"
 paths:
   /project-instances:
     get:
@@ -551,7 +549,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/Workflow"
+                  $ref: "../../../../hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
     post:
       description: "Create new workflow and adds it to an existing project."
       summary: "Create new workflow and adds it to an existing project."
@@ -570,7 +568,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Workflow'
+              $ref: '../../../../hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow'
         required: true
       responses:
         "200":
@@ -578,7 +576,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workflow"
+                $ref: "../../../../hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
   /projects/{id}/workflows/{workflowId}:
     delete:
       description: "Delete a workflow."
@@ -630,13 +628,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workflow"
+                $ref: "../../../../hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
   /workflows:
     get:
       description: "Get workflow definitions."
       summary: "Get workflow definitions"
       tags:
-      - "workflow"
+        - "workflow"
       operationId: "getWorkflows"
       responses:
         "200":
@@ -646,54 +644,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/Workflow"
-  /workflows/{id}:
-    get:
-      description: "Get a workflow by id."
-      summary: "Get a workflow by id"
-      tags:
-      - "workflow"
-      operationId: "getWorkflow"
-      parameters:
-      - name: "id"
-        description: "The id of the workflow to get."
-        in: "path"
-        required: true
-        schema:
-          type: "string"
-      responses:
-        "200":
-          description: "The workflow object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Workflow"
-    put:
-      description: "Update an existing workflow."
-      summary: "Update an existing workflow"
-      tags:
-      - "workflow"
-      operationId: "updateWorkflow"
-      parameters:
-      - name: "id"
-        description: "The id of the workflow to update."
-        in: "path"
-        required: true
-        schema:
-          type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Workflow'
-        required: true
-      responses:
-        "200":
-          description: "The updated workflow object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Workflow"
+                  $ref: "../../../../hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
 components:
   schemas:
     Category:
@@ -729,62 +680,6 @@ components:
         __version:
           type: "integer"
           format: "int32"
-    Input:
-      type: "object"
-      required:
-      - "name"
-      - "value"
-      properties:
-        label:
-          description: "The descriptive name of an input"
-          type: "string"
-        name:
-          description: "The name of an input"
-          type: "string"
-        required:
-          description: "If an input is required, or not"
-          type: "boolean"
-          default: false
-        type:
-          description: "The type of an input, for example \\\"string\\\""
-          type: "string"
-    Output:
-      type: "object"
-      required:
-      - "name"
-      - "value"
-      properties:
-        name:
-          description: "The name of an output"
-          type: "string"
-        value:
-          description: "The value of an output"
-          type: "object"
-    Page:
-      description: "A sublist of a list of objects. It allows gain information about\
-        \ the position of it in the containing entire list."
-      type: "object"
-      properties:
-        number:
-          description: "The current page."
-          type: "integer"
-        size:
-          description: "The size of the page."
-          type: "integer"
-        numberOfElements:
-          description: "The number of elements."
-          type: "integer"
-        totalPages:
-          description: "The total number of pages."
-          type: "integer"
-        totalElements:
-          description: "The total number of elements."
-          type: "integer"
-        content:
-          description: "The list of elements."
-          type: "array"
-          items:
-            type: "object"
     Project:
       description: "A group of workflows that make one logical project."
       type: "object"
@@ -1065,7 +960,7 @@ components:
         __version:
           type: "integer"
     ProjectInstanceWorkflowConnection:
-      description: "The connection used in a particular task."
+      description: "The connection used in a particular task or trigger."
       type: "object"
       required:
         - "connectionId"
@@ -1123,193 +1018,3 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Tag"
-    Workflow:
-      description: "The blueprint that describe the execution of a job."
-      type: "object"
-      properties:
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        definition:
-          description: "The definition of a workflow."
-          type: "string"
-          writeOnly: true
-        description:
-          description: "The description of a workflow."
-          type: "string"
-          readOnly: true
-        format:
-          $ref: "#/components/schemas/WorkflowFormat"
-        id:
-          description: "The id of the workflow."
-          type: "string"
-          readOnly: true
-        inputs:
-          description: "The workflow's expected list of inputs."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Input"
-          readOnly: true
-        label:
-          description: "The descriptive name for the workflow"
-          type: "string"
-          readOnly: true
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        outputs:
-          description: "The workflow's list of expected outputs."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Output"
-          readOnly: true
-        sourceType:
-          description: "The type of the source which stores the workflow definition."
-          type: "string"
-          enum:
-          - "CLASSPATH"
-          - "FILESYSTEM"
-          - "GIT"
-          - "JDBC"
-        maxRetries:
-          description: "The maximum number of times a task may retry."
-          type: "integer"
-          format: "int32"
-          readOnly: true
-        tasks:
-          description: "The steps that make up the workflow."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/WorkflowTask"
-          readOnly: true
-        triggers:
-          description: "The steps that make up the workflow."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/WorkflowTrigger"
-          readOnly: true
-        __version:
-          type: "integer"
-    WorkflowConnection:
-      type: "object"
-      required:
-      - "componentName"
-      - "componentVersion"
-      - "key"
-      - "operationName"
-      - "required"
-      properties:
-        componentName:
-          type: "string"
-        componentVersion:
-          type: "integer"
-        id:
-          type: "integer"
-          format: "int64"
-        key:
-          type: "string"
-        operationName:
-          type: "string"
-        required:
-          type: "boolean"
-    WorkflowFormat:
-      type: "string"
-      enum:
-      - "JSON"
-      - "YAML"
-    WorkflowTask:
-      description: "Represents a definition of a workflow task."
-      type: "object"
-      required:
-      - "name"
-      - "type"
-      properties:
-        connections:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/WorkflowConnection"
-        finalize:
-          description: "The (optional) list of tasks that are to be executed after\
-            \ execution of a task -- regardless of whether it had failed or not."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/WorkflowTask"
-        label:
-          description: "The human-readable description of the task."
-          type: "string"
-        name:
-          description: "The identifier name of the task. Task names are used for assigning\
-            \ the output of one task so it can be later used by subsequent tasks."
-          type: "string"
-        node:
-          description: "Defines the name of the type of the node that the task execution\
-            \ will be routed to. For instance, if the node value is \"encoder\", then\
-            \ the task will be routed to the \"encoder\" queue which is presumably\
-            \ subscribed to by worker nodes of \"encoder\" type."
-          type: "string"
-        parameters:
-          description: "Key-value map of task parameters."
-          type: "object"
-          additionalProperties:
-            type: "object"
-        post:
-          description: "The (optional) list of tasks that are to be executed after\
-            \ the successful execution of a task."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/WorkflowTask"
-        pre:
-          description: "The (optional) list of tasks that are to be executed prior\
-            \ to a task."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/WorkflowTask"
-        timeout:
-          description: "The timeout expression which describes when a task should\
-            \ be deemed as timed-out."
-          type: "string"
-        type:
-          description: "The type of a task."
-          type: "string"
-    WorkflowTrigger:
-      description: "Represents a definition of a workflow trigger."
-      type: "object"
-      required:
-      - "name"
-      - "type"
-      properties:
-        connections:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/WorkflowConnection"
-        label:
-          description: "The human-readable description of the task."
-          type: "string"
-        name:
-          description: "The identifier name of the task. Task names are used for assigning\
-            \ the output of one task so it can be later used by subsequent tasks."
-          type: "string"
-        parameters:
-          description: "Key-value map of task parameters."
-          type: "object"
-          additionalProperties:
-            type: "object"
-        timeout:
-          description: "The timeout expression which describes when a trigger should\
-            \ be deemed as timed-out."
-          type: "string"
-        type:
-          description: "The type of a trigger."
-          type: "string"

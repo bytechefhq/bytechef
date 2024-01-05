@@ -1,7 +1,7 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Definition API"
+  title: "The Core Configuration API"
   version: "1"
 servers:
 - url: "http://localhost:5173/api/core"
@@ -16,6 +16,10 @@ tags:
   description: "The Core Task Dispatcher Definition API"
 - name: "trigger-definition"
   description: "The Core Trigger Definition API"
+- name: "workflow"
+  description: "The Core Workflow API"
+- name: "workflow-test-configuration"
+  description: "The Core Workflow Test Configuration API"
 paths:
   /action-definitions:
     get:
@@ -914,6 +918,53 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/TriggerDefinition"
+  /workflows/{id}:
+    get:
+      description: "Get a workflow by id."
+      summary: "Get a workflow by id"
+      tags:
+        - "workflow"
+      operationId: "getWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of the workflow to get."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+    put:
+      description: "Update an existing workflow."
+      summary: "Update an existing workflow"
+      tags:
+        - "workflow"
+      operationId: "updateWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of the workflow to update."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workflow'
+        required: true
+      responses:
+        "200":
+          description: "The updated workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
 components:
   schemas:
     ActionDefinition:
@@ -1126,9 +1177,6 @@ components:
         actionsCount:
           default: "The number of actions a component has"
           type: "integer"
-        category:
-          description: "The category."
-          type: "string"
         description:
           description: "The description."
           type: "string"
@@ -1138,13 +1186,6 @@ components:
         name:
           description: "The name of a component."
           type: "string"
-        resources:
-          $ref: "#/components/schemas/Resources"
-        tags:
-          description: "Tags for categorization."
-          type: "array"
-          items:
-            type: "string"
         title:
           description: "The title"
           type: "string"
@@ -1804,3 +1845,232 @@ components:
         properties:
           controlType:
             $ref: "#/components/schemas/ControlType"
+    Workflow:
+      description: "The blueprint that describe the execution of a job."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/WorkflowBasic"
+        - type: "object"
+          properties:
+            definition:
+              description: "The definition of a workflow."
+              type: "string"
+              writeOnly: true
+            format:
+              $ref: "#/components/schemas/WorkflowFormat"
+            inputs:
+              description: "The workflow's expected list of inputs."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/WorkflowInput"
+              readOnly: true
+            outputs:
+              description: "The workflow's list of expected outputs."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/WorkflowOutput"
+              readOnly: true
+            sourceType:
+              description: "The type of the source which stores the workflow definition."
+              type: "string"
+              enum:
+                - "CLASSPATH"
+                - "FILESYSTEM"
+                - "GIT"
+                - "JDBC"
+            maxRetries:
+              description: "The maximum number of times a task may retry."
+              type: "integer"
+              format: "int32"
+              readOnly: true
+            tasks:
+              description: "The steps that make up the workflow."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/WorkflowTask"
+              readOnly: true
+            triggers:
+              description: "The steps that make up the workflow."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/WorkflowTrigger"
+              readOnly: true
+    WorkflowBasic:
+      description: "The blueprint that describe the execution of a job."
+      type: "object"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        description:
+          description: "The description of a workflow."
+          type: "string"
+          writeOnly: true
+        id:
+          description: "The id of the workflow."
+          type: "string"
+          readOnly: true
+        label:
+          description: "The descriptive name for the workflow"
+          type: "string"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        __version:
+          type: "integer"
+    WorkflowConnection:
+      type: "object"
+      required:
+        - "componentName"
+        - "componentVersion"
+        - "key"
+        - "operationName"
+        - "required"
+      properties:
+        componentName:
+          type: "string"
+        componentVersion:
+          type: "integer"
+        id:
+          type: "integer"
+          format: "int64"
+        key:
+          type: "string"
+        operationName:
+          type: "string"
+        required:
+          type: "boolean"
+    WorkflowFormat:
+      type: "string"
+      enum:
+        - "JSON"
+        - "YAML"
+    WorkflowInput:
+      type: "object"
+      required:
+        - "name"
+        - "value"
+      properties:
+        label:
+          description: "The descriptive name of an input"
+          type: "string"
+        name:
+          description: "The name of an input"
+          type: "string"
+        required:
+          description: "If an input is required, or not"
+          type: "boolean"
+          default: false
+        type:
+          description: "The type of an input, for example \\\"string\\\""
+          type: "string"
+          default: "string"
+    WorkflowOutput:
+      type: "object"
+      required:
+        - "name"
+        - "value"
+      properties:
+        name:
+          description: "The name of an output"
+          type: "string"
+        value:
+          description: "The value of an output"
+          type: "object"
+    WorkflowTask:
+      description: "Represents a definition of a workflow task."
+      type: "object"
+      required:
+        - "name"
+        - "type"
+      properties:
+        connections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowConnection"
+        finalize:
+          description: "The (optional) list of tasks that are to be executed after\
+            \ execution of a task -- regardless of whether it had failed or not."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+        label:
+          description: "The human-readable description of the task."
+          type: "string"
+        name:
+          description: "The identifier name of the task. Task names are used for assigning\
+            \ the output of one task so it can be later used by subsequent tasks."
+          type: "string"
+        node:
+          description: "Defines the name of the type of the node that the task execution\
+            \ will be routed to. For instance, if the node value is \"encoder\", then\
+            \ the task will be routed to the \"encoder\" queue which is presumably\
+            \ subscribed to by worker nodes of \"encoder\" type."
+          type: "string"
+        parameters:
+          description: "Key-value map of task parameters."
+          type: "object"
+          additionalProperties:
+            type: "object"
+        post:
+          description: "The (optional) list of tasks that are to be executed after\
+            \ the successful execution of a task."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+        pre:
+          description: "The (optional) list of tasks that are to be executed prior\
+            \ to a task."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+        timeout:
+          description: "The timeout expression which describes when a task should\
+            \ be deemed as timed-out."
+          type: "string"
+        type:
+          description: "The type of a task."
+          type: "string"
+    WorkflowTrigger:
+      description: "Represents a definition of a workflow trigger."
+      type: "object"
+      required:
+        - "name"
+        - "type"
+      properties:
+        connections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowConnection"
+        label:
+          description: "The human-readable description of the task."
+          type: "string"
+        name:
+          description: "The identifier name of the task. Task names are used for assigning\
+            \ the output of one task so it can be later used by subsequent tasks."
+          type: "string"
+        parameters:
+          description: "Key-value map of task parameters."
+          type: "object"
+          additionalProperties:
+            type: "object"
+        timeout:
+          description: "The timeout expression which describes when a trigger should\
+            \ be deemed as timed-out."
+          type: "string"
+        type:
+          description: "The type of a trigger."
+          type: "string"
