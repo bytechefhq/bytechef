@@ -41,7 +41,6 @@ import com.bytechef.hermes.component.definition.Context.Http.Body;
 import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
 import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
@@ -215,9 +214,8 @@ public class CustomActionUtils {
     }
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
-            context.outputSchema(outputSchema -> outputSchema.get(
-                perform(inputParameters, connectionParameters, context))));
+        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+            outputSchema -> outputSchema.get(perform(inputParameters, connectionParameters, context)));
     }
 
     protected static ActionSampleOutputFunction getSampleOutputFunction() {

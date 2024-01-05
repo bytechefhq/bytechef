@@ -23,7 +23,6 @@ import com.bytechef.component.object.helper.constant.ObjectHelperConstants;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
@@ -45,9 +44,8 @@ public class ObjectHelperParseAction {
         .perform(ObjectHelperParseAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
-            context.outputSchema(outputSchema -> outputSchema.get(
-                perform(inputParameters, connectionParameters, context))));
+        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+            outputSchema -> outputSchema.get(perform(inputParameters, connectionParameters, context)));
     }
 
     protected static ActionSampleOutputFunction getSampleOutputFunction() {

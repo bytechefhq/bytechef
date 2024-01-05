@@ -38,7 +38,6 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectio
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.hermes.component.jdbc.constant.JdbcConstants;
@@ -235,9 +234,8 @@ public class JdbcComponentHandler implements ComponentHandler {
     }
 
     protected ActionOutputSchemaFunction getDeleteOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
-            context.outputSchema(outputSchema -> outputSchema.get(
-                performDelete(inputParameters, connectionParameters, context))));
+        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+            outputSchema -> outputSchema.get(performDelete(inputParameters, connectionParameters, context)));
     }
 
     protected ActionSampleOutputFunction getDeleteOSampleOutputSchemaFunction() {
@@ -246,9 +244,8 @@ public class JdbcComponentHandler implements ComponentHandler {
     }
 
     protected ActionOutputSchemaFunction getExecuteOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
-            context.outputSchema(outputSchema -> outputSchema.get(
-                performExecute(inputParameters, connectionParameters, context))));
+        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+            outputSchema -> outputSchema.get(performExecute(inputParameters, connectionParameters, context)));
     }
 
     protected ActionSampleOutputFunction getExecuteOSampleOutputSchemaFunction() {
@@ -257,9 +254,8 @@ public class JdbcComponentHandler implements ComponentHandler {
     }
 
     protected ActionOutputSchemaFunction getInsertOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
-            context.outputSchema(outputSchema -> outputSchema.get(
-                performInsert(inputParameters, connectionParameters, context))));
+        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+            outputSchema -> outputSchema.get(performInsert(inputParameters, connectionParameters, context)));
     }
 
     protected ActionSampleOutputFunction getInsertOSampleOutputSchemaFunction() {
@@ -268,9 +264,8 @@ public class JdbcComponentHandler implements ComponentHandler {
     }
 
     protected ActionOutputSchemaFunction getQueryOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
-            context.outputSchema(outputSchema -> outputSchema.get(
-                performQuery(inputParameters, connectionParameters, context))));
+        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+            outputSchema -> outputSchema.get(performQuery(inputParameters, connectionParameters, context)));
     }
 
     protected ActionSampleOutputFunction getQueryOSampleOutputSchemaFunction() {
@@ -279,9 +274,8 @@ public class JdbcComponentHandler implements ComponentHandler {
     }
 
     protected ActionOutputSchemaFunction getUpdateOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
-            context.outputSchema(outputSchema -> outputSchema.get(
-                performUpdate(inputParameters, connectionParameters, context))));
+        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+            outputSchema -> outputSchema.get(performUpdate(inputParameters, connectionParameters, context)));
     }
 
     protected ActionSampleOutputFunction getUpdateOSampleOutputSchemaFunction() {

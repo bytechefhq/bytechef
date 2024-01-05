@@ -25,6 +25,7 @@ import com.bytechef.hermes.component.definition.DynamicOptionsProperty;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource;
 import com.bytechef.hermes.component.definition.OptionsDataSource;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
+import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.hermes.component.definition.ParametersImpl;
 import com.bytechef.hermes.component.definition.PropertiesDataSource;
 import com.bytechef.hermes.component.definition.Property.DynamicPropertiesProperty;
@@ -35,12 +36,7 @@ import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ActionDefinition;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
-import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.component.registry.domain.OptionsResponse;
-import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
 import com.bytechef.hermes.component.registry.domain.Property;
-import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
 import com.bytechef.hermes.component.registry.domain.ValueProperty;
 import com.bytechef.hermes.registry.domain.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -63,32 +59,26 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public PropertiesResponse executeDynamicProperties(
+    public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
         PropertiesDataSource.ActionPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, actionName, propertyName);
 
-        PropertiesDataSource.PropertiesResponse propertiesResponse = null;
-
         try {
-            propertiesResponse = propertiesFunction.apply(
-                new ParametersImpl(inputParameters),
-                connection == null ? null : new ParametersImpl(connection.parameters()), context);
+            return CollectionUtils.map(
+                propertiesFunction.apply(
+                    new ParametersImpl(inputParameters),
+                    connection == null ? null : new ParametersImpl(connection.parameters()), context),
+                valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
-
-        return new PropertiesResponse(
-            CollectionUtils.map(
-                propertiesResponse.properties(),
-                valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty)),
-            propertiesResponse.errorMessage());
     }
 
     @Override
-    public EditorDescriptionResponse executeEditorDescription(
+    public String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
@@ -96,20 +86,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             getEditorDescriptionFunction(
                 componentName, componentVersion, actionName);
 
-        EditorDescriptionDataSource.EditorDescriptionResponse editorDescriptionResponse;
-
         try {
-            editorDescriptionResponse = editorDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
+            return editorDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
-
-        return new EditorDescriptionResponse(
-            editorDescriptionResponse.description(), editorDescriptionResponse.errorMessage());
     }
 
     @Override
-    public OptionsResponse executeOptions(
+    public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, String searchText, ComponentConnection connection,
         @NonNull ActionContext context) {
@@ -117,40 +102,32 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         OptionsDataSource.ActionOptionsFunction optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, actionName, propertyName);
 
-        OptionsDataSource.OptionsResponse optionsResponse;
-
         try {
-            optionsResponse = optionsFunction.apply(
-                new ParametersImpl(inputParameters),
-                connection == null ? null : new ParametersImpl(connection.parameters()), searchText, context);
+            return CollectionUtils.map(
+                optionsFunction.apply(
+                    new ParametersImpl(inputParameters),
+                    connection == null ? null : new ParametersImpl(connection.parameters()), searchText, context),
+                Option::new);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
-
-        return new OptionsResponse(
-            CollectionUtils.map(optionsResponse.options(), Option::new), optionsResponse.errorMessage());
     }
 
     @Override
-    public OutputSchemaResponse executeOutputSchema(
+    public Property executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
-        OutputSchemaDataSource.ActionOutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
+        ActionOutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
             componentName, componentVersion, actionName);
 
-        OutputSchemaDataSource.OutputSchemaResponse outputSchemaResponse;
-
         try {
-            outputSchemaResponse = outputSchemaFunction.apply(
+            return Property.toProperty(outputSchemaFunction.apply(
                 new ParametersImpl(inputParameters),
-                connection == null ? null : new ParametersImpl(connection.parameters()), context);
+                connection == null ? null : new ParametersImpl(connection.parameters()), context));
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
-
-        return new OutputSchemaResponse(
-            Property.toProperty(outputSchemaResponse.property()), outputSchemaResponse.errorMessage());
     }
 
     @Override
@@ -175,7 +152,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public SampleOutputResponse executeSampleOutput(
+    public Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
@@ -202,7 +179,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             }
         }
 
-        return new SampleOutputResponse(sampleOutput, sampleOutputResponse.errorMessage());
+        return sampleOutput;
     }
 
     @Override
@@ -277,12 +254,12 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             actionDefinition.getEditorDescriptionDataSource(),
             editorDescriptionDataSource -> (EditorDescriptionDataSource.ActionEditorDescriptionFunction) editorDescriptionDataSource
                 .getEditorDescription(),
-            (inputParameters, context) -> new EditorDescriptionDataSource.EditorDescriptionResponse(
-                OptionalUtils.orElse(componentDefinition.getTitle(), componentDefinition.getName()) + ": " +
-                    OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName())));
+            (inputParameters, context) -> OptionalUtils.orElse(
+                componentDefinition.getTitle(), componentDefinition.getName()) + ": " +
+                OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
     }
 
-    private OutputSchemaDataSource.ActionOutputSchemaFunction getOutputSchemaFunction(
+    private ActionOutputSchemaFunction getOutputSchemaFunction(
         String componentName, int componentVersion, String actionName) {
 
         com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
@@ -291,7 +268,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(actionDefinition.getOutputSchemaDataSource());
 
-        return (OutputSchemaDataSource.ActionOutputSchemaFunction) outputSchemaDataSource.getOutputSchema();
+        return (ActionOutputSchemaFunction) outputSchemaDataSource.getOutputSchema();
     }
 
     private ActionSampleOutputFunction getSampleOutputFunction(

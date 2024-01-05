@@ -17,7 +17,6 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.definition.Option;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,7 +60,7 @@ public interface OptionsDataSource {
          * @return
          * @throws Exception
          */
-        OptionsResponse apply(
+        List<? extends Option<?>> apply(
             Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
             throws Exception;
     }
@@ -81,21 +80,8 @@ public interface OptionsDataSource {
          * @return
          * @throws Exception
          */
-        OptionsResponse apply(
+        List<? extends Option<?>> apply(
             Parameters inputParameters, Parameters connectionParameters, String searchText, TriggerContext context)
             throws Exception;
-    }
-
-    /**
-     *
-     * @param options
-     * @param errorMessage
-     */
-    @SuppressFBWarnings("EI")
-    record OptionsResponse(List<? extends Option<?>> options, String errorMessage) {
-
-        public OptionsResponse(List<? extends Option<?>> options) {
-            this(options, null);
-        }
     }
 }

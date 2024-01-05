@@ -7,14 +7,13 @@
 
 package com.bytechef.hermes.component.registry.remote.web.rest.facade;
 
-import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.component.registry.domain.OptionsResponse;
-import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
+import com.bytechef.hermes.component.registry.domain.Property;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
+import com.bytechef.hermes.registry.domain.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -44,7 +43,7 @@ public class RemoteActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<EditorDescriptionResponse> executeEditorDescription(
+    public ResponseEntity<String> executeEditorDescription(
         @Valid @RequestBody EditorDescriptionRequest editorDescriptionRequest) {
 
         return ResponseEntity.ok(actionDefinitionFacade.executeEditorDescription(
@@ -59,7 +58,7 @@ public class RemoteActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<OptionsResponse> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
+    public ResponseEntity<List<Option>> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
 
         return ResponseEntity.ok(
             actionDefinitionFacade.executeOptions(
@@ -74,7 +73,7 @@ public class RemoteActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<PropertiesResponse> executeDynamicProperties(
+    public ResponseEntity<List<Property>> executeDynamicProperties(
         @Valid @RequestBody PropertiesRequest propertiesRequest) {
 
         return ResponseEntity.ok(
@@ -103,7 +102,7 @@ public class RemoteActionDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<OutputSchemaResponse> executeOutputSchema(
+    public ResponseEntity<Property> executeOutputSchema(
         @Valid @RequestBody OutputSchemaRequest outputSchemaRequest) {
 
         return ResponseEntity.ok(

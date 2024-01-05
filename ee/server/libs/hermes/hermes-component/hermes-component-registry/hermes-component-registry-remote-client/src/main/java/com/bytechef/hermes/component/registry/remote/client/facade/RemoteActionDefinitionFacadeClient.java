@@ -8,14 +8,12 @@
 package com.bytechef.hermes.component.registry.remote.client.facade;
 
 import com.bytechef.commons.rest.client.DefaultRestClient;
-import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.component.registry.domain.OptionsResponse;
-import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
-import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
+import com.bytechef.hermes.component.registry.domain.Property;
 import com.bytechef.hermes.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
+import com.bytechef.hermes.registry.domain.Option;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -42,7 +40,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public EditorDescriptionResponse executeEditorDescription(
+    public String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> inputParameters,
         Long connectionId) {
@@ -51,11 +49,11 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-editor-description"),
             new EditorDescriptionRequest(
                 actionName, inputParameters, componentName, componentVersion, connectionId),
-            EditorDescriptionResponse.class);
+            String.class);
     }
 
     @Override
-    public OptionsResponse executeOptions(
+    public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, Object> inputParameters, Long connectionId, String searchText) {
 
@@ -68,7 +66,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public OutputSchemaResponse executeOutputSchema(
+    public Property executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
@@ -80,7 +78,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public PropertiesResponse executeDynamicProperties(
+    public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         Map<String, Object> inputParameters, Long connectionId) {
 
@@ -106,14 +104,14 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public SampleOutputResponse executeSampleOutput(
+    public Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-sample-output"),
             new SampleOutputRequest(actionName, inputParameters, componentName, componentVersion, connectionId),
-            SampleOutputResponse.class);
+            Object.class);
     }
 
     private record EditorDescriptionRequest(

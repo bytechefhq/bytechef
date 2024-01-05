@@ -23,7 +23,6 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO
 import static com.bytechef.hermes.component.definition.ComponentDSL.array;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import static com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 
 import com.bytechef.hermes.component.definition.ActionContext;
@@ -64,9 +63,8 @@ public class DataMapperMapKeysAction {
         .perform(DataMapperMapKeysAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
-            context.outputSchema(outputSchema -> outputSchema.get(
-                perform(inputParameters, connectionParameters, context))));
+        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+            outputSchema -> outputSchema.get(perform(inputParameters, connectionParameters, context)));
     }
 
     protected static ActionSampleOutputFunction getSampleOutputFunction() {

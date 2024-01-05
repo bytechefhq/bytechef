@@ -13,17 +13,14 @@ import com.bytechef.hermes.component.definition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
-import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.component.registry.domain.OptionsResponse;
-import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
-import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
+import com.bytechef.hermes.component.registry.domain.Property;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
+import com.bytechef.hermes.registry.domain.Option;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +57,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public PropertiesResponse executeDynamicProperties(
+    public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, ComponentConnection connection,
         @NonNull TriggerContext context) {
@@ -86,7 +83,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public EditorDescriptionResponse executeEditorDescription(
+    public String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> triggerParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 
@@ -112,7 +109,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public OptionsResponse executeOptions(
+    public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, String searchText,
         ComponentConnection connection, @NonNull TriggerContext context) {
@@ -121,7 +118,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public OutputSchemaResponse executeOutputSchema(
+    public Property executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 
@@ -129,7 +126,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public SampleOutputResponse executeSampleOutput(
+    public Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 

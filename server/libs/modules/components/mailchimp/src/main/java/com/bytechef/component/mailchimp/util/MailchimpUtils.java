@@ -73,7 +73,7 @@ public class MailchimpUtils {
                 options.add(option((String) list.get("name"), list.get("id")));
             }
 
-            return new OptionsDataSource.OptionsResponse(options);
+            return options;
         };
     }
 }

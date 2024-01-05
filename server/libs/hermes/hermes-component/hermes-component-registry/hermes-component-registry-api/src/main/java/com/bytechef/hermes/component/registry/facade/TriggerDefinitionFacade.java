@@ -17,13 +17,11 @@
 package com.bytechef.hermes.component.registry.facade;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.component.registry.domain.OptionsResponse;
-import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
-import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
+import com.bytechef.hermes.component.registry.domain.Property;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
+import com.bytechef.hermes.registry.domain.Option;
+import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
 
@@ -32,7 +30,7 @@ import org.springframework.lang.NonNull;
  */
 public interface TriggerDefinitionFacade {
 
-    PropertiesResponse executeDynamicProperties(
+    List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
         @NonNull Map<String, Object> inputParameters, Long connectionId);
 
@@ -50,7 +48,7 @@ public interface TriggerDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters);
 
-    EditorDescriptionResponse executeEditorDescription(
+    String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId);
 
@@ -62,15 +60,15 @@ public interface TriggerDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId, Long connectionId);
 
-    OptionsResponse executeOptions(
+    List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText);
 
-    OutputSchemaResponse executeOutputSchema(
+    Property executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId);
 
-    SampleOutputResponse executeSampleOutput(
+    Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId);
 

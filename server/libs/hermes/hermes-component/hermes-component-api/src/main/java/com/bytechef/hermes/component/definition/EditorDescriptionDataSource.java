@@ -16,8 +16,6 @@
 
 package com.bytechef.hermes.component.definition;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * @author Ivica Cardic
  */
@@ -46,7 +44,7 @@ public interface EditorDescriptionDataSource {
          * @param context
          * @return
          */
-        EditorDescriptionResponse apply(Parameters inputParameters, ActionContext context)
+        String apply(Parameters inputParameters, ActionContext context)
             throws Exception;
     }
 
@@ -61,20 +59,7 @@ public interface EditorDescriptionDataSource {
          * @param context
          * @return
          */
-        EditorDescriptionResponse apply(Parameters inputParameters, TriggerContext context)
+        String apply(Parameters inputParameters, TriggerContext context)
             throws Exception;
-    }
-
-    /**
-     *
-     * @param description
-     * @param errorMessage
-     */
-    @SuppressFBWarnings("EI")
-    record EditorDescriptionResponse(String description, String errorMessage) {
-
-        public EditorDescriptionResponse(String description) {
-            this(description, null);
-        }
     }
 }

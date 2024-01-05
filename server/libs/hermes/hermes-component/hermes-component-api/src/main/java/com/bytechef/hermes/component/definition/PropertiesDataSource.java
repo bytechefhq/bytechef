@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.component.definition;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.hermes.component.definition.Property.ValueProperty;
 import java.util.List;
 
 /**
@@ -57,7 +57,7 @@ public interface PropertiesDataSource {
          * @return
          * @throws Exception
          */
-        PropertiesResponse apply(
+        List<? extends ValueProperty<?>> apply(
             Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
@@ -76,21 +76,8 @@ public interface PropertiesDataSource {
          * @return
          * @throws Exception
          */
-        PropertiesResponse apply(
+        List<? extends ValueProperty<?>> apply(
             Parameters inputParameters, Parameters connectionParameters, TriggerContext context)
             throws Exception;
-    }
-
-    /**
-     *
-     * @param properties
-     * @param errorMessage
-     */
-    @SuppressFBWarnings("EI")
-    record PropertiesResponse(List<? extends Property.ValueProperty<?>> properties, String errorMessage) {
-
-        public PropertiesResponse(List<? extends Property.ValueProperty<?>> properties) {
-            this(properties, null);
-        }
     }
 }

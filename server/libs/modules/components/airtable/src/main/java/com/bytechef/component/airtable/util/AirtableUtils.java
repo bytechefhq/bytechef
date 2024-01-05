@@ -125,15 +125,14 @@ public class AirtableUtils {
                                 : field.description()));
             }
 
-            return new PropertiesDataSource.PropertiesResponse(
-                List.of(
-                    object("__item")
-                        .label("Record")
-                        .properties(
-                            object("fields")
-                                .label("Fields")
-                                .properties(properties)
-                                .required(false))));
+            return List.of(
+                object("__item")
+                    .label("Record")
+                    .properties(
+                        object("fields")
+                            .label("Fields")
+                            .properties(properties)
+                            .required(false)));
         };
     }
 
@@ -153,14 +152,14 @@ public class AirtableUtils {
         };
     }
 
-    private static OptionsDataSource.OptionsResponse getOptions(Map<String, List<Map<?, ?>>> response, String name) {
+    private static List<Option<?>> getOptions(Map<String, List<Map<?, ?>>> response, String name) {
         List<Option<?>> options = new ArrayList<>();
 
         for (Map<?, ?> list : response.get(name)) {
             options.add(option((String) list.get("name"), list.get("id")));
         }
 
-        return new OptionsDataSource.OptionsResponse(options);
+        return options;
     }
 
     private static List<ModifiableOption<String>> getOptions(AirtableField field) {

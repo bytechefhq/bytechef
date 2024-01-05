@@ -30,7 +30,6 @@ import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.hermes.component.definition.OptionsDataSource.OptionsResponse;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.definition.Option;
 import com.google.api.client.http.FileContent;
@@ -71,7 +70,7 @@ public final class GoogleDriveUploadFileAction {
     private GoogleDriveUploadFileAction() {
     }
 
-    public static OptionsResponse getOptionsFunction(
+    public static List<Option<String>> getOptionsFunction(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws IOException {
 
@@ -90,7 +89,7 @@ public final class GoogleDriveUploadFileAction {
             .map(drive -> (Option<String>) option(drive.getName(), drive.getId()))
             .toList();
 
-        return new OptionsResponse(options);
+        return options;
     }
 
     public static File perform(

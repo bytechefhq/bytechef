@@ -21,7 +21,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.hermes.component.definition.DynamicOptionsProperty;
-import com.bytechef.hermes.component.definition.EditorDescriptionDataSource;
+import com.bytechef.hermes.component.definition.EditorDescriptionDataSource.TriggerEditorDescriptionFunction;
 import com.bytechef.hermes.component.definition.HttpHeadersImpl;
 import com.bytechef.hermes.component.definition.HttpParametersImpl;
 import com.bytechef.hermes.component.definition.OptionsDataSource;
@@ -49,12 +49,7 @@ import com.bytechef.hermes.component.exception.ComponentExecutionException;
 import com.bytechef.hermes.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
-import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.component.registry.domain.OptionsResponse;
-import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
 import com.bytechef.hermes.component.registry.domain.Property;
-import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.component.registry.domain.ValueProperty;
 import com.bytechef.hermes.component.registry.domain.WebhookTriggerFlags;
@@ -93,7 +88,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public PropertiesResponse executeDynamicProperties(
+    public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context) {
@@ -101,21 +96,15 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         PropertiesDataSource.TriggerPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
             componentName, componentVersion, triggerName, propertyName);
 
-        PropertiesDataSource.PropertiesResponse propertiesResponse;
-
         try {
-            propertiesResponse = propertiesFunction.apply(
-                new ParametersImpl(inputParameters),
-                connection == null ? null : new ParametersImpl(connection.parameters()), context);
+            return CollectionUtils.map(
+                propertiesFunction.apply(
+                    new ParametersImpl(inputParameters),
+                    connection == null ? null : new ParametersImpl(connection.parameters()), context),
+                valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
-
-        return new PropertiesResponse(
-            CollectionUtils.map(
-                propertiesResponse.properties(),
-                valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty)),
-            propertiesResponse.errorMessage());
     }
 
     @Override
@@ -161,25 +150,20 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public EditorDescriptionResponse executeEditorDescription(
+    public String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 
-        EditorDescriptionDataSource.TriggerEditorDescriptionFunction editorDescriptionFunction =
+        TriggerEditorDescriptionFunction editorDescriptionFunction =
             getEditorDescriptionFunction(
                 componentName, componentVersion, triggerName);
 
-        EditorDescriptionDataSource.EditorDescriptionResponse editorDescriptionResponse;
-
         try {
-            editorDescriptionResponse = editorDescriptionFunction
+            return editorDescriptionFunction
                 .apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
-
-        return new EditorDescriptionResponse(
-            editorDescriptionResponse.description(), editorDescriptionResponse.errorMessage());
     }
 
     @Override
@@ -226,7 +210,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public OptionsResponse executeOptions(
+    public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, String searchText,
         ComponentConnection connection, @NonNull TriggerContext context) {
@@ -234,43 +218,37 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         OptionsDataSource.TriggerOptionsFunction optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, triggerName, propertyName);
 
-        OptionsDataSource.OptionsResponse optionsResponse = null;
         try {
-            optionsResponse = optionsFunction.apply(
-                new ParametersImpl(inputParameters),
-                connection == null ? null : new ParametersImpl(connection.parameters()), searchText, context);
+            return CollectionUtils.map(
+                optionsFunction.apply(
+                    new ParametersImpl(inputParameters),
+                    connection == null ? null : new ParametersImpl(connection.parameters()), searchText, context),
+                Option::new);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
-
-        return new OptionsResponse(
-            CollectionUtils.map(optionsResponse.options(), Option::new), optionsResponse.errorMessage());
     }
 
     @Override
-    public OutputSchemaResponse executeOutputSchema(
+    public Property executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 
         OutputSchemaDataSource.TriggerOutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
             componentName, componentVersion, triggerName);
 
-        OutputSchemaDataSource.OutputSchemaResponse outputSchemaResponse;
-
         try {
-            outputSchemaResponse = outputSchemaFunction.apply(
-                new ParametersImpl(inputParameters),
-                connection == null ? null : new ParametersImpl(connection.parameters()), context);
+            return Property.toProperty(
+                outputSchemaFunction.apply(
+                    new ParametersImpl(inputParameters),
+                    connection == null ? null : new ParametersImpl(connection.parameters()), context));
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
-
-        return new OutputSchemaResponse(
-            Property.toProperty(outputSchemaResponse.property()), outputSchemaResponse.errorMessage());
     }
 
     @Override
-    public SampleOutputResponse executeSampleOutput(
+    public Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 
@@ -297,7 +275,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             }
         }
 
-        return new SampleOutputResponse(sampleOutput, sampleOutputResponse.errorMessage());
+        return sampleOutput;
     }
 
     @Override
@@ -536,7 +514,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return OptionalUtils.get(triggerDefinition.getDynamicWebhookEnable());
     }
 
-    private EditorDescriptionDataSource.TriggerEditorDescriptionFunction getEditorDescriptionFunction(
+    private TriggerEditorDescriptionFunction getEditorDescriptionFunction(
         String componentName, int componentVersion, String triggerName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
@@ -547,10 +525,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         return OptionalUtils.mapOrElse(
             triggerDefinition.getEditorDescriptionDataSource(),
-            editorDescriptionDataSource -> (EditorDescriptionDataSource.TriggerEditorDescriptionFunction) editorDescriptionDataSource
+            editorDescriptionDataSource -> (TriggerEditorDescriptionFunction) editorDescriptionDataSource
                 .getEditorDescription(),
-            (inputParameters, context) -> new EditorDescriptionDataSource.EditorDescriptionResponse(
-                componentDefinition.getTitle() + ": " + triggerDefinition.getTitle()));
+            (inputParameters, context) -> componentDefinition.getTitle() + ": " + triggerDefinition.getTitle());
     }
 
     private ListenerDisableConsumer getListenerDisableConsumer(

@@ -17,7 +17,6 @@
 package com.bytechef.hermes.component.definition;
 
 import com.bytechef.hermes.component.definition.Property.OutputProperty;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Ivica Cardic
@@ -49,7 +48,7 @@ public interface OutputSchemaDataSource {
          * @param context
          * @return
          */
-        OutputSchemaResponse apply(
+        OutputProperty<?> apply(
             Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
@@ -66,21 +65,8 @@ public interface OutputSchemaDataSource {
          * @param context
          * @return
          */
-        OutputSchemaResponse apply(
+        OutputProperty<?> apply(
             Parameters inputParameters, Parameters connectionParameters, TriggerContext context)
             throws Exception;
-    }
-
-    /**
-     *
-     * @param property
-     * @param errorMessage
-     */
-    @SuppressFBWarnings("EI")
-    record OutputSchemaResponse(OutputProperty<?> property, String errorMessage) {
-
-        public OutputSchemaResponse(OutputProperty<?> property) {
-            this(property, null);
-        }
     }
 }

@@ -8,17 +8,15 @@
 package com.bytechef.hermes.component.registry.remote.web.rest.facade;
 
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.component.registry.domain.OptionsResponse;
-import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
-import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
+import com.bytechef.hermes.component.registry.domain.Property;
 import com.bytechef.hermes.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
+import com.bytechef.hermes.registry.domain.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -102,7 +100,7 @@ public class RemoteTriggerDefinitionFacadeController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<EditorDescriptionResponse> executeEditorDescription(
+    public ResponseEntity<String> executeEditorDescription(
         @Valid @RequestBody EditorDescriptionRequest editorDescriptionRequest) {
 
         return ResponseEntity.ok(
@@ -155,7 +153,7 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<OptionsResponse> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
+    public ResponseEntity<List<Option>> executeOptions(@Valid @RequestBody OptionsRequest optionsRequest) {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeOptions(
                 optionsRequest.componentName, optionsRequest.componentVersion, optionsRequest.triggerName,
@@ -172,7 +170,7 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<PropertiesResponse>
+    public ResponseEntity<List<Property>>
         executeProperties(@Valid @RequestBody PropertiesRequest propertiesRequest) {
         return ResponseEntity.ok(
             triggerDefinitionFacade.executeDynamicProperties(
@@ -189,7 +187,7 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<OutputSchemaResponse> executeOutputSchema(
+    public ResponseEntity<Property> executeOutputSchema(
         @Valid @RequestBody RemoteTriggerDefinitionFacadeController.OutputSchemaRequest outputSchemaRequest) {
 
         return ResponseEntity.ok(
@@ -208,7 +206,7 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<SampleOutputResponse> executeSampleOutput(
+    public ResponseEntity<Object> executeSampleOutput(
         @Valid @RequestBody SampleOutputRequest sampleOutputRequest) {
 
         return ResponseEntity.ok(

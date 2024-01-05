@@ -36,7 +36,6 @@ import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableOption;
 import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.hermes.component.definition.OptionsDataSource.OptionsResponse;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.intuit.ipp.data.Account;
 import com.intuit.ipp.data.AccountTypeEnum;
@@ -160,42 +159,36 @@ public final class QuickbooksCreateItemAction {
         return (List<Account>) queryResult.getEntities();
     }
 
-    private static OptionsResponse getAssetAccountIdOptions(
+    private static List<ModifiableOption<String>> getAssetAccountIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws FMSException {
 
-        List<ModifiableOption<String>> options = getAllAccounts(connectionParameters)
+        return getAllAccounts(connectionParameters)
             .stream()
             .filter(account -> AccountTypeEnum.OTHER_CURRENT_ASSET.equals(account.getAccountType()))
             .map(account -> option(account.getName(), account.getId()))
             .toList();
-
-        return new OptionsResponse(options);
     }
 
-    private static OptionsResponse getExpenseAccountIdOptions(
+    private static List<ModifiableOption<String>> getExpenseAccountIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws FMSException {
 
-        List<ModifiableOption<String>> options = getAllAccounts(connectionParameters)
+        return getAllAccounts(connectionParameters)
             .stream()
             .filter(account -> AccountTypeEnum.COST_OF_GOODS_SOLD.equals(account.getAccountType()))
             .map(account -> option(account.getName(), account.getId()))
             .toList();
-
-        return new OptionsResponse(options);
     }
 
-    private static OptionsResponse getIncomeAccountIdOptions(
+    private static List<ModifiableOption<String>> getIncomeAccountIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws FMSException {
 
-        List<ModifiableOption<String>> options = getAllAccounts(connectionParameters)
+        return getAllAccounts(connectionParameters)
             .stream()
             .filter(account -> AccountTypeEnum.INCOME.equals(account.getAccountType()))
             .map(account -> option(account.getName(), account.getId()))
             .toList();
-
-        return new OptionsResponse(options);
     }
 }

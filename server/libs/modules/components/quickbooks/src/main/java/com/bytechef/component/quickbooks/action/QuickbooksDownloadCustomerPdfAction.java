@@ -27,8 +27,8 @@ import com.bytechef.component.quickbooks.util.QuickbooksUtils;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableOption;
 import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.hermes.component.definition.OptionsDataSource.OptionsResponse;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.intuit.ipp.data.Customer;
 import com.intuit.ipp.exception.FMSException;
@@ -36,6 +36,7 @@ import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author Mario Cvjetojevic
@@ -71,7 +72,7 @@ public final class QuickbooksDownloadCustomerPdfAction {
         }
     }
 
-    private static OptionsResponse getAllCustomerOptions(
+    private static List<ModifiableOption<String>> getAllCustomerOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws FMSException {
 
@@ -79,10 +80,9 @@ public final class QuickbooksDownloadCustomerPdfAction {
 
         QueryResult queryResult = dataService.executeQuery("select * from Customer");
 
-        return new OptionsResponse(
-            queryResult.getEntities()
-                .stream()
-                .map(entity -> option(((Customer) entity).getDisplayName(), ((Customer) entity).getId()))
-                .toList());
+        return queryResult.getEntities()
+            .stream()
+            .map(entity -> option(((Customer) entity).getDisplayName(), ((Customer) entity).getId()))
+            .toList();
     }
 }

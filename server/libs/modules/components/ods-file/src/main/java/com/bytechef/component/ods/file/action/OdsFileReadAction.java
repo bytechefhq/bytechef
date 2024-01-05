@@ -26,7 +26,6 @@ import com.bytechef.component.ods.file.constant.OdsFileConstants;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
@@ -92,9 +91,8 @@ public class OdsFileReadAction {
         .perform(OdsFileReadAction::perform);
 
     protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> new OutputSchemaResponse(
-            context.outputSchema(outputSchema -> outputSchema.get(
-                perform(inputParameters, connectionParameters, context))));
+        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+            outputSchema -> outputSchema.get(perform(inputParameters, connectionParameters, context)));
     }
 
     protected static ActionSampleOutputFunction getSampleOutputFunction() {

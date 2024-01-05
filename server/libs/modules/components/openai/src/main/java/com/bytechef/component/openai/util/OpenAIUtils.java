@@ -28,11 +28,12 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.option;
 import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.OptionsDataSource.OptionsResponse;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.OutputSchemaResponse;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableArrayProperty;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableIntegerProperty;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.PropertiesDataSource.PropertiesResponse;
+import com.bytechef.hermes.component.definition.Property.OutputProperty;
 import com.bytechef.hermes.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,69 +43,67 @@ import java.util.List;
  */
 public class OpenAIUtils {
 
-    public static final OutputSchemaResponse outputSchemaResponseForStream =
-        new OutputSchemaResponse(
-            array()
-                .items(
-                    string("id"),
-                    string("object"),
-                    integer("created"),
-                    string("model"),
-                    array("choices")
-                        .items(
-                            object()
-                                .properties(
-                                    integer("index"),
-                                    object("message")
-                                        .properties(
-                                            string("role"),
-                                            string("content"),
-                                            string("name"),
-                                            object("functionCall")
-                                                .properties(
-                                                    string("name"),
-                                                    object("arguments"))),
-                                    string("finishReason")))));
+    public static final ModifiableArrayProperty outputSchemaResponseForStream =
+        array()
+            .items(
+                string("id"),
+                string("object"),
+                integer("created"),
+                string("model"),
+                array("choices")
+                    .items(
+                        object()
+                            .properties(
+                                integer("index"),
+                                object("message")
+                                    .properties(
+                                        string("role"),
+                                        string("content"),
+                                        string("name"),
+                                        object("functionCall")
+                                            .properties(
+                                                string("name"),
+                                                object("arguments"))),
+                                string("finishReason"))));
 
-    public static final OutputSchemaResponse outputSchemaResponse =
-        new OutputSchemaResponse(
-            object()
-                .properties(
-                    string("id"),
-                    string("object"),
-                    integer("created"),
-                    string("model"),
-                    array("choices")
-                        .items(
-                            object()
-                                .properties(
-                                    integer("index"),
-                                    object("message")
-                                        .properties(
-                                            string("role"),
-                                            string("content"),
-                                            string("name"),
-                                            object("functionCall")
-                                                .properties(
-                                                    string("name"),
-                                                    object("arguments"))),
-                                    string("finishReason"))),
-                    object("usage")
-                        .properties(
-                            integer("promptTokens"),
-                            integer("completionTokens"),
-                            integer("totalTokens"))));
+    public static final ModifiableObjectProperty outputSchemaResponse =
+        object()
+            .properties(
+                string("id"),
+                string("object"),
+                integer("created"),
+                string("model"),
+                array("choices")
+                    .items(
+                        object()
+                            .properties(
+                                integer("index"),
+                                object("message")
+                                    .properties(
+                                        string("role"),
+                                        string("content"),
+                                        string("name"),
+                                        object("functionCall")
+                                            .properties(
+                                                string("name"),
+                                                object("arguments"))),
+                                string("finishReason"))),
+                object("usage")
+                    .properties(
+                        integer("promptTokens"),
+                        integer("completionTokens"),
+                        integer("totalTokens")));
 
     private static final String DEFAULT_SIZE = "1024x1024";
 
     private OpenAIUtils() {
     }
 
-    public static OptionsResponse getSizeOptions(
+    public static List<Option<String>> getSizeOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
         String model = inputParameters.getRequiredString(MODEL);
 
-        List<Option<?>> options = new ArrayList<>();
+        List<Option<String>> options = new ArrayList<>();
 
         if (model.equals(DALL_E_2)) {
             options.add(option("256x256", "256x256"));
@@ -116,14 +115,14 @@ public class OpenAIUtils {
             options.add(option("1024x1792", "1024x1792"));
         }
 
-        return new OptionsResponse(options);
+        return options;
     }
 
-    public static PropertiesResponse getModelProperties(
+    public static List<ModifiableStringProperty> getModelProperties(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         String model = inputParameters.getRequiredString(MODEL);
 
-        ComponentDSL.ModifiableStringProperty string = string(PROMPT)
+        ModifiableStringProperty string = string(PROMPT)
             .label("Prompt")
             .description("A text description of the desired image(s).")
             .required(true);
@@ -134,15 +133,15 @@ public class OpenAIUtils {
             string.maxLength(4000);
         }
 
-        return new PropertiesResponse(List.of(string));
+        return List.of(string);
     }
 
-    public static PropertiesResponse getNumberOfImagesProperties(
+    public static List<ModifiableIntegerProperty> getNumberOfImagesProperties(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String model = inputParameters.getRequiredString(MODEL);
 
-        ComponentDSL.ModifiableIntegerProperty n = integer(N)
+        ModifiableIntegerProperty n = integer(N)
             .label("n")
             .description("The number of images to generate." +
                 " Must be between 1 and 10. " +
@@ -155,10 +154,10 @@ public class OpenAIUtils {
             n.maxValue(10);
         }
 
-        return new PropertiesResponse(List.of(n));
+        return List.of(n);
     }
 
-    public static OutputSchemaResponse getOutputSchemaResponse(
+    public static OutputProperty<?> getOutputSchemaResponse(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         boolean stream = inputParameters.getBoolean(STREAM);

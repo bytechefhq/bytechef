@@ -20,15 +20,12 @@ import com.bytechef.hermes.component.definition.TriggerContext;
 import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
-import com.bytechef.hermes.component.registry.domain.EditorDescriptionResponse;
-import com.bytechef.hermes.component.registry.domain.OptionsResponse;
-import com.bytechef.hermes.component.registry.domain.OutputSchemaResponse;
-import com.bytechef.hermes.component.registry.domain.PropertiesResponse;
-import com.bytechef.hermes.component.registry.domain.SampleOutputResponse;
+import com.bytechef.hermes.component.registry.domain.Property;
 import com.bytechef.hermes.component.registry.domain.TriggerDefinition;
 import com.bytechef.hermes.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.hermes.component.registry.trigger.TriggerOutput;
 import com.bytechef.hermes.component.registry.trigger.WebhookRequest;
+import com.bytechef.hermes.registry.domain.Option;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
@@ -39,7 +36,7 @@ import org.springframework.lang.Nullable;
  */
 public interface TriggerDefinitionService {
 
-    PropertiesResponse executeDynamicProperties(
+    List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);
@@ -59,7 +56,7 @@ public interface TriggerDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context);
 
-    EditorDescriptionResponse executeEditorDescription(
+    String executeEditorDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> triggerParameters, @Nullable ComponentConnection connection,
         @NonNull TriggerContext context);
@@ -74,17 +71,17 @@ public interface TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull String workflowExecutionId,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
-    OptionsResponse executeOptions(
+    List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @Nullable String searchText,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
-    OutputSchemaResponse executeOutputSchema(
+    Property executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull TriggerContext context);
 
-    SampleOutputResponse executeSampleOutput(
+    Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull TriggerContext context);
