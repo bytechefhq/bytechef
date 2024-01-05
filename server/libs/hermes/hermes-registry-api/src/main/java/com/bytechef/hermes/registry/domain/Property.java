@@ -31,8 +31,6 @@ public abstract class Property {
     private String displayCondition;
     private boolean expressionEnabled; // Defaults to true
     private boolean hidden;
-    private String label;
-    private String placeholder;
     private boolean required;
     private String name;
     private Type type;
@@ -46,8 +44,6 @@ public abstract class Property {
         this.displayCondition = OptionalUtils.orElse(property.getDisplayCondition(), null);
         this.expressionEnabled = OptionalUtils.orElse(property.getExpressionEnabled(), true);
         this.hidden = OptionalUtils.orElse(property.getHidden(), false);
-        this.label = OptionalUtils.orElse(property.getLabel(), property.getName());
-        this.placeholder = OptionalUtils.orElse(property.getPlaceholder(), null);
         this.required = OptionalUtils.orElse(property.getRequired(), false);
         this.name = property.getName();
         this.type = property.getType();
@@ -55,20 +51,24 @@ public abstract class Property {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof Property that))
+        }
+
+        if (!(o instanceof Property that)) {
             return false;
+        }
+
         return advancedOption == that.advancedOption && expressionEnabled == that.expressionEnabled
-            && hidden == that.hidden && required == that.required && Objects.equals(description, that.description)
-            && Objects.equals(displayCondition, that.displayCondition) && Objects.equals(label, that.label)
-            && Objects.equals(placeholder, that.placeholder) && Objects.equals(name, that.name) && type == that.type;
+            && hidden == that.hidden && required == that.required
+            && Objects.equals(displayCondition, that.displayCondition)
+            && Objects.equals(name, that.name) && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(advancedOption, description, displayCondition, expressionEnabled, hidden, label,
-            placeholder, required, name, type);
+        return Objects.hash(
+            advancedOption, displayCondition, expressionEnabled, hidden, required, name, type);
     }
 
     public boolean getAdvancedOption() {
@@ -91,14 +91,6 @@ public abstract class Property {
         return hidden;
     }
 
-    public Optional<String> getLabel() {
-        return Optional.ofNullable(label);
-    }
-
-    public Optional<String> getPlaceholder() {
-        return Optional.ofNullable(placeholder);
-    }
-
     public boolean getRequired() {
         return required;
     }
@@ -119,8 +111,6 @@ public abstract class Property {
             ", displayCondition='" + displayCondition + '\'' +
             ", expressionEnabled=" + expressionEnabled +
             ", hidden=" + hidden +
-            ", label='" + label + '\'' +
-            ", placeholder='" + placeholder + '\'' +
             ", required=" + required +
             ", name='" + name + '\'' +
             ", type=" + type +

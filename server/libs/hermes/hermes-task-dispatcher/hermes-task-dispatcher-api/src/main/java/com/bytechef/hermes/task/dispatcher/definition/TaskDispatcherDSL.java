@@ -193,10 +193,11 @@ public final class TaskDispatcherDSL {
         extends ModifiableValueProperty<List<Object>, ModifiableArrayProperty>
         implements Property.ArrayProperty {
 
-        private List<Option<?>> options;
-
         private List<? extends ModifiableValueProperty<?, ?>> items;
+        private Long maxItems;
+        private Long minItems;
         private Boolean multipleValues;
+        private List<Option<?>> options;
 
         private ModifiableArrayProperty() {
             this(null);
@@ -305,6 +306,18 @@ public final class TaskDispatcherDSL {
             return this;
         }
 
+        public ModifiableArrayProperty maxItems(long maxItems) {
+            this.maxItems = maxItems;
+
+            return this;
+        }
+
+        public ModifiableArrayProperty minItems(long minItems) {
+            this.minItems = minItems;
+
+            return this;
+        }
+
         public ModifiableArrayProperty multipleValues(boolean multipleValues) {
             this.multipleValues = multipleValues;
 
@@ -343,6 +356,16 @@ public final class TaskDispatcherDSL {
         @Override
         public Optional<List<? extends ValueProperty<?>>> getItems() {
             return Optional.ofNullable(items);
+        }
+
+        @Override
+        public Optional<Long> getMaxItems() {
+            return Optional.ofNullable(maxItems);
+        }
+
+        @Override
+        public Optional<Long> getMinItems() {
+            return Optional.ofNullable(minItems);
         }
 
         @Override
@@ -577,7 +600,9 @@ public final class TaskDispatcherDSL {
         implements Property.NumberProperty {
 
         private List<Option<?>> options;
+        private Integer maxNumberPrecision;
         private Double maxValue;
+        private Integer minNumberPrecision;
         private Double minValue;
         private Integer numberPrecision;
 
@@ -637,8 +662,20 @@ public final class TaskDispatcherDSL {
             return this;
         }
 
+        public ModifiableNumberProperty maxNumberPrecision(Integer maxNumberPrecision) {
+            this.maxNumberPrecision = maxNumberPrecision;
+
+            return this;
+        }
+
         public ModifiableNumberProperty maxValue(double maxValue) {
             this.maxValue = maxValue;
+
+            return this;
+        }
+
+        public ModifiableNumberProperty minNumberPrecision(Integer minNumberPrecision) {
+            this.minNumberPrecision = minNumberPrecision;
 
             return this;
         }
@@ -674,6 +711,11 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
+        public Optional<Integer> getMaxNumberPrecision() {
+            return Optional.ofNullable(maxNumberPrecision);
+        }
+
+        @Override
         public Optional<Double> getMaxValue() {
             return Optional.ofNullable(maxValue);
         }
@@ -681,6 +723,11 @@ public final class TaskDispatcherDSL {
         @Override
         public Optional<Double> getMinValue() {
             return Optional.ofNullable(minValue);
+        }
+
+        @Override
+        public Optional<Integer> getMinNumberPrecision() {
+            return Optional.ofNullable(minNumberPrecision);
         }
 
         @Override
@@ -876,13 +923,10 @@ public final class TaskDispatcherDSL {
     public abstract static class ModifiableProperty<M extends ModifiableProperty<M>> implements Property {
 
         private Boolean advancedOption;
-        private String description;
         private String displayCondition;
         private Boolean expressionEnabled; // Defaults to true
         private Boolean hidden;
-        private String label;
         private Map<String, Object> metadata = new HashMap<>();
-        private String placeholder;
         private Boolean required;
         private final String name;
         private final Type type;
@@ -895,13 +939,6 @@ public final class TaskDispatcherDSL {
         @SuppressWarnings("unchecked")
         public M advancedOption(boolean advancedOption) {
             this.advancedOption = advancedOption;
-
-            return (M) this;
-        }
-
-        @SuppressWarnings("unchecked")
-        public M description(String description) {
-            this.description = description;
 
             return (M) this;
         }
@@ -928,13 +965,6 @@ public final class TaskDispatcherDSL {
         }
 
         @SuppressWarnings("unchecked")
-        public M label(String label) {
-            this.label = label;
-
-            return (M) this;
-        }
-
-        @SuppressWarnings("unchecked")
         public M metadata(String key, String value) {
             if (metadata == null) {
                 metadata = new HashMap<>();
@@ -949,13 +979,6 @@ public final class TaskDispatcherDSL {
         @SuppressFBWarnings("EI2")
         public M metadata(Map<String, Object> metadata) {
             this.metadata = metadata;
-
-            return (M) this;
-        }
-
-        @SuppressWarnings("unchecked")
-        public M placeholder(String placeholder) {
-            this.placeholder = placeholder;
 
             return (M) this;
         }
@@ -994,11 +1017,6 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<String> getDescription() {
-            return Optional.ofNullable(description);
-        }
-
-        @Override
         public Optional<String> getDisplayCondition() {
             return Optional.ofNullable(displayCondition);
         }
@@ -1019,11 +1037,6 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<String> getLabel() {
-            return Optional.ofNullable(label);
-        }
-
-        @Override
         public Map<String, Object> getMetadata() {
             return Collections.unmodifiableMap(metadata);
         }
@@ -1031,11 +1044,6 @@ public final class TaskDispatcherDSL {
         @Override
         public String getName() {
             return name;
-        }
-
-        @Override
-        public Optional<String> getPlaceholder() {
-            return Optional.ofNullable(placeholder);
         }
 
         @Override
@@ -1359,10 +1367,34 @@ public final class TaskDispatcherDSL {
         extends ModifiableProperty<P> implements Property.ValueProperty<V> {
 
         protected V defaultValue;
+        private String description;
         protected V exampleValue;
+        private String label;
+        private String placeholder;
 
         protected ModifiableValueProperty(String name, Type type) {
             super(name, type);
+        }
+
+        @SuppressWarnings("unchecked")
+        public P description(String description) {
+            this.description = description;
+
+            return (P) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public P label(String label) {
+            this.label = label;
+
+            return (P) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public P placeholder(String placeholder) {
+            this.placeholder = placeholder;
+
+            return (P) this;
         }
 
         @Override
@@ -1373,6 +1405,21 @@ public final class TaskDispatcherDSL {
         @Override
         public Optional<V> getExampleValue() {
             return Optional.ofNullable(exampleValue);
+        }
+
+        @Override
+        public Optional<String> getDescription() {
+            return Optional.ofNullable(description);
+        }
+
+        @Override
+        public Optional<String> getLabel() {
+            return Optional.ofNullable(label);
+        }
+
+        @Override
+        public Optional<String> getPlaceholder() {
+            return Optional.ofNullable(placeholder);
         }
     }
 

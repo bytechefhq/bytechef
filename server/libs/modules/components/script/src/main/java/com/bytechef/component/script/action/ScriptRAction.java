@@ -58,7 +58,7 @@ public class ScriptRAction {
             string(SCRIPT)
                 .label("R code")
                 .description("Add your R custom logic here.")
-                .controlType(Property.ControlType.CODE_EDITOR)
+                .controlType(Property.ValueProperty.ControlType.CODE_EDITOR)
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
         .sampleOutput(getSampleOutputFunction())

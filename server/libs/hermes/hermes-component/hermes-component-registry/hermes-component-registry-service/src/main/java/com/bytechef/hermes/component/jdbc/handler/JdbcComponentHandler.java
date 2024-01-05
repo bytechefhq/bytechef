@@ -70,7 +70,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                 .required(true),
             string(JdbcConstants.PASSWORD)
                 .label("Password")
-                .controlType(Property.ControlType.PASSWORD)
+                .controlType(Property.ValueProperty.ControlType.PASSWORD)
                 .required(true));
 
     private final List<ModifiableActionDefinition> actionDefinitions = List.of(

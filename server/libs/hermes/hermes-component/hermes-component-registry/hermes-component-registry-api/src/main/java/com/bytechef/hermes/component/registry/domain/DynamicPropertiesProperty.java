@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.component.registry.domain;
 
+import com.bytechef.commons.util.OptionalUtils;
 import java.util.Objects;
 
 /**
@@ -23,6 +24,7 @@ import java.util.Objects;
  */
 public class DynamicPropertiesProperty extends Property {
 
+    private String header;
     private PropertiesDataSource propertiesDataSource;
 
     private DynamicPropertiesProperty() {
@@ -32,16 +34,13 @@ public class DynamicPropertiesProperty extends Property {
         com.bytechef.hermes.component.definition.Property.DynamicPropertiesProperty property) {
         super(property);
 
+        this.header = OptionalUtils.orElse(property.getHeader(), null);
         this.propertiesDataSource = new PropertiesDataSource(property.getDynamicPropertiesDataSource());
     }
 
     @Override
     public Object accept(PropertyVisitor propertyVisitor) {
         return propertyVisitor.visit(this);
-    }
-
-    public PropertiesDataSource getPropertiesDataSource() {
-        return propertiesDataSource;
     }
 
     @Override
@@ -58,10 +57,19 @@ public class DynamicPropertiesProperty extends Property {
         return Objects.hash(propertiesDataSource);
     }
 
+    public String getHeader() {
+        return header;
+    }
+
+    public PropertiesDataSource getPropertiesDataSource() {
+        return propertiesDataSource;
+    }
+
     @Override
     public String toString() {
         return "DynamicPropertiesProperty{" +
-            "propertiesDataSource=" + propertiesDataSource +
-            "} ";
+            "header='" + header + '\'' +
+            ", propertiesDataSource=" + propertiesDataSource +
+            "} " + super.toString();
     }
 }

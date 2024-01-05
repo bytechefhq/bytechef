@@ -57,7 +57,7 @@ public class ScriptRubyAction {
             string(SCRIPT)
                 .label("Ruby code")
                 .description("Add your Ruby custom logic here.")
-                .controlType(Property.ControlType.CODE_EDITOR)
+                .controlType(Property.ValueProperty.ControlType.CODE_EDITOR)
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
         .sampleOutput(getSampleOutputFunction())

@@ -19,7 +19,9 @@ package com.bytechef.hermes.component.definition;
 import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
 import com.bytechef.hermes.component.definition.EditorDescriptionDataSource.ActionEditorDescriptionFunction;
 import com.bytechef.hermes.component.definition.OptionsDataSource.OptionsFunction;
+import com.bytechef.hermes.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.hermes.component.definition.PropertiesDataSource.PropertiesFunction;
+import com.bytechef.hermes.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
 import com.bytechef.hermes.component.definition.Property.InputProperty;
 import com.bytechef.hermes.component.definition.Property.OutputProperty;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
@@ -533,6 +535,8 @@ public final class ComponentDSL {
 
         private List<? extends ModifiableValueProperty<?, ?>> items;
         private List<String> loadOptionsDependsOn;
+        private Long maxItems;
+        private Long minItems;
         private Boolean multipleValues;
         private List<Option<?>> options;
         private OptionsFunction optionsFunction;
@@ -652,6 +656,18 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableArrayProperty maxItems(long maxItems) {
+            this.maxItems = maxItems;
+
+            return this;
+        }
+
+        public ModifiableArrayProperty minItems(long minItems) {
+            this.minItems = minItems;
+
+            return this;
+        }
+
         public ModifiableArrayProperty multipleValues(boolean multipleValues) {
             this.multipleValues = multipleValues;
 
@@ -691,6 +707,16 @@ public final class ComponentDSL {
         @Override
         public Optional<List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>>> getItems() {
             return Optional.ofNullable(items);
+        }
+
+        @Override
+        public Optional<Long> getMaxItems() {
+            return Optional.ofNullable(maxItems);
+        }
+
+        @Override
+        public Optional<Long> getMinItems() {
+            return Optional.ofNullable(minItems);
         }
 
         @Override
@@ -1476,6 +1502,7 @@ public final class ComponentDSL {
         extends ModifiableProperty<ModifiableDynamicPropertiesProperty>
         implements InputProperty, Property.DynamicPropertiesProperty {
 
+        private String header;
         private List<String> loadPropertiesDependsOn;
         private PropertiesFunction propertiesFunction;
 
@@ -1491,18 +1518,27 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableDynamicPropertiesProperty
-            properties(PropertiesDataSource.ActionPropertiesFunction propertiesFunction) {
+        public ModifiableDynamicPropertiesProperty header(String header) {
+            this.header = header;
+
+            return this;
+        }
+
+        public ModifiableDynamicPropertiesProperty properties(ActionPropertiesFunction propertiesFunction) {
             this.propertiesFunction = propertiesFunction;
 
             return this;
         }
 
-        public ModifiableDynamicPropertiesProperty
-            properties(PropertiesDataSource.TriggerPropertiesFunction propertiesFunction) {
+        public ModifiableDynamicPropertiesProperty properties(TriggerPropertiesFunction propertiesFunction) {
             this.propertiesFunction = propertiesFunction;
 
             return this;
+        }
+
+        @Override
+        public Optional<String> getHeader() {
+            return Optional.ofNullable(header);
         }
 
         @Override
@@ -1997,7 +2033,9 @@ public final class ComponentDSL {
         implements Property.NumberProperty {
 
         private List<String> loadOptionsDependsOn;
+        private Integer maxNumberPrecision;
         private Double maxValue;
+        private Integer minNumberPrecision;
         private Double minValue;
         private Integer numberPrecision;
         private List<Option<?>> options;
@@ -2067,8 +2105,20 @@ public final class ComponentDSL {
             return this;
         }
 
+        public ModifiableNumberProperty maxNumberPrecision(Integer maxNumberPrecision) {
+            this.maxNumberPrecision = maxNumberPrecision;
+
+            return this;
+        }
+
         public ModifiableNumberProperty maxValue(double maxValue) {
             this.maxValue = maxValue;
+
+            return this;
+        }
+
+        public ModifiableNumberProperty minNumberPrecision(Integer minNumberPrecision) {
+            this.minNumberPrecision = minNumberPrecision;
 
             return this;
         }
@@ -2110,6 +2160,11 @@ public final class ComponentDSL {
         }
 
         @Override
+        public Optional<Integer> getMaxNumberPrecision() {
+            return Optional.ofNullable(maxNumberPrecision);
+        }
+
+        @Override
         public Optional<Double> getMaxValue() {
             return Optional.ofNullable(maxValue);
         }
@@ -2117,6 +2172,11 @@ public final class ComponentDSL {
         @Override
         public Optional<Double> getMinValue() {
             return Optional.ofNullable(minValue);
+        }
+
+        @Override
+        public Optional<Integer> getMinNumberPrecision() {
+            return Optional.ofNullable(minNumberPrecision);
         }
 
         @Override
@@ -2410,9 +2470,7 @@ public final class ComponentDSL {
         private String displayCondition;
         private Boolean expressionEnabled; // Defaults to true
         private Boolean hidden;
-        private String label;
         private Map<String, Object> metadata = new HashMap<>();
-        private String placeholder;
         private Boolean required;
         private final String name;
         private final Type type;
@@ -2458,13 +2516,6 @@ public final class ComponentDSL {
         }
 
         @SuppressWarnings("unchecked")
-        public M label(String label) {
-            this.label = label;
-
-            return (M) this;
-        }
-
-        @SuppressWarnings("unchecked")
         public M metadata(String key, String value) {
             if (metadata == null) {
                 metadata = new HashMap<>();
@@ -2479,13 +2530,6 @@ public final class ComponentDSL {
         @SuppressFBWarnings("EI2")
         public M metadata(Map<String, Object> metadata) {
             this.metadata = metadata;
-
-            return (M) this;
-        }
-
-        @SuppressWarnings("unchecked")
-        public M placeholder(String placeholder) {
-            this.placeholder = placeholder;
 
             return (M) this;
         }
@@ -2549,11 +2593,6 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<String> getLabel() {
-            return Optional.ofNullable(label);
-        }
-
-        @Override
         public Map<String, Object> getMetadata() {
             return Collections.unmodifiableMap(metadata);
         }
@@ -2561,11 +2600,6 @@ public final class ComponentDSL {
         @Override
         public String getName() {
             return name;
-        }
-
-        @Override
-        public Optional<String> getPlaceholder() {
-            return Optional.ofNullable(placeholder);
         }
 
         @Override
@@ -3201,9 +3235,25 @@ public final class ComponentDSL {
 
         protected V defaultValue;
         protected V exampleValue;
+        private String label;
+        private String placeholder;
 
         protected ModifiableValueProperty(String name, Type type) {
             super(name, type);
+        }
+
+        @SuppressWarnings("unchecked")
+        public P label(String label) {
+            this.label = label;
+
+            return (P) this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public P placeholder(String placeholder) {
+            this.placeholder = placeholder;
+
+            return (P) this;
         }
 
         @Override
@@ -3214,6 +3264,16 @@ public final class ComponentDSL {
         @Override
         public Optional<V> getExampleValue() {
             return Optional.ofNullable(exampleValue);
+        }
+
+        @Override
+        public Optional<String> getLabel() {
+            return Optional.ofNullable(label);
+        }
+
+        @Override
+        public Optional<String> getPlaceholder() {
+            return Optional.ofNullable(placeholder);
         }
     }
 

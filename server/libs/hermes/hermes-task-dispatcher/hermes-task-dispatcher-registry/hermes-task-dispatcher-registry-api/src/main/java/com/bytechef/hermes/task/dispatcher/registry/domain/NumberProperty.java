@@ -30,7 +30,9 @@ import java.util.Optional;
  */
 public class NumberProperty extends ValueProperty<Double> {
 
+    private Integer maxNumberPrecision;
     private Double maxValue;
+    private Integer minNumberPrecision;
     private Double minValue;
     private Integer numberPrecision;
     private List<Option> options;
@@ -41,7 +43,9 @@ public class NumberProperty extends ValueProperty<Double> {
     public NumberProperty(Property.NumberProperty numberProperty) {
         super(numberProperty);
 
+        this.maxNumberPrecision = OptionalUtils.orElse(numberProperty.getMaxNumberPrecision(), null);
         this.maxValue = OptionalUtils.orElse(numberProperty.getMaxValue(), null);
+        this.minNumberPrecision = OptionalUtils.orElse(numberProperty.getMinNumberPrecision(), null);
         this.minValue = OptionalUtils.orElse(numberProperty.getMinValue(), null);
         this.numberPrecision = OptionalUtils.orElse(numberProperty.getNumberPrecision(), null);
         this.options = CollectionUtils.map(OptionalUtils.orElse(numberProperty.getOptions(), List.of()), Option::new);
@@ -52,8 +56,16 @@ public class NumberProperty extends ValueProperty<Double> {
         return propertyVisitor.visit(this);
     }
 
+    public Integer getMaxNumberPrecision() {
+        return maxNumberPrecision;
+    }
+
     public Optional<Double> getMaxValue() {
         return Optional.ofNullable(maxValue);
+    }
+
+    public Integer getMinNumberPrecision() {
+        return minNumberPrecision;
     }
 
     public Optional<Double> getMinValue() {

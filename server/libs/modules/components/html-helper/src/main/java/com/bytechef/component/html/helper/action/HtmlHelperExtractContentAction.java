@@ -53,7 +53,7 @@ public class HtmlHelperExtractContentAction {
             string(CONTENT)
                 .label("HTML content to extract content from.")
                 .description("The HTML content.")
-                .controlType(Property.ControlType.TEXT_AREA)
+                .controlType(Property.ValueProperty.ControlType.TEXT_AREA)
                 .required(true),
             string(QUERY_SELECTOR)
                 .label("CSS Selector")

@@ -22,6 +22,7 @@ import com.bytechef.hermes.registry.domain.Option;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -29,6 +30,8 @@ import java.util.Objects;
 public class ArrayProperty extends ValueProperty<List<Object>> {
 
     private List<? extends Property> items;
+    private Long maxItems;
+    private Long minItems;
     private boolean multipleValues; // Defaults to true
     private List<Option> options;
 
@@ -41,6 +44,8 @@ public class ArrayProperty extends ValueProperty<List<Object>> {
         this.items = CollectionUtils.map(
             OptionalUtils.orElse(arrayProperty.getItems(), List.of()),
             valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
+        this.maxItems = OptionalUtils.orElse(arrayProperty.getMaxItems(), null);
+        this.minItems = OptionalUtils.orElse(arrayProperty.getMinItems(), null);
         this.multipleValues = OptionalUtils.orElse(arrayProperty.getMultipleValues(), true);
         this.options = CollectionUtils.map(OptionalUtils.orElse(arrayProperty.getOptions(), List.of()), Option::new);
     }
@@ -50,12 +55,20 @@ public class ArrayProperty extends ValueProperty<List<Object>> {
         return propertyVisitor.visit(this);
     }
 
+    public boolean isMultipleValues() {
+        return multipleValues;
+    }
+
     public List<? extends Property> getItems() {
         return Collections.unmodifiableList(items);
     }
 
-    public boolean isMultipleValues() {
-        return multipleValues;
+    public Optional<Long> getMaxItems() {
+        return Optional.ofNullable(maxItems);
+    }
+
+    public Optional<Long> getMinItems() {
+        return Optional.ofNullable(minItems);
     }
 
     public List<Option> getOptions() {
@@ -86,6 +99,8 @@ public class ArrayProperty extends ValueProperty<List<Object>> {
             ", controlType=" + controlType +
             ", defaultValue=" + defaultValue +
             ", exampleValue=" + exampleValue +
+            ", minItems=" + minItems +
+            ", maxItems=" + maxItems +
             "} ";
     }
 }

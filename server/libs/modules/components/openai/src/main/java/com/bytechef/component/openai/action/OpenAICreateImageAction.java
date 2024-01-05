@@ -56,8 +56,6 @@ public class OpenAICreateImageAction {
         .description("Create an image using text-to-image models")
         .properties(
             dynamicProperties(PROMPT)
-                .label("Prompt")
-                .description("A text description of the desired image(s).")
                 .loadPropertiesDependsOn(MODEL)
                 .properties(OpenAIUtils::getModelProperties)
                 .required(true),
@@ -70,8 +68,6 @@ public class OpenAICreateImageAction {
                 .defaultValue(DALL_E_2)
                 .required(false),
             dynamicProperties(N)
-                .label("n")
-                .description("The number of images to generate.")
                 .loadPropertiesDependsOn(MODEL)
                 .properties(OpenAIUtils::getNumberOfImagesProperties)
                 .required(false),
@@ -119,7 +115,7 @@ public class OpenAICreateImageAction {
                         object()
                             .properties(
                                 string("url")
-                                    .controlType(Property.ControlType.URL),
+                                    .controlType(Property.ValueProperty.ControlType.URL),
                                 string("b64Json"),
                                 string("revisedPrompt"))))
 

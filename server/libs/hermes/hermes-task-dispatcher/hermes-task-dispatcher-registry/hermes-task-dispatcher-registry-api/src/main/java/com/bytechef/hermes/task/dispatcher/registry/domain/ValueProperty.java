@@ -17,7 +17,7 @@
 package com.bytechef.hermes.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property.ControlType;
+import com.bytechef.hermes.definition.Property.ValueProperty.ControlType;
 import java.util.Optional;
 
 /**
@@ -28,6 +28,8 @@ public abstract class ValueProperty<V> extends Property {
     protected ControlType controlType;
     protected V defaultValue;
     protected V exampleValue;
+    private String label;
+    private String placeholder;
 
     protected ValueProperty() {
     }
@@ -38,6 +40,8 @@ public abstract class ValueProperty<V> extends Property {
         this.controlType = valueProperty.getControlType();
         this.defaultValue = OptionalUtils.orElse(valueProperty.getDefaultValue(), null);
         this.exampleValue = OptionalUtils.orElse(valueProperty.getExampleValue(), null);
+        this.label = OptionalUtils.orElse(valueProperty.getLabel(), valueProperty.getName());
+        this.placeholder = OptionalUtils.orElse(valueProperty.getPlaceholder(), null);
     }
 
     public ControlType getControlType() {
@@ -50,5 +54,24 @@ public abstract class ValueProperty<V> extends Property {
 
     public Optional<V> getExampleValue() {
         return Optional.ofNullable(exampleValue);
+    }
+
+    public Optional<String> getLabel() {
+        return Optional.ofNullable(label);
+    }
+
+    public Optional<String> getPlaceholder() {
+        return Optional.ofNullable(placeholder);
+    }
+
+    @Override
+    public String toString() {
+        return "ValueProperty{" +
+            "controlType=" + controlType +
+            ", defaultValue=" + defaultValue +
+            ", exampleValue=" + exampleValue +
+            ", label='" + label + '\'' +
+            ", placeholder='" + placeholder + '\'' +
+            "} " + super.toString();
     }
 }

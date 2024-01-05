@@ -30,6 +30,8 @@ import java.util.Optional;
 public class ArrayProperty extends ValueProperty<List<Object>> {
 
     private List<? extends Property> items;
+    private Long maxItems;
+    private Long minItems;
     private boolean multipleValues; // Defaults to true
     private List<Option> options;
     private OptionsDataSource optionsDataSource;
@@ -44,6 +46,8 @@ public class ArrayProperty extends ValueProperty<List<Object>> {
             OptionalUtils.orElse(arrayProperty.getItems(), List.of()),
             valueProperty -> (ValueProperty<?>) Property.toProperty(
                 (com.bytechef.hermes.component.definition.Property) valueProperty));
+        this.maxItems = OptionalUtils.orElse(arrayProperty.getMaxItems(), null);
+        this.minItems = OptionalUtils.orElse(arrayProperty.getMinItems(), null);
         this.multipleValues = OptionalUtils.orElse(arrayProperty.getMultipleValues(), true);
         this.options = CollectionUtils.map(OptionalUtils.orElse(arrayProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
@@ -61,6 +65,14 @@ public class ArrayProperty extends ValueProperty<List<Object>> {
 
     public boolean isMultipleValues() {
         return multipleValues;
+    }
+
+    public Optional<Long> getMaxItems() {
+        return Optional.ofNullable(maxItems);
+    }
+
+    public Optional<Long> getMinItems() {
+        return Optional.ofNullable(minItems);
     }
 
     public List<Option> getOptions() {

@@ -62,10 +62,9 @@ public class AirtableCreateRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)),
-            dynamicProperties("__item").label("Item")
-                .metadata(
-                    Map.of(
-                        "type", PropertyType.BODY)))
+            dynamicProperties("__item").metadata(
+                Map.of(
+                    "type", PropertyType.BODY)))
         .outputSchema(object()
             .properties(dateTime("createdTime").required(false), object("fields").additionalProperties(
                 array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())

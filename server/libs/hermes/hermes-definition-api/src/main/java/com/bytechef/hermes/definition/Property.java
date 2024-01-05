@@ -31,29 +31,6 @@ public interface Property {
     /**
      *
      */
-    enum ControlType {
-        ARRAY_BUILDER,
-        CHECKBOX,
-        CODE_EDITOR,
-        DATE,
-        DATE_TIME,
-        EMAIL,
-        INTEGER,
-        MULTI_SELECT,
-        NUMBER,
-        OBJECT_BUILDER,
-        PASSWORD,
-        PHONE,
-        SELECT,
-        TEXT,
-        TEXT_AREA,
-        TIME,
-        URL
-    }
-
-    /**
-     *
-     */
     enum Type {
         ARRAY,
         BOOLEAN,
@@ -96,22 +73,12 @@ public interface Property {
     /**
      *
      */
-    Optional<String> getLabel();
-
-    /**
-     *
-     */
     Map<String, Object> getMetadata();
 
     /**
      *
      */
     String getName();
-
-    /**
-     *
-     */
-    Optional<String> getPlaceholder();
 
     /**
      *
@@ -126,27 +93,6 @@ public interface Property {
     /**
      *
      */
-    interface ValueProperty<V> extends Property {
-
-        /**
-         *
-         */
-        ControlType getControlType();
-
-        /**
-         *
-         */
-        Optional<V> getDefaultValue();
-
-        /**
-         *
-         */
-        Optional<V> getExampleValue();
-    }
-
-    /**
-     *
-     */
     interface ArrayProperty
         extends InputProperty, OptionsProperty, OutputProperty<List<Object>>, ValueProperty<List<Object>> {
 
@@ -154,6 +100,16 @@ public interface Property {
          *
          */
         Optional<List<? extends ValueProperty<?>>> getItems();
+
+        /**
+         *
+         */
+        Optional<Long> getMaxItems();
+
+        /**
+         *
+         */
+        Optional<Long> getMinItems();
 
         /**
          *
@@ -216,12 +172,22 @@ public interface Property {
         /**
          *
          */
+        Optional<Integer> getMaxNumberPrecision();
+
+        /**
+         *
+         */
         Optional<Double> getMaxValue();
 
         /**
          *
          */
         Optional<Double> getMinValue();
+
+        /**
+         *
+         */
+        Optional<Integer> getMinNumberPrecision();
 
         /**
          *
@@ -285,6 +251,60 @@ public interface Property {
      *
      */
     interface TimeProperty extends InputProperty, OptionsProperty, OutputProperty<LocalTime>, ValueProperty<LocalTime> {
+    }
+
+    /**
+     *
+     */
+    interface ValueProperty<V> extends Property {
+
+        /**
+         *
+         */
+        enum ControlType {
+            ARRAY_BUILDER,
+            CHECKBOX,
+            CODE_EDITOR,
+            DATE,
+            DATE_TIME,
+            EMAIL,
+            INTEGER,
+            MULTI_SELECT,
+            NUMBER,
+            OBJECT_BUILDER,
+            PASSWORD,
+            PHONE,
+            SELECT,
+            TEXT,
+            TEXT_AREA,
+            TIME,
+            URL
+        }
+
+        /**
+         *
+         */
+        ControlType getControlType();
+
+        /**
+         *
+         */
+        Optional<V> getDefaultValue();
+
+        /**
+         *
+         */
+        Optional<V> getExampleValue();
+
+        /**
+         *
+         */
+        Optional<String> getLabel();
+
+        /**
+         *
+         */
+        Optional<String> getPlaceholder();
     }
 }
 // CHECKSTYLE:ON

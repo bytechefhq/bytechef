@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -65,6 +66,11 @@ public interface Property extends com.bytechef.hermes.definition.Property {
      *
      */
     interface DynamicPropertiesProperty extends InputProperty, Property {
+
+        /**
+         *
+         */
+        Optional<String> getHeader();
 
         /**
          *

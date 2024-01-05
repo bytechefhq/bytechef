@@ -58,7 +58,7 @@ public class ScriptJavaScriptAction {
             string(SCRIPT)
                 .label("JavaScript code")
                 .description("Add your JavaScript custom logic here.")
-                .controlType(Property.ControlType.CODE_EDITOR)
+                .controlType(Property.ValueProperty.ControlType.CODE_EDITOR)
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
         .sampleOutput(getSampleOutputFunction())
