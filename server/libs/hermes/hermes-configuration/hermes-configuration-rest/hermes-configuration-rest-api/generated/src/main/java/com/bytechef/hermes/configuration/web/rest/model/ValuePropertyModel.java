@@ -46,10 +46,14 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = TimePropertyModel.class, name = "TIME")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-03T07:47:14.476436+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-06T07:28:24.860493+01:00[Europe/Zagreb]")
 public class ValuePropertyModel extends PropertyModel {
 
   private ControlTypeModel controlType;
+
+  private String label;
+
+  private String placeholder;
 
   public ValuePropertyModel controlType(ControlTypeModel controlType) {
     this.controlType = controlType;
@@ -69,6 +73,46 @@ public class ValuePropertyModel extends PropertyModel {
 
   public void setControlType(ControlTypeModel controlType) {
     this.controlType = controlType;
+  }
+
+  public ValuePropertyModel label(String label) {
+    this.label = label;
+    return this;
+  }
+
+  /**
+   * The property label.
+   * @return label
+  */
+  
+  @Schema(name = "label", description = "The property label.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("label")
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  public ValuePropertyModel placeholder(String placeholder) {
+    this.placeholder = placeholder;
+    return this;
+  }
+
+  /**
+   * The property placeholder.
+   * @return placeholder
+  */
+  
+  @Schema(name = "placeholder", description = "The property placeholder.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("placeholder")
+  public String getPlaceholder() {
+    return placeholder;
+  }
+
+  public void setPlaceholder(String placeholder) {
+    this.placeholder = placeholder;
   }
 
 
@@ -97,18 +141,8 @@ public class ValuePropertyModel extends PropertyModel {
     return this;
   }
 
-  public ValuePropertyModel label(String label) {
-    super.label(label);
-    return this;
-  }
-
   public ValuePropertyModel name(String name) {
     super.name(name);
-    return this;
-  }
-
-  public ValuePropertyModel placeholder(String placeholder) {
-    super.placeholder(placeholder);
     return this;
   }
 
@@ -131,12 +165,14 @@ public class ValuePropertyModel extends PropertyModel {
     }
     ValuePropertyModel valueProperty = (ValuePropertyModel) o;
     return Objects.equals(this.controlType, valueProperty.controlType) &&
+        Objects.equals(this.label, valueProperty.label) &&
+        Objects.equals(this.placeholder, valueProperty.placeholder) &&
         super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(controlType, super.hashCode());
+    return Objects.hash(controlType, label, placeholder, super.hashCode());
   }
 
   @Override
@@ -145,6 +181,8 @@ public class ValuePropertyModel extends PropertyModel {
     sb.append("class ValuePropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("    controlType: ").append(toIndentedString(controlType)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
+    sb.append("    placeholder: ").append(toIndentedString(placeholder)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -32,14 +32,18 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NumberProperty", description = "A number property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-03T07:47:14.476436+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-06T07:28:24.860493+01:00[Europe/Zagreb]")
 public class NumberPropertyModel extends PropertyModel {
 
   private Double defaultValue;
 
   private Double exampleValue;
 
+  private Integer maxNumberPrecision;
+
   private Double maxValue;
+
+  private Integer minNumberPrecision;
 
   private Double minValue;
 
@@ -90,6 +94,26 @@ public class NumberPropertyModel extends PropertyModel {
     this.exampleValue = exampleValue;
   }
 
+  public NumberPropertyModel maxNumberPrecision(Integer maxNumberPrecision) {
+    this.maxNumberPrecision = maxNumberPrecision;
+    return this;
+  }
+
+  /**
+   * The number value precision.
+   * @return maxNumberPrecision
+  */
+  
+  @Schema(name = "maxNumberPrecision", description = "The number value precision.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("maxNumberPrecision")
+  public Integer getMaxNumberPrecision() {
+    return maxNumberPrecision;
+  }
+
+  public void setMaxNumberPrecision(Integer maxNumberPrecision) {
+    this.maxNumberPrecision = maxNumberPrecision;
+  }
+
   public NumberPropertyModel maxValue(Double maxValue) {
     this.maxValue = maxValue;
     return this;
@@ -108,6 +132,26 @@ public class NumberPropertyModel extends PropertyModel {
 
   public void setMaxValue(Double maxValue) {
     this.maxValue = maxValue;
+  }
+
+  public NumberPropertyModel minNumberPrecision(Integer minNumberPrecision) {
+    this.minNumberPrecision = minNumberPrecision;
+    return this;
+  }
+
+  /**
+   * The number value precision.
+   * @return minNumberPrecision
+  */
+  
+  @Schema(name = "minNumberPrecision", description = "The number value precision.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("minNumberPrecision")
+  public Integer getMinNumberPrecision() {
+    return minNumberPrecision;
+  }
+
+  public void setMinNumberPrecision(Integer minNumberPrecision) {
+    this.minNumberPrecision = minNumberPrecision;
   }
 
   public NumberPropertyModel minValue(Double minValue) {
@@ -224,18 +268,8 @@ public class NumberPropertyModel extends PropertyModel {
     return this;
   }
 
-  public NumberPropertyModel label(String label) {
-    super.label(label);
-    return this;
-  }
-
   public NumberPropertyModel name(String name) {
     super.name(name);
-    return this;
-  }
-
-  public NumberPropertyModel placeholder(String placeholder) {
-    super.placeholder(placeholder);
     return this;
   }
 
@@ -259,7 +293,9 @@ public class NumberPropertyModel extends PropertyModel {
     NumberPropertyModel numberProperty = (NumberPropertyModel) o;
     return Objects.equals(this.defaultValue, numberProperty.defaultValue) &&
         Objects.equals(this.exampleValue, numberProperty.exampleValue) &&
+        Objects.equals(this.maxNumberPrecision, numberProperty.maxNumberPrecision) &&
         Objects.equals(this.maxValue, numberProperty.maxValue) &&
+        Objects.equals(this.minNumberPrecision, numberProperty.minNumberPrecision) &&
         Objects.equals(this.minValue, numberProperty.minValue) &&
         Objects.equals(this.numberPrecision, numberProperty.numberPrecision) &&
         Objects.equals(this.options, numberProperty.options) &&
@@ -269,7 +305,7 @@ public class NumberPropertyModel extends PropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(defaultValue, exampleValue, maxValue, minValue, numberPrecision, options, optionsDataSource, super.hashCode());
+    return Objects.hash(defaultValue, exampleValue, maxNumberPrecision, maxValue, minNumberPrecision, minValue, numberPrecision, options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -279,7 +315,9 @@ public class NumberPropertyModel extends PropertyModel {
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
     sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
+    sb.append("    maxNumberPrecision: ").append(toIndentedString(maxNumberPrecision)).append("\n");
     sb.append("    maxValue: ").append(toIndentedString(maxValue)).append("\n");
+    sb.append("    minNumberPrecision: ").append(toIndentedString(minNumberPrecision)).append("\n");
     sb.append("    minValue: ").append(toIndentedString(minValue)).append("\n");
     sb.append("    numberPrecision: ").append(toIndentedString(numberPrecision)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");

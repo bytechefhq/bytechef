@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ArrayProperty", description = "An array property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-03T07:47:14.476436+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-06T07:28:24.860493+01:00[Europe/Zagreb]")
 public class ArrayPropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -45,6 +45,10 @@ public class ArrayPropertyModel extends ValuePropertyModel {
 
   @Valid
   private List<@Valid PropertyModel> items;
+
+  private Long maxItems;
+
+  private Long minItems;
 
   private Boolean multipleValues;
 
@@ -137,6 +141,46 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     this.items = items;
   }
 
+  public ArrayPropertyModel maxItems(Long maxItems) {
+    this.maxItems = maxItems;
+    return this;
+  }
+
+  /**
+   * Get maxItems
+   * @return maxItems
+  */
+  
+  @Schema(name = "maxItems", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("maxItems")
+  public Long getMaxItems() {
+    return maxItems;
+  }
+
+  public void setMaxItems(Long maxItems) {
+    this.maxItems = maxItems;
+  }
+
+  public ArrayPropertyModel minItems(Long minItems) {
+    this.minItems = minItems;
+    return this;
+  }
+
+  /**
+   * Get minItems
+   * @return minItems
+  */
+  
+  @Schema(name = "minItems", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("minItems")
+  public Long getMinItems() {
+    return minItems;
+  }
+
+  public void setMinItems(Long minItems) {
+    this.minItems = minItems;
+  }
+
   public ArrayPropertyModel multipleValues(Boolean multipleValues) {
     this.multipleValues = multipleValues;
     return this;
@@ -211,6 +255,16 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return this;
   }
 
+  public ArrayPropertyModel label(String label) {
+    super.label(label);
+    return this;
+  }
+
+  public ArrayPropertyModel placeholder(String placeholder) {
+    super.placeholder(placeholder);
+    return this;
+  }
+
   public ArrayPropertyModel advancedOption(Boolean advancedOption) {
     super.advancedOption(advancedOption);
     return this;
@@ -236,18 +290,8 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return this;
   }
 
-  public ArrayPropertyModel label(String label) {
-    super.label(label);
-    return this;
-  }
-
   public ArrayPropertyModel name(String name) {
     super.name(name);
-    return this;
-  }
-
-  public ArrayPropertyModel placeholder(String placeholder) {
-    super.placeholder(placeholder);
     return this;
   }
 
@@ -272,6 +316,8 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     return Objects.equals(this.defaultValue, arrayProperty.defaultValue) &&
         Objects.equals(this.exampleValue, arrayProperty.exampleValue) &&
         Objects.equals(this.items, arrayProperty.items) &&
+        Objects.equals(this.maxItems, arrayProperty.maxItems) &&
+        Objects.equals(this.minItems, arrayProperty.minItems) &&
         Objects.equals(this.multipleValues, arrayProperty.multipleValues) &&
         Objects.equals(this.options, arrayProperty.options) &&
         Objects.equals(this.optionsDataSource, arrayProperty.optionsDataSource) &&
@@ -280,7 +326,7 @@ public class ArrayPropertyModel extends ValuePropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(defaultValue, exampleValue, items, multipleValues, options, optionsDataSource, super.hashCode());
+    return Objects.hash(defaultValue, exampleValue, items, maxItems, minItems, multipleValues, options, optionsDataSource, super.hashCode());
   }
 
   @Override
@@ -291,6 +337,8 @@ public class ArrayPropertyModel extends ValuePropertyModel {
     sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
     sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("    items: ").append(toIndentedString(items)).append("\n");
+    sb.append("    maxItems: ").append(toIndentedString(maxItems)).append("\n");
+    sb.append("    minItems: ").append(toIndentedString(minItems)).append("\n");
     sb.append("    multipleValues: ").append(toIndentedString(multipleValues)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");
     sb.append("    optionsDataSource: ").append(toIndentedString(optionsDataSource)).append("\n");

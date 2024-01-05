@@ -35,7 +35,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DateProperty", description = "A date property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-03T07:47:14.476436+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-06T07:28:24.860493+01:00[Europe/Zagreb]")
 public class DatePropertyModel extends ValuePropertyModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -143,6 +143,16 @@ public class DatePropertyModel extends ValuePropertyModel {
     return this;
   }
 
+  public DatePropertyModel label(String label) {
+    super.label(label);
+    return this;
+  }
+
+  public DatePropertyModel placeholder(String placeholder) {
+    super.placeholder(placeholder);
+    return this;
+  }
+
   public DatePropertyModel advancedOption(Boolean advancedOption) {
     super.advancedOption(advancedOption);
     return this;
@@ -168,18 +178,8 @@ public class DatePropertyModel extends ValuePropertyModel {
     return this;
   }
 
-  public DatePropertyModel label(String label) {
-    super.label(label);
-    return this;
-  }
-
   public DatePropertyModel name(String name) {
     super.name(name);
-    return this;
-  }
-
-  public DatePropertyModel placeholder(String placeholder) {
-    super.placeholder(placeholder);
     return this;
   }
 

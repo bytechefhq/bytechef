@@ -45,7 +45,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-03T07:47:14.476436+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-06T07:28:24.860493+01:00[Europe/Zagreb]")
 public class PropertyModel {
 
   private Boolean advancedOption;
@@ -58,11 +58,7 @@ public class PropertyModel {
 
   private Boolean hidden;
 
-  private String label;
-
   private String name;
-
-  private String placeholder;
 
   private Boolean required;
 
@@ -168,26 +164,6 @@ public class PropertyModel {
     this.hidden = hidden;
   }
 
-  public PropertyModel label(String label) {
-    this.label = label;
-    return this;
-  }
-
-  /**
-   * The property label.
-   * @return label
-  */
-  
-  @Schema(name = "label", description = "The property label.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("label")
-  public String getLabel() {
-    return label;
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
   public PropertyModel name(String name) {
     this.name = name;
     return this;
@@ -206,26 +182,6 @@ public class PropertyModel {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public PropertyModel placeholder(String placeholder) {
-    this.placeholder = placeholder;
-    return this;
-  }
-
-  /**
-   * The property placeholder.
-   * @return placeholder
-  */
-  
-  @Schema(name = "placeholder", description = "The property placeholder.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("placeholder")
-  public String getPlaceholder() {
-    return placeholder;
-  }
-
-  public void setPlaceholder(String placeholder) {
-    this.placeholder = placeholder;
   }
 
   public PropertyModel required(Boolean required) {
@@ -282,16 +238,14 @@ public class PropertyModel {
         Objects.equals(this.displayCondition, property.displayCondition) &&
         Objects.equals(this.expressionEnabled, property.expressionEnabled) &&
         Objects.equals(this.hidden, property.hidden) &&
-        Objects.equals(this.label, property.label) &&
         Objects.equals(this.name, property.name) &&
-        Objects.equals(this.placeholder, property.placeholder) &&
         Objects.equals(this.required, property.required) &&
         Objects.equals(this.type, property.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(advancedOption, description, displayCondition, expressionEnabled, hidden, label, name, placeholder, required, type);
+    return Objects.hash(advancedOption, description, displayCondition, expressionEnabled, hidden, name, required, type);
   }
 
   @Override
@@ -303,9 +257,7 @@ public class PropertyModel {
     sb.append("    displayCondition: ").append(toIndentedString(displayCondition)).append("\n");
     sb.append("    expressionEnabled: ").append(toIndentedString(expressionEnabled)).append("\n");
     sb.append("    hidden: ").append(toIndentedString(hidden)).append("\n");
-    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    placeholder: ").append(toIndentedString(placeholder)).append("\n");
     sb.append("    required: ").append(toIndentedString(required)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
