@@ -16,8 +16,8 @@
 
 package com.bytechef.hermes.component.definition;
 
+import com.bytechef.hermes.definition.BaseProperty;
 import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -60,7 +60,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testArrayProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.array("name")
+        BaseProperty property = ComponentDSL.array("name")
             .defaultValue(1, 2)
             .description("description")
             .label("label")
@@ -77,7 +77,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testBooleanProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.bool("name")
+        BaseProperty property = ComponentDSL.bool("name")
             .defaultValue(true)
             .description("description")
             .label("label")
@@ -108,7 +108,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testDateProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.date("name")
+        BaseProperty property = ComponentDSL.date("name")
             .defaultValue(LocalDate.MIN)
             .description("description")
             .label("label")
@@ -124,7 +124,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testDateTimeProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.dateTime("name")
+        BaseProperty property = ComponentDSL.dateTime("name")
             .defaultValue(LocalDateTime.MIN)
             .description("description")
             .label("label")
@@ -140,7 +140,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testIntegerProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.integer("name")
+        BaseProperty property = ComponentDSL.integer("name")
             .defaultValue(2)
             .description("description")
             .label("label")
@@ -156,7 +156,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testNumberProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.number("name")
+        BaseProperty property = ComponentDSL.number("name")
             .defaultValue(2)
             .description("description")
             .label("label")
@@ -173,7 +173,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testObjectProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.object("name")
+        BaseProperty property = ComponentDSL.object("name")
             .defaultValue(Map.of("key", Map.of("key1", "value1")))
             .description("description")
             .label("label")
@@ -189,7 +189,7 @@ public class ComponentDefinitionTest {
 
     @Test
     public void testStringProperty() throws JSONException, JsonProcessingException {
-        Property property = ComponentDSL.string("name")
+        BaseProperty property = ComponentDSL.string("name")
             .defaultValue("defaultValue")
             .description("description")
             .label("label")

@@ -18,8 +18,8 @@ package com.bytechef.hermes.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.registry.domain.Option;
+import com.bytechef.hermes.task.dispatcher.definition.Property;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;

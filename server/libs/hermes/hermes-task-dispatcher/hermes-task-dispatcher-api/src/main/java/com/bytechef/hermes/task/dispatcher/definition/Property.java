@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.hermes.component.definition;
+package com.bytechef.hermes.task.dispatcher.definition;
 
 import com.bytechef.hermes.definition.BaseProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -35,11 +35,12 @@ public interface Property extends BaseProperty {
      *
      */
     interface ArrayProperty
-        extends BaseProperty.ArrayProperty, DynamicOptionsProperty, InputProperty, OutputProperty<List<Object>>,
-        Property, ValueProperty<List<Object>> {
+        extends BaseProperty.ArrayProperty, InputProperty, OutputProperty<List<Object>>, Property,
+        ValueProperty<List<Object>> {
 
         /**
          *
+         * @return
          */
         Optional<List<? extends Property.ValueProperty<?>>> getItems();
     }
@@ -55,7 +56,7 @@ public interface Property extends BaseProperty {
      *
      */
     interface DateProperty
-        extends BaseProperty.DateProperty, DynamicOptionsProperty, InputProperty, OutputProperty<LocalDate>, Property,
+        extends BaseProperty.DateProperty, InputProperty, OutputProperty<LocalDate>, Property,
         ValueProperty<LocalDate> {
     }
 
@@ -63,24 +64,8 @@ public interface Property extends BaseProperty {
      *
      */
     interface DateTimeProperty
-        extends BaseProperty.DateTimeProperty, DynamicOptionsProperty, InputProperty, OutputProperty<LocalDateTime>,
-        Property, ValueProperty<LocalDateTime> {
-    }
-
-    /**
-     *
-     */
-    interface DynamicPropertiesProperty extends InputProperty, Property {
-
-        /**
-         *
-         */
-        Optional<String> getHeader();
-
-        /**
-         *
-         */
-        PropertiesDataSource getDynamicPropertiesDataSource();
+        extends BaseProperty.DateTimeProperty, InputProperty, OutputProperty<LocalDateTime>, Property,
+        ValueProperty<LocalDateTime> {
     }
 
     /**
@@ -93,8 +78,7 @@ public interface Property extends BaseProperty {
      *
      */
     interface IntegerProperty
-        extends BaseProperty.IntegerProperty, DynamicOptionsProperty, InputProperty, OutputProperty<Long>, Property,
-        ValueProperty<Long> {
+        extends BaseProperty.IntegerProperty, InputProperty, OutputProperty<Long>, Property, ValueProperty<Long> {
     }
 
     /**
@@ -107,24 +91,25 @@ public interface Property extends BaseProperty {
      *
      */
     interface NumberProperty
-        extends BaseProperty.NumberProperty, DynamicOptionsProperty, InputProperty, OutputProperty<Double>, Property,
-        ValueProperty<Double> {
+        extends BaseProperty.NumberProperty, InputProperty, OutputProperty<Double>, Property, ValueProperty<Double> {
     }
 
     /**
      *
      */
     interface ObjectProperty
-        extends BaseProperty.ObjectProperty, DynamicOptionsProperty, InputProperty, OutputProperty<Map<String, Object>>,
-        Property, ValueProperty<Map<String, Object>> {
+        extends BaseProperty.ObjectProperty, InputProperty, OutputProperty<Map<String, Object>>, Property,
+        ValueProperty<Map<String, Object>> {
 
         /**
          *
+         * @return
          */
         Optional<List<? extends Property.ValueProperty<?>>> getAdditionalProperties();
 
         /**
          *
+         * @return
          */
         Optional<List<? extends Property.ValueProperty<?>>> getProperties();
     }
@@ -133,23 +118,21 @@ public interface Property extends BaseProperty {
      *
      * @param <V>
      */
-    interface OutputProperty<V>
-        extends BaseProperty.OutputProperty<V>, Property.ValueProperty<V> {
+    interface OutputProperty<V> extends BaseProperty.OutputProperty<V>, ValueProperty<V> {
     }
 
     /**
      *
      */
     interface StringProperty
-        extends BaseProperty.StringProperty, DynamicOptionsProperty, InputProperty, OutputProperty<String>, Property,
-        ValueProperty<String> {
+        extends BaseProperty.StringProperty, InputProperty, OutputProperty<String>, Property, ValueProperty<String> {
     }
 
     /**
      *
      */
     interface TimeProperty
-        extends BaseProperty.TimeProperty, DynamicOptionsProperty, InputProperty, OutputProperty<LocalTime>, Property,
+        extends BaseProperty.TimeProperty, InputProperty, OutputProperty<LocalTime>, Property,
         ValueProperty<LocalTime> {
     }
 

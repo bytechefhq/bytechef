@@ -16,8 +16,8 @@
 
 package com.bytechef.hermes.registry.util;
 
-import com.bytechef.hermes.definition.Property.InputProperty;
-import com.bytechef.hermes.definition.Property.OutputProperty;
+import com.bytechef.hermes.definition.BaseProperty.InputProperty;
+import com.bytechef.hermes.definition.BaseProperty.OutputProperty;
 import java.util.List;
 
 /**

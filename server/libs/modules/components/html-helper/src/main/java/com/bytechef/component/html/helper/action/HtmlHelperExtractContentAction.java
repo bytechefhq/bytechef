@@ -33,7 +33,7 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOut
 import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.BaseProperty;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;
@@ -53,7 +53,7 @@ public class HtmlHelperExtractContentAction {
             string(CONTENT)
                 .label("HTML content to extract content from.")
                 .description("The HTML content.")
-                .controlType(Property.ValueProperty.ControlType.TEXT_AREA)
+                .controlType(BaseProperty.ValueProperty.ControlType.TEXT_AREA)
                 .required(true),
             string(QUERY_SELECTOR)
                 .label("CSS Selector")

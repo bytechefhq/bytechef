@@ -166,14 +166,16 @@ public class PropertyMapper {
         }
 
         @Override
-        default ArrayPropertyModel
-            visit(com.bytechef.hermes.task.dispatcher.registry.domain.ArrayProperty arrayProperty) {
+        default ArrayPropertyModel visit(
+            com.bytechef.hermes.task.dispatcher.registry.domain.ArrayProperty arrayProperty) {
+
             return map(arrayProperty);
         }
 
         @Override
-        default BooleanPropertyModel
-            visit(com.bytechef.hermes.task.dispatcher.registry.domain.BooleanProperty booleanProperty) {
+        default BooleanPropertyModel visit(
+            com.bytechef.hermes.task.dispatcher.registry.domain.BooleanProperty booleanProperty) {
+
             return map(booleanProperty);
         }
 
@@ -183,14 +185,16 @@ public class PropertyMapper {
         }
 
         @Override
-        default DateTimePropertyModel
-            visit(com.bytechef.hermes.task.dispatcher.registry.domain.DateTimeProperty dateTimeProperty) {
+        default DateTimePropertyModel visit(
+            com.bytechef.hermes.task.dispatcher.registry.domain.DateTimeProperty dateTimeProperty) {
+
             return map(dateTimeProperty);
         }
 
         @Override
-        default IntegerPropertyModel
-            visit(com.bytechef.hermes.task.dispatcher.registry.domain.IntegerProperty integerProperty) {
+        default IntegerPropertyModel visit(
+            com.bytechef.hermes.task.dispatcher.registry.domain.IntegerProperty integerProperty) {
+
             return map(integerProperty);
         }
 
@@ -200,20 +204,23 @@ public class PropertyMapper {
         }
 
         @Override
-        default NumberPropertyModel
-            visit(com.bytechef.hermes.task.dispatcher.registry.domain.NumberProperty numberProperty) {
+        default NumberPropertyModel visit(
+            com.bytechef.hermes.task.dispatcher.registry.domain.NumberProperty numberProperty) {
+
             return map(numberProperty);
         }
 
         @Override
-        default ObjectPropertyModel
-            visit(com.bytechef.hermes.task.dispatcher.registry.domain.ObjectProperty objectProperty) {
+        default ObjectPropertyModel visit(
+            com.bytechef.hermes.task.dispatcher.registry.domain.ObjectProperty objectProperty) {
+
             return map(objectProperty);
         }
 
         @Override
-        default StringPropertyModel
-            visit(com.bytechef.hermes.task.dispatcher.registry.domain.StringProperty stringProperty) {
+        default StringPropertyModel visit(
+            com.bytechef.hermes.task.dispatcher.registry.domain.StringProperty stringProperty) {
+
             return map(stringProperty);
         }
 

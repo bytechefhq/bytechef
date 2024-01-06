@@ -48,7 +48,11 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
 
         OutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(name, version);
 
-        return Property.toProperty(outputSchemaFunction.apply(inputParameters));
+        try {
+            return Property.toProperty(outputSchemaFunction.apply(inputParameters));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

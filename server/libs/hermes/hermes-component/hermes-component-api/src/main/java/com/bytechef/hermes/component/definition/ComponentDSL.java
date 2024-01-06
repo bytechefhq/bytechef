@@ -26,6 +26,7 @@ import com.bytechef.hermes.component.definition.Property.InputProperty;
 import com.bytechef.hermes.component.definition.Property.OutputProperty;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.TriggerSampleOutputFunction;
+import com.bytechef.hermes.definition.BaseProperty;
 import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Option;
 import com.bytechef.hermes.definition.Resources;
@@ -705,7 +706,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>>> getItems() {
+        public Optional<List<? extends Property.ValueProperty<?>>> getItems() {
             return Optional.ofNullable(items);
         }
 
@@ -2312,7 +2313,7 @@ public final class ComponentDSL {
 
         public <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty properties(List<P> properties) {
             if (properties != null) {
-                for (com.bytechef.hermes.definition.Property property : properties) {
+                for (BaseProperty property : properties) {
                     String name = property.getName();
 
                     if (name == null || name.isEmpty()) {
@@ -2329,10 +2330,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>>>
-            getAdditionalProperties() {
-            return Optional.ofNullable(
-                additionalProperties == null ? null : new ArrayList<>(additionalProperties));
+        public Optional<List<? extends Property.ValueProperty<?>>> getAdditionalProperties() {
+            return Optional.ofNullable(additionalProperties == null ? null : new ArrayList<>(additionalProperties));
         }
 
         @Override
@@ -2367,7 +2366,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<? extends com.bytechef.hermes.definition.Property.ValueProperty<?>>> getProperties() {
+        public Optional<List<? extends Property.ValueProperty<?>>> getProperties() {
             return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
         }
 
@@ -2463,7 +2462,7 @@ public final class ComponentDSL {
     }
 
     public abstract static class ModifiableProperty<M extends ModifiableProperty<M>>
-        implements com.bytechef.hermes.definition.Property {
+        implements BaseProperty {
 
         private Boolean advancedOption;
         private String description;

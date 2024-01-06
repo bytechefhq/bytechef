@@ -18,7 +18,6 @@ package com.bytechef.hermes.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.registry.domain.Option;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +39,7 @@ public class NumberProperty extends ValueProperty<Double> {
     private NumberProperty() {
     }
 
-    public NumberProperty(Property.NumberProperty numberProperty) {
+    public NumberProperty(com.bytechef.hermes.task.dispatcher.definition.Property.NumberProperty numberProperty) {
         super(numberProperty);
 
         this.maxNumberPrecision = OptionalUtils.orElse(numberProperty.getMaxNumberPrecision(), null);

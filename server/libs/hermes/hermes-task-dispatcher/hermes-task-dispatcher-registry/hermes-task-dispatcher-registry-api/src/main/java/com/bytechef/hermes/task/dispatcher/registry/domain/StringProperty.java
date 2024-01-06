@@ -18,7 +18,7 @@ package com.bytechef.hermes.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.BaseProperty;
 import com.bytechef.hermes.registry.domain.Option;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +36,7 @@ public class StringProperty extends ValueProperty<String> {
     private StringProperty() {
     }
 
-    public StringProperty(Property.StringProperty stringProperty) {
+    public StringProperty(BaseProperty.StringProperty stringProperty) {
         super(stringProperty);
 
         this.maxLength = OptionalUtils.orElse(stringProperty.getMaxLength(), null);

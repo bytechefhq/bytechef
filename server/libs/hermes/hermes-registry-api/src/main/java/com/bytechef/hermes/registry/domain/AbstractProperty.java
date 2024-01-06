@@ -17,14 +17,15 @@
 package com.bytechef.hermes.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property.Type;
+import com.bytechef.hermes.definition.BaseProperty;
+import com.bytechef.hermes.definition.BaseProperty.Type;
 import java.util.Objects;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public abstract class Property {
+public abstract class AbstractProperty {
 
     private boolean advancedOption;
     private String description;
@@ -35,10 +36,10 @@ public abstract class Property {
     private String name;
     private Type type;
 
-    protected Property() {
+    protected AbstractProperty() {
     }
 
-    public Property(com.bytechef.hermes.definition.Property property) {
+    public AbstractProperty(BaseProperty property) {
         this.advancedOption = OptionalUtils.orElse(property.getAdvancedOption(), false);
         this.description = OptionalUtils.orElse(property.getDescription(), null);
         this.displayCondition = OptionalUtils.orElse(property.getDisplayCondition(), null);
@@ -55,7 +56,7 @@ public abstract class Property {
             return true;
         }
 
-        if (!(o instanceof Property that)) {
+        if (!(o instanceof AbstractProperty that)) {
             return false;
         }
 

@@ -39,7 +39,7 @@ public class ObjectProperty extends ValueProperty<Map<String, Object>> {
     private ObjectProperty() {
     }
 
-    public ObjectProperty(com.bytechef.hermes.definition.Property.ObjectProperty objectProperty) {
+    public ObjectProperty(com.bytechef.hermes.task.dispatcher.definition.Property.ObjectProperty objectProperty) {
         super(objectProperty);
 
         this.additionalProperties = CollectionUtils.map(

@@ -16,8 +16,6 @@
 
 package com.bytechef.hermes.task.dispatcher.registry.domain;
 
-import com.bytechef.hermes.definition.Property;
-
 /**
  * @author Ivica Cardic
  */
@@ -26,7 +24,7 @@ public class NullProperty extends ValueProperty<Void> {
     private NullProperty() {
     }
 
-    public NullProperty(Property.NullProperty nullProperty) {
+    public NullProperty(com.bytechef.hermes.task.dispatcher.definition.Property.NullProperty nullProperty) {
         super(nullProperty);
     }
 

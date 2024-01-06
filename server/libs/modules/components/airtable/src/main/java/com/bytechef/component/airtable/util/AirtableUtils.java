@@ -33,8 +33,8 @@ import com.bytechef.hermes.component.definition.Context.Http;
 import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
 import com.bytechef.hermes.component.definition.OptionsDataSource;
 import com.bytechef.hermes.component.definition.PropertiesDataSource;
+import com.bytechef.hermes.definition.BaseProperty;
 import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -101,18 +101,18 @@ public class AirtableUtils {
                         "duration" -> string(field.name());
                     case "checkbox" -> bool(field.name());
                     case "email" -> string(field.name())
-                        .controlType(Property.ValueProperty.ControlType.EMAIL);
+                        .controlType(BaseProperty.ValueProperty.ControlType.EMAIL);
                     case "multilineText" -> string(field.name())
-                        .controlType(Property.ValueProperty.ControlType.TEXT_AREA);
+                        .controlType(BaseProperty.ValueProperty.ControlType.TEXT_AREA);
                     case "multipleSelects" -> array(field.name())
                         .items(string())
                         .options(getOptions(field));
                     case "number" -> number(field.name());
                     case "phoneNumber" -> string(field.name())
-                        .controlType(Property.ValueProperty.ControlType.PHONE);
+                        .controlType(BaseProperty.ValueProperty.ControlType.PHONE);
                     case "singleSelect" -> string(field.name()).options(
                         getOptions(field));
-                    case "url" -> string(field.name()).controlType(Property.ValueProperty.ControlType.URL);
+                    case "url" -> string(field.name()).controlType(BaseProperty.ValueProperty.ControlType.URL);
                     default -> throw new IllegalArgumentException(
                         "Unknown Airtable field type='%s'".formatted(field.type()));
                 };

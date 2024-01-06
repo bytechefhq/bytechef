@@ -27,10 +27,10 @@ import com.bytechef.hermes.component.definition.Context.Http.Body;
 import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
 import com.bytechef.hermes.component.definition.Context.Http.Response;
 import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
-import com.bytechef.hermes.definition.Property;
-import com.bytechef.hermes.definition.Property.InputProperty;
-import com.bytechef.hermes.definition.Property.OutputProperty;
-import com.bytechef.hermes.definition.Property.Type;
+import com.bytechef.hermes.definition.BaseProperty;
+import com.bytechef.hermes.definition.BaseProperty.InputProperty;
+import com.bytechef.hermes.definition.BaseProperty.OutputProperty;
+import com.bytechef.hermes.definition.BaseProperty.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,11 +66,11 @@ public class OpenApiClientUtils {
     }
 
     private static String createUrl(
-        Map<String, ?> inputParameters, Map<String, ?> metadata, List<? extends Property> properties) {
+        Map<String, ?> inputParameters, Map<String, ?> metadata, List<? extends BaseProperty> properties) {
 
         String path = (String) metadata.get("path");
 
-        for (Property property : properties) {
+        for (BaseProperty property : properties) {
             if (MapUtils.get(property.getMetadata(), TYPE, PropertyType.class) == PropertyType.PATH) {
                 path = path.replace(
                     "{" + property.getName() + "}", MapUtils.getRequiredString(inputParameters, property.getName()));
@@ -82,13 +82,13 @@ public class OpenApiClientUtils {
 
     private static Body getBody(
         BodyContentType bodyContentType, String mimeType, Map<String, ?> inputParameters,
-        List<? extends Property> properties) {
+        List<? extends BaseProperty> properties) {
 
         if (bodyContentType == null) {
             return null;
         }
 
-        for (Property property : properties) {
+        for (BaseProperty property : properties) {
             if (Objects.equals(
                 MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
 
@@ -122,11 +122,11 @@ public class OpenApiClientUtils {
     }
 
     private static Map<String, List<String>> getValuesMap(
-        Map<String, ?> inputParameters, List<? extends Property> properties, PropertyType propertyType) {
+        Map<String, ?> inputParameters, List<? extends BaseProperty> properties, PropertyType propertyType) {
 
         Map<String, List<String>> valuesMap = new HashMap<>();
 
-        for (Property property : properties) {
+        for (BaseProperty property : properties) {
             if (Objects.equals(MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), propertyType)) {
                 List<String> values;
 

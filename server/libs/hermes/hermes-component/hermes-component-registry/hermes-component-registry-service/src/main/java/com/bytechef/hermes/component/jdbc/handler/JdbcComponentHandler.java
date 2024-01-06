@@ -48,7 +48,7 @@ import com.bytechef.hermes.component.jdbc.operation.InsertJdbcOperation;
 import com.bytechef.hermes.component.jdbc.operation.QueryJdbcOperation;
 import com.bytechef.hermes.component.jdbc.operation.UpdateJdbcOperation;
 import com.bytechef.hermes.component.jdbc.sql.DataSourceFactory;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.BaseProperty;
 import java.util.List;
 import java.util.Map;
 
@@ -70,7 +70,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                 .required(true),
             string(JdbcConstants.PASSWORD)
                 .label("Password")
-                .controlType(Property.ValueProperty.ControlType.PASSWORD)
+                .controlType(BaseProperty.ValueProperty.ControlType.PASSWORD)
                 .required(true));
 
     private final List<ModifiableActionDefinition> actionDefinitions = List.of(

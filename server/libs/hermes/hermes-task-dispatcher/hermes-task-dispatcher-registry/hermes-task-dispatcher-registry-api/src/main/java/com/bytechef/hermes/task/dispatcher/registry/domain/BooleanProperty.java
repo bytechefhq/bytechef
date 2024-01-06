@@ -18,7 +18,6 @@ package com.bytechef.hermes.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.registry.domain.Option;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +33,7 @@ public class BooleanProperty extends ValueProperty<Boolean> {
     private BooleanProperty() {
     }
 
-    public BooleanProperty(Property.BooleanProperty booleanProperty) {
+    public BooleanProperty(com.bytechef.hermes.task.dispatcher.definition.Property.BooleanProperty booleanProperty) {
         super(booleanProperty);
 
         this.options = CollectionUtils.map(

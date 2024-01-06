@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.component.registry.domain;
 
+import com.bytechef.hermes.registry.domain.AbstractProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,7 +43,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
     @JsonSubTypes.Type(value = TimeProperty.class, name = "TIME"),
 })
 @SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_SUPERCLASS")
-public abstract class Property extends com.bytechef.hermes.registry.domain.Property {
+public abstract class Property extends AbstractProperty {
 
     protected Property() {
     }

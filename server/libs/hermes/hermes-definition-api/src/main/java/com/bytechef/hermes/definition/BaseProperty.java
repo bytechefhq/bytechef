@@ -26,7 +26,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public interface Property {
+public interface BaseProperty {
 
     /**
      *
@@ -99,11 +99,6 @@ public interface Property {
         /**
          *
          */
-        Optional<List<? extends ValueProperty<?>>> getItems();
-
-        /**
-         *
-         */
         Optional<Long> getMaxItems();
 
         /**
@@ -139,7 +134,7 @@ public interface Property {
     /**
      *
      */
-    interface InputProperty extends Property {
+    interface InputProperty extends BaseProperty {
     }
 
     /**
@@ -204,22 +199,12 @@ public interface Property {
         /**
          *
          */
-        Optional<List<? extends ValueProperty<?>>> getAdditionalProperties();
-
-        /**
-         *
-         */
         Optional<Boolean> getMultipleValues();
 
         /**
          *
          */
         Optional<String> getObjectType();
-
-        /**
-         *
-         */
-        Optional<List<? extends ValueProperty<?>>> getProperties();
     }
 
     /**
@@ -256,7 +241,7 @@ public interface Property {
     /**
      *
      */
-    interface ValueProperty<V> extends Property {
+    interface ValueProperty<V> extends BaseProperty {
 
         /**
          *

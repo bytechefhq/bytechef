@@ -18,7 +18,6 @@ package com.bytechef.hermes.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.registry.domain.Option;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +36,7 @@ public class IntegerProperty extends ValueProperty<Long> {
     private IntegerProperty() {
     }
 
-    public IntegerProperty(Property.IntegerProperty integerProperty) {
+    public IntegerProperty(com.bytechef.hermes.task.dispatcher.definition.Property.IntegerProperty integerProperty) {
         super(integerProperty);
 
         this.maxValue = OptionalUtils.orElse(integerProperty.getMaxValue(), null);

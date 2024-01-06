@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.task.dispatcher.definition;
 
-import com.bytechef.hermes.definition.Property.OutputProperty;
+import com.bytechef.hermes.task.dispatcher.definition.Property.OutputProperty;
 import java.util.Map;
 
 /**
@@ -41,6 +41,6 @@ public interface OutputSchemaDataSource {
          * @param inputParameters
          * @return
          */
-        OutputProperty<?> apply(Map<String, ?> inputParameters);
+        OutputProperty<?> apply(Map<String, ?> inputParameters) throws Exception;
     }
 }

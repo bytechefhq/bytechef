@@ -18,7 +18,7 @@ package com.bytechef.hermes.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.BaseProperty;
 import com.bytechef.hermes.registry.domain.Option;
 import java.time.LocalTime;
 import java.util.Collections;
@@ -35,7 +35,7 @@ public class TimeProperty extends ValueProperty<LocalTime> {
     private TimeProperty() {
     }
 
-    public TimeProperty(Property.TimeProperty timeProperty) {
+    public TimeProperty(BaseProperty.TimeProperty timeProperty) {
         super(timeProperty);
 
         this.options = CollectionUtils.map(OptionalUtils.orElse(timeProperty.getOptions(), List.of()), Option::new);

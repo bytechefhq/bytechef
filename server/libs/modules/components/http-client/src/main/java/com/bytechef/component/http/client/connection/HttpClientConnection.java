@@ -37,7 +37,7 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 import com.bytechef.hermes.component.definition.Authorization;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.BaseProperty;
 
 public class HttpClientConnection {
 
@@ -115,7 +115,7 @@ public class HttpClientConnection {
                         string(SCOPES)
                             .label("Scopes")
                             .description("Optional comma-delimited list of scopes")
-                            .controlType(Property.ValueProperty.ControlType.TEXT_AREA)),
+                            .controlType(BaseProperty.ValueProperty.ControlType.TEXT_AREA)),
             authorization(
                 Authorization.AuthorizationType.OAUTH2_IMPLICIT_CODE
                     .name()
@@ -137,7 +137,7 @@ public class HttpClientConnection {
                         string(SCOPES)
                             .label("Scopes")
                             .description("Optional comma-delimited list of scopes")
-                            .controlType(Property.ValueProperty.ControlType.TEXT_AREA)),
+                            .controlType(BaseProperty.ValueProperty.ControlType.TEXT_AREA)),
             authorization(
                 Authorization.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS
                     .name()
@@ -158,5 +158,5 @@ public class HttpClientConnection {
                         string(SCOPES)
                             .label("Scopes")
                             .description("Optional comma-delimited list of scopes")
-                            .controlType(Property.ValueProperty.ControlType.TEXT_AREA)));
+                            .controlType(BaseProperty.ValueProperty.ControlType.TEXT_AREA)));
 }

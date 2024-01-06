@@ -38,7 +38,7 @@ public class ArrayProperty extends ValueProperty<List<Object>> {
     private ArrayProperty() {
     }
 
-    public ArrayProperty(com.bytechef.hermes.definition.Property.ArrayProperty arrayProperty) {
+    public ArrayProperty(com.bytechef.hermes.task.dispatcher.definition.Property.ArrayProperty arrayProperty) {
         super(arrayProperty);
 
         this.items = CollectionUtils.map(

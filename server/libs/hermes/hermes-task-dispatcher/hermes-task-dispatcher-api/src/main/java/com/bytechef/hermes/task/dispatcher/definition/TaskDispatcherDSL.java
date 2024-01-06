@@ -18,12 +18,10 @@ package com.bytechef.hermes.task.dispatcher.definition;
 
 import com.bytechef.hermes.definition.Help;
 import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Property;
-import com.bytechef.hermes.definition.Property.InputProperty;
-import com.bytechef.hermes.definition.Property.OutputProperty;
-import com.bytechef.hermes.definition.Property.ValueProperty;
 import com.bytechef.hermes.definition.Resources;
 import com.bytechef.hermes.task.dispatcher.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.hermes.task.dispatcher.definition.Property.InputProperty;
+import com.bytechef.hermes.task.dispatcher.definition.Property.OutputProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -1297,7 +1295,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getTaskProperties() {
+        public Optional<List<? extends Property.ValueProperty<?>>> getTaskProperties() {
             return Optional.ofNullable(taskProperties);
         }
 
@@ -1307,7 +1305,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getVariableProperties() {
+        public Optional<List<? extends Property.ValueProperty<?>>> getVariableProperties() {
             return Optional.ofNullable(variableProperties);
         }
 

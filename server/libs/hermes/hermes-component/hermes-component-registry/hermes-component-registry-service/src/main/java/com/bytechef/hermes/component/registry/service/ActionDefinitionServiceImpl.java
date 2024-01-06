@@ -122,9 +122,10 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentName, componentVersion, actionName);
 
         try {
-            return Property.toProperty(outputSchemaFunction.apply(
-                new ParametersImpl(inputParameters),
-                connection == null ? null : new ParametersImpl(connection.parameters()), context));
+            return Property.toProperty(
+                outputSchemaFunction.apply(
+                    new ParametersImpl(inputParameters),
+                    connection == null ? null : new ParametersImpl(connection.parameters()), context));
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
@@ -245,8 +246,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentName, componentVersion);
 
         com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
-            componentDefinitionRegistry.getActionDefinition(
-                componentName, componentVersion, actionName);
+            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         getActionDefinition(componentName, componentVersion, actionName);
 
@@ -263,8 +263,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         String componentName, int componentVersion, String actionName) {
 
         com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
-            componentDefinitionRegistry.getActionDefinition(
-                componentName, componentVersion, actionName);
+            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(actionDefinition.getOutputSchemaDataSource());
 
@@ -275,11 +274,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         String componentName, int componentVersion, String actionName) {
 
         com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
-            componentDefinitionRegistry.getActionDefinition(
-                componentName, componentVersion, actionName);
+            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
-        SampleOutputDataSource sampleOutputDataSource = OptionalUtils.get(
-            actionDefinition.getSampleOutputDataSource());
+        SampleOutputDataSource sampleOutputDataSource = OptionalUtils.get(actionDefinition.getSampleOutputDataSource());
 
         return (ActionSampleOutputFunction) sampleOutputDataSource.getSampleOutput();
     }
@@ -287,7 +284,6 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     private com.bytechef.hermes.component.definition.ActionDefinition resolveActionDefinition(
         String componentName, int componentVersion, String actionName) {
 
-        return componentDefinitionRegistry.getActionDefinition(
-            componentName, componentVersion, actionName);
+        return componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
     }
 }

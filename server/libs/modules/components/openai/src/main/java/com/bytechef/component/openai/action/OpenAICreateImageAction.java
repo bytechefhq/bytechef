@@ -41,7 +41,7 @@ import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.BaseProperty;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.service.OpenAiService;
@@ -115,7 +115,7 @@ public class OpenAICreateImageAction {
                         object()
                             .properties(
                                 string("url")
-                                    .controlType(Property.ValueProperty.ControlType.URL),
+                                    .controlType(BaseProperty.ValueProperty.ControlType.URL),
                                 string("b64Json"),
                                 string("revisedPrompt"))))
 

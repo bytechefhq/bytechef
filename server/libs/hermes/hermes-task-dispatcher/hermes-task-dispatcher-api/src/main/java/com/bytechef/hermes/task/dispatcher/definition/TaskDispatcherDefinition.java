@@ -17,10 +17,10 @@
 package com.bytechef.hermes.task.dispatcher.definition;
 
 import com.bytechef.hermes.definition.Help;
-import com.bytechef.hermes.definition.Property.InputProperty;
-import com.bytechef.hermes.definition.Property.OutputProperty;
-import com.bytechef.hermes.definition.Property.ValueProperty;
 import com.bytechef.hermes.definition.Resources;
+import com.bytechef.hermes.task.dispatcher.definition.Property.InputProperty;
+import com.bytechef.hermes.task.dispatcher.definition.Property.OutputProperty;
+import com.bytechef.hermes.task.dispatcher.definition.Property.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;

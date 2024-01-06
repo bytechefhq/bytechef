@@ -29,7 +29,7 @@ import com.bytechef.hermes.component.definition.ConnectionDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.hermes.component.registry.factory.ComponentHandlerListFactory;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.BaseProperty;
 import com.bytechef.hermes.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
@@ -111,7 +111,7 @@ public class ComponentDefinitionRegistry {
         return OptionalUtils.orElse(componentDefinition.getActions(), Collections.emptyList());
     }
 
-    public Property getActionProperty(
+    public BaseProperty getActionProperty(
         String componentName, int componentVersion, String actionName, String propertyName) {
 
         ActionDefinition actionDefinition = getActionDefinition(componentName, componentVersion, actionName);
@@ -201,7 +201,7 @@ public class ComponentDefinitionRegistry {
         return OptionalUtils.orElse(componentDefinition.getTriggers(), Collections.emptyList());
     }
 
-    public Property getTriggerProperty(
+    public BaseProperty getTriggerProperty(
         String componentName, int componentVersion, String triggerName, String propertyName) {
 
         TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, triggerName);

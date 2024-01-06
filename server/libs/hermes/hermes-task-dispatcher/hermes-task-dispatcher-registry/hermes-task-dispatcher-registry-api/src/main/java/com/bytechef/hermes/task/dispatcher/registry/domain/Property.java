@@ -16,6 +16,8 @@
 
 package com.bytechef.hermes.task.dispatcher.registry.domain;
 
+import com.bytechef.hermes.definition.BaseProperty;
+import com.bytechef.hermes.registry.domain.AbstractProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,79 +40,100 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
     @JsonSubTypes.Type(value = TimeProperty.class, name = "TIME"),
 })
 @SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_SUPERCLASS")
-public abstract class Property extends com.bytechef.hermes.registry.domain.Property {
+public abstract class Property extends AbstractProperty {
 
     protected Property() {
     }
 
-    public Property(com.bytechef.hermes.definition.Property property) {
+    public Property(BaseProperty property) {
         super(property);
     }
 
     @SuppressWarnings("unchecked")
-    public static <P extends Property> P toProperty(com.bytechef.hermes.definition.Property property) {
+    public static <P extends Property> P toProperty(com.bytechef.hermes.task.dispatcher.definition.Property property) {
         return switch (property.getType()) {
-            case ARRAY -> (P) toArrayProperty((com.bytechef.hermes.definition.Property.ArrayProperty) property);
-            case BOOLEAN -> (P) toBooleanProperty((com.bytechef.hermes.definition.Property.BooleanProperty) property);
-            case DATE -> (P) toDateProperty((com.bytechef.hermes.definition.Property.DateProperty) property);
+            case ARRAY -> (P) toArrayProperty(
+                (com.bytechef.hermes.task.dispatcher.definition.Property.ArrayProperty) property);
+            case BOOLEAN -> (P) toBooleanProperty(
+                (com.bytechef.hermes.task.dispatcher.definition.Property.BooleanProperty) property);
+            case DATE -> (P) toDateProperty(
+                (com.bytechef.hermes.task.dispatcher.definition.Property.DateProperty) property);
             case DATE_TIME ->
-                (P) toDateTimeProperty((com.bytechef.hermes.definition.Property.DateTimeProperty) property);
+                (P) toDateTimeProperty(
+                    (com.bytechef.hermes.task.dispatcher.definition.Property.DateTimeProperty) property);
             case DYNAMIC_PROPERTIES -> throw new IllegalStateException(
                 "DYNAMIC_PROPERTIES property type is not supported");
-            case INTEGER -> (P) toIntegerProperty((com.bytechef.hermes.definition.Property.IntegerProperty) property);
-            case NULL -> (P) toNullProperty((com.bytechef.hermes.definition.Property.NullProperty) property);
-            case NUMBER -> (P) toNumberProperty((com.bytechef.hermes.definition.Property.NumberProperty) property);
-            case OBJECT -> (P) toObjectProperty((com.bytechef.hermes.definition.Property.ObjectProperty) property);
-            case STRING -> (P) toStringProperty((com.bytechef.hermes.definition.Property.StringProperty) property);
-            case TIME -> (P) toTimeProperty((com.bytechef.hermes.definition.Property.TimeProperty) property);
+            case INTEGER -> (P) toIntegerProperty(
+                (com.bytechef.hermes.task.dispatcher.definition.Property.IntegerProperty) property);
+            case NULL -> (P) toNullProperty(
+                (com.bytechef.hermes.task.dispatcher.definition.Property.NullProperty) property);
+            case NUMBER -> (P) toNumberProperty(
+                (com.bytechef.hermes.task.dispatcher.definition.Property.NumberProperty) property);
+            case OBJECT -> (P) toObjectProperty(
+                (com.bytechef.hermes.task.dispatcher.definition.Property.ObjectProperty) property);
+            case STRING -> (P) toStringProperty(
+                (com.bytechef.hermes.task.dispatcher.definition.Property.StringProperty) property);
+            case TIME -> (P) toTimeProperty((BaseProperty.TimeProperty) property);
         };
     }
 
     public abstract Object accept(PropertyVisitor propertyVisitor);
 
-    private static ArrayProperty toArrayProperty(com.bytechef.hermes.definition.Property.ArrayProperty arrayProperty) {
+    private static ArrayProperty toArrayProperty(
+        com.bytechef.hermes.task.dispatcher.definition.Property.ArrayProperty arrayProperty) {
+
         return new ArrayProperty(arrayProperty);
     }
 
-    private static BooleanProperty
-        toBooleanProperty(com.bytechef.hermes.definition.Property.BooleanProperty booleanProperty) {
+    private static BooleanProperty toBooleanProperty(
+        com.bytechef.hermes.task.dispatcher.definition.Property.BooleanProperty booleanProperty) {
+
         return new BooleanProperty(booleanProperty);
     }
 
-    private static DateProperty toDateProperty(com.bytechef.hermes.definition.Property.DateProperty dateProperty) {
+    private static DateProperty toDateProperty(
+        com.bytechef.hermes.task.dispatcher.definition.Property.DateProperty dateProperty) {
+
         return new DateProperty(dateProperty);
     }
 
-    private static DateTimeProperty
-        toDateTimeProperty(com.bytechef.hermes.definition.Property.DateTimeProperty dateTimeProperty) {
+    private static DateTimeProperty toDateTimeProperty(
+        com.bytechef.hermes.task.dispatcher.definition.Property.DateTimeProperty dateTimeProperty) {
+
         return new DateTimeProperty(dateTimeProperty);
     }
 
-    private static IntegerProperty
-        toIntegerProperty(com.bytechef.hermes.definition.Property.IntegerProperty integerProperty) {
+    private static IntegerProperty toIntegerProperty(
+        com.bytechef.hermes.task.dispatcher.definition.Property.IntegerProperty integerProperty) {
+
         return new IntegerProperty(integerProperty);
     }
 
-    private static NullProperty toNullProperty(com.bytechef.hermes.definition.Property.NullProperty nullProperty) {
+    private static NullProperty toNullProperty(
+        com.bytechef.hermes.task.dispatcher.definition.Property.NullProperty nullProperty) {
+
         return new NullProperty(nullProperty);
     }
 
-    private static NumberProperty
-        toNumberProperty(com.bytechef.hermes.definition.Property.NumberProperty numberProperty) {
+    private static NumberProperty toNumberProperty(
+        com.bytechef.hermes.task.dispatcher.definition.Property.NumberProperty numberProperty) {
+
         return new NumberProperty(numberProperty);
     }
 
-    private static ObjectProperty
-        toObjectProperty(com.bytechef.hermes.definition.Property.ObjectProperty objectProperty) {
+    private static ObjectProperty toObjectProperty(
+        com.bytechef.hermes.task.dispatcher.definition.Property.ObjectProperty objectProperty) {
+
         return new ObjectProperty(objectProperty);
     }
 
-    private static StringProperty
-        toStringProperty(com.bytechef.hermes.definition.Property.StringProperty stringProperty) {
+    private static StringProperty toStringProperty(
+        com.bytechef.hermes.task.dispatcher.definition.Property.StringProperty stringProperty) {
+
         return new StringProperty(stringProperty);
     }
 
-    private static TimeProperty toTimeProperty(com.bytechef.hermes.definition.Property.TimeProperty timeProperty) {
+    private static TimeProperty toTimeProperty(BaseProperty.TimeProperty timeProperty) {
         return new TimeProperty(timeProperty);
     }
 

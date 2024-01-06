@@ -38,7 +38,7 @@ import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOut
 import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.BaseProperty;
 
 /**
  * @author Matija Petanjek
@@ -58,7 +58,7 @@ public class ScriptRAction {
             string(SCRIPT)
                 .label("R code")
                 .description("Add your R custom logic here.")
-                .controlType(Property.ValueProperty.ControlType.CODE_EDITOR)
+                .controlType(BaseProperty.ValueProperty.ControlType.CODE_EDITOR)
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
         .sampleOutput(getSampleOutputFunction())

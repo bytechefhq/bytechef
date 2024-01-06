@@ -18,7 +18,6 @@ package com.bytechef.hermes.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.Property;
 import com.bytechef.hermes.registry.domain.Option;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -35,7 +34,7 @@ public class DateTimeProperty extends ValueProperty<LocalDateTime> {
     private DateTimeProperty() {
     }
 
-    public DateTimeProperty(Property.DateTimeProperty dateTimeProperty) {
+    public DateTimeProperty(com.bytechef.hermes.task.dispatcher.definition.Property.DateTimeProperty dateTimeProperty) {
         super(dateTimeProperty);
 
         this.options = CollectionUtils.map(
