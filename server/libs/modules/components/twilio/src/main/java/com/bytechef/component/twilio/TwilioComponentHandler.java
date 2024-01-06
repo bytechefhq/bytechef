@@ -38,8 +38,7 @@ public class TwilioComponentHandler implements ComponentHandler {
                 " video capabilities into their applications.")
         .icon("path:assets/twilio.svg")
         .connection(TwilioConnection.CONNECTION_DEFINITION)
-        .actions(
-            TwilioSendSMSAction.ACTION_DEFINITION);
+        .actions(TwilioSendSMSAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

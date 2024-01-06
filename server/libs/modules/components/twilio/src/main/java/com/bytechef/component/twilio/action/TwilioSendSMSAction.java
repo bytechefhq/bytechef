@@ -58,9 +58,9 @@ import static com.bytechef.hermes.component.definition.constant.AuthorizationCon
 
 import com.bytechef.component.twilio.util.TwilioUtils;
 import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.definition.BaseProperty.ValueProperty.ControlType;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
@@ -72,7 +72,7 @@ import java.util.List;
  */
 public class TwilioSendSMSAction {
 
-    public static final ComponentDSL.ModifiableActionDefinition ACTION_DEFINITION = action(SEND_SMS)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_SMS)
         .title("Send SMS")
         .description("Send a new SMS message")
         .properties(
@@ -85,7 +85,7 @@ public class TwilioSendSMSAction {
                 .description(
                     "The recipient's phone number in E.164 format (for SMS/MMS) or channel address, e.g. " +
                         "whatsapp:+15552229999.")
-                .controlType(Property.ControlType.PHONE)
+                .controlType(ControlType.PHONE)
                 .required(true),
             string(STATUS_CALLBACK)
                 .label("Status callback")
@@ -94,7 +94,7 @@ public class TwilioSendSMSAction {
                         "contain a valid hostname and underscores are not allowed. If you include this parameter " +
                         "with the messaging_service_sid, Twilio uses this URL instead of the Status Callback URL of " +
                         "the Messaging Service.")
-                .controlType(Property.ControlType.URL)
+                .controlType(ControlType.URL)
                 .required(false),
             string(APPLICATION_SID)
                 .label("Application SID")
@@ -278,47 +278,55 @@ public class TwilioSendSMSAction {
         String messagingServiceSID = inputParameters.getString(MESSAGING_SERVICE_SID);
 
         // first case: to, from, body
-        // second case: pathAccountSid, to, from, body
-        // third case: to, from, mediaUrl
-        // fourth case: pathAccountSid, to, from, mediaUrl
-        // fifth case: to, messagingServiceSID, body
-        // sixth case: pathAccountSid, to, messagingServiceSid, body
-        // seventh case: to, messagingServiceSid, mediaUrl
-        // eighth case: pathAccountSid, to, messagingServiceSid, mediaUrl
 
         if (isFirstCase(from, body, pathAccountSid)) {
             return Message.creator(new PhoneNumber(to), messagingServiceSID, mediaURL)
                 .create();
         }
 
+        // second case: pathAccountSid, to, from, body
+
         if (isSecondCase(from, body, pathAccountSid)) {
             return Message.creator(pathAccountSid, new PhoneNumber(to), messagingServiceSID, mediaURL)
                 .create();
         }
+
+        // third case: to, from, mediaUrl
 
         if (isThirdCase(from, body, pathAccountSid)) {
             return Message.creator(new PhoneNumber(to), messagingServiceSID, body)
                 .create();
         }
 
+        // fourth case: pathAccountSid, to, from, mediaUrl
+
         if (isFourthCase(from, body, pathAccountSid)) {
             return Message.creator(pathAccountSid, new PhoneNumber(to), messagingServiceSID, body)
                 .create();
         }
 
+        // fifth case: to, messagingServiceSID, body
+
         if (isFifthCase(from, body, pathAccountSid)) {
             return Message.creator(new PhoneNumber(to), new PhoneNumber(from), mediaURL)
                 .create();
         }
+
+        // sixth case: pathAccountSid, to, messagingServiceSid, body
+
         if (isSixthCase(from, body, pathAccountSid)) {
             return Message.creator(pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), mediaURL)
                 .create();
         }
 
+        // seventh case: to, messagingServiceSid, mediaUrl
+
         if (isSeventhCase(from, body, pathAccountSid)) {
             return Message.creator(new PhoneNumber(to), new PhoneNumber(from), body)
                 .create();
         }
+
+        // eighth case: pathAccountSid, to, messagingServiceSid, mediaUrl
 
         return Message.creator(pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), body)
             .create();

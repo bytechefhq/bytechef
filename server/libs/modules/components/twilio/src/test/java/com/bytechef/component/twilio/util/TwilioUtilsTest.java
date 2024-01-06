@@ -28,8 +28,9 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.PropertiesDataSource;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.component.definition.Property;
+import com.bytechef.hermes.definition.BaseProperty.ValueProperty.ControlType;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,22 +38,19 @@ import org.junit.jupiter.api.Test;
  */
 class TwilioUtilsTest {
 
-    protected Parameters mockedParameters = mock(Parameters.class);
-    protected ActionContext mockedContext = mock(ActionContext.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final ActionContext mockedContext = mock(ActionContext.class);
 
     @Test
     void testGetContentPropertiesForMediaUrl() {
-        when(mockedParameters.getString(CONTENT)).thenReturn(MEDIA_URL);
+        when(mockedParameters.getString(CONTENT))
+            .thenReturn(MEDIA_URL);
 
-        PropertiesDataSource.PropertiesResponse mediaUrlProperties =
+        List<? extends Property.ValueProperty<?>> mediaUrlProperties =
             TwilioUtils.getContentProperties(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(1, mediaUrlProperties.properties()
-            .size());
-        assertEquals("Media URL", mediaUrlProperties.properties()
-            .getFirst()
-            .getLabel()
-            .get());
+        assertEquals(1, mediaUrlProperties.size());
+        assertEquals("Media URL", mediaUrlProperties.getFirst().getLabel().get());
         assertEquals(
             "The URL of media to include in the Message content. jpeg, jpg, gif, and png file types are " +
                 "fully supported by Twilio and content is formatted for delivery on destination devices. The " +
@@ -60,58 +58,39 @@ class TwilioUtilsTest {
                 "other types of accepted media. To send more than one image in the message, provide multiple " +
                 "media_url parameters in the POST request. You can include up to ten media_url parameters " +
                 "per message. International and carrier limits apply.",
-            mediaUrlProperties.properties()
-                .getFirst()
-                .getDescription()
-                .get());
-
-        assertEquals(true, mediaUrlProperties.properties()
-            .getFirst()
-            .getRequired()
-            .get());
+            mediaUrlProperties.getFirst().getDescription().get());
+        assertEquals(true, mediaUrlProperties.getFirst().getRequired().get());
     }
 
     @Test
     void testGetContentPropertiesForBody() {
-        when(mockedParameters.getString(CONTENT)).thenReturn(BODY);
+        when(mockedParameters.getString(CONTENT))
+            .thenReturn(BODY);
 
-        PropertiesDataSource.PropertiesResponse bodyProperties =
+        List<? extends Property.ValueProperty<?>> bodyProperties =
             TwilioUtils.getContentProperties(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(1, bodyProperties.properties()
-            .size());
-        assertEquals("Body", bodyProperties.properties()
-            .getFirst()
-            .getLabel()
-            .get());
+        assertEquals(1, bodyProperties.size());
+        assertEquals("Body", bodyProperties.getFirst().getLabel().get());
         assertEquals(
             "The text content of the outgoing message. Can be up to 1,600 characters in length. SMS only: If " +
                 "the body contains more than 160 GSM-7 characters (or 70 UCS-2 characters), the message is " +
                 "segmented and charged accordingly. For long body text, consider using the send_as_mms " +
                 "parameter.",
-            bodyProperties.properties()
-                .getFirst()
-                .getDescription()
-                .get());
-        assertEquals(true, bodyProperties.properties()
-            .getFirst()
-            .getRequired()
-            .get());
+            bodyProperties .getFirst().getDescription().get());
+        assertEquals(true, bodyProperties.getFirst().getRequired().get());
     }
 
     @Test
     void testGetSourcePropertiesForFrom() {
-        when(mockedParameters.getString(SOURCE)).thenReturn(FROM);
+        when(mockedParameters.getString(SOURCE))
+            .thenReturn(FROM);
 
-        PropertiesDataSource.PropertiesResponse fromProperties =
+        List<? extends Property.ValueProperty<?>> fromProperties =
             TwilioUtils.getSourceProperties(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(1, fromProperties.properties()
-            .size());
-        assertEquals("From", fromProperties.properties()
-            .getFirst()
-            .getLabel()
-            .get());
+        assertEquals(1, fromProperties.size());
+        assertEquals("From", fromProperties.getFirst().getLabel().get());
         assertEquals(
             "The sender's Twilio phone number (in E.164 format), alphanumeric sender ID, Wireless SIM, short " +
                 "code, or channel address (e.g., whatsapp:+15554449999). The value of the from parameter " +
@@ -119,45 +98,28 @@ class TwilioUtilsTest {
                 "Message. If you are using messaging_service_sid, this parameter can be empty (Twilio " +
                 "assigns a from value from the Messaging Service's Sender Pool) or you can provide a " +
                 "specific sender from your Sender Pool.",
-            fromProperties.properties()
-                .getFirst()
-                .getDescription()
-                .get());
-        assertEquals(Property.ControlType.PHONE, fromProperties.properties()
-            .getFirst()
-            .getControlType());
-        assertEquals(true, fromProperties.properties()
-            .getFirst()
-            .getRequired()
-            .get());
+            fromProperties.getFirst().getDescription().get());
+        assertEquals(ControlType.PHONE, fromProperties.getFirst().getControlType());
+        assertEquals(true, fromProperties.getFirst().getRequired().get());
     }
 
     @Test
     void testGetSourcePropertiesForMessagingServiceSid() {
-        when(mockedParameters.getString(SOURCE)).thenReturn(MESSAGING_SERVICE_SID);
+        when(mockedParameters.getString(SOURCE))
+            .thenReturn(MESSAGING_SERVICE_SID);
 
-        PropertiesDataSource.PropertiesResponse messagingServiceSidProperties =
+        List<? extends Property.ValueProperty<?>> messagingServiceSidProperties =
             TwilioUtils.getSourceProperties(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(1, messagingServiceSidProperties.properties()
-            .size());
-        assertEquals("Messaging Service SID", messagingServiceSidProperties.properties()
-            .getFirst()
-            .getLabel()
-            .get());
+        assertEquals(1, messagingServiceSidProperties.size());
+        assertEquals(
+            "Messaging Service SID", messagingServiceSidProperties .getFirst().getLabel().get());
         assertEquals(
             "The SID of the Messaging Service you want to associate with the Message. When this parameter is " +
                 "provided and the from parameter is omitted, Twilio selects the optimal sender from the " +
                 "Messaging Service's Sender Pool. You may also provide a from parameter if you want to use a " +
                 "specific Sender from the Sender Pool.",
-            messagingServiceSidProperties.properties()
-                .getFirst()
-                .getDescription()
-                .get());
-        assertEquals(true, messagingServiceSidProperties.properties()
-            .getFirst()
-            .getRequired()
-            .get());
+            messagingServiceSidProperties.getFirst().getDescription().get());
+        assertEquals(true, messagingServiceSidProperties.getFirst().getRequired().get());
     }
-
 }

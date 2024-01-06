@@ -21,6 +21,9 @@ package com.bytechef.component.twilio.constant;
  */
 public class TwilioConstants {
 
+    private TwilioConstants() {
+    }
+
     public static final String TWILIO = "twilio";
     public static final String SEND_SMS = "sendSMS";
     public static final String ACCOUNT_SID = "accountSID";
@@ -50,8 +53,4 @@ public class TwilioConstants {
     public static final String SMART_ENCODED = "smartEncoded";
     public static final String TO = "to";
     public static final String VALIDITY_PERIOD = "validityPeriod";
-
-    private TwilioConstants() {
-    }
-
 }

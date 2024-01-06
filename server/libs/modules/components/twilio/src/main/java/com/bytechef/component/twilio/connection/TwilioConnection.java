@@ -22,19 +22,22 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.PASSWORD;
 import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.USERNAME;
 
-import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
+import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
 /**
  * @author Monika Domiter
  */
 public class TwilioConnection {
 
-    public static final ComponentDSL.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+    private TwilioConnection() {
+    }
+
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(authorization(
-            Authorization.AuthorizationType.BASIC_AUTH.name()
+            AuthorizationType.BASIC_AUTH.name()
                 .toLowerCase(),
-            Authorization.AuthorizationType.BASIC_AUTH)
+            AuthorizationType.BASIC_AUTH)
                 .title("Basic Auth")
                 .properties(
                     string(USERNAME)
@@ -43,7 +46,4 @@ public class TwilioConnection {
                     string(PASSWORD)
                         .label("Password")
                         .required(true)));
-
-    private TwilioConnection() {
-    }
 }

@@ -28,8 +28,8 @@ import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.PropertiesDataSource.PropertiesResponse;
-import com.bytechef.hermes.definition.Property;
+import com.bytechef.hermes.component.definition.Property;
+import com.bytechef.hermes.definition.BaseProperty.ValueProperty.ControlType;
 import java.util.List;
 
 /**
@@ -37,7 +37,10 @@ import java.util.List;
  */
 public class TwilioUtils {
 
-    public static PropertiesResponse getContentProperties(
+    private TwilioUtils() {
+    }
+
+    public static List<? extends Property.ValueProperty<?>> getContentProperties(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         String content = inputParameters.getString(CONTENT);
 
@@ -52,7 +55,7 @@ public class TwilioUtils {
                 .maxLength(1600)
                 .required(true);
 
-            return new PropertiesResponse(List.of(body));
+            return List.of(body);
         } else {
             ComponentDSL.ModifiableArrayProperty arrayProperty = array(MEDIA_URL)
                 .label("Media URL")
@@ -65,11 +68,11 @@ public class TwilioUtils {
                         "per message. International and carrier limits apply.")
                 .required(true);
 
-            return new PropertiesResponse(List.of(arrayProperty));
+            return List.of(arrayProperty);
         }
     }
 
-    public static PropertiesResponse getSourceProperties(
+    public static List<? extends Property.ValueProperty<?>> getSourceProperties(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         String source = inputParameters.getString(SOURCE);
 
@@ -85,7 +88,7 @@ public class TwilioUtils {
                         "Message. If you are using messaging_service_sid, this parameter can be empty (Twilio " +
                         "assigns a from value from the Messaging Service's Sender Pool) or you can provide a " +
                         "specific sender from your Sender Pool.")
-                .controlType(Property.ControlType.PHONE)
+                .controlType(ControlType.PHONE)
                 .required(true);
         } else {
             stringProperty = string(MESSAGING_SERVICE_SID)
@@ -98,9 +101,6 @@ public class TwilioUtils {
                 .required(true);
         }
 
-        return new PropertiesResponse(List.of(stringProperty));
-    }
-
-    private TwilioUtils() {
+        return List.of(stringProperty);
     }
 }

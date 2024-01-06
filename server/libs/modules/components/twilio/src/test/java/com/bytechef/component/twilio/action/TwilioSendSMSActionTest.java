@@ -48,17 +48,18 @@ import org.mockito.MockedStatic;
  */
 class TwilioSendSMSActionTest {
 
+    private final ArgumentCaptor<String> accountSidStringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> bodyStringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<PhoneNumber> fromPhoneNumberArgumentCaptor = ArgumentCaptor.forClass(
+        PhoneNumber.class);
+    @SuppressWarnings("rawtypes")
+    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    private final ArgumentCaptor<String> messagingServidSIDStringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Message mockedMessage = mock(Message.class);
     private final MessageCreator mockedMessageCreator = mock(MessageCreator.class);
     private final ArgumentCaptor<PhoneNumber> toPhoneNumberArgumentCaptor = ArgumentCaptor.forClass(PhoneNumber.class);
-    private final ArgumentCaptor<PhoneNumber> fromPhoneNumberArgumentCaptor =
-        ArgumentCaptor.forClass(PhoneNumber.class);
-    private final ArgumentCaptor<String> bodyStringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> accountSidStringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> messagingServidSIDStringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
     @BeforeEach
     public void beforeEach() {
@@ -71,6 +72,7 @@ class TwilioSendSMSActionTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testPerformFirstCase() {
         List<URI> uriList = List.of();
 
@@ -80,17 +82,20 @@ class TwilioSendSMSActionTest {
             .thenReturn(uriList);
 
         try (MockedStatic<Twilio> twilioMockedStatic = mockStatic(Twilio.class)) {
-            twilioMockedStatic.when(() -> Twilio.init(
-                mockedParameters.getRequiredString(USERNAME), mockedParameters.getRequiredString(PASSWORD)))
+            twilioMockedStatic.when(
+                () -> Twilio.init(
+                    mockedParameters.getRequiredString(USERNAME), mockedParameters.getRequiredString(PASSWORD)))
                 .thenAnswer(Answers.RETURNS_DEFAULTS);
 
             try (MockedStatic<Message> messageMockedStatic = mockStatic(Message.class)) {
-                messageMockedStatic.when(() -> Message.creator(
-                    toPhoneNumberArgumentCaptor.capture(), messagingServidSIDStringArgumentCaptor.capture(),
-                    listArgumentCaptor.capture()))
+                messageMockedStatic.when(
+                    () -> Message.creator(
+                        toPhoneNumberArgumentCaptor.capture(), messagingServidSIDStringArgumentCaptor.capture(),
+                        listArgumentCaptor.capture()))
                     .thenReturn(mockedMessageCreator);
 
-                when(mockedMessageCreator.create()).thenReturn(mockedMessage);
+                when(mockedMessageCreator.create())
+                    .thenReturn(mockedMessage);
 
                 Message result = TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
 
@@ -100,18 +105,14 @@ class TwilioSendSMSActionTest {
 
                 assertEquals("+15592585054", toPhoneNumber.getEndpoint());
 
-                String messagingServiceSID = messagingServidSIDStringArgumentCaptor.getValue();
-
-                assertEquals("messaging_service_sid", messagingServiceSID);
-
-                List value = listArgumentCaptor.getValue();
-
-                assertEquals(uriList, value);
+                assertEquals("messaging_service_sid", messagingServidSIDStringArgumentCaptor.getValue());
+                assertEquals(uriList, listArgumentCaptor.getValue());
             }
         }
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testPerformSecondCase() {
         List<URI> uriList = List.of();
 
@@ -123,21 +124,23 @@ class TwilioSendSMSActionTest {
             .thenReturn(uriList);
 
         try (MockedStatic<Twilio> twilioMockedStatic = mockStatic(Twilio.class)) {
-            twilioMockedStatic.when(() -> Twilio.init(
-                mockedParameters.getRequiredString(USERNAME), mockedParameters.getRequiredString(PASSWORD)))
+            twilioMockedStatic.when(
+                () -> Twilio.init(
+                    mockedParameters.getRequiredString(USERNAME), mockedParameters.getRequiredString(PASSWORD)))
                 .thenAnswer(Answers.RETURNS_DEFAULTS);
 
             try (MockedStatic<Message> messageMockedStatic = mockStatic(Message.class)) {
-                messageMockedStatic.when(() -> Message.creator(
-                    accountSidStringArgumentCaptor.capture(), toPhoneNumberArgumentCaptor.capture(),
-                    messagingServidSIDStringArgumentCaptor.capture(), listArgumentCaptor.capture()))
+                messageMockedStatic.when(
+                    () -> Message.creator(
+                        accountSidStringArgumentCaptor.capture(), toPhoneNumberArgumentCaptor.capture(),
+                        messagingServidSIDStringArgumentCaptor.capture(), listArgumentCaptor.capture()))
                     .thenReturn(mockedMessageCreator);
 
-                when(mockedMessageCreator.create()).thenReturn(mockedMessage);
+                when(mockedMessageCreator.create())
+                    .thenReturn(mockedMessage);
 
-                Message result = TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-                assertEquals(mockedMessage, result);
+                assertEquals(
+                    mockedMessage, TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext));
 
                 String accountSid = accountSidStringArgumentCaptor.getValue();
 
@@ -147,13 +150,8 @@ class TwilioSendSMSActionTest {
 
                 assertEquals("+15592585054", toPhoneNumber.getEndpoint());
 
-                String messagingServiceSID = messagingServidSIDStringArgumentCaptor.getValue();
-
-                assertEquals("messaging_service_sid", messagingServiceSID);
-
-                List value = listArgumentCaptor.getValue();
-
-                assertEquals(uriList, value);
+                assertEquals("messaging_service_sid", messagingServidSIDStringArgumentCaptor.getValue());
+                assertEquals(uriList, listArgumentCaptor.getValue());
             }
         }
     }
@@ -166,33 +164,31 @@ class TwilioSendSMSActionTest {
             .thenReturn("body");
 
         try (MockedStatic<Twilio> twilioMockedStatic = mockStatic(Twilio.class)) {
-            twilioMockedStatic.when(() -> Twilio.init(
+            twilioMockedStatic.when(
+                () -> Twilio.init(
                     mockedParameters.getRequiredString(USERNAME), mockedParameters.getRequiredString(PASSWORD)))
-                .thenAnswer(Answers.RETURNS_DEFAULTS);
+                .thenAnswer(
+                    Answers.RETURNS_DEFAULTS);
 
             try (MockedStatic<Message> messageMockedStatic = mockStatic(Message.class)) {
-                messageMockedStatic.when(() -> Message.creator(
+                messageMockedStatic.when(
+                    () -> Message.creator(
                         toPhoneNumberArgumentCaptor.capture(), messagingServidSIDStringArgumentCaptor.capture(),
                         bodyStringArgumentCaptor.capture()))
                     .thenReturn(mockedMessageCreator);
 
-                when(mockedMessageCreator.create()).thenReturn(mockedMessage);
+                when(mockedMessageCreator.create())
+                    .thenReturn(mockedMessage);
 
-                Message result = TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-                assertEquals(mockedMessage, result);
+                assertEquals(
+                    mockedMessage, TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext));
 
                 PhoneNumber toPhoneNumber = toPhoneNumberArgumentCaptor.getValue();
 
                 assertEquals("+15592585054", toPhoneNumber.getEndpoint());
 
-                String messagingServiceSID = messagingServidSIDStringArgumentCaptor.getValue();
-
-                assertEquals("messaging_service_sid", messagingServiceSID);
-
-                String body = bodyStringArgumentCaptor.getValue();
-
-                assertEquals("body", body);
+                assertEquals("messaging_service_sid",  messagingServidSIDStringArgumentCaptor.getValue());
+                assertEquals("body", bodyStringArgumentCaptor.getValue());
             }
         }
     }
@@ -207,42 +203,38 @@ class TwilioSendSMSActionTest {
             .thenReturn("body");
 
         try (MockedStatic<Twilio> twilioMockedStatic = mockStatic(Twilio.class)) {
-            twilioMockedStatic.when(() -> Twilio.init(
+            twilioMockedStatic.when(
+                () -> Twilio.init(
                     mockedParameters.getRequiredString(USERNAME), mockedParameters.getRequiredString(PASSWORD)))
                 .thenAnswer(Answers.RETURNS_DEFAULTS);
 
             try (MockedStatic<Message> messageMockedStatic = mockStatic(Message.class)) {
-                messageMockedStatic.when(() -> Message.creator(
+                messageMockedStatic.when(
+                    () -> Message.creator(
                         accountSidStringArgumentCaptor.capture(), toPhoneNumberArgumentCaptor.capture(),
                         messagingServidSIDStringArgumentCaptor.capture(), bodyStringArgumentCaptor.capture()))
                     .thenReturn(mockedMessageCreator);
 
-                when(mockedMessageCreator.create()).thenReturn(mockedMessage);
+                when(mockedMessageCreator.create())
+                    .thenReturn(mockedMessage);
 
-                Message result = TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
+                assertEquals(
+                    mockedMessage, TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext));
 
-                assertEquals(mockedMessage, result);
-
-                String accountSid = accountSidStringArgumentCaptor.getValue();
-
-                assertEquals("account_sid", accountSid);
+                assertEquals("account_sid", accountSidStringArgumentCaptor.getValue());
 
                 PhoneNumber toPhoneNumber = toPhoneNumberArgumentCaptor.getValue();
 
                 assertEquals("+15592585054", toPhoneNumber.getEndpoint());
 
-                String messagingServiceSID = messagingServidSIDStringArgumentCaptor.getValue();
-
-                assertEquals("messaging_service_sid", messagingServiceSID);
-
-                String body = bodyStringArgumentCaptor.getValue();
-
-                assertEquals("body", body);
+                assertEquals("messaging_service_sid", messagingServidSIDStringArgumentCaptor.getValue());
+                assertEquals("body", bodyStringArgumentCaptor.getValue());
             }
         }
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testPerformFifthCase() {
         List<URI> uriList = List.of();
 
@@ -252,21 +244,23 @@ class TwilioSendSMSActionTest {
             .thenReturn(uriList);
 
         try (MockedStatic<Twilio> twilioMockedStatic = mockStatic(Twilio.class)) {
-            twilioMockedStatic.when(() -> Twilio.init(
-                mockedParameters.getRequiredString(USERNAME), mockedParameters.getRequiredString(PASSWORD)))
+            twilioMockedStatic.when(
+                () -> Twilio.init(
+                    mockedParameters.getRequiredString(USERNAME), mockedParameters.getRequiredString(PASSWORD)))
                 .thenAnswer(Answers.RETURNS_DEFAULTS);
 
             try (MockedStatic<Message> messageMockedStatic = mockStatic(Message.class)) {
-                messageMockedStatic.when(() -> Message.creator(
-                    toPhoneNumberArgumentCaptor.capture(), fromPhoneNumberArgumentCaptor.capture(),
-                    listArgumentCaptor.capture()))
+                messageMockedStatic.when(
+                    () -> Message.creator(
+                        toPhoneNumberArgumentCaptor.capture(), fromPhoneNumberArgumentCaptor.capture(),
+                        listArgumentCaptor.capture()))
                     .thenReturn(mockedMessageCreator);
 
-                when(mockedMessageCreator.create()).thenReturn(mockedMessage);
+                when(mockedMessageCreator.create())
+                    .thenReturn(mockedMessage);
 
-                Message result = TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-                assertEquals(mockedMessage, result);
+                assertEquals(
+                    mockedMessage, TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext));
 
                 PhoneNumber toPhoneNumber = toPhoneNumberArgumentCaptor.getValue();
 
@@ -276,14 +270,13 @@ class TwilioSendSMSActionTest {
 
                 assertEquals("+15592582024", fromPhoneNumber.getEndpoint());
 
-                List list = listArgumentCaptor.getValue();
-
-                assertEquals(uriList, list);
+                assertEquals(uriList, listArgumentCaptor.getValue());
             }
         }
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testPerformSixthCase() {
         List<URI> uriList = List.of();
 
@@ -295,25 +288,24 @@ class TwilioSendSMSActionTest {
             .thenReturn(uriList);
 
         try (MockedStatic<Twilio> twilioMockedStatic = mockStatic(Twilio.class)) {
-            twilioMockedStatic.when(() -> Twilio.init(
-                mockedParameters.getRequiredString(USERNAME), mockedParameters.getRequiredString(PASSWORD)))
+            twilioMockedStatic.when(
+                () -> Twilio.init(
+                    mockedParameters.getRequiredString(USERNAME), mockedParameters.getRequiredString(PASSWORD)))
                 .thenAnswer(Answers.RETURNS_DEFAULTS);
 
             try (MockedStatic<Message> messageMockedStatic = mockStatic(Message.class)) {
-                messageMockedStatic.when(() -> Message.creator(
-                    accountSidStringArgumentCaptor.capture(), toPhoneNumberArgumentCaptor.capture(),
-                    fromPhoneNumberArgumentCaptor.capture(), listArgumentCaptor.capture()))
+                messageMockedStatic.when(
+                    () -> Message.creator(
+                        accountSidStringArgumentCaptor.capture(), toPhoneNumberArgumentCaptor.capture(),
+                        fromPhoneNumberArgumentCaptor.capture(), listArgumentCaptor.capture()))
                     .thenReturn(mockedMessageCreator);
 
-                when(mockedMessageCreator.create()).thenReturn(mockedMessage);
+                when(mockedMessageCreator.create())
+                    .thenReturn(mockedMessage);
 
-                Message result = TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-                assertEquals(mockedMessage, result);
-
-                String accountSid = accountSidStringArgumentCaptor.getValue();
-
-                assertEquals("account_sid", accountSid);
+                assertEquals(
+                    mockedMessage, TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext));
+                assertEquals("account_sid", accountSidStringArgumentCaptor.getValue());
 
                 PhoneNumber toPhoneNumber = toPhoneNumberArgumentCaptor.getValue();
 
@@ -323,9 +315,7 @@ class TwilioSendSMSActionTest {
 
                 assertEquals("+15592582024", fromPhoneNumber.getEndpoint());
 
-                List list = listArgumentCaptor.getValue();
-
-                assertEquals(uriList, list);
+                assertEquals(uriList, listArgumentCaptor.getValue());
             }
         }
     }
@@ -338,21 +328,24 @@ class TwilioSendSMSActionTest {
             .thenReturn("body");
 
         try (MockedStatic<Twilio> twilioMockedStatic = mockStatic(Twilio.class)) {
-            twilioMockedStatic.when(() -> Twilio.init(
+            twilioMockedStatic.when(
+                () -> Twilio.init(
                     mockedParameters.getRequiredString(USERNAME), mockedParameters.getRequiredString(PASSWORD)))
-                .thenAnswer(Answers.RETURNS_DEFAULTS);
+                .thenAnswer(
+                    Answers.RETURNS_DEFAULTS);
 
             try (MockedStatic<Message> messageMockedStatic = mockStatic(Message.class)) {
-                messageMockedStatic.when(() -> Message.creator(
+                messageMockedStatic.when(
+                    () -> Message.creator(
                         toPhoneNumberArgumentCaptor.capture(), fromPhoneNumberArgumentCaptor.capture(),
                         bodyStringArgumentCaptor.capture()))
                     .thenReturn(mockedMessageCreator);
 
-                when(mockedMessageCreator.create()).thenReturn(mockedMessage);
+                when(mockedMessageCreator.create())
+                    .thenReturn(mockedMessage);
 
-                Message result = TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-                assertEquals(mockedMessage, result);
+                assertEquals(
+                    mockedMessage, TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext));
 
                 PhoneNumber toPhoneNumber = toPhoneNumberArgumentCaptor.getValue();
 
@@ -362,9 +355,7 @@ class TwilioSendSMSActionTest {
 
                 assertEquals("+15592582024", fromPhoneNumber.getEndpoint());
 
-                String body = bodyStringArgumentCaptor.getValue();
-
-                assertEquals("body", body);
+                assertEquals("body", bodyStringArgumentCaptor.getValue());
             }
         }
     }
@@ -379,25 +370,25 @@ class TwilioSendSMSActionTest {
             .thenReturn("body");
 
         try (MockedStatic<Twilio> twilioMockedStatic = mockStatic(Twilio.class)) {
-            twilioMockedStatic.when(() -> Twilio.init(
+            twilioMockedStatic.when(
+                () -> Twilio.init(
                     mockedParameters.getRequiredString(USERNAME), mockedParameters.getRequiredString(PASSWORD)))
                 .thenAnswer(Answers.RETURNS_DEFAULTS);
 
             try (MockedStatic<Message> messageMockedStatic = mockStatic(Message.class)) {
-                messageMockedStatic.when(() -> Message.creator(
+                messageMockedStatic.when(
+                    () -> Message.creator(
                         accountSidStringArgumentCaptor.capture(), toPhoneNumberArgumentCaptor.capture(),
                         fromPhoneNumberArgumentCaptor.capture(), bodyStringArgumentCaptor.capture()))
                     .thenReturn(mockedMessageCreator);
 
-                when(mockedMessageCreator.create()).thenReturn(mockedMessage);
+                when(mockedMessageCreator.create())
+                    .thenReturn(mockedMessage);
 
-                Message result = TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
+                assertEquals(
+                    mockedMessage, TwilioSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext));
 
-                assertEquals(mockedMessage, result);
-
-                String accountSid = accountSidStringArgumentCaptor.getValue();
-
-                assertEquals("account_sid", accountSid);
+                assertEquals("account_sid", accountSidStringArgumentCaptor.getValue());
 
                 PhoneNumber toPhoneNumber = toPhoneNumberArgumentCaptor.getValue();
 
@@ -407,11 +398,8 @@ class TwilioSendSMSActionTest {
 
                 assertEquals("+15592582024", fromPhoneNumber.getEndpoint());
 
-                String body = bodyStringArgumentCaptor.getValue();
-
-                assertEquals("body", body);
+                assertEquals("body", bodyStringArgumentCaptor.getValue());
             }
         }
     }
-
 }
