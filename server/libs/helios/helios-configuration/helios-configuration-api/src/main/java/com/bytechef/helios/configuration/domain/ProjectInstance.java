@@ -17,7 +17,7 @@
 package com.bytechef.helios.configuration.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.hermes.domain.Instance;
+import com.bytechef.hermes.configuration.domain.Instance;
 import com.bytechef.tag.domain.Tag;
 import java.time.LocalDateTime;
 import java.util.Collections;

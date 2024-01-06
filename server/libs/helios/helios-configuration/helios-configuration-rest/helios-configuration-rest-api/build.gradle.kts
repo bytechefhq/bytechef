@@ -5,6 +5,7 @@ dependencies {
     annotationProcessor(libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions)
 
     api(project(":server:libs:helios:helios-configuration:helios-configuration-api"))
+    api(project(":server:libs:hermes:hermes-configuration:hermes-configuration-rest:hermes-configuration-rest-api"))
 
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 

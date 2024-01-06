@@ -36,35 +36,35 @@ public class JobParameters {
     private Map<String, ?> metadata = Collections.emptyMap();
     private Long parentTaskExecutionId;
     private int priority = Prioritizable.DEFAULT_PRIORITY;
-    private String workflowId;
     private List<Webhook> webhooks = Collections.emptyList();
+    private String workflowId;
 
     private JobParameters() {
     }
 
     @SuppressFBWarnings("EI2")
+    public JobParameters(String workflowId) {
+        this(workflowId, Map.of());
+    }
+
+    @SuppressFBWarnings("EI2")
     public JobParameters(String workflowId, Map<String, ?> inputs) {
-        this.inputs = inputs;
-        this.workflowId = workflowId;
+        this(workflowId, inputs, Map.of());
     }
 
     @SuppressFBWarnings("EI2")
     public JobParameters(String workflowId, Map<String, ?> inputs, Map<String, ?> metadata) {
-        this.inputs = inputs;
-        this.workflowId = workflowId;
-        this.metadata = new HashMap<>(metadata);
+        this(workflowId, null, inputs, null, null, List.of(), metadata);
     }
 
     @SuppressFBWarnings("EI2")
     public JobParameters(String workflowId, Long parentTaskExecutionId, Map<String, ?> inputs) {
-        this.inputs = inputs;
-        this.parentTaskExecutionId = parentTaskExecutionId;
-        this.workflowId = workflowId;
+        this(workflowId, parentTaskExecutionId, inputs, null, null, List.of(), Map.of());
     }
 
     @Default
     public JobParameters(
-        String workflowId, Long parentTaskExecutionId, Map<String, Object> inputs, String label, Integer priority,
+        String workflowId, Long parentTaskExecutionId, Map<String, ?> inputs, String label, Integer priority,
         List<Webhook> webhooks, Map<String, ?> metadata) {
 
         if (inputs != null) {
@@ -72,22 +72,15 @@ public class JobParameters {
         }
 
         this.label = label;
-
-        if (metadata != null) {
-            this.metadata = new HashMap<>(metadata);
-        }
-
+        this.metadata = new HashMap<>(metadata);
         this.parentTaskExecutionId = parentTaskExecutionId;
 
         if (priority != null) {
             this.priority = priority;
         }
 
+        this.webhooks = new ArrayList<>(webhooks);
         this.workflowId = workflowId;
-
-        if (webhooks != null) {
-            this.webhooks = new ArrayList<>(webhooks);
-        }
     }
 
     public Map<String, Object> getInputs() {
@@ -110,12 +103,12 @@ public class JobParameters {
         return priority;
     }
 
-    public String getWorkflowId() {
-        return workflowId;
-    }
-
     public List<Webhook> getWebhooks() {
         return Collections.unmodifiableList(webhooks);
+    }
+
+    public String getWorkflowId() {
+        return workflowId;
     }
 
     @Override
@@ -133,23 +126,23 @@ public class JobParameters {
             && Objects.equals(this.label, jobParameters.label)
             && Objects.equals(this.parentTaskExecutionId, jobParameters.parentTaskExecutionId)
             && Objects.equals(this.priority, jobParameters.priority)
-            && Objects.equals(this.workflowId, jobParameters.workflowId)
-            && Objects.equals(this.webhooks, jobParameters.webhooks);
+            && Objects.equals(this.webhooks, jobParameters.webhooks)
+            && Objects.equals(this.workflowId, jobParameters.workflowId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(inputs, label, parentTaskExecutionId, priority, workflowId, webhooks);
+        return Objects.hash(inputs, label, parentTaskExecutionId, priority, webhooks, workflowId);
     }
 
     @Override
     public String toString() {
         return "JobParameters{" +
-            "inputs=" + inputs +
+            "workflowId='" + workflowId + '\'' +
+            ", inputs=" + inputs +
             ", label='" + label + '\'' +
             ", parentTaskExecutionId='" + parentTaskExecutionId + '\'' +
             ", priority=" + priority +
-            ", workflowId='" + workflowId + '\'' +
             ", webhooks=" + webhooks +
             '}';
     }

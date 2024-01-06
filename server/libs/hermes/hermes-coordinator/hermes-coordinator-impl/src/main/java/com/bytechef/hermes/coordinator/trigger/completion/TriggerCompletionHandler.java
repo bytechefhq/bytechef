@@ -92,11 +92,12 @@ public class TriggerCompletionHandler {
 
         Object output = triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput());
 
-        if (!triggerExecution.isBatch() && output instanceof Collection<?> collectionOutput) {
-            for (Object outputItem : collectionOutput) {
+        if (!triggerExecution.isBatch() && output instanceof Collection<?> triggerOutputValues) {
+            for (Object triggerOutputValue : triggerOutputValues) {
                 triggerExecution.addJobId(
                     createJob(
-                        workflowExecutionId, MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), outputItem)),
+                        workflowExecutionId,
+                        MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerOutputValue)),
                         workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
             }
         } else {
@@ -119,7 +120,7 @@ public class TriggerCompletionHandler {
     private long createJob(
         WorkflowExecutionId workflowExecutionId, Map<String, ?> inpputMap, long instanceId, int type) {
 
-        Job job = instanceJobFacade.createAsyncJob(
+        Job job = instanceJobFacade.createJob(
             new JobParameters(workflowExecutionId.getWorkflowId(), inpputMap), instanceId, type);
 
         return Validate.notNull(job.getId(), "id");

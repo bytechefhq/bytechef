@@ -19,12 +19,17 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     outputDir.set("$projectDir/../helios-configuration-rest-api/generated")
     schemaMappings.set(
         mapOf(
-            "Page" to "org.springframework.data.domain.Page"
+            "Workflow" to "com.bytechef.hermes.configuration.web.rest.model.WorkflowModel",
+            "WorkflowBasic" to "com.bytechef.hermes.configuration.web.rest.model.WorkflowBasicModel",
+            "WorkflowConnection" to "com.bytechef.hermes.configuration.web.rest.model.WorkflowConnectionModel",
+            "WorkflowFormat" to "com.bytechef.hermes.configuration.web.rest.model.WorkflowFormatModel",
+            "WorkflowInput" to "com.bytechef.hermes.configuration.web.rest.model.WorkflowInputModel",
+            "WorkflowOutput" to "com.bytechef.hermes.configuration.web.rest.model.WorkflowOutputModel",
+            "WorkflowTask" to "com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel",
+            "WorkflowTrigger" to "com.bytechef.hermes.configuration.web.rest.model.WorkflowTriggerModel"
         )
     )
 }
-
-sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 
 val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
     generatorName.set("typescript-fetch")

@@ -16,7 +16,6 @@
 
 package com.bytechef.helios.execution.facade;
 
-import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.helios.execution.dto.WorkflowExecution;
 import java.time.LocalDateTime;
 import org.springframework.data.domain.Page;
@@ -31,6 +30,4 @@ public interface WorkflowExecutionFacade {
     Page<WorkflowExecution> getWorkflowExecutions(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, int pageNumber);
-
-    WorkflowExecution testWorkflow(JobParameters jobParameters);
 }

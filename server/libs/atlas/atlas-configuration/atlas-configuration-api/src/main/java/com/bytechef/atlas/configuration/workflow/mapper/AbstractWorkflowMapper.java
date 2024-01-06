@@ -92,11 +92,9 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
         try {
             String definition = readDefinition(workflowResource);
 
-            Map<String, Object> workflowMap = parse(definition);
-
             return new Workflow(
                 workflowResource.getId(), definition, workflowResource.getWorkflowFormat(),
-                LocalDateTimeUtils.getLocalDateTime(new Date(workflowResource.lastModified())), workflowMap,
+                LocalDateTimeUtils.getLocalDateTime(new Date(workflowResource.lastModified())),
                 workflowResource.getMetadata(), type);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -105,9 +103,7 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
     protected Map<String, Object> doReadWorkflowMap(WorkflowResource workflowResource) {
         try {
-            String definition = readDefinition(workflowResource);
-
-            return parse(definition);
+            return parse(readDefinition(workflowResource));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

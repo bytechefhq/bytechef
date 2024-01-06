@@ -16,38 +16,18 @@
 
 package com.bytechef.hermes.component.definition;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.date;
-import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.number;
 import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.ComponentDSL.time;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableArrayProperty;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableObjectProperty;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.hermes.component.definition.Property.OutputProperty;
 import com.bytechef.hermes.component.registry.domain.ComponentConnection;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.bytechef.hermes.component.util.OutputSchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
@@ -66,12 +46,12 @@ public class ContextImpl implements Context {
     @SuppressFBWarnings("EI")
     public ContextImpl(
         String componentName, String operationName, ComponentConnection connection,
-        HttpClientExecutor httpClientExecutor, ObjectMapper objectMapper) {
+        HttpClientExecutor httpClientExecutor) {
 
         this.http = new HttpImpl(componentName, connection, this, httpClientExecutor);
         this.json = new JsonImpl();
         this.logger = new LoggerImpl(componentName, operationName);
-        this.outputSchema = new OutputSchemaImpl(objectMapper);
+        this.outputSchema = new OutputSchemaImpl();
         this.xml = new XmlImpl();
     }
 
@@ -508,76 +488,12 @@ public class ContextImpl implements Context {
 
         private static final org.slf4j.Logger logger = LoggerFactory.getLogger(OutputSchemaImpl.class);
 
-        private final ObjectMapper objectMapper;
-
-        private OutputSchemaImpl(ObjectMapper objectMapper) {
-            this.objectMapper = objectMapper;
+        private OutputSchemaImpl() {
         }
 
         @Override
         public OutputProperty<?> get(Object value) {
-            return getOutputSchema(null, value);
-        }
-
-        private OutputProperty<?> getOutputSchema(String name, Object value) {
-            OutputProperty<?> outputProperty;
-
-            Class<?> valueClass = value.getClass();
-
-            if (value instanceof Boolean) {
-                outputProperty = bool(name);
-            } else if (value instanceof Date || value instanceof LocalDate) {
-                outputProperty = date(name);
-            } else if (value instanceof LocalDateTime) {
-                outputProperty = dateTime(name);
-            } else if (value instanceof LocalTime) {
-                outputProperty = time(name);
-            } else if (value instanceof Integer) {
-                outputProperty = integer(name);
-            } else if (value instanceof Number) {
-                outputProperty = number(name);
-            } else if (value instanceof String) {
-                outputProperty = string(name);
-            } else if (value instanceof ActionContext.FileEntry) {
-                outputProperty = fileEntry();
-            } else if (valueClass.isArray()) {
-                outputProperty = array(name);
-            } else if (value instanceof List<?> list) {
-                ModifiableArrayProperty arrayProperty = array(name);
-
-                Set<OutputProperty<?>> itemProperties = new HashSet<>();
-
-                for (Object item : list) {
-                    itemProperties.add(getOutputSchema(null, item));
-                }
-
-                outputProperty = arrayProperty.items(
-                    CollectionUtils.map(
-                        new ArrayList<>(itemProperties), property -> (ModifiableValueProperty<?, ?>) property));
-            } else if (value instanceof Map<?, ?> map) {
-                ModifiableObjectProperty objectProperty = object();
-
-                List<OutputProperty<?>> properties = new ArrayList<>();
-
-                for (Map.Entry<?, ?> entry : map.entrySet()) {
-                    properties.add(getOutputSchema((String) entry.getKey(), entry.getValue()));
-                }
-
-                outputProperty = objectProperty.properties(
-                    CollectionUtils.map(properties, property -> (ModifiableValueProperty<?, ?>) property));
-            } else {
-                try {
-                    outputProperty = get(objectMapper.convertValue(value, Map.class));
-                } catch (IllegalArgumentException e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(e.getMessage(), e);
-                    }
-
-                    outputProperty = object(name);
-                }
-            }
-
-            return outputProperty;
+            return OutputSchemaUtils.getOutputSchema(value);
         }
     }
 

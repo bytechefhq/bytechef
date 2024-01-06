@@ -13,3 +13,5 @@ bytechef:
     repository:
       jdbc:
         enabled: true
+    output-storage:
+      provider: base64

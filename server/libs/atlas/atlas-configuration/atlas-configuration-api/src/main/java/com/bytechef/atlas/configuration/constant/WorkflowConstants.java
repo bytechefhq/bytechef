@@ -52,22 +52,6 @@ public class WorkflowConstants {
     public static final String WORKFLOW_ID = "workflowId";
 
     public static final List<String> WORKFLOW_DEFINITION_CONSTANTS = List.of(
-        DEFAULT,
-        DESCRIPTION,
-        FINALIZE,
-        INPUTS,
-        LABEL,
-        METADATA,
-        NAME,
-        NODE,
-        OUTPUTS,
-        PARAMETERS,
-        POST,
-        PRE,
-        MAX_RETRIES,
-        REQUIRED,
-        TASKS,
-        TIMEOUT,
-        TYPE,
-        VALUE);
+        DEFAULT, DESCRIPTION, FINALIZE, INPUTS, LABEL, METADATA, NAME, NODE, OUTPUTS, PARAMETERS, POST, PRE,
+        MAX_RETRIES, REQUIRED, TASKS, TIMEOUT, TYPE, VALUE);
 }

@@ -16,16 +16,17 @@
 
 package com.bytechef.helios.execution.facade;
 
+import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
@@ -37,6 +38,7 @@ import com.bytechef.helios.execution.dto.WorkflowExecution;
 import com.bytechef.hermes.component.registry.OperationType;
 import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
 import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
+import com.bytechef.hermes.configuration.domain.WorkflowConnection;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.dto.JobDTO;
 import com.bytechef.hermes.execution.dto.TaskExecutionDTO;
@@ -44,7 +46,6 @@ import com.bytechef.hermes.execution.dto.TriggerExecutionDTO;
 import com.bytechef.hermes.execution.service.InstanceJobService;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.file.storage.TriggerFileStorage;
-import com.bytechef.hermes.test.executor.JobTestExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -66,7 +67,6 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
     private final JobService jobService;
-    private final JobTestExecutor jobTestExecutor;
     private final InstanceJobService instanceJobService;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
@@ -80,8 +80,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     @SuppressFBWarnings("EI")
     public WorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
-        JobService jobService, JobTestExecutor jobTestExecutor,
-        InstanceJobService instanceJobService, ProjectInstanceService projectInstanceService,
+        JobService jobService, InstanceJobService instanceJobService, ProjectInstanceService projectInstanceService,
         ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectService projectService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
         TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
@@ -90,7 +89,6 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
         this.jobService = jobService;
-        this.jobTestExecutor = jobTestExecutor;
         this.instanceJobService = instanceJobService;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
@@ -113,9 +111,8 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             Validate.notNull(job.getId(), ""), ProjectConstants.PROJECT_TYPE);
 
         return new WorkflowExecution(
-            Validate.notNull(jobDTO.id(), "id"),
-            projectService.getWorkflowProject(jobDTO.workflowId()),
-            OptionalUtils.mapOrElse(projectInstanceIdOptional, projectInstanceService::getProjectInstance, null),
+            jobDTO.id(), projectService.getWorkflowProject(jobDTO.workflowId()),
+            OptionalUtils.map(projectInstanceIdOptional, projectInstanceService::getProjectInstance),
             jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
             getTriggerExecutionDTO(
                 OptionalUtils.orElse(projectInstanceIdOptional, null),
@@ -163,25 +160,17 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
 
             return jobsPage.map(job -> new WorkflowExecution(
                 Validate.notNull(job.getId(), "id"),
-                CollectionUtils.findFirstOrElse(
-                    projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId()), null),
-                OptionalUtils.mapOrElse(
+                CollectionUtils.getFirst(
+                    projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId())),
+                OptionalUtils.map(
                     instanceJobService.fetchJobInstanceId(job.getId(), ProjectConstants.PROJECT_TYPE),
-                    projectInstanceService::getProjectInstance, null),
-                new JobDTO(job, Map.of(), List.of()),
+                    projectInstanceService::getProjectInstance),
+                new JobDTO(job),
                 CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),
                 getTriggerExecutionDTO(
                     projectInstanceId,
                     triggerExecutionService.getJobTriggerExecution(Validate.notNull(job.getId(), "id")), job)));
         }
-    }
-
-    @Override
-    public WorkflowExecution testWorkflow(JobParameters jobParameters) {
-        JobDTO job = jobTestExecutor.execute(jobParameters);
-
-        return new WorkflowExecution(
-            job.id(), null, null, job, workflowService.getWorkflow(jobParameters.getWorkflowId()), null);
     }
 
     private ComponentDefinition getComponentDefinition(String type) {
@@ -220,5 +209,19 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         }
 
         return triggerExecutionDTO;
+    }
+
+    private static void updateOperations(
+        Map.Entry<String, Map<String, Object>> connectionEntry, List<Map<String, Object>> workflowOperations) {
+
+        for (int i = 0; i < workflowOperations.size(); i++) {
+            Map<String, Object> workflowTask = workflowOperations.get(i);
+
+            if (Objects.equals(MapUtils.getString(workflowTask, WorkflowConstants.NAME), connectionEntry.getKey())) {
+                workflowOperations.set(
+                    i,
+                    MapUtils.concat(workflowTask, Map.of(WorkflowConnection.CONNECTIONS, connectionEntry.getValue())));
+            }
+        }
     }
 }

@@ -61,42 +61,31 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     @Override
     @Transactional(readOnly = true)
     public Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
-        String workflowConnectionKey) {
+        long projectInstanceId, String workflowId, String operationName,
+        String key) {
 
         return projectInstanceWorkflowConnectionRepository.findByProjectInstanceIdAndWorkflowIdAndOperationNameAndKey(
-            projectInstanceId, workflowId, workflowConnectionOperationName, workflowConnectionKey);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean isProjectInstanceWorkflowEnabled(long projectInstanceId, String workflowId) {
-        ProjectInstanceWorkflow projectInstanceWorkflow = getProjectInstanceWorkflow(projectInstanceId, workflowId);
-
-        return projectInstanceWorkflow.isEnabled();
+            projectInstanceId, workflowId, operationName, key);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
-        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
-        String workflowConnectionKey) {
+        long projectInstanceId, String workflowId, String operationName,
+        String key) {
 
         return OptionalUtils.get(
             projectInstanceWorkflowConnectionRepository.findByProjectInstanceIdAndWorkflowIdAndOperationNameAndKey(
-                projectInstanceId, workflowId, workflowConnectionKey, workflowConnectionOperationName));
+                projectInstanceId, workflowId, operationName, key));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public long getProjectInstanceWorkflowConnectionId(
-        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
-        String workflowConnectionKey) {
+    public List<ProjectInstanceWorkflowConnection> getProjectInstanceWorkflowConnections(
+        long projectInstanceId, String workflowId, String operationName) {
 
-        ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection = getProjectInstanceWorkflowConnection(
-            projectInstanceId, workflowId, workflowConnectionOperationName, workflowConnectionKey);
-
-        return projectInstanceWorkflowConnection.getConnectionId();
+        return projectInstanceWorkflowConnectionRepository.findAllByProjectInstanceIdAndWorkflowIdAndOperationName(
+            projectInstanceId, workflowId, operationName);
     }
 
     @Override
@@ -120,6 +109,14 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
         Validate.notNull(projectInstanceIds, "'projectInstanceIds' must not be null");
 
         return projectInstanceWorkflowRepository.findAllByProjectInstanceIdIn(projectInstanceIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isProjectInstanceWorkflowEnabled(long projectInstanceId, String workflowId) {
+        ProjectInstanceWorkflow projectInstanceWorkflow = getProjectInstanceWorkflow(projectInstanceId, workflowId);
+
+        return projectInstanceWorkflow.isEnabled();
     }
 
     @Override

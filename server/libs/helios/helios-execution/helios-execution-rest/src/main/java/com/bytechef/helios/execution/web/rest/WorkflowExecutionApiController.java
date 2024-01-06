@@ -55,7 +55,7 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     }
 
     @Override
-    public ResponseEntity<Page> getWorkflowExecutions(
+    public ResponseEntity<Page> getWorkflowExecutionsPage(
         String jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId, Long projectInstanceId,
         String workflowId, Integer pageNumber) {
 

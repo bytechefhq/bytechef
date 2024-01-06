@@ -43,5 +43,5 @@ public interface WorkflowService {
 
     void refreshCache(@NonNull String id);
 
-    Workflow update(@NonNull String id, @NonNull String definition);
+    Workflow update(@NonNull String id, @NonNull String definition, int version);
 }

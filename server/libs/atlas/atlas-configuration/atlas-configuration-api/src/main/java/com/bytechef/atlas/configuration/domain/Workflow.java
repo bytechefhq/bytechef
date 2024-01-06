@@ -154,9 +154,6 @@ public final class Workflow implements Persistable<String>, Serializable {
     @Version
     private int version;
 
-    public Workflow() {
-    }
-
     public Workflow(String definition, Format format, int type) {
         this.definition = definition;
         this.format = format.getId();
@@ -164,18 +161,17 @@ public final class Workflow implements Persistable<String>, Serializable {
     }
 
     public Workflow(String id, String definition, Format format, int type) {
-        this(id, definition, format, null, Map.of(), Map.of(), type);
+        this(id, definition, format, null, Map.of(), type);
     }
 
     @SuppressWarnings("unchecked")
     public Workflow(
-        String id, String definition, Format format, LocalDateTime lastModifiedDate, Map<String, ?> sourceMap,
-        Map<String, Object> metadata, int type) {
+        String id, String definition, Format format, LocalDateTime lastModifiedDate, Map<String, Object> metadata,
+        int type) {
 
         Validate.notNull(definition, "'definition' must not be null");
         Validate.notNull(format, "'format' must not be null");
         Validate.notNull(id, "'id' must not be null");
-        Validate.notNull(sourceMap, "'sourceMap' must not be null");
         Validate.notNull(metadata, "'metadata' must not be null");
 
         this.definition = definition;
@@ -184,6 +180,8 @@ public final class Workflow implements Persistable<String>, Serializable {
         this.lastModifiedDate = lastModifiedDate;
         this.metadata = new HashMap<>(metadata);
         this.type = type;
+
+        Map<String, ?> sourceMap = readWorkflowMap(definition, id, format.getId());
 
         for (Map.Entry<String, ?> entry : sourceMap.entrySet()) {
             if (WorkflowConstants.DESCRIPTION.equals(entry.getKey())) {
@@ -216,17 +214,14 @@ public final class Workflow implements Persistable<String>, Serializable {
         }
     }
 
-    public Workflow(String id, String definition, Format format, Map<String, ?> source, int type) {
-        this(id, definition, format, null, source, Map.of(), type);
-    }
-
     @PersistenceCreator
     public Workflow(String id, String definition, int format, LocalDateTime lastModifiedDate, int type)
         throws Exception {
 
-        this(
-            id, definition, Format.valueOf(format), lastModifiedDate, readWorkflowMap(definition, id, format),
-            Map.of(), type);
+        this(id, definition, Format.valueOf(format), lastModifiedDate, Map.of(), type);
+    }
+
+    private Workflow() {
     }
 
     @Override
@@ -397,16 +392,21 @@ public final class Workflow implements Persistable<String>, Serializable {
             '}';
     }
 
-    public record Input(String name, String label, String type, boolean required) implements Serializable {
+    public record Input(String name, String label, String type, boolean required)
+        implements Serializable {
     }
 
     public record Output(String name, Object value) implements Serializable {
     }
 
-    private static Map<String, ?> readWorkflowMap(String definition, String id, int format) throws Exception {
-        return WorkflowReader.readWorkflowMap(
-            new WorkflowResource(
-                id, Map.of(), new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),
-                Format.valueOf(format)));
+    private static Map<String, ?> readWorkflowMap(String definition, String id, int format) {
+        try {
+            return WorkflowReader.readWorkflowMap(
+                new WorkflowResource(
+                    id, Map.of(), new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)),
+                    Format.valueOf(format)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -19,8 +19,7 @@ package com.bytechef.helios.configuration.web.rest;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
-import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.helios.configuration.web.rest.model.WorkflowRequestModel;
+import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -58,10 +57,10 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
-    public ResponseEntity<WorkflowModel> createProjectWorkflow(Long id, WorkflowRequestModel workflowRequestModel) {
+    public ResponseEntity<WorkflowModel> createProjectWorkflow(Long id, WorkflowModel workflowModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                projectFacade.addProjectWorkflow(id, workflowRequestModel.getDefinition()), WorkflowModel.class));
+                projectFacade.addProjectWorkflow(id, workflowModel.getDefinition()), WorkflowModel.class));
     }
 
     @Override

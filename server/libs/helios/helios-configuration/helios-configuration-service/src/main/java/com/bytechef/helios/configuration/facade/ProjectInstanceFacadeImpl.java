@@ -141,7 +141,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
             id, workflowId);
 
-        Job job = instanceJobFacade.createAsyncJob(
+        Job job = instanceJobFacade.createJob(
             new JobParameters(workflowId, projectInstanceWorkflow.getInputs()), id, ProjectConstants.PROJECT_TYPE);
 
         return Validate.notNull(job.getId(), "id");

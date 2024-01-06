@@ -92,7 +92,7 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     }
 
     @Override
-    public Workflow update(@NonNull String id, @NonNull String definition) {
+    public Workflow update(@NonNull String id, @NonNull String definition, int version) {
         throw new UnsupportedOperationException();
     }
 }

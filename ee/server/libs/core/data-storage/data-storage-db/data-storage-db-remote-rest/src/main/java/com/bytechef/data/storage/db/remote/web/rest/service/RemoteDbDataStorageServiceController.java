@@ -62,8 +62,7 @@ public class RemoteDbDataStorageServiceController {
 
         dataStorageService.put(componentName, actionName, scope, scopeId, key, type, data);
 
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .build();
     }
 }

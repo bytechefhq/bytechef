@@ -61,8 +61,7 @@ public class RemoteTriggerStateServiceController {
 
         triggerStateService.save(WorkflowExecutionId.parse(workflowExecutionId), value);
 
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .build();
     }
 }

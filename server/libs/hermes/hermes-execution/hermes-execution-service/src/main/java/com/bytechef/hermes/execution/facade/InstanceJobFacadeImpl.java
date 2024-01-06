@@ -16,7 +16,7 @@
 
 package com.bytechef.hermes.execution.facade;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
@@ -36,20 +36,23 @@ public class InstanceJobFacadeImpl implements InstanceJobFacade {
     private final InstanceJobService instanceJobService;
     private final JobFacade jobFacade;
     private final JobService jobService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public InstanceJobFacadeImpl(
-        InstanceJobService instanceJobService, JobFacade jobFacade, JobService jobService) {
+        InstanceJobService instanceJobService, JobFacade jobFacade, JobService jobService,
+        WorkflowService workflowService) {
 
         this.instanceJobService = instanceJobService;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
+        this.workflowService = workflowService;
     }
 
     @Override
     // TODO @Transactional
-    public Job createAsyncJob(JobParameters jobParameters, long instanceId, int type) {
-        long jobId = jobFacade.createAsyncJob(jobParameters);
+    public Job createJob(JobParameters jobParameters, long instanceId, int type) {
+        long jobId = jobFacade.createJob(jobParameters);
 
         instanceJobService.create(jobId, instanceId, type);
 
@@ -58,8 +61,8 @@ public class InstanceJobFacadeImpl implements InstanceJobFacade {
 
     @Override
     @Transactional
-    public Job createSyncJob(JobParameters jobParameters, Workflow workflow, long instanceId, int type) {
-        Job job = jobService.create(jobParameters, workflow);
+    public Job createSyncJob(JobParameters jobParameters, long instanceId, int type) {
+        Job job = jobService.create(jobParameters, workflowService.getWorkflow(jobParameters.getWorkflowId()));
 
         instanceJobService.create(Validate.notNull(job.getId(), "id"), instanceId, type);
 

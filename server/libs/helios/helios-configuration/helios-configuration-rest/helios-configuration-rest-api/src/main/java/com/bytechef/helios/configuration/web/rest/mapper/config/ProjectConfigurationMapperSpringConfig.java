@@ -17,6 +17,7 @@
 package com.bytechef.helios.configuration.web.rest.mapper.config;
 
 import com.bytechef.helios.configuration.web.rest.adapter.ProjectConfigurationConversionServiceAdapter;
+import com.bytechef.hermes.configuration.web.rest.adapter.ConfigurationConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -24,7 +25,7 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    ProjectConfigurationConversionServiceAdapter.class
+    ConfigurationConversionServiceAdapter.class, ProjectConfigurationConversionServiceAdapter.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.helios.configuration.web.rest.adapter",

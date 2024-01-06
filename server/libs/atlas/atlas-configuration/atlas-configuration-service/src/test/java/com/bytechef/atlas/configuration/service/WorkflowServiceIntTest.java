@@ -99,7 +99,8 @@ public class WorkflowServiceIntTest {
         String definition = "{\"label\": \"Label\",\"tasks\": []}";
         Workflow workflow = workflowCrudRepository.save(getWorkflow());
 
-        Workflow updatedWorkflow = workflowService.update(Validate.notNull(workflow.getId(), "id"), definition);
+        Workflow updatedWorkflow = workflowService.update(
+            Validate.notNull(workflow.getId(), "id"), definition, workflow.getVersion());
 
         Assertions.assertEquals(definition, updatedWorkflow.getDefinition());
     }

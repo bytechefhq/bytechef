@@ -48,6 +48,10 @@ public class JsonUtils {
     @SuppressFBWarnings("MS_PKGPROTECT")
     protected static ObjectMapper objectMapper;
 
+    public static <T> T convertValue(Object fromValue, Class<T> toValueType) {
+        return objectMapper.convertValue(fromValue, toValueType);
+    }
+
     public static Object read(InputStream inputStream) {
         try {
             return objectMapper.readValue(inputStream, Object.class);

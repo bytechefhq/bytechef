@@ -62,21 +62,27 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     }
 
     @Override
-    public Object execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+    public void execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+        eventPublisher.publishEvent(
+            new TriggerWebhookEvent(new TriggerWebhookEvent.WebhookParameters(workflowExecutionId, webhookRequest)));
+    }
+
+    @Override
+    public Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         Object outputs;
 
         TriggerOutput triggerOutput = triggerSyncExecutor.execute(workflowExecutionId, webhookRequest);
 
         Map<String, ?> inputMap = getInputMap(workflowExecutionId);
 
-        if (!triggerOutput.batch() && triggerOutput.value() instanceof Collection<?> collectionOutput) {
+        if (!triggerOutput.batch() && triggerOutput.value() instanceof Collection<?> triggerOutputValues) {
             List<Map<String, ?>> outputsList = new ArrayList<>();
 
-            for (Object outputItem : collectionOutput) {
+            for (Object triggerOutputValue : triggerOutputValues) {
                 Job job = jobSyncExecutor.execute(
-                    createJobParameters(workflowExecutionId, inputMap, outputItem),
-                    (jobParameters, workflow) -> instanceJobFacade.createSyncJob(
-                        jobParameters, workflow, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
+                    createJobParameters(workflowExecutionId, inputMap, triggerOutputValue),
+                    (jobParameters) -> instanceJobFacade.createSyncJob(
+                        jobParameters, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
 
                 outputsList.add(taskFileStorage.readJobOutputs(job.getOutputs()));
             }
@@ -85,8 +91,8 @@ public class WebhookExecutorImpl implements WebhookExecutor {
         } else {
             Job job = jobSyncExecutor.execute(
                 createJobParameters(workflowExecutionId, inputMap, triggerOutput.value()),
-                (jobParameters, workflow) -> instanceJobFacade.createSyncJob(
-                    jobParameters, workflow, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
+                (jobParameters) -> instanceJobFacade.createSyncJob(
+                    jobParameters, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
 
             outputs = job.getOutputs() == null ? null : taskFileStorage.readJobOutputs(job.getOutputs());
         }
@@ -95,17 +101,11 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     }
 
     @Override
-    public void executeAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
-        eventPublisher.publishEvent(
-            new TriggerWebhookEvent(new TriggerWebhookEvent.WebhookParameters(workflowExecutionId, webhookRequest)));
-    }
-
-    @Override
     public boolean validateAndExecuteAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         boolean valid = triggerSyncExecutor.validate(workflowExecutionId, webhookRequest);
 
         if (valid) {
-            executeAsync(workflowExecutionId, webhookRequest);
+            execute(workflowExecutionId, webhookRequest);
         }
 
         return valid;
@@ -113,11 +113,12 @@ public class WebhookExecutorImpl implements WebhookExecutor {
 
     @SuppressWarnings("unchecked")
     private static JobParameters createJobParameters(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> inputMap, Object outputItem) {
+        WorkflowExecutionId workflowExecutionId, Map<String, ?> inputMap, Object triggerOutputValue) {
 
         return new JobParameters(
             workflowExecutionId.getWorkflowId(),
-            MapUtils.concat((Map<String, Object>) inputMap, Map.of(workflowExecutionId.getTriggerName(), outputItem)));
+            MapUtils.concat(
+                (Map<String, Object>) inputMap, Map.of(workflowExecutionId.getTriggerName(), triggerOutputValue)));
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {

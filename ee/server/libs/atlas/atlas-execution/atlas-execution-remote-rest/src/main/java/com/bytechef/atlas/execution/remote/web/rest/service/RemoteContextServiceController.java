@@ -70,8 +70,7 @@ public class RemoteContextServiceController {
 
         contextService.push(stackId, classname, value);
 
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .build();
     }
 
@@ -87,8 +86,7 @@ public class RemoteContextServiceController {
 
         contextService.push(stackId, subStackId, classname, value);
 
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .build();
     }
 }

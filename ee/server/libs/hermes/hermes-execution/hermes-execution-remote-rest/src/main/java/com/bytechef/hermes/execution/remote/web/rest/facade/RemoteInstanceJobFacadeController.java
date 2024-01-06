@@ -7,7 +7,6 @@
 
 package com.bytechef.hermes.execution.remote.web.rest.facade;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.hermes.execution.facade.InstanceJobFacade;
@@ -40,22 +39,23 @@ public class RemoteInstanceJobFacadeController {
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/create-job")
+    public ResponseEntity<Job> createJob(@Valid @RequestBody CreateJobRequest createJobRequest) {
+        return ResponseEntity.ok(
+            instanceJobFacade.createJob(
+                createJobRequest.jobParameters, createJobRequest.instanceId, createJobRequest.type));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/create-sync-job")
     public ResponseEntity<Job> create(@Valid @RequestBody CreateJobRequest createJobRequest) {
-        Job job;
-
-        if (createJobRequest.workflow == null) {
-            job = instanceJobFacade.createAsyncJob(
-                createJobRequest.jobParameters, createJobRequest.instanceId, createJobRequest.type);
-        } else {
-            job = instanceJobFacade.createSyncJob(
-                createJobRequest.jobParameters, createJobRequest.workflow, createJobRequest.instanceId,
-                createJobRequest.type);
-        }
-
-        return ResponseEntity.ok(job);
+        return ResponseEntity.ok(
+            instanceJobFacade.createSyncJob(
+                createJobRequest.jobParameters, createJobRequest.instanceId,
+                createJobRequest.type));
     }
 
     @SuppressFBWarnings("EI")
-    public record CreateJobRequest(JobParameters jobParameters, Workflow workflow, long instanceId, int type) {
+    public record CreateJobRequest(JobParameters jobParameters, long instanceId, int type) {
     }
 }

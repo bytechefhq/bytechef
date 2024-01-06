@@ -65,8 +65,7 @@ public class ProjectInstanceTagApiController implements ProjectInstanceTagApi {
                 .map(tagModel -> conversionService.convert(tagModel, Tag.class))
                 .toList());
 
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .build();
     }
 }

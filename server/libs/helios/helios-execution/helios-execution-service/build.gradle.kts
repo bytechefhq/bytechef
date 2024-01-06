@@ -7,7 +7,6 @@ dependencies {
     implementation(project(":server:libs:helios:helios-execution:helios-execution-api"))
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     implementation(project(":server:libs:hermes:hermes-file-storage:hermes-file-storage-api"))
-    implementation(project(":server:libs:hermes:hermes-test-executor:hermes-test-executor-api"))
 
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-jdbc"))
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))

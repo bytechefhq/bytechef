@@ -19,11 +19,11 @@ package com.bytechef.helios.coordinator.trigger.dispatcher;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
-import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.hermes.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,25 +33,23 @@ import org.springframework.stereotype.Component;
 public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcherPreSendProcessor
     implements TriggerDispatcherPreSendProcessor {
 
-    private final WorkflowConnectionFacade workflowConnectionFacade;
-
     @SuppressFBWarnings("EI")
     public ProjectTriggerDispatcherPreSendProcessor(
-        ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        WorkflowConnectionFacade workflowConnectionFacade) {
+        ProjectInstanceWorkflowService projectInstanceWorkflowService) {
 
         super(projectInstanceWorkflowService);
-        this.workflowConnectionFacade = workflowConnectionFacade;
     }
 
     @Override
     public TriggerExecution process(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        triggerExecution.putMetadata(
-            MetadataConstants.CONNECTION_IDS,
-            getConnectionIdMap(workflowExecutionId.getInstanceId(), triggerExecution.getWorkflowId(),
-                workflowConnectionFacade.getWorkflowConnections(triggerExecution.getWorkflowTrigger())));
+        Map<String, Long> connectionIdMap = getConnectionIdMap(
+            workflowExecutionId.getInstanceId(), triggerExecution.getWorkflowId(), triggerExecution.getName());
+
+        if (!connectionIdMap.isEmpty()) {
+            triggerExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
+        }
 
         return triggerExecution;
     }

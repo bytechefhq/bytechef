@@ -17,6 +17,7 @@
 package com.bytechef.helios.configuration.repository;
 
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,6 +29,17 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProjectInstanceWorkflowConnectionRepository
     extends org.springframework.data.repository.Repository<ProjectInstanceWorkflowConnection, Long> {
+
+    @Query("""
+            SELECT project_instance_workflow_connection.* FROM project_instance_workflow_connection
+            JOIN project_instance_workflow ON project_instance_workflow_connection.project_instance_workflow_id = project_instance_workflow.id
+            WHERE project_instance_workflow.project_instance_id = :projectInstanceId
+            AND project_instance_workflow.workflow_id = :workflowId
+            AND project_instance_workflow_connection.operation_name = :operationName
+        """)
+    List<ProjectInstanceWorkflowConnection> findAllByProjectInstanceIdAndWorkflowIdAndOperationName(
+        @Param("projectInstanceId") long projectInstanceId, @Param("workflowId") String workflowId,
+        @Param("operationName") String operationName);
 
     @Query("""
             SELECT project_instance_workflow_connection.* FROM project_instance_workflow_connection

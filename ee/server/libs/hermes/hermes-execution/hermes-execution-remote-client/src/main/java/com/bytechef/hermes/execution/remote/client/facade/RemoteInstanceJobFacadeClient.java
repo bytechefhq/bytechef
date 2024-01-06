@@ -7,7 +7,6 @@
 
 package com.bytechef.hermes.execution.remote.client.facade;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
@@ -34,25 +33,26 @@ public class RemoteInstanceJobFacadeClient implements InstanceJobFacade {
     }
 
     @Override
-    public Job createAsyncJob(JobParameters jobParameters, long instanceId, int type) {
-        return post(new CreateJobRequest(jobParameters, null, instanceId, type));
-    }
-
-    @Override
-    public Job createSyncJob(JobParameters jobParameters, Workflow workflow, long instanceId, int type) {
-        return post(new CreateJobRequest(jobParameters, workflow, instanceId, type));
-    }
-
-    private Job post(CreateJobRequest createJobRequest) {
+    public Job createJob(JobParameters jobParameters, long instanceId, int type) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(INSTANCE_JOB_FACADE + "/create-job")
                 .build(),
-            createJobRequest, Job.class);
+            new CreateJobRequest(jobParameters, instanceId, type), Job.class);
+    }
+
+    @Override
+    public Job createSyncJob(JobParameters jobParameters, long instanceId, int type) {
+        return loadBalancedRestClient.post(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(INSTANCE_JOB_FACADE + "/create-sync-job")
+                .build(),
+            new CreateJobRequest(jobParameters, instanceId, type), Job.class);
     }
 
     @SuppressFBWarnings("EI")
-    public record CreateJobRequest(JobParameters jobParameters, Workflow workflow, long instanceId, int type) {
+    public record CreateJobRequest(JobParameters jobParameters, long instanceId, int type) {
     }
 }

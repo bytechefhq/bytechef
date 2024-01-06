@@ -24,9 +24,9 @@ import com.bytechef.hermes.execution.WorkflowExecutionId;
  */
 public interface WebhookExecutor {
 
-    Object execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    void execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
-    void executeAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
     boolean validateAndExecuteAsync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 }

@@ -39,8 +39,7 @@ public class RemoteCounterServiceController {
     public ResponseEntity<Void> delete(@PathVariable long id) {
         counterService.delete(id);
 
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .build();
     }
 

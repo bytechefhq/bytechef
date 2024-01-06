@@ -16,7 +16,6 @@
 
 package com.bytechef.hermes.execution.facade;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 
@@ -25,7 +24,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
  */
 public interface InstanceJobFacade {
 
-    Job createAsyncJob(JobParameters jobParameters, long instanceId, int type);
+    Job createJob(JobParameters jobParameters, long instanceId, int type);
 
-    Job createSyncJob(JobParameters jobParameters, Workflow workflow, long instanceId, int type);
+    Job createSyncJob(JobParameters jobParameters, long instanceId, int type);
 }

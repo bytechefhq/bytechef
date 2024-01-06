@@ -69,7 +69,8 @@ public class WorkflowConnection {
 
         return List.of(
             new WorkflowConnection(
-                operationType.componentName(), operationType.componentVersion(), name, name, null, connectionRequired));
+                operationType.componentName(), operationType.componentVersion(), name, operationType.componentName(),
+                null, connectionRequired));
     }
 
     private static List<WorkflowConnection> getWorkflowConnections(
@@ -108,8 +109,7 @@ public class WorkflowConnection {
                 return new WorkflowConnection(
                     MapUtils.getString(connectionMap, COMPONENT_NAME, componentName),
                     MapUtils.getInteger(connectionMap, COMPONENT_VERSION, componentVersion),
-                    operationName, entry.getKey(),
-                    MapUtils.getLong(connectionMap, ID),
+                    operationName, entry.getKey(), MapUtils.getLong(connectionMap, ID),
                     MapUtils.getBoolean(connectionMap, AUTHORIZATION_REQUIRED, false) || connectionRequired);
             });
     }

@@ -12,6 +12,7 @@ import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnectio
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,17 +86,17 @@ public class RemoteProjectInstanceWorkflowServiceController {
 
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/get-project-instance-workflow-connection-id/{projectInstanceId}/{workflowId}/" +
-            "{workflowConnectionOperationName}/{workflowConnectionKey}",
+        value = "/get-project-instance-workflow-connection/{projectInstanceId}/{workflowId}/" +
+            "{workflowConnectionOperationName}",
         produces = {
             "application/json"
         })
-    public ResponseEntity<Long> getProjectInstanceWorkflowConnectionId(
+    public ResponseEntity<List<ProjectInstanceWorkflowConnection>> getProjectInstanceWorkflowConnection(
         @PathVariable long projectInstanceId, @PathVariable String workflowId,
-        @PathVariable String workflowConnectionOperationName, @PathVariable String workflowConnectionKey) {
+        @PathVariable String workflowConnectionOperationName) {
 
         return ResponseEntity.ok(
-            projectInstanceWorkflowService.getProjectInstanceWorkflowConnectionId(
-                projectInstanceId, workflowId, workflowConnectionOperationName, workflowConnectionKey));
+            projectInstanceWorkflowService.getProjectInstanceWorkflowConnections(
+                projectInstanceId, workflowId, workflowConnectionOperationName));
     }
 }

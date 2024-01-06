@@ -14,6 +14,7 @@ import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 /**
@@ -45,8 +46,8 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
 
     @Override
     public Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
-        String workflowConnectionKey) {
+        long projectInstanceId, String workflowId, String operationName,
+        String key) {
 
         return Optional.ofNullable(
             loadBalancedRestClient.get(
@@ -54,9 +55,9 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
                     .host(CONFIGURATION_APP)
                     .path(
                         PROJECT_INSTANCE_WORKFLOW_SERVICE +
-                            "/fetch-project-instance-workflow-connection/{workflowId}/" +
+                            "/fetch-project-instance-workflow-connection/{projectInstanceId}/{workflowId}/" +
                             "{workflowConnectionOperationName}/{workflowConnectionKey}")
-                    .build(workflowId, workflowConnectionOperationName, workflowConnectionKey),
+                    .build(projectInstanceId, workflowId, operationName, key),
                 ProjectInstanceWorkflowConnection.class));
     }
 
@@ -79,33 +80,32 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
 
     @Override
     public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
-        long projectInstanceOd, String workflowId, String workflowConnectionOperationName,
-        String workflowConnectionKey) {
+        long projectInstanceOd, String workflowId, String operationName, String key) {
 
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(
                     PROJECT_INSTANCE_WORKFLOW_SERVICE +
-                        "/get-project-instance-workflow-connection/{workflowConnectionOperationName}" +
-                        "/{workflowConnectionKey}")
-                .build(workflowConnectionOperationName, workflowConnectionKey),
+                        "/get-project-instance-workflow-connection/{projectInstanceId}/{workflowId}/" +
+                        "{workflowConnectionOperationName}/{workflowConnectionKey}")
+                .build(projectInstanceOd, workflowId, operationName, key),
             ProjectInstanceWorkflowConnection.class);
     }
 
     @Override
-    public long getProjectInstanceWorkflowConnectionId(
-        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
-        String workflowConnectionKey) {
+    public List<ProjectInstanceWorkflowConnection> getProjectInstanceWorkflowConnections(
+        long projectInstanceOd, String workflowId, String operationName) {
 
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
                 .path(
-                    PROJECT_INSTANCE_WORKFLOW_SERVICE + "/get-project-instance-workflow-connection-id" +
-                        "/{workflowConnectionOperationName}/{workflowConnectionKey}")
-                .build(workflowConnectionOperationName, workflowConnectionKey),
-            Long.class);
+                    PROJECT_INSTANCE_WORKFLOW_SERVICE +
+                        "/get-project-instance-workflow-connection/{projectInstanceId}/{workflowId}/" +
+                        "{workflowConnectionOperationName}")
+                .build(projectInstanceOd, workflowId, operationName),
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override

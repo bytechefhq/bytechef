@@ -26,6 +26,8 @@ import org.springframework.context.annotation.Configuration;
 
 @ComponentScan(basePackages = {
     "com.bytechef.helios.configuration.web.rest",
+    "com.bytechef.hermes.configuration.web.rest.adapter",
+    "com.bytechef.hermes.configuration.web.rest.mapper",
 })
 @Configuration
 @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")

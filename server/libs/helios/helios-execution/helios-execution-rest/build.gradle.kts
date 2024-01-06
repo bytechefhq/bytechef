@@ -19,6 +19,11 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     outputDir.set("$projectDir/generated")
     schemaMappings.set(
         mapOf(
+            "Category" to "com.bytechef.helios.configuration.web.rest.model.CategoryModel",
+            "ComponentDefinitionBasic" to "com.bytechef.hermes.configuration.web.rest.model.ComponentDefinitionBasic",
+            "ExecutionError" to "com.bytechef.hermes.execution.web.rest.model.ExecutionErrorModel",
+            "Job" to "com.bytechef.hermes.execution.web.rest.model.JobModel",
+            "JobBasic" to "com.bytechef.hermes.execution.web.rest.model.JobBasicModel",
             "Page" to "org.springframework.data.domain.Page",
             "ProjectBasic" to "com.bytechef.helios.configuration.web.rest.model.ProjectBasicModel",
             "ProjectInstanceBasic" to  "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceBasicModel",
@@ -27,7 +32,15 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
             "ProjectInstanceWorkflowConnection" to "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowConnectionModel",
             "ProjectInstanceWorkflow" to "com.bytechef.helios.configuration.web.rest.model.ProjectInstanceWorkflowModel",
             "Project" to "com.bytechef.helios.configuration.web.rest.model.ProjectModel",
-            "WorkflowTask" to "com.bytechef.helios.configuration.web.rest.model.WorkflowTaskModel"
+            "Tag" to "com.bytechef.helios.configuration.web.rest.model.TagModel",
+            "TaskExecution" to "com.bytechef.hermes.execution.web.rest.model.TaskExecutionModel",
+            "TriggerExecution" to "com.bytechef.hermes.execution.web.rest.model.TriggerExecutionModel",
+            "Webhook" to "com.bytechef.hermes.execution.web.rest.model.WebhookModel",
+            "WebhookRetry" to "com.bytechef.hermes.execution.web.rest.model.WebhookRetryModel",
+            "WorkflowBasic" to "com.bytechef.hermes.configuration.web.rest.model.WorkflowBasicModel",
+            "WorkflowConnection" to "com.bytechef.hermes.configuration.web.rest.model.WorkflowConnectionModel",
+            "WorkflowTask" to "com.bytechef.hermes.configuration.web.rest.model.WorkflowTaskModel",
+            "WorkflowTrigger" to "com.bytechef.hermes.configuration.web.rest.model.WorkflowTriggerModel"
         )
     )
 }
@@ -69,6 +82,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:helios:helios-configuration:helios-configuration-rest:helios-configuration-rest-api"))
     implementation(project(":server:libs:helios:helios-execution:helios-execution-api"))
+    implementation(project(":server:libs:hermes:hermes-execution:hermes-execution-rest:hermes-execution-rest-api"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")

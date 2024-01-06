@@ -36,6 +36,7 @@ import org.apache.commons.lang3.Validate;
 public class WorkflowTrigger implements Serializable, Trigger {
 
     public static final String TRIGGERS = "triggers";
+
     private final Map<String, Object> extensions = new HashMap<>();
     private Map<String, ?> metadata = new HashMap<>();
     private String name;
@@ -105,6 +106,11 @@ public class WorkflowTrigger implements Serializable, Trigger {
             && Objects.equals(type, that.type);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(label, name, parameters, timeout, type);
+    }
+
     public <T> T getExtension(String name, Class<T> elementType, T defaultValue) {
         return MapUtils.get(extensions, name, elementType, defaultValue);
     }
@@ -115,11 +121,6 @@ public class WorkflowTrigger implements Serializable, Trigger {
 
     public <T> List<T> getExtensions(String name, Class<T> elementType, List<T> defaultValue) {
         return MapUtils.getList(extensions, name, elementType, defaultValue);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(label, name, parameters, timeout, type);
     }
 
     public String getName() {

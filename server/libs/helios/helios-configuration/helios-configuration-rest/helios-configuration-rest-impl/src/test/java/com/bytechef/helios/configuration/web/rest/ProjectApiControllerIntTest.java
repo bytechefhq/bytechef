@@ -35,7 +35,7 @@ import com.bytechef.helios.configuration.web.rest.model.CategoryModel;
 import com.bytechef.helios.configuration.web.rest.model.ProjectModel;
 import com.bytechef.helios.configuration.web.rest.model.TagModel;
 import com.bytechef.helios.configuration.web.rest.model.UpdateTagsRequestModel;
-import com.bytechef.helios.configuration.web.rest.model.WorkflowRequestModel;
+import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.tag.domain.Tag;
 import java.util.Iterator;
 import java.util.List;
@@ -292,7 +292,7 @@ public class ProjectApiControllerIntTest {
     public void testPostIntegrationWorkflows() {
         String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
 
-        WorkflowRequestModel workflowRequestModel = new WorkflowRequestModel().definition(definition);
+        WorkflowModel workflowModel = new WorkflowModel().definition(definition);
         Workflow workflow = new Workflow("id", definition, Format.JSON, 0);
 
         when(projectFacade.addProjectWorkflow(anyLong(), any()))
@@ -304,7 +304,7 @@ public class ProjectApiControllerIntTest {
                 .uri("/projects/1/workflows")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(workflowRequestModel)
+                .bodyValue(workflowModel)
                 .exchange()
                 .expectStatus()
                 .isOk()

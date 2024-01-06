@@ -201,7 +201,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<Pr
 
     @Override
     public String toString() {
-        return "ProjectTag{" + ", id='"
+        return "ProjectInstanceWorkflow{" + ", id='"
             + id + '\'' + ", workflowId='"
             + workflowId + '\'' + ", inputs="
             + inputs + ", projectInstanceWorkflowConnections="

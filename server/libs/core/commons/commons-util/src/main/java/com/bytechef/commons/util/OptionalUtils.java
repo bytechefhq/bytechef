@@ -95,4 +95,15 @@ public final class OptionalUtils {
             .map(u -> (U) u)
             .orElse(other);
     }
+
+    public static <T, U> U mapOrElseGet(
+        Optional<T> optional, Function<? super T, ? extends U> mapper, Supplier<? extends U> supplier) {
+
+        Validate.notNull(optional, "'optional' must not be null");
+
+        return optional
+            .map(mapper)
+            .map(u -> (U) u)
+            .orElseGet(supplier);
+    }
 }

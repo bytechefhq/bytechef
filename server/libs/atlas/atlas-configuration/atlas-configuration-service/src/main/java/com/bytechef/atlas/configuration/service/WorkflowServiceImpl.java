@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -268,11 +269,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
-    public Workflow update(@NonNull String id, @NonNull String definition) {
+    public Workflow update(@NonNull String id, @NonNull String definition, int version) {
         Validate.notNull(id, "'id' must not be null");
         Validate.notNull(definition, "'definition' must not be null");
 
         final Workflow workflow = getWorkflow(id);
+
+        workflow.setVersion(version);
 
         return CollectionUtils.getFirst(
             workflowCrudRepositories,
@@ -283,7 +286,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     private Workflow update(String definition, WorkflowCrudRepository workflowCrudRepository, Workflow workflow) {
         workflow.setDefinition(definition);
 
-        workflowCrudRepository.save(workflow);
+        try {
+            workflowCrudRepository.save(workflow);
+        } catch (OptimisticLockingFailureException e) {
+            refreshCache(Validate.notNull(workflow.getId(), "id"));
+
+            throw e;
+        }
 
         return updateCache(OptionalUtils.get(workflowCrudRepository.findById(workflow.getId())));
     }

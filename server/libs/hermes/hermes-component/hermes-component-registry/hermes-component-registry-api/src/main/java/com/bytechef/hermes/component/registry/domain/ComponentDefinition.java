@@ -77,6 +77,10 @@ public class ComponentDefinition {
         return actions;
     }
 
+    public int getActionsCount() {
+        return actions.size();
+    }
+
     public Optional<String> getCategory() {
         return Optional.ofNullable(category);
     }
@@ -105,12 +109,16 @@ public class ComponentDefinition {
         return tags;
     }
 
+    public Optional<String> getTitle() {
+        return Optional.ofNullable(title);
+    }
+
     public List<TriggerDefinitionBasic> getTriggers() {
         return triggers;
     }
 
-    public Optional<String> getTitle() {
-        return Optional.ofNullable(title);
+    public int getTriggersCount() {
+        return triggers.size();
     }
 
     public int getVersion() {

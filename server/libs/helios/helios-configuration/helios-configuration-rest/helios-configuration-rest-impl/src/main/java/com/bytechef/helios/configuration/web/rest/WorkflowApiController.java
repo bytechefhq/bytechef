@@ -18,10 +18,10 @@ package com.bytechef.helios.configuration.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
-import com.bytechef.helios.configuration.web.rest.model.WorkflowModel;
-import com.bytechef.helios.configuration.web.rest.model.WorkflowRequestModel;
+import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,8 +56,7 @@ public class WorkflowApiController implements WorkflowApi {
     public ResponseEntity<Void> deleteProjectWorkflow(Long id, String workflowId) {
         projectFacade.deleteWorkflow(id, workflowId);
 
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .build();
     }
 
@@ -70,15 +69,9 @@ public class WorkflowApiController implements WorkflowApi {
     @Override
     public ResponseEntity<List<WorkflowModel>> getProjectWorkflows(Long id) {
         return ResponseEntity.ok(
-            projectFacade.getProjectWorkflows(id)
-                .stream()
-                .map(workflow -> conversionService.convert(workflow, WorkflowModel.class))
-                .toList());
-    }
-
-    @Override
-    public ResponseEntity<WorkflowModel> getWorkflow(String id) {
-        return ResponseEntity.ok(conversionService.convert(workflowService.getWorkflow(id), WorkflowModel.class));
+            CollectionUtils.map(
+                projectFacade.getProjectWorkflows(id),
+                workflow -> conversionService.convert(workflow, WorkflowModel.class)));
     }
 
     @Override
@@ -90,12 +83,5 @@ public class WorkflowApiController implements WorkflowApi {
         }
 
         return ResponseEntity.ok(workflowModels);
-    }
-
-    @Override
-    public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowRequestModel workflowRequestModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                workflowService.update(id, workflowRequestModel.getDefinition()), WorkflowModel.class));
     }
 }

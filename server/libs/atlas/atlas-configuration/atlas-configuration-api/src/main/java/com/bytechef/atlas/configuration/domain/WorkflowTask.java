@@ -51,9 +51,6 @@ public class WorkflowTask implements Task, Serializable {
     private String timeout;
     private String type;
 
-    private WorkflowTask() {
-    }
-
     public WorkflowTask(Map<String, ?> source) {
         Validate.notNull(source, "'source' must not be null");
 
@@ -92,6 +89,9 @@ public class WorkflowTask implements Task, Serializable {
 
         Validate.notNull(name, "'name' must not be null");
         Validate.notNull(type, "'type' must not be null");
+    }
+
+    private WorkflowTask() {
     }
 
     public static WorkflowTask of(Map<String, ?> source) {
