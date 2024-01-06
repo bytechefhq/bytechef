@@ -17,7 +17,7 @@
 package com.bytechef.hermes.component.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.BaseProperty.ValueProperty.ControlType;
+import com.bytechef.hermes.definition.BaseProperty.ControlType;
 import java.util.Optional;
 
 /**

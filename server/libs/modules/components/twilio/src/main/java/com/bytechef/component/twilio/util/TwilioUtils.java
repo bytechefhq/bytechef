@@ -29,7 +29,7 @@ import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.Property;
-import com.bytechef.hermes.definition.BaseProperty.ValueProperty.ControlType;
+import com.bytechef.hermes.definition.BaseProperty;
 import java.util.List;
 
 /**
@@ -88,7 +88,7 @@ public class TwilioUtils {
                         "Message. If you are using messaging_service_sid, this parameter can be empty (Twilio " +
                         "assigns a from value from the Messaging Service's Sender Pool) or you can provide a " +
                         "specific sender from your Sender Pool.")
-                .controlType(ControlType.PHONE)
+                .controlType(BaseProperty.ControlType.PHONE)
                 .required(true);
         } else {
             stringProperty = string(MESSAGING_SERVICE_SID)

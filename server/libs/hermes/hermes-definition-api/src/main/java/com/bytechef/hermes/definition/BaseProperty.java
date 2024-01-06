@@ -31,6 +31,29 @@ public interface BaseProperty {
     /**
      *
      */
+    enum ControlType {
+        ARRAY_BUILDER,
+        CHECKBOX,
+        CODE_EDITOR,
+        DATE,
+        DATE_TIME,
+        EMAIL,
+        INTEGER,
+        MULTI_SELECT,
+        NUMBER,
+        OBJECT_BUILDER,
+        PASSWORD,
+        PHONE,
+        SELECT,
+        TEXT,
+        TEXT_AREA,
+        TIME,
+        URL
+    }
+
+    /**
+     *
+     */
     enum Type {
         ARRAY,
         BOOLEAN,
@@ -242,29 +265,6 @@ public interface BaseProperty {
      *
      */
     interface ValueProperty<V> extends BaseProperty {
-
-        /**
-         *
-         */
-        enum ControlType {
-            ARRAY_BUILDER,
-            CHECKBOX,
-            CODE_EDITOR,
-            DATE,
-            DATE_TIME,
-            EMAIL,
-            INTEGER,
-            MULTI_SELECT,
-            NUMBER,
-            OBJECT_BUILDER,
-            PASSWORD,
-            PHONE,
-            SELECT,
-            TEXT,
-            TEXT_AREA,
-            TIME,
-            URL
-        }
 
         /**
          *

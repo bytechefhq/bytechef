@@ -101,18 +101,18 @@ public class AirtableUtils {
                         "duration" -> string(field.name());
                     case "checkbox" -> bool(field.name());
                     case "email" -> string(field.name())
-                        .controlType(BaseProperty.ValueProperty.ControlType.EMAIL);
+                        .controlType(BaseProperty.ControlType.EMAIL);
                     case "multilineText" -> string(field.name())
-                        .controlType(BaseProperty.ValueProperty.ControlType.TEXT_AREA);
+                        .controlType(BaseProperty.ControlType.TEXT_AREA);
                     case "multipleSelects" -> array(field.name())
                         .items(string())
                         .options(getOptions(field));
                     case "number" -> number(field.name());
                     case "phoneNumber" -> string(field.name())
-                        .controlType(BaseProperty.ValueProperty.ControlType.PHONE);
+                        .controlType(BaseProperty.ControlType.PHONE);
                     case "singleSelect" -> string(field.name()).options(
                         getOptions(field));
-                    case "url" -> string(field.name()).controlType(BaseProperty.ValueProperty.ControlType.URL);
+                    case "url" -> string(field.name()).controlType(BaseProperty.ControlType.URL);
                     default -> throw new IllegalArgumentException(
                         "Unknown Airtable field type='%s'".formatted(field.type()));
                 };

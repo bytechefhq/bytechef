@@ -58,7 +58,7 @@ public class ScriptPythonAction {
             string(SCRIPT)
                 .label("Python code")
                 .description("Add your Python custom logic here.")
-                .controlType(BaseProperty.ValueProperty.ControlType.CODE_EDITOR)
+                .controlType(BaseProperty.ControlType.CODE_EDITOR)
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
         .sampleOutput(getSampleOutputFunction())

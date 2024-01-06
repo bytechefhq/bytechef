@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.Property;
-import com.bytechef.hermes.definition.BaseProperty.ValueProperty.ControlType;
+import com.bytechef.hermes.definition.BaseProperty;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -99,7 +99,7 @@ class TwilioUtilsTest {
                 "assigns a from value from the Messaging Service's Sender Pool) or you can provide a " +
                 "specific sender from your Sender Pool.",
             fromProperties.getFirst().getDescription().get());
-        assertEquals(ControlType.PHONE, fromProperties.getFirst().getControlType());
+        assertEquals(BaseProperty.ControlType.PHONE, fromProperties.getFirst().getControlType());
         assertEquals(true, fromProperties.getFirst().getRequired().get());
     }
 

@@ -115,7 +115,7 @@ public class HttpClientConnection {
                         string(SCOPES)
                             .label("Scopes")
                             .description("Optional comma-delimited list of scopes")
-                            .controlType(BaseProperty.ValueProperty.ControlType.TEXT_AREA)),
+                            .controlType(BaseProperty.ControlType.TEXT_AREA)),
             authorization(
                 Authorization.AuthorizationType.OAUTH2_IMPLICIT_CODE
                     .name()
@@ -137,7 +137,7 @@ public class HttpClientConnection {
                         string(SCOPES)
                             .label("Scopes")
                             .description("Optional comma-delimited list of scopes")
-                            .controlType(BaseProperty.ValueProperty.ControlType.TEXT_AREA)),
+                            .controlType(BaseProperty.ControlType.TEXT_AREA)),
             authorization(
                 Authorization.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS
                     .name()
@@ -158,5 +158,5 @@ public class HttpClientConnection {
                         string(SCOPES)
                             .label("Scopes")
                             .description("Optional comma-delimited list of scopes")
-                            .controlType(BaseProperty.ValueProperty.ControlType.TEXT_AREA)));
+                            .controlType(BaseProperty.ControlType.TEXT_AREA)));
 }

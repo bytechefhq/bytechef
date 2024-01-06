@@ -60,7 +60,7 @@ import com.bytechef.component.twilio.util.TwilioUtils;
 import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.definition.BaseProperty.ValueProperty.ControlType;
+import com.bytechef.hermes.definition.BaseProperty;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
@@ -85,7 +85,7 @@ public class TwilioSendSMSAction {
                 .description(
                     "The recipient's phone number in E.164 format (for SMS/MMS) or channel address, e.g. " +
                         "whatsapp:+15552229999.")
-                .controlType(ControlType.PHONE)
+                .controlType(BaseProperty.ControlType.PHONE)
                 .required(true),
             string(STATUS_CALLBACK)
                 .label("Status callback")
@@ -94,7 +94,7 @@ public class TwilioSendSMSAction {
                         "contain a valid hostname and underscores are not allowed. If you include this parameter " +
                         "with the messaging_service_sid, Twilio uses this URL instead of the Status Callback URL of " +
                         "the Messaging Service.")
-                .controlType(ControlType.URL)
+                .controlType(BaseProperty.ControlType.URL)
                 .required(false),
             string(APPLICATION_SID)
                 .label("Application SID")

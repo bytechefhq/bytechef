@@ -111,7 +111,7 @@ public class OpenAICreateImageAction {
                         object()
                             .properties(
                                 string("url")
-                                    .controlType(BaseProperty.ValueProperty.ControlType.URL),
+                                    .controlType(BaseProperty.ControlType.URL),
                                 string("b64Json"),
                                 string("revisedPrompt"))))
 
