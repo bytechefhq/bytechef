@@ -971,7 +971,9 @@ public class OpenApiComponentGenerator {
 
         builder.add("$L($S)", extensionMap.get("x-property-type"), propertyName);
 
-        if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
+        if (!StringUtils.isEmpty(propertyName) && !outputSchema &&
+            !Objects.equals(extensionMap.get("x-property-type"), "dynamicProperties")) {
+
             builder.add(".label($S)", buildPropertyLabel(propertyName.replace("__", "")));
         }
 
