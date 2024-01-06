@@ -41,11 +41,8 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testGetSizeOptionsForDallE2() {
-        when(
-            mockedParameters.getRequiredString(MODEL)
-        ).thenReturn(
-            DALL_E_2
-        );
+        when(mockedParameters.getRequiredString(MODEL))
+            .thenReturn(DALL_E_2);
 
         List<Option<String>> sizeOptions = OpenAIUtils.getSizeOptions(
             mockedParameters, mockedParameters, "", mockedContext);
@@ -61,11 +58,8 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testGetSizeOptionsForDallE3() {
-        when(
-            mockedParameters.getRequiredString(MODEL)
-        ).thenReturn(
-            DALL_E_3
-        );
+        when(mockedParameters.getRequiredString(MODEL))
+            .thenReturn(DALL_E_3);
 
         List<Option<String>> sizeOptions = OpenAIUtils.getSizeOptions(
             mockedParameters, mockedParameters, "", mockedContext);
@@ -81,11 +75,8 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testGetModelPropertiesForDallE2() {
-        when(
-            mockedParameters.getRequiredString(MODEL)
-        ).thenReturn(
-            DALL_E_2
-        );
+        when(mockedParameters.getRequiredString(MODEL))
+            .thenReturn(DALL_E_2);
 
         List<ValueProperty<?>> modelProperties = OpenAIUtils.getModelProperties(
             mockedParameters, mockedParameters, mockedContext);
@@ -113,11 +104,8 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testGetModelPropertiesForDallE3() {
-        when(
-            mockedParameters.getRequiredString(MODEL)
-        ).thenReturn(
-            DALL_E_3
-        );
+        when(mockedParameters.getRequiredString(MODEL))
+            .thenReturn(DALL_E_3);
 
         List<ValueProperty<?>> modelProperties =
             OpenAIUtils.getModelProperties(mockedParameters, mockedParameters, mockedContext);
@@ -145,11 +133,8 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testGetOutputSchemaFunctionForStream() {
-        when(
-            mockedParameters.getRequiredBoolean(STREAM)
-        ).thenReturn(
-            true
-        );
+        when(mockedParameters.getRequiredBoolean(STREAM))
+            .thenReturn(true);
 
         OutputProperty<?> outputProperty = OpenAIUtils.getOutputSchemaResponse(
             mockedParameters, mockedParameters, mockedContext);
@@ -159,11 +144,8 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
 
     @Test
     public void testGetOutputSchemaFunction() {
-        when(
-            mockedParameters.getRequiredBoolean(STREAM)
-        ).thenReturn(
-            false
-        );
+        when(mockedParameters.getRequiredBoolean(STREAM))
+            .thenReturn(false);
 
         OutputProperty<?> outputProperty = OpenAIUtils.getOutputSchemaResponse(
             mockedParameters, mockedParameters, mockedContext);
