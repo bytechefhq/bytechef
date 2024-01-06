@@ -35,6 +35,7 @@ import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableObjectPro
 import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.Property.OutputProperty;
+import com.bytechef.hermes.component.definition.Property.ValueProperty;
 import com.bytechef.hermes.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +118,7 @@ public class OpenAIUtils {
         return options;
     }
 
-    public static List<ModifiableStringProperty> getModelProperties(
+    public static List<ValueProperty<?>> getModelProperties(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         String model = inputParameters.getRequiredString(MODEL);
 
@@ -135,8 +136,8 @@ public class OpenAIUtils {
 
         if (model.equals(DALL_E_2)) {
             string.maxLength(1000);
-            n.minValue(1);
-            n.maxValue(10);
+            n.minValue(1)
+                .maxValue(10);
         } else {
             string.maxLength(4000);
         }
