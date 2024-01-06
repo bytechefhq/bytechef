@@ -164,7 +164,7 @@ const WorkflowNodeDetailsPanel = ({
         };
     });
 
-    const {data: outputSchemaResponse} = useGetComponentActionOutputSchemaQuery(
+    const {data: actionOutputSchema} = useGetComponentActionOutputSchemaQuery(
         {
             actionName: getActionName(),
             componentName: currentComponent?.name as string,
@@ -265,7 +265,7 @@ const WorkflowNodeDetailsPanel = ({
         }
     });
 
-    const outputSchemaProperty = currentAction?.outputSchema || (outputSchemaResponse && outputSchemaResponse.property);
+    const outputSchema = currentAction?.outputSchema || actionOutputSchema;
 
     // Set currentActionName depending on the currentComponentAction.actionName
     useEffect(() => {
@@ -548,8 +548,8 @@ const WorkflowNodeDetailsPanel = ({
                                                 </div>
                                             ))}
 
-                                        {activeTab === 'output' && outputSchemaProperty && (
-                                            <OutputTab outputSchema={outputSchemaProperty} />
+                                        {activeTab === 'output' && outputSchema && (
+                                            <OutputTab outputSchema={outputSchema} />
                                         )}
                                     </div>
                                 </div>
