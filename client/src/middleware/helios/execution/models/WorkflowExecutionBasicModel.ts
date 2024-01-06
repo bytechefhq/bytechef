@@ -39,7 +39,7 @@ import {
 } from './WorkflowBasicModel';
 
 /**
- * Contains basic information about execution of a project workflow.
+ * Contains information about execution of a Integration workflow.
  * @export
  * @interface WorkflowExecutionBasicModel
  */
@@ -52,6 +52,12 @@ export interface WorkflowExecutionBasicModel {
     readonly id?: number;
     /**
      * 
+     * @type {ProjectBasicModel}
+     * @memberof WorkflowExecutionBasicModel
+     */
+    project?: ProjectBasicModel;
+    /**
+     * 
      * @type {ProjectInstanceBasicModel}
      * @memberof WorkflowExecutionBasicModel
      */
@@ -62,12 +68,6 @@ export interface WorkflowExecutionBasicModel {
      * @memberof WorkflowExecutionBasicModel
      */
     job?: JobBasicModel;
-    /**
-     * 
-     * @type {ProjectBasicModel}
-     * @memberof WorkflowExecutionBasicModel
-     */
-    project?: ProjectBasicModel;
     /**
      * 
      * @type {WorkflowBasicModel}
@@ -96,9 +96,9 @@ export function WorkflowExecutionBasicModelFromJSONTyped(json: any, ignoreDiscri
     return {
         
         'id': !exists(json, 'id') ? undefined : json['id'],
+        'project': !exists(json, 'project') ? undefined : ProjectBasicModelFromJSON(json['project']),
         'projectInstance': !exists(json, 'projectInstance') ? undefined : ProjectInstanceBasicModelFromJSON(json['projectInstance']),
         'job': !exists(json, 'job') ? undefined : JobBasicModelFromJSON(json['job']),
-        'project': !exists(json, 'project') ? undefined : ProjectBasicModelFromJSON(json['project']),
         'workflow': !exists(json, 'workflow') ? undefined : WorkflowBasicModelFromJSON(json['workflow']),
     };
 }
@@ -112,9 +112,9 @@ export function WorkflowExecutionBasicModelToJSON(value?: WorkflowExecutionBasic
     }
     return {
         
+        'project': ProjectBasicModelToJSON(value.project),
         'projectInstance': ProjectInstanceBasicModelToJSON(value.projectInstance),
         'job': JobBasicModelToJSON(value.job),
-        'project': ProjectBasicModelToJSON(value.project),
         'workflow': WorkflowBasicModelToJSON(value.workflow),
     };
 }

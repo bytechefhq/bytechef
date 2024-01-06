@@ -13,19 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ExecutionErrorModel } from './ExecutionErrorModel';
-import {
-    ExecutionErrorModelFromJSON,
-    ExecutionErrorModelFromJSONTyped,
-    ExecutionErrorModelToJSON,
-} from './ExecutionErrorModel';
-import type { WebhookModel } from './WebhookModel';
-import {
-    WebhookModelFromJSON,
-    WebhookModelFromJSONTyped,
-    WebhookModelToJSON,
-} from './WebhookModel';
-
 /**
  * Represents an execution of a workflow.
  * @export
@@ -45,35 +32,17 @@ export interface JobBasicModel {
      */
     readonly createdDate?: Date;
     /**
-     * The index of the step on the job's workflow on which the job is working on right now.
-     * @type {number}
-     * @memberof JobBasicModel
-     */
-    readonly currentTask?: number;
-    /**
      * The time execution entered end status COMPLETED, STOPPED, FAILED
      * @type {Date}
      * @memberof JobBasicModel
      */
     endDate?: Date;
     /**
-     * 
-     * @type {ExecutionErrorModel}
-     * @memberof JobBasicModel
-     */
-    error?: ExecutionErrorModel;
-    /**
      * The id of a job.
      * @type {string}
      * @memberof JobBasicModel
      */
     readonly id?: string;
-    /**
-     * The key-value map of the inputs passed to the job when it was created.
-     * @type {{ [key: string]: object; }}
-     * @memberof JobBasicModel
-     */
-    readonly inputs?: { [key: string]: object; };
     /**
      * The job's human-readable name.
      * @type {string}
@@ -93,18 +62,6 @@ export interface JobBasicModel {
      */
     readonly lastModifiedDate?: Date;
     /**
-     * The key-value map of the outputs returned.
-     * @type {{ [key: string]: object; }}
-     * @memberof JobBasicModel
-     */
-    readonly outputs?: { [key: string]: object; };
-    /**
-     * The id of the parent task that created this job. Required for sub-flows.
-     * @type {number}
-     * @memberof JobBasicModel
-     */
-    readonly parentTaskExecutionId?: number;
-    /**
      * The priority value.
      * @type {number}
      * @memberof JobBasicModel
@@ -122,12 +79,6 @@ export interface JobBasicModel {
      * @memberof JobBasicModel
      */
     readonly status: JobBasicModelStatusEnum;
-    /**
-     * The list of the webhooks configured.
-     * @type {Array<WebhookModel>}
-     * @memberof JobBasicModel
-     */
-    readonly webhooks?: Array<WebhookModel>;
     /**
      * 
      * @type {string}
@@ -174,20 +125,14 @@ export function JobBasicModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
-        'currentTask': !exists(json, 'currentTask') ? undefined : json['currentTask'],
         'endDate': !exists(json, 'endDate') ? undefined : (new Date(json['endDate'])),
-        'error': !exists(json, 'error') ? undefined : ExecutionErrorModelFromJSON(json['error']),
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
         'label': !exists(json, 'label') ? undefined : json['label'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
-        'outputs': !exists(json, 'outputs') ? undefined : json['outputs'],
-        'parentTaskExecutionId': !exists(json, 'parentTaskExecutionId') ? undefined : json['parentTaskExecutionId'],
         'priority': json['priority'],
         'startDate': (new Date(json['startDate'])),
         'status': json['status'],
-        'webhooks': !exists(json, 'webhooks') ? undefined : ((json['webhooks'] as Array<any>).map(WebhookModelFromJSON)),
         'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
     };
 }
@@ -202,7 +147,6 @@ export function JobBasicModelToJSON(value?: JobBasicModel | null): any {
     return {
         
         'endDate': value.endDate === undefined ? undefined : (value.endDate.toISOString()),
-        'error': ExecutionErrorModelToJSON(value.error),
     };
 }
 

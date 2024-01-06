@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ComponentDefinitionModel } from './ComponentDefinitionModel';
+import type { ComponentDefinitionBasicModel } from './ComponentDefinitionBasicModel';
 import {
-    ComponentDefinitionModelFromJSON,
-    ComponentDefinitionModelFromJSONTyped,
-    ComponentDefinitionModelToJSON,
-} from './ComponentDefinitionModel';
+    ComponentDefinitionBasicModelFromJSON,
+    ComponentDefinitionBasicModelFromJSONTyped,
+    ComponentDefinitionBasicModelToJSON,
+} from './ComponentDefinitionBasicModel';
 import type { ExecutionErrorModel } from './ExecutionErrorModel';
 import {
     ExecutionErrorModelFromJSON,
@@ -40,10 +40,10 @@ import {
 export interface TaskExecutionModel {
     /**
      * 
-     * @type {ComponentDefinitionModel}
+     * @type {ComponentDefinitionBasicModel}
      * @memberof TaskExecutionModel
      */
-    component?: ComponentDefinitionModel;
+    component?: ComponentDefinitionBasicModel;
     /**
      * The created by.
      * @type {string}
@@ -227,7 +227,7 @@ export function TaskExecutionModelFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'component': !exists(json, 'component') ? undefined : ComponentDefinitionModelFromJSON(json['component']),
+        'component': !exists(json, 'component') ? undefined : ComponentDefinitionBasicModelFromJSON(json['component']),
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'endDate': !exists(json, 'endDate') ? undefined : (new Date(json['endDate'])),
@@ -264,7 +264,7 @@ export function TaskExecutionModelToJSON(value?: TaskExecutionModel | null): any
     }
     return {
         
-        'component': ComponentDefinitionModelToJSON(value.component),
+        'component': ComponentDefinitionBasicModelToJSON(value.component),
         'error': ExecutionErrorModelToJSON(value.error),
         'workflowTask': WorkflowTaskModelToJSON(value.workflowTask),
     };

@@ -1,12 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './CategoryModel';
-export * from './ComponentDefinitionModel';
-export * from './CreateJob200ResponseModel';
+export * from './ComponentDefinitionBasicModel';
 export * from './ExecutionErrorModel';
 export * from './JobBasicModel';
 export * from './JobModel';
-export * from './JobParametersModel';
 export * from './PageModel';
 export * from './ProjectBasicModel';
 export * from './ProjectInstanceBasicModel';
@@ -16,11 +14,8 @@ export * from './ProjectInstanceWorkflowConnectionModel';
 export * from './ProjectInstanceWorkflowModel';
 export * from './ProjectModel';
 export * from './TagModel';
-export * from './TaskConnectionModel';
 export * from './TaskExecutionModel';
-export * from './TestParametersModel';
 export * from './TriggerExecutionModel';
-export * from './TriggerOutputModel';
 export * from './WebhookModel';
 export * from './WebhookRetryModel';
 export * from './WorkflowBasicModel';

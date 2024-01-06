@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ComponentDefinitionModel } from './ComponentDefinitionModel';
+import type { ComponentDefinitionBasicModel } from './ComponentDefinitionBasicModel';
 import {
-    ComponentDefinitionModelFromJSON,
-    ComponentDefinitionModelFromJSONTyped,
-    ComponentDefinitionModelToJSON,
-} from './ComponentDefinitionModel';
+    ComponentDefinitionBasicModelFromJSON,
+    ComponentDefinitionBasicModelFromJSONTyped,
+    ComponentDefinitionBasicModelToJSON,
+} from './ComponentDefinitionBasicModel';
 import type { ExecutionErrorModel } from './ExecutionErrorModel';
 import {
     ExecutionErrorModelFromJSON,
@@ -46,10 +46,10 @@ export interface TriggerExecutionModel {
     batch?: boolean;
     /**
      * 
-     * @type {ComponentDefinitionModel}
+     * @type {ComponentDefinitionBasicModel}
      * @memberof TriggerExecutionModel
      */
-    component?: ComponentDefinitionModel;
+    component?: ComponentDefinitionBasicModel;
     /**
      * The created by.
      * @type {string}
@@ -209,7 +209,7 @@ export function TriggerExecutionModelFromJSONTyped(json: any, ignoreDiscriminato
     return {
         
         'batch': !exists(json, 'batch') ? undefined : json['batch'],
-        'component': !exists(json, 'component') ? undefined : ComponentDefinitionModelFromJSON(json['component']),
+        'component': !exists(json, 'component') ? undefined : ComponentDefinitionBasicModelFromJSON(json['component']),
         'createdBy': !exists(json, 'createdBy') ? undefined : json['createdBy'],
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'endDate': !exists(json, 'endDate') ? undefined : (new Date(json['endDate'])),
@@ -243,7 +243,7 @@ export function TriggerExecutionModelToJSON(value?: TriggerExecutionModel | null
     return {
         
         'batch': value.batch,
-        'component': ComponentDefinitionModelToJSON(value.component),
+        'component': ComponentDefinitionBasicModelToJSON(value.component),
         'error': ExecutionErrorModelToJSON(value.error),
         'workflowTrigger': WorkflowTriggerModelToJSON(value.workflowTrigger),
     };

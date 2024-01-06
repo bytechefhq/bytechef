@@ -29,8 +29,8 @@ export interface GetWorkflowExecutionRequest {
     id: number;
 }
 
-export interface GetWorkflowExecutionsRequest {
-    jobStatus?: GetWorkflowExecutionsJobStatusEnum;
+export interface GetWorkflowExecutionsPageRequest {
+    jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
     jobStartDate?: Date;
     jobEndDate?: Date;
     projectId?: number;
@@ -80,7 +80,7 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      * Get project workflow executions.
      * Get project workflow executions
      */
-    async getWorkflowExecutionsRaw(requestParameters: GetWorkflowExecutionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
+    async getWorkflowExecutionsPageRaw(requestParameters: GetWorkflowExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PageModel>> {
         const queryParameters: any = {};
 
         if (requestParameters.jobStatus !== undefined) {
@@ -127,8 +127,8 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      * Get project workflow executions.
      * Get project workflow executions
      */
-    async getWorkflowExecutions(requestParameters: GetWorkflowExecutionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageModel> {
-        const response = await this.getWorkflowExecutionsRaw(requestParameters, initOverrides);
+    async getWorkflowExecutionsPage(requestParameters: GetWorkflowExecutionsPageRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PageModel> {
+        const response = await this.getWorkflowExecutionsPageRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -137,11 +137,11 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
 /**
  * @export
  */
-export const GetWorkflowExecutionsJobStatusEnum = {
+export const GetWorkflowExecutionsPageJobStatusEnum = {
     Created: 'CREATED',
     Started: 'STARTED',
     Stopped: 'STOPPED',
     Failed: 'FAILED',
     Completed: 'COMPLETED'
 } as const;
-export type GetWorkflowExecutionsJobStatusEnum = typeof GetWorkflowExecutionsJobStatusEnum[keyof typeof GetWorkflowExecutionsJobStatusEnum];
+export type GetWorkflowExecutionsPageJobStatusEnum = typeof GetWorkflowExecutionsPageJobStatusEnum[keyof typeof GetWorkflowExecutionsPageJobStatusEnum];

@@ -61,6 +61,12 @@ export interface WorkflowBasicModel {
      * @memberof WorkflowBasicModel
      */
     readonly lastModifiedDate?: Date;
+    /**
+     * 
+     * @type {number}
+     * @memberof WorkflowBasicModel
+     */
+    version?: number;
 }
 
 /**
@@ -89,6 +95,7 @@ export function WorkflowBasicModelFromJSONTyped(json: any, ignoreDiscriminator: 
         'label': !exists(json, 'label') ? undefined : json['label'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
+        'version': !exists(json, '__version') ? undefined : json['__version'],
     };
 }
 
@@ -102,6 +109,7 @@ export function WorkflowBasicModelToJSON(value?: WorkflowBasicModel | null): any
     return {
         
         'description': value.description,
+        '__version': value.version,
     };
 }
 

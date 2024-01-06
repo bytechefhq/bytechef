@@ -14,7 +14,7 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * The connection used in a particular task.
+ * The connection used in a particular task or trigger.
  * @export
  * @interface ProjectInstanceWorkflowConnectionModel
  */

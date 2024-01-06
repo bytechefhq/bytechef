@@ -17,15 +17,12 @@ import * as runtime from '../runtime';
 import type {
   ProjectModel,
   WorkflowModel,
-  WorkflowRequestModel,
 } from '../models/index';
 import {
     ProjectModelFromJSON,
     ProjectModelToJSON,
     WorkflowModelFromJSON,
     WorkflowModelToJSON,
-    WorkflowRequestModelFromJSON,
-    WorkflowRequestModelToJSON,
 } from '../models/index';
 
 export interface CreateProjectRequest {
@@ -34,7 +31,7 @@ export interface CreateProjectRequest {
 
 export interface CreateProjectWorkflowRequest {
     id: number;
-    workflowRequestModel: WorkflowRequestModel;
+    workflowModel: WorkflowModel;
 }
 
 export interface DeleteProjectRequest {
@@ -114,8 +111,8 @@ export class ProjectApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling createProjectWorkflow.');
         }
 
-        if (requestParameters.workflowRequestModel === null || requestParameters.workflowRequestModel === undefined) {
-            throw new runtime.RequiredError('workflowRequestModel','Required parameter requestParameters.workflowRequestModel was null or undefined when calling createProjectWorkflow.');
+        if (requestParameters.workflowModel === null || requestParameters.workflowModel === undefined) {
+            throw new runtime.RequiredError('workflowModel','Required parameter requestParameters.workflowModel was null or undefined when calling createProjectWorkflow.');
         }
 
         const queryParameters: any = {};
@@ -129,7 +126,7 @@ export class ProjectApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: WorkflowRequestModelToJSON(requestParameters.workflowRequestModel),
+            body: WorkflowModelToJSON(requestParameters.workflowModel),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowModelFromJSON(jsonValue));
