@@ -1,9 +1,9 @@
-import {ComponentDefinitionModel} from '@/middleware/helios/execution/models';
+import {ComponentDefinitionBasicModel} from '@/middleware/hermes/execution/models';
 import {PropertyType} from '@/types/projectTypes';
 
 export default function getSubProperties(
     componentAlias: string,
-    componentDefinition: ComponentDefinitionModel,
+    componentDefinition: ComponentDefinitionBasicModel,
     properties: Array<PropertyType>,
     propertyName?: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

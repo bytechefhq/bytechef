@@ -1,15 +1,15 @@
 import {TriggerExecutionModel} from '@/middleware/helios/execution';
-import {AccordionContent, AccordionItem, AccordionTrigger} from '@radix-ui/react-accordion';
+import WorkflowExecutionDetailsAccordionContent from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordionContent';
+import {AccordionItem, AccordionTrigger} from '@radix-ui/react-accordion';
 import {CheckCircledIcon, CrossCircledIcon} from '@radix-ui/react-icons';
 import InlineSVG from 'react-inlinesvg';
-import ReactJson from 'react-json-view';
 
 const WorkflowExecutionDetailsTriggerAccordionItem = ({
     triggerExecution,
 }: {
     triggerExecution: TriggerExecutionModel;
 }) => {
-    const {endDate, id, input, output, startDate, workflowTrigger} = triggerExecution;
+    const {component, endDate, error, id, input, output, startDate, workflowTrigger} = triggerExecution;
 
     const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
 
@@ -21,7 +21,11 @@ const WorkflowExecutionDetailsTriggerAccordionItem = ({
                         <InlineSVG className="mr-1 h-6 w-6" src={triggerExecution?.component?.icon} />
                     )}
 
-                    {workflowTrigger?.name || workflowTrigger?.type}
+                    <span>{component?.title}</span>
+
+                    <span className="text-xs text-muted-foreground">
+                        ({workflowTrigger?.name || workflowTrigger?.type})
+                    </span>
                 </div>
 
                 <div className="flex items-center">
@@ -33,47 +37,13 @@ const WorkflowExecutionDetailsTriggerAccordionItem = ({
                 </div>
             </AccordionTrigger>
 
-            <AccordionContent className="space-y-4 border-b border-gray-100 p-3">
-                <div className="space-y-2 rounded-lg">
-                    <header className="flex items-center justify-between rounded-md bg-gray-100 px-2 py-1">
-                        <span className="text-sm font-medium uppercase">Input</span>
-
-                        <span className="text-xs">{startDate?.toLocaleString()}</span>
-                    </header>
-
-                    <div className="overflow-x-auto">
-                        {input ? (
-                            typeof input === 'object' ? (
-                                <ReactJson enableClipboard={false} src={input as object} />
-                            ) : (
-                                input
-                            )
-                        ) : (
-                            <span className="text-xs">No input data.</span>
-                        )}
-                    </div>
-                </div>
-
-                <div className="space-y-2 rounded-lg">
-                    <header className="flex items-center justify-between rounded-md bg-gray-100 px-2 py-1">
-                        <span className="text-sm font-medium uppercase">Output</span>
-
-                        <span className="text-xs">{endDate?.toLocaleString()}</span>
-                    </header>
-
-                    <div className="overflow-x-auto">
-                        {output ? (
-                            typeof output === 'object' ? (
-                                <ReactJson enableClipboard={false} src={output as object} />
-                            ) : (
-                                output
-                            )
-                        ) : (
-                            <span className="text-xs">No output data.</span>
-                        )}
-                    </div>
-                </div>
-            </AccordionContent>
+            <WorkflowExecutionDetailsAccordionContent
+                endDate={endDate}
+                error={error}
+                input={input}
+                output={output}
+                startDate={startDate}
+            />
         </AccordionItem>
     );
 };

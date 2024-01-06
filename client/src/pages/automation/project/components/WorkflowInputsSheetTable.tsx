@@ -16,7 +16,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {InputModel, WorkflowModel} from '@/middleware/helios/configuration';
+import {WorkflowInputModel, WorkflowModel} from '@/middleware/hermes/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
 import WorkflowInputsSheetDialog from '@/pages/automation/project/components/WorkflowInputsSheetDialog';
 import {ProjectKeys} from '@/queries/projects.queries';
@@ -30,7 +30,7 @@ const WorkflowInputsSheetTable = ({
     projectId,
     workflow,
 }: {
-    inputs: InputModel[];
+    inputs: WorkflowInputModel[];
     projectId: number;
     workflow: WorkflowModel;
 }) => {
@@ -48,11 +48,11 @@ const WorkflowInputsSheetTable = ({
         },
     });
 
-    function handleDelete(input: InputModel) {
+    function handleDelete(input: WorkflowInputModel) {
         /* eslint-disable @typescript-eslint/no-explicit-any */
         const definitionObject: any = JSON.parse(workflow.definition!);
 
-        const inputs: InputModel[] = definitionObject.inputs;
+        const inputs: WorkflowInputModel[] = definitionObject.inputs;
 
         const index = inputs.findIndex((curInput) => curInput.name === input.name);
 
@@ -60,7 +60,7 @@ const WorkflowInputsSheetTable = ({
 
         updateWorkflowMutation.mutate({
             id: workflow.id!,
-            workflowRequestModel: {
+            workflowModel: {
                 definition: JSON.stringify(
                     {
                         ...definitionObject,
@@ -69,6 +69,7 @@ const WorkflowInputsSheetTable = ({
                     null,
                     4
                 ),
+                version: workflow.version,
             },
         });
 

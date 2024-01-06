@@ -6,7 +6,7 @@ import {
     GetActionDefinitionsRequest,
     GetComponentActionDefinitionRequest,
     GetComponentActionOutputSchemaRequest,
-    type OutputSchemaResponseModel,
+    type PropertyModel,
 } from 'middleware/hermes/configuration';
 
 export const ActionDefinitionKeys = {
@@ -45,7 +45,7 @@ export const useGetComponentActionOutputSchemaQuery = (
     request: GetComponentActionOutputSchemaRequest,
     enabled?: boolean
 ) =>
-    useQuery<OutputSchemaResponseModel, Error>({
+    useQuery<PropertyModel, Error>({
         queryKey: ActionDefinitionKeys.filteredActionOutputSchemas(request),
         queryFn: () => new ActionDefinitionApi().getComponentActionOutputSchema(request),
         enabled: enabled === undefined ? true : enabled,

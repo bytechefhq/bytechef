@@ -1,10 +1,10 @@
 import {
     DeleteProjectWorkflowRequest,
     DuplicateWorkflowRequest,
-    UpdateWorkflowRequest,
     WorkflowApi,
     WorkflowModel,
 } from '@/middleware/helios/configuration';
+import {UpdateWorkflowRequest, WorkflowApi as CoreWorkflowApi} from '@/middleware/hermes/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 type DeleteWorkflowMutationProps = {
@@ -43,7 +43,7 @@ type UpdateWorkflowMutationProps = {
 export const useUpdateWorkflowMutation = (mutationProps?: UpdateWorkflowMutationProps) =>
     useMutation({
         mutationFn: (request: UpdateWorkflowRequest) => {
-            return new WorkflowApi().updateWorkflow(request);
+            return new CoreWorkflowApi().updateWorkflow(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

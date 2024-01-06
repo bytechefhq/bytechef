@@ -25,7 +25,12 @@ const WorkflowExecutionDetailsSheet = () => {
                 {workflowExecutionLoading && <span>Loading...</span>}
 
                 <div className="flex w-7/12 flex-col border-r border-gray-100 bg-white">
-                    {workflowExecution && <WorkflowExecutionDetailsAccordion workflowExecution={workflowExecution} />}
+                    {workflowExecution?.job && (
+                        <WorkflowExecutionDetailsAccordion
+                            job={workflowExecution.job}
+                            triggerExecution={workflowExecution?.triggerExecution}
+                        />
+                    )}
                 </div>
 
                 {workflowExecution && (

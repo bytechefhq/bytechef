@@ -13,7 +13,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {InputModel, WorkflowModel} from '@/middleware/helios/configuration';
+import {WorkflowInputModel, WorkflowModel} from '@/middleware/hermes/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
@@ -38,7 +38,7 @@ const WorkflowInputsSheetDialog = ({
 }: WorkflowInputsSheetDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
-    const form = useForm<InputModel>({
+    const form = useForm<WorkflowInputModel>({
         defaultValues: {
             ...workflow.inputs![inputIndex],
         },
@@ -66,11 +66,11 @@ const WorkflowInputsSheetDialog = ({
         reset();
     }
 
-    function handleSave(input: InputModel) {
+    function handleSave(input: WorkflowInputModel) {
         /* eslint-disable @typescript-eslint/no-explicit-any */
         const definitionObject: any = JSON.parse(workflow.definition!);
 
-        let inputs: InputModel[] = definitionObject.inputs;
+        let inputs: WorkflowInputModel[] = definitionObject.inputs;
 
         if (inputIndex === -1) {
             inputs = [...(inputs || []), input];
@@ -80,7 +80,7 @@ const WorkflowInputsSheetDialog = ({
 
         updateWorkflowMutation.mutate({
             id: workflow.id!,
-            workflowRequestModel: {
+            workflowModel: {
                 definition: JSON.stringify(
                     {
                         ...definitionObject,
@@ -89,6 +89,7 @@ const WorkflowInputsSheetDialog = ({
                     null,
                     4
                 ),
+                version: workflow.version,
             },
         });
 
@@ -110,118 +111,120 @@ const WorkflowInputsSheetDialog = ({
 
             <DialogContent>
                 <Form {...form}>
-                    <DialogHeader>
-                        <div className="flex items-center justify-between">
-                            <DialogTitle>{`${inputIndex === -1 ? 'Edit' : 'Create'} Input`}</DialogTitle>
+                    <form onSubmit={handleSubmit(handleSave)}>
+                        <DialogHeader>
+                            <div className="flex items-center justify-between">
+                                <DialogTitle>{`${inputIndex === -1 ? 'Edit' : 'Create'} Input`}</DialogTitle>
 
-                            <DialogClose asChild>
-                                <Button size="icon" variant="ghost">
-                                    <Cross2Icon className="h-4 w-4 opacity-70" />
-                                </Button>
-                            </DialogClose>
+                                <DialogClose asChild>
+                                    <Button size="icon" variant="ghost">
+                                        <Cross2Icon className="h-4 w-4 opacity-70" />
+                                    </Button>
+                                </DialogClose>
+                            </div>
+
+                            <DialogDescription>Use this to define a workflow input.</DialogDescription>
+                        </DialogHeader>
+
+                        <div className="grid gap-4 py-4">
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Name</FormLabel>
+
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                rules={{required: true}}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="label"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Label</FormLabel>
+
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                rules={{required: true}}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="type"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Type</FormLabel>
+
+                                        <FormControl>
+                                            <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Select an input type" />
+                                                </SelectTrigger>
+
+                                                <SelectContent>
+                                                    <SelectItem value="boolean">Boolean</SelectItem>
+
+                                                    <SelectItem value="date">Date</SelectItem>
+
+                                                    <SelectItem value="date_time">Date Time</SelectItem>
+
+                                                    <SelectItem value="integer">Integer</SelectItem>
+
+                                                    <SelectItem value="number">Number</SelectItem>
+
+                                                    <SelectItem value="string">String</SelectItem>
+
+                                                    <SelectItem value="time">Time</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                rules={{required: true}}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="required"
+                                render={({field}) => (
+                                    <FormItem className="flex flex-col space-y-2">
+                                        <FormLabel>Required</FormLabel>
+
+                                        <FormControl>
+                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
 
-                        <DialogDescription>Use this to define a workflow input.</DialogDescription>
-                    </DialogHeader>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button type="button" variant="outline">
+                                    Cancel
+                                </Button>
+                            </DialogClose>
 
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Name</FormLabel>
-
-                                <FormControl>
-                                    <Input {...field} />
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required: true}}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="label"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Label</FormLabel>
-
-                                <FormControl>
-                                    <Input {...field} />
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required: true}}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="type"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Type</FormLabel>
-
-                                <FormControl>
-                                    <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select an input type" />
-                                        </SelectTrigger>
-
-                                        <SelectContent>
-                                            <SelectItem value="boolean">Boolean</SelectItem>
-
-                                            <SelectItem value="date">Date</SelectItem>
-
-                                            <SelectItem value="date_time">Date Time</SelectItem>
-
-                                            <SelectItem value="integer">Integer</SelectItem>
-
-                                            <SelectItem value="number">Number</SelectItem>
-
-                                            <SelectItem value="string">String</SelectItem>
-
-                                            <SelectItem value="time">Time</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required: true}}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="required"
-                        render={({field}) => (
-                            <FormItem className="flex flex-col space-y-2">
-                                <FormLabel>Required</FormLabel>
-
-                                <FormControl>
-                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button type="button" variant="outline">
-                                Cancel
-                            </Button>
-                        </DialogClose>
-
-                        <Button onClick={handleSubmit(handleSave)} type="submit">
-                            Save
-                        </Button>
-                    </DialogFooter>
+                            <Button type="submit">Save</Button>
+                        </DialogFooter>
+                    </form>
                 </Form>
             </DialogContent>
         </Dialog>

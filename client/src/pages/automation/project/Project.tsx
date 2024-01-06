@@ -28,13 +28,9 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import {RightSidebar} from '@/layouts/RightSidebar';
-import {ProjectModel, WorkflowModel} from '@/middleware/helios/configuration';
-import {
-    TaskConnectionModel,
-    TriggerOutputModel,
-    WorkflowExecutionModel,
-    WorkflowTestApi,
-} from '@/middleware/helios/execution';
+import {ProjectModel} from '@/middleware/helios/configuration';
+import {WorkflowModel} from '@/middleware/hermes/configuration';
+import {WorkflowTestExecutionApi, WorkflowTestExecutionModel} from '@/middleware/hermes/test';
 import {useCreateProjectWorkflowMutation} from '@/mutations/projectWorkflows.mutations';
 import {
     useDeleteProjectMutation,
@@ -60,6 +56,7 @@ import {ProjectCategoryKeys} from '@/queries/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/projectTags.quries';
 import {ProjectKeys, useGetProjectQuery, useGetProjectWorkflowsQuery} from '@/queries/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
+import {useGetWorkflowTestConfigurationsQuery} from '@/queries/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType} from '@/types/types';
 import {ChevronDownIcon, DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -84,7 +81,7 @@ import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
 import useWorkflowDefinitionStore from './stores/useWorkflowDefinitionStore';
 
-const workflowTestApi = new WorkflowTestApi();
+const workflowTestExecutionApi = new WorkflowTestExecutionApi();
 
 const headerToggleItems: IToggleItem[] = [
     {
@@ -106,7 +103,7 @@ const Project = () => {
     const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
     const [showWorkflowCodeEditorSheet, setShowWorkflowCodeEditorSheet] = useState(false);
     const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] = useState(false);
-    const [workflowExecution, setWorkflowExecution] = useState<WorkflowExecutionModel>();
+    const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecutionModel>();
     const [workflowIsRunning, setWorkflowIsRunning] = useState(false);
 
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
@@ -163,25 +160,40 @@ const Project = () => {
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
-    useEffect(() => {
-        if (componentDefinitions) {
-            setComponentDefinitions(componentDefinitions);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [componentDefinitions?.length]);
-
-    useEffect(() => {
-        if (taskDispatcherDefinitions) {
-            setTaskDispatcherDefinitions(taskDispatcherDefinitions);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [taskDispatcherDefinitions?.length]);
-
     const {
         data: projectWorkflows,
         error: projectWorkflowsError,
         isLoading: projectWorkflowsLoading,
     } = useGetProjectWorkflowsQuery(project?.id as number);
+
+    const {data: workflowTestConfigurations} = useGetWorkflowTestConfigurationsQuery();
+
+    const workflowTestConfigurationInputs =
+        workflowTestConfigurations && workflowTestConfigurations.length > 0 && workflowTestConfigurations[0].inputs
+            ? workflowTestConfigurations[0].inputs
+            : {};
+    const workflowTestConfigurationConnections = (
+        workflowTestConfigurations && workflowTestConfigurations.length > 0 && workflowTestConfigurations[0].connections
+            ? workflowTestConfigurations[0].connections
+            : []
+    ).reduce(function (map: {[key: string]: number}, workflowTestConfigurationConnection) {
+        map[workflowTestConfigurationConnection.key] = workflowTestConfigurationConnection.connectionId;
+
+        return map;
+    }, {});
+
+    const runDisabled =
+        (currentWorkflow?.inputs ?? []).filter(
+            (input) => input.required && !workflowTestConfigurationInputs[input.name]
+        ).length > 0 ||
+        (currentWorkflow?.tasks ?? [])
+            .flatMap((task) => (task.connections ? task.connections : []))
+            .filter(
+                (workflowConnection) =>
+                    workflowConnection.required && !workflowTestConfigurationConnections[workflowConnection.key]
+            ).length > 0;
+
+    const queryClient = useQueryClient();
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: (workflow) => {
@@ -244,20 +256,28 @@ const Project = () => {
     });
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
-        onSuccess: (workflow: WorkflowModel) => {
+        onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projectWorkflows(+projectId!),
             });
 
             setShowEditWorkflowDialog(false);
-
-            toast({
-                description: `The workflow ${workflow.label} is saved.`,
-            });
         },
     });
 
-    const queryClient = useQueryClient();
+    useEffect(() => {
+        if (componentDefinitions) {
+            setComponentDefinitions(componentDefinitions);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [componentDefinitions?.length]);
+
+    useEffect(() => {
+        if (taskDispatcherDefinitions) {
+            setTaskDispatcherDefinitions(taskDispatcherDefinitions);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [taskDispatcherDefinitions?.length]);
 
     useEffect(() => {
         setLeftSidebarOpen(false);
@@ -319,67 +339,27 @@ const Project = () => {
     };
 
     const handleRunClick = () => {
-        // TODO
-    };
+        setLeftSidebarOpen(true);
+        setWorkflowTestExecution(undefined);
+        setWorkflowIsRunning(true);
 
-    const handleWorkflowCodeEditorRunClick = () => {
-        const workflowConnections = currentWorkflow?.tasks
-            ? currentWorkflow.tasks
-                  .flatMap((task) => (task.connections ? task.connections : []))
-                  .filter((workflowConnection) => !workflowConnection.id)
-            : [];
-
-        if (
-            (currentWorkflow?.inputs && currentWorkflow?.inputs?.length > 0) ||
-            (workflowConnections && workflowConnections?.length > 0)
-        ) {
-            setShowWorkflowTestConfigurationDialog(true);
-        } else {
-            setWorkflowIsRunning(true);
-            setLeftSidebarOpen(true);
-            setWorkflowExecution(undefined);
-
-            workflowTestApi
+        if (currentWorkflow?.id) {
+            workflowTestExecutionApi
                 .testWorkflow({
-                    testParametersModel: {
-                        workflowId: currentWorkflow?.id,
-                    },
+                    id: currentWorkflow?.id,
                 })
-                .then((workflowExecution) => {
-                    setWorkflowExecution(workflowExecution);
+                .then((workflowTestExecution) => {
+                    setWorkflowTestExecution(workflowTestExecution);
                     setWorkflowIsRunning(false);
                 })
-                .catch(() => setWorkflowIsRunning(false));
+                .catch(() => {
+                    setWorkflowIsRunning(false);
+
+                    queryClient.invalidateQueries({
+                        queryKey: ProjectKeys.projectWorkflows(parseInt(projectId!)),
+                    });
+                });
         }
-    };
-
-    const handleWorkflowTestConfigurationDialogRunClick = ({
-        connections,
-        inputs,
-        triggerOutputs,
-    }: {
-        connections: TaskConnectionModel[];
-        inputs: {[key: string]: object};
-        triggerOutputs: TriggerOutputModel[];
-    }) => {
-        setWorkflowIsRunning(true);
-        setLeftSidebarOpen(true);
-        setShowWorkflowTestConfigurationDialog(false);
-
-        workflowTestApi
-            .testWorkflow({
-                testParametersModel: {
-                    connections,
-                    inputs,
-                    triggerOutputs,
-                    workflowId: currentWorkflow?.id,
-                },
-            })
-            .then((workflowExecution) => {
-                setWorkflowExecution(workflowExecution);
-                setWorkflowIsRunning(false);
-            })
-            .catch(() => setWorkflowIsRunning(false));
     };
 
     const handleProjectWorkflowValueChange = (id: string) => {
@@ -396,17 +376,6 @@ const Project = () => {
         }
 
         navigate(`/automation/projects/${projectId}/workflows/${id}`);
-    };
-
-    const handleWorkflowCodeEditorSheetSave = (definition: string) => {
-        if (currentWorkflow && currentWorkflow.id) {
-            updateWorkflowMutation.mutate({
-                id: currentWorkflow.id,
-                workflowRequestModel: {
-                    definition,
-                },
-            });
-        }
     };
 
     return (
@@ -552,15 +521,28 @@ const Project = () => {
                             />
                         </div>
 
-                        <div>
+                        <div className="mr-4 flex items-center space-x-1">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        onClick={() => setShowWorkflowTestConfigurationDialog(true)}
+                                        variant="outline"
+                                    >
+                                        Test Configuration
+                                    </Button>
+                                </TooltipTrigger>
+
+                                <TooltipContent>Workflow test configuration</TooltipContent>
+                            </Tooltip>
+
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <>
                                         {!workflowIsRunning && (
                                             <Button
-                                                className="mr-1 bg-success text-success-foreground hover:bg-success/80"
+                                                className="bg-success text-success-foreground hover:bg-success/80"
+                                                disabled={runDisabled}
                                                 onClick={handleRunClick}
-                                                size="sm"
                                                 variant="secondary"
                                             >
                                                 <PlayIcon className="mr-0.5 h-5" /> Run
@@ -569,7 +551,6 @@ const Project = () => {
 
                                         {workflowIsRunning && (
                                             <Button
-                                                className="mr-1"
                                                 onClick={() => {
                                                     // TODO
                                                 }}
@@ -588,14 +569,12 @@ const Project = () => {
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
-                                        className="mr-4"
                                         disabled={!!project?.publishedDate}
                                         onClick={() =>
                                             publishProjectMutation.mutate({
                                                 id: +projectId!,
                                             })
                                         }
-                                        size="sm"
                                     >
                                         <CircleDotDashedIcon className="mr-0.5 h-5" /> Publish
                                     </Button>
@@ -611,8 +590,8 @@ const Project = () => {
                 leftSidebarBody={
                     <div className="py-1.5">
                         {!workflowIsRunning ? (
-                            workflowExecution ? (
-                                <WorkflowExecutionDetailsAccordion workflowExecution={workflowExecution} />
+                            workflowTestExecution?.job ? (
+                                <WorkflowExecutionDetailsAccordion job={workflowTestExecution.job} />
                             ) : (
                                 <div className="absolute inset-x-0 bottom-0 top-2/4">
                                     <div className="flex w-full flex-col items-center gap-y-6 text-gray-500">
@@ -719,18 +698,20 @@ const Project = () => {
             {showEditWorkflowDialog && (
                 <WorkflowDialog
                     onClose={() => setShowEditWorkflowDialog(false)}
-                    updateWorkflowMutationMutation={updateWorkflowMutation}
+                    updateWorkflowMutation={updateWorkflowMutation}
                     workflow={currentWorkflow}
                 />
             )}
 
             {currentWorkflow && (
                 <>
-                    {showWorkflowTestConfigurationDialog && (
+                    {showWorkflowTestConfigurationDialog && workflowTestConfigurations && (
                         <WorkflowTestConfigurationDialog
                             onClose={() => setShowWorkflowTestConfigurationDialog(false)}
-                            onRunClick={handleWorkflowTestConfigurationDialogRunClick}
                             workflow={currentWorkflow}
+                            workflowTestConfiguration={
+                                workflowTestConfigurations.length > 0 ? workflowTestConfigurations[0] : undefined
+                            }
                         />
                     )}
 
@@ -739,10 +720,8 @@ const Project = () => {
                             onClose={() => {
                                 setShowWorkflowCodeEditorSheet(false);
                             }}
-                            onRunClick={handleWorkflowCodeEditorRunClick}
-                            onSave={handleWorkflowCodeEditorSheetSave}
+                            projectId={+projectId!}
                             workflow={currentWorkflow}
-                            workflowIsRunning={workflowIsRunning}
                         />
                     )}
 

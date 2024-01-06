@@ -13,7 +13,7 @@ import {useGetWorkflowExecutionsQuery} from '@/queries/workflowExecutions.querie
 import {useGetWorkflowsQuery} from '@/queries/workflows.queries';
 import {ActivityIcon} from 'lucide-react';
 import {
-    GetWorkflowExecutionsJobStatusEnum,
+    GetWorkflowExecutionsPageJobStatusEnum,
     WorkflowExecutionModel,
     WorkflowExecutionModelFromJSON,
 } from 'middleware/helios/execution';
@@ -26,24 +26,24 @@ import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
 
 const jobStatusOptions = [
     {
-        label: GetWorkflowExecutionsJobStatusEnum.Started,
-        value: GetWorkflowExecutionsJobStatusEnum.Started,
+        label: GetWorkflowExecutionsPageJobStatusEnum.Started,
+        value: GetWorkflowExecutionsPageJobStatusEnum.Started,
     },
     {
-        label: GetWorkflowExecutionsJobStatusEnum.Completed,
-        value: GetWorkflowExecutionsJobStatusEnum.Completed,
+        label: GetWorkflowExecutionsPageJobStatusEnum.Completed,
+        value: GetWorkflowExecutionsPageJobStatusEnum.Completed,
     },
     {
-        label: GetWorkflowExecutionsJobStatusEnum.Created,
-        value: GetWorkflowExecutionsJobStatusEnum.Created,
+        label: GetWorkflowExecutionsPageJobStatusEnum.Created,
+        value: GetWorkflowExecutionsPageJobStatusEnum.Created,
     },
     {
-        label: GetWorkflowExecutionsJobStatusEnum.Stopped,
-        value: GetWorkflowExecutionsJobStatusEnum.Stopped,
+        label: GetWorkflowExecutionsPageJobStatusEnum.Stopped,
+        value: GetWorkflowExecutionsPageJobStatusEnum.Stopped,
     },
     {
-        label: GetWorkflowExecutionsJobStatusEnum.Failed,
-        value: GetWorkflowExecutionsJobStatusEnum.Failed,
+        label: GetWorkflowExecutionsPageJobStatusEnum.Failed,
+        value: GetWorkflowExecutionsPageJobStatusEnum.Failed,
     },
 ];
 
@@ -59,8 +59,8 @@ const WorkflowExecutions = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
-    const [filterStatus, setFilterStatus] = useState<GetWorkflowExecutionsJobStatusEnum | undefined>(
-        searchParams.get('status') ? (searchParams.get('status')! as GetWorkflowExecutionsJobStatusEnum) : undefined
+    const [filterStatus, setFilterStatus] = useState<GetWorkflowExecutionsPageJobStatusEnum | undefined>(
+        searchParams.get('status') ? (searchParams.get('status')! as GetWorkflowExecutionsPageJobStatusEnum) : undefined
     );
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(
         searchParams.get('startDate') ? new Date(+searchParams.get('startDate')!) : undefined
@@ -115,7 +115,7 @@ const WorkflowExecutions = () => {
     );
 
     function search(
-        status?: GetWorkflowExecutionsJobStatusEnum,
+        status?: GetWorkflowExecutionsPageJobStatusEnum,
         projectId?: number,
         projectInstanceId?: number,
         workflowId?: string,
@@ -203,7 +203,7 @@ const WorkflowExecutions = () => {
         let status;
 
         if (item) {
-            status = item.value as GetWorkflowExecutionsJobStatusEnum;
+            status = item.value as GetWorkflowExecutionsPageJobStatusEnum;
         }
 
         setFilterStatus(status);

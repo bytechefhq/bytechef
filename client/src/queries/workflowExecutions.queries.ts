@@ -1,6 +1,6 @@
 import {
     GetWorkflowExecutionRequest,
-    GetWorkflowExecutionsRequest,
+    GetWorkflowExecutionsPageRequest,
     PageModel,
     WorkflowExecutionApi,
     WorkflowExecutionModel,
@@ -10,7 +10,7 @@ import {
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowExecutionKeys = {
-    filteredWorkflowExecutions: (request: GetWorkflowExecutionsRequest) => [
+    filteredWorkflowExecutions: (request: GetWorkflowExecutionsPageRequest) => [
         ...WorkflowExecutionKeys.workflowExecutions,
         request,
     ],
@@ -18,10 +18,10 @@ export const WorkflowExecutionKeys = {
     workflowExecutions: ['workflowExecutions'] as const,
 };
 
-export const useGetWorkflowExecutionsQuery = (request: GetWorkflowExecutionsRequest) =>
+export const useGetWorkflowExecutionsQuery = (request: GetWorkflowExecutionsPageRequest) =>
     useQuery<PageModel, Error>({
         queryKey: WorkflowExecutionKeys.filteredWorkflowExecutions(request),
-        queryFn: () => new WorkflowExecutionApi().getWorkflowExecutions(request),
+        queryFn: () => new WorkflowExecutionApi().getWorkflowExecutionsPage(request),
     });
 
 export const useGetWorkflowExecutionQuery = (request: GetWorkflowExecutionRequest, enabled?: boolean) =>

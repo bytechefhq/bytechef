@@ -14,7 +14,11 @@ interface WorkflowInputsSheetProps {
 
 const WorkflowInputsSheet = ({onClose, projectId, workflow}: WorkflowInputsSheetProps) => (
     <Sheet modal={false} onOpenChange={onClose} open>
-        <SheetContent className="flex flex-col p-4 sm:max-w-[500px]">
+        <SheetContent
+            className="flex flex-col p-4 sm:max-w-[700px]"
+            onFocusOutside={(event) => event.preventDefault()}
+            onPointerDownOutside={(event) => event.preventDefault()}
+        >
             <SheetHeader>
                 <div className="flex items-center justify-between">
                     <SheetTitle className="flex">Workflow Inputs</SheetTitle>

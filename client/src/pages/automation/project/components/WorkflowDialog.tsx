@@ -25,7 +25,7 @@ type WorkflowDialogProps = {
     parentId?: number;
     triggerNode?: ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    updateWorkflowMutationMutation?: UseMutationResult<any, object, any, unknown>;
+    updateWorkflowMutation?: UseMutationResult<any, object, any, unknown>;
     workflow?: WorkflowModel;
 };
 
@@ -34,7 +34,7 @@ const WorkflowDialog = ({
     onClose,
     parentId,
     triggerNode,
-    updateWorkflowMutationMutation,
+    updateWorkflowMutation,
     workflow,
 }: WorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
@@ -50,7 +50,7 @@ const WorkflowDialog = ({
 
     const {isPending, mutate} = createWorkflowRequestMutation
         ? createWorkflowRequestMutation!
-        : updateWorkflowMutationMutation!;
+        : updateWorkflowMutation!;
 
     function closeDialog() {
         setIsOpen(false);
