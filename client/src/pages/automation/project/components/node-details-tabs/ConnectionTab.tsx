@@ -1,6 +1,12 @@
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {useUpdateWorkflowTestConfigurationConnectionMutation} from '@/mutations/workflowTestConfigurations.mutations';
+import {
+    WorkflowTestConfigurationKeys,
+    useGetWorkflowTestConfigurationConnectionsQuery,
+} from '@/queries/workflowTestConfigurations.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
+import {useQueryClient} from '@tanstack/react-query';
 import EmptyList from 'components/EmptyList';
 import {LinkIcon, PlusIcon} from 'lucide-react';
 import {ComponentDefinitionModel} from 'middleware/hermes/configuration';
@@ -10,8 +16,18 @@ import {useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 
-const ConnectionTab = ({componentDefinition}: {componentDefinition: ComponentDefinitionModel}) => {
+const ConnectionTab = ({
+    componentDefinition,
+    operationName,
+    workflowId,
+}: {
+    componentDefinition: ComponentDefinitionModel;
+    operationName: string;
+    workflowId: string;
+}) => {
     const [showEditConnectionDialog, setShowEditConnectionDialog] = useState(false);
+
+    const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
 
     const {data: connections} = useGetConnectionsQuery(
         {
@@ -21,12 +37,44 @@ const ConnectionTab = ({componentDefinition}: {componentDefinition: ComponentDef
         !!componentDefinition.connection?.componentName
     );
 
-    const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
+    const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery({
+        operationName,
+        workflowId,
+    });
+
+    let connectionId: number | undefined;
+    let key: string;
+
+    if (workflowTestConfigurationConnections && workflowTestConfigurationConnections.length > 0) {
+        connectionId = workflowTestConfigurationConnections[0].connectionId;
+        key = workflowTestConfigurationConnections[0].key;
+    }
+
+    const queryClient = useQueryClient();
+
+    const mutation = useUpdateWorkflowTestConfigurationConnectionMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
+            });
+        },
+    });
+
+    const handleValueChange = (connectionId: number) => {
+        mutation.mutate({
+            key,
+            operationName,
+            updateWorkflowTestConfigurationConnectionRequestModel: {
+                connectionId,
+            },
+            workflowId,
+        });
+    };
 
     return (
         <div className="h-full flex-[1_1_1px] overflow-auto p-4">
             {connections?.length ? (
-                <Select>
+                <Select onValueChange={(value) => handleValueChange(+value)} value={connectionId + ''}>
                     <div className="flex space-x-2">
                         <SelectTrigger>
                             <SelectValue placeholder="Choose Connection..." />

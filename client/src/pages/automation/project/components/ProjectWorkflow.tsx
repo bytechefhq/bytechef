@@ -62,7 +62,10 @@ const ProjectWorkflow = ({componentDefinitions, currentWorkflowId, taskDispatche
             />
 
             {connectionComponentDefinitions && currentNode.name && (
-                <WorkflowNodeDetailsPanel componentDefinitions={connectionComponentDefinitions} />
+                <WorkflowNodeDetailsPanel
+                    componentDefinitions={connectionComponentDefinitions}
+                    workflowId={currentWorkflowId}
+                />
             )}
 
             {previousComponentDefinitions && (

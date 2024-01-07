@@ -46,8 +46,10 @@ const TABS = [
 
 const WorkflowNodeDetailsPanel = ({
     componentDefinitions,
+    workflowId,
 }: {
     componentDefinitions: Array<ComponentDefinitionBasicModel>;
+    workflowId: string;
 }) => {
     const [activeTab, setActiveTab] = useState('description');
     const [componentDefinitionNames, setComponentDefinitionNames] = useState<Array<string>>([]);
@@ -529,7 +531,11 @@ const WorkflowNodeDetailsPanel = ({
                                         )}
 
                                         {activeTab === 'connection' && currentComponent.connection && (
-                                            <ConnectionTab componentDefinition={currentComponent} />
+                                            <ConnectionTab
+                                                componentDefinition={currentComponent}
+                                                operationName={currentNode.name}
+                                                workflowId={workflowId}
+                                            />
                                         )}
 
                                         {activeTab === 'properties' &&

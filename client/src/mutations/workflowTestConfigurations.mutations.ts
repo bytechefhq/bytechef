@@ -1,7 +1,9 @@
 import {
     CreateWorkflowTestConfigurationRequest,
+    UpdateWorkflowTestConfigurationConnectionRequest,
     UpdateWorkflowTestConfigurationRequest,
     WorkflowTestConfigurationApi,
+    WorkflowTestConfigurationConnectionModel,
     WorkflowTestConfigurationModel,
 } from '@/middleware/hermes/test';
 import {useMutation} from '@tanstack/react-query';
@@ -33,6 +35,25 @@ export const useUpdateWorkflowTestConfigurationMutation = (
     useMutation({
         mutationFn: (request: UpdateWorkflowTestConfigurationRequest) => {
             return new WorkflowTestConfigurationApi().updateWorkflowTestConfiguration(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+type UpdateWorkflowTestConfigurationConnectionRequestProps = {
+    onSuccess?: (
+        result: WorkflowTestConfigurationConnectionModel,
+        variables: UpdateWorkflowTestConfigurationConnectionRequest
+    ) => void;
+    onError?: (error: Error, variables: UpdateWorkflowTestConfigurationConnectionRequest) => void;
+};
+
+export const useUpdateWorkflowTestConfigurationConnectionMutation = (
+    mutationProps?: UpdateWorkflowTestConfigurationConnectionRequestProps
+) =>
+    useMutation({
+        mutationFn: (request: UpdateWorkflowTestConfigurationConnectionRequest) => {
+            return new WorkflowTestConfigurationApi().updateWorkflowTestConfigurationConnection(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
