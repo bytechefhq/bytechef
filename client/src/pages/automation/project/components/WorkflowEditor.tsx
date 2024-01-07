@@ -1,13 +1,8 @@
-import {ComponentDefinitionKeys, useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
+import {useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
 import {ComponentActionType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
-import {QueryClient} from '@tanstack/react-query';
-import {
-    ComponentDefinitionApi,
-    ComponentDefinitionBasicModel,
-    TaskDispatcherDefinitionBasicModel,
-} from 'middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/hermes/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import ReactFlow, {Controls, Edge, MiniMap, Node, NodeDimensionChange, useReactFlow, useStore} from 'reactflow';
@@ -24,6 +19,7 @@ import defaultNodes from '../nodes/defaultNodes';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
+import saveToWorkflowDefinition from '../utils/saveToWorkflowDefinition';
 
 export type WorkflowEditorProps = {
     componentDefinitions: ComponentDefinitionBasicModel[];
@@ -46,8 +42,6 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
     const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge] = useHandleDrop();
-
-    const queryClient = new QueryClient();
 
     const previousComponentNames: Array<string> | undefined = usePrevious(componentNames);
 
@@ -308,40 +302,13 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
             return;
         }
 
-        const {componentName, label, name, parameters} = newNode.data;
-
-        const newNodeComponentDefinition = await queryClient.fetchQuery({
-            queryFn: () => new ComponentDefinitionApi().getComponentDefinition({componentName}),
-            queryKey: ComponentDefinitionKeys.componentDefinition({componentName}),
-        });
-
-        if (!newNodeComponentDefinition) {
-            return;
-        }
-
-        const newWorkflowNode = {
-            componentName,
-            label,
-            name,
-            parameters,
-            type: `${componentName}/v1/${newNodeComponentDefinition.actions?.[0].name}`,
-        };
-
-        const workflowNodeAlreadyExists = currentWorkflowDefinition.tasks?.some(
-            (task) => task.name === newWorkflowNode.name
+        saveToWorkflowDefinition(
+            newNode.data,
+            currentWorkflowDefinition,
+            currentWorkflowId,
+            workflowDefinitions,
+            setWorkflowDefinitions
         );
-
-        if (workflowNodeAlreadyExists) {
-            return;
-        }
-
-        setWorkflowDefinitions({
-            ...workflowDefinitions,
-            [currentWorkflowId]: {
-                ...currentWorkflowDefinition,
-                tasks: [...(currentWorkflowDefinition.tasks || []), newWorkflowNode],
-            },
-        });
     };
 
     useLayout();
