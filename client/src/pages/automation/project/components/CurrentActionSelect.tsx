@@ -19,8 +19,8 @@ const ActionSelect = ({
 }) => {
     return (
         <div className="flex w-full flex-col">
-            <Label className="mb-1 flex items-center space-x-1">
-                <span>Actions</span>
+            <Label className="flex items-center space-x-1">
+                <span className="text-sm font-medium leading-6">Actions</span>
 
                 {description && (
                     <Tooltip>
