@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Webhook_retry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-03T08:15:27.860146+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-08T06:25:40.619879+01:00[Europe/Zagreb]")
 public class WebhookRetryModel {
 
   private Integer initialInterval;

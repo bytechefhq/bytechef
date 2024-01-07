@@ -5,6 +5,8 @@
  */
 package com.bytechef.hermes.test.web.rest;
 
+import com.bytechef.hermes.test.web.rest.model.UpdateWorkflowTestConfigurationConnectionRequestModel;
+import com.bytechef.hermes.test.web.rest.model.WorkflowTestConfigurationConnectionModel;
 import com.bytechef.hermes.test.web.rest.model.WorkflowTestConfigurationModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-03T08:15:27.860146+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-08T06:25:40.619879+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-test-configuration", description = "the workflow-test-configuration API")
 public interface WorkflowTestConfigurationApi {
@@ -125,6 +127,49 @@ public interface WorkflowTestConfigurationApi {
 
 
     /**
+     * GET /workflow-test-configurations/{workflowId}/connections/{operationName} : Get a workflow test configuration connections
+     * Get a workflow test configuration connections.
+     *
+     * @param workflowId The id of a testing workflow. (required)
+     * @param operationName The action/trigger name defined in the workflow. (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "getWorkflowTestConfigurationConnections",
+        summary = "Get a workflow test configuration connections",
+        description = "Get a workflow test configuration connections.",
+        tags = { "workflow-test-configuration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowTestConfigurationConnectionModel.class)))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/workflow-test-configurations/{workflowId}/connections/{operationName}",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<List<WorkflowTestConfigurationConnectionModel>> getWorkflowTestConfigurationConnections(
+        @Parameter(name = "workflowId", description = "The id of a testing workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @Parameter(name = "operationName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("operationName") String operationName
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "[ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
      * GET /workflow-test-configurations : Get all workflow test configurations
      * Get all workflow test configurations.
      *
@@ -198,6 +243,54 @@ public interface WorkflowTestConfigurationApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"{}\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"id\" : 6, \"connections\" : [ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * PUT /workflow-test-configurations/{workflowId}/connections/{operationName}/{key} : Update a workflow test configuration connection
+     * Update a workflow test configuration connection.
+     *
+     * @param workflowId The id of a testing workflow. (required)
+     * @param operationName The action/trigger name defined in the workflow. (required)
+     * @param key The key of a connection. (required)
+     * @param updateWorkflowTestConfigurationConnectionRequestModel  (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "updateWorkflowTestConfigurationConnection",
+        summary = "Update a workflow test configuration connection",
+        description = "Update a workflow test configuration connection.",
+        tags = { "workflow-test-configuration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowTestConfigurationConnectionModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/workflow-test-configurations/{workflowId}/connections/{operationName}/{key}",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<WorkflowTestConfigurationConnectionModel> updateWorkflowTestConfigurationConnection(
+        @Parameter(name = "workflowId", description = "The id of a testing workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @Parameter(name = "operationName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("operationName") String operationName,
+        @Parameter(name = "key", description = "The key of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("key") String key,
+        @Parameter(name = "UpdateWorkflowTestConfigurationConnectionRequestModel", description = "", required = true) @Valid @RequestBody UpdateWorkflowTestConfigurationConnectionRequestModel updateWorkflowTestConfigurationConnectionRequestModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
