@@ -93,6 +93,78 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowTestConfiguration"
+  /workflow-test-configurations/{workflowId}/connections/{operationName}:
+    get:
+      description: "Get a workflow test configuration connections."
+      summary: "Get a workflow test configuration connections"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "getWorkflowTestConfigurationConnections"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a testing workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "operationName"
+          description: "The action/trigger name defined in the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
+  /workflow-test-configurations/{workflowId}/connections/{operationName}/{key}:
+    put:
+      description: "Update a workflow test configuration connection."
+      summary: "Update a workflow test configuration connection"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "updateWorkflowTestConfigurationConnection"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a testing workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "operationName"
+          description: "The action/trigger name defined in the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "key"
+          description: "The key of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                connectionId:
+                  type: "integer"
+                  format: "int64"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
   /workflows/{id}/tests:
     post:
       description: "Execute a workflow synchronously for testing purposes."
