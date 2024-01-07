@@ -326,7 +326,7 @@ const Property = ({
                                 description={description}
                                 label={label}
                                 leadingIcon={typeIcon}
-                                options={formattedOptions || []}
+                                options={(formattedOptions as Array<ISelectOption>) || undefined || []}
                                 triggerClassName="w-full border border-gray-300"
                             />
                         )}

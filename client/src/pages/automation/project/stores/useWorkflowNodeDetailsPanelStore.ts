@@ -6,6 +6,7 @@ import {devtools} from 'zustand/middleware';
 interface Node {
     componentName?: string;
     icon?: ReactNode;
+    id: string;
     label?: string;
     name: string;
     type: 'component' | 'flowControl';
@@ -35,7 +36,7 @@ export const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelS
                     workflowNodeDetailsPanelOpen: workflowNodeDetailsPanelOpen,
                 })),
 
-            currentNode: {name: '', type: 'component', version: 1},
+            currentNode: {id: '', name: '', type: 'component', version: 1},
             setCurrentNode: (currentNode) => set((state) => ({...state, currentNode})),
 
             focusedInput: null,

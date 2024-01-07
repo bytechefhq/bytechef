@@ -1,4 +1,8 @@
-import {ComponentDefinitionModel} from '@/middleware/hermes/configuration';
+import {
+    ComponentDefinitionBasicModel,
+    ComponentDefinitionModel,
+    TaskDispatcherDefinitionModel,
+} from '@/middleware/hermes/configuration';
 
 export type DataPillType = {
     componentAlias?: string;
@@ -37,7 +41,11 @@ export type CurrentComponentType = {
     workflowNodeName?: string;
 } & ComponentDefinitionModel;
 
-interface WorkflowDefinitionModel {
+export type ClickedItemType = {
+    componentName?: string;
+} & (ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel);
+
+export interface WorkflowDefinitionModel {
     action?: string;
     name?: string;
     components?: Array<ComponentDataType>;
