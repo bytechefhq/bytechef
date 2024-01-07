@@ -63,8 +63,8 @@ public class WorkflowTestConfigurationConnection implements Persistable<Long> {
 
         WorkflowTestConfigurationConnection that = (WorkflowTestConfigurationConnection) o;
 
-        return Objects.equals(id, that.id) && Objects.equals(connectionId, that.connectionId)
-            && Objects.equals(key, that.key) && Objects.equals(operationName, that.operationName);
+        return Objects.equals(connectionId, that.connectionId) && Objects.equals(key, that.key) &&
+            Objects.equals(operationName, that.operationName);
     }
 
     @Override

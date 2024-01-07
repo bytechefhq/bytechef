@@ -38,4 +38,7 @@ public interface WorkflowTestConfigurationService {
     List<WorkflowTestConfiguration> getWorkflowTestConfigurations();
 
     WorkflowTestConfiguration updateWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
+
+    WorkflowTestConfigurationConnection updateWorkflowTestConfigurationConnection(
+        String workflowId, String operationName, String key, long connectionId);
 }

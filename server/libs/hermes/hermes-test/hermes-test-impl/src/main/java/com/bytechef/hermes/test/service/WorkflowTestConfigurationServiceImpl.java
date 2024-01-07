@@ -16,12 +16,14 @@
 
 package com.bytechef.hermes.test.service;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.test.domain.WorkflowTestConfiguration;
 import com.bytechef.hermes.test.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.hermes.test.repository.WorkflowTestConfigurationConnectionRepository;
 import com.bytechef.hermes.test.repository.WorkflowTestConfigurationRepository;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
@@ -58,6 +60,12 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
 
     @Override
     @Transactional(readOnly = true)
+    public WorkflowTestConfiguration getWorkflowTestConfiguration(long id) {
+        return OptionalUtils.get(workflowTestConfigurationRepository.findById(id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
         String workflowId, String operationName) {
 
@@ -66,11 +74,7 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
-    public WorkflowTestConfiguration getWorkflowTestConfiguration(long id) {
-        return OptionalUtils.get(workflowTestConfigurationRepository.findById(id));
-    }
-
-    @Override
+    @Transactional(readOnly = true)
     public List<WorkflowTestConfiguration> getWorkflowTestConfigurations() {
         return workflowTestConfigurationRepository.findAll();
     }
@@ -86,5 +90,27 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
         currentWorkflowTestConfiguration.setInputs(workflowTestConfiguration.getInputs());
 
         return workflowTestConfigurationRepository.save(currentWorkflowTestConfiguration);
+    }
+
+    @Override
+    public WorkflowTestConfigurationConnection updateWorkflowTestConfigurationConnection(
+        String workflowId, String operationName, String key, long connectionId) {
+
+        WorkflowTestConfiguration workflowTestConfiguration = OptionalUtils.get(
+            workflowTestConfigurationRepository.findByWorkflowId(workflowId));
+
+        WorkflowTestConfigurationConnection workflowTestConfigurationConnection =
+            new WorkflowTestConfigurationConnection(connectionId, key, operationName);
+
+        workflowTestConfiguration.setConnections(
+            CollectionUtils.concat(
+                CollectionUtils.filter(
+                    workflowTestConfiguration.getConnections(),
+                    connection -> !Objects.equals(connection.getKey(), key)),
+                List.of(workflowTestConfigurationConnection)));
+
+        workflowTestConfigurationRepository.save(workflowTestConfiguration);
+
+        return workflowTestConfigurationConnection;
     }
 }

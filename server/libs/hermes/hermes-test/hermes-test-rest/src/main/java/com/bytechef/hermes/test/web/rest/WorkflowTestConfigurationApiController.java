@@ -19,9 +19,10 @@ package com.bytechef.hermes.test.web.rest;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.hermes.test.domain.WorkflowTestConfiguration;
 import com.bytechef.hermes.test.service.WorkflowTestConfigurationService;
+import com.bytechef.hermes.test.web.rest.model.UpdateWorkflowTestConfigurationConnectionRequestModel;
+import com.bytechef.hermes.test.web.rest.model.WorkflowTestConfigurationConnectionModel;
 import com.bytechef.hermes.test.web.rest.model.WorkflowTestConfigurationModel;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +67,17 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     }
 
     @Override
+    public ResponseEntity<List<WorkflowTestConfigurationConnectionModel>> getWorkflowTestConfigurationConnections(
+        String workflowId, String operationName) {
+
+        return ResponseEntity.ok(
+            CollectionUtils.map(
+                workflowTestConfigurationService.getWorkflowTestConfigurationConnections(workflowId, operationName),
+                workflowTestConfigurationConnection -> conversionService.convert(
+                    workflowTestConfigurationConnection, WorkflowTestConfigurationConnectionModel.class)));
+    }
+
+    @Override
     public ResponseEntity<List<WorkflowTestConfigurationModel>> getWorkflowTestConfigurations() {
         return ResponseEntity.ok(
             CollectionUtils.map(
@@ -81,10 +93,20 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
         return ResponseEntity.ok(
             conversionService.convert(
                 workflowTestConfigurationService.updateWorkflowTestConfiguration(
-                    Validate.notNull(
-                        conversionService.convert(
-                            workflowTestConfigurationModel.id(id), WorkflowTestConfiguration.class),
-                        "WorkflowTestConfiguration")),
+                    conversionService.convert(workflowTestConfigurationModel.id(id), WorkflowTestConfiguration.class)),
                 WorkflowTestConfigurationModel.class));
+    }
+
+    @Override
+    public ResponseEntity<WorkflowTestConfigurationConnectionModel> updateWorkflowTestConfigurationConnection(
+        String workflowId, String operationName, String key,
+        UpdateWorkflowTestConfigurationConnectionRequestModel updateWorkflowTestConfigurationConnectionRequestModel) {
+
+        return ResponseEntity.ok(
+            conversionService.convert(
+                workflowTestConfigurationService.updateWorkflowTestConfigurationConnection(
+                    workflowId, operationName, key,
+                    updateWorkflowTestConfigurationConnectionRequestModel.getConnectionId()),
+                WorkflowTestConfigurationConnectionModel.class));
     }
 }
