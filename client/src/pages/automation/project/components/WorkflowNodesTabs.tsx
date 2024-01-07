@@ -1,4 +1,5 @@
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {ClickedItemType} from '@/types/types';
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from 'middleware/hermes/configuration';
 
 import WorkflowNodesTabsItem from './WorkflowNodesTabsItem';
@@ -10,7 +11,7 @@ type WorkflowNodesTabsProps = {
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
     itemsDraggable?: boolean;
-    onItemClick?: (clickedItem: ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel) => void;
+    onItemClick?: (clickedItem: ClickedItemType) => void;
     triggerComponentDefinitions: Array<ComponentDefinitionBasicModel>;
 };
 

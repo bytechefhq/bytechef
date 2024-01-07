@@ -3,11 +3,15 @@ import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/mi
 import WorkflowNodesTabs from '@/pages/automation/project/components/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import getFormattedName from '@/pages/automation/project/utils/getFormattedName';
+import {ClickedItemType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {memo, useEffect, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
+
+import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
+import saveToWorkflowDefinition from '../utils/saveToWorkflowDefinition';
 
 type WorkflowNodesListProps = {
     edge?: boolean;
@@ -45,12 +49,14 @@ const WorkflowNodesPopoverMenuList = memo(
             Array<ComponentDefinitionBasicModel>
         >([]);
 
-        const {componentDefinitions, componentNames, setComponentNames, taskDispatcherDefinitions} =
+        const {componentDefinitions, componentNames, currentWorkflowId, setComponentNames, taskDispatcherDefinitions} =
             useWorkflowDataStore();
+
+        const {setWorkflowDefinitions, workflowDefinitions} = useWorkflowDefinitionStore();
 
         const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
-        const handleItemClick = (clickedItem: ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel) => {
+        const handleItemClick = (clickedItem: ClickedItemType) => {
             if (edge) {
                 const clickedEdge = getEdge(id);
 
@@ -62,6 +68,7 @@ const WorkflowNodesPopoverMenuList = memo(
 
                 const newWorkflowNode = {
                     data: {
+                        componentName: clickedItem.name,
                         icon: (
                             <>
                                 {clickedItem.icon ? (
@@ -73,7 +80,6 @@ const WorkflowNodesPopoverMenuList = memo(
                         ),
                         label: clickedItem?.title,
                         name: getFormattedName(clickedItem.name!, nodes),
-                        componentName: clickedItem.name,
                     },
                     id: getRandomId(),
                     position: {
@@ -97,8 +103,6 @@ const WorkflowNodesPopoverMenuList = memo(
                     type: 'workflow',
                 };
 
-                setEdges((edges) => edges.filter((edge) => edge.id !== id).concat([sourceEdge, targetEdge]));
-
                 setNodes((nodes) => {
                     const previousWorkflowNode = nodes.find((node) => node.id === clickedEdge.source);
 
@@ -110,6 +114,8 @@ const WorkflowNodesPopoverMenuList = memo(
 
                     tempComponentNames.splice(previousComponentNameIndex + 1, 0, newWorkflowNode.data.componentName);
 
+                    const currentWorkflowDefinition = workflowDefinitions[currentWorkflowId!];
+
                     setComponentNames(tempComponentNames);
 
                     const previousWorkflowNodeIndex = nodes.findIndex((node) => node.id === clickedEdge.source);
@@ -118,8 +124,19 @@ const WorkflowNodesPopoverMenuList = memo(
 
                     tempNodes.splice(previousWorkflowNodeIndex + 1, 0, newWorkflowNode);
 
+                    saveToWorkflowDefinition(
+                        newWorkflowNode.data,
+                        currentWorkflowDefinition,
+                        currentWorkflowId,
+                        workflowDefinitions,
+                        setWorkflowDefinitions,
+                        previousWorkflowNodeIndex
+                    );
+
                     return tempNodes;
                 });
+
+                setEdges((edges) => edges.filter((edge) => edge.id !== id).concat([sourceEdge, targetEdge]));
             } else {
                 const placeholderNode = getNode(id);
 
