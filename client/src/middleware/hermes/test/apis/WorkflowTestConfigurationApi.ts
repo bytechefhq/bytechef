@@ -15,9 +15,15 @@
 
 import * as runtime from '../runtime';
 import type {
+  UpdateWorkflowTestConfigurationConnectionRequestModel,
+  WorkflowTestConfigurationConnectionModel,
   WorkflowTestConfigurationModel,
 } from '../models/index';
 import {
+    UpdateWorkflowTestConfigurationConnectionRequestModelFromJSON,
+    UpdateWorkflowTestConfigurationConnectionRequestModelToJSON,
+    WorkflowTestConfigurationConnectionModelFromJSON,
+    WorkflowTestConfigurationConnectionModelToJSON,
     WorkflowTestConfigurationModelFromJSON,
     WorkflowTestConfigurationModelToJSON,
 } from '../models/index';
@@ -30,9 +36,21 @@ export interface GetWorkflowTestConfigurationRequest {
     id: number;
 }
 
+export interface GetWorkflowTestConfigurationConnectionsRequest {
+    workflowId: string;
+    operationName: string;
+}
+
 export interface UpdateWorkflowTestConfigurationRequest {
     id: number;
     workflowTestConfigurationModel: WorkflowTestConfigurationModel;
+}
+
+export interface UpdateWorkflowTestConfigurationConnectionRequest {
+    workflowId: string;
+    operationName: string;
+    key: string;
+    updateWorkflowTestConfigurationConnectionRequestModel: UpdateWorkflowTestConfigurationConnectionRequestModel;
 }
 
 /**
@@ -108,6 +126,42 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
+     * Get a workflow test configuration connections.
+     * Get a workflow test configuration connections
+     */
+    async getWorkflowTestConfigurationConnectionsRaw(requestParameters: GetWorkflowTestConfigurationConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowTestConfigurationConnectionModel>>> {
+        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
+            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling getWorkflowTestConfigurationConnections.');
+        }
+
+        if (requestParameters.operationName === null || requestParameters.operationName === undefined) {
+            throw new runtime.RequiredError('operationName','Required parameter requestParameters.operationName was null or undefined when calling getWorkflowTestConfigurationConnections.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflow-test-configurations/{workflowId}/connections/{operationName}`.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))).replace(`{${"operationName"}}`, encodeURIComponent(String(requestParameters.operationName))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowTestConfigurationConnectionModelFromJSON));
+    }
+
+    /**
+     * Get a workflow test configuration connections.
+     * Get a workflow test configuration connections
+     */
+    async getWorkflowTestConfigurationConnections(requestParameters: GetWorkflowTestConfigurationConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowTestConfigurationConnectionModel>> {
+        const response = await this.getWorkflowTestConfigurationConnectionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Get all workflow test configurations.
      * Get all workflow test configurations
      */
@@ -171,6 +225,53 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
      */
     async updateWorkflowTestConfiguration(requestParameters: UpdateWorkflowTestConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestConfigurationModel> {
         const response = await this.updateWorkflowTestConfigurationRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Update a workflow test configuration connection.
+     * Update a workflow test configuration connection
+     */
+    async updateWorkflowTestConfigurationConnectionRaw(requestParameters: UpdateWorkflowTestConfigurationConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestConfigurationConnectionModel>> {
+        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
+            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling updateWorkflowTestConfigurationConnection.');
+        }
+
+        if (requestParameters.operationName === null || requestParameters.operationName === undefined) {
+            throw new runtime.RequiredError('operationName','Required parameter requestParameters.operationName was null or undefined when calling updateWorkflowTestConfigurationConnection.');
+        }
+
+        if (requestParameters.key === null || requestParameters.key === undefined) {
+            throw new runtime.RequiredError('key','Required parameter requestParameters.key was null or undefined when calling updateWorkflowTestConfigurationConnection.');
+        }
+
+        if (requestParameters.updateWorkflowTestConfigurationConnectionRequestModel === null || requestParameters.updateWorkflowTestConfigurationConnectionRequestModel === undefined) {
+            throw new runtime.RequiredError('updateWorkflowTestConfigurationConnectionRequestModel','Required parameter requestParameters.updateWorkflowTestConfigurationConnectionRequestModel was null or undefined when calling updateWorkflowTestConfigurationConnection.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/workflow-test-configurations/{workflowId}/connections/{operationName}/{key}`.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))).replace(`{${"operationName"}}`, encodeURIComponent(String(requestParameters.operationName))).replace(`{${"key"}}`, encodeURIComponent(String(requestParameters.key))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateWorkflowTestConfigurationConnectionRequestModelToJSON(requestParameters.updateWorkflowTestConfigurationConnectionRequestModel),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowTestConfigurationConnectionModelFromJSON(jsonValue));
+    }
+
+    /**
+     * Update a workflow test configuration connection.
+     * Update a workflow test configuration connection
+     */
+    async updateWorkflowTestConfigurationConnection(requestParameters: UpdateWorkflowTestConfigurationConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestConfigurationConnectionModel> {
+        const response = await this.updateWorkflowTestConfigurationConnectionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

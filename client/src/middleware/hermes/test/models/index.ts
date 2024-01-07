@@ -6,6 +6,7 @@ export * from './JobBasicModel';
 export * from './JobModel';
 export * from './TaskExecutionModel';
 export * from './TriggerExecutionModel';
+export * from './UpdateWorkflowTestConfigurationConnectionRequestModel';
 export * from './WebhookModel';
 export * from './WebhookRetryModel';
 export * from './WorkflowConnectionModel';

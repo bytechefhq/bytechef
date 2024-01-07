@@ -8,6 +8,7 @@ models/JobBasicModel.ts
 models/JobModel.ts
 models/TaskExecutionModel.ts
 models/TriggerExecutionModel.ts
+models/UpdateWorkflowTestConfigurationConnectionRequestModel.ts
 models/WebhookModel.ts
 models/WebhookRetryModel.ts
 models/WorkflowConnectionModel.ts
