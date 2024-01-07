@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Cross1Icon} from '@radix-ui/react-icons';
+import {Cross2Icon} from '@radix-ui/react-icons';
 import EmptyList from 'components/EmptyList';
 import {LinkIcon, PlusIcon} from 'lucide-react';
 import {ComponentDefinitionModel} from 'middleware/hermes/configuration';
@@ -75,15 +75,13 @@ const ConnectionTab = ({componentDefinition}: {componentDefinition: ComponentDef
                     <div className="flex items-center pb-2">
                         <span className="font-medium">Note</span>
 
-                        <Button
+                        <button
                             className="ml-auto p-0"
                             onClick={() => setShowConnectionNote(false)}
-                            size="icon"
                             title="Close the note"
-                            variant="ghost"
                         >
-                            <Cross1Icon className="h-3 w-3" />
-                        </Button>
+                            <Cross2Icon aria-hidden="true" className="h-4 w-4 cursor-pointer" />
+                        </button>
                     </div>
 
                     <p className="text-sm text-gray-800">The selected connection is used for testing purposes only.</p>

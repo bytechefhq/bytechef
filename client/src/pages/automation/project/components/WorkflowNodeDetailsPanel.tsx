@@ -5,7 +5,7 @@ import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import {PropertyType} from '@/types/projectTypes';
 import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
-import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
+import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Properties from 'components/Properties/Properties';
 import {
     useGetActionDefinitionsQuery,
@@ -479,15 +479,13 @@ const WorkflowNodeDetailsPanel = ({
                                     </Tooltip>
                                 )}
 
-                                <Button
+                                <button
                                     aria-label="Close the node details dialog"
                                     className="ml-auto pr-0"
                                     onClick={() => setWorkflowNodeDetailsPanelOpen(false)}
-                                    size="icon"
-                                    variant="ghost"
                                 >
-                                    <Cross1Icon aria-hidden="true" className="h-3 w-3 cursor-pointer" />
-                                </Button>
+                                    <Cross2Icon aria-hidden="true" className="h-4 w-4 cursor-pointer" />
+                                </button>
                             </Dialog.Title>
 
                             <div className="flex h-full flex-col">

@@ -1,5 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {ChevronDownIcon, Cross1Icon, PlusIcon} from '@radix-ui/react-icons';
+import {ChevronDownIcon, Cross2Icon, PlusIcon} from '@radix-ui/react-icons';
 import {UseMutationResult} from '@tanstack/react-query';
 import CreatableSelect, {ISelectOption} from 'components/CreatableSelect/CreatableSelect';
 import {useState} from 'react';
@@ -24,8 +24,8 @@ const Tag = ({onDeleteTag, tag}: TagProps) => (
     <span className="inline-flex items-center rounded-full border border-gray-100 px-3 py-1 text-xs text-gray-700 hover:border-gray-200">
         {tag.name}
 
-        <Cross1Icon
-            className="ml-1.5 h-3 w-3 cursor-pointer rounded-full hover:bg-gray-200"
+        <Cross2Icon
+            className="ml-1.5 h-4 w-4 cursor-pointer rounded-full hover:bg-gray-200"
             onClick={() => onDeleteTag(tag)}
         />
     </span>

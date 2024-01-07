@@ -1,5 +1,5 @@
 import {Dialog, Transition} from '@headlessui/react';
-import {Cross1Icon} from '@radix-ui/react-icons';
+import {Cross2Icon} from '@radix-ui/react-icons';
 import {Fragment, PropsWithChildren, ReactNode, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -92,7 +92,7 @@ const LayoutContainer = ({
                                             onClick={() => setSidebarOpen(false)}
                                             type="button"
                                         >
-                                            <Cross1Icon aria-hidden="true" className="h-6 w-6 text-white" />
+                                            <Cross2Icon aria-hidden="true" className="h-4 w-4 text-white" />
 
                                             <span className="sr-only">Close sidebar</span>
                                         </button>

@@ -1,10 +1,9 @@
-import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ActionDefinitionModel, ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import DataPillPanelBody, {ComponentActionData} from '@/pages/automation/project/components/DataPillPanelBody';
 import {PropertyType} from '@/types/projectTypes';
 import * as Dialog from '@radix-ui/react-dialog';
-import {Cross1Icon, InfoCircledIcon} from '@radix-ui/react-icons';
+import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Input from 'components/Input/Input';
 import {useState} from 'react';
 
@@ -105,15 +104,13 @@ const DataPillPanel = ({
                                 </TooltipContent>
                             </Tooltip>
 
-                            <Button
+                            <button
                                 aria-label="Close the data pill panel"
                                 className="ml-auto pr-0"
                                 onClick={() => setDataPillPanelOpen(false)}
-                                size="icon"
-                                variant="ghost"
                             >
-                                <Cross1Icon aria-hidden="true" className="h-3 w-3 cursor-pointer" />
-                            </Button>
+                                <Cross2Icon aria-hidden="true" className="h-4 w-4 cursor-pointer" />
+                            </button>
                         </Dialog.Title>
 
                         <div className="flex w-full grow flex-col">
