@@ -71,14 +71,17 @@ class TwilioUtilsTest {
             TwilioUtils.getContentProperties(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(1, bodyProperties.size());
-        assertEquals("Body", bodyProperties.getFirst().getLabel().get());
+
+        Property.ValueProperty<?> bodyProperty = bodyProperties.getFirst();
+
+        assertEquals("Body", bodyProperty.getLabel().get());
         assertEquals(
             "The text content of the outgoing message. Can be up to 1,600 characters in length. SMS only: If " +
                 "the body contains more than 160 GSM-7 characters (or 70 UCS-2 characters), the message is " +
                 "segmented and charged accordingly. For long body text, consider using the send_as_mms " +
                 "parameter.",
-            bodyProperties .getFirst().getDescription().get());
-        assertEquals(true, bodyProperties.getFirst().getRequired().get());
+            bodyProperty.getDescription().get());
+        assertEquals(true, bodyProperty.getRequired().get());
     }
 
     @Test
@@ -90,7 +93,10 @@ class TwilioUtilsTest {
             TwilioUtils.getSourceProperties(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(1, fromProperties.size());
-        assertEquals("From", fromProperties.getFirst().getLabel().get());
+
+        Property.ValueProperty<?> fromProperty = fromProperties.getFirst();
+
+        assertEquals("From", fromProperty.getLabel().get());
         assertEquals(
             "The sender's Twilio phone number (in E.164 format), alphanumeric sender ID, Wireless SIM, short " +
                 "code, or channel address (e.g., whatsapp:+15554449999). The value of the from parameter " +
@@ -98,9 +104,9 @@ class TwilioUtilsTest {
                 "Message. If you are using messaging_service_sid, this parameter can be empty (Twilio " +
                 "assigns a from value from the Messaging Service's Sender Pool) or you can provide a " +
                 "specific sender from your Sender Pool.",
-            fromProperties.getFirst().getDescription().get());
-        assertEquals(BaseProperty.ControlType.PHONE, fromProperties.getFirst().getControlType());
-        assertEquals(true, fromProperties.getFirst().getRequired().get());
+            fromProperty.getDescription().get());
+        assertEquals(BaseProperty.ControlType.PHONE, fromProperty.getControlType());
+        assertEquals(true, fromProperty.getRequired().get());
     }
 
     @Test
@@ -112,14 +118,17 @@ class TwilioUtilsTest {
             TwilioUtils.getSourceProperties(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(1, messagingServiceSidProperties.size());
+
+        Property.ValueProperty<?> messagingServiceSidProperty = messagingServiceSidProperties.getFirst();
+
         assertEquals(
-            "Messaging Service SID", messagingServiceSidProperties .getFirst().getLabel().get());
+            "Messaging Service SID", messagingServiceSidProperty.getLabel().get());
         assertEquals(
             "The SID of the Messaging Service you want to associate with the Message. When this parameter is " +
                 "provided and the from parameter is omitted, Twilio selects the optimal sender from the " +
                 "Messaging Service's Sender Pool. You may also provide a from parameter if you want to use a " +
                 "specific Sender from the Sender Pool.",
-            messagingServiceSidProperties.getFirst().getDescription().get());
-        assertEquals(true, messagingServiceSidProperties.getFirst().getRequired().get());
+            messagingServiceSidProperty.getDescription().get());
+        assertEquals(true, messagingServiceSidProperty.getRequired().get());
     }
 }

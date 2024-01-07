@@ -111,7 +111,8 @@ public class ProjectApiControllerIntTest {
         try {
             ProjectDTO projectDTO = getProjectDTO();
 
-            when(projectFacade.getProject(1L)).thenReturn(projectDTO);
+            when(projectFacade.getProject(1L))
+                .thenReturn(projectDTO);
 
             this.webTestClient
                 .get()
@@ -130,7 +131,8 @@ public class ProjectApiControllerIntTest {
     @Test
     public void testGetProjectCategories() {
         try {
-            when(projectFacade.getProjectCategories()).thenReturn(List.of(new Category(1, "name")));
+            when(projectFacade.getProjectCategories())
+                .thenReturn(List.of(new Category(1, "name")));
 
             this.webTestClient
                 .get()
@@ -148,7 +150,8 @@ public class ProjectApiControllerIntTest {
 
     @Test
     public void testGetProjectTags() {
-        when(projectFacade.getProjectTags()).thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
+        when(projectFacade.getProjectTags())
+            .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         try {
             this.webTestClient
@@ -176,7 +179,8 @@ public class ProjectApiControllerIntTest {
         try {
             Workflow workflow = new Workflow("workflow1", "{}", Format.JSON, 0);
 
-            when(projectFacade.getProjectWorkflows(1L)).thenReturn(List.of(workflow));
+            when(projectFacade.getProjectWorkflows(1L))
+                .thenReturn(List.of(workflow));
 
             this.webTestClient
                 .get()
@@ -197,7 +201,8 @@ public class ProjectApiControllerIntTest {
     public void testGetProjects() {
         ProjectDTO projectDTO = getProjectDTO();
 
-        when(projectFacade.getProjects(null, false, null, null)).thenReturn(List.of(projectDTO));
+        when(projectFacade.getProjects(null, false, null, null))
+            .thenReturn(List.of(projectDTO));
 
         this.webTestClient
             .get()
@@ -210,7 +215,8 @@ public class ProjectApiControllerIntTest {
             .contains(projectMapper.convert(projectDTO))
             .hasSize(1);
 
-        when(projectFacade.getProjects(1L, false, null, null)).thenReturn(List.of(projectDTO));
+        when(projectFacade.getProjects(1L, false, null, null))
+            .thenReturn(List.of(projectDTO));
 
         this.webTestClient
             .get()
@@ -222,7 +228,8 @@ public class ProjectApiControllerIntTest {
             .expectBodyList(ProjectModel.class)
             .hasSize(1);
 
-        when(projectFacade.getProjects(null, false, 1L, null)).thenReturn(List.of(projectDTO));
+        when(projectFacade.getProjects(null, false, 1L, null))
+            .thenReturn(List.of(projectDTO));
 
         this.webTestClient
             .get()
@@ -234,7 +241,8 @@ public class ProjectApiControllerIntTest {
             .expectBodyList(ProjectModel.class)
             .hasSize(1);
 
-        when(projectFacade.getProjects(1L, false, 1L, null)).thenReturn(List.of(projectDTO));
+        when(projectFacade.getProjects(1L, false, 1L, null))
+            .thenReturn(List.of(projectDTO));
 
         this.webTestClient
             .get()
@@ -252,7 +260,8 @@ public class ProjectApiControllerIntTest {
             .name("name")
             .description("description");
 
-        when(projectFacade.createProject(any())).thenReturn(projectDTO);
+        when(projectFacade.createProject(any()))
+            .thenReturn(projectDTO);
 
         try {
             assert projectDTO.id() != null;
@@ -343,7 +352,8 @@ public class ProjectApiControllerIntTest {
             .id(1L)
             .name("name2");
 
-        when(projectFacade.updateProject(any(ProjectDTO.class))).thenReturn(projectDTO);
+        when(projectFacade.updateProject(any(ProjectDTO.class)))
+            .thenReturn(projectDTO);
 
         try {
             this.webTestClient

@@ -98,9 +98,10 @@ public class EachTaskDispatcherTest {
 
     @Test
     public void testDispatch2() {
-        when(contextService.peek(anyLong(), any())).thenReturn(
-            taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
-        when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
+        when(contextService.peek(anyLong(), any()))
+            .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
+        when(taskExecutionService.create(any()))
+            .thenReturn(TaskExecution.builder().id(1L).build());
 
         EachTaskDispatcher dispatcher = new EachTaskDispatcher(
             eventPublisher, contextService, counterService, taskDispatcher, taskExecutionService,
@@ -119,7 +120,8 @@ public class EachTaskDispatcherTest {
         taskExecution.setId(1L);
         taskExecution.setJobId(1L);
 
-        when(taskExecutionService.update(any())).thenReturn(taskExecution);
+        when(taskExecutionService.update(any()))
+            .thenReturn(taskExecution);
 
         dispatcher.dispatch(taskExecution);
 
@@ -146,7 +148,8 @@ public class EachTaskDispatcherTest {
                             "iteratee", new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", "type", "print"))))))
             .build();
 
-        when(taskExecutionService.update(any())).thenReturn(taskExecution);
+        when(taskExecutionService.update(any()))
+            .thenReturn(taskExecution);
 
         dispatcher.dispatch(taskExecution);
 

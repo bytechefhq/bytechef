@@ -49,7 +49,8 @@ public class TaskExecutionErrorEventListenerTest {
 
     @Test
     public void test1() {
-        when(jobService.getTaskExecutionJob(1234L)).thenReturn(new Job(4567L));
+        when(jobService.getTaskExecutionJob(1234L))
+            .thenReturn(new Job(4567L));
 
         TaskExecutionErrorEventListener taskExecutionErrorEventListener = new TaskExecutionErrorEventListener(
             eventPublisher, jobService, taskDispatcher, taskExecutionService);
@@ -59,7 +60,8 @@ public class TaskExecutionErrorEventListenerTest {
         erroredTaskExecution.setError(new ExecutionError("something bad happened", List.of()));
         erroredTaskExecution.setId(1234L);
 
-        when(taskExecutionService.update(any())).thenReturn(erroredTaskExecution);
+        when(taskExecutionService.update(any()))
+            .thenReturn(erroredTaskExecution);
 
         taskExecutionErrorEventListener.onErrorEvent(new TaskExecutionErrorEvent(erroredTaskExecution));
         taskExecutionErrorEventListener.onErrorEvent(new TaskExecutionErrorEvent(erroredTaskExecution));
@@ -69,7 +71,8 @@ public class TaskExecutionErrorEventListenerTest {
 
     @Test
     public void test2() {
-        when(jobService.getTaskExecutionJob(1234L)).thenReturn(new Job());
+        when(jobService.getTaskExecutionJob(1234L))
+            .thenReturn(new Job());
 
         TaskExecutionErrorEventListener taskExecutionErrorEventListener = new TaskExecutionErrorEventListener(
             eventPublisher, jobService, taskDispatcher, taskExecutionService);
@@ -80,7 +83,8 @@ public class TaskExecutionErrorEventListenerTest {
         erroredTaskExecution.setId(1234L);
         erroredTaskExecution.setMaxRetries(1);
 
-        when(taskExecutionService.update(any())).thenReturn(erroredTaskExecution);
+        when(taskExecutionService.update(any()))
+            .thenReturn(erroredTaskExecution);
 
         taskExecutionErrorEventListener.onErrorEvent(new TaskExecutionErrorEvent(erroredTaskExecution));
 

@@ -83,7 +83,8 @@ public class WorkflowApiControllerIntTest {
 
     @Test
     public void testGetWorkflows() {
-        when(workflowService.getWorkflows(anyInt())).thenReturn(List.of(getWorkflow()));
+        when(workflowService.getWorkflows(anyInt()))
+            .thenReturn(List.of(getWorkflow()));
 
         try {
             this.webTestClient

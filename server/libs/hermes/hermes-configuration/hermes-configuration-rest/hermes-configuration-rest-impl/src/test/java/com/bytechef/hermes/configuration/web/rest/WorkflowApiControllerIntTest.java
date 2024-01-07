@@ -76,7 +76,8 @@ public class WorkflowApiControllerIntTest {
     @Test
     public void testGetWorkflow() {
         try {
-            when(workflowService.getWorkflow("1")).thenReturn(getWorkflow());
+            when(workflowService.getWorkflow("1"))
+                .thenReturn(getWorkflow());
 
             this.webTestClient
                 .get()
@@ -99,7 +100,8 @@ public class WorkflowApiControllerIntTest {
             .definition(DEFINITION)
             .version(0);
 
-        when(workflowService.update("1", DEFINITION, 0)).thenReturn(workflow);
+        when(workflowService.update("1", DEFINITION, 0))
+            .thenReturn(workflow);
 
         Workflow.Format format = workflow.getFormat();
 

@@ -90,7 +90,8 @@ public class BranchTaskDispatcherTest {
     public void test1() {
         when(contextService.peek(anyLong(), any()))
             .thenReturn(base64FileStorageService.storeFileContent("", "", CompressionUtils.compress("{}")));
-        when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
+        when(taskExecutionService.create(any()))
+            .thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
@@ -123,7 +124,8 @@ public class BranchTaskDispatcherTest {
                         new WorkflowTask(Map.of(WorkflowConstants.NAME, "name", WorkflowConstants.TYPE, "print")))
                     .build());
 
-        when(taskExecutionService.update(any())).thenReturn(taskExecution);
+        when(taskExecutionService.update(any()))
+            .thenReturn(taskExecution);
 
         branchTaskDispatcher.dispatch(taskExecution);
 
@@ -138,8 +140,8 @@ public class BranchTaskDispatcherTest {
 
     @Test
     public void test2() {
-        when(contextService.peek(anyLong(), any())).thenReturn(
-            base64FileStorageService.storeFileContent("", "", "{}"));
+        when(contextService.peek(anyLong(), any()))
+            .thenReturn(base64FileStorageService.storeFileContent("", "", "{}"));
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
@@ -161,7 +163,8 @@ public class BranchTaskDispatcherTest {
                             "expression", "k2"))))
             .build();
 
-        when(taskExecutionService.update(any())).thenReturn(taskExecution);
+        when(taskExecutionService.update(any()))
+            .thenReturn(taskExecution);
 
         branchTaskDispatcher.dispatch(taskExecution);
 
@@ -170,9 +173,10 @@ public class BranchTaskDispatcherTest {
 
     @Test
     public void test3() {
-        when(contextService.peek(anyLong(), any())).thenReturn(
-            taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
-        when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
+        when(contextService.peek(anyLong(), any()))
+            .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
+        when(taskExecutionService.create(any()))
+            .thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
@@ -197,7 +201,8 @@ public class BranchTaskDispatcherTest {
         taskExecution.setId(1L);
         taskExecution.setJobId(2L);
 
-        when(taskExecutionService.update(any())).thenReturn(taskExecution);
+        when(taskExecutionService.update(any()))
+            .thenReturn(taskExecution);
 
         when(taskExecutionService.create(any()))
             .thenReturn(
@@ -217,9 +222,10 @@ public class BranchTaskDispatcherTest {
 
     @Test
     public void test4() {
-        when(contextService.peek(anyLong(), any())).thenReturn(
-            base64FileStorageService.storeFileContent("", "", "{}"));
-        when(taskExecutionService.create(any())).thenReturn(TaskExecution.builder().id(1L).build());
+        when(contextService.peek(anyLong(), any()))
+            .thenReturn(base64FileStorageService.storeFileContent("", "", "{}"));
+        when(taskExecutionService.create(any()))
+            .thenReturn(TaskExecution.builder().id(1L).build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
@@ -244,7 +250,8 @@ public class BranchTaskDispatcherTest {
                             "expression", "k99"))))
             .build();
 
-        when(taskExecutionService.update(any())).thenReturn(taskExecution);
+        when(taskExecutionService.update(any()))
+            .thenReturn(taskExecution);
 
         branchTaskDispatcher.dispatch(taskExecution);
 
