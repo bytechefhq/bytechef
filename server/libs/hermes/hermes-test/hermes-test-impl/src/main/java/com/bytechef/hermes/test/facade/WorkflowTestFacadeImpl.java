@@ -90,7 +90,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
             Map<String, Long> connectionIdMap = connectionIdsMap.computeIfAbsent(
                 connection.getOperationName(), key -> new HashMap<>());
 
-            connectionIdMap.put(connection.getKey(), connection.getId());
+            connectionIdMap.put(connection.getKey(), connection.getConnectionId());
         }
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
