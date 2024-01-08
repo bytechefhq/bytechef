@@ -73,7 +73,7 @@ const Property = ({
 
     let {name} = property;
 
-    let defaultValue: string | undefined = property.defaultValue as string | undefined;
+    let defaultValue: string | undefined = property.defaultValue;
 
     const {controlType, description, hidden, items, label, objectType, options, properties, required, type} = property;
 
@@ -112,7 +112,8 @@ const Property = ({
         showMentionInput = mentionInput && !!dataPills?.length;
     }
 
-    const showInputTypeSwitchButton = controlType === 'SELECT' && !!dataPills?.length && !!name;
+    const showInputTypeSwitchButton =
+        controlType === 'SELECT' && !!formattedOptions?.length && !!dataPills?.length && !!name;
 
     const otherComponentData = componentData.filter((component) => {
         if (component.name !== currentComponent?.name) {
