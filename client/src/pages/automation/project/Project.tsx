@@ -490,7 +490,7 @@ const Project = () => {
 
                                 {!!projectId && (
                                     <WorkflowDialog
-                                        createWorkflowRequestMutation={createProjectWorkflowMutation}
+                                        createWorkflowMutation={createProjectWorkflowMutation}
                                         parentId={+projectId}
                                         triggerNode={
                                             <Button

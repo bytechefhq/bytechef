@@ -51,7 +51,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     const queryClient = useQueryClient();
 
-    const createProjectWorkflowRequestMutation = useCreateProjectWorkflowMutation({
+    const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: (workflow) => {
             navigate(`/automation/projects/${project.id}/workflows/${workflow?.id}`);
 
@@ -252,7 +252,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
             {showWorkflowDialog && !!project.id && (
                 <WorkflowDialog
-                    createWorkflowRequestMutation={createProjectWorkflowRequestMutation}
+                    createWorkflowMutation={createProjectWorkflowMutation}
                     onClose={() => setShowWorkflowDialog(false)}
                     parentId={project.id}
                 />

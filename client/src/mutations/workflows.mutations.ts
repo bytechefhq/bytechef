@@ -43,6 +43,7 @@ type UpdateWorkflowMutationProps = {
 export const useUpdateWorkflowMutation = (mutationProps?: UpdateWorkflowMutationProps) =>
     useMutation({
         mutationFn: (request: UpdateWorkflowRequest) => {
+            console.log(request);
             return new CoreWorkflowApi().updateWorkflow(request);
         },
         onError: mutationProps?.onError,
