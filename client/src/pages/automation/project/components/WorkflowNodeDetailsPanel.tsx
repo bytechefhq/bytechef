@@ -399,7 +399,7 @@ const WorkflowNodeDetailsPanel = ({
                 } else {
                     const orderedComponentActions = componentNames.map((componentName) => {
                         const componentActionIndex = componentActions.findIndex(
-                            (componentAction) => componentAction.workflowNodeName === componentName
+                            (componentAction) => componentAction.componentName === componentName
                         );
 
                         return componentActions[componentActionIndex];
