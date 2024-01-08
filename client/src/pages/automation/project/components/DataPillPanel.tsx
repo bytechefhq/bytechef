@@ -26,7 +26,7 @@ const DataPillPanel = ({
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
-    const {componentNames} = useWorkflowDataStore();
+    const {nodeNames} = useWorkflowDataStore();
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
@@ -42,7 +42,7 @@ const DataPillPanel = ({
     });
 
     const previousActions = actionDataWithComponentAlias?.filter((action) =>
-        previousComponentNames.includes(action.workflowNodeName!)
+        previousComponentNames.includes(action.componentName!)
     );
 
     const componentActionData = previousActions?.map((action, index) => {
@@ -50,11 +50,11 @@ const DataPillPanel = ({
             (currentComponentDefinition) => currentComponentDefinition.name === normalizedPreviousComponentNames[index]
         );
 
-        if (previousComponentNames.includes(action.workflowNodeName!)) {
+        if (previousComponentNames.includes(action.componentName!)) {
             return {
                 ...action,
                 componentDefinition,
-                workflowNodeName: componentNames[index],
+                workflowNodeName: nodeNames[index],
             };
         }
     });

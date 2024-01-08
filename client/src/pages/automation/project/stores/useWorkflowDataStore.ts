@@ -20,6 +20,9 @@ interface WorkflowDefinitionState {
     dataPills: Array<DataPillType>;
     setDataPills: (dataPills: Array<DataPillType>) => void;
 
+    nodeNames: string[];
+    setNodeNames: (componentNames: string[]) => void;
+
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
     setTaskDispatcherDefinitions: (taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>) => void;
 }
@@ -41,6 +44,9 @@ const useWorkflowDataStore = create<WorkflowDefinitionState>()(
 
             dataPills: [],
             setDataPills: (dataPills) => set((state) => ({...state, dataPills})),
+
+            nodeNames: [],
+            setNodeNames: (nodeNames) => set((state) => ({...state, nodeNames})),
 
             taskDispatcherDefinitions: [],
             setTaskDispatcherDefinitions: (taskDispatcherDefinitions) =>
