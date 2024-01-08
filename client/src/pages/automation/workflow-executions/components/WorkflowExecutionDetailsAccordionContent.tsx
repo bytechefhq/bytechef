@@ -85,7 +85,7 @@ const WorkflowExecutionDetailsAccordionContent = ({
                 <header className="flex items-center justify-between rounded-md bg-gray-100 px-2 py-1">
                     <span className="text-sm font-medium uppercase">Output</span>
 
-                    <div className="flex space-x-1">
+                    <div className="flex items-center space-x-1">
                         <span className="text-xs">{endDate?.toLocaleString()}</span>
 
                         <Dialog>
