@@ -46,7 +46,7 @@ public class TestTaskDispatcherPreSendProcessor implements TaskDispatcherPreSend
         Map<String, Map<String, Long>> connectionIdsMap = MapUtils.getMap(
             job.getMetadata(), MetadataConstants.CONNECTION_IDS, new TypeReference<>() {}, Map.of());
 
-        if (!connectionIdsMap.containsKey(taskExecution.getName())) {
+        if (connectionIdsMap.containsKey(taskExecution.getName())) {
             taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdsMap.get(taskExecution.getName()));
         }
 
