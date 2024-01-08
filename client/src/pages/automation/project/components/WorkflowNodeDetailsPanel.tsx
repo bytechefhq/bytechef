@@ -64,14 +64,17 @@ const WorkflowNodeDetailsPanel = ({
 
     const {componentData, setComponentData} = useWorkflowDefinitionStore();
 
-    const {componentActions, componentNames, dataPills, setComponentActions, setDataPills} = useWorkflowDataStore();
+    const {componentActions, componentNames, dataPills, nodeNames, setComponentActions, setDataPills} =
+        useWorkflowDataStore();
 
     let currentComponent: CurrentComponentType | undefined;
 
     if (currentComponentDefinition) {
         currentComponent = currentComponentDefinition;
 
-        currentComponent.workflowNodeName = currentNode.name;
+        if (currentComponent) {
+            currentComponent.workflowNodeName = currentNode.name;
+        }
     }
 
     const handleActionSelectChange = (value: string) => {
@@ -134,7 +137,7 @@ const WorkflowNodeDetailsPanel = ({
         (componentAction) => `${componentAction.componentName}/1/${componentAction.actionName}`
     );
 
-    const currentNodeIndex = componentNames.indexOf(currentNode.name);
+    const currentNodeIndex = nodeNames.indexOf(currentNode.name);
 
     const previousComponentNames = componentNames.length > 1 ? componentNames.slice(0, currentNodeIndex) : [];
 

@@ -31,12 +31,12 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
     const [edges, setEdges] = useState(defaultEdges);
     const [latestComponentName, setLatestComponentName] = useState('');
     const [nodeActions, setNodeActions] = useState<Array<ComponentActionType>>([]);
-    const [nodeNames, setNodeNames] = useState<Array<string>>([]);
     const [nodes, setNodes] = useState(defaultNodes);
     const [viewportWidth, setViewportWidth] = useState(0);
 
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {componentActions, componentNames, setComponentActions, setComponentNames} = useWorkflowDataStore();
+    const {componentActions, componentNames, nodeNames, setComponentActions, setComponentNames, setNodeNames} =
+        useWorkflowDataStore();
     const {setWorkflowDefinitions, workflowDefinitions} = useWorkflowDefinitionStore();
 
     const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
@@ -175,7 +175,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
             return nodes;
         }
-    }, [componentDefinitions, currentWorkflowDefinition.tasks]);
+    }, [componentDefinitions, currentWorkflowDefinition?.tasks, setNodeNames]);
 
     const defaultEdgesWithWorkflowEdges = useMemo(() => {
         const workflowEdges: Array<Edge> = [];
@@ -238,7 +238,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
             setNodes(defaultNodesWithWorkflowNodes as Array<Node>);
         }
-    }, [defaultNodesWithWorkflowNodes, currentWorkflowId, setComponentNames]);
+    }, [defaultNodesWithWorkflowNodes, currentWorkflowId, setComponentNames, setNodeNames]);
 
     useEffect(() => {
         if (defaultEdgesWithWorkflowEdges) {

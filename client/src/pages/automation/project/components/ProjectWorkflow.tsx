@@ -22,7 +22,7 @@ const ProjectWorkflow = ({componentDefinitions, currentWorkflowId, taskDispatche
     const {componentActions, componentNames} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const currentNodeIndex = componentNames.indexOf(currentNode.name);
+    const currentNodeIndex = componentNames.indexOf(currentNode.componentName || currentNode.name);
 
     const previousComponentNames = componentNames.length > 1 ? componentNames.slice(0, currentNodeIndex) : [];
 
