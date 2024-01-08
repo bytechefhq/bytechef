@@ -191,9 +191,9 @@ const MentionsInput = forwardRef(
                             htmlFor={elementId}
                         >
                             {label}
-                        </label>
 
-                        {required && <span className="px-1 leading-3 text-red-500">*</span>}
+                            {required && <span className="leading-3 text-red-500">*</span>}
+                        </label>
 
                         {description && (
                             <Tooltip>
