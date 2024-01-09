@@ -45,8 +45,6 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
     const previousComponentNames: Array<string> | undefined = usePrevious(componentNames);
 
-    const currentWorkflowDefinition = workflowDefinitions[currentWorkflowId!];
-
     const nodeTypes = useMemo(
         () => ({
             placeholder: PlaceholderNode,
@@ -121,6 +119,8 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
         };
     }, [nodeNames, workflowComponent]);
 
+    const currentWorkflowDefinition = workflowDefinitions[currentWorkflowId!];
+
     const defaultNodesWithWorkflowNodes = useMemo(() => {
         const workflowTasks = currentWorkflowDefinition?.tasks?.filter((task) => task.name);
 
@@ -159,8 +159,6 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
         });
 
         if (workflowNodes) {
-            setNodeNames(workflowNodes.map((node) => node!.data.name));
-
             setNodeActions(
                 workflowNodes.map((node) => ({
                     actionName: node!.data.actionName!,
@@ -175,7 +173,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
             return nodes;
         }
-    }, [componentDefinitions, currentWorkflowDefinition?.tasks, setNodeNames]);
+    }, [componentDefinitions, currentWorkflowDefinition?.tasks]);
 
     const defaultEdgesWithWorkflowEdges = useMemo(() => {
         const workflowEdges: Array<Edge> = [];
