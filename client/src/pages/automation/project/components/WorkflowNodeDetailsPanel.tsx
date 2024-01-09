@@ -182,6 +182,8 @@ const WorkflowNodeDetailsPanel = ({
         !!currentAction?.outputSchemaDataSource
     );
 
+    const connectionKey = workflow.tasks?.filter((task) => task.name === currentNode.name)[0]?.connections![0].key;
+
     const getExistingProperties = (properties: Array<PropertyType>): Array<PropertyType> =>
         properties.filter((property) => {
             if (property.properties) {
@@ -533,9 +535,10 @@ const WorkflowNodeDetailsPanel = ({
                                             />
                                         )}
 
-                                        {activeTab === 'connection' && currentComponent.connection && (
+                                        {activeTab === 'connection' && connectionKey && currentComponent.connection && (
                                             <ConnectionTab
                                                 componentDefinition={currentComponent}
+                                                connectionKey={connectionKey}
                                                 operationName={currentNode.name}
                                                 workflowId={workflowId}
                                             />
