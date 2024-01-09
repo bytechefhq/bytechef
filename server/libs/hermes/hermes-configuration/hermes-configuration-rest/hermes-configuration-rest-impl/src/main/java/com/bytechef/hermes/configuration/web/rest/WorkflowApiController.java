@@ -51,8 +51,7 @@ public class WorkflowApiController implements WorkflowApi {
     public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowService.update(
-                    id, workflowModel.getDefinition(), workflowModel.getVersion()),
+                workflowService.update(id, workflowModel.getDefinition(), workflowModel.getVersion()),
                 WorkflowModel.class));
     }
 }
