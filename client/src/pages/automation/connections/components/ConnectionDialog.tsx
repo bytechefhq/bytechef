@@ -199,12 +199,6 @@ const ConnectionDialog = ({componentDefinition, connection, onClose, triggerNode
         !usePredefinedOAuthApp &&
         oAuth2Properties?.redirectUri;
 
-    useEffect(() => {
-        setAuthorizationName(
-            authorizationOptions && authorizationOptions.length > 0 ? authorizationOptions[0].value : undefined
-        );
-    }, [authorizationsExists, authorizationOptions, selectedComponentDefinition]);
-
     const tagNames = connection?.tags?.map((tag) => tag.name);
 
     const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
@@ -344,6 +338,12 @@ const ConnectionDialog = ({componentDefinition, connection, onClose, triggerNode
             setWizardStep('configuration_step');
         }
     };
+
+    useEffect(() => {
+        setAuthorizationName(
+            authorizationOptions && authorizationOptions.length > 0 ? authorizationOptions[0].value : undefined
+        );
+    }, [authorizationsExists, authorizationOptions, selectedComponentDefinition]);
 
     return (
         <Dialog

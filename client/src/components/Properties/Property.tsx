@@ -184,11 +184,9 @@ const Property = ({
         }
     }, [controlType, mention, mentionInput]);
 
-    if (type === 'OBJECT' && !properties?.length && !items?.length) {
-        return <></>;
-    }
-
-    return (
+    return type === 'OBJECT' && !properties?.length && !items?.length ? (
+        <></>
+    ) : (
         <li
             className={twMerge(
                 controlType === 'CODE_EDITOR' && 'h-5/6',

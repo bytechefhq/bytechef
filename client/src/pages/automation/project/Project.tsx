@@ -275,58 +275,6 @@ const Project = () => {
         },
     });
 
-    useEffect(() => {
-        if (componentDefinitions) {
-            setComponentDefinitions(componentDefinitions);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [componentDefinitions?.length]);
-
-    useEffect(() => {
-        if (taskDispatcherDefinitions) {
-            setTaskDispatcherDefinitions(taskDispatcherDefinitions);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [taskDispatcherDefinitions?.length]);
-
-    useEffect(() => {
-        setLeftSidebarOpen(false);
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
-        if (projectId) {
-            setProjectId(+projectId);
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [projectId]);
-
-    useEffect(() => {
-        setWorkflowNodeDetailsPanelOpen(false);
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowId]);
-
-    useEffect(() => {
-        if (projectWorkflows) {
-            const workflow = projectWorkflows.find((workflow) => workflow.id === workflowId);
-
-            if (workflow) {
-                setWorkflow(workflow);
-            }
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [projectWorkflows, workflowId]);
-
-    useEffect(() => {
-        if (workflow?.id) {
-            navigate(`/automation/projects/${projectId}/workflows/${workflow.id}`);
-        }
-    }, [workflow, navigate, projectId, setWorkflowNodeDetailsPanelOpen]);
-
     const handleDeleteProjectAlertDialogClick = () => {
         if (project?.id) {
             deleteProjectMutation.mutate(project.id);
@@ -389,6 +337,58 @@ const Project = () => {
 
         navigate(`/automation/projects/${projectId}/workflows/${id}`);
     };
+
+    useEffect(() => {
+        if (componentDefinitions) {
+            setComponentDefinitions(componentDefinitions);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [componentDefinitions?.length]);
+
+    useEffect(() => {
+        if (taskDispatcherDefinitions) {
+            setTaskDispatcherDefinitions(taskDispatcherDefinitions);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [taskDispatcherDefinitions?.length]);
+
+    useEffect(() => {
+        setLeftSidebarOpen(false);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (projectId) {
+            setProjectId(+projectId);
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [projectId]);
+
+    useEffect(() => {
+        setWorkflowNodeDetailsPanelOpen(false);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflowId]);
+
+    useEffect(() => {
+        if (projectWorkflows) {
+            const workflow = projectWorkflows.find((workflow) => workflow.id === workflowId);
+
+            if (workflow) {
+                setWorkflow(workflow);
+            }
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [projectWorkflows, workflowId]);
+
+    useEffect(() => {
+        if (workflow?.id) {
+            navigate(`/automation/projects/${projectId}/workflows/${workflow.id}`);
+        }
+    }, [workflow, navigate, projectId, setWorkflowNodeDetailsPanelOpen]);
 
     return (
         <>

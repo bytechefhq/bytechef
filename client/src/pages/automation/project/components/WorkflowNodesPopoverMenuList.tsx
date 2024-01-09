@@ -43,12 +43,6 @@ const WorkflowNodesPopoverMenuList = memo(
             },
         });
 
-        useEffect(() => {
-            if (filter) {
-                setFilter(filter.toLowerCase());
-            }
-        }, [filter]);
-
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
             Array<ComponentDefinitionBasicModel>
         >([]);
@@ -229,6 +223,12 @@ const WorkflowNodesPopoverMenuList = memo(
                 );
             }
         };
+
+        useEffect(() => {
+            if (filter) {
+                setFilter(filter.toLowerCase());
+            }
+        }, [filter]);
 
         useEffect(() => {
             if (taskDispatcherDefinitions) {

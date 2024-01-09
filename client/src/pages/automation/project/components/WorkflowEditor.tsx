@@ -232,6 +232,28 @@ const WorkflowEditor = ({
         }
     }, [defaultNodesWithWorkflowNodes]);
 
+    const handleNodeChange = async (changes: NodeDimensionChange[]) => {
+        const changesIds = changes.map((change) => change.id);
+
+        const changesIncludeExistingNodes = defaultNodesWithWorkflowNodes?.some((node) =>
+            changesIds.includes(node?.data.id)
+        );
+
+        if (changesIncludeExistingNodes) {
+            return;
+        }
+
+        const workflowNodes = getNodes();
+
+        const newNode = workflowNodes.find((node) => node.id === changes[0].id);
+
+        if (!newNode?.data.componentName) {
+            return;
+        }
+
+        saveToWorkflowDefinition(newNode.data, workflow!, updateWorkflowMutationMutation);
+    };
+
     useEffect(() => {
         if (componentNames && previousComponentNames?.length) {
             const latestName = componentNames.find((componentName) => !previousComponentNames?.includes(componentName));
@@ -304,28 +326,6 @@ const WorkflowEditor = ({
             zoom: 1,
         });
     }, [workflowNodeDetailsPanelOpen, setViewport, width]);
-
-    const handleNodeChange = async (changes: NodeDimensionChange[]) => {
-        const changesIds = changes.map((change) => change.id);
-
-        const changesIncludeExistingNodes = defaultNodesWithWorkflowNodes?.some((node) =>
-            changesIds.includes(node?.data.id)
-        );
-
-        if (changesIncludeExistingNodes) {
-            return;
-        }
-
-        const workflowNodes = getNodes();
-
-        const newNode = workflowNodes.find((node) => node.id === changes[0].id);
-
-        if (!newNode?.data.componentName) {
-            return;
-        }
-
-        saveToWorkflowDefinition(newNode.data, workflow!, updateWorkflowMutationMutation);
-    };
 
     useLayout();
 
