@@ -1,5 +1,9 @@
 import {Button} from '@/components/ui/button';
+import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
 import WorkflowNodesPopoverMenu from '@/pages/automation/project/components/WorkflowNodesPopoverMenu';
+import {ProjectKeys} from '@/queries/projects.queries';
+import {WorkflowDefinition} from '@/types/types';
+import {useQueryClient} from '@tanstack/react-query';
 import {PencilIcon, TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
 import {Handle, NodeProps, Position, getConnectedEdges, useReactFlow} from 'reactflow';
@@ -7,22 +11,30 @@ import {twMerge} from 'tailwind-merge';
 
 import useNodeClickHandler from '../hooks/useNodeClick';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 import styles from './NodeTypes.module.css';
 
 const WorkflowNode = ({data, id}: NodeProps) => {
     const [isHovered, setIsHovered] = useState(false);
 
+    const {projectId} = useWorkflowDataStore();
+
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {setWorkflowDefinitions, workflowDefinitions} = useWorkflowDefinitionStore();
-    const {componentNames, currentWorkflowId, setComponentNames} = useWorkflowDataStore();
+    const {componentNames, setComponentNames, setWorkflow, workflow} = useWorkflowDataStore();
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
     const {getEdges, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
     const isSelected = currentNode.name === data.name;
+
+    const queryClient = useQueryClient();
+
+    const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(projectId!)});
+        },
+    });
 
     const handleDeleteActionNodeClick = () => {
         const nodes = getNodes();
@@ -74,13 +86,31 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
         setComponentNames(componentNames.filter((componentName) => componentName !== data.name));
 
-        const updatedTasks = workflowDefinitions[currentWorkflowId].tasks?.filter((task) => task.name !== data.name);
+        if (!workflow?.definition) {
+            return;
+        }
 
-        setWorkflowDefinitions({
-            ...workflowDefinitions,
-            [currentWorkflowId]: {
-                ...workflowDefinitions[currentWorkflowId],
-                tasks: updatedTasks,
+        const workflowDefinition: WorkflowDefinition = JSON.parse(workflow?.definition);
+
+        const updatedTasks = workflowDefinition!.tasks?.filter((task) => task.name !== data.name);
+
+        setWorkflow({
+            ...workflow,
+            tasks: updatedTasks,
+        });
+
+        updateWorkflowMutationMutation.mutate({
+            id: workflow.id!,
+            workflowModel: {
+                definition: JSON.stringify(
+                    {
+                        ...workflowDefinition,
+                        tasks: updatedTasks,
+                    },
+                    null,
+                    4
+                ),
+                version: workflow.version,
             },
         });
     };

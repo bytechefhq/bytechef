@@ -1,7 +1,8 @@
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, WorkflowModel} from '@/middleware/hermes/configuration';
+import useComponentDataStore from '@/pages/automation/project/stores/useComponentDataStore';
 import {PropertyType} from '@/types/projectTypes';
 import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -17,7 +18,6 @@ import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 import getSubProperties from '../utils/getSubProperties';
 import CurrentActionSelect from './CurrentActionSelect';
@@ -46,10 +46,10 @@ const TABS = [
 
 const WorkflowNodeDetailsPanel = ({
     componentDefinitions,
-    workflowId,
+    workflow,
 }: {
     componentDefinitions: Array<ComponentDefinitionBasicModel>;
-    workflowId: string;
+    workflow: WorkflowModel;
 }) => {
     const [activeTab, setActiveTab] = useState('description');
     const [componentDefinitionNames, setComponentDefinitionNames] = useState<Array<string>>([]);
@@ -62,7 +62,7 @@ const WorkflowNodeDetailsPanel = ({
         componentName: currentNode.componentName || currentNode.id,
     });
 
-    const {componentData, setComponentData} = useWorkflowDefinitionStore();
+    const {componentData, setComponentData} = useComponentDataStore();
 
     const {componentActions, componentNames, dataPills, nodeNames, setComponentActions, setDataPills} =
         useWorkflowDataStore();
@@ -540,7 +540,7 @@ const WorkflowNodeDetailsPanel = ({
                                                 componentDefinition={currentComponent}
                                                 connectionKey={connectionKey}
                                                 operationName={currentNode.name}
-                                                workflowId={workflowId}
+                                                workflowId={workflow.id!}
                                             />
                                         )}
 

@@ -1,7 +1,12 @@
-import {ComponentDefinitionApi} from '@/middleware/hermes/configuration';
+import {
+    ComponentDefinitionApi,
+    UpdateWorkflowRequest,
+    WorkflowModel,
+    WorkflowTaskModel,
+} from '@/middleware/hermes/configuration';
 import {ComponentDefinitionKeys} from '@/queries/componentDefinitions.queries';
-import {WorkflowDefinitionModel, WorkflowDefinitionType} from '@/types/types';
-import {QueryClient} from '@tanstack/react-query';
+import {WorkflowDefinition} from '@/types/types';
+import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 export default async function saveToWorkflowDefinition(
     nodeData: {
@@ -9,15 +14,10 @@ export default async function saveToWorkflowDefinition(
         icon: JSX.Element;
         label?: string;
         name: string;
-        parameters?: Array<{
-            name: string;
-            value: string;
-        }>;
+        parameters?: {[key: string]: object};
     },
-    workflowDefinition: WorkflowDefinitionModel,
-    workflowId: string,
-    workflowDefinitions: WorkflowDefinitionType,
-    setWorkflowDefinitions: (workflowDefinition: WorkflowDefinitionType) => void,
+    workflow: WorkflowModel,
+    updateWorkflowMutationMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>,
     index?: number
 ) {
     const {componentName, label, name, parameters} = nodeData;
@@ -33,41 +33,42 @@ export default async function saveToWorkflowDefinition(
         return;
     }
 
-    const newTask = {
-        componentName,
+    const newTask: WorkflowTaskModel = {
         label,
         name,
         parameters,
         type: `${componentName}/v1/${newNodeComponentDefinition.actions?.[0].name}`,
     };
 
-    const workflowNodeAlreadyExists = workflowDefinition.tasks?.some((task) => task.name === newTask.name);
+    const workflowNodeAlreadyExists = workflow.tasks?.some((task) => task.name === newTask.name);
 
     if (workflowNodeAlreadyExists) {
         return;
     }
 
-    const tasks = [...(workflowDefinition.tasks || [])];
+    let tasks: WorkflowTaskModel[];
+    const workflowDefinition: WorkflowDefinition = JSON.parse(workflow.definition!);
 
     if (index) {
+        tasks = [...(workflowDefinition.tasks || [])];
+
         tasks.splice(index, 0, newTask);
-
-        setWorkflowDefinitions({
-            ...workflowDefinitions,
-            [workflowId]: {
-                ...workflowDefinition,
-                tasks,
-            },
-        });
-
-        return;
+    } else {
+        tasks = [...(workflowDefinition.tasks || []), newTask];
     }
 
-    setWorkflowDefinitions({
-        ...workflowDefinitions,
-        [workflowId]: {
-            ...workflowDefinition,
-            tasks: [...(workflowDefinition.tasks || []), newTask],
+    updateWorkflowMutationMutation.mutate({
+        id: workflow.id!,
+        workflowModel: {
+            definition: JSON.stringify(
+                {
+                    ...workflowDefinition,
+                    tasks,
+                },
+                null,
+                4
+            ),
+            version: workflow.version,
         },
     });
 }

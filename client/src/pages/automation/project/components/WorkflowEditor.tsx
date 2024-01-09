@@ -1,7 +1,10 @@
+import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
 import {useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
+import {ProjectKeys} from '@/queries/projects.queries';
 import {ComponentActionType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
+import {useQueryClient} from '@tanstack/react-query';
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/hermes/configuration';
 import {DragEventHandler, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -17,17 +20,22 @@ import PlaceholderNode from '../nodes/PlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import defaultNodes from '../nodes/defaultNodes';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 import saveToWorkflowDefinition from '../utils/saveToWorkflowDefinition';
 
 export type WorkflowEditorProps = {
     componentDefinitions: ComponentDefinitionBasicModel[];
-    currentWorkflowId: string;
+    projectId: number;
+    workflowId: string;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasicModel[];
 };
 
-const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcherDefinitions}: WorkflowEditorProps) => {
+const WorkflowEditor = ({
+    componentDefinitions,
+    projectId,
+    taskDispatcherDefinitions,
+    workflowId,
+}: WorkflowEditorProps) => {
     const [edges, setEdges] = useState(defaultEdges);
     const [latestComponentName, setLatestComponentName] = useState('');
     const [nodeActions, setNodeActions] = useState<Array<ComponentActionType>>([]);
@@ -35,9 +43,15 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
     const [viewportWidth, setViewportWidth] = useState(0);
 
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {componentActions, componentNames, nodeNames, setComponentActions, setComponentNames, setNodeNames} =
-        useWorkflowDataStore();
-    const {setWorkflowDefinitions, workflowDefinitions} = useWorkflowDefinitionStore();
+    const {
+        componentActions,
+        componentNames,
+        nodeNames,
+        setComponentActions,
+        setComponentNames,
+        setNodeNames,
+        workflow,
+    } = useWorkflowDataStore();
 
     const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
 
@@ -69,6 +83,14 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
         },
         !!componentNames.length
     );
+
+    const queryClient = useQueryClient();
+
+    const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(projectId)});
+        },
+    });
 
     const onDrop: DragEventHandler = (event) => {
         const droppedNodeName = event.dataTransfer.getData('application/reactflow');
@@ -119,10 +141,8 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
         };
     }, [nodeNames, workflowComponent]);
 
-    const currentWorkflowDefinition = workflowDefinitions[currentWorkflowId!];
-
     const defaultNodesWithWorkflowNodes = useMemo(() => {
-        const workflowTasks = currentWorkflowDefinition?.tasks?.filter((task) => task.name);
+        const workflowTasks = workflow?.tasks?.filter((task) => task.name);
 
         const workflowNodes = workflowTasks?.map((workflowNode, index) => {
             const componentName = workflowNode.type?.split('/')[0];
@@ -173,7 +193,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
             return nodes;
         }
-    }, [componentDefinitions, currentWorkflowDefinition?.tasks]);
+    }, [componentDefinitions, workflow?.tasks]);
 
     const defaultEdgesWithWorkflowEdges = useMemo(() => {
         const workflowEdges: Array<Edge> = [];
@@ -236,13 +256,13 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
 
             setNodes(defaultNodesWithWorkflowNodes as Array<Node>);
         }
-    }, [defaultNodesWithWorkflowNodes, currentWorkflowId, setComponentNames, setNodeNames]);
+    }, [defaultNodesWithWorkflowNodes, workflowId, setComponentNames, setNodeNames]);
 
     useEffect(() => {
         if (defaultEdgesWithWorkflowEdges) {
             setEdges(defaultEdgesWithWorkflowEdges);
         }
-    }, [defaultEdgesWithWorkflowEdges, currentWorkflowId]);
+    }, [defaultEdgesWithWorkflowEdges, workflowId]);
 
     useEffect(() => {
         if (workflowComponentWithAlias?.actions) {
@@ -304,13 +324,7 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
             return;
         }
 
-        saveToWorkflowDefinition(
-            newNode.data,
-            currentWorkflowDefinition,
-            currentWorkflowId,
-            workflowDefinitions,
-            setWorkflowDefinitions
-        );
+        saveToWorkflowDefinition(newNode.data, workflow!, updateWorkflowMutationMutation);
     };
 
     useLayout();

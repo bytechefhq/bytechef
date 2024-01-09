@@ -1,11 +1,10 @@
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
+import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {ComponentDataType} from '@/types/types';
 import Input from 'components/Input/Input';
 import {ComponentDefinitionModel} from 'middleware/hermes/configuration';
 import {ChangeEvent} from 'react';
-
-import useWorkflowDefinitionStore from '../../stores/useWorkflowDefinitionStore';
 
 const DescriptionTab = ({
     componentDefinition,
@@ -17,7 +16,7 @@ const DescriptionTab = ({
     otherComponentData: Array<ComponentDataType>;
 }) => {
     const {name, title} = componentDefinition;
-    const {setComponentData} = useWorkflowDefinitionStore();
+    const {setComponentData} = useWorkflowDataStore();
 
     const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) =>
         setComponentData([

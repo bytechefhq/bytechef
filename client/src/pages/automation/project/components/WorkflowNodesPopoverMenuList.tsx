@@ -1,16 +1,18 @@
 import Input from '@/components/Input/Input';
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/hermes/configuration';
+import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
 import WorkflowNodesTabs from '@/pages/automation/project/components/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import getFormattedName from '@/pages/automation/project/utils/getFormattedName';
+import {ProjectKeys} from '@/queries/projects.queries';
 import {ClickedItemType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';
+import {useQueryClient} from '@tanstack/react-query';
 import {memo, useEffect, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 
-import useWorkflowDefinitionStore from '../stores/useWorkflowDefinitionStore';
 import saveToWorkflowDefinition from '../utils/saveToWorkflowDefinition';
 
 type WorkflowNodesListProps = {
@@ -31,6 +33,16 @@ const WorkflowNodesPopoverMenuList = memo(
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
 
+        const {projectId} = useWorkflowDataStore();
+
+        const queryClient = useQueryClient();
+
+        const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
+            onSuccess: () => {
+                queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(projectId!)});
+            },
+        });
+
         useEffect(() => {
             if (filter) {
                 setFilter(filter.toLowerCase());
@@ -49,10 +61,8 @@ const WorkflowNodesPopoverMenuList = memo(
             Array<ComponentDefinitionBasicModel>
         >([]);
 
-        const {componentDefinitions, componentNames, currentWorkflowId, setComponentNames, taskDispatcherDefinitions} =
+        const {componentDefinitions, componentNames, setComponentNames, taskDispatcherDefinitions, workflow} =
             useWorkflowDataStore();
-
-        const {setWorkflowDefinitions, workflowDefinitions} = useWorkflowDefinitionStore();
 
         const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
@@ -114,8 +124,6 @@ const WorkflowNodesPopoverMenuList = memo(
 
                     tempComponentNames.splice(previousComponentNameIndex + 1, 0, newWorkflowNode.data.componentName);
 
-                    const currentWorkflowDefinition = workflowDefinitions[currentWorkflowId!];
-
                     setComponentNames(tempComponentNames);
 
                     const previousWorkflowNodeIndex = nodes.findIndex((node) => node.id === clickedEdge.source);
@@ -126,10 +134,8 @@ const WorkflowNodesPopoverMenuList = memo(
 
                     saveToWorkflowDefinition(
                         newWorkflowNode.data,
-                        currentWorkflowDefinition,
-                        currentWorkflowId,
-                        workflowDefinitions,
-                        setWorkflowDefinitions,
+                        workflow!,
+                        updateWorkflowMutationMutation,
                         previousWorkflowNodeIndex
                     );
 

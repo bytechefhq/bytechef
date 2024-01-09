@@ -57,7 +57,6 @@ import {ProjectTagKeys} from '@/queries/projectTags.quries';
 import {ProjectKeys, useGetProjectQuery, useGetProjectWorkflowsQuery} from '@/queries/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
 import {useGetWorkflowTestConfigurationsQuery} from '@/queries/workflowTestConfigurations.queries';
-import {WorkflowDefinitionType} from '@/types/types';
 import {ChevronDownIcon, DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {
@@ -79,7 +78,6 @@ import ProjectWorkflow from './components/ProjectWorkflow';
 import ToggleGroup, {IToggleItem} from './components/ToggleGroup';
 import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
-import useWorkflowDefinitionStore from './stores/useWorkflowDefinitionStore';
 
 const workflowTestExecutionApi = new WorkflowTestExecutionApi();
 
@@ -95,7 +93,6 @@ const headerToggleItems: IToggleItem[] = [
 ];
 
 const Project = () => {
-    const [currentWorkflow, setCurrentWorkflow] = useState<WorkflowModel | undefined>();
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
@@ -109,8 +106,13 @@ const Project = () => {
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {setComponentDefinitions, setCurrentWorkflowId, setTaskDispatcherDefinitions} = useWorkflowDataStore();
-    const {setWorkflowDefinitions, workflowDefinitions} = useWorkflowDefinitionStore();
+    const {
+        setComponentDefinitions,
+        setProjectId,
+        setTaskDispatcherDefinitions,
+        setWorkflow: setWorkflow,
+        workflow: workflow,
+    } = useWorkflowDataStore();
 
     const {toast} = useToast();
 
@@ -171,7 +173,7 @@ const Project = () => {
     const filteredWorkflowTestConfigurations =
         workflowTestConfigurations && workflowTestConfigurations.length > 0
             ? workflowTestConfigurations.filter(
-                  (workflowTestConfiguration) => workflowTestConfiguration.workflowId === currentWorkflow?.id
+                  (workflowTestConfiguration) => workflowTestConfiguration.workflowId === workflow?.id
               )
             : undefined;
 
@@ -195,10 +197,9 @@ const Project = () => {
     }, {});
 
     const runDisabled =
-        (currentWorkflow?.inputs ?? []).filter(
-            (input) => input.required && !workflowTestConfigurationInputs[input.name]
-        ).length > 0 ||
-        (currentWorkflow?.tasks ?? [])
+        (workflow?.inputs ?? []).filter((input) => input.required && !workflowTestConfigurationInputs[input.name])
+            .length > 0 ||
+        (workflow?.tasks ?? [])
             .flatMap((task) => (task.connections ? task.connections : []))
             .filter(
                 (workflowConnection) =>
@@ -212,10 +213,7 @@ const Project = () => {
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projectWorkflows(parseInt(projectId!)),
             });
-
-            setCurrentWorkflow(workflow);
-
-            setWorkflowDefinitions({...workflowDefinitions, [workflow.id!]: workflow} as WorkflowDefinitionType);
+            setWorkflow(workflow);
         },
     });
 
@@ -298,6 +296,14 @@ const Project = () => {
     }, []);
 
     useEffect(() => {
+        if (projectId) {
+            setProjectId(+projectId);
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [projectId]);
+
+    useEffect(() => {
         setWorkflowNodeDetailsPanelOpen(false);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -307,10 +313,8 @@ const Project = () => {
         if (projectWorkflows) {
             const workflow = projectWorkflows.find((workflow) => workflow.id === workflowId);
 
-            setCurrentWorkflow(workflow);
-
-            if (workflow?.id && !workflowDefinitions[workflow.id]) {
-                setWorkflowDefinitions({...workflowDefinitions, [workflow.id]: workflow} as WorkflowDefinitionType);
+            if (workflow) {
+                setWorkflow(workflow);
             }
         }
 
@@ -318,12 +322,10 @@ const Project = () => {
     }, [projectWorkflows, workflowId]);
 
     useEffect(() => {
-        if (currentWorkflow?.id) {
-            navigate(`/automation/projects/${projectId}/workflows/${currentWorkflow.id}`);
-
-            setCurrentWorkflowId(currentWorkflow.id);
+        if (workflow?.id) {
+            navigate(`/automation/projects/${projectId}/workflows/${workflow.id}`);
         }
-    }, [currentWorkflow, navigate, projectId, setCurrentWorkflowId, setWorkflowNodeDetailsPanelOpen]);
+    }, [workflow, navigate, projectId, setWorkflowNodeDetailsPanelOpen]);
 
     const handleDeleteProjectAlertDialogClick = () => {
         if (project?.id) {
@@ -332,10 +334,10 @@ const Project = () => {
     };
 
     const handleDeleteWorkflowAlertDialogClick = () => {
-        if (project?.id && currentWorkflow?.id) {
+        if (project?.id && workflow?.id) {
             deleteWorkflowMutationMutation.mutate({
                 id: project?.id,
-                workflowId: currentWorkflow?.id,
+                workflowId: workflow?.id,
             });
         }
     };
@@ -355,10 +357,10 @@ const Project = () => {
         setWorkflowTestExecution(undefined);
         setWorkflowIsRunning(true);
 
-        if (currentWorkflow?.id) {
+        if (workflow?.id) {
             workflowTestExecutionApi
                 .testWorkflow({
-                    id: currentWorkflow?.id,
+                    id: workflow?.id,
                 })
                 .then((workflowTestExecution) => {
                     setWorkflowTestExecution(workflowTestExecution);
@@ -381,10 +383,8 @@ const Project = () => {
 
         const newWorkflow = projectWorkflows.find((workflow: WorkflowModel) => workflow.id === id);
 
-        setCurrentWorkflow(newWorkflow);
-
-        if (newWorkflow?.id && !workflowDefinitions[newWorkflow.id]) {
-            setWorkflowDefinitions({...workflowDefinitions, [newWorkflow.id]: newWorkflow});
+        if (newWorkflow) {
+            setWorkflow(newWorkflow);
         }
 
         navigate(`/automation/projects/${projectId}/workflows/${id}`);
@@ -433,12 +433,12 @@ const Project = () => {
                             </div>
 
                             <div className="mr-2 flex rounded-md border border-input bg-white shadow-sm">
-                                {currentWorkflow && !!projectWorkflows && (
+                                {workflow && !!projectWorkflows && (
                                     <Select
                                         defaultValue={workflowId}
                                         name="projectWorkflowSelect"
                                         onValueChange={handleProjectWorkflowValueChange}
-                                        value={currentWorkflow.id || workflowId}
+                                        value={workflow.id || workflowId}
                                     >
                                         <SelectTrigger className="mr-0.5 border-0 bg-white shadow-none">
                                             <SelectValue placeholder="Select a workflow" />
@@ -474,12 +474,12 @@ const Project = () => {
                                             Edit
                                         </DropdownMenuItem>
 
-                                        {project && currentWorkflow && (
+                                        {project && workflow && (
                                             <DropdownMenuItem
                                                 onClick={() =>
                                                     duplicateWorkflowMutationMutation.mutate({
                                                         id: project.id!,
-                                                        workflowId: currentWorkflow.id!,
+                                                        workflowId: workflow.id!,
                                                     })
                                                 }
                                             >
@@ -684,11 +684,12 @@ const Project = () => {
                     errors={[componentsError, taskDispatcherDefinitionsError, projectWorkflowsError]}
                     loading={componentsIsLoading || taskDispatcherDefinitionsLoading || projectWorkflowsLoading}
                 >
-                    {componentDefinitions && !!taskDispatcherDefinitions && currentWorkflow?.id && (
+                    {componentDefinitions && !!taskDispatcherDefinitions && workflow?.id && (
                         <ProjectWorkflow
                             componentDefinitions={componentDefinitions}
-                            currentWorkflowId={currentWorkflow.id}
+                            projectId={+projectId!}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
+                            workflowId={workflow.id}
                         />
                     )}
                 </PageLoader>
@@ -747,16 +748,16 @@ const Project = () => {
                 <WorkflowDialog
                     onClose={() => setShowEditWorkflowDialog(false)}
                     updateWorkflowMutation={updateWorkflowMutation}
-                    workflow={currentWorkflow}
+                    workflow={workflow}
                 />
             )}
 
-            {currentWorkflow && (
+            {workflow && (
                 <>
                     {showWorkflowTestConfigurationDialog && (
                         <WorkflowTestConfigurationDialog
                             onClose={() => setShowWorkflowTestConfigurationDialog(false)}
-                            workflow={currentWorkflow}
+                            workflow={workflow}
                             workflowTestConfiguration={currentWorkflowTestConfiguration}
                         />
                     )}
@@ -767,7 +768,7 @@ const Project = () => {
                                 setShowWorkflowCodeEditorSheet(false);
                             }}
                             projectId={+projectId!}
-                            workflow={currentWorkflow}
+                            workflow={workflow}
                         />
                     )}
 
@@ -775,7 +776,7 @@ const Project = () => {
                         <WorkflowInputsSheet
                             onClose={() => setShowWorkflowInputsSheet(false)}
                             projectId={+projectId}
-                            workflow={currentWorkflow}
+                            workflow={workflow}
                         />
                     )}
                 </>

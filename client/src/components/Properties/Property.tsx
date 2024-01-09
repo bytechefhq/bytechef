@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
-import useWorkflowDefinitionStore from '@/pages/automation/project/stores/useWorkflowDefinitionStore';
+import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import getInputType from '@/pages/automation/project/utils/getInputType';
 import {PropertyType} from '@/types/projectTypes';
@@ -69,7 +69,7 @@ const Property = ({
 
     const {setFocusedInput} = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {componentData, setComponentData} = useWorkflowDefinitionStore();
+    const {componentData, setComponentData} = useWorkflowDataStore();
 
     let {name} = property;
 

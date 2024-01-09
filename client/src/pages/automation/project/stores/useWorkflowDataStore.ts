@@ -1,21 +1,23 @@
+import {WorkflowModel} from '@/middleware/helios/configuration';
+
 /* eslint-disable sort-keys */
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/hermes/configuration';
-import {ComponentActionType, DataPillType} from '@/types/types';
+import {ComponentActionType, ComponentDataType, DataPillType} from '@/types/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-interface WorkflowDefinitionState {
+interface WorkflowDataState {
+    componentActions: Array<ComponentActionType>;
+    setComponentActions: (componentActions: Array<ComponentActionType>) => void;
+
+    componentData: Array<ComponentDataType>;
+    setComponentData: (componentData: Array<ComponentDataType>) => void;
+
     componentDefinitions: Array<ComponentDefinitionBasicModel>;
     setComponentDefinitions: (componentDefinitions: Array<ComponentDefinitionBasicModel>) => void;
 
     componentNames: Array<string>;
     setComponentNames: (componentNames: Array<string>) => void;
-
-    componentActions: Array<ComponentActionType>;
-    setComponentActions: (componentActions: Array<ComponentActionType>) => void;
-
-    currentWorkflowId: string;
-    setCurrentWorkflowId: (currentWorkflowId: string) => void;
 
     dataPills: Array<DataPillType>;
     setDataPills: (dataPills: Array<DataPillType>) => void;
@@ -23,24 +25,30 @@ interface WorkflowDefinitionState {
     nodeNames: Array<string>;
     setNodeNames: (nodeNames: Array<string>) => void;
 
+    projectId: number;
+    setProjectId: (projectId: number) => void;
+
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
     setTaskDispatcherDefinitions: (taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>) => void;
+
+    workflow: WorkflowModel;
+    setWorkflow: (workflowDefinition: WorkflowModel) => void;
 }
 
-const useWorkflowDataStore = create<WorkflowDefinitionState>()(
+const useWorkflowDataStore = create<WorkflowDataState>()(
     devtools(
         (set) => ({
+            componentActions: [],
+            setComponentActions: (componentActions) => set((state) => ({...state, componentActions})),
+
+            componentData: [],
+            setComponentData: (componentData) => set(() => ({componentData})),
+
             componentDefinitions: [],
             setComponentDefinitions: (componentDefinitions) => set((state) => ({...state, componentDefinitions})),
 
             componentNames: [],
             setComponentNames: (componentNames) => set((state) => ({...state, componentNames})),
-
-            componentActions: [],
-            setComponentActions: (componentActions) => set((state) => ({...state, componentActions})),
-
-            currentWorkflowId: '',
-            setCurrentWorkflowId: (currentWorkflowId) => set((state) => ({...state, currentWorkflowId})),
 
             dataPills: [],
             setDataPills: (dataPills) => set((state) => ({...state, dataPills})),
@@ -48,9 +56,15 @@ const useWorkflowDataStore = create<WorkflowDefinitionState>()(
             nodeNames: [],
             setNodeNames: (nodeNames) => set((state) => ({...state, nodeNames})),
 
+            projectId: 0,
+            setProjectId: (projectId: number) => set((state) => ({...state, projectId})),
+
             taskDispatcherDefinitions: [],
             setTaskDispatcherDefinitions: (taskDispatcherDefinitions) =>
                 set((state) => ({...state, taskDispatcherDefinitions})),
+
+            workflow: {},
+            setWorkflow: (workflow) => set(() => ({workflow})),
         }),
         {name: 'workflow-data'}
     )
