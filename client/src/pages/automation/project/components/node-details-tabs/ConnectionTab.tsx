@@ -74,7 +74,10 @@ const ConnectionTab = ({
     return (
         <div className="h-full flex-[1_1_1px] overflow-auto p-4">
             {connections?.length ? (
-                <Select onValueChange={(value) => handleValueChange(+value)} value={connectionId + ''}>
+                <Select
+                    onValueChange={(value) => handleValueChange(+value)}
+                    value={connectionId ? connectionId + '' : undefined}
+                >
                     <div className="flex space-x-2">
                         <SelectTrigger>
                             <SelectValue placeholder="Choose Connection..." />
