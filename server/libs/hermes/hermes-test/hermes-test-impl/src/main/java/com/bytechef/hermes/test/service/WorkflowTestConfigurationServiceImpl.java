@@ -112,7 +112,8 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
             CollectionUtils.concat(
                 CollectionUtils.filter(
                     workflowTestConfiguration.getConnections(),
-                    connection -> !Objects.equals(connection.getKey(), key)),
+                    connection -> !(Objects.equals(connection.getKey(), key) &&
+                        Objects.equals(connection.getOperationName(), operationName))),
                 List.of(workflowTestConfigurationConnection)));
 
         workflowTestConfigurationRepository.save(workflowTestConfiguration);
