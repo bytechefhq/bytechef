@@ -18,10 +18,12 @@ import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 
 const ConnectionTab = ({
     componentDefinition,
+    connectionKey,
     operationName,
     workflowId,
 }: {
     componentDefinition: ComponentDefinitionModel;
+    connectionKey: string;
     operationName: string;
     workflowId: string;
 }) => {
@@ -43,11 +45,9 @@ const ConnectionTab = ({
     });
 
     let connectionId: number | undefined;
-    let key: string;
 
     if (workflowTestConfigurationConnections && workflowTestConfigurationConnections.length > 0) {
         connectionId = workflowTestConfigurationConnections[0].connectionId;
-        key = workflowTestConfigurationConnections[0].key;
     }
 
     const queryClient = useQueryClient();
@@ -62,7 +62,7 @@ const ConnectionTab = ({
 
     const handleValueChange = (connectionId: number) => {
         mutation.mutate({
-            key,
+            key: connectionKey,
             operationName,
             updateWorkflowTestConfigurationConnectionRequestModel: {
                 connectionId,
