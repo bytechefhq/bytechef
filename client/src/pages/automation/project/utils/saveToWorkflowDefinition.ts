@@ -8,6 +8,8 @@ import {ComponentDefinitionKeys} from '@/queries/componentDefinitions.queries';
 import {WorkflowDefinition} from '@/types/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
+const SPACE = 4;
+
 export default async function saveToWorkflowDefinition(
     nodeData: {
         componentName: string;
@@ -66,7 +68,7 @@ export default async function saveToWorkflowDefinition(
                     tasks,
                 },
                 null,
-                4
+                SPACE
             ),
             version: workflow.version,
         },

@@ -18,6 +18,8 @@ import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
+const SPACE = 4;
+
 type WorkflowDialogProps = {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     createWorkflowMutation?: UseMutationResult<any, object, any, unknown>;
@@ -74,7 +76,7 @@ const WorkflowDialog = ({
                             label: formData.label,
                         },
                         null,
-                        4
+                        SPACE
                     ),
                 },
             });
@@ -92,7 +94,7 @@ const WorkflowDialog = ({
                             tasks: [],
                         },
                         null,
-                        4
+                        SPACE
                     ),
                 },
             });

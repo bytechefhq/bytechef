@@ -1,4 +1,8 @@
+import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
+import saveToWorkflowDefinition from '@/pages/automation/project/utils/saveToWorkflowDefinition';
+import {ProjectKeys} from '@/queries/projects.queries';
 import getRandomId from '@/utils/getRandomId';
+import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon} from 'lucide-react';
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/hermes/configuration';
 import InlineSVG from 'react-inlinesvg';
@@ -11,13 +15,21 @@ export default function useHandleDrop(): [
     (targetNode: Node, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
     (targetEdge: Edge, droppedNode: ComponentDefinitionBasicModel | TaskDispatcherDefinitionBasicModel) => void,
 ] {
-    const {componentNames, setComponentNames} = useWorkflowDataStore();
+    const {componentNames, projectId, setComponentNames, workflow} = useWorkflowDataStore();
 
     const {getEdges, getNodes, setEdges, setNodes} = useReactFlow();
 
     const newNodeId = getRandomId();
     const nodes = getNodes();
     const edges = getEdges();
+
+    const queryClient = useQueryClient();
+
+    const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(projectId)});
+        },
+    });
 
     function handleDropOnPlaceholderNode(
         targetNode: Node,
@@ -130,7 +142,7 @@ export default function useHandleDrop(): [
 
             const tempComponentNames = [...componentNames];
 
-            tempComponentNames.splice(nextNodeIndex - 1, 0, draggedNode.data.name);
+            tempComponentNames.splice(nextNodeIndex - 1, 0, draggedNode.data.componentName);
 
             setComponentNames(tempComponentNames);
 
@@ -155,6 +167,8 @@ export default function useHandleDrop(): [
 
             return edges;
         });
+
+        saveToWorkflowDefinition(draggedNode.data, workflow, updateWorkflowMutationMutation, targetEdgeIndex);
     }
 
     return [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge];

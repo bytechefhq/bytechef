@@ -14,13 +14,13 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 import styles from './NodeTypes.module.css';
 
+const SPACE = 4;
+
 const WorkflowNode = ({data, id}: NodeProps) => {
     const [isHovered, setIsHovered] = useState(false);
 
-    const {projectId} = useWorkflowDataStore();
-
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {componentNames, setComponentNames, setWorkflow, workflow} = useWorkflowDataStore();
+    const {componentNames, projectId, setComponentNames, setWorkflow, workflow} = useWorkflowDataStore();
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
@@ -108,7 +108,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                         tasks: updatedTasks,
                     },
                     null,
-                    4
+                    SPACE
                 ),
                 version: workflow.version,
             },

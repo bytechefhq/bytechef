@@ -30,6 +30,8 @@ export interface WorkflowInputsSheetDialogProps {
     workflow: WorkflowModel;
 }
 
+const SPACE = 4;
+
 const WorkflowInputsSheetDialog = ({
     inputIndex = -1,
     onClose,
@@ -87,7 +89,7 @@ const WorkflowInputsSheetDialog = ({
                         inputs,
                     },
                     null,
-                    4
+                    SPACE
                 ),
                 version: workflow.version,
             },

@@ -26,6 +26,8 @@ import {useQueryClient} from '@tanstack/react-query';
 import {AlignJustifyIcon, PlusIcon} from 'lucide-react';
 import {useState} from 'react';
 
+const SPACE = 4;
+
 const WorkflowInputsSheetTable = ({
     inputs,
     projectId,
@@ -67,7 +69,7 @@ const WorkflowInputsSheetTable = ({
                         inputs,
                     },
                     null,
-                    4
+                    SPACE
                 ),
                 version: workflow.version,
             },

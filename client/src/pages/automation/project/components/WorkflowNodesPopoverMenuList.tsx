@@ -37,7 +37,7 @@ const WorkflowNodesPopoverMenuList = memo(
 
         const queryClient = useQueryClient();
 
-        const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
+        const updateWorkflowMutation = useUpdateWorkflowMutation({
             onSuccess: () => {
                 queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(projectId!)});
             },
@@ -129,7 +129,7 @@ const WorkflowNodesPopoverMenuList = memo(
                     saveToWorkflowDefinition(
                         newWorkflowNode.data,
                         workflow!,
-                        updateWorkflowMutationMutation,
+                        updateWorkflowMutation,
                         previousWorkflowNodeIndex
                     );
 

@@ -76,7 +76,7 @@ const ConnectionTab = ({
             {connections?.length ? (
                 <Select
                     onValueChange={(value) => handleValueChange(+value)}
-                    value={connectionId ? connectionId + '' : undefined}
+                    value={connectionId ? connectionId.toString() : undefined}
                 >
                     <div className="flex space-x-2">
                         <SelectTrigger>

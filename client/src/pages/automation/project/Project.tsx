@@ -106,13 +106,8 @@ const Project = () => {
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebarStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
-    const {
-        setComponentDefinitions,
-        setProjectId,
-        setTaskDispatcherDefinitions,
-        setWorkflow: setWorkflow,
-        workflow: workflow,
-    } = useWorkflowDataStore();
+    const {setComponentDefinitions, setProjectId, setTaskDispatcherDefinitions, setWorkflow, workflow} =
+        useWorkflowDataStore();
 
     const {toast} = useToast();
 
