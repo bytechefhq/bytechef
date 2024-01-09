@@ -544,13 +544,36 @@ const Project = () => {
                                     </Button>
                                 </TooltipTrigger>
 
-                                <TooltipContent>Workflow test configuration</TooltipContent>
+                                <TooltipContent>
+                                    Set the workflow test configuration (test input parameters and/or connections)
+                                </TooltipContent>
                             </Tooltip>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <>
-                                        {!workflowIsRunning && (
+                            {!workflowIsRunning && runDisabled && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span tabIndex={0}>
+                                            <Button
+                                                className="bg-success text-success-foreground hover:bg-success/80"
+                                                disabled={runDisabled}
+                                                variant="secondary"
+                                            >
+                                                <PlayIcon className="mr-0.5 h-5" /> Run
+                                            </Button>
+                                        </span>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>
+                                        The workflow cannot be executed. Please set all required workflow input
+                                        parameters, connections and component properties.
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
+
+                            {!workflowIsRunning && !runDisabled && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span tabIndex={0}>
                                             <Button
                                                 className="bg-success text-success-foreground hover:bg-success/80"
                                                 disabled={runDisabled}
@@ -559,43 +582,56 @@ const Project = () => {
                                             >
                                                 <PlayIcon className="mr-0.5 h-5" /> Run
                                             </Button>
-                                        )}
+                                        </span>
+                                    </TooltipTrigger>
 
-                                        {workflowIsRunning && (
-                                            <Button
-                                                onClick={() => {
-                                                    // TODO
-                                                }}
-                                                size="sm"
-                                                variant="destructive"
-                                            >
-                                                <SquareIcon className="mr-0.5 h-5" /> Running
+                                    <TooltipContent>Run the current workflow</TooltipContent>
+                                </Tooltip>
+                            )}
+
+                            {workflowIsRunning && (
+                                <Button
+                                    onClick={() => {
+                                        // TODO
+                                    }}
+                                    size="sm"
+                                    variant="destructive"
+                                >
+                                    <SquareIcon className="mr-0.5 h-5" /> Running
+                                </Button>
+                            )}
+
+                            {!project?.publishedDate && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            onClick={() =>
+                                                publishProjectMutation.mutate({
+                                                    id: +projectId!,
+                                                })
+                                            }
+                                        >
+                                            <CircleDotDashedIcon className="mr-0.5 h-5" /> Publish
+                                        </Button>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Publish the project.</TooltipContent>
+                                </Tooltip>
+                            )}
+
+                            {project?.publishedDate && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span>
+                                            <Button disabled={!!project?.publishedDate}>
+                                                <CircleDotDashedIcon className="mr-0.5 h-5" /> Publish
                                             </Button>
-                                        )}
-                                    </>
-                                </TooltipTrigger>
+                                        </span>
+                                    </TooltipTrigger>
 
-                                <TooltipContent>Run the current workflow</TooltipContent>
-                            </Tooltip>
-
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        disabled={!!project?.publishedDate}
-                                        onClick={() =>
-                                            publishProjectMutation.mutate({
-                                                id: +projectId!,
-                                            })
-                                        }
-                                    >
-                                        <CircleDotDashedIcon className="mr-0.5 h-5" /> Publish
-                                    </Button>
-                                </TooltipTrigger>
-
-                                <TooltipContent>
-                                    {`${!project?.publishedDate ? 'Project is not published' : 'Project is published'}`}
-                                </TooltipContent>
-                            </Tooltip>
+                                    <TooltipContent>The project is published</TooltipContent>
+                                </Tooltip>
+                            )}
                         </div>
                     </header>
                 }
