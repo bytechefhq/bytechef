@@ -19,10 +19,10 @@ import WorkflowEditor, {WorkflowEditorProps} from './WorkflowEditor';
 const ProjectWorkflow = ({componentDefinitions, currentWorkflowId, taskDispatcherDefinitions}: WorkflowEditorProps) => {
     const [actionData, setActionData] = useState<Array<ActionDefinitionModel>>([]);
 
-    const {componentActions, componentNames} = useWorkflowDataStore();
+    const {componentActions, componentNames, nodeNames} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const currentNodeIndex = componentNames.indexOf(currentNode.componentName || currentNode.name);
+    const currentNodeIndex = nodeNames.indexOf(currentNode.name);
 
     const previousComponentNames = componentNames.length > 1 ? componentNames.slice(0, currentNodeIndex) : [];
 
