@@ -20,6 +20,7 @@ import {WorkflowInputModel, WorkflowModel} from '@/middleware/hermes/configurati
 import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
 import WorkflowInputsSheetDialog from '@/pages/automation/project/components/WorkflowInputsSheetDialog';
 import {ProjectKeys} from '@/queries/projects.queries';
+import {WorkflowDefinition} from '@/types/types';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {AlignJustifyIcon, PlusIcon} from 'lucide-react';
@@ -49,10 +50,9 @@ const WorkflowInputsSheetTable = ({
     });
 
     function handleDelete(input: WorkflowInputModel) {
-        /* eslint-disable @typescript-eslint/no-explicit-any */
-        const definitionObject: any = JSON.parse(workflow.definition!);
+        const definitionObject: WorkflowDefinition = JSON.parse(workflow.definition!);
 
-        const inputs: WorkflowInputModel[] = definitionObject.inputs;
+        const inputs: WorkflowInputModel[] = definitionObject.inputs ?? [];
 
         const index = inputs.findIndex((curInput) => curInput.name === input.name);
 

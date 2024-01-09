@@ -1,6 +1,7 @@
 import {
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
+    ConnectionDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
 } from '@/middleware/hermes/configuration';
 
@@ -35,7 +36,7 @@ export type ComponentDataType = {
 };
 
 export type CurrentComponentType = {
-    connection?: object;
+    connection?: ConnectionDefinitionBasicModel;
     notes?: string;
     properties?: object;
     workflowNodeName?: string;
@@ -45,14 +46,43 @@ export type ClickedItemType = {
     componentName?: string;
 } & (ComponentDefinitionBasicModel | TaskDispatcherDefinitionModel);
 
-export interface WorkflowDefinitionModel {
-    action?: string;
-    name?: string;
-    components?: Array<ComponentDataType>;
-    flowControls?: Array<ComponentDataType>;
-    tasks?: Array<ComponentDataType>;
+export interface WorkflowDefinition {
+    description?: string;
+    label?: string;
+    inputs?: Array<WorkflowInput>;
+    outputs?: Array<WorkflowOutput>;
+    tasks?: Array<WorkflowTask>;
+    triggers?: Array<WorkflowTrigger>;
 }
 
-export type WorkflowDefinitionType = {
-    [workflowId: string]: WorkflowDefinitionModel;
-};
+export interface WorkflowInput {
+    label?: string;
+    name: string;
+    required?: boolean;
+    type?: string;
+}
+
+export interface WorkflowOutput {
+    name: string;
+    value: object;
+}
+
+export interface WorkflowTask {
+    finalize?: Array<WorkflowTask>;
+    label?: string;
+    name: string;
+    node?: string;
+    parameters?: {[key: string]: object};
+    post?: Array<WorkflowTask>;
+    pre?: Array<WorkflowTask>;
+    timeout?: string;
+    type: string;
+}
+
+export interface WorkflowTrigger {
+    label?: string;
+    name: string;
+    parameters?: {[key: string]: object};
+    timeout?: string;
+    type: string;
+}
