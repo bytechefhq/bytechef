@@ -168,13 +168,23 @@ const Project = () => {
 
     const {data: workflowTestConfigurations} = useGetWorkflowTestConfigurationsQuery();
 
+    const filteredWorkflowTestConfigurations =
+        workflowTestConfigurations && workflowTestConfigurations.length > 0
+            ? workflowTestConfigurations.filter(
+                  (workflowTestConfiguration) => workflowTestConfiguration.workflowId === currentWorkflow?.id
+              )
+            : undefined;
+
+    const currentWorkflowTestConfiguration =
+        filteredWorkflowTestConfigurations && filteredWorkflowTestConfigurations.length > 0 ? filteredWorkflowTestConfigurations[0] : undefined;
+
     const workflowTestConfigurationInputs =
-        workflowTestConfigurations && workflowTestConfigurations.length > 0 && workflowTestConfigurations[0].inputs
-            ? workflowTestConfigurations[0].inputs
+        currentWorkflowTestConfiguration && currentWorkflowTestConfiguration.inputs
+            ? currentWorkflowTestConfiguration.inputs
             : {};
     const workflowTestConfigurationConnections = (
-        workflowTestConfigurations && workflowTestConfigurations.length > 0 && workflowTestConfigurations[0].connections
-            ? workflowTestConfigurations[0].connections
+        currentWorkflowTestConfiguration && currentWorkflowTestConfiguration.connections
+            ? currentWorkflowTestConfiguration.connections
             : []
     ).reduce(function (map: {[key: string]: number}, workflowTestConfigurationConnection) {
         map[workflowTestConfigurationConnection.key] = workflowTestConfigurationConnection.connectionId;
@@ -705,13 +715,11 @@ const Project = () => {
 
             {currentWorkflow && (
                 <>
-                    {showWorkflowTestConfigurationDialog && workflowTestConfigurations && (
+                    {showWorkflowTestConfigurationDialog && (
                         <WorkflowTestConfigurationDialog
                             onClose={() => setShowWorkflowTestConfigurationDialog(false)}
                             workflow={currentWorkflow}
-                            workflowTestConfiguration={
-                                workflowTestConfigurations.length > 0 ? workflowTestConfigurations[0] : undefined
-                            }
+                            workflowTestConfiguration={currentWorkflowTestConfiguration}
                         />
                     )}
 
