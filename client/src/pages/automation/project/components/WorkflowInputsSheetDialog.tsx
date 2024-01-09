@@ -16,6 +16,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {WorkflowInputModel, WorkflowModel} from '@/middleware/hermes/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
 import {ProjectKeys} from '@/queries/projects.queries';
+import {WorkflowDefinition} from '@/types/types';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useState} from 'react';
@@ -67,10 +68,9 @@ const WorkflowInputsSheetDialog = ({
     }
 
     function handleSave(input: WorkflowInputModel) {
-        /* eslint-disable @typescript-eslint/no-explicit-any */
-        const definitionObject: any = JSON.parse(workflow.definition!);
+        const workflowDefinition: WorkflowDefinition = JSON.parse(workflow.definition!);
 
-        let inputs: WorkflowInputModel[] = definitionObject.inputs;
+        let inputs: WorkflowInputModel[] = workflowDefinition.inputs ?? [];
 
         if (inputIndex === -1) {
             inputs = [...(inputs || []), input];
@@ -83,7 +83,7 @@ const WorkflowInputsSheetDialog = ({
             workflowModel: {
                 definition: JSON.stringify(
                     {
-                        ...definitionObject,
+                        ...workflowDefinition,
                         inputs,
                     },
                     null,
