@@ -82,9 +82,9 @@ const WorkflowCodeEditorSheet = ({onClose, projectId, workflow}: WorkflowExecuti
                                 </Tooltip>
 
                                 <SheetPrimitive.Close asChild>
-                                    <Button size="icon" variant="ghost">
+                                    <button>
                                         <Cross2Icon className="h-4 w-4 opacity-70" />
-                                    </Button>
+                                    </button>
                                 </SheetPrimitive.Close>
                             </div>
                         </div>

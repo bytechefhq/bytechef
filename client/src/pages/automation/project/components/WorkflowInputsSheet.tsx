@@ -23,7 +23,7 @@ const WorkflowInputsSheet = ({onClose, projectId, workflow}: WorkflowInputsSheet
                 <div className="flex items-center justify-between">
                     <SheetTitle className="flex">Workflow Inputs</SheetTitle>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                         <WorkflowInputsSheetDialog
                             projectId={projectId}
                             triggerNode={<Button size="sm">Create</Button>}
@@ -31,9 +31,9 @@ const WorkflowInputsSheet = ({onClose, projectId, workflow}: WorkflowInputsSheet
                         />
 
                         <SheetPrimitive.Close asChild>
-                            <Button size="icon" variant="ghost">
+                            <button>
                                 <Cross2Icon className="h-4 w-4 opacity-70" />
-                            </Button>
+                            </button>
                         </SheetPrimitive.Close>
                     </div>
                 </div>
