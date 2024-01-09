@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ComponentDefinitionBasicModel, WorkflowModel} from '@/middleware/hermes/configuration';
+import {ActionDefinitionModel, ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
 import useComponentDataStore from '@/pages/automation/project/stores/useComponentDataStore';
 import {PropertyType} from '@/types/projectTypes';
 import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
@@ -9,7 +9,6 @@ import * as Dialog from '@radix-ui/react-dialog';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Properties from 'components/Properties/Properties';
 import {
-    useGetActionDefinitionsQuery,
     useGetComponentActionDefinitionQuery,
     useGetComponentActionOutputSchemaQuery,
 } from 'queries/actionDefinitions.queries';
@@ -45,11 +44,11 @@ const TABS = [
 ];
 
 const WorkflowNodeDetailsPanel = ({
-    componentDefinitions,
-    workflow,
+    actionDefinitions,
+    previousComponentDefinitions,
 }: {
-    componentDefinitions: Array<ComponentDefinitionBasicModel>;
-    workflow: WorkflowModel;
+    actionDefinitions: Array<ActionDefinitionModel>;
+    previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
 }) => {
     const [activeTab, setActiveTab] = useState('description');
     const [componentDefinitionNames, setComponentDefinitionNames] = useState<Array<string>>([]);
@@ -64,7 +63,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const {componentData, setComponentData} = useComponentDataStore();
 
-    const {componentActions, componentNames, dataPills, nodeNames, setComponentActions, setDataPills} =
+    const {componentActions, componentNames, dataPills, nodeNames, setComponentActions, setDataPills, workflow} =
         useWorkflowDataStore();
 
     let currentComponent: CurrentComponentType | undefined;
@@ -122,7 +121,11 @@ const WorkflowNodeDetailsPanel = ({
             : (currentComponent?.actions?.[0]?.name as string);
     };
 
-    const {data: currentAction, isFetched: currentActionFetched} = useGetComponentActionDefinitionQuery(
+    const {data: connectionComponentDefinitions} = useGetComponentDefinitionsQuery({
+        connectionDefinitions: true,
+    });
+
+    const {data: currentActionDefinition, isFetched: currentActionFetched} = useGetComponentActionDefinitionQuery(
         {
             actionName: getActionName(),
             componentName: currentComponent?.name as string,
@@ -131,35 +134,18 @@ const WorkflowNodeDetailsPanel = ({
         !!currentComponent?.actions && !!getActionName()
     );
 
-    const currentActionProperties = currentAction?.properties;
-
-    const taskTypes = componentActions?.map(
-        (componentAction) => `${componentAction.componentName}/1/${componentAction.actionName}`
-    );
+    const currentActionProperties = currentActionDefinition?.properties;
 
     const currentNodeIndex = nodeNames.indexOf(currentNode.name);
 
     const previousComponentNames = componentNames.length > 1 ? componentNames.slice(0, currentNodeIndex) : [];
 
-    const normalizedPreviousComponentNames = previousComponentNames.map((name) =>
-        name.match(new RegExp(/_\d$/)) ? name.slice(0, name.length - 2) : name
-    );
-
-    const {data: previousComponents} = useGetComponentDefinitionsQuery(
-        {
-            include: normalizedPreviousComponentNames,
-        },
-        !!normalizedPreviousComponentNames.length
-    );
-
-    const {data: actionData} = useGetActionDefinitionsQuery({taskTypes}, !!componentActions?.length);
-
-    const previousComponentProperties = previousComponents?.map((componentDefinition, index) => {
-        if (!actionData?.length) {
+    const previousComponentProperties = previousComponentDefinitions?.map((componentDefinition, index) => {
+        if (!actionDefinitions?.length) {
             return;
         }
 
-        const outputSchema: PropertyType | undefined = actionData[index]?.outputSchema;
+        const outputSchema: PropertyType | undefined = actionDefinitions[index]?.outputSchema;
 
         const properties = outputSchema?.properties?.length ? outputSchema.properties : outputSchema?.items;
 
@@ -179,7 +165,7 @@ const WorkflowNodeDetailsPanel = ({
             },
             componentVersion: currentComponent?.version as number,
         },
-        !!currentAction?.outputSchemaDataSource
+        !!currentActionDefinition?.outputSchemaDataSource
     );
 
     const connectionKey = workflow.tasks?.filter((task) => task.name === currentNode.name)[0]?.connections![0].key;
@@ -247,9 +233,9 @@ const WorkflowNodeDetailsPanel = ({
 
         if (name === 'output') {
             return (
-                (currentAction?.outputSchema as PropertyType)?.properties?.length ||
-                (currentAction?.outputSchema as PropertyType)?.items?.length ||
-                currentAction?.outputSchemaDataSource
+                (currentActionDefinition?.outputSchema as PropertyType)?.properties?.length ||
+                (currentActionDefinition?.outputSchema as PropertyType)?.items?.length ||
+                currentActionDefinition?.outputSchemaDataSource
             );
         }
 
@@ -272,7 +258,7 @@ const WorkflowNodeDetailsPanel = ({
         }
     });
 
-    const outputSchema = currentAction?.outputSchema || actionOutputSchema;
+    const outputSchema = currentActionDefinition?.outputSchema || actionOutputSchema;
 
     // Set currentActionName depending on the currentComponentAction.actionName
     useEffect(() => {
@@ -290,11 +276,13 @@ const WorkflowNodeDetailsPanel = ({
 
     // Set componentDefinitionNames depending on componentDefinitions
     useEffect(() => {
-        if (componentDefinitions?.length) {
-            setComponentDefinitionNames(componentDefinitions.map((componentDefinition) => componentDefinition.name));
+        if (connectionComponentDefinitions?.length) {
+            setComponentDefinitionNames(
+                connectionComponentDefinitions.map((componentDefinition) => componentDefinition.name)
+            );
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [componentDefinitions?.length]);
+    }, [connectionComponentDefinitions?.length]);
 
     // Set dataPills depending on availableDataPills
     useEffect(() => {
@@ -365,20 +353,20 @@ const WorkflowNodeDetailsPanel = ({
     }, [
         activeTab,
         componentDefinitionNames.length,
-        currentAction?.outputSchema,
+        currentActionDefinition?.outputSchema,
         currentActionFetched,
         currentActionProperties?.length,
         currentComponent?.name,
     ]);
 
     useEffect(() => {
-        if (currentAction && currentActionFetched && currentComponent) {
+        if (currentActionDefinition && currentActionFetched && currentComponent) {
             if (currentComponentData) {
                 setComponentData([
                     ...otherComponentData,
                     {
                         ...currentComponentData,
-                        action: currentAction.name,
+                        action: currentActionDefinition.name,
                         workflowNodeName: currentComponent.workflowNodeName,
                     },
                 ]);
@@ -395,7 +383,7 @@ const WorkflowNodeDetailsPanel = ({
 
                 if (duplicateComponentActionIndex !== -1) {
                     componentActions.splice(duplicateComponentActionIndex, 1, {
-                        actionName: currentAction.name,
+                        actionName: currentActionDefinition.name,
                         componentName: name,
                         workflowNodeName,
                     });
@@ -413,7 +401,7 @@ const WorkflowNodeDetailsPanel = ({
                     const updatedComponentActions = [
                         ...orderedComponentActions.slice(0, currentNodeIndex),
                         {
-                            actionName: currentAction.name,
+                            actionName: currentActionDefinition.name,
                             componentName: name,
                             workflowNodeName,
                         },
@@ -425,10 +413,10 @@ const WorkflowNodeDetailsPanel = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentComponent?.workflowNodeName, currentAction?.name, currentActionFetched]);
+    }, [currentComponent?.workflowNodeName, currentActionDefinition?.name, currentActionFetched]);
 
     useEffect(() => {
-        if (currentAction?.name) {
+        if (currentActionDefinition?.name) {
             const componentDataIndex = componentData.findIndex(
                 (component) => component.workflowNodeName === currentComponent?.workflowNodeName
             );
@@ -437,12 +425,12 @@ const WorkflowNodeDetailsPanel = ({
                 setComponentData([
                     ...componentData.filter((item) => item.workflowNodeName !== currentComponent!.workflowNodeName),
                     {
-                        action: currentAction.name,
+                        action: currentActionDefinition.name,
                         connection: currentComponent.connection,
                         name: currentComponent.name,
                         properties: {
                             ...currentComponentData?.properties,
-                            [currentAction.name]: {},
+                            [currentActionDefinition.name]: {},
                         },
                         title: currentComponent.title,
                         version: currentComponent.version,
@@ -452,7 +440,7 @@ const WorkflowNodeDetailsPanel = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentAction?.name, currentComponent?.workflowNodeName]);
+    }, [currentActionDefinition?.name, currentComponent?.workflowNodeName]);
 
     useEffect(() => {
         if (currentNode.componentName && !componentNames.includes(currentNode.componentName)) {
@@ -499,7 +487,7 @@ const WorkflowNodeDetailsPanel = ({
                                 {!!currentComponent?.actions?.length && (
                                     <CurrentActionSelect
                                         actions={currentComponent.actions}
-                                        description={currentAction?.description}
+                                        description={currentActionDefinition?.description}
                                         handleValueChange={handleActionSelectChange}
                                         value={currentActionName}
                                     />

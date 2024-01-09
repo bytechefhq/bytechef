@@ -12,12 +12,12 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 
 const DataPillPanel = ({
-    actionData,
+    actionDefinitions,
     normalizedPreviousComponentNames,
     previousComponentDefinitions,
     previousComponentNames,
 }: {
-    actionData: Array<ActionDefinitionModel>;
+    actionDefinitions: Array<ActionDefinitionModel>;
     normalizedPreviousComponentNames: Array<string>;
     previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
     previousComponentNames: Array<string>;
@@ -29,8 +29,10 @@ const DataPillPanel = ({
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
-    const actionDataWithComponentAlias = actionData?.map((action) => {
-        const sameNameActions = actionData?.filter((actionDatum) => actionDatum.componentName === action.componentName);
+    const actionDataWithComponentAlias = actionDefinitions?.map((action) => {
+        const sameNameActions = actionDefinitions?.filter(
+            (actionDatum) => actionDatum.componentName === action.componentName
+        );
 
         const sameNameIndex = sameNameActions.indexOf(action);
 

@@ -6,10 +6,8 @@ import 'reactflow/dist/base.css';
 
 import './ProjectWorkflow.css';
 
-import {ActionDefinitionModel} from '@/middleware/hermes/configuration';
 import {useGetActionDefinitionsQuery} from '@/queries/actionDefinitions.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
-import {useEffect, useState} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -22,8 +20,6 @@ const ProjectWorkflow = ({
     taskDispatcherDefinitions,
     workflowId,
 }: WorkflowEditorProps) => {
-    const [actionData, setActionData] = useState<Array<ActionDefinitionModel>>([]);
-
     const {componentActions, componentNames, nodeNames} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
@@ -34,10 +30,6 @@ const ProjectWorkflow = ({
     const normalizedPreviousComponentNames = previousComponentNames.map((name) =>
         name.match(new RegExp(/_\d$/)) ? name.slice(0, name.length - 2) : name
     );
-
-    const {data: connectionComponentDefinitions} = useGetComponentDefinitionsQuery({
-        connectionDefinitions: true,
-    });
 
     const {data: previousComponentDefinitions} = useGetComponentDefinitionsQuery(
         {
@@ -50,13 +42,7 @@ const ProjectWorkflow = ({
         (componentAction) => `${componentAction.componentName}/1/${componentAction.actionName}`
     );
 
-    const {data: actionDefinitions} = useGetActionDefinitionsQuery({taskTypes}, !!previousComponentDefinitions?.length);
-
-    useEffect(() => {
-        if (actionDefinitions) {
-            setActionData(actionDefinitions);
-        }
-    }, [actionDefinitions]);
+    const {data: actionDefinitions} = useGetActionDefinitionsQuery({taskTypes}, !!componentActions?.length);
 
     return (
         <ReactFlowProvider>
@@ -67,16 +53,16 @@ const ProjectWorkflow = ({
                 workflowId={workflowId}
             />
 
-            {connectionComponentDefinitions && currentNode.name && (
+            {actionDefinitions && currentNode.name && (
                 <WorkflowNodeDetailsPanel
-                    componentDefinitions={connectionComponentDefinitions}
-                    workflowId={workflowId}
+                    actionDefinitions={actionDefinitions}
+                    previousComponentDefinitions={previousComponentDefinitions ?? []}
                 />
             )}
 
-            {previousComponentDefinitions && (
+            {actionDefinitions && previousComponentDefinitions && (
                 <DataPillPanel
-                    actionData={actionData}
+                    actionDefinitions={actionDefinitions}
                     normalizedPreviousComponentNames={normalizedPreviousComponentNames}
                     previousComponentDefinitions={previousComponentDefinitions}
                     previousComponentNames={previousComponentNames}
