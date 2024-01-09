@@ -96,8 +96,14 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     public WorkflowTestConfigurationConnection updateWorkflowTestConfigurationConnection(
         String workflowId, String operationName, String key, long connectionId) {
 
-        WorkflowTestConfiguration workflowTestConfiguration = OptionalUtils.get(
-            workflowTestConfigurationRepository.findByWorkflowId(workflowId));
+        WorkflowTestConfiguration workflowTestConfiguration = OptionalUtils.orElseGet(
+            workflowTestConfigurationRepository.findByWorkflowId(workflowId), () -> {
+                WorkflowTestConfiguration newWorkflowTestConfiguration = new WorkflowTestConfiguration();
+
+                newWorkflowTestConfiguration.setWorkflowId(workflowId);
+
+                return newWorkflowTestConfiguration;
+            });
 
         WorkflowTestConfigurationConnection workflowTestConfigurationConnection =
             new WorkflowTestConfigurationConnection(connectionId, key, operationName);
