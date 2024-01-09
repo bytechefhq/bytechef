@@ -176,7 +176,9 @@ const Project = () => {
             : undefined;
 
     const currentWorkflowTestConfiguration =
-        filteredWorkflowTestConfigurations && filteredWorkflowTestConfigurations.length > 0 ? filteredWorkflowTestConfigurations[0] : undefined;
+        filteredWorkflowTestConfigurations && filteredWorkflowTestConfigurations.length > 0
+            ? filteredWorkflowTestConfigurations[0]
+            : undefined;
 
     const workflowTestConfigurationInputs =
         currentWorkflowTestConfiguration && currentWorkflowTestConfiguration.inputs
