@@ -8,8 +8,8 @@ interface WorkflowDefinitionState {
     componentDefinitions: Array<ComponentDefinitionBasicModel>;
     setComponentDefinitions: (componentDefinitions: Array<ComponentDefinitionBasicModel>) => void;
 
-    componentNames: string[];
-    setComponentNames: (componentNames: string[]) => void;
+    componentNames: Array<string>;
+    setComponentNames: (componentNames: Array<string>) => void;
 
     componentActions: Array<ComponentActionType>;
     setComponentActions: (componentActions: Array<ComponentActionType>) => void;
@@ -20,8 +20,8 @@ interface WorkflowDefinitionState {
     dataPills: Array<DataPillType>;
     setDataPills: (dataPills: Array<DataPillType>) => void;
 
-    nodeNames: string[];
-    setNodeNames: (componentNames: string[]) => void;
+    nodeNames: Array<string>;
+    setNodeNames: (nodeNames: Array<string>) => void;
 
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>;
     setTaskDispatcherDefinitions: (taskDispatcherDefinitions: Array<TaskDispatcherDefinitionModel>) => void;

@@ -257,14 +257,18 @@ const WorkflowEditor = ({componentDefinitions, currentWorkflowId, taskDispatcher
                 index++;
             }
 
-            setComponentActions([
-                ...componentActions,
-                {
-                    actionName: actions[0].name,
-                    componentName: name,
-                    workflowNodeName,
-                },
-            ]);
+            const actionNames = componentActions.map((action) => action.actionName);
+
+            if (!actionNames.includes(actions[0].name)) {
+                setComponentActions([
+                    ...componentActions,
+                    {
+                        actionName: actions[0].name,
+                        componentName: name,
+                        workflowNodeName,
+                    },
+                ]);
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowComponentWithAlias?.workflowNodeName]);
