@@ -53,7 +53,7 @@ const WorkflowCodeEditorSheet = ({onClose, projectId, workflow}: WorkflowExecuti
     return (
         <Sheet modal={false} onOpenChange={onClose} open={true}>
             <SheetContent
-                className="flex w-11/12 flex-col gap-2 p-4 sm:max-w-[900px]"
+                className="flex w-11/12 flex-col gap-2 p-4 sm:max-w-[800px]"
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
