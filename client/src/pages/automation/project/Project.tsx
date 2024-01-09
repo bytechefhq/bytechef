@@ -191,7 +191,8 @@ const Project = () => {
             ? currentWorkflowTestConfiguration.connections
             : []
     ).reduce(function (map: {[key: string]: number}, workflowTestConfigurationConnection) {
-        map[workflowTestConfigurationConnection.key] = workflowTestConfigurationConnection.connectionId;
+        map[workflowTestConfigurationConnection.operationName + '_' + workflowTestConfigurationConnection.key] =
+            workflowTestConfigurationConnection.connectionId;
 
         return map;
     }, {});
@@ -203,7 +204,10 @@ const Project = () => {
             .flatMap((task) => (task.connections ? task.connections : []))
             .filter(
                 (workflowConnection) =>
-                    workflowConnection.required && !workflowTestConfigurationConnections[workflowConnection.key]
+                    workflowConnection.required &&
+                    !workflowTestConfigurationConnections[
+                        workflowConnection.operationName + '_' + workflowConnection.key
+                    ]
             ).length > 0;
 
     const queryClient = useQueryClient();
