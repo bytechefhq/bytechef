@@ -2,7 +2,6 @@ import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ActionDefinitionModel, ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
-import useComponentDataStore from '@/pages/automation/project/stores/useComponentDataStore';
 import {PropertyType} from '@/types/projectTypes';
 import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -61,10 +60,17 @@ const WorkflowNodeDetailsPanel = ({
         componentName: currentNode.componentName || currentNode.id,
     });
 
-    const {componentData, setComponentData} = useComponentDataStore();
-
-    const {componentActions, componentNames, dataPills, nodeNames, setComponentActions, setDataPills, workflow} =
-        useWorkflowDataStore();
+    const {
+        componentActions,
+        componentData,
+        componentNames,
+        dataPills,
+        nodeNames,
+        setComponentActions,
+        setComponentData,
+        setDataPills,
+        workflow,
+    } = useWorkflowDataStore();
 
     let currentComponent: CurrentComponentType | undefined;
 
