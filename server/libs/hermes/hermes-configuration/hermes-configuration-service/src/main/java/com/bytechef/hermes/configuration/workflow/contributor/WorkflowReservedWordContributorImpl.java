@@ -28,6 +28,8 @@ public class WorkflowReservedWordContributorImpl implements WorkflowReservedWord
 
     @Override
     public List<String> getReservedWords() {
-        return List.of(WorkflowConnection.CONNECTIONS, WorkflowTrigger.TRIGGERS);
+        return List.of(
+            WorkflowConnection.COMPONENT_NAME, WorkflowConnection.COMPONENT_VERSION, WorkflowConnection.CONNECTIONS,
+            WorkflowTrigger.TRIGGERS);
     }
 }
