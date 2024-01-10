@@ -122,6 +122,12 @@ public interface Context {
          * @return
          */
         Path toTempFilePath(FileEntry fileEntry);
+
+        /**
+         * @param fileEntry
+         * @return
+         */
+        byte[] readAllBytes(FileEntry fileEntry) throws IOException;
     }
 
     @FunctionalInterface

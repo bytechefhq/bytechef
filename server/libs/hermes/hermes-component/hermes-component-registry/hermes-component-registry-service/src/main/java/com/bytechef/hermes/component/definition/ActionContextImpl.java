@@ -166,6 +166,13 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         }
 
         @Override
+        public byte[] readAllBytes(FileEntry fileEntry) throws IOException {
+            InputStream inputStream = getStream(fileEntry);
+
+            return inputStream.readAllBytes();
+        }
+
+        @Override
         public FileEntry storeContent(String fileName, InputStream inputStream) {
             try {
                 return new ContextFileEntryImpl(
