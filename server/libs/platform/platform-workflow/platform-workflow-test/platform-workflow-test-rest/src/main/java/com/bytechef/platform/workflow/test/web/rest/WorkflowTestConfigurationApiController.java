@@ -20,6 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.workflow.test.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.workflow.test.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.workflow.test.web.rest.model.UpdateWorkflowTestConfigurationConnectionRequestModel;
+import com.bytechef.platform.workflow.test.web.rest.model.UpdateWorkflowTestConfigurationInputsRequestModel;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestConfigurationConnectionModel;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestConfigurationModel;
 import java.util.List;
@@ -98,15 +99,27 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     }
 
     @Override
-    public ResponseEntity<WorkflowTestConfigurationConnectionModel> updateWorkflowTestConfigurationConnection(
+    public ResponseEntity<Void> updateWorkflowTestConfigurationConnection(
         String workflowId, String operationName, String key,
         UpdateWorkflowTestConfigurationConnectionRequestModel updateWorkflowTestConfigurationConnectionRequestModel) {
 
-        return ResponseEntity.ok(
-            conversionService.convert(
-                workflowTestConfigurationService.updateWorkflowTestConfigurationConnection(
-                    workflowId, operationName, key,
-                    updateWorkflowTestConfigurationConnectionRequestModel.getConnectionId()),
-                WorkflowTestConfigurationConnectionModel.class));
+        workflowTestConfigurationService.updateWorkflowTestConfigurationConnection(
+            workflowId, operationName, key,
+            updateWorkflowTestConfigurationConnectionRequestModel.getConnectionId());
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateWorkflowTestConfigurationInputs(
+        String workflowId,
+        UpdateWorkflowTestConfigurationInputsRequestModel updateWorkflowTestConfigurationInputsRequestModel) {
+
+        workflowTestConfigurationService.updateWorkflowTestConfigurationInputs(
+            workflowId, updateWorkflowTestConfigurationInputsRequestModel.getInputs());
+
+        return ResponseEntity.noContent()
+            .build();
     }
 }

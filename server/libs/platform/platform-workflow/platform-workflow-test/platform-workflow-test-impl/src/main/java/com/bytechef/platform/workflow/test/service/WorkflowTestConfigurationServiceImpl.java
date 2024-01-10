@@ -23,6 +23,7 @@ import com.bytechef.platform.workflow.test.domain.WorkflowTestConfigurationConne
 import com.bytechef.platform.workflow.test.repository.WorkflowTestConfigurationConnectionRepository;
 import com.bytechef.platform.workflow.test.repository.WorkflowTestConfigurationRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -93,17 +94,10 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
-    public WorkflowTestConfigurationConnection updateWorkflowTestConfigurationConnection(
+    public void updateWorkflowTestConfigurationConnection(
         String workflowId, String operationName, String key, long connectionId) {
 
-        WorkflowTestConfiguration workflowTestConfiguration = OptionalUtils.orElseGet(
-            workflowTestConfigurationRepository.findByWorkflowId(workflowId), () -> {
-                WorkflowTestConfiguration newWorkflowTestConfiguration = new WorkflowTestConfiguration();
-
-                newWorkflowTestConfiguration.setWorkflowId(workflowId);
-
-                return newWorkflowTestConfiguration;
-            });
+        WorkflowTestConfiguration workflowTestConfiguration = getWorkflowTestConfiguration(workflowId);
 
         WorkflowTestConfigurationConnection workflowTestConfigurationConnection =
             new WorkflowTestConfigurationConnection(connectionId, key, operationName);
@@ -117,7 +111,25 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
                 List.of(workflowTestConfigurationConnection)));
 
         workflowTestConfigurationRepository.save(workflowTestConfiguration);
+    }
 
-        return workflowTestConfigurationConnection;
+    @Override
+    public void updateWorkflowTestConfigurationInputs(String workflowId, Map<String, Object> inputs) {
+        WorkflowTestConfiguration workflowTestConfiguration = getWorkflowTestConfiguration(workflowId);
+
+        workflowTestConfiguration.setInputs(inputs);
+
+        workflowTestConfigurationRepository.save(workflowTestConfiguration);
+    }
+
+    private WorkflowTestConfiguration getWorkflowTestConfiguration(String workflowId) {
+        return OptionalUtils.orElseGet(
+            workflowTestConfigurationRepository.findByWorkflowId(workflowId), () -> {
+                WorkflowTestConfiguration newWorkflowTestConfiguration = new WorkflowTestConfiguration();
+
+                newWorkflowTestConfiguration.setWorkflowId(workflowId);
+
+                return newWorkflowTestConfiguration;
+            });
     }
 }

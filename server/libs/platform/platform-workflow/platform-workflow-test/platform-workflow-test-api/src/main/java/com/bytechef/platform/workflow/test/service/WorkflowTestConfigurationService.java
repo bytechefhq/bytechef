@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.test.service;
 import com.bytechef.platform.workflow.test.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.workflow.test.domain.WorkflowTestConfigurationConnection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -39,6 +40,8 @@ public interface WorkflowTestConfigurationService {
 
     WorkflowTestConfiguration updateWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
 
-    WorkflowTestConfigurationConnection updateWorkflowTestConfigurationConnection(
+    void updateWorkflowTestConfigurationConnection(
         String workflowId, String operationName, String key, long connectionId);
+
+    void updateWorkflowTestConfigurationInputs(String workflowId, Map<String, Object> inputs);
 }
