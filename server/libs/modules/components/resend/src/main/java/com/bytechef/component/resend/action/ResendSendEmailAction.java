@@ -153,9 +153,10 @@ public final class ResendSendEmailAction {
     public static CreateEmailResponse perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws ResendException {
+
         Resend resend = new Resend(connectionParameters.get(TOKEN, String.class));
 
-        List<Attachment> attachmentList = ResendUtils.getAttachments(inputParameters, actionContext);
+        List<Attachment> attachments = ResendUtils.getAttachments(inputParameters, actionContext);
 
         CreateEmailOptions createEmailOptions = CreateEmailOptions.builder()
             .from(inputParameters.getRequiredString(FROM))
@@ -166,7 +167,7 @@ public final class ResendSendEmailAction {
             .replyTo(inputParameters.getList(REPLY_TO, String.class, List.of()))
             .html(inputParameters.getString(HTML))
             .text(inputParameters.getString(TEXT))
-            .attachments(attachmentList)
+            .attachments(attachments)
             .headers(inputParameters.getMap(HEADERS, String.class, Map.of()))
             .tags(inputParameters.getList(TAGS, Tag.class, List.of()))
             .build();
