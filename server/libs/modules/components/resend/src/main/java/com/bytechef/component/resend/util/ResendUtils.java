@@ -31,24 +31,23 @@ import java.util.List;
  */
 public class ResendUtils {
 
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
     private ResendUtils() {
     }
 
     public static List<Attachment> getAttachments(Parameters inputParameters, ActionContext actionContext) {
-        List<Attachment> attachmentList = new ArrayList<>();
+        List<Attachment> attachments = new ArrayList<>();
 
         for (FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
             Attachment attachment = new Attachment.Builder()
                 .fileName(fileEntry.getName())
-                .content(Base64.getEncoder()
-                    .encodeToString(
-                        actionContext.file(file -> file.getStream(fileEntry)
-                            .readAllBytes())))
+                .content(ENCODER.encodeToString(actionContext.file(file -> file.readAllBytes(fileEntry))))
                 .build();
 
-            attachmentList.add(attachment);
+            attachments.add(attachment);
         }
 
-        return attachmentList;
+        return attachments;
     }
 }
