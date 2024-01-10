@@ -53,9 +53,9 @@ const ProjectWorkflow = ({
                 workflowId={workflowId}
             />
 
-            {actionDefinitions && currentNode.name && (
+            {currentNode.name && (
                 <WorkflowNodeDetailsPanel
-                    actionDefinitions={actionDefinitions}
+                    actionDefinitions={actionDefinitions ?? []}
                     previousComponentDefinitions={previousComponentDefinitions ?? []}
                 />
             )}
