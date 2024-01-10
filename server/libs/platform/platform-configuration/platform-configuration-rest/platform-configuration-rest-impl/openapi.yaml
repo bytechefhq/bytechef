@@ -1889,6 +1889,7 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/WorkflowConnection"
+          readOnly: true
         finalize:
           description: "The (optional) list of tasks that are to be executed after\
             \ execution of a task -- regardless of whether it had failed or not."
@@ -1943,6 +1944,7 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/WorkflowConnection"
+          readOnly: true
         label:
           description: "The human-readable description of the task."
           type: "string"
