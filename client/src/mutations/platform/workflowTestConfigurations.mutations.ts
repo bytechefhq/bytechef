@@ -1,9 +1,9 @@
 import {
     CreateWorkflowTestConfigurationRequest,
     UpdateWorkflowTestConfigurationConnectionRequest,
+    UpdateWorkflowTestConfigurationInputsRequest,
     UpdateWorkflowTestConfigurationRequest,
     WorkflowTestConfigurationApi,
-    WorkflowTestConfigurationConnectionModel,
     WorkflowTestConfigurationModel,
 } from '@/middleware/platform/workflow/test';
 import {useMutation} from '@tanstack/react-query';
@@ -41,10 +41,7 @@ export const useUpdateWorkflowTestConfigurationMutation = (
     });
 
 type UpdateWorkflowTestConfigurationConnectionRequestProps = {
-    onSuccess?: (
-        result: WorkflowTestConfigurationConnectionModel,
-        variables: UpdateWorkflowTestConfigurationConnectionRequest
-    ) => void;
+    onSuccess?: (result: void, variables: UpdateWorkflowTestConfigurationConnectionRequest) => void;
     onError?: (error: Error, variables: UpdateWorkflowTestConfigurationConnectionRequest) => void;
 };
 
@@ -54,6 +51,22 @@ export const useUpdateWorkflowTestConfigurationConnectionMutation = (
     useMutation({
         mutationFn: (request: UpdateWorkflowTestConfigurationConnectionRequest) => {
             return new WorkflowTestConfigurationApi().updateWorkflowTestConfigurationConnection(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+type UpdateWorkflowTestConfigurationInputsRequestProps = {
+    onSuccess?: (result: void, variables: UpdateWorkflowTestConfigurationInputsRequest) => void;
+    onError?: (error: Error, variables: UpdateWorkflowTestConfigurationInputsRequest) => void;
+};
+
+export const useUpdateWorkflowTestConfigurationInputsMutation = (
+    mutationProps?: UpdateWorkflowTestConfigurationInputsRequestProps
+) =>
+    useMutation({
+        mutationFn: (request: UpdateWorkflowTestConfigurationInputsRequest) => {
+            return new WorkflowTestConfigurationApi().updateWorkflowTestConfigurationInputs(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
