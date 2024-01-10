@@ -122,6 +122,36 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
+  /workflow-test-configurations/{workflowId}/inputs:
+    put:
+      description: "Update a workflow test configuration inputs."
+      summary: "Update a workflow test configuration inputs"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "updateWorkflowTestConfigurationInputs"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a testing workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                inputs:
+                  description: "The input parameters used as workflow\
+                    \ input values."
+                  type: "object"
+                  additionalProperties:
+                    type: "object"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
   /workflow-test-configurations/{workflowId}/connections/{operationName}/{key}:
     put:
       description: "Update a workflow test configuration connection."
@@ -161,10 +191,6 @@ paths:
       responses:
         "200":
           description: "Successful operation."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
   /workflows/{id}/tests:
     post:
       description: "Execute a workflow synchronously for testing purposes."
