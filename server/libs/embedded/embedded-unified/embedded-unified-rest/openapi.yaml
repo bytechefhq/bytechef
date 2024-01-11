@@ -1,0 +1,11 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Embedded Unified API"
+  version: "1"
+servers:
+- url: "http://localhost:5173/api/embedded"
+tags:
+- name: "passthrough"
+  description: "The Embedded Pass-through API"
+paths:

@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.helios.configuration.web.rest.WorkflowApiController")
+@RestController("com.bytechef.automation.configuration.web.rest.WorkflowApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnEndpoint
 public class WorkflowApiController implements WorkflowApi {

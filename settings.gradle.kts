@@ -102,6 +102,18 @@ include("server:libs:core:rest:rest-impl")
 include("server:libs:core:tag:tag-api")
 include("server:libs:core:tag:tag-service")
 
+include("server:libs:embedded:embedded-connection:embedded-connection-rest")
+include("server:libs:embedded:embedded-workflow:embedded-workflow-coordinator")
+include("server:libs:embedded:embedded-configuration:embedded-configuration-api")
+include("server:libs:embedded:embedded-configuration:embedded-configuration-instance-impl")
+include("server:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-api")
+include("server:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-impl")
+include("server:libs:embedded:embedded-configuration:embedded-configuration-service")
+include("server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-api")
+include("server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest")
+include("server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service")
+include("server:libs:embedded:embedded-swagger")
+
 include("server:libs:platform:platform-api")
 include("server:libs:platform:platform-component:platform-component-registry:platform-component-registry-api")
 include("server:libs:platform:platform-component:platform-component-api")
@@ -248,6 +260,9 @@ include("server:ee:libs:core:data-storage:data-storage-db:data-storage-db-remote
 include("server:ee:libs:core:data-storage:data-storage-db:data-storage-db-remote-client")
 include("server:ee:libs:core:discovery:discovery-metadata-api")
 include("server:ee:libs:core:discovery:discovery-redis")
+
+include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client")
+include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-rest")
 
 include("server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-client")
 include("server:ee:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-rest")
