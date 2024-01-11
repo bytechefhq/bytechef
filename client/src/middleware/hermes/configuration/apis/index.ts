@@ -6,4 +6,3 @@ export * from './ConnectionDefinitionApi';
 export * from './Oauth2Api';
 export * from './TaskDispatcherDefinitionApi';
 export * from './TriggerDefinitionApi';
-export * from './WorkflowApi';

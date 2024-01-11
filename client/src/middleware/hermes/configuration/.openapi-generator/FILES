@@ -4,7 +4,6 @@ apis/ConnectionDefinitionApi.ts
 apis/Oauth2Api.ts
 apis/TaskDispatcherDefinitionApi.ts
 apis/TriggerDefinitionApi.ts
-apis/WorkflowApi.ts
 apis/index.ts
 index.ts
 models/ActionDefinitionBasicModel.ts

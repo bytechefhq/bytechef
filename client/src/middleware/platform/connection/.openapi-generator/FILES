@@ -1,5 +1,5 @@
-apis/ConnectionApi.ts
-apis/ConnectionTagApi.ts
+.openapi-generator-ignore
+apis/DefaultApi.ts
 apis/index.ts
 index.ts
 models/ConnectionModel.ts
