@@ -1,3 +1,17 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Platform Connection API"
+  version: "1"
+servers:
+  - url: "http://localhost:5173/api/platform"
+paths:
+  /dummy:
+    get:
+      operationId: getDummy
+      responses:
+        "200":
+          description: "Successful operation."
 components:
   schemas:
     Connection:

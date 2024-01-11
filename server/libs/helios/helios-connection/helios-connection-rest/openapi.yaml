@@ -46,7 +46,7 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "../../../hermes/hermes-connection/hermes-connection-rest/openapi.yaml#/components/schemas/Connection"
+                  $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
     post:
       description: "Create a new connection."
       summary: "Create a new connection"
@@ -57,7 +57,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "../../../hermes/hermes-connection/hermes-connection-rest/openapi.yaml#/components/schemas/Connection"
+              $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
         required: true
       responses:
         "200":
@@ -65,7 +65,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../hermes/hermes-connection/hermes-connection-rest/openapi.yaml#/components/schemas/Connection"
+                $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
   /connections/tags:
     get:
       description: "Get connection tags."
@@ -82,22 +82,22 @@ paths:
                 description: "The response object that contains the array of tags."
                 type: "array"
                 items:
-                  $ref: "../../../hermes/hermes-connection/hermes-connection-rest/openapi.yaml#/components/schemas/Tag"
+                  $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Tag"
   /connections/{id}:
     delete:
       description: "Delete a connection."
       summary: "Delete a connection"
       tags:
-      - "connection"
+        - "connection"
       operationId: "deleteConnection"
       parameters:
-      - name: "id"
-        description: "The id of a connection."
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "Successful operation."
@@ -105,42 +105,42 @@ paths:
       description: "Get a connection by id."
       summary: "Get a connection by id"
       tags:
-      - "connection"
+        - "connection"
       operationId: "getConnection"
       parameters:
-      - name: "id"
-        description: "The id of a connection."
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The connection object."
           content:
             application/json:
               schema:
-                $ref: "../../../hermes/hermes-connection/hermes-connection-rest/openapi.yaml#/components/schemas/Connection"
+                $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
     put:
       description: "Update an existing connection."
       summary: "Update an existing connection"
       tags:
-      - "connection"
+        - "connection"
       operationId: "updateConnection"
       parameters:
-      - name: "id"
-        description: "The id of a connection."
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "../../../hermes/hermes-connection/hermes-connection-rest/openapi.yaml#/components/schemas/Connection"
+              $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
         required: true
       responses:
         "200":
@@ -148,27 +148,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../../../hermes/hermes-connection/hermes-connection-rest/openapi.yaml#/components/schemas/Connection"
+                $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/Connection"
   /connections/{id}/tags:
     put:
       description: "Updates tags of an existing connection."
       summary: "Updates tags of an existing connection"
       tags:
-      - "connection-tag"
+        - "connection-tag"
       operationId: "updateConnectionTags"
       parameters:
-      - name: "id"
-        description: "The id of the connection."
-        in: "path"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
+        - name: "id"
+          description: "The id of the connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "../../../hermes/hermes-connection/hermes-connection-rest/openapi.yaml#/components/schemas/UpdateTagsRequest"
+              $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-impl/openapi.yaml#/components/schemas/UpdateTagsRequest"
         required: true
       responses:
         "200":

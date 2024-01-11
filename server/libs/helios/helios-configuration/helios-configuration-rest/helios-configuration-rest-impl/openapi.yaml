@@ -16,6 +16,8 @@ tags:
   description: "The Automation Project Tag API"
 - name: "project"
   description: "The Automation Project API"
+- name: "workflow"
+  description: "The Automation Workflow API"
 paths:
   /project-instances:
     get:
@@ -645,6 +647,53 @@ paths:
                 type: "array"
                 items:
                   $ref: "../../../../hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+  /workflows/{id}:
+    get:
+      description: "Get a workflow by id."
+      summary: "Get a workflow by id"
+      tags:
+        - "workflow"
+      operationId: "getWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of the workflow to get."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../../hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+    put:
+      description: "Update an existing workflow."
+      summary: "Update an existing workflow"
+      tags:
+        - "workflow"
+      operationId: "updateWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of the workflow to update."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "../../../../hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+        required: true
+      responses:
+        "200":
+          description: "The updated workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../../hermes/hermes-configuration/hermes-configuration-rest/hermes-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
 components:
   schemas:
     Category:
