@@ -1,0 +1,8 @@
+README.md
+pom.xml
+src/main/java/com/bytechef/platform/connection/web/rest/ApiUtil.java
+src/main/java/com/bytechef/platform/connection/web/rest/DefaultApi.java
+src/main/java/com/bytechef/platform/connection/web/rest/model/ConnectionModel.java
+src/main/java/com/bytechef/platform/connection/web/rest/model/CredentialStatusModel.java
+src/main/java/com/bytechef/platform/connection/web/rest/model/TagModel.java
+src/main/java/com/bytechef/platform/connection/web/rest/model/UpdateTagsRequestModel.java

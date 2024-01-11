@@ -5,8 +5,6 @@
  */
 package com.bytechef.helios.connection.web.rest;
 
-import com.bytechef.helios.connection.web.rest.model.TagModel;
-import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-02T11:12:12.799267+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-11T07:50:21.376600+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connection-tag", description = "The Automation Connection Tag API")
 public interface ConnectionTagApi {
@@ -55,7 +53,7 @@ public interface ConnectionTagApi {
         tags = { "connection-tag" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of connection tags.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TagModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.platform.connection.web.rest.model.TagModel.class)))
             })
         }
     )
@@ -65,7 +63,7 @@ public interface ConnectionTagApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<TagModel>> getConnectionTags(
+    default ResponseEntity<List<com.bytechef.platform.connection.web.rest.model.TagModel>> getConnectionTags(
         
     ) {
         getRequest().ifPresent(request -> {
@@ -87,7 +85,7 @@ public interface ConnectionTagApi {
      * Updates tags of an existing connection.
      *
      * @param id The id of the connection. (required)
-     * @param updateTagsRequestModel  (required)
+     * @param comBytechefPlatformConnectionWebRestModelUpdateTagsRequestModel  (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -107,7 +105,7 @@ public interface ConnectionTagApi {
     
     default ResponseEntity<Void> updateConnectionTags(
         @Parameter(name = "id", description = "The id of the connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody UpdateTagsRequestModel updateTagsRequestModel
+        @Parameter(name = "com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel comBytechefPlatformConnectionWebRestModelUpdateTagsRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 

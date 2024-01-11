@@ -1,4 +1,4 @@
-package com.bytechef.helios.connection.web.rest.model;
+package com.bytechef.platform.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets CredentialStatus
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-02T11:12:12.799267+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-11T07:10:00.542563+01:00[Europe/Zagreb]")
 public enum CredentialStatusModel {
   
   VALID("VALID"),

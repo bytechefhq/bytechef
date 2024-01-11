@@ -1,9 +1,9 @@
-package com.bytechef.helios.connection.web.rest.model;
+package com.bytechef.platform.connection.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.helios.connection.web.rest.model.CredentialStatusModel;
-import com.bytechef.helios.connection.web.rest.model.TagModel;
+import com.bytechef.platform.connection.web.rest.model.CredentialStatusModel;
+import com.bytechef.platform.connection.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-02T11:12:12.799267+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-11T07:10:00.542563+01:00[Europe/Zagreb]")
 public class ConnectionModel {
 
   private Boolean active;

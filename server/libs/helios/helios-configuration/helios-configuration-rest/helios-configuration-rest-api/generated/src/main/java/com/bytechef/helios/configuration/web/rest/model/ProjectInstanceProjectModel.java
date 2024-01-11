@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ProjectInstance_project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-05T07:50:53.784118+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-11T08:08:11.446816+01:00[Europe/Zagreb]")
 public class ProjectInstanceProjectModel {
 
   private String createdBy;

@@ -1,22 +1,15 @@
-package com.bytechef.helios.connection.web.rest.model;
+package com.bytechef.platform.connection.web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
-import com.bytechef.helios.connection.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
+
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -25,7 +18,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "UpdateTagsRequest", description = "The request object that contains the array of tags.")
 @JsonTypeName("UpdateTagsRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-02T11:12:12.799267+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-11T07:46:40.284876+01:00[Europe/Zagreb]")
 public class UpdateTagsRequestModel {
 
   @Valid
@@ -36,7 +29,7 @@ public class UpdateTagsRequestModel {
     return this;
   }
 
-  public UpdateTagsRequestModel addTagsItem(TagModel tagsItem) {
+  public UpdateTagsRequestModel addTagsItem(com.bytechef.platform.connection.web.rest.model.TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -48,7 +41,7 @@ public class UpdateTagsRequestModel {
    * Get tags
    * @return tags
   */
-  @Valid 
+  @Valid
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
   public List<@Valid TagModel> getTags() {

@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-06T07:28:24.860493+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-11T08:04:40.380461+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "component-definition", description = "The Core Component Definition API")
 public interface ComponentDefinitionApi {

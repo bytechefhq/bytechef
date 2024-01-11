@@ -31,9 +31,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-05T07:50:53.784118+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-11T08:08:11.446816+01:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "workflow", description = "the workflow API")
+@Tag(name = "workflow", description = "The Automation Workflow API")
 public interface WorkflowApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -156,6 +156,47 @@ public interface WorkflowApi {
 
 
     /**
+     * GET /workflows/{id} : Get a workflow by id
+     * Get a workflow by id.
+     *
+     * @param id The id of the workflow to get. (required)
+     * @return The workflow object. (status code 200)
+     */
+    @Operation(
+        operationId = "getWorkflow",
+        summary = "Get a workflow by id",
+        description = "Get a workflow by id.",
+        tags = { "workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The workflow object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.hermes.configuration.web.rest.model.WorkflowModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/workflows/{id}",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<com.bytechef.hermes.configuration.web.rest.model.WorkflowModel> getWorkflow(
+        @Parameter(name = "id", description = "The id of the workflow to get.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "null";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
      * GET /workflows : Get workflow definitions
      * Get workflow definitions.
      *
@@ -185,6 +226,50 @@ public interface WorkflowApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "[ null, null ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * PUT /workflows/{id} : Update an existing workflow
+     * Update an existing workflow.
+     *
+     * @param id The id of the workflow to update. (required)
+     * @param comBytechefHermesConfigurationWebRestModelWorkflowModel  (required)
+     * @return The updated workflow object. (status code 200)
+     */
+    @Operation(
+        operationId = "updateWorkflow",
+        summary = "Update an existing workflow",
+        description = "Update an existing workflow.",
+        tags = { "workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The updated workflow object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.hermes.configuration.web.rest.model.WorkflowModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/workflows/{id}",
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<com.bytechef.hermes.configuration.web.rest.model.WorkflowModel> updateWorkflow(
+        @Parameter(name = "id", description = "The id of the workflow to update.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "com.bytechef.hermes.configuration.web.rest.model.WorkflowModel", description = "", required = true) @Valid @RequestBody com.bytechef.hermes.configuration.web.rest.model.WorkflowModel comBytechefHermesConfigurationWebRestModelWorkflowModel
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "null";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

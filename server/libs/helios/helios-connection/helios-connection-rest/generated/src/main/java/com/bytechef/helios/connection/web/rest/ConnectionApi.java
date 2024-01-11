@@ -5,7 +5,6 @@
  */
 package com.bytechef.helios.connection.web.rest;
 
-import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-02T11:12:12.799267+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-11T07:50:21.376600+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connection", description = "The Automation Connection API")
 public interface ConnectionApi {
@@ -45,7 +44,7 @@ public interface ConnectionApi {
      * POST /connections : Create a new connection
      * Create a new connection.
      *
-     * @param connectionModel  (required)
+     * @param comBytechefPlatformConnectionWebRestModelConnectionModel  (required)
      * @return The connection object. (status code 200)
      */
     @Operation(
@@ -55,7 +54,7 @@ public interface ConnectionApi {
         tags = { "connection" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The connection object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectionModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.platform.connection.web.rest.model.ConnectionModel.class))
             })
         }
     )
@@ -66,8 +65,8 @@ public interface ConnectionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<ConnectionModel> createConnection(
-        @Parameter(name = "ConnectionModel", description = "", required = true) @Valid @RequestBody ConnectionModel connectionModel
+    default ResponseEntity<com.bytechef.platform.connection.web.rest.model.ConnectionModel> createConnection(
+        @Parameter(name = "com.bytechef.platform.connection.web.rest.model.ConnectionModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.connection.web.rest.model.ConnectionModel comBytechefPlatformConnectionWebRestModelConnectionModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -126,7 +125,7 @@ public interface ConnectionApi {
         tags = { "connection" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The connection object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectionModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.platform.connection.web.rest.model.ConnectionModel.class))
             })
         }
     )
@@ -136,7 +135,7 @@ public interface ConnectionApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<ConnectionModel> getConnection(
+    default ResponseEntity<com.bytechef.platform.connection.web.rest.model.ConnectionModel> getConnection(
         @Parameter(name = "id", description = "The id of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
@@ -169,7 +168,7 @@ public interface ConnectionApi {
         tags = { "connection" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of connections.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ConnectionModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.platform.connection.web.rest.model.ConnectionModel.class)))
             })
         }
     )
@@ -179,7 +178,7 @@ public interface ConnectionApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<ConnectionModel>> getConnections(
+    default ResponseEntity<List<com.bytechef.platform.connection.web.rest.model.ConnectionModel>> getConnections(
         @Parameter(name = "componentName", description = "The component name used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentName", required = false) String componentName,
         @Parameter(name = "connectionVersion", description = "The connection version.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionVersion", required = false) Integer connectionVersion,
         @Parameter(name = "tagId", description = "The tag id of used for filtering connections.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
@@ -203,7 +202,7 @@ public interface ConnectionApi {
      * Update an existing connection.
      *
      * @param id The id of a connection. (required)
-     * @param connectionModel  (required)
+     * @param comBytechefPlatformConnectionWebRestModelConnectionModel  (required)
      * @return The updated connection object. (status code 200)
      */
     @Operation(
@@ -213,7 +212,7 @@ public interface ConnectionApi {
         tags = { "connection" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated connection object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectionModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.platform.connection.web.rest.model.ConnectionModel.class))
             })
         }
     )
@@ -224,9 +223,9 @@ public interface ConnectionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<ConnectionModel> updateConnection(
+    default ResponseEntity<com.bytechef.platform.connection.web.rest.model.ConnectionModel> updateConnection(
         @Parameter(name = "id", description = "The id of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "ConnectionModel", description = "", required = true) @Valid @RequestBody ConnectionModel connectionModel
+        @Parameter(name = "com.bytechef.platform.connection.web.rest.model.ConnectionModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.connection.web.rest.model.ConnectionModel comBytechefPlatformConnectionWebRestModelConnectionModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

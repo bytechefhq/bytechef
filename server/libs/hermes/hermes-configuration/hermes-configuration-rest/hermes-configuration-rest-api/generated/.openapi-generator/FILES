@@ -7,7 +7,6 @@ src/main/java/com/bytechef/hermes/configuration/web/rest/ConnectionDefinitionApi
 src/main/java/com/bytechef/hermes/configuration/web/rest/Oauth2Api.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/TaskDispatcherDefinitionApi.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/TriggerDefinitionApi.java
-src/main/java/com/bytechef/hermes/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ActionDefinitionBasicModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ActionDefinitionModel.java
 src/main/java/com/bytechef/hermes/configuration/web/rest/model/ArrayPropertyModel.java
