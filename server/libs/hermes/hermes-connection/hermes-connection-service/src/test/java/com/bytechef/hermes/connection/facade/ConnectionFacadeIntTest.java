@@ -27,6 +27,7 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
 import com.bytechef.hermes.oauth2.service.OAuth2Service;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -77,7 +78,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        connectionDTO = connectionFacade.create(connectionDTO, 1);
+        connectionDTO = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
 
         Assertions.assertThat(connectionDTO.name())
             .isEqualTo("name1");
@@ -95,7 +96,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        connectionDTO1 = connectionFacade.create(connectionDTO1, 1);
+        connectionDTO1 = connectionFacade.create(connectionDTO1, PlatformType.AUTOMATION);
 
         ConnectionDTO connectionDTO2 = ConnectionDTO.builder()
             .componentName("componentName")
@@ -103,7 +104,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        connectionDTO2 = connectionFacade.create(connectionDTO2, 1);
+        connectionDTO2 = connectionFacade.create(connectionDTO2, PlatformType.AUTOMATION);
 
         Assertions.assertThat(connectionRepository.count())
             .isEqualTo(2);
@@ -159,7 +160,7 @@ public class ConnectionFacadeIntTest {
 
         connection = connectionRepository.save(connection);
 
-        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(null, null, null, 1);
+        List<ConnectionDTO> connectionDTOs = connectionFacade.getConnections(null, null, null, PlatformType.AUTOMATION);
 
         Assertions.assertThat(
             CollectionUtils.map(connectionDTOs, ConnectionDTO::toConnection))
@@ -186,7 +187,7 @@ public class ConnectionFacadeIntTest {
 
         connectionRepository.save(connection);
 
-        Assertions.assertThat(connectionFacade.getConnectionTags(1)
+        Assertions.assertThat(connectionFacade.getConnectionTags(PlatformType.AUTOMATION)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet()))
@@ -204,7 +205,7 @@ public class ConnectionFacadeIntTest {
 
         connectionRepository.save(connection);
 
-        Assertions.assertThat(connectionFacade.getConnectionTags(1)
+        Assertions.assertThat(connectionFacade.getConnectionTags(PlatformType.AUTOMATION)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet()))
@@ -212,7 +213,7 @@ public class ConnectionFacadeIntTest {
 
         connectionRepository.deleteById(Validate.notNull(connection.getId(), "id"));
 
-        Assertions.assertThat(connectionFacade.getConnectionTags(1)
+        Assertions.assertThat(connectionFacade.getConnectionTags(PlatformType.AUTOMATION)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toSet()))
@@ -229,7 +230,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
             .build();
 
-        connectionDTO = connectionFacade.create(connectionDTO, 1);
+        connectionDTO = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
 
         Assertions.assertThat(connectionDTO.tags())
             .hasSize(2);
@@ -242,7 +243,7 @@ public class ConnectionFacadeIntTest {
             .version(connectionDTO.version())
             .build();
 
-        connectionDTO = connectionFacade.update(connectionDTO, 1);
+        connectionDTO = connectionFacade.update(connectionDTO);
 
         Assertions.assertThat(connectionDTO.tags())
             .hasSize(1);

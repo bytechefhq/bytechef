@@ -16,17 +16,19 @@
 
 package com.bytechef.helios.connection.web.rest;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.helios.connection.web.rest.mapper.ConnectionMapper;
-import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
-import com.bytechef.helios.connection.web.rest.model.TagModel;
-import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.web.rest.mapper.ConnectionMapper;
+import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
+import com.bytechef.platform.connection.web.rest.model.TagModel;
+import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tag.domain.Tag;
 import java.util.Iterator;
 import java.util.List;
@@ -117,7 +119,7 @@ public class ConnectionApiControllerIntTest {
 
     @Test
     public void testGetConnectionTags() {
-        when(connectionFacade.getConnectionTags(1))
+        when(connectionFacade.getConnectionTags(PlatformType.AUTOMATION))
             .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         try {
@@ -145,7 +147,7 @@ public class ConnectionApiControllerIntTest {
     public void testGetConnections() {
         ConnectionDTO connectionDTO = getConnection();
 
-        when(connectionFacade.getConnections((String) null, null, 1))
+        when(connectionFacade.getConnections((String) null, null, PlatformType.AUTOMATION))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -160,7 +162,7 @@ public class ConnectionApiControllerIntTest {
                 .parameters(null))
             .hasSize(1);
 
-        when(connectionFacade.getConnections("component1", null, 1))
+        when(connectionFacade.getConnections("component1", null, PlatformType.AUTOMATION))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -173,7 +175,7 @@ public class ConnectionApiControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections(null, 1, 1))
+        when(connectionFacade.getConnections(null, 1, PlatformType.AUTOMATION))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -186,7 +188,7 @@ public class ConnectionApiControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections("component1", 1, 1))
+        when(connectionFacade.getConnections("component1", 1, PlatformType.AUTOMATION))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -205,7 +207,7 @@ public class ConnectionApiControllerIntTest {
             .name("name")
             .parameters(Map.of("key1", "value1"));
 
-        when(connectionFacade.create(any(), 1))
+        when(connectionFacade.create(any(), PlatformType.AUTOMATION))
             .thenReturn(getConnection());
 
         try {
@@ -234,9 +236,9 @@ public class ConnectionApiControllerIntTest {
 
         ArgumentCaptor<ConnectionDTO> connectionArgumentCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
 
-        verify(connectionFacade).create(connectionArgumentCaptor.capture(), 1);
+        verify(connectionFacade).create(connectionArgumentCaptor.capture(), PlatformType.AUTOMATION);
 
-        org.assertj.core.api.Assertions.assertThat(connectionArgumentCaptor.getValue())
+        assertThat(connectionArgumentCaptor.getValue())
             .hasFieldOrPropertyWithValue("componentName", "componentName")
             .hasFieldOrPropertyWithValue("name", "name")
             .hasFieldOrPropertyWithValue("parameters", Map.of("key1", "value1"));
@@ -253,7 +255,7 @@ public class ConnectionApiControllerIntTest {
             .build();
         ConnectionModel connectionModel = new ConnectionModel().name("name2");
 
-        when(connectionFacade.update(any(ConnectionDTO.class), 1))
+        when(connectionFacade.update(any(ConnectionDTO.class)))
             .thenReturn(connection);
 
         try {

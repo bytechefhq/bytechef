@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.configuration.instance.accessor;
 
+import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InstanceAccessorRegistry {
 
-    private final Map<Integer, InstanceAccessor> instanceAccessorMap;
+    private final Map<PlatformType, InstanceAccessor> instanceAccessorMap;
 
     public InstanceAccessorRegistry(List<InstanceAccessor> instanceAccessors) {
         this.instanceAccessorMap = instanceAccessors
@@ -38,7 +39,7 @@ public class InstanceAccessorRegistry {
                     InstanceAccessor::getType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
     }
 
-    public InstanceAccessor getInstanceAccessor(int type) {
+    public InstanceAccessor getInstanceAccessor(PlatformType type) {
         return Validate.notNull(instanceAccessorMap.get(type), "instanceAccessor");
     }
 }

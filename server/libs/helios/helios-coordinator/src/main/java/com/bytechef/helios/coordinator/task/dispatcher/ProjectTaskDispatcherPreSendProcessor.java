@@ -22,11 +22,11 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.helios.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.hermes.configuration.constant.MetadataConstants;
 import com.bytechef.hermes.execution.service.InstanceJobService;
+import com.bytechef.platform.constant.PlatformType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -59,7 +59,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long projectInstanceId = OptionalUtils.orElse(
-            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), ProjectConstants.PROJECT_TYPE),
+            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), PlatformType.AUTOMATION),
             null);
 
         if (projectInstanceId != null) {
@@ -86,7 +86,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
             taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
         }
 
-        taskExecution.putMetadata(MetadataConstants.TYPE, ProjectConstants.PROJECT_TYPE);
+        taskExecution.putMetadata(MetadataConstants.TYPE, PlatformType.AUTOMATION.getId());
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 
         return taskExecution;

@@ -19,9 +19,10 @@ package com.bytechef.helios.configuration.web.rest;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.facade.ProjectFacade;
+import com.bytechef.hermes.configuration.web.rest.AbstractWorkflowApiController;
 import com.bytechef.hermes.configuration.web.rest.model.WorkflowModel;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.helios.configuration.web.rest.WorkflowApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
-public class WorkflowApiController implements WorkflowApi {
+public class WorkflowApiController extends AbstractWorkflowApiController implements WorkflowApi {
 
     private final ConversionService conversionService;
     private final ProjectFacade projectFacade;
@@ -46,6 +47,8 @@ public class WorkflowApiController implements WorkflowApi {
     @SuppressFBWarnings("EI2")
     public WorkflowApiController(
         ConversionService conversionService, ProjectFacade projectFacade, WorkflowService workflowService) {
+
+        super(conversionService, workflowService);
 
         this.conversionService = conversionService;
         this.projectFacade = projectFacade;
@@ -75,13 +78,23 @@ public class WorkflowApiController implements WorkflowApi {
     }
 
     @Override
+    public ResponseEntity<WorkflowModel> getWorkflow(String id) {
+        return super.getWorkflow(id);
+    }
+
+    @Override
     public ResponseEntity<List<WorkflowModel>> getWorkflows() {
         List<WorkflowModel> workflowModels = new ArrayList<>();
 
-        for (Workflow workflow : workflowService.getWorkflows(ProjectConstants.PROJECT_TYPE)) {
+        for (Workflow workflow : workflowService.getWorkflows(PlatformType.AUTOMATION.getId())) {
             workflowModels.add(conversionService.convert(workflow, WorkflowModel.class));
         }
 
         return ResponseEntity.ok(workflowModels);
+    }
+
+    @Override
+    public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
+        return super.updateWorkflow(id, workflowModel);
     }
 }

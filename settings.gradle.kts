@@ -140,6 +140,11 @@ include("server:libs:hermes:hermes-worker:hermes-worker-api")
 include("server:libs:hermes:hermes-swagger")
 include("server:libs:hermes:hermes-worker:hermes-worker-impl")
 
+include("server:libs:platform:platform-api")
+include("server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-api")
+include("server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-impl")
+include("server:libs:platform:platform-swagger")
+
 include("server:libs:modules:components:airtable")
 include("server:libs:modules:components:aws:aws-s3")
 include("server:libs:modules:components:bash")

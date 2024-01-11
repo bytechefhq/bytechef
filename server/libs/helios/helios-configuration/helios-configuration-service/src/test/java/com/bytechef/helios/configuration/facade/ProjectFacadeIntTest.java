@@ -25,18 +25,14 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.repository.CategoryRepository;
-import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.helios.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.repository.ProjectRepository;
-import com.bytechef.helios.configuration.service.ProjectInstanceService;
-import com.bytechef.helios.configuration.service.ProjectService;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
-import com.bytechef.tag.service.TagService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -321,15 +317,6 @@ public class ProjectFacadeIntTest {
 
     @TestConfiguration
     public static class ProjectFacadeIntTestConfiguration {
-
-        @Bean
-        ProjectFacade projectFacade(
-            CategoryService categoryService, ProjectInstanceService projectInstanceService,
-            ProjectService projectService, TagService tagService, WorkflowService workflowService) {
-
-            return new ProjectFacadeImpl(
-                categoryService, projectInstanceService, projectService, tagService, workflowService);
-        }
 
         @Bean
         WorkflowService workflowService(

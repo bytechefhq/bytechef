@@ -19,9 +19,9 @@ package com.bytechef.helios.demo.config;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -80,7 +80,7 @@ public class DemoProjectConfiguration {
                 for (Resource resource : resourcePatternResolver.getResources("classpath:demo/*.yaml")) {
                     Workflow workflow = workflowService.create(
                         resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.YAML, SourceType.JDBC,
-                        ProjectConstants.PROJECT_TYPE);
+                        PlatformType.AUTOMATION.getId());
 
                     projectService.addWorkflow(Validate.notNull(project.getId(), "id"), workflow.getId());
                 }

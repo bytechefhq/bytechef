@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.hermes.execution.service.InstanceJobService;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,7 @@ public class InstanceJobFacadeImpl implements InstanceJobFacade {
 
     @Override
     // TODO @Transactional
-    public Job createJob(JobParameters jobParameters, long instanceId, int type) {
+    public Job createJob(JobParameters jobParameters, long instanceId, PlatformType type) {
         long jobId = jobFacade.createJob(jobParameters);
 
         instanceJobService.create(jobId, instanceId, type);
@@ -61,7 +62,7 @@ public class InstanceJobFacadeImpl implements InstanceJobFacade {
 
     @Override
     @Transactional
-    public Job createSyncJob(JobParameters jobParameters, long instanceId, int type) {
+    public Job createSyncJob(JobParameters jobParameters, long instanceId, PlatformType type) {
         Job job = jobService.create(jobParameters, workflowService.getWorkflow(jobParameters.getWorkflowId()));
 
         instanceJobService.create(Validate.notNull(job.getId(), "id"), instanceId, type);

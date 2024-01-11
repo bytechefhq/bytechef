@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.connection.web.rest.mapper.config;
+package com.bytechef.platform.connection.web.rest.mapper;
 
-import com.bytechef.helios.connection.web.rest.adapter.ConnectionConversionServiceAdapter;
-import org.mapstruct.MapperConfig;
-import org.mapstruct.extensions.spring.SpringMapperConfig;
+import com.bytechef.platform.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
+import com.bytechef.platform.connection.web.rest.model.TagModel;
+import com.bytechef.tag.domain.Tag;
+import org.mapstruct.Mapper;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = {
-    ConnectionConversionServiceAdapter.class
-})
-@SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.helios.connection.web.rest.adapter",
-    conversionServiceAdapterClassName = "ConnectionConversionServiceAdapter")
-public interface ConnectionMapperSpringConfig {
+@Mapper(config = ConnectionMapperSpringConfig.class)
+public interface ConnectionTagMapper extends Converter<Tag, TagModel> {
+
+    TagModel convert(Tag tag);
 }

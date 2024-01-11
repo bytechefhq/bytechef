@@ -8,6 +8,7 @@
 package com.bytechef.hermes.execution.remote.web.rest.service;
 
 import com.bytechef.hermes.execution.service.InstanceJobService;
+import com.bytechef.platform.constant.PlatformType;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,7 +42,7 @@ public class RemoteInstanceJobServiceController {
             "application/json"
         })
     public ResponseEntity<Long> fetchLastJobId(@PathVariable long instanceId, @PathVariable int type) {
-        return instanceJobService.fetchLastJobId(instanceId, type)
+        return instanceJobService.fetchLastJobId(instanceId, PlatformType.valueOf(type))
             .map(ResponseEntity::ok)
             .orElse(
                 ResponseEntity.noContent()
@@ -58,7 +59,7 @@ public class RemoteInstanceJobServiceController {
             "application/json"
         })
     public ResponseEntity<Long> fetchJobInstanceId(@PathVariable long jobId, @PathVariable int type) {
-        return instanceJobService.fetchJobInstanceId(jobId, type)
+        return instanceJobService.fetchJobInstanceId(jobId, PlatformType.valueOf(type))
             .map(ResponseEntity::ok)
             .orElse(
                 ResponseEntity.noContent()

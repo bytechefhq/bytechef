@@ -69,6 +69,8 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-webhook:hermes-webhook-rest"))
     implementation(project(":server:libs:hermes:hermes-worker:hermes-worker-impl"))
     implementation(project(":server:libs:hermes:hermes-swagger"))
+    implementation(project(":server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-impl"))
+    implementation(project(":server:libs:platform:platform-swagger"))
 
     implementation(project(":server:libs:modules:components:airtable"))
     implementation(project(":server:libs:modules:components:aws:aws-s3"))

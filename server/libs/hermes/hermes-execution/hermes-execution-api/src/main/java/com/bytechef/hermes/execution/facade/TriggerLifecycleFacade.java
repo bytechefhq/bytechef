@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.execution.facade;
 
+import com.bytechef.platform.constant.PlatformType;
 import java.util.Map;
 
 /**
@@ -24,10 +25,10 @@ import java.util.Map;
 public interface TriggerLifecycleFacade {
 
     void executeTriggerDisable(
-        String workflowId, int type, long instanceId, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, PlatformType type, long instanceId, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, Long connectionId);
 
     void executeTriggerEnable(
-        String workflowId, int type, long instanceId, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, PlatformType type, long instanceId, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl);
 }

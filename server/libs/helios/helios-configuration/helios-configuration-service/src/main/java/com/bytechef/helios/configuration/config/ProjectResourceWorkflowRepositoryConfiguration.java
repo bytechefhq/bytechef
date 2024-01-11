@@ -18,7 +18,7 @@ package com.bytechef.helios.configuration.config;
 
 import com.bytechef.atlas.configuration.repository.config.contributor.ClasspathResourceWorkflowRepositoryPropertiesContributor;
 import com.bytechef.atlas.configuration.repository.config.contributor.FilesystemResourceWorkflowRepositoryPropertiesContributor;
-import com.bytechef.helios.configuration.constant.ProjectConstants;
+import com.bytechef.platform.constant.PlatformType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +40,7 @@ public class ProjectResourceWorkflowRepositoryConfiguration {
 
             @Override
             public int getType() {
-                return ProjectConstants.PROJECT_TYPE;
+                return PlatformType.AUTOMATION.getId();
             }
         };
     }
@@ -59,7 +59,7 @@ public class ProjectResourceWorkflowRepositoryConfiguration {
 
             @Override
             public int getType() {
-                return ProjectConstants.PROJECT_TYPE;
+                return PlatformType.AUTOMATION.getId();
             }
         };
     }

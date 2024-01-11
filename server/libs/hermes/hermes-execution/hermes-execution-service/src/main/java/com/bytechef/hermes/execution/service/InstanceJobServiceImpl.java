@@ -18,6 +18,7 @@ package com.bytechef.hermes.execution.service;
 
 import com.bytechef.hermes.execution.domain.InstanceJob;
 import com.bytechef.hermes.execution.repository.InstanceJobRepository;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,30 +43,30 @@ public class InstanceJobServiceImpl implements InstanceJobService {
     }
 
     @Override
-    public InstanceJob create(long jobId, long instanceId, int type) {
-        return instanceJobRepository.save(new InstanceJob(instanceId, jobId, type));
+    public InstanceJob create(long jobId, long instanceId, PlatformType type) {
+        return instanceJobRepository.save(new InstanceJob(instanceId, jobId, type.getId()));
     }
 
     @Override
-    public Optional<Long> fetchLastJobId(long instanceId, int type) {
-        return instanceJobRepository.findTop1ByInstanceIdAndTypeOrderByJobIdDesc(instanceId, type)
+    public Optional<Long> fetchLastJobId(long instanceId, PlatformType type) {
+        return instanceJobRepository.findTop1ByInstanceIdAndTypeOrderByJobIdDesc(instanceId, type.getId())
             .map(InstanceJob::getJobId);
     }
 
     @Override
-    public Optional<Long> fetchJobInstanceId(long jobId, int type) {
-        return instanceJobRepository.findByJobIdAndType(jobId, type)
+    public Optional<Long> fetchJobInstanceId(long jobId, PlatformType type) {
+        return instanceJobRepository.findByJobIdAndType(jobId, type.getId())
             .map(InstanceJob::getInstanceId);
     }
 
     @Override
     public Page<Long> getJobIds(
-        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, PlatformType type,
         List<String> workflowIds, int pageNumber) {
 
         PageRequest pageRequest = PageRequest.of(pageNumber, InstanceJobRepository.DEFAULT_PAGE_SIZE);
 
         return instanceJobRepository.findAllJobIds(
-            status, startDate, endDate, instanceId, type, workflowIds, pageRequest);
+            status, startDate, endDate, instanceId, type.getId(), workflowIds, pageRequest);
     }
 }

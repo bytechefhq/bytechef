@@ -16,6 +16,7 @@
 
 package com.bytechef.hermes.configuration.instance.accessor;
 
+import com.bytechef.platform.constant.PlatformType;
 import java.util.Map;
 
 /**
@@ -30,5 +31,5 @@ public interface InstanceAccessor {
 
     Map<String, ?> getInputMap(long instanceId, String workflowId);
 
-    int getType();
+    PlatformType getType();
 }

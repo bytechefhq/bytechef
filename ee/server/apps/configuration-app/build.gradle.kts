@@ -43,6 +43,7 @@ dependencies {
     implementation(project(":server:libs:hermes:hermes-swagger"))
     implementation(project(":server:libs:hermes:hermes-test:hermes-test-impl"))
     implementation(project(":server:libs:hermes:hermes-test:hermes-test-api"))
+    implementation(project(":server:libs:platform:platform-swagger"))
 
     implementation(project(":ee:server:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":ee:server:libs:atlas:atlas-worker:atlas-worker-remote-client"))

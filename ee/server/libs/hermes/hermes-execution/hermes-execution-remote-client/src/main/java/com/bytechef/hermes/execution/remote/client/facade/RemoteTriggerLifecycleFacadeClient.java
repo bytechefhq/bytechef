@@ -9,6 +9,7 @@ package com.bytechef.hermes.execution.remote.client.facade;
 
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,7 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
 
     @Override
     public void executeTriggerDisable(
-        String workflowId, int type, long instanceId, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, PlatformType type, long instanceId, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, Long connectionId) {
 
         post(
@@ -45,7 +46,7 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
 
     @Override
     public void executeTriggerEnable(
-        String workflowId, int type, long instanceId, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, PlatformType type, long instanceId, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl) {
 
         post(
@@ -66,7 +67,7 @@ public class RemoteTriggerLifecycleFacadeClient implements TriggerLifecycleFacad
 
     @SuppressFBWarnings("EI")
     private record TriggerRequest(
-        String workflowId, long instanceId, int type, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, long instanceId, PlatformType type, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
     }
 }

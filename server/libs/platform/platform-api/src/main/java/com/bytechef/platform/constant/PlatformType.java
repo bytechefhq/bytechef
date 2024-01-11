@@ -14,12 +14,30 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.configuration.constant;
+package com.bytechef.platform.constant;
 
 /**
  * @author Ivica Cardic
  */
-public class ProjectConstants {
+public enum PlatformType {
 
-    public static final int PROJECT_TYPE = 1;
+    AUTOMATION(1), EMBEDDED(2);
+
+    private final int id;
+
+    PlatformType(int id) {
+        this.id = id;
+    }
+
+    public static PlatformType valueOf(int type) {
+        return switch (type) {
+            case 1 -> PlatformType.AUTOMATION;
+            case 2 -> PlatformType.EMBEDDED;
+            default -> throw new IllegalArgumentException("PlatformType %s does not exist".formatted(type));
+        };
+    }
+
+    public int getId() {
+        return id;
+    }
 }

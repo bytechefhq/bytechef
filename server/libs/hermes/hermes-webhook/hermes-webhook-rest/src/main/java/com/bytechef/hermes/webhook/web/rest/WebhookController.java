@@ -37,6 +37,7 @@ import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.constants.FileEntryConstants;
 import com.bytechef.hermes.webhook.executor.WebhookExecutor;
 import com.bytechef.hermes.webhook.web.rest.exception.WorkflowNotEnabledException;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
@@ -102,7 +103,7 @@ public class WebhookController {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(
-            workflowExecutionId.getType());
+            PlatformType.valueOf(workflowExecutionId.getType()));
 
         if (!instanceAccessor.isWorkflowEnabled(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId())) {

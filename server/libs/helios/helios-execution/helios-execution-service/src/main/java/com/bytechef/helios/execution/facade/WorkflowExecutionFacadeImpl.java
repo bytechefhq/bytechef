@@ -28,7 +28,6 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
@@ -46,6 +45,7 @@ import com.bytechef.hermes.execution.dto.TriggerExecutionDTO;
 import com.bytechef.hermes.execution.service.InstanceJobService;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.file.storage.TriggerFileStorage;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -108,7 +108,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         JobDTO jobDTO = new JobDTO(
             job, taskFileStorage.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
         Optional<Long> projectInstanceIdOptional = instanceJobService.fetchJobInstanceId(
-            Validate.notNull(job.getId(), ""), ProjectConstants.PROJECT_TYPE);
+            Validate.notNull(job.getId(), ""), PlatformType.AUTOMATION);
 
         return new WorkflowExecution(
             jobDTO.id(), projectService.getWorkflowProject(jobDTO.workflowId()),
@@ -135,7 +135,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
             workflowIds.addAll(project.getWorkflowIds());
         } else {
             workflowIds.addAll(
-                CollectionUtils.map(workflowService.getWorkflows(ProjectConstants.PROJECT_TYPE), Workflow::getId));
+                CollectionUtils.map(workflowService.getWorkflows(PlatformType.AUTOMATION.getId()), Workflow::getId));
         }
 
         if (workflowIds.isEmpty()) {
@@ -143,7 +143,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
         } else {
             Page<Job> jobsPage = instanceJobService
                 .getJobIds(
-                    jobStatus, jobStartDate, jobEndDate, projectInstanceId, ProjectConstants.PROJECT_TYPE, workflowIds,
+                    jobStatus, jobStartDate, jobEndDate, projectInstanceId, PlatformType.AUTOMATION, workflowIds,
                     pageNumber)
                 .map(jobService::getJob);
 
@@ -163,7 +163,7 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
                 CollectionUtils.getFirst(
                     projects, project -> CollectionUtils.contains(project.getWorkflowIds(), job.getWorkflowId())),
                 OptionalUtils.map(
-                    instanceJobService.fetchJobInstanceId(job.getId(), ProjectConstants.PROJECT_TYPE),
+                    instanceJobService.fetchJobInstanceId(job.getId(), PlatformType.AUTOMATION),
                     projectInstanceService::getProjectInstance),
                 new JobDTO(job),
                 CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),

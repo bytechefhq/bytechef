@@ -17,6 +17,7 @@
 package com.bytechef.hermes.connection.facade;
 
 import com.bytechef.hermes.connection.dto.ConnectionDTO;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tag.domain.Tag;
 import java.util.List;
 
@@ -25,19 +26,19 @@ import java.util.List;
  */
 public interface ConnectionFacade {
 
-    ConnectionDTO create(ConnectionDTO connectionDTO, int type);
+    ConnectionDTO create(ConnectionDTO connectionDTO, PlatformType type);
 
     void delete(Long id);
 
     ConnectionDTO getConnection(Long id);
 
-    List<ConnectionDTO> getConnections(String componentName, Integer componentVersion, int type);
+    List<ConnectionDTO> getConnections(String componentName, Integer componentVersion, PlatformType type);
 
-    List<ConnectionDTO> getConnections(String componentName, Integer connectionVersion, Long tagId, int type);
+    List<ConnectionDTO> getConnections(String componentName, Integer connectionVersion, Long tagId, PlatformType type);
 
-    List<Tag> getConnectionTags(int type);
+    List<Tag> getConnectionTags(PlatformType type);
 
     ConnectionDTO update(Long id, List<Tag> tags);
 
-    ConnectionDTO update(ConnectionDTO connectionDTO, int type);
+    ConnectionDTO update(ConnectionDTO connectionDTO);
 }

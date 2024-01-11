@@ -28,6 +28,7 @@ import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.file.storage.TriggerFileStorage;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.Collection;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -85,7 +86,7 @@ public class TriggerCompletionHandler {
         }
 
         InstanceAccessor instanceAccessor =
-            instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+            instanceAccessorRegistry.getInstanceAccessor(PlatformType.valueOf(workflowExecutionId.getType()));
 
         Map<String, Object> inputMap = (Map<String, Object>) instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());
@@ -98,14 +99,14 @@ public class TriggerCompletionHandler {
                     createJob(
                         workflowExecutionId,
                         MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerOutputValue)),
-                        workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
+                        workflowExecutionId.getInstanceId(), PlatformType.valueOf(workflowExecutionId.getType())));
             }
         } else {
             triggerExecution.addJobId(
                 createJob(
                     workflowExecutionId,
                     MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
-                    workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
+                    workflowExecutionId.getInstanceId(), PlatformType.valueOf(workflowExecutionId.getType())));
         }
 
         triggerExecutionService.update(triggerExecution);
@@ -118,7 +119,7 @@ public class TriggerCompletionHandler {
     }
 
     private long createJob(
-        WorkflowExecutionId workflowExecutionId, Map<String, ?> inpputMap, long instanceId, int type) {
+        WorkflowExecutionId workflowExecutionId, Map<String, ?> inpputMap, long instanceId, PlatformType type) {
 
         Job job = instanceJobFacade.createJob(
             new JobParameters(workflowExecutionId.getWorkflowId(), inpputMap), instanceId, type);

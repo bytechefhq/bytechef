@@ -17,6 +17,7 @@
 package com.bytechef.hermes.connection.service;
 
 import com.bytechef.hermes.connection.domain.Connection;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 
 /**
@@ -30,13 +31,13 @@ public interface ConnectionService {
 
     Connection getConnection(long id);
 
-    List<Connection> getConnections(int type);
+    List<Connection> getConnections(PlatformType type);
 
     List<Connection> getConnections(List<Long> ids);
 
-    List<Connection> getConnections(String componentName, int version, int type);
+    List<Connection> getConnections(String componentName, int version, PlatformType type);
 
-    List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId, int type);
+    List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId, PlatformType type);
 
     Connection update(long id, List<Long> tagIds);
 

@@ -62,6 +62,7 @@ openapi:
       automation: /api/automation
       core: /api/core
       embedded: /api/embedded
+      platform: /api/platform
 
 
 spring:

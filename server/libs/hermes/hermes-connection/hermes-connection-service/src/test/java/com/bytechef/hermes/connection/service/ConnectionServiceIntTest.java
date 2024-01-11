@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.hermes.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -92,14 +93,14 @@ public class ConnectionServiceIntTest {
         connection = connectionRepository.save(connection);
 
         assertThat(connectionService.getConnection(Validate.notNull(connection.getId(), "id"))).isEqualTo(connection);
-        assertThat(connectionService.getConnections(null, null, tag.getId(), 1)).hasSize(1);
+        assertThat(connectionService.getConnections(null, null, tag.getId(), PlatformType.AUTOMATION)).hasSize(1);
     }
 
     @Test
     public void getGetConnections() {
         connectionRepository.save(getConnection());
 
-        assertThat(connectionService.getConnections(null, null, null, 1)).hasSize(1);
+        assertThat(connectionService.getConnections(null, null, null, PlatformType.AUTOMATION)).hasSize(1);
     }
 
     @Test

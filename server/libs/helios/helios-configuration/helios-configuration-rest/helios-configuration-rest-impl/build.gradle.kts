@@ -54,6 +54,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:helios:helios-configuration:helios-configuration-rest:helios-configuration-rest-api"))
+    implementation(project(":server:libs:platform:platform-api"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")

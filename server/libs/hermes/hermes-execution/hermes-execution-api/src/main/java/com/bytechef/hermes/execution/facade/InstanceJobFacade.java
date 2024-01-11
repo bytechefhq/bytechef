@@ -18,13 +18,14 @@ package com.bytechef.hermes.execution.facade;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.platform.constant.PlatformType;
 
 /**
  * @author Ivica Cardic
  */
 public interface InstanceJobFacade {
 
-    Job createJob(JobParameters jobParameters, long instanceId, int type);
+    Job createJob(JobParameters jobParameters, long instanceId, PlatformType type);
 
-    Job createSyncJob(JobParameters jobParameters, long instanceId, int type);
+    Job createSyncJob(JobParameters jobParameters, long instanceId, PlatformType type);
 }

@@ -27,7 +27,8 @@ import org.springframework.lang.NonNull;
  */
 public interface WorkflowService {
 
-    Workflow create(@NonNull String definition, @NonNull Format format, @NonNull SourceType sourceType, int type);
+    Workflow create(
+        @NonNull String definition, @NonNull Format format, @NonNull SourceType sourceType, @NonNull int type);
 
     void delete(@NonNull String id);
 

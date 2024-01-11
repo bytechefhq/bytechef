@@ -35,6 +35,7 @@ import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.file.storage.TriggerFileStorage;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +146,7 @@ public class TriggerSyncExecutor {
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
         InstanceAccessor instanceAccessor = instanceAccessorRegistry
-            .getInstanceAccessor(workflowExecutionId.getType());
+            .getInstanceAccessor(PlatformType.valueOf(workflowExecutionId.getType()));
 
         return instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());

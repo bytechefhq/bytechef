@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.helios.connection.web.rest.mapper;
+package com.bytechef.platform.connection.web.rest.mapper;
 
-import com.bytechef.helios.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
-import com.bytechef.helios.connection.web.rest.model.TagModel;
-import com.bytechef.tag.domain.Tag;
+import com.bytechef.hermes.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
+import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -26,7 +26,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = ConnectionMapperSpringConfig.class)
-public interface ConnectionTagMapper extends Converter<Tag, TagModel> {
+public interface ConnectionMapper extends Converter<ConnectionDTO, ConnectionModel> {
 
-    TagModel convert(Tag tag);
+    @Override
+    ConnectionModel convert(ConnectionDTO connectionDTO);
 }

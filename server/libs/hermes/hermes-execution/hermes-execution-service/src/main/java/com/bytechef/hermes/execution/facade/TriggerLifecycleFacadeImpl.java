@@ -25,6 +25,7 @@ import com.bytechef.hermes.component.registry.service.TriggerDefinitionService;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.scheduler.TriggerScheduler;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
     @Override
     public void executeTriggerDisable(
-        String workflowId, int type, long instanceId, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, PlatformType type, long instanceId, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, Long connectionId) {
 
         OperationType operationType = OperationType.ofType(workflowTriggerType);
@@ -65,7 +66,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
             operationType.componentOperationName());
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            type, instanceId, workflowId, workflowTriggerName);
+            type.getId(), instanceId, workflowId, workflowTriggerName);
 
         DynamicWebhookEnableOutput output = OptionalUtils.orElse(
             triggerStateService.fetchValue(workflowExecutionId), null);
@@ -97,7 +98,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
     @Override
     public void executeTriggerEnable(
-        String workflowId, int type, long instanceId, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, PlatformType type, long instanceId, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, Long connectionId, String webhookUrl) {
 
         OperationType operationType = OperationType.ofType(workflowTriggerType);
@@ -107,7 +108,7 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
             operationType.componentOperationName());
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            type, instanceId, workflowId, workflowTriggerName);
+            type.getId(), instanceId, workflowId, workflowTriggerName);
 
         switch (triggerDefinition.getType()) {
             case HYBRID, DYNAMIC_WEBHOOK -> {

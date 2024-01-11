@@ -23,7 +23,6 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
@@ -39,6 +38,7 @@ import com.bytechef.hermes.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.hermes.execution.facade.InstanceJobFacade;
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.hermes.execution.service.InstanceJobService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -142,7 +142,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             id, workflowId);
 
         Job job = instanceJobFacade.createJob(
-            new JobParameters(workflowId, projectInstanceWorkflow.getInputs()), id, ProjectConstants.PROJECT_TYPE);
+            new JobParameters(workflowId, projectInstanceWorkflow.getInputs()), id, PlatformType.AUTOMATION);
 
         return Validate.notNull(job.getId(), "id");
     }
@@ -302,7 +302,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             triggerLifecycleFacade.executeTriggerDisable(
-                workflow.getId(), ProjectConstants.PROJECT_TYPE, projectInstanceWorkflow.getProjectInstanceId(),
+                workflow.getId(), PlatformType.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(),
                 workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
                 getConnectionId(projectInstanceWorkflow.getProjectInstanceId(), workflow.getId(), workflowTrigger));
         }
@@ -317,7 +317,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             triggerLifecycleFacade.executeTriggerEnable(
-                workflow.getId(), ProjectConstants.PROJECT_TYPE, projectInstanceWorkflow.getProjectInstanceId(),
+                workflow.getId(), PlatformType.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(),
                 workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getParameters(),
                 getConnectionId(
                     projectInstanceWorkflow.getProjectInstanceId(), workflow.getId(), workflowTrigger),
@@ -356,7 +356,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private LocalDateTime getProjectInstanceLastExecutionDate(long projectInstanceId) {
         return OptionalUtils.mapOrElse(
-            instanceJobService.fetchLastJobId(projectInstanceId, ProjectConstants.PROJECT_TYPE),
+            instanceJobService.fetchLastJobId(projectInstanceId, PlatformType.AUTOMATION),
             jobId -> {
                 Job job = jobService.getJob(jobId);
 

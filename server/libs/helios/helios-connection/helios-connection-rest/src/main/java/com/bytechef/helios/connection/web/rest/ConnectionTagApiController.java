@@ -16,11 +16,11 @@
 
 package com.bytechef.helios.connection.web.rest;
 
-import com.bytechef.helios.configuration.constant.ProjectConstants;
-import com.bytechef.helios.connection.web.rest.model.TagModel;
-import com.bytechef.helios.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
-import com.bytechef.tag.domain.Tag;
+import com.bytechef.platform.connection.web.rest.AbstractConnectionTagApiController;
+import com.bytechef.platform.connection.web.rest.model.TagModel;
+import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -32,16 +32,18 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController
+@RestController("com.bytechef.helios.connection.web.rest.ConnectionTagApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
-public class ConnectionTagApiController implements ConnectionTagApi {
+public class ConnectionTagApiController extends AbstractConnectionTagApiController implements ConnectionTagApi {
 
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
+        super(connectionFacade, conversionService);
+
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
     }
@@ -49,23 +51,14 @@ public class ConnectionTagApiController implements ConnectionTagApi {
     @Override
     public ResponseEntity<List<TagModel>> getConnectionTags() {
         return ResponseEntity.ok(
-            connectionFacade.getConnectionTags(ProjectConstants.PROJECT_TYPE)
+            connectionFacade.getConnectionTags(PlatformType.AUTOMATION)
                 .stream()
                 .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());
     }
 
     @Override
-    public ResponseEntity<Void> updateConnectionTags(Long id, UpdateTagsRequestModel updateConnectionTagsRequestModel) {
-        List<TagModel> tagModels = updateConnectionTagsRequestModel.getTags();
-
-        connectionFacade.update(
-            id,
-            tagModels.stream()
-                .map(tagModel -> conversionService.convert(tagModel, Tag.class))
-                .toList());
-
-        return ResponseEntity.noContent()
-            .build();
+    public ResponseEntity<Void> updateConnectionTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
+        return super.updateConnectionTags(id, updateTagsRequestModel);
     }
 }

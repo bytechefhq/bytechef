@@ -20,9 +20,9 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.service.ProjectService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -67,7 +67,7 @@ public class ProjectOrphanFilesystemWorkflowChecker {
     public void onApplicationReadyEvent() {
         List<Project> projects = projectService.getProjects();
         List<Workflow> workflows = workflowService.getWorkflows(
-            ProjectConstants.PROJECT_TYPE, List.of(Workflow.SourceType.FILESYSTEM, Workflow.SourceType.GIT));
+            PlatformType.AUTOMATION.getId(), List.of(Workflow.SourceType.FILESYSTEM, Workflow.SourceType.GIT));
 
         List<Workflow> orphanWorkflows = new ArrayList<>();
         List<String> projectWorkflowIds = CollectionUtils.flatMap(projects, Project::getWorkflowIds);

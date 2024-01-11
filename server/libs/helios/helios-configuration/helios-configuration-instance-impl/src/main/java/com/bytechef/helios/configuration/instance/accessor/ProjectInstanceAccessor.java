@@ -16,13 +16,13 @@
 
 package com.bytechef.helios.configuration.instance.accessor;
 
-import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.ProjectInstance;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.helios.configuration.domain.ProjectInstanceWorkflowConnection;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectInstanceWorkflowService;
 import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessor;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +90,7 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
     }
 
     @Override
-    public int getType() {
-        return ProjectConstants.PROJECT_TYPE;
+    public PlatformType getType() {
+        return PlatformType.AUTOMATION;
     }
 }

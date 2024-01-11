@@ -10,6 +10,7 @@ package com.bytechef.hermes.execution.remote.web.rest.facade;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.hermes.execution.facade.InstanceJobFacade;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
@@ -56,6 +57,6 @@ public class RemoteInstanceJobFacadeController {
     }
 
     @SuppressFBWarnings("EI")
-    public record CreateJobRequest(JobParameters jobParameters, long instanceId, int type) {
+    public record CreateJobRequest(JobParameters jobParameters, long instanceId, PlatformType type) {
     }
 }

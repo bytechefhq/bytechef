@@ -17,6 +17,7 @@
 package com.bytechef.hermes.execution.service;
 
 import com.bytechef.hermes.execution.domain.InstanceJob;
+import com.bytechef.platform.constant.PlatformType;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,13 +28,13 @@ import org.springframework.data.domain.Page;
  */
 public interface InstanceJobService {
 
-    InstanceJob create(long jobId, long instanceId, int type);
+    InstanceJob create(long jobId, long instanceId, PlatformType type);
 
-    Optional<Long> fetchLastJobId(long instanceId, int type);
+    Optional<Long> fetchLastJobId(long instanceId, PlatformType type);
 
-    Optional<Long> fetchJobInstanceId(long jobId, int type);
+    Optional<Long> fetchJobInstanceId(long jobId, PlatformType type);
 
     Page<Long> getJobIds(
-        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, PlatformType type,
         List<String> workflowIds, int pageNumber);
 }

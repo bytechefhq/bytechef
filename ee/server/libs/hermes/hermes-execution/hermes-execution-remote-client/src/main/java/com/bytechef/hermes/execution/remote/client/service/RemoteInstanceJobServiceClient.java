@@ -10,6 +10,7 @@ package com.bytechef.hermes.execution.remote.client.service;
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.hermes.execution.domain.InstanceJob;
 import com.bytechef.hermes.execution.service.InstanceJobService;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,35 +37,35 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
     }
 
     @Override
-    public InstanceJob create(long jobId, long instanceId, int type) {
+    public InstanceJob create(long jobId, long instanceId, PlatformType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<Long> fetchLastJobId(long instanceId, int type) {
+    public Optional<Long> fetchLastJobId(long instanceId, PlatformType type) {
         return Optional.ofNullable(
             loadBalancedRestClient.get(
                 uriBuilder -> uriBuilder
                     .host(EXECUTION_APP)
                     .path(INSTANCE_JOB_SERVICE + "/fetch-last-job-id/{instanceId}/{type}")
-                    .build(instanceId, type),
+                    .build(instanceId, type.getId()),
                 Long.class));
     }
 
     @Override
-    public Optional<Long> fetchJobInstanceId(long jobId, int type) {
+    public Optional<Long> fetchJobInstanceId(long jobId, PlatformType type) {
         return Optional.ofNullable(
             loadBalancedRestClient.get(
                 uriBuilder -> uriBuilder
                     .host(EXECUTION_APP)
                     .path(INSTANCE_JOB_SERVICE + "/fetch-job-instance-id/{jobId}/{type}")
-                    .build(jobId, type),
+                    .build(jobId, type.getId()),
                 Long.class));
     }
 
     @Override
     public Page<Long> getJobIds(
-        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, int type,
+        String status, LocalDateTime startDate, LocalDateTime endDate, Long instanceId, PlatformType type,
         List<String> workflowIds, int pageNumber) {
 
         throw new UnsupportedOperationException();

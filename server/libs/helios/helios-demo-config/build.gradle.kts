@@ -6,4 +6,5 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:helios:helios-configuration:helios-configuration-api"))
+    implementation(project(":server:libs:platform:platform-api"))
 }

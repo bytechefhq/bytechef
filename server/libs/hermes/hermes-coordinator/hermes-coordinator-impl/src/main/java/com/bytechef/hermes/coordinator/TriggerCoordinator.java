@@ -42,6 +42,7 @@ import com.bytechef.hermes.execution.domain.TriggerExecution;
 import com.bytechef.hermes.execution.service.TriggerExecutionService;
 import com.bytechef.hermes.execution.service.TriggerStateService;
 import com.bytechef.hermes.file.storage.TriggerFileStorage;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -214,7 +215,7 @@ public class TriggerCoordinator {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
         InstanceAccessor instanceAccessor = instanceAccessorRegistry
-            .getInstanceAccessor(workflowExecutionId.getType());
+            .getInstanceAccessor(PlatformType.valueOf(workflowExecutionId.getType()));
 
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(

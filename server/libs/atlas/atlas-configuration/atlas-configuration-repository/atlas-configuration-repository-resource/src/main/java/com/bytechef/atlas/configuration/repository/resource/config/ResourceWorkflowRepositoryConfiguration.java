@@ -49,7 +49,7 @@ public class ResourceWorkflowRepositoryConfiguration {
     @Order(1)
     @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.classpath.enabled", havingValue = "true")
     ClassPathResourceWorkflowRepository classpathBasedWorkflowRepository(
-        List<ClasspathResourceWorkflowRepositoryPropertiesContributor> accessors) {
+        List<ClasspathResourceWorkflowRepositoryPropertiesContributor> contributors) {
 
         if (logger.isInfoEnabled()) {
             logger.info("Workflow repository type enabled: classpath");
@@ -57,8 +57,8 @@ public class ResourceWorkflowRepositoryConfiguration {
 
         Map<Integer, String> propertiesMap = new HashMap<>();
 
-        for (ClasspathResourceWorkflowRepositoryPropertiesContributor accessor : accessors) {
-            propertiesMap.put(accessor.getType(), accessor.getLocationPattern());
+        for (ClasspathResourceWorkflowRepositoryPropertiesContributor contributor : contributors) {
+            propertiesMap.put(contributor.getType(), contributor.getLocationPattern());
         }
 
         return new ClassPathResourceWorkflowRepository(

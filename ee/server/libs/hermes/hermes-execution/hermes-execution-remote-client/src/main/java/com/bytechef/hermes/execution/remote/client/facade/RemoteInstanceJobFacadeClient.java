@@ -11,6 +11,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.hermes.execution.facade.InstanceJobFacade;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +34,7 @@ public class RemoteInstanceJobFacadeClient implements InstanceJobFacade {
     }
 
     @Override
-    public Job createJob(JobParameters jobParameters, long instanceId, int type) {
+    public Job createJob(JobParameters jobParameters, long instanceId, PlatformType type) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
@@ -43,7 +44,7 @@ public class RemoteInstanceJobFacadeClient implements InstanceJobFacade {
     }
 
     @Override
-    public Job createSyncJob(JobParameters jobParameters, long instanceId, int type) {
+    public Job createSyncJob(JobParameters jobParameters, long instanceId, PlatformType type) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
@@ -53,6 +54,6 @@ public class RemoteInstanceJobFacadeClient implements InstanceJobFacade {
     }
 
     @SuppressFBWarnings("EI")
-    public record CreateJobRequest(JobParameters jobParameters, long instanceId, int type) {
+    public record CreateJobRequest(JobParameters jobParameters, long instanceId, PlatformType type) {
     }
 }

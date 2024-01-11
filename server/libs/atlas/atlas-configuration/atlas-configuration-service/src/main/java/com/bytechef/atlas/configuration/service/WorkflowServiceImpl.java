@@ -101,7 +101,8 @@ public class WorkflowServiceImpl implements WorkflowService {
     public Workflow duplicateWorkflow(@NonNull String id) {
         Workflow workflow = getWorkflow(id);
 
-        return create(workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType(), workflow.getType());
+        return create(
+            workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType(), workflow.getType());
     }
 
     @Override

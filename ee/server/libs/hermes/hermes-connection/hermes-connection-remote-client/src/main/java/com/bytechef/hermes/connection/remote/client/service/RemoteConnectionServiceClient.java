@@ -10,6 +10,7 @@ package com.bytechef.hermes.connection.remote.client.service;
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.ParameterizedTypeReference;
@@ -51,7 +52,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections(int type) {
+    public List<Connection> getConnections(PlatformType type) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host("connection-app")
@@ -66,12 +67,14 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections(String componentName, int version, int type) {
+    public List<Connection> getConnections(String componentName, int version, PlatformType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId, int type) {
+    public List<Connection> getConnections(
+        String componentName, Integer connectionVersion, Long tagId, PlatformType type) {
+
         throw new UnsupportedOperationException();
     }
 

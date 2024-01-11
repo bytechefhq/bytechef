@@ -35,6 +35,7 @@ import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.service.ConnectionService;
 import com.bytechef.hermes.oauth2.service.OAuth2Service;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -84,7 +85,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
-    public ConnectionDTO create(ConnectionDTO connectionDTO, int type) {
+    public ConnectionDTO create(ConnectionDTO connectionDTO, PlatformType type) {
         Connection connection = connectionDTO.toConnection();
 
         if (StringUtils.isNotBlank(connection.getAuthorizationName()) &&
@@ -126,7 +127,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             connection.setTags(tags);
         }
 
-        connection.setType(type);
+        connection.setType(type.getId());
 
         connection = connectionService.create(connection);
 
@@ -150,13 +151,13 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         Connection connection = connectionService.getConnection(id);
 
         return new ConnectionDTO(
-            isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()), connection,
-            tagService.getTags(connection.getTagIds()));
+            isConnectionUsed(Validate.notNull(connection.getId(), "id"), PlatformType.valueOf(connection.getType())),
+            connection, tagService.getTags(connection.getTagIds()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ConnectionDTO> getConnections(String componentName, Integer componentVersion, int type) {
+    public List<ConnectionDTO> getConnections(String componentName, Integer componentVersion, PlatformType type) {
         List<Connection> connections = new ArrayList<>();
 
         List<ConnectionDefinition> connectionDefinitions = connectionDefinitionService.getConnectionDefinitions(
@@ -172,7 +173,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ConnectionDTO> getConnections(String componentName, Integer connectionVersion, Long tagId, int type) {
+    public List<ConnectionDTO> getConnections(
+        String componentName, Integer connectionVersion, Long tagId, PlatformType type) {
+
         List<Connection> connections = connectionService.getConnections(componentName, connectionVersion, tagId, type);
 
         return getConnections(connections);
@@ -180,7 +183,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Tag> getConnectionTags(int type) {
+    public List<Tag> getConnectionTags(PlatformType type) {
         List<Connection> connections = connectionService.getConnections(type);
 
         return tagService.getTags(connections.stream()
@@ -196,19 +199,20 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         Connection connection = connectionService.update(id, CollectionUtils.map(tags, Tag::getId));
 
         return new ConnectionDTO(
-            isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()), connection, tags);
+            isConnectionUsed(Validate.notNull(connection.getId(), "id"), PlatformType.valueOf(connection.getType())),
+            connection, tags);
     }
 
     @Override
-    public ConnectionDTO update(ConnectionDTO connectionDTO, int type) {
+    public ConnectionDTO update(ConnectionDTO connectionDTO) {
         List<Tag> tags = checkTags(connectionDTO.tags());
 
         Connection connection = connectionDTO.toConnection();
 
-        connection.setType(type);
+        connection = connectionService.update(connection);
 
         return new ConnectionDTO(
-            isConnectionUsed(connectionDTO.id(), type), connectionService.update(connection), tags);
+            isConnectionUsed(connectionDTO.id(), PlatformType.valueOf(connection.getType())), connection, tags);
     }
 
     private List<Tag> checkTags(List<Tag> tags) {
@@ -221,8 +225,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return curTagIds.contains(tag.getId());
     }
 
-    private boolean isConnectionUsed(long connectionId, int type) {
-        List<Workflow> workflows = workflowService.getWorkflows(type);
+    private boolean isConnectionUsed(long connectionId, PlatformType type) {
+        List<Workflow> workflows = workflowService.getWorkflows(type.getId());
 
         for (Workflow workflow : workflows) {
             for (WorkflowTask workflowTask : workflow.getTasks()) {
@@ -236,7 +240,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     private boolean isConnectionUsed(
-        String workflowId, WorkflowConnection workflowConnection, long connectionId, int type) {
+        String workflowId, WorkflowConnection workflowConnection, long connectionId, PlatformType type) {
 
         return workflowConnection.getId()
             .map(curConnectionId -> connectionId == curConnectionId)
@@ -245,7 +249,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                 connectionId, type));
     }
 
-    private boolean isConnectionUsed(String workflowId, WorkflowTask workflowTask, long id, int type) {
+    private boolean isConnectionUsed(String workflowId, WorkflowTask workflowTask, long id, PlatformType type) {
         return workflowConnectionFacade.getWorkflowConnections(workflowTask)
             .stream()
             .map(workflowConnection -> isConnectionUsed(workflowId, workflowConnection, id, type))
@@ -255,7 +259,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     private boolean isConnectionUsed(
         String workflowId, String workflowConnectionOperationName, String workflowConnectionKey, long connectionId,
-        int type) {
+        PlatformType type) {
 
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(type);
 
@@ -278,7 +282,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return CollectionUtils.map(
             connections,
             connection -> new ConnectionDTO(
-                isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()),
+                isConnectionUsed(Validate.notNull(connection.getId(), "id"),
+                    PlatformType.valueOf(connection.getType())),
                 connection, filterTags(tags, connection)));
     }
 }

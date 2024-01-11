@@ -28,6 +28,7 @@ import com.bytechef.hermes.configuration.instance.accessor.InstanceAccessorRegis
 import com.bytechef.hermes.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.hermes.execution.WorkflowExecutionId;
 import com.bytechef.hermes.execution.facade.InstanceJobFacade;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -82,7 +83,8 @@ public class WebhookExecutorImpl implements WebhookExecutor {
                 Job job = jobSyncExecutor.execute(
                     createJobParameters(workflowExecutionId, inputMap, triggerOutputValue),
                     (jobParameters) -> instanceJobFacade.createSyncJob(
-                        jobParameters, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
+                        jobParameters, workflowExecutionId.getInstanceId(),
+                        PlatformType.valueOf(workflowExecutionId.getType())));
 
                 outputsList.add(taskFileStorage.readJobOutputs(job.getOutputs()));
             }
@@ -92,7 +94,8 @@ public class WebhookExecutorImpl implements WebhookExecutor {
             Job job = jobSyncExecutor.execute(
                 createJobParameters(workflowExecutionId, inputMap, triggerOutput.value()),
                 (jobParameters) -> instanceJobFacade.createSyncJob(
-                    jobParameters, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
+                    jobParameters, workflowExecutionId.getInstanceId(),
+                    PlatformType.valueOf(workflowExecutionId.getType())));
 
             outputs = job.getOutputs() == null ? null : taskFileStorage.readJobOutputs(job.getOutputs());
         }
@@ -122,8 +125,8 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry
-            .getInstanceAccessor(workflowExecutionId.getType());
+        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(
+            PlatformType.valueOf(workflowExecutionId.getType()));
 
         return instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowId());

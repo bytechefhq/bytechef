@@ -8,6 +8,7 @@
 package com.bytechef.hermes.execution.remote.web.rest.facade;
 
 import com.bytechef.hermes.execution.facade.TriggerLifecycleFacade;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class RemoteTriggerLifecycleFacadeController {
 
     @SuppressFBWarnings("EI")
     public record TriggerRequest(
-        String workflowId, long instanceId, int type, String workflowTriggerName, String workflowTriggerType,
+        String workflowId, long instanceId, PlatformType type, String workflowTriggerName, String workflowTriggerType,
         Map<String, ?> triggerParameters, long connectionId, String webhookUrl) {
     }
 }

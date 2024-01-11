@@ -16,13 +16,13 @@
 
 package com.bytechef.helios.connection.web.rest;
 
-import com.bytechef.helios.configuration.constant.ProjectConstants;
-import com.bytechef.helios.connection.web.rest.model.ConnectionModel;
 import com.bytechef.hermes.connection.dto.ConnectionDTO;
 import com.bytechef.hermes.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.web.rest.AbstractConnectionApiController;
+import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -32,16 +32,18 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController
+@RestController("com.bytechef.helios.connection.web.rest.ConnectionApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
-public class ConnectionApiController implements ConnectionApi {
+public class ConnectionApiController extends AbstractConnectionApiController implements ConnectionApi {
 
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ConnectionApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
+        super(connectionFacade, conversionService);
+
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
     }
@@ -51,26 +53,18 @@ public class ConnectionApiController implements ConnectionApi {
         return ResponseEntity.ok(
             conversionService.convert(
                 connectionFacade.create(
-                    conversionService.convert(connectionModel, ConnectionDTO.class), ProjectConstants.PROJECT_TYPE),
+                    conversionService.convert(connectionModel, ConnectionDTO.class), PlatformType.AUTOMATION),
                 ConnectionModel.class));
     }
 
     @Override
     public ResponseEntity<Void> deleteConnection(Long id) {
-        connectionFacade.delete(id);
-
-        return ResponseEntity.noContent()
-            .build();
+        return super.deleteConnection(id);
     }
 
     @Override
     public ResponseEntity<ConnectionModel> getConnection(Long id) {
-        return ResponseEntity.ok(
-            Validate.notNull(
-                conversionService.convert(
-                    connectionFacade.getConnection(Validate.notNull(id, "id")), ConnectionModel.class),
-                "connection")
-                .parameters(null));
+        return super.getConnection(id);
     }
 
     @Override
@@ -78,7 +72,7 @@ public class ConnectionApiController implements ConnectionApi {
         String componentName, Integer connectionVersion, Long tagId) {
 
         return ResponseEntity.ok(
-            connectionFacade.getConnections(componentName, connectionVersion, tagId, ProjectConstants.PROJECT_TYPE)
+            connectionFacade.getConnections(componentName, connectionVersion, tagId, PlatformType.AUTOMATION)
                 .stream()
                 .map(connection -> conversionService.convert(connection, ConnectionModel.class)
                     .parameters(null))
@@ -87,11 +81,6 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<ConnectionModel> updateConnection(Long id, ConnectionModel connectionModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                connectionFacade.update(
-                    conversionService.convert(connectionModel.id(id), ConnectionDTO.class),
-                    ProjectConstants.PROJECT_TYPE),
-                ConnectionModel.class));
+        return super.updateConnection(id, connectionModel);
     }
 }

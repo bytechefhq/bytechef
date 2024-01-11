@@ -20,6 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.hermes.connection.domain.Connection;
 import com.bytechef.hermes.connection.repository.ConnectionRepository;
+import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -65,8 +66,10 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(int type) {
-        return connectionRepository.findAll(Sort.by("name"));
+    public List<Connection> getConnections(PlatformType type) {
+        return CollectionUtils.filter(
+            connectionRepository.findAll(Sort.by("name")),
+            connection -> connection.getType() == type.getId());
     }
 
     @Override
@@ -77,31 +80,37 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(String componentName, int version, int type) {
-        return connectionRepository.findAllByComponentNameAndConnectionVersionOrderByName(componentName, version);
+    public List<Connection> getConnections(String componentName, int version, PlatformType type) {
+        return connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
+            componentName, version, type.getId());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(String componentName, Integer connectionVersion, Long tagId, int type) {
+    public List<Connection> getConnections(
+        String componentName, Integer connectionVersion, Long tagId, PlatformType type) {
+
         Iterable<Connection> connectionIterable;
 
         if (StringUtils.isBlank(componentName) && tagId == null) {
-            connectionIterable = connectionRepository.findAll(Sort.by("name"));
+            connectionIterable = connectionRepository.findAllByType(type.getId());
         } else if (StringUtils.isNotBlank(componentName) && tagId == null) {
             if (connectionVersion == null) {
-                connectionIterable = connectionRepository.findAllByComponentNameOrderByName(componentName);
+                connectionIterable = connectionRepository.findAllByComponentNameAndTypeOrderByName(
+                    componentName, type.getId());
             } else {
-                connectionIterable = connectionRepository.findAllByComponentNameAndConnectionVersionOrderByName(
-                    componentName, connectionVersion);
+                connectionIterable = connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
+                    componentName, connectionVersion, type.getId());
             }
         } else if (StringUtils.isBlank(componentName)) {
-            connectionIterable = connectionRepository.findAllByTagId(tagId);
+            connectionIterable = connectionRepository.findAllByTagIdAndType(tagId, type.getId());
         } else {
             if (connectionVersion == null) {
-                connectionIterable = connectionRepository.findAllByComponentNameAndTagId(componentName, tagId);
+                connectionIterable = connectionRepository.findAllByComponentNameAndTagIdAndType(
+                    componentName, tagId, type.getId());
             } else {
-                connectionIterable = connectionRepository.findAllByCNCVTI(componentName, connectionVersion, tagId);
+                connectionIterable = connectionRepository.findAllByCNCVTIT(
+                    componentName, connectionVersion, tagId, type.getId());
             }
 
         }

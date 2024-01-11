@@ -31,38 +31,43 @@ import org.springframework.stereotype.Repository;
 public interface ConnectionRepository
     extends ListPagingAndSortingRepository<Connection, Long>, ListCrudRepository<Connection, Long> {
 
-    List<Connection> findAllByComponentNameOrderByName(String componentName);
+    List<Connection> findAllByComponentNameAndTypeOrderByName(String componentName, int type);
 
-    List<Connection> findAllByComponentNameAndConnectionVersionOrderByName(
-        String componentName, int connectionVersion);
+    List<Connection> findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
+        String componentName, int connectionVersion, int type);
 
     @Query("""
             SELECT connection.* FROM connection
             JOIN connection_tag ON connection.id = connection_tag.connection_id
             WHERE connection.component_name = :componentName
+            AND connection.type = :type
             AND connection_tag.tag_id = :tagId
             ORDER BY connection.name
         """)
-    List<Connection> findAllByComponentNameAndTagId(
-        @Param("componentName") String componentName, @Param("tagId") long tagId);
+    List<Connection> findAllByComponentNameAndTagIdAndType(
+        @Param("componentName") String componentName, @Param("tagId") long tagId, @Param("type") int type);
 
     @Query("""
             SELECT connection.* FROM connection
             JOIN connection_tag ON connection.id = connection_tag.connection_id
             WHERE connection.component_name = :componentName
             AND connection.connection_version = :connectionVersion
+            AND connection.type = :type
             AND connection_tag.tag_id = :tagId
             ORDER BY connection.name
         """)
-    Iterable<Connection> findAllByCNCVTI(
+    Iterable<Connection> findAllByCNCVTIT(
         @Param("componentName") String componentName, @Param("connectionVersion") int connectionVersion,
-        @Param("tagId") long tagId);
+        @Param("tagId") long tagId, @Param("type") int type);
 
     @Query("""
             SELECT connection.* FROM connection
             JOIN connection_tag ON connection.id = connection_tag.connection_id
-            WHERE connection_tag.tag_id = :tagId
+            WHERE connection.type = :type
+            AND connection_tag.tag_id = :tagId
             ORDER BY connection.name
         """)
-    List<Connection> findAllByTagId(@Param("tagId") long tagId);
+    List<Connection> findAllByTagIdAndType(@Param("tagId") long tagId, @Param("type") int type);
+
+    List<Connection> findAllByType(int type);
 }

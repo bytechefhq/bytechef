@@ -23,11 +23,11 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.category.domain.Category;
 import com.bytechef.category.service.CategoryService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.helios.configuration.constant.ProjectConstants;
 import com.bytechef.helios.configuration.domain.Project;
 import com.bytechef.helios.configuration.dto.ProjectDTO;
 import com.bytechef.helios.configuration.service.ProjectInstanceService;
 import com.bytechef.helios.configuration.service.ProjectService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tag.domain.Tag;
 import com.bytechef.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -82,7 +82,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     public Workflow addProjectWorkflow(long id, @NonNull String definition) {
         Workflow workflow = workflowService.create(
-            definition, Format.JSON, SourceType.JDBC, ProjectConstants.PROJECT_TYPE);
+            definition, Format.JSON, SourceType.JDBC, PlatformType.AUTOMATION.getId());
 
         projectService.addWorkflow(id, workflow.getId());
 
@@ -103,7 +103,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         if (CollectionUtils.isEmpty(projectDTO.workflowIds())) {
             Workflow workflow = workflowService.create(
-                WORKFLOW_DEFINITION, Format.JSON, SourceType.JDBC, ProjectConstants.PROJECT_TYPE);
+                WORKFLOW_DEFINITION, Format.JSON, SourceType.JDBC, PlatformType.AUTOMATION.getId());
 
             project.setWorkflowIds(List.of(Validate.notNull(workflow.getId(), "id")));
         }
@@ -277,7 +277,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
             workflow = workflowService.create(
                 workflow.getDefinition(), workflow.getFormat(), workflow.getSourceType(),
-                ProjectConstants.PROJECT_TYPE);
+                PlatformType.AUTOMATION.getId());
 
             newWorkflowIds.add(workflow.getId());
         }

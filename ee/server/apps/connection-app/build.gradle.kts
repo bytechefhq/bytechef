@@ -28,6 +28,8 @@ dependencies {
     implementation(project(":server:libs:helios:helios-swagger"))
     implementation(project(":server:libs:hermes:hermes-connection:hermes-connection-service"))
     implementation(project(":server:libs:hermes:hermes-oauth2:hermes-oauth2-service"))
+    implementation(project(":server:libs:platform:platform-connection:platform-connection-rest:platform-connection-rest-impl"))
+    implementation(project(":server:libs:platform:platform-swagger"))
 
     implementation(project(":ee:server:libs:core:discovery:discovery-redis"))
     implementation(project(":ee:server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-remote-client"))
