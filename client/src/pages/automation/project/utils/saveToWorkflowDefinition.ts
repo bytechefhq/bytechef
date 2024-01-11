@@ -1,14 +1,14 @@
-import {
-    ComponentDefinitionApi,
-    UpdateWorkflowRequest,
-    WorkflowModel,
-    WorkflowTaskModel,
-} from '@/middleware/hermes/configuration';
+import {ComponentDefinitionApi, WorkflowModel, WorkflowTaskModel} from '@/middleware/hermes/configuration';
 import {ComponentDefinitionKeys} from '@/queries/componentDefinitions.queries';
 import {WorkflowDefinition} from '@/types/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
 const SPACE = 4;
+
+interface UpdateWorkflowRequest {
+    id: string;
+    workflowModel: WorkflowModel;
+}
 
 export default async function saveToWorkflowDefinition(
     nodeData: {
