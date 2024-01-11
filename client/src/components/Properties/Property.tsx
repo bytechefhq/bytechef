@@ -88,12 +88,13 @@ const Property = ({
         (formState?.errors[path] as never)[propertyName];
 
     const formattedOptions = options
-        ?.map(({label, value}) => {
+        ?.map(({description, label, value}) => {
             if (value === '') {
                 return null;
             }
 
             return {
+                description,
                 label,
                 value,
             } as ISelectOption;
