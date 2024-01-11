@@ -11,7 +11,7 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
 import TextArea from 'components/TextArea/TextArea';
 import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
-import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, KeyboardEvent, useRef, useState} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import {TYPE_ICONS} from 'shared/typeIcons';
@@ -22,7 +22,7 @@ import MentionsInput from '../MentionsInput/MentionsInput';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
 
-const inputPropertyControlTypes = [
+const INPUT_PROPERTY_CONTROL_TYPES = [
     'DATE',
     'DATE_TIME',
     'EMAIL',
@@ -56,12 +56,11 @@ const Property = ({
     customClassName,
     dataPills,
     formState,
-    mention,
     path = 'parameters',
     property,
     register,
 }: PropertyProps) => {
-    const [mentionInput, setMentionInput] = useState(true);
+    const [mentionInput, setMentionInput] = useState(property.controlType !== 'SELECT');
     const [integerValue, setIntegerValue] = useState('');
 
     const editorRef = useRef<ReactQuill>(null);
@@ -75,7 +74,7 @@ const Property = ({
 
     let defaultValue: string | undefined = property.defaultValue;
 
-    const {controlType, description, hidden, items, label, objectType, options, properties, required, type} = property;
+    const {controlType, description, hidden, items, label, options, properties, required, type} = property;
 
     if (!name) {
         type === 'OBJECT' || type === 'ARRAY' ? (name = 'item') : <></>;
@@ -101,20 +100,19 @@ const Property = ({
         })
         .filter((option) => option !== null);
 
-    const isValidPropertyType = inputPropertyControlTypes.includes(controlType!);
+    const isValidPropertyType = INPUT_PROPERTY_CONTROL_TYPES.includes(controlType!);
 
     const isNumericalInput = getInputType(controlType) === 'number' || type === 'INTEGER' || type === 'NUMBER';
 
     const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
 
-    let showMentionInput = type !== 'OBJECT' && type !== 'ARRAY' && mentionInput && !!dataPills?.length;
+    const showMentionInput = mentionInput && !!dataPills?.length;
 
-    if (type === 'OBJECT' && objectType === 'FILE_ENTRY') {
-        showMentionInput = mentionInput && !!dataPills?.length;
+    let showInputTypeSwitchButton = type !== 'STRING' && !!dataPills?.length && !!name;
+
+    if (controlType === 'SELECT') {
+        showInputTypeSwitchButton = true;
     }
-
-    const showInputTypeSwitchButton =
-        controlType === 'SELECT' && !!formattedOptions?.length && !!dataPills?.length && !!name;
 
     const otherComponentData = componentData.filter((component) => {
         if (component.name !== currentComponent?.name) {
@@ -174,16 +172,6 @@ const Property = ({
             }, 50);
         }
     };
-
-    useEffect(() => {
-        if (mention !== undefined) {
-            setMentionInput(mention);
-
-            if (controlType === 'SELECT' && mention) {
-                setMentionInput(false);
-            }
-        }
-    }, [controlType, mention, mentionInput]);
 
     return type === 'OBJECT' && !properties?.length && !items?.length ? (
         <></>
