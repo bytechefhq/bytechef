@@ -21,7 +21,7 @@ import WorkflowNode from '../nodes/WorkflowNode';
 import defaultNodes from '../nodes/defaultNodes';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
-import saveToWorkflowDefinition from '../utils/saveToWorkflowDefinition';
+import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 export type WorkflowEditorProps = {
     componentDefinitions: ComponentDefinitionBasicModel[];
@@ -86,7 +86,7 @@ const WorkflowEditor = ({
 
     const queryClient = useQueryClient();
 
-    const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
+    const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(projectId)});
         },
@@ -251,7 +251,7 @@ const WorkflowEditor = ({
             return;
         }
 
-        saveToWorkflowDefinition(newNode.data, workflow!, updateWorkflowMutationMutation);
+        saveWorkflowDefinition(newNode.data, workflow!, updateWorkflowMutation);
     };
 
     useEffect(() => {

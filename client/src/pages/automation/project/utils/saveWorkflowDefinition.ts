@@ -10,7 +10,7 @@ interface UpdateWorkflowRequest {
     workflowModel: WorkflowModel;
 }
 
-export default async function saveToWorkflowDefinition(
+export default async function saveWorkflowDefinition(
     nodeData: {
         componentName: string;
         icon: JSX.Element;
@@ -19,7 +19,7 @@ export default async function saveToWorkflowDefinition(
         parameters?: {[key: string]: object};
     },
     workflow: WorkflowModel,
-    updateWorkflowMutationMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>,
+    updateWorkflowMutation: UseMutationResult<WorkflowModel, Error, UpdateWorkflowRequest, unknown>,
     index?: number
 ) {
     const {componentName, label, name, parameters} = nodeData;
@@ -59,7 +59,7 @@ export default async function saveToWorkflowDefinition(
         tasks = [...(workflowDefinition.tasks || []), newTask];
     }
 
-    updateWorkflowMutationMutation.mutate({
+    updateWorkflowMutation.mutate({
         id: workflow.id!,
         workflowModel: {
             definition: JSON.stringify(
