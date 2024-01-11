@@ -21,9 +21,9 @@ import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 export interface ISelectOption {
+    description?: string;
     label: string;
     value: string;
-    description?: string;
 }
 
 type SelectProps = {
