@@ -57,7 +57,7 @@ const ProjectWorkflowListItem = ({
 
     const queryClient = useQueryClient();
 
-    const deleteWorkflowMutationMutation = useDeleteWorkflowMutation({
+    const deleteWorkflowMutation = useDeleteWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
@@ -65,13 +65,13 @@ const ProjectWorkflowListItem = ({
         },
     });
 
-    const duplicateWorkflowMutationMutation = useDuplicateWorkflowMutation({
+    const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
     });
 
-    const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
+    const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(project.id!)});
 
@@ -149,7 +149,7 @@ const ProjectWorkflowListItem = ({
                         {project && workflow && (
                             <DropdownMenuItem
                                 onClick={() =>
-                                    duplicateWorkflowMutationMutation.mutate({
+                                    duplicateWorkflowMutation.mutate({
                                         id: project.id!,
                                         workflowId: workflow.id!,
                                     })
@@ -191,7 +191,7 @@ const ProjectWorkflowListItem = ({
                             className="bg-red-600"
                             onClick={() => {
                                 if (project?.id && selectedWorkflow?.id) {
-                                    deleteWorkflowMutationMutation.mutate({
+                                    deleteWorkflowMutation.mutate({
                                         id: project?.id,
                                         workflowId: selectedWorkflow?.id,
                                     });
@@ -207,7 +207,7 @@ const ProjectWorkflowListItem = ({
             {showEditDialog && (
                 <WorkflowDialog
                     onClose={() => setShowEditDialog(false)}
-                    updateWorkflowMutation={updateWorkflowMutationMutation}
+                    updateWorkflowMutation={updateWorkflowMutation}
                     workflow={selectedWorkflow!}
                 />
             )}
