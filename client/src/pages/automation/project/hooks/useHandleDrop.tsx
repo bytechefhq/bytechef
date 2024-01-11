@@ -65,7 +65,7 @@ export default function useHandleDrop(): [
 
             const tempComponentNames = [...componentNames];
 
-            tempComponentNames.splice(nodeIndex - 1, 0, newWorkflowNode.data.name);
+            tempComponentNames.splice(nodeIndex - 1, 0, newWorkflowNode.data.componentName);
 
             setComponentNames(tempComponentNames);
 
