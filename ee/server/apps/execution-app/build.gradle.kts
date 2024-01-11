@@ -14,6 +14,8 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation("org.springframework.retry:spring-retry")
+    implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest"))
+    implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-converter"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-jdbc"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-config"))
@@ -42,6 +44,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service"))
 
+    implementation(project(":ee:server:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":ee:server:libs:atlas:atlas-execution:atlas-execution-remote-rest"))
     implementation(project(":ee:server:libs:automation:automation-configuration:automation-configuration-remote-client"))
     implementation(project(":ee:server:libs:core:discovery:discovery-redis"))

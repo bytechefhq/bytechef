@@ -1,0 +1,165 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Embedded Execution API"
+  version: "1"
+servers:
+- url: "http://localhost:5173/api/embedded"
+tags:
+  - name: "workflow-execution"
+    description: "The Embedded Workflow Execution API"
+paths:
+  /workflow-executions:
+    get:
+      description: "Get Integration workflow executions."
+      summary: "Get Integration workflow executions"
+      tags:
+        - "workflow-execution"
+      operationId: "getWorkflowExecutionsPage"
+      parameters:
+        - name: "jobStatus"
+          description: "The status of an executed job"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            enum:
+              - "CREATED"
+              - "STARTED"
+              - "STOPPED"
+              - "FAILED"
+              - "COMPLETED"
+        - name: "jobStartDate"
+          description: "The start date of a job."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "jobEndDate"
+          description: "The end date of a job."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "integrationId"
+          description: "The id of a Integration."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "integrationInstanceId"
+          description: "The id of a Integration instance."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+        - name: "pageNumber"
+          description: "The number of the page to return."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: 0
+      responses:
+        "200":
+          description: "The page of workflow executions."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+  /workflow-executions/{id}:
+    get:
+      description: "Get workflow execution by id."
+      summary: "Get workflow executions by id"
+      tags:
+        - "workflow-execution"
+      operationId: "getWorkflowExecution"
+      parameters:
+        - name: "id"
+          description: "The id of an execution."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The execution object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowExecution"
+components:
+  schemas:
+    Page:
+      description: "A sublist of a list of objects. It allows gain information about\
+        \ the position of it in the containing entire list."
+      type: "object"
+      properties:
+        number:
+          description: "The current page."
+          type: "integer"
+        size:
+          description: "The size of the page."
+          type: "integer"
+        numberOfElements:
+          description: "The number of elements."
+          type: "integer"
+        totalPages:
+          description: "The total number of pages."
+          type: "integer"
+        totalElements:
+          description: "The total number of elements."
+          type: "integer"
+        content:
+          description: "The list of elements."
+          type: "array"
+          items:
+            type: "object"
+    WorkflowExecution:
+      description: "Contains information about execution of a Integration workflow."
+      type: "object"
+      properties:
+        id:
+          description: "The id of a workflow execution."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        integration:
+          $ref: "../../../embedded-configuration/embedded-configuration-rest/embedded-configuration-rest-impl/openapi.yaml#/components/schemas/Integration"
+        integrationInstance:
+          $ref: "../../../embedded-configuration/embedded-configuration-rest/embedded-configuration-rest-impl/openapi.yaml#/components/schemas/IntegrationInstance"
+        job:
+          $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest/platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/Job"
+        triggerExecution:
+          $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest/platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TriggerExecution"
+        workflow:
+          $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
+    WorkflowExecutionBasic:
+      description: "Contains information about execution of a Integration workflow."
+      type: "object"
+      properties:
+        id:
+          description: "The id of a workflow execution."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        integration:
+          $ref: "../../../embedded-configuration/embedded-configuration-rest/embedded-configuration-rest-impl/openapi.yaml#/components/schemas/IntegrationBasic"
+        integrationInstance:
+          $ref: "../../../embedded-configuration/embedded-configuration-rest/embedded-configuration-rest-impl/openapi.yaml#/components/schemas/IntegrationInstanceBasic"
+        job:
+          $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest/platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/JobBasic"
+        workflow:
+          $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"

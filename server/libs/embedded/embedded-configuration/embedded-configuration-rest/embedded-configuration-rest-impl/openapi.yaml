@@ -1,0 +1,1133 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Embedded Configuration API"
+  version: "1"
+servers:
+- url: "http://localhost:5173/api/embedded"
+tags:
+- name: "app-event"
+  description: "The Embedded App Event API"
+- name: "category"
+  description: "The Embedded Category API"
+- name: "integration-tag"
+  description: "The Embedded Tag API"
+- name: "integration"
+  description: "The Embedded Integration API"
+- name: "workflow"
+  description: "The Embedded Workflow API"
+paths:
+  /app-events:
+    get:
+      description: "Get app events."
+      summary: "Get app events"
+      tags:
+        - "app-event"
+      operationId: "getAppEvents"
+      responses:
+        "200":
+          description: "A list of app events."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AppEvent"
+    post:
+      description: "Create a new app event."
+      summary: "Create a new app event"
+      tags:
+        - "app-event"
+      operationId: "createAppEvent"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppEvent"
+        required: true
+      responses:
+        "200":
+          description: "The app event object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppEvent"
+  /app-events/{id}:
+    delete:
+      description: "Delete an app event."
+      summary: "Delete an app event"
+      tags:
+        - "app-event"
+      operationId: "deleteAppEvent"
+      parameters:
+        - name: "id"
+          description: "The id of an app event."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+    get:
+      description: "Get an app event by id."
+      summary: "Get an app event by id"
+      tags:
+        - "app-event"
+      operationId: "getAppEvent"
+      parameters:
+        - name: "id"
+          description: "The id of an app event."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The app event object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppEvent"
+    put:
+      description: "Update an existing app event."
+      summary: "Update an existing app event"
+      tags:
+        - "app-event"
+      operationId: "updateAppEvent"
+      parameters:
+        - name: "id"
+          description: "The id of an app event."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppEvent"
+        required: true
+      responses:
+        "200":
+          description: "The updated app event object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppEvent"
+  /integration-instances:
+    get:
+      description: "Get integration instances."
+      summary: "Get integration instances"
+      tags:
+        - "integration-instance"
+      operationId: "getIntegrationInstances"
+      parameters:
+        - name: "integrationId"
+          description: "The integration ids used for filtering integration instances."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "tagId"
+          description: "The tag id of used for filtering integration instances."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "A list of integration instances."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/IntegrationInstance"
+    post:
+      description: "Create a new integration instance."
+      summary: "Create a new integration instance"
+      tags:
+        - "integration-instance"
+      operationId: "createIntegrationInstance"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IntegrationInstance"
+        required: true
+      responses:
+        "200":
+          description: "The integration instance object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntegrationInstance"
+  /integration-instances/tags:
+    get:
+      description: "Get integration instance tags."
+      summary: "Get integration instance tags"
+      tags:
+        - "integration-instance-tag"
+      operationId: "getIntegrationInstanceTags"
+      responses:
+        "200":
+          description: "A list of integration tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Tag"
+  /integration-instances/{id}:
+    delete:
+      description: "Delete a integration instance."
+      summary: "Delete a integration instance"
+      tags:
+        - "integration-instance"
+      operationId: "deleteIntegrationInstance"
+      parameters:
+        - name: "id"
+          description: "The id of a integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+    get:
+      description: "Get a integration instance by id."
+      summary: "Get a integration instance by id"
+      tags:
+        - "integration-instance"
+      operationId: "getIntegrationInstance"
+      parameters:
+        - name: "id"
+          description: "The id of a integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The integration object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntegrationInstance"
+    put:
+      description: "Update an existing integration instance."
+      summary: "Update an existing integration instance"
+      tags:
+        - "integration-instance"
+      operationId: "updateIntegrationInstance"
+      parameters:
+        - name: "id"
+          description: "The id of a integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IntegrationInstance"
+        required: true
+      responses:
+        "200":
+          description: "The updated integration instance object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntegrationInstance"
+  /integration-instances/{id}/enable/{enable}:
+    put:
+      description: "Enable/disable a integration instance."
+      summary: "Enable/disable a integration instance"
+      tags:
+        - "integration-instance"
+      operationId: "enableIntegrationInstance"
+      parameters:
+        - name: "id"
+          description: "The id of a integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "enable"
+          description: "Enable/disable the integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "boolean"
+      responses:
+        "200":
+          description: "Successful operation."
+  /integration-instances/{id}/tags:
+    put:
+      description: "Updates tags of an existing integration instance."
+      summary: "Updates tags of an existing integration instance"
+      tags:
+        - "integration-instance-tag"
+      operationId: "updateIntegrationInstanceTags"
+      parameters:
+        - name: "id"
+          description: "The id of a integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagsRequest"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
+  /integration-instances/{id}/workflows/{workflowId}/enable/{enable}:
+    put:
+      description: "Enable/disable a workflow of a integration instance."
+      summary: "Enable/disable a workflow of a integration instance"
+      tags:
+        - "integration-instance"
+      operationId: "enableIntegrationInstanceWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of a integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowId"
+          description: "The id of a integration workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "enable"
+          description: "Enable/disable the workflow of a integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "boolean"
+      responses:
+        "200":
+          description: "Successful operation."
+  /integration-instances/{id}/integration-instance-workflows/{integrationInstanceWorkflowId}:
+    put:
+      description: "Update an existing integration instance workflow."
+      summary: "Update an existing integration instance workflow"
+      tags:
+        - "integration-instance"
+      operationId: "updateIntegrationInstanceWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of a integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "integrationInstanceWorkflowId"
+          description: "The id of a integration instance workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IntegrationInstanceWorkflow"
+        required: true
+      responses:
+        "200":
+          description: "The updated integration instance workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntegrationInstanceWorkflow"
+  /integration-instances/{id}/workflows/{workflowId}/jobs:
+    post:
+      description: "Create a request for running a new job."
+      summary: "Create a request for running a new job"
+      tags:
+        - "integration-instance"
+      operationId: "createIntegrationInstanceWorkflowJob"
+      parameters:
+        - name: "id"
+          description: "The id of a integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowId"
+          description: "The id of the workflow to execute."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The id of a created job."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  jobId:
+                    description: "The id of an executed job."
+                    type: "integer"
+                    format: "int64"
+  /integrations:
+    get:
+      description: "Get integrations."
+      summary: "Get integrations"
+      tags:
+      - "integration"
+      operationId: "getIntegrations"
+      parameters:
+      - name: "categoryId"
+        description: "The category id used for filtering integrations."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "integrationInstances"
+        description: "Use for filtering integrations for which integration instances exist."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
+      - name: "tagId"
+        description: "The tag id of used for filtering integrations."
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "published"
+        description: "Use for filtering published integrations."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
+      responses:
+        "200":
+          description: "A list of integrations."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Integration"
+    post:
+      description: "Create a new integration."
+      summary: "Create a new integration"
+      tags:
+      - "integration"
+      operationId: "createIntegration"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Integration"
+        required: true
+      responses:
+        "200":
+          description: "The integration object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Integration"
+  /integrations/categories:
+    get:
+      description: "Get integration categories."
+      summary: "Get integration categories"
+      tags:
+        - "category"
+      operationId: "getIntegrationCategories"
+      responses:
+        "200":
+          description: "A list of categories."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of categories."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Category"
+  /integrations/tags:
+    get:
+      description: "Get integration tags."
+      summary: "Get integration tags"
+      tags:
+      - "integration-tag"
+      operationId: "getIntegrationTags"
+      responses:
+        "200":
+          description: "A list of integration tags."
+          content:
+            application/json:
+              schema:
+                description: "The response object that contains the array of tags."
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Tag"
+  /integrations/{id}:
+    delete:
+      description: "Delete an integration."
+      summary: "Delete an integration"
+      tags:
+      - "integration"
+      operationId: "deleteIntegration"
+      parameters:
+      - name: "id"
+        description: "The id of an integration."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+    get:
+      description: "Get an integration by id."
+      summary: "Get an integration by id"
+      tags:
+      - "integration"
+      operationId: "getIntegration"
+      parameters:
+      - name: "id"
+        description: "The id of an integration."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "The integration object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Integration"
+    put:
+      description: "Update an existing integration."
+      summary: "Update an existing integration"
+      tags:
+      - "integration"
+      operationId: "updateIntegration"
+      parameters:
+      - name: "id"
+        description: "The id of an integration."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Integration"
+        required: true
+      responses:
+        "200":
+          description: "The updated integration object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Integration"
+  /integrations/{id}/tags:
+    put:
+      description: "Updates tags of an existing integration."
+      summary: "Updates tags of an existing integration"
+      tags:
+      - "integration-tag"
+      operationId: "updateIntegrationTags"
+      parameters:
+      - name: "id"
+        description: "The id of an integration."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagsRequest"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
+  /integrations/{id}/workflows:
+    get:
+      description: "Get integration workflows for particular integration."
+      summary: "Get integration workflows for particular integration"
+      tags:
+      - "workflow"
+      operationId: "getIntegrationWorkflows"
+      parameters:
+      - name: "id"
+        description: "The id of an integration."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "The updated integration object."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
+    post:
+      description: "Create new workflow and adds it to an existing integration."
+      summary: "Create new workflow and adds it to an existing integration"
+      tags:
+      - "integration"
+      operationId: "createIntegrationWorkflow"
+      parameters:
+      - name: "id"
+        description: "The id of an integration."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow'
+        required: true
+      responses:
+        "200":
+          description: "The updated integration object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+  /integrations/{id}/workflows/{workflowId}:
+    delete:
+      description: "Delete a workflow."
+      summary: "Delete a workflow"
+      tags:
+        - "workflow"
+      operationId: "deleteIntegrationWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of an integration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowId"
+          description: "The id of the workflow to delete."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+  /workflows:
+    get:
+      description: "Get workflow definitions."
+      summary: "Get workflow definitions"
+      tags:
+        - "workflow"
+      operationId: "getWorkflows"
+      responses:
+        "200":
+          description: "A list of workflows."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"
+  /workflows/{id}:
+    get:
+      description: "Get a workflow by id."
+      summary: "Get a workflow by id"
+      tags:
+        - "workflow"
+      operationId: "getWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of the workflow to get."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+    put:
+      description: "Update an existing workflow."
+      summary: "Update an existing workflow"
+      tags:
+        - "workflow"
+      operationId: "updateWorkflow"
+      parameters:
+        - name: "id"
+          description: "The id of the workflow to update."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+        required: true
+      responses:
+        "200":
+          description: "The updated workflow object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/Workflow"
+components:
+  schemas:
+    AppEvent:
+      description: "An app event."
+      required:
+        - "name"
+        - "schema"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        id:
+          description: "The id of the category."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The name of the category."
+          type: "string"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        schema:
+          description: "The schema of an event."
+          type: "string"
+        __version:
+          type: "integer"
+          format: "int32"
+    Category:
+      description: "A category."
+      required:
+      - "name"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        id:
+          description: "The id of the category."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The name of the category."
+          type: "string"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        __version:
+          type: "integer"
+          format: "int32"
+    Integration:
+      description: "A group of workflows that make one logical integration."
+      type: "object"
+      required:
+      - "name"
+      properties:
+        category:
+          $ref: "#/components/schemas/Category"
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        componentName:
+          description: "The name of the integration's component."
+          type: "string"
+        componentVersion:
+          description: "The version of the integration's component."
+          type: "integer"
+        id:
+          description: "The id of an integration."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        integrationVersion:
+          description: "The version of an integration."
+          type: "integer"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        overview:
+          description: "The overview of an integration."
+          type: "string"
+        publishedDate:
+          description: "The published date."
+          type: "string"
+          format: "date-time"
+        status:
+          description: "A status of an integration."
+          type: "string"
+          enum:
+          - "PUBLISHED"
+          - "UNPUBLISHED"
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"
+        workflowIds:
+          description: "The workflow ids belonging to this integration."
+          type: "array"
+          items:
+            type: "string"
+            readOnly: true
+        __version:
+          type: "integer"
+    IntegrationBasic:
+      description: "A group of workflows that make one logical integration."
+      type: "object"
+      required:
+        - "name"
+      properties:
+        componentName:
+          description: "The name of the integration's component."
+          type: "string"
+        componentVersion:
+          description: "The version of the integration's component."
+          type: "integer"
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        id:
+          description: "The id of a integration."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        publishedDate:
+          description: "The published date."
+          type: "string"
+          format: "date-time"
+        integrationVersion:
+          description: "The version of a integration."
+          type: "integer"
+        status:
+          description: "The status of a integration."
+          type: "string"
+          enum:
+            - "PUBLISHED"
+            - "UNPUBLISHED"
+    IntegrationInstance:
+      description: "Contains configurations and connections required for the execution\
+        \ of integration workflows."
+      type: "object"
+      required:
+        - "name"
+      properties:
+        description:
+          description: "The description of a integration instance."
+          type: "string"
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        id:
+          description: "The id of a integration instance."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastExecutionDate:
+          description: "The last execution date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of a integration instance."
+          type: "string"
+        integration:
+          type: "object"
+          allOf:
+            - $ref: "#/components/schemas/IntegrationBasic"
+          readOnly: true
+        integrationId:
+          description: "Th id of a integration."
+          type: "integer"
+          format: "int64"
+          writeOnly: true
+        integrationInstanceWorkflows:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/IntegrationInstanceWorkflow"
+        enabled:
+          description: "If a workflow is enabled or not in the integration instance."
+          type: "boolean"
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"
+        __version:
+          type: "integer"
+    IntegrationInstanceBasic:
+      description: "Contains configurations and connections required for the execution\
+        \ of integration workflows."
+      type: "object"
+      required:
+        - "name"
+      properties:
+        description:
+          description: "The description of a integration instance."
+          type: "string"
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        id:
+          description: "The id of a integration instance."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastExecutionDate:
+          description: "The last execution date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of a integration instance."
+          type: "string"
+        integrationId:
+          description: "Th id of a integration."
+          type: "integer"
+          format: "int64"
+          writeOnly: true
+        enabled:
+          description: "If a workflow is enabled or not in the integration instance."
+          type: "boolean"
+    IntegrationInstanceWorkflow:
+      description: "Contains configuration and connections required for the execution\
+        \ of a particular project workflow."
+      type: "object"
+      required:
+        - "name"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        inputs:
+          description: "The input parameters of an project instance used as workflow\
+            \ input values."
+          type: "object"
+          additionalProperties:
+            type: "object"
+        connections:
+          description: "The connections used by a project instance."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/IntegrationInstanceWorkflowConnection"
+        enabled:
+          description: "If a workflow is enabled or not in the project instance workflow."
+          type: "boolean"
+        id:
+          description: "The id of a project instance."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastExecutionDate:
+          description: "The last execution date of a project instance."
+          type: "string"
+          format: "date-time"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        integrationInstanceId:
+          description: "The id of a integration instance."
+          type: "integer"
+          format: "int64"
+        workflowId:
+          description: "The id of a workflow."
+          type: "string"
+        __version:
+          type: "integer"
+    IntegrationInstanceWorkflowConnection:
+      description: "The connection used in a particular task or trigger."
+      type: "object"
+      properties:
+        connectionId:
+          description: "The connection id"
+          type: "integer"
+          format: "int64"
+        key:
+          description: "The connection key under which a connection is defined in\
+            \ a workflow definition."
+          type: "string"
+        workflowNodeName:
+          description: "The action/trigger name to which a connection belongs."
+          type: "string"
+    Tag:
+      description: "A tag."
+      required:
+      - "name"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        id:
+          description: "The id of the tag."
+          type: "integer"
+          format: "int64"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of the tag."
+          type: "string"
+        __version:
+          type: "integer"
+    UpdateTagsRequest:
+      description: "The request object that contains the array of tags."
+      type: "object"
+      properties:
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"

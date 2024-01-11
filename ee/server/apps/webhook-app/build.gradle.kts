@@ -12,6 +12,8 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation("org.springframework.retry:spring-retry")
+    implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
+    implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
     implementation(project(":server:libs:core:async-config"))
     implementation(project(":server:libs:core:environment-config"))
     implementation(project(":server:libs:core:commons:commons-util"))

@@ -1,0 +1,77 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Embedded PassThrough API"
+  version: "1"
+servers:
+- url: "http://localhost:5173/api/embedded"
+tags:
+- name: "passthrough"
+  description: "The Embedded Pass-through API"
+paths:
+  /passthrough:
+    post:
+      description: "Send request directly to a provider."
+      summary: "Send request directly to a provider"
+      tags:
+      - "unified-executions"
+      operationId: "sendPassThrough"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                path:
+                  description: "The path to send the request to (without the domain)"
+                  type: "string"
+                method:
+                  description: "The HTTP method"
+                  type: "string"
+                  enum:
+                  - "GET"
+                  - "OPTIONS"
+                  - "HEAD"
+                  - "POST"
+                  - "PUT"
+                  - "PATCH"
+                  - "DELETE"
+                headers:
+                  description: "The headers to use for the request"
+                  type: "object"
+                  additionalProperties:
+                    type: "string"
+                parameters:
+                  description: "The query parameters to use for the request"
+                  type: "object"
+                  additionalProperties:
+                    type: "string"
+                body:
+                  description: "The body content to pass to downstream"
+                  type: "string"
+        required: true
+      responses:
+        "200":
+          description: "The response of pass-through request."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  method:
+                    description: "The HTTP method used for the request"
+                    type: "string"
+                  url:
+                    description: "The full URL the request was went to"
+                    type: "string"
+                  status:
+                    description: "The status code from the downstream"
+                    type: "integer"
+                  headers:
+                    description: "The response headers from the downstream"
+                    type: "object"
+                    additionalProperties:
+                      type: "string"
+                  body:
+                    description: "The response body content from the downstream"
+                    type: "object"
