@@ -1,5 +1,5 @@
 import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
-import saveToWorkflowDefinition from '@/pages/automation/project/utils/saveToWorkflowDefinition';
+import saveWorkflowDefinition from '@/pages/automation/project/utils/saveWorkflowDefinition';
 import {ProjectKeys} from '@/queries/projects.queries';
 import getRandomId from '@/utils/getRandomId';
 import {useQueryClient} from '@tanstack/react-query';
@@ -25,7 +25,7 @@ export default function useHandleDrop(): [
 
     const queryClient = useQueryClient();
 
-    const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
+    const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(projectId)});
         },
@@ -168,7 +168,7 @@ export default function useHandleDrop(): [
             return edges;
         });
 
-        saveToWorkflowDefinition(draggedNode.data, workflow, updateWorkflowMutationMutation, targetEdgeIndex);
+        saveWorkflowDefinition(draggedNode.data, workflow, updateWorkflowMutation, targetEdgeIndex);
     }
 
     return [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge];

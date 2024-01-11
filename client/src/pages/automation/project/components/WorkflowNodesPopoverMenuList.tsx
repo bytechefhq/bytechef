@@ -13,7 +13,7 @@ import {memo, useEffect, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, MarkerType, Node, useReactFlow} from 'reactflow';
 
-import saveToWorkflowDefinition from '../utils/saveToWorkflowDefinition';
+import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 type WorkflowNodesListProps = {
     edge?: boolean;
@@ -126,7 +126,7 @@ const WorkflowNodesPopoverMenuList = memo(
 
                     tempNodes.splice(previousWorkflowNodeIndex + 1, 0, newWorkflowNode);
 
-                    saveToWorkflowDefinition(
+                    saveWorkflowDefinition(
                         newWorkflowNode.data,
                         workflow!,
                         updateWorkflowMutation,
