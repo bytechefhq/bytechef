@@ -30,7 +30,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     const queryClient = useQueryClient();
 
-    const updateWorkflowMutationMutation = useUpdateWorkflowMutation({
+    const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projectWorkflows(projectId!)});
         },
@@ -99,7 +99,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             tasks: updatedTasks,
         });
 
-        updateWorkflowMutationMutation.mutate({
+        updateWorkflowMutation.mutate({
             id: workflow.id!,
             workflowModel: {
                 definition: JSON.stringify(

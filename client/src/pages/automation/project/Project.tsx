@@ -230,7 +230,7 @@ const Project = () => {
         },
     });
 
-    const deleteWorkflowMutationMutation = useDeleteWorkflowMutation({
+    const deleteWorkflowMutation = useDeleteWorkflowMutation({
         onSuccess: () => {
             setShowDeleteWorkflowAlertDialog(false);
 
@@ -248,7 +248,7 @@ const Project = () => {
         },
     });
 
-    const duplicateWorkflowMutationMutation = useDuplicateWorkflowMutation({
+    const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
@@ -282,7 +282,7 @@ const Project = () => {
 
     const handleDeleteWorkflowAlertDialogClick = () => {
         if (project?.id && workflow?.id) {
-            deleteWorkflowMutationMutation.mutate({
+            deleteWorkflowMutation.mutate({
                 id: project?.id,
                 workflowId: workflow?.id,
             });
@@ -476,7 +476,7 @@ const Project = () => {
                                         {project && workflow && (
                                             <DropdownMenuItem
                                                 onClick={() =>
-                                                    duplicateWorkflowMutationMutation.mutate({
+                                                    duplicateWorkflowMutation.mutate({
                                                         id: project.id!,
                                                         workflowId: workflow.id!,
                                                     })
