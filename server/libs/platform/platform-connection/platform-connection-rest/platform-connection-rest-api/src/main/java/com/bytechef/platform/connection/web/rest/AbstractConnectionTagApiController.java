@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.connection.web.rest;
 
-import com.bytechef.hermes.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.TagModel;
 import com.bytechef.platform.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.tag.domain.Tag;

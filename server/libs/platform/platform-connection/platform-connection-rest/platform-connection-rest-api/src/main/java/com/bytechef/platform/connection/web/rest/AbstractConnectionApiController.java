@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.connection.web.rest;
 
-import com.bytechef.hermes.connection.dto.ConnectionDTO;
-import com.bytechef.hermes.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.Validate;

@@ -5,7 +5,6 @@ openapi:
   openAPIDefinition:
     base-path:
       automation: /api/automation
-      core: /api/core
       embedded: /api/embedded
       platform: /api/platform
 

@@ -18,13 +18,13 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
-    implementation(project(":server:libs:hermes:hermes-scheduler:hermes-scheduler-impl"))
+    implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-impl"))
     implementation(project(":server:libs:core:liquibase-config"))
 
     implementation(project(":ee:server:libs:core:discovery:discovery-redis"))
-    implementation(project(":ee:server:libs:hermes:hermes-component:hermes-component-registry:hermes-component-registry-remote-client"))
-    implementation(project(":ee:server:libs:hermes:hermes-execution:hermes-execution-remote-client"))
-    implementation(project(":ee:server:libs:hermes:hermes-scheduler:hermes-scheduler-remote-rest"))
+    implementation(project(":ee:server:libs:platform:platform-component:platform-component-registry:platform-component-registry-remote-client"))
+    implementation(project(":ee:server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
+    implementation(project(":ee:server:libs:platform:platform-scheduler:platform-scheduler-remote-rest"))
 
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")

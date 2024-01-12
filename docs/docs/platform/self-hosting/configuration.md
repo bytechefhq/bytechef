@@ -50,7 +50,10 @@ spring:
     username: user
     password: user
     
-atlas:
+bytechef:
+  storage:
+    provider: file
+    fileStorageDir: /tmp/files
   workflow-repository:
     git:
       enabled: true
@@ -58,11 +61,6 @@ atlas:
       url: https://github.com/mygithub/workflows.git
       branch: master
       username: user
-      password: user
-      
-hermes:
-  storage:
-    provider: file
-    fileStorageDir: /tmp/files
+      password: user    
 ```
 

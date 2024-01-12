@@ -9,8 +9,8 @@ package com.bytechef.worker.config;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.discovery.metadata.ServiceMetadataRegistry;
-import com.bytechef.hermes.component.registry.domain.ComponentDefinition;
-import com.bytechef.hermes.component.registry.service.ComponentDefinitionService;
+import com.bytechef.platform.component.registry.domain.ComponentDefinition;
+import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;

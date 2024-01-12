@@ -1,0 +1,1998 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Platform Configuration API"
+  version: "1"
+servers:
+- url: "http://localhost:5173/api/platform"
+tags:
+- name: "action-definition"
+  description: "The Platform Action Definition API"
+- name: "component-definition"
+  description: "The Platform Component Definition API"
+- name: "connection-definition"
+  description: "The Platform Connection Definition API"
+- name: "task-dispatcher-definition"
+  description: "The Platform Task Dispatcher Definition API"
+- name: "trigger-definition"
+  description: "The Platform Trigger Definition API"
+paths:
+  /action-definitions:
+    get:
+      description: "Get all action definitions."
+      summary: "Get all action definitions"
+      tags:
+      - "action-definition"
+      operationId: "getActionDefinitions"
+      parameters:
+      - name: "taskTypes"
+        description: "The list of task types defined in workflows.(E.g. mailchimp/v1/addMemberToList)"
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "string"
+          example: "mailchimp/v1/addMemberToList,httpClient/v1/get,httpClient/v1/post"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ActionDefinition"
+  /component-definitions:
+    get:
+      description: "Get all component definitions."
+      summary: "Get all component definitions"
+      tags:
+      - "component-definition"
+      operationId: "getComponentDefinitions"
+      parameters:
+      - name: "actionDefinitions"
+        description: "Use for filtering components which define action definitions."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
+      - name: "connectionDefinitions"
+        description: "Use for filtering components which define connection definitions."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
+      - name: "triggerDefinitions"
+        description: "Use for filtering components which define trigger definitions."
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
+      - name: "include"
+        description: "The list of component names to include in the result."
+        in: "query"
+        required: false
+        schema:
+          type: "array"
+          items:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ComponentDefinitionBasic"
+  /component-definitions/{componentName}/{componentVersion}/action-definitions:
+    get:
+      description: "Get a list of action definitions for a component."
+      summary: "Get a list of action definitions for a component"
+      tags:
+      - "action-definition"
+      operationId: "getComponentActionDefinitions"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ActionDefinitionBasic"
+  /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}:
+    get:
+      description: "Get an action definition of a component."
+      summary: "Get an action definition of a component"
+      tags:
+      - "action-definition"
+      operationId: "getComponentActionDefinition"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "actionName"
+        description: "The name of the action to get."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActionDefinition"
+  /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/editor-description:
+    post:
+      description: "Get an action description shown in the editor."
+      summary: "Get an action description shown in the editor"
+      tags:
+      - "action-definition"
+      operationId: "getComponentActionEditorDescription"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "actionName"
+        description: "The name of an action."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComponentOperationRequest"
+      responses:
+        "200":
+          description: "The editor description."
+          content:
+            application/json:
+              schema:
+                type: "string"
+  /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/output-schema:
+    post:
+      description: "Get an action output schema shown in the editor."
+      summary: "Get an action output schema shown in the editor"
+      tags:
+      - "action-definition"
+      operationId: "getComponentActionOutputSchema"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "actionName"
+        description: "The name of an action."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComponentOperationRequest"
+      responses:
+        "200":
+          description: "The output schema."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+  /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/sample-output:
+    post:
+      description: "Get an action sample output shown in the editor."
+      summary: "Get an action sample output shown in the editor"
+      tags:
+      - "action-definition"
+      operationId: "getComponentActionSampleOutput"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "actionName"
+        description: "The name of an action."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComponentOperationRequest"
+      responses:
+        "200":
+          description: "The output schema."
+          content:
+            application/json:
+              schema:
+                type: "object"
+  ? /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/dynamic-properties
+  : post:
+      description: "Get dynamic properties for an action property shown in the editor."
+      summary: "Get dynamic properties for an action property shown in the editor"
+      tags:
+      - "action-definition"
+      operationId: "getComponentActionPropertyDynamicProperties"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "actionName"
+        description: "The name of an action."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "propertyName"
+        description: "The name of a property."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComponentOperationRequest"
+      responses:
+        "200":
+          description: "The list of options."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Property"
+  /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/options:
+    post:
+      description: "Get an action property options shown in the editor."
+      summary: "Get an action property options shown in the editor"
+      tags:
+      - "action-definition"
+      operationId: "getComponentActionPropertyOptions"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "actionName"
+        description: "The name of an action."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "propertyName"
+        description: "The name of a property."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "searchText"
+        description: "Optional search text used to filter option items"
+        in: "query"
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComponentOperationRequest"
+      responses:
+        "200":
+          description: "The list of options."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Option"
+  /component-definitions/{componentName}/{componentVersion}/connection-definition:
+    get:
+      description: "Get connection definition for a component."
+      summary: "Get connection definition for a component"
+      tags:
+      - "connection-definition"
+      operationId: "getComponentConnectionDefinition"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectionDefinition"
+  /component-definitions/{componentName}/{componentVersion}/connection-definitions:
+    get:
+      description: "Get all compatible connection definitions for a component."
+      summary: "Get all compatible connection definitions for a component"
+      tags:
+      - "connection-definition"
+      operationId: "getComponentConnectionDefinitions"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ConnectionDefinitionBasic"
+  /component-definitions/{componentName}:
+    get:
+      description: "Get a component definition."
+      summary: "Get a component definition"
+      tags:
+      - "component-definition"
+      operationId: "getComponentDefinition"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component to get."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component to get. If not set, teh latest version\
+          \ is returned."
+        required: false
+        in: "query"
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComponentDefinition"
+  /component-definitions/{componentName}/versions:
+    get:
+      description: "Get all component definition versions of a component."
+      summary: "Get all component definition versions of a component"
+      tags:
+      - "component-definition"
+      operationId: "getComponentDefinitionVersions"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ComponentDefinitionBasic"
+  /component-definitions/{componentName}/{componentVersion}/trigger-definitions:
+    get:
+      description: "Get a list of trigger definitionss for a component."
+      summary: "Get a list of trigger definitionss for a component"
+      tags:
+      - "trigger-definition"
+      operationId: "getComponentTriggerDefinitions"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/TriggerDefinitionBasic"
+  /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}:
+    get:
+      description: "Get a trigger definition of a component."
+      summary: "Get a trigger definition of a component"
+      tags:
+      - "trigger-definition"
+      operationId: "getComponentTriggerDefinition"
+      parameters:
+      - name: "componentName"
+        description: "The name of the component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "triggerName"
+        description: "The name of a trigger to get."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TriggerDefinition"
+  /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/editor-description:
+    post:
+      description: "Get an trigger description shown in the editor."
+      summary: "Get an trigger description shown in the editor"
+      tags:
+      - "trigger-definition"
+      operationId: "getComponentTriggerEditorDescription"
+      parameters:
+      - name: "componentName"
+        description: "The name of the component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "triggerName"
+        description: "The name of a trigger."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComponentOperationRequest"
+      responses:
+        "200":
+          description: "The editor description."
+          content:
+            application/json:
+              schema:
+                type: "string"
+  /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/output-schema:
+    post:
+      description: "Get a trigger output schema shown in the editor."
+      summary: "Get a trigger output schema shown in the editor"
+      tags:
+      - "trigger-definition"
+      operationId: "getComponentTriggerOutputSchema"
+      parameters:
+      - name: "componentName"
+        description: "The name of the component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "triggerName"
+        description: "The name of a trigger."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComponentOperationRequest"
+      responses:
+        "200":
+          description: "The output schema."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+  /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/sample-output:
+    post:
+      description: "Get a trigger sample output shown in the editor."
+      summary: "Get a trigger sample output shown in the editor"
+      tags:
+      - "trigger-definition"
+      operationId: "getComponentTriggerSampleOutput"
+      parameters:
+      - name: "componentName"
+        description: "The name of the component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "triggerName"
+        description: "The name of a trigger."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComponentOperationRequest"
+      responses:
+        "200":
+          description: "The output schema."
+          content:
+            application/json:
+              schema:
+                type: "object"
+  ? /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/dynamic-properties
+  : post:
+      description: "Get dynamic properties for a trigger property shown in the editor."
+      summary: "Get dynamic properties for a trigger property shown in the editor"
+      tags:
+      - "trigger-definition"
+      operationId: "getComponentTriggerPropertyDynamicProperties"
+      parameters:
+      - name: "componentName"
+        description: "The name of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "triggerName"
+        description: "The name of a trigger."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "propertyName"
+        description: "The name of a property."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComponentOperationRequest"
+      responses:
+        "200":
+          description: "The list of options."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Property"
+  /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/options:
+    post:
+      description: "Get a trigger property options shown in the editor."
+      summary: "Get a trigger property options shown in the editor"
+      tags:
+      - "trigger-definition"
+      operationId: "getComponentTriggerPropertyOptions"
+      parameters:
+      - name: "componentName"
+        description: "The name of the component."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "componentVersion"
+        description: "The version of a component."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      - name: "triggerName"
+        description: "The name of a trigger."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "propertyName"
+        description: "The name of a property."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "searchText"
+        description: "Optional search text used to filter option items"
+        in: "query"
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComponentOperationRequest"
+      responses:
+        "200":
+          description: "The list of options."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Option"
+  /oauth2/authorization-parameters:
+    post:
+      description: "Retrieves oauth2 authorization parameters."
+      summary: "Retrieves oauth2 authorization parameters"
+      tags:
+      - "oauth2"
+      operationId: "getOAuth2AuthorizationParameters"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: "Contains all required information to open a connection\
+                \ to a service defined by componentName parameter."
+              type: "object"
+              required:
+              - "name"
+              - "componentName"
+              - "componentVersion"
+              - "parameters"
+              properties:
+                authorizationName:
+                  description: "The name of an authorization used by this connection.\
+                    \ Used for HTTP based services."
+                  type: "string"
+                componentName:
+                  description: "The name of a component that uses this connection."
+                  type: "string"
+                connectionVersion:
+                  description: "The version of a connection."
+                  type: "integer"
+                parameters:
+                  description: "The parameters of a connection."
+                  type: "object"
+                  additionalProperties:
+                    type: "object"
+        required: true
+      responses:
+        "200":
+          description: "The object with oauth2 authorization parameters."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2AuthorizationParameters"
+  /oauth2/properties:
+    get:
+      description: "Get OAuth2 properties."
+      summary: "Get OAuth2 properties"
+      tags:
+      - "oauth2"
+      operationId: "getOAuth2Properties"
+      responses:
+        "200":
+          description: "The OAuth2Properties object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OAuth2Properties"
+  /task-dispatcher-definitions:
+    get:
+      description: "Get all task dispatcher definitions."
+      summary: "Get all task dispatcher definitions"
+      tags:
+      - "task-dispatcher-definition"
+      operationId: "getTaskDispatcherDefinitions"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/TaskDispatcherDefinition"
+  /task-dispatcher-definitions/{taskDispatcherName}/versions:
+    get:
+      description: "Get all task dispatcher definition versions of a task dispatcher."
+      summary: "Get all task dispatcher definition versions of a task dispatcher"
+      tags:
+      - "task-dispatcher-definition"
+      operationId: "getTaskDispatcherDefinitionVersions"
+      parameters:
+      - name: "taskDispatcherName"
+        description: "The name of a task dispatcher."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/TaskDispatcherDefinitionBasic"
+  /task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}:
+    get:
+      description: "Get a task dispatcher definition."
+      summary: "Get a task dispatcher definition"
+      tags:
+      - "task-dispatcher-definition"
+      operationId: "getTaskDispatcherDefinition"
+      parameters:
+      - name: "taskDispatcherName"
+        description: "The name of a task dispatcher to get."
+        required: true
+        in: "path"
+        schema:
+          type: "string"
+      - name: "taskDispatcherVersion"
+        description: "The version of a task dispatcher to get."
+        required: true
+        in: "path"
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskDispatcherDefinition"
+  /task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}/output-schema:
+    post:
+      description: "Get a task dispatcher output schema shown in the editor."
+      summary: "Get a task dispatcher output schema shown in the editor"
+      tags:
+        - "task-dispatcher-definition"
+      operationId: "getTaskDispatcherOutputSchema"
+      parameters:
+        - name: "taskDispatcherName"
+          description: "The name of a task dispatcher."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "taskDispatcherVersion"
+          description: "The version of a task dispatcher."
+          required: true
+          in: "path"
+          schema:
+            type: "integer"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskDispatcherOperationRequest"
+      responses:
+        "200":
+          description: "The output schema."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Property"
+  /trigger-definitions:
+    get:
+      description: "Get all trigger definitions."
+      summary: "Get all trigger definitions"
+      tags:
+        - "trigger-definition"
+      operationId: "getTriggerDefinitions"
+      parameters:
+        - name: "triggerTypes"
+          description: "The list of trigger types defined in workflows.(E.g. mailchimp/v1/subscribe)"
+          in: "query"
+          required: false
+          schema:
+            type: "array"
+            items:
+              type: "string"
+            example: "mailchimp/v1/subscribe"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/TriggerDefinition"
+components:
+  schemas:
+    ActionDefinition:
+      description: "An action is a portion of reusable code that accomplish a specific\
+        \ task. When building a workflow, each action is represented as a task inside\
+        \ the workflow. The task 'type' property is defined as [component name]/v[component\
+        \ version]/[action name]. Action properties are used to set properties of\
+        \ the task inside the workflow."
+      type: "object"
+      required:
+      - "name"
+      properties:
+        componentName:
+          description: "The component name."
+          type: "string"
+        componentVersion:
+          description: "The component version."
+          type: "integer"
+        description:
+          description: "The description."
+          type: "string"
+        editorDescriptionDataSource:
+          description: "Does action has defined dynamic editor description."
+          type: "boolean"
+        help:
+          $ref: "#/components/schemas/Help"
+        name:
+          description: "The action name."
+          type: "string"
+        outputSchema:
+          $ref: "#/components/schemas/Property"
+        outputSchemaDataSource:
+          description: "Does action has defined dynamic output schema."
+          type: "boolean"
+        properties:
+          description: "The list of action properties."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        sampleOutput:
+          description: "The sample value of the action's output."
+          type: "object"
+        sampleOutputDataSource:
+          description: "Does action has defined dynamic sample output."
+          type: "boolean"
+        title:
+          description: "The title"
+          type: "string"
+    AnyValue:
+      description: "Can be anything: string, number, array, object, etc. (except `null`)"
+    ActionDefinitionBasic:
+      description: "An action is a portion of reusable code that accomplish a specific\
+        \ task. When building a workflow, each action is represented as a task inside\
+        \ the workflow. The task 'type' property is defined as [component name]/v[component\
+        \ version]/[action name]. Action properties are used to set properties of\
+        \ the task inside the workflow."
+      type: "object"
+      required:
+      - "name"
+      properties:
+        description:
+          description: "The description."
+          type: "string"
+        help:
+          $ref: "#/components/schemas/Help"
+        name:
+          description: "The action name."
+          type: "string"
+        title:
+          description: "The title"
+          type: "string"
+    ArrayProperty:
+      description: "An array property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          defaultValue:
+            description: "The property default value."
+            type: "array"
+            items:
+              type: "object"
+          exampleValue:
+            description: "The property sample value."
+            type: "array"
+            items:
+              type: "object"
+          items:
+            description: "Types of the array items."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Property"
+          maxItems:
+            type: "integer"
+            format: "int64"
+          minItems:
+            type: "integer"
+            format: "int64"
+          multipleValues:
+            description: "If the array can contain multiple items."
+            type: "boolean"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+    Authorization:
+      description: "Contains information required for a connection's authorization."
+      type: "object"
+      properties:
+        description:
+          description: "The description."
+          type: "string"
+        name:
+          description: "The authorization name."
+          type: "string"
+        properties:
+          description: "Properties of the connection."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        title:
+          description: "The title"
+          type: "string"
+        type:
+          $ref: "#/components/schemas/AuthorizationType"
+    AuthorizationType:
+      description: "Authorization type."
+      type: "string"
+      enum:
+      - "API_KEY"
+      - "BASIC_AUTH"
+      - "BEARER_TOKEN"
+      - "CUSTOM"
+      - "DIGEST_AUTH"
+      - "OAUTH2_AUTHORIZATION_CODE"
+      - "OAUTH2_AUTHORIZATION_CODE_PKCE"
+      - "OAUTH2_CLIENT_CREDENTIALS"
+      - "OAUTH2_IMPLICIT_CODE"
+      - "OAUTH2_RESOURCE_OWNER_PASSWORD"
+    BooleanProperty:
+      description: "A boolean property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: object
+        properties:
+          defaultValue:
+            description: "The property default value."
+            type: "boolean"
+          exampleValue:
+            description: "The property sample value."
+            type: "boolean"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+    ComponentDefinition:
+      description: "A component contains a set of reusable code(actions) that accomplish\
+        \ specific tasks, triggers and connections if there is a need for a connection\
+        \ to an outside service."
+      type: "object"
+      required:
+      - "name"
+      - "version"
+      properties:
+        actions:
+          description: "The list of all available actions the component can perform."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ActionDefinitionBasic"
+        category:
+          description: "The category."
+          type: "string"
+        connection:
+          $ref: "#/components/schemas/ConnectionDefinitionBasic"
+        description:
+          description: "The description."
+          type: "string"
+        icon:
+          description: "The icon."
+          type: "string"
+        name:
+          description: "The name."
+          type: "string"
+        resources:
+          $ref: "#/components/schemas/Resources"
+        tags:
+          description: "Tags for categorization."
+          type: "array"
+          items:
+            type: "string"
+        title:
+          description: "The title"
+          type: "string"
+        triggers:
+          description: "The list of all available triggers the component can perform."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/TriggerDefinitionBasic"
+        version:
+          description: "The version of a component."
+          type: "integer"
+    ComponentDefinitionBasic:
+      description: "A component contains a set of reusable code(actions) that accomplish\
+        \ specific tasks, triggers and connections if there is a need for a connection\
+        \ to an outside service."
+      type: "object"
+      required:
+      - "name"
+      properties:
+        actionsCount:
+          default: "The number of actions a component has"
+          type: "integer"
+        description:
+          description: "The description."
+          type: "string"
+        icon:
+          description: "The icon."
+          type: "string"
+        name:
+          description: "The name of a component."
+          type: "string"
+        title:
+          description: "The title"
+          type: "string"
+        triggersCount:
+          default: "The number of triggers a component has"
+          type: "integer"
+    ComponentOperationRequest:
+      type: "object"
+      required:
+      - "parameters"
+      properties:
+        connectionId:
+          description: "The connection id."
+          type: "integer"
+          format: "int64"
+        parameters:
+          description: "The parameters of an action."
+          type: "object"
+          additionalProperties:
+            type: "object"
+    ConnectionDefinition:
+      description: "Definition of a connection to an outside service."
+      type: "object"
+      required:
+      - "componentName"
+      - "version"
+      properties:
+        authorizationRequired:
+          description: "If a connection requires an authorization to be defined or\
+            \ not"
+          type: "boolean"
+          default: true
+        authorizations:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Authorization"
+        baseUri:
+          description: "Defines the base URI for all future HTTP requests."
+          type: "string"
+        componentDescription:
+          description: "The description used from the connection's component."
+          type: "string"
+        componentName:
+          description: "The connection name used from the connection's component."
+          type: "string"
+        properties:
+          description: "The properties of the connection."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        componentTitle:
+          description: "The title used from the connection's component."
+          type: "string"
+        version:
+          description: "The version of a connection."
+          type: "integer"
+    ConnectionDefinitionBasic:
+      description: "Definition of a connection to an outside service."
+      type: "object"
+      required:
+      - "componentName"
+      - "version"
+      properties:
+        componentDescription:
+          description: "The description used from the connection's component."
+          type: "string"
+        componentName:
+          description: "The connection name used from the connection's component."
+          type: "string"
+        componentTitle:
+          description: "The title used from the connection's component"
+          type: "string"
+        version:
+          description: "The version of a connection."
+          type: "integer"
+    ControlType:
+      description: "A type of the control to show in UI."
+      type: "string"
+      enum:
+      - "ARRAY_BUILDER"
+      - "CHECKBOX"
+      - "CODE_EDITOR"
+      - "DATE"
+      - "DATE_TIME"
+      - "EMAIL"
+      - "INTEGER"
+      - "OBJECT_BUILDER"
+      - "MULTI_SELECT"
+      - "NUMBER"
+      - "PASSWORD"
+      - "PHONE"
+      - "SELECT"
+      - "TEXT"
+      - "TEXT_AREA"
+      - "TIME"
+      - "URL"
+    DateProperty:
+      description: "A date property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          defaultValue:
+            description: "The property default value."
+            type: "string"
+            format: "date"
+          exampleValue:
+            description: "The property sample value."
+            type: "string"
+            format: "date"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+    DateTimeProperty:
+      description: "A date-time property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          defaultValue:
+            description: "The property default value."
+            type: "string"
+            format: "date-time"
+          exampleValue:
+            description: "The property sample value."
+            type: "string"
+            format: "date-time"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+    DynamicPropertiesProperty:
+      description: "A dynamic properties property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/Property"
+      - type: "object"
+        properties:
+          header:
+            description: "The dynamic property header."
+            type: "string"
+          propertiesDataSource:
+            $ref: "#/components/schemas/PropertiesDataSource"
+    Help:
+      description: "The help text that is meant to guide your users as to how to configure\
+        \ this action or trigger."
+      type: "object"
+      required:
+      - "body"
+      properties:
+        body:
+          description: "The help text"
+          type: "string"
+        learnMoreUrl:
+          description: "The url to additional documentation"
+          type: "string"
+    IntegerProperty:
+      description: "An integer property type."
+      type: "object"
+      required:
+      - "type"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          defaultValue:
+            description: "The property default value."
+            type: "integer"
+            format: "int64"
+          exampleValue:
+            description: "The property sample value."
+            type: "integer"
+            format: "int64"
+          maxValue:
+            description: "The maximum property value."
+            type: "integer"
+            format: "int64"
+          minValue:
+            description: "The minimum property value."
+            type: "integer"
+            format: "int64"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+    NullProperty:
+      description: "A null property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+    NumberProperty:
+      description: "A number property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/Property"
+      - type: "object"
+        properties:
+          defaultValue:
+            description: "The property default value."
+            type: "number"
+            format: "double"
+          exampleValue:
+            description: "The property sample value."
+            type: "number"
+            format: "double"
+          maxNumberPrecision:
+            description: "The number value precision."
+            type: "integer"
+            format: "int32"
+          maxValue:
+            description: "The maximum property value."
+            type: "number"
+            format: "double"
+          minNumberPrecision:
+            description: "The number value precision."
+            type: "integer"
+            format: "int32"
+          minValue:
+            description: "The minimum property value."
+            type: "number"
+            format: "double"
+          numberPrecision:
+            description: "The number value precision."
+            type: "integer"
+            format: "int32"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+    OAuth2AuthorizationParameters:
+      properties:
+        authorizationUrl:
+          type: "string"
+        clientId:
+          type: "string"
+        scopes:
+          type: "array"
+          items:
+            type: "string"
+    OAuth2Properties:
+      properties:
+        redirectUri:
+          description: "The redirect URI used for OAuth2 callback URL."
+          type: "string"
+          readOnly: true
+        predefinedApps:
+          description: "The list of predefined OAuth2 apps."
+          type: "array"
+          readOnly: true
+          items:
+            type: "string"
+    ObjectProperty:
+      description: "An object property type."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          additionalProperties:
+            description: "Types of dynamically defined properties."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Property"
+          defaultValue:
+            description: "The property default value."
+            type: "object"
+          exampleValue:
+            description: "The property sample value."
+            type: "object"
+          multipleValues:
+            description: "If the object can contain multiple additional properties."
+            type: "boolean"
+          objectType:
+            description: "The object type."
+            type: "string"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+          properties:
+            description: "The list of valid object property types."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Property"
+    Option:
+      description: "Defines valid property value."
+      type: "object"
+      properties:
+        description:
+          description: "Description of the option."
+          type: "string"
+        displayCondition:
+          description: "Defines rules when a property should be shown or hidden."
+          type: "string"
+        label:
+          description: "The label of an option."
+          type: "string"
+        value:
+          $ref: "#/components/schemas/AnyValue"
+    OptionsDataSource:
+      description: "Defines function that should dynamically load options for the\
+        \ property."
+      type: "object"
+      properties:
+        loadOptionsDependsOn:
+          description: "The list of property names on which value change the property\
+            \ options should load/reload."
+          type: "array"
+          items:
+            type: "string"
+    PropertiesDataSource:
+      description: "Defines function that should load properties."
+      type: "object"
+      properties:
+        loadPropertiesDependsOn:
+          description: "The list of property names on which value change the properties\
+            \ should load/reload."
+          type: "array"
+          items:
+            type: "string"
+    Property:
+      description: "A base property."
+      type: "object"
+      required:
+      - "propertyType"
+      properties:
+        advancedOption:
+          description: "If the property should be grouped under advanced options."
+          type: "boolean"
+        description:
+          description: "The property description."
+          type: "string"
+        displayCondition:
+          description: "Defines rules when a property should be shown or hidden."
+          type: "string"
+        expressionEnabled:
+          description: "Defines if the property can contain expressions or only constant\
+            \ values. Defaults to true."
+          type: "boolean"
+        hidden:
+          description: "If the property should be visible or not."
+          type: "boolean"
+        name:
+          description: "The property name."
+          type: "string"
+        required:
+          description: "If the property is required or not."
+          type: "boolean"
+        type:
+          $ref: "#/components/schemas/PropertyType"
+      discriminator:
+        propertyName: "type"
+        mapping:
+          ARRAY: "#/components/schemas/ArrayProperty"
+          BOOLEAN: "#/components/schemas/BooleanProperty"
+          DATE: "#/components/schemas/DateProperty"
+          DATE_TIME: "#/components/schemas/DateTimeProperty"
+          DYNAMIC_PROPERTIES: "#/components/schemas/DynamicPropertiesProperty"
+          INTEGER: "#/components/schemas/IntegerProperty"
+          "NULL": "#/components/schemas/NullProperty"
+          NUMBER: "#/components/schemas/NumberProperty"
+          OBJECT: "#/components/schemas/ObjectProperty"
+          STRING: "#/components/schemas/StringProperty"
+          TIME: "#/components/schemas/TimeProperty"
+    PropertyType:
+      description: "A type of property."
+      type: "string"
+      enum:
+      - "ANY"
+      - "ARRAY"
+      - "BOOLEAN"
+      - "DATE"
+      - "DATE_TIME"
+      - "DYNAMIC_PROPERTIES"
+      - "INTEGER"
+      - "NULL"
+      - "NUMBER"
+      - "STRING"
+      - "OBJECT"
+      - "TIME"
+    Resources:
+      description: "A set of available resources."
+      type: "object"
+      properties:
+        documentationUrl:
+          description: "The url of available documentation."
+          type: "string"
+    StringProperty:
+      description: "A string property."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          defaultValue:
+            description: "The property default value."
+            type: "string"
+          exampleValue:
+            description: "The property sample value."
+            type: "string"
+          maxLength:
+            description: "The maximum string length."
+            type: "integer"
+            format: "int32"
+          minLength:
+            description: "The minimum string length."
+            type: "integer"
+            format: "int32"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+    TaskDispatcherDefinition:
+      description: "A task dispatcher defines a strategy for dispatching tasks to\
+        \ be executed."
+      type: "object"
+      required:
+      - "name"
+      - "version"
+      properties:
+        description:
+          description: "The description."
+          type: "string"
+        icon:
+          description: "The icon."
+          type: "string"
+        name:
+          description: "The task dispatcher name.."
+          type: "string"
+        outputSchema:
+          $ref: "#/components/schemas/Property"
+        properties:
+          description: "The list of task dispatcher properties."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        resources:
+          $ref: "#/components/schemas/Resources"
+        taskProperties:
+          description: "Properties used to define tasks to be dispatched."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        title:
+          description: "The title"
+          type: "string"
+        variableProperties:
+          description: "Properties used to define tasks to be dispatched."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        version:
+          type: "integer"
+          description: "The version of a task dispatcher."
+    TaskDispatcherDefinitionBasic:
+      description: "A task dispatcher defines a strategy for dispatching tasks to\
+        \ be executed."
+      type: "object"
+      required:
+      - "name"
+      properties:
+        description:
+          description: "The description."
+          type: "string"
+        icon:
+          description: "The icon."
+          type: "string"
+        name:
+          description: "The task dispatcher name.."
+          type: "string"
+        resources:
+          $ref: "#/components/schemas/Resources"
+        title:
+          description: "The title"
+          type: "string"
+    TaskDispatcherOperationRequest:
+      type: "object"
+      required:
+        - "parameters"
+      properties:
+        parameters:
+          description: "The parameters of an action."
+          type: "object"
+          additionalProperties:
+            type: "object"
+    TimeProperty:
+      description: "A time property."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/ValueProperty"
+      - type: "object"
+        properties:
+          defaultValue:
+            description: "The property default value."
+            type: "string"
+            format: "time"
+          exampleValue:
+            description: "The property sample value."
+            type: "string"
+            format: "time"
+          options:
+            description: "The list of valid property options."
+            type: "array"
+            items:
+              $ref: "#/components/schemas/Option"
+          optionsDataSource:
+            $ref: "#/components/schemas/OptionsDataSource"
+    TriggerDefinition:
+      description: "A trigger definition defines ways to trigger workflows from the\
+        \ outside services."
+      type: "object"
+      required:
+      - "name"
+      - "type"
+      properties:
+        componentName:
+          description: "The component name."
+          type: "string"
+        componentVersion:
+          description: "The component version."
+          type: "integer"
+        description:
+          description: "The description."
+          type: "string"
+        editorDescriptionDataSource:
+          description: "Does trigger has defined dynamic editor description."
+          type: "boolean"
+        help:
+          $ref: "#/components/schemas/Help"
+        name:
+          description: "The action name."
+          type: "string"
+        outputSchema:
+          $ref: "#/components/schemas/Property"
+        outputSchemaDataSource:
+          description: "Does trigger has defined dynamic output schema."
+          type: "boolean"
+        properties:
+          description: "The list of action properties."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
+        sampleOutput:
+          description: "The sample value of the action's output."
+          type: "object"
+        sampleOutputDataSource:
+          description: "Does trigger has defined dynamic sample output."
+          type: "boolean"
+        title:
+          description: "The title"
+          type: "string"
+        type:
+          $ref: "#/components/schemas/TriggerType"
+    TriggerDefinitionBasic:
+      description: "A trigger definition defines ways to trigger workflows from the\
+        \ outside services."
+      type: "object"
+      required:
+      - "name"
+      - "type"
+      properties:
+        description:
+          description: "The description."
+          type: "string"
+        help:
+          $ref: "#/components/schemas/Help"
+        name:
+          description: "The action name."
+          type: "string"
+        title:
+          description: "The title"
+          type: "string"
+        type:
+          $ref: "#/components/schemas/TriggerType"
+    TriggerType:
+      type: "string"
+      enum:
+      - "STATIC_WEBHOOK"
+      - "HYBRID"
+      - "LISTENER"
+      - "POLLING"
+      - "DYNAMIC_WEBHOOK"
+    ValueProperty:
+      description: "A base property for all value based properties."
+      type: "object"
+      allOf:
+      - $ref: "#/components/schemas/Property"
+      - type: "object"
+        properties:
+          controlType:
+            $ref: "#/components/schemas/ControlType"
+          label:
+            description: "The property label."
+            type: "string"
+          placeholder:
+            description: "The property placeholder."
+            type: "string"
+    Workflow:
+      description: "The blueprint that describe the execution of a job."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/WorkflowBasic"
+        - type: "object"
+          properties:
+            definition:
+              description: "The definition of a workflow."
+              type: "string"
+              writeOnly: true
+            format:
+              $ref: "#/components/schemas/WorkflowFormat"
+            inputs:
+              description: "The workflow's expected list of inputs."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/WorkflowInput"
+              readOnly: true
+            outputs:
+              description: "The workflow's list of expected outputs."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/WorkflowOutput"
+              readOnly: true
+            sourceType:
+              description: "The type of the source which stores the workflow definition."
+              type: "string"
+              enum:
+                - "CLASSPATH"
+                - "FILESYSTEM"
+                - "GIT"
+                - "JDBC"
+            maxRetries:
+              description: "The maximum number of times a task may retry."
+              type: "integer"
+              format: "int32"
+              readOnly: true
+            tasks:
+              description: "The steps that make up the workflow."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/WorkflowTask"
+              readOnly: true
+            triggers:
+              description: "The steps that make up the workflow."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/WorkflowTrigger"
+              readOnly: true
+    WorkflowBasic:
+      description: "The blueprint that describe the execution of a job."
+      type: "object"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        description:
+          description: "The description of a workflow."
+          type: "string"
+          writeOnly: true
+        id:
+          description: "The id of the workflow."
+          type: "string"
+          readOnly: true
+        label:
+          description: "The descriptive name for the workflow"
+          type: "string"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        __version:
+          type: "integer"
+    WorkflowConnection:
+      type: "object"
+      required:
+        - "componentName"
+        - "componentVersion"
+        - "key"
+        - "operationName"
+        - "required"
+      properties:
+        componentName:
+          type: "string"
+        componentVersion:
+          type: "integer"
+        id:
+          type: "integer"
+          format: "int64"
+        key:
+          type: "string"
+        operationName:
+          type: "string"
+        required:
+          type: "boolean"
+    WorkflowFormat:
+      type: "string"
+      enum:
+        - "JSON"
+        - "YAML"
+    WorkflowInput:
+      type: "object"
+      required:
+        - "name"
+        - "value"
+      properties:
+        label:
+          description: "The descriptive name of an input"
+          type: "string"
+        name:
+          description: "The name of an input"
+          type: "string"
+        required:
+          description: "If an input is required, or not"
+          type: "boolean"
+          default: false
+        type:
+          description: "The type of an input, for example \\\"string\\\""
+          type: "string"
+          default: "string"
+    WorkflowOutput:
+      type: "object"
+      required:
+        - "name"
+        - "value"
+      properties:
+        name:
+          description: "The name of an output"
+          type: "string"
+        value:
+          description: "The value of an output"
+          type: "object"
+    WorkflowTask:
+      description: "Represents a definition of a workflow task."
+      type: "object"
+      required:
+        - "name"
+        - "type"
+      properties:
+        connections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowConnection"
+        finalize:
+          description: "The (optional) list of tasks that are to be executed after\
+            \ execution of a task -- regardless of whether it had failed or not."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+        label:
+          description: "The human-readable description of the task."
+          type: "string"
+        name:
+          description: "The identifier name of the task. Task names are used for assigning\
+            \ the output of one task so it can be later used by subsequent tasks."
+          type: "string"
+        node:
+          description: "Defines the name of the type of the node that the task execution\
+            \ will be routed to. For instance, if the node value is \"encoder\", then\
+            \ the task will be routed to the \"encoder\" queue which is presumably\
+            \ subscribed to by worker nodes of \"encoder\" type."
+          type: "string"
+        parameters:
+          description: "Key-value map of task parameters."
+          type: "object"
+          additionalProperties:
+            type: "object"
+        post:
+          description: "The (optional) list of tasks that are to be executed after\
+            \ the successful execution of a task."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+        pre:
+          description: "The (optional) list of tasks that are to be executed prior\
+            \ to a task."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTask"
+        timeout:
+          description: "The timeout expression which describes when a task should\
+            \ be deemed as timed-out."
+          type: "string"
+        type:
+          description: "The type of a task."
+          type: "string"
+    WorkflowTrigger:
+      description: "Represents a definition of a workflow trigger."
+      type: "object"
+      required:
+        - "name"
+        - "type"
+      properties:
+        connections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowConnection"
+        label:
+          description: "The human-readable description of the task."
+          type: "string"
+        name:
+          description: "The identifier name of the task. Task names are used for assigning\
+            \ the output of one task so it can be later used by subsequent tasks."
+          type: "string"
+        parameters:
+          description: "Key-value map of task parameters."
+          type: "object"
+          additionalProperties:
+            type: "object"
+        timeout:
+          description: "The timeout expression which describes when a trigger should\
+            \ be deemed as timed-out."
+          type: "string"
+        type:
+          description: "The type of a trigger."
+          type: "string"

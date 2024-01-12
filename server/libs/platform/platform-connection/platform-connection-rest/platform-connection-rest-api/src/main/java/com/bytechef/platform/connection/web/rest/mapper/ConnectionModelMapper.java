@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.connection.web.rest.mapper;
 
-import com.bytechef.hermes.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
 import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
 import org.mapstruct.Mapper;

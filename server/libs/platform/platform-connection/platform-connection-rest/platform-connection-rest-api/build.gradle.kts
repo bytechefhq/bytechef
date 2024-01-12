@@ -4,7 +4,7 @@ dependencies {
     annotationProcessor(libs.org.mapstruct.mapstruct.processor)
     annotationProcessor(libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions)
 
-    api(project(":server:libs:hermes:hermes-connection:hermes-connection-api"))
+    api(project(":server:libs:platform:platform-connection:platform-connection-api"))
 
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 

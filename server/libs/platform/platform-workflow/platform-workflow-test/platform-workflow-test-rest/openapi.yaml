@@ -1,0 +1,262 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Platform Workflow Test API"
+  version: "1"
+servers:
+  - url: "http://localhost:5173/api/platform"
+tags:
+  - name: "workflow-test"
+    description: "The Platform Workflow Test API"
+paths:
+  /workflow-test-configurations:
+    get:
+      description: "Get all workflow test configurations."
+      summary: "Get all workflow test configurations"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "getWorkflowTestConfigurations"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkflowTestConfiguration"
+    post:
+      description: "Create a new workflow test configuration."
+      summary: "Create a new workflow test configuration."
+      tags:
+        - "workflow-test-configuration"
+      operationId: "createWorkflowTestConfiguration"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkflowTestConfiguration"
+        required: true
+      responses:
+        "200":
+          description: "The workflow test configuration object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTestConfiguration"
+  /workflow-test-configurations/{id}:
+    get:
+      description: "Get a workflow test configuration."
+      summary: "Get a workflow test configuration"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "getWorkflowTestConfiguration"
+      parameters:
+        - name: "id"
+          description: "The id of a workflow test configuration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTestConfiguration"
+    put:
+      description: "Update an existing workflow test configuration."
+      summary: "Update an existing workflow test configuration"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "updateWorkflowTestConfiguration"
+      parameters:
+        - name: "id"
+          description: "The id of a workflow test configuration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkflowTestConfiguration"
+        required: true
+      responses:
+        "200":
+          description: "The updated workflow test configuration object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTestConfiguration"
+  /workflow-test-configurations/{workflowId}/connections/{operationName}:
+    get:
+      description: "Get a workflow test configuration connections."
+      summary: "Get a workflow test configuration connections"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "getWorkflowTestConfigurationConnections"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a testing workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "operationName"
+          description: "The action/trigger name defined in the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
+  /workflow-test-configurations/{workflowId}/connections/{operationName}/{key}:
+    put:
+      description: "Update a workflow test configuration connection."
+      summary: "Update a workflow test configuration connection"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "updateWorkflowTestConfigurationConnection"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a testing workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "operationName"
+          description: "The action/trigger name defined in the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "key"
+          description: "The key of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                connectionId:
+                  type: "integer"
+                  format: "int64"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
+  /workflows/{id}/tests:
+    post:
+      description: "Execute a workflow synchronously for testing purposes."
+      summary: "Execute a workflow synchronously for testing purpose"
+      tags:
+        - "workflow-test"
+      operationId: "testWorkflow"
+      parameters:
+        - name: "id"
+          description: "Id of the workflow to execute."
+          in: "path"
+          schema:
+            type: "string"
+          required: true
+      responses:
+        "200":
+          description: "The output expected by the workflow."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTestExecution"
+components:
+  schemas:
+    WorkflowTestConfiguration:
+      description: "Contains configuration and connections required for the test execution of a particular workflow."
+      type: "object"
+      required:
+        - "name"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        inputs:
+          description: "The input parameters used as workflow\
+            \ input values."
+          type: "object"
+          additionalProperties:
+            type: "object"
+        connections:
+          description: "The connections used by workflow test."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
+        id:
+          description: "The id of a workflow test configuration."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        workflowId:
+          description: "The id of a workflow."
+          type: "string"
+        __version:
+          type: "integer"
+    WorkflowTestConfigurationConnection:
+      description: "The connection used in a particular task or trigger."
+      type: "object"
+      required:
+        - "connectionId"
+        - "key"
+        - "operationName"
+      properties:
+        connectionId:
+          description: "The connection id"
+          type: "integer"
+          format: "int64"
+        key:
+          description: "The connection key under which a connection is defined in\
+            \ a workflow definition."
+          type: "string"
+        operationName:
+          description: "The action/trigger name to which a connection belongs."
+          type: "string"
+    WorkflowTestExecution:
+      description: "Contains information about test execution of a workflow."
+      type: "object"
+      properties:
+        job:
+          $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/Job"
+        triggerExecution:
+          $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TriggerExecution"
