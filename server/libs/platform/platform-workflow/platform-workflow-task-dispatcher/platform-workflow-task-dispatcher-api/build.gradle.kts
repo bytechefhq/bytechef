@@ -1,3 +1,3 @@
 dependencies {
-    api(project(":server:libs:hermes:hermes-definition-api"))
+    api(project(":server:sdks:java:definition-api"))
 }

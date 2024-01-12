@@ -113,9 +113,6 @@ include("server:libs:embedded:embedded-workflow:embedded-workflow-execution:embe
 include("server:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service")
 include("server:libs:embedded:embedded-swagger")
 
-include("server:libs:hermes:hermes-component:hermes-component-api")
-include("server:libs:hermes:hermes-definition-api")
-
 include("server:libs:platform:platform-api")
 include("server:libs:platform:platform-component:platform-component-registry:platform-component-registry-api")
 include("server:libs:platform:platform-component:platform-component-registry:platform-component-registry-service")
@@ -191,7 +188,6 @@ include("server:libs:modules:components:resend")
 include("server:libs:modules:components:schedule")
 include("server:libs:modules:components:script")
 include("server:libs:modules:components:twilio")
-
 //include("server:libs:modules:components:shopify")
 include("server:libs:modules:components:var")
 include("server:libs:modules:components:xlsx-file")
@@ -211,6 +207,8 @@ include("server:libs:modules:task-dispatchers:subflow")
 
 include("server:libs:test:test-support")
 include("server:libs:test:test-int-support")
+
+include("server:sdks:java:component-api")
 
 include("ee:server:apps:api-gateway-app")
 include("ee:server:apps:config-server-app")
