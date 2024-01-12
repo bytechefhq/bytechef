@@ -16,14 +16,14 @@
 
 package com.bytechef.task.dispatcher.sequence;
 
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.array;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.task;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.sequence.SequenceTaskDispatcher.TASKS;
 import static com.bytechef.task.dispatcher.sequence.constant.SequenceTaskDispatcherConstants.SEQUENCE;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
 /**

@@ -16,11 +16,11 @@
 
 package com.bytechef.task.dispatcher.branch;
 
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.object;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.array;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.object;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.string;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.task;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.BRANCH;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.CASES;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.DEFAULT;
@@ -28,8 +28,8 @@ import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherC
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.KEY;
 import static com.bytechef.task.dispatcher.branch.constant.BranchTaskDispatcherConstants.TASKS;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
 /**

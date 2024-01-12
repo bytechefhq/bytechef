@@ -16,15 +16,15 @@
 
 package com.bytechef.task.dispatcher.condition;
 
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.array;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.bool;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.dateTime;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.number;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.object;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.option;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.string;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.task;
-import static com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.array;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.bool;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.dateTime;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.number;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.object;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.option;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.string;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.task;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.BOOLEAN;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_FALSE;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_TRUE;
@@ -40,8 +40,8 @@ import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispa
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.VALUE_1;
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.VALUE_2;
 
-import com.bytechef.hermes.task.dispatcher.TaskDispatcherDefinitionFactory;
-import com.bytechef.hermes.task.dispatcher.definition.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CombineOperation;
 import com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.Operation;
 import org.springframework.stereotype.Component;

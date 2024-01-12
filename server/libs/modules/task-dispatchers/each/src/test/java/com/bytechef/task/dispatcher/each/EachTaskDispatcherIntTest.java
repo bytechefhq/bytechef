@@ -18,9 +18,9 @@ package com.bytechef.task.dispatcher.each;
 
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.hermes.task.dispatcher.test.annotation.TaskDispatcherIntTest;
-import com.bytechef.hermes.task.dispatcher.test.task.handler.TestVarTaskHandler;
-import com.bytechef.hermes.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
+import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
+import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
+import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import java.util.ArrayList;
 import java.util.List;
