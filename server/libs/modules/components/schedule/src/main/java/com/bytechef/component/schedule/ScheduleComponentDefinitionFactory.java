@@ -26,7 +26,7 @@ import com.bytechef.component.schedule.trigger.ScheduleEveryWeekTrigger;
 import com.bytechef.component.schedule.trigger.ScheduleIntervalTrigger;
 import com.bytechef.hermes.component.ComponentDefinitionFactory;
 import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.scheduler.TriggerScheduler;
+import com.bytechef.platform.scheduler.TriggerScheduler;
 import org.springframework.stereotype.Component;
 
 /**

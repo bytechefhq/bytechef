@@ -16,7 +16,7 @@
 
 package com.bytechef.component.random.helper;
 
-import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
+import com.bytechef.platform.component.test.annotation.ComponentIntTest;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

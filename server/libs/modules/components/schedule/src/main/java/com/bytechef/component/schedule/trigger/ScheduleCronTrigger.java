@@ -29,8 +29,8 @@ import com.bytechef.hermes.component.definition.Context;
 import com.bytechef.hermes.component.definition.Parameters;
 import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.hermes.execution.WorkflowExecutionId;
-import com.bytechef.hermes.scheduler.TriggerScheduler;
+import com.bytechef.platform.scheduler.TriggerScheduler;
+import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import java.util.Map;
 
 /**

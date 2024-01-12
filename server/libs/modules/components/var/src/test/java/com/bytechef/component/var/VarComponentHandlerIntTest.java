@@ -18,8 +18,8 @@ package com.bytechef.component.var;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.hermes.component.test.ComponentJobTestExecutor;
-import com.bytechef.hermes.component.test.annotation.ComponentIntTest;
+import com.bytechef.platform.component.test.ComponentJobTestExecutor;
+import com.bytechef.platform.component.test.annotation.ComponentIntTest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
