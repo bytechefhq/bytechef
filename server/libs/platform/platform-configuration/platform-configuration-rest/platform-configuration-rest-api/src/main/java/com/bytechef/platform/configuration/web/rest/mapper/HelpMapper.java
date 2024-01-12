@@ -16,18 +16,29 @@
 
 package com.bytechef.platform.configuration.web.rest.mapper;
 
+import com.bytechef.platform.component.registry.domain.Help;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.HelpModel;
-import com.bytechef.platform.registry.domain.Help;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-public interface HelpMapper extends Converter<Help, HelpModel> {
+public class HelpMapper {
 
-    @Override
-    HelpModel convert(Help help);
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    interface ComponentHelpMapper extends Converter<Help, HelpModel> {
+
+        @Override
+        HelpModel convert(Help help);
+    }
+
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    interface TaskDispatcherHelpMapper
+        extends Converter<com.bytechef.platform.workflow.task.dispatcher.registry.domain.Help, HelpModel> {
+
+        @Override
+        HelpModel convert(com.bytechef.platform.workflow.task.dispatcher.registry.domain.Help help);
+    }
 }

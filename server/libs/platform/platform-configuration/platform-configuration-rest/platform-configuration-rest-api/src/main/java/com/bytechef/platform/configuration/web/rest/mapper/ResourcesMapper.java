@@ -16,18 +16,29 @@
 
 package com.bytechef.platform.configuration.web.rest.mapper;
 
+import com.bytechef.platform.component.registry.domain.Resources;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.ResourcesModel;
-import com.bytechef.platform.registry.domain.Resources;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
-public interface ResourcesMapper extends Converter<Resources, ResourcesModel> {
+public interface ResourcesMapper {
 
-    @Override
-    ResourcesModel convert(Resources resources);
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    interface ComponentResourcesMapper extends Converter<Resources, ResourcesModel> {
+
+        @Override
+        ResourcesModel convert(Resources resources);
+    }
+
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    interface TaskDispatcherResourcesMapper
+        extends Converter<com.bytechef.platform.workflow.task.dispatcher.registry.domain.Resources, ResourcesModel> {
+
+        @Override
+        ResourcesModel convert(com.bytechef.platform.workflow.task.dispatcher.registry.domain.Resources resources);
+    }
 }

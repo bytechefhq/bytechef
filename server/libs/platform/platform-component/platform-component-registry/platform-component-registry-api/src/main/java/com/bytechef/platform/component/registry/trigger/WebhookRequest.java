@@ -17,8 +17,8 @@
 package com.bytechef.platform.component.registry.trigger;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 

@@ -7,9 +7,9 @@
 
 package com.bytechef.platform.component.registry.remote.web.rest.facade;
 
+import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
-import com.bytechef.platform.registry.domain.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

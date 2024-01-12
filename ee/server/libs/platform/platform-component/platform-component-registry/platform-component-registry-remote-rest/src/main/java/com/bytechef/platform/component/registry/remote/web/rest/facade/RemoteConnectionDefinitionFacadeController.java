@@ -7,7 +7,7 @@
 
 package com.bytechef.platform.component.registry.remote.web.rest.facade;
 
-import com.bytechef.hermes.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;

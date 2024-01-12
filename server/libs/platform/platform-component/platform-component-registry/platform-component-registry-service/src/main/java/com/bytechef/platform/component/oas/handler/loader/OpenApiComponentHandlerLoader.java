@@ -17,9 +17,9 @@
 package com.bytechef.platform.component.oas.handler.loader;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
 import com.bytechef.platform.component.handler.loader.AbstractComponentHandlerLoader;
 import com.bytechef.platform.component.oas.handler.OpenApiComponentTaskHandler;

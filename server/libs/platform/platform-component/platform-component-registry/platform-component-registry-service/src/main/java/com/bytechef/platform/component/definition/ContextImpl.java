@@ -16,12 +16,12 @@
 
 package com.bytechef.platform.component.definition;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.object;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Property;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.util.OutputSchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

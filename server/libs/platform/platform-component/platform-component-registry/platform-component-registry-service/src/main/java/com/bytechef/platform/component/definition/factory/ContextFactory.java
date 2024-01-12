@@ -16,11 +16,11 @@
 
 package com.bytechef.platform.component.definition.factory;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.TriggerContext;
 import com.bytechef.platform.component.definition.ActionContextImpl;
 import com.bytechef.platform.component.definition.ContextImpl;
 import com.bytechef.platform.component.definition.HttpClientExecutor;

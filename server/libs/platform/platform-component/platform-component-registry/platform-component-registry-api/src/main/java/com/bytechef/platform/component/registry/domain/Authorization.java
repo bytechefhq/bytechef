@@ -18,7 +18,7 @@ package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +39,7 @@ public class Authorization {
     private Authorization() {
     }
 
-    public Authorization(com.bytechef.hermes.component.definition.Authorization authorization) {
+    public Authorization(com.bytechef.component.definition.Authorization authorization) {
         this.description = OptionalUtils.orElse(authorization.getDescription(), null);
         this.name = authorization.getName();
         this.properties = CollectionUtils.map(

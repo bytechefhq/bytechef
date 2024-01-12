@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.definition.ComponentDefinition;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
+ *
  */
-public class ComponentHandlerWrapper implements ComponentHandler {
+@SuppressFBWarnings("EI")
+public interface Help {
 
-    private final ComponentDefinition componentDefinition;
+    /**
+     *
+     * @return
+     */
+    String getBody();
 
-    public ComponentHandlerWrapper(ComponentDefinition componentDefinition) {
-        this.componentDefinition = componentDefinition;
-    }
-
-    @Override
-    public ComponentDefinition getDefinition() {
-        return componentDefinition;
-    }
+    /**
+     *
+     * @return
+     */
+    Optional<String> getLearnMoreUrl();
 }

@@ -17,7 +17,7 @@
 package com.bytechef.platform.oauth2.service;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
+import com.bytechef.component.definition.constant.AuthorizationConstants;
 import com.bytechef.platform.oauth2.config.OAuth2Properties;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;

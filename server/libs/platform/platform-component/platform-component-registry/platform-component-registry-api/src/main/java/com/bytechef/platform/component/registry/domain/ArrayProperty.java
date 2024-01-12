@@ -18,7 +18,6 @@ package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.registry.domain.Option;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -39,13 +38,13 @@ public class ArrayProperty extends ValueProperty<List<Object>> {
     private ArrayProperty() {
     }
 
-    public ArrayProperty(com.bytechef.hermes.component.definition.Property.ArrayProperty arrayProperty) {
+    public ArrayProperty(com.bytechef.component.definition.Property.ArrayProperty arrayProperty) {
         super(arrayProperty);
 
         this.items = CollectionUtils.map(
             OptionalUtils.orElse(arrayProperty.getItems(), List.of()),
             valueProperty -> (ValueProperty<?>) toProperty(
-                (com.bytechef.hermes.component.definition.Property) valueProperty));
+                (com.bytechef.component.definition.Property) valueProperty));
         this.maxItems = OptionalUtils.orElse(arrayProperty.getMaxItems(), null);
         this.minItems = OptionalUtils.orElse(arrayProperty.getMinItems(), null);
         this.multipleValues = OptionalUtils.orElse(arrayProperty.getMultipleValues(), true);

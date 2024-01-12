@@ -17,12 +17,12 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.definition.Help;
-import com.bytechef.hermes.definition.Resources;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ConnectionDefinition;
+import com.bytechef.component.definition.Help;
+import com.bytechef.component.definition.Resources;
+import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.platform.component.util.CustomActionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;

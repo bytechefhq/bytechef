@@ -9,10 +9,11 @@ package com.bytechef.platform.component.registry.remote.client.service;
 
 import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.hermes.component.definition.TriggerContext;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.platform.component.registry.OperationType;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
+import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
@@ -20,7 +21,6 @@ import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClie
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.component.registry.trigger.TriggerOutput;
 import com.bytechef.platform.component.registry.trigger.WebhookRequest;
-import com.bytechef.platform.registry.domain.Option;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;

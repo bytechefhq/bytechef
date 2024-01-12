@@ -16,31 +16,31 @@
 
 package com.bytechef.platform.component.jdbc.handler;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.component.definition.ComponentDSL.date;
-import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.nullable;
-import static com.bytechef.hermes.component.definition.ComponentDSL.number;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.ComponentDSL.time;
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.connection;
+import static com.bytechef.component.definition.ComponentDSL.date;
+import static com.bytechef.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.nullable;
+import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
-import com.bytechef.hermes.definition.BaseProperty;
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.JdbcComponentDefinition;
+import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.platform.component.jdbc.constant.JdbcConstants;
 import com.bytechef.platform.component.jdbc.executor.JdbcExecutor;
 import com.bytechef.platform.component.jdbc.operation.DeleteJdbcOperation;
@@ -70,7 +70,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                 .required(true),
             string(JdbcConstants.PASSWORD)
                 .label("Password")
-                .controlType(BaseProperty.ControlType.PASSWORD)
+                .controlType(Property.ControlType.PASSWORD)
                 .required(true));
 
     private final List<ModifiableActionDefinition> actionDefinitions = List.of(

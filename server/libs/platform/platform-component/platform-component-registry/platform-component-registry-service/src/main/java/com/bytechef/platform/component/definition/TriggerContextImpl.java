@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.definition;
 
-import com.bytechef.hermes.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 
 /**

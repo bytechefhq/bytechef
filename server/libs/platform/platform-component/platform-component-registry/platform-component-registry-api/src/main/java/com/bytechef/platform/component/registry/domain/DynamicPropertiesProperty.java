@@ -31,7 +31,7 @@ public class DynamicPropertiesProperty extends Property {
     }
 
     public DynamicPropertiesProperty(
-        com.bytechef.hermes.component.definition.Property.DynamicPropertiesProperty property) {
+        com.bytechef.component.definition.Property.DynamicPropertiesProperty property) {
         super(property);
 
         this.header = OptionalUtils.orElse(property.getHeader(), null);

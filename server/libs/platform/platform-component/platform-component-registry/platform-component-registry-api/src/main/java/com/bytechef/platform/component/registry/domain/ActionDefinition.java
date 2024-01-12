@@ -40,7 +40,7 @@ public class ActionDefinition extends ActionDefinitionBasic {
     private ActionDefinition() {
     }
 
-    public ActionDefinition(com.bytechef.hermes.component.definition.ActionDefinition actionDefinition) {
+    public ActionDefinition(com.bytechef.component.definition.ActionDefinition actionDefinition) {
         super(actionDefinition);
 
         this.editorDescriptionDataSource = OptionalUtils.mapOrElse(

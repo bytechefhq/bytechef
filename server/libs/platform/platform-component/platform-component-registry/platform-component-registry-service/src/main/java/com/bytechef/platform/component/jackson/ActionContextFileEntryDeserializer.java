@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.jackson;
 
-import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.component.definition.ContextFileEntryImpl;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;

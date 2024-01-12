@@ -7,10 +7,10 @@
 
 package com.bytechef.worker.config;
 
-import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.definition.Context;
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.ApplyResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
+import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;

@@ -18,9 +18,9 @@ package com.bytechef.platform.component.jackson;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
+import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookBody.ContentType;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.platform.component.registry.trigger.WebhookRequest;
 import com.bytechef.platform.component.registry.trigger.WebhookRequest.WebhookBodyImpl;
 import com.fasterxml.jackson.core.JsonParser;

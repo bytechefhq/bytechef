@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import com.bytechef.hermes.definition.BaseProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,56 +28,163 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_INTERFACE")
-public interface Property extends BaseProperty {
+public interface Property {
+
+    /**
+     *
+     */
+    enum ControlType {
+        ARRAY_BUILDER,
+        CHECKBOX,
+        CODE_EDITOR,
+        DATE,
+        DATE_TIME,
+        EMAIL,
+        INTEGER,
+        MULTI_SELECT,
+        NUMBER,
+        OBJECT_BUILDER,
+        PASSWORD,
+        PHONE,
+        SELECT,
+        TEXT,
+        TEXT_AREA,
+        TIME,
+        URL
+    }
+
+    /**
+     *
+     */
+    enum Type {
+        ARRAY,
+        BOOLEAN,
+        DATE,
+        DATE_TIME,
+        DYNAMIC_PROPERTIES,
+        INTEGER,
+        NULL,
+        NUMBER,
+        OBJECT,
+        STRING,
+        TIME,
+    }
+
+    /**
+     *
+     */
+    Optional<Boolean> getAdvancedOption();
+
+    /**
+     *
+     */
+    Optional<String> getDescription();
+
+    /**
+     *
+     */
+    Optional<String> getDisplayCondition();
+
+    /**
+     *
+     */
+    Optional<Boolean> getExpressionEnabled();
+
+    /**
+     *
+     */
+    Optional<Boolean> getHidden();
+
+    /**
+     *
+     */
+    Map<String, Object> getMetadata();
+
+    /**
+     *
+     */
+    String getName();
+
+    /**
+     *
+     */
+    Optional<Boolean> getRequired();
+
+    /**
+     *
+     */
+    Type getType();
 
     /**
      *
      */
     interface ArrayProperty
-        extends BaseProperty.ArrayProperty, InputProperty, OutputProperty<List<Object>>, Property,
-        ValueProperty<List<Object>> {
+        extends InputProperty, OptionsProperty, OutputProperty<List<Object>>, Property, ValueProperty<List<Object>> {
 
         /**
          *
          * @return
          */
         Optional<List<? extends Property.ValueProperty<?>>> getItems();
+
+        /**
+         *
+         */
+        Optional<Long> getMaxItems();
+
+        /**
+         *
+         */
+        Optional<Long> getMinItems();
+
+        /**
+         *
+         */
+        Optional<Boolean> getMultipleValues();
     }
 
     /**
      *
      */
     interface BooleanProperty
-        extends BaseProperty.BooleanProperty, InputProperty, OutputProperty<Boolean>, Property, ValueProperty<Boolean> {
+        extends InputProperty, OptionsProperty, OutputProperty<Boolean>, Property, ValueProperty<Boolean> {
     }
 
     /**
      *
      */
     interface DateProperty
-        extends BaseProperty.DateProperty, InputProperty, OutputProperty<LocalDate>, Property,
-        ValueProperty<LocalDate> {
+        extends InputProperty, OptionsProperty, OutputProperty<LocalDate>, Property, ValueProperty<LocalDate> {
     }
 
     /**
      *
      */
     interface DateTimeProperty
-        extends BaseProperty.DateTimeProperty, InputProperty, OutputProperty<LocalDateTime>, Property,
-        ValueProperty<LocalDateTime> {
+        extends InputProperty, OptionsProperty, OutputProperty<LocalDateTime>, Property, ValueProperty<LocalDateTime> {
     }
 
     /**
      *
      */
-    interface InputProperty extends BaseProperty.InputProperty, Property {
+    interface InputProperty extends Property {
     }
 
     /**
      *
      */
     interface IntegerProperty
-        extends BaseProperty.IntegerProperty, InputProperty, OutputProperty<Long>, Property, ValueProperty<Long> {
+        extends InputProperty, OptionsProperty, OutputProperty<Long>, Property, ValueProperty<Long> {
+
+        /**
+         *
+         */
+        Optional<Long> getMaxValue();
+
+        /**
+         *
+         */
+        Optional<Long> getMinValue();
     }
 
     /**
@@ -91,14 +197,39 @@ public interface Property extends BaseProperty {
      *
      */
     interface NumberProperty
-        extends BaseProperty.NumberProperty, InputProperty, OutputProperty<Double>, Property, ValueProperty<Double> {
+        extends InputProperty, OptionsProperty, OutputProperty<Double>, Property, ValueProperty<Double> {
+
+        /**
+         *
+         */
+        Optional<Integer> getMaxNumberPrecision();
+
+        /**
+         *
+         */
+        Optional<Double> getMaxValue();
+
+        /**
+         *
+         */
+        Optional<Double> getMinValue();
+
+        /**
+         *
+         */
+        Optional<Integer> getMinNumberPrecision();
+
+        /**
+         *
+         */
+        Optional<Integer> getNumberPrecision();
     }
 
     /**
      *
      */
     interface ObjectProperty
-        extends BaseProperty.ObjectProperty, InputProperty, OutputProperty<Map<String, Object>>, Property,
+        extends InputProperty, OptionsProperty, OutputProperty<Map<String, Object>>, Property,
         ValueProperty<Map<String, Object>> {
 
         /**
@@ -106,6 +237,16 @@ public interface Property extends BaseProperty {
          * @return
          */
         Optional<List<? extends Property.ValueProperty<?>>> getAdditionalProperties();
+
+        /**
+         *
+         */
+        Optional<Boolean> getMultipleValues();
+
+        /**
+         *
+         */
+        Optional<String> getObjectType();
 
         /**
          *
@@ -118,24 +259,64 @@ public interface Property extends BaseProperty {
      *
      * @param <V>
      */
-    interface OutputProperty<V> extends BaseProperty.OutputProperty<V>, ValueProperty<V> {
+    interface OutputProperty<V> extends ValueProperty<V> {
     }
 
     /**
      *
      */
     interface StringProperty
-        extends BaseProperty.StringProperty, InputProperty, OutputProperty<String>, Property, ValueProperty<String> {
+        extends InputProperty, OptionsProperty, OutputProperty<String>, Property, ValueProperty<String> {
+
+        /**
+         *
+         * @return
+         */
+        Optional<Integer> getMaxLength();
+
+        /**
+         *
+         * @return
+         */
+        Optional<Integer> getMinLength();
     }
 
     /**
      *
      */
     interface TimeProperty
-        extends BaseProperty.TimeProperty, InputProperty, OutputProperty<LocalTime>, Property,
-        ValueProperty<LocalTime> {
+        extends InputProperty, OptionsProperty, OutputProperty<LocalTime>, Property, ValueProperty<LocalTime> {
     }
 
-    interface ValueProperty<V> extends BaseProperty.ValueProperty<V>, Property {
+    /**
+     *
+     * @param <V>
+     */
+    interface ValueProperty<V> extends Property {
+
+        /**
+         *
+         */
+        ControlType getControlType();
+
+        /**
+         *
+         */
+        Optional<V> getDefaultValue();
+
+        /**
+         *
+         */
+        Optional<V> getExampleValue();
+
+        /**
+         *
+         */
+        Optional<String> getLabel();
+
+        /**
+         *
+         */
+        Optional<String> getPlaceholder();
     }
 }

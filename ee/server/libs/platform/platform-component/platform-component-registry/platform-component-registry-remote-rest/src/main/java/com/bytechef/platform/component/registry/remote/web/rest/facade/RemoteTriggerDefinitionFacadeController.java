@@ -7,12 +7,12 @@
 
 package com.bytechef.platform.component.registry.remote.web.rest.facade;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.trigger.TriggerOutput;
 import com.bytechef.platform.component.registry.trigger.WebhookRequest;
-import com.bytechef.platform.registry.domain.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

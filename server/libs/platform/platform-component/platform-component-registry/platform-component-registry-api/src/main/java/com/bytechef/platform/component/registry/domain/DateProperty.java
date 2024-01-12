@@ -18,8 +18,7 @@ package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.Property;
-import com.bytechef.platform.registry.domain.Option;
+import com.bytechef.component.definition.Property;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;

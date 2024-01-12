@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.registry.factory;
 
-import com.bytechef.hermes.component.ComponentHandler;
+import com.bytechef.component.ComponentHandler;
 import java.util.List;
 
 /**

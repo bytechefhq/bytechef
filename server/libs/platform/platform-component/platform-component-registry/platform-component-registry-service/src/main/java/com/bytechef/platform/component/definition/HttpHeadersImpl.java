@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.definition;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition;
 import java.util.Map;
 
 /**

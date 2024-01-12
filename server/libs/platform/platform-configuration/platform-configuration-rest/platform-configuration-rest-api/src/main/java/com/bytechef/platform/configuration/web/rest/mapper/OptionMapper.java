@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.configuration.web.rest.mapper;
 
+import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
-import com.bytechef.platform.registry.domain.Option;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 

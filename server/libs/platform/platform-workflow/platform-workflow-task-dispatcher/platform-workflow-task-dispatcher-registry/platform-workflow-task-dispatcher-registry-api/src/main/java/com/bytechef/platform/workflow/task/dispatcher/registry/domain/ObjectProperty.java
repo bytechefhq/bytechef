@@ -18,7 +18,6 @@ package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.registry.domain.Option;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

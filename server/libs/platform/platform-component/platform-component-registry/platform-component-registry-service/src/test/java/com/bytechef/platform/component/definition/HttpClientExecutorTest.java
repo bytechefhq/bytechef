@@ -18,10 +18,10 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.constant.AuthorizationConstants;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import com.fasterxml.jackson.core.type.TypeReference;

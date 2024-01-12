@@ -16,9 +16,6 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import com.bytechef.hermes.definition.Help;
-import com.bytechef.hermes.definition.Option;
-import com.bytechef.hermes.definition.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -203,87 +200,87 @@ public final class TaskDispatcherDSL {
         }
 
         public ModifiableArrayProperty defaultValue(Boolean... defaultValue) {
-            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
+            this.defaultValue = defaultValue == null ? List.of() : List.of((Object[]) defaultValue);
 
             return this;
         }
 
         public ModifiableArrayProperty defaultValue(Integer... defaultValue) {
-            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
+            this.defaultValue = defaultValue == null ? List.of() : List.of((Object[]) defaultValue);
 
             return this;
         }
 
         public ModifiableArrayProperty defaultValue(Long... defaultValue) {
-            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
+            this.defaultValue = defaultValue == null ? List.of() : List.of((Object[]) defaultValue);
 
             return this;
         }
 
         public ModifiableArrayProperty defaultValue(Float... defaultValue) {
-            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
+            this.defaultValue = defaultValue == null ? List.of() : List.of((Object[]) defaultValue);
 
             return this;
         }
 
         public ModifiableArrayProperty defaultValue(Double... defaultValue) {
-            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
+            this.defaultValue = defaultValue == null ? List.of() : List.of((Object[]) defaultValue);
 
             return this;
         }
 
         public ModifiableArrayProperty defaultValue(String... defaultValue) {
-            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
+            this.defaultValue = defaultValue == null ? List.of() : List.of((Object[]) defaultValue);
 
             return this;
         }
 
         @SafeVarargs
         public final ModifiableArrayProperty defaultValue(Map<String, ?>... defaultValue) {
-            this.defaultValue = defaultValue == null ? List.of() : List.of(defaultValue);
+            this.defaultValue = defaultValue == null ? List.of() : List.of((Object[]) defaultValue);
 
             return this;
         }
 
         public ModifiableArrayProperty exampleValue(Boolean... exampleValue) {
-            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
+            this.exampleValue = exampleValue == null ? List.of() : List.of((Object[]) exampleValue);
 
             return this;
         }
 
         public ModifiableArrayProperty exampleValue(Integer... exampleValue) {
-            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
+            this.exampleValue = exampleValue == null ? List.of() : List.of((Object[]) exampleValue);
 
             return this;
         }
 
         public ModifiableArrayProperty exampleValue(Long... exampleValue) {
-            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
+            this.exampleValue = exampleValue == null ? List.of() : List.of((Object[]) exampleValue);
 
             return this;
         }
 
         public ModifiableArrayProperty exampleValue(Float... exampleValue) {
-            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
+            this.exampleValue = exampleValue == null ? List.of() : List.of((Object[]) exampleValue);
 
             return this;
         }
 
         public ModifiableArrayProperty exampleValue(Double... exampleValue) {
-            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
+            this.exampleValue = exampleValue == null ? List.of() : List.of((Object[]) exampleValue);
 
             return this;
         }
 
         public ModifiableArrayProperty exampleValue(String... exampleValue) {
-            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
+            this.exampleValue = exampleValue == null ? List.of() : List.of((Object[]) exampleValue);
 
             return this;
         }
 
         @SafeVarargs
         public final ModifiableArrayProperty exampleValue(Map<String, ?>... exampleValue) {
-            this.exampleValue = exampleValue == null ? List.of() : List.of(exampleValue);
+            this.exampleValue = exampleValue == null ? List.of() : List.of((Object[]) exampleValue);
 
             return this;
         }
@@ -1048,8 +1045,7 @@ public final class TaskDispatcherDSL {
     }
 
     public static class ModifiableStringProperty
-        extends ModifiableValueProperty<String, ModifiableStringProperty>
-        implements Property.StringProperty {
+        extends ModifiableValueProperty<String, ModifiableStringProperty> implements Property.StringProperty {
 
         private List<Option<?>> options;
         private ControlType controlType;

@@ -43,7 +43,7 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     private TriggerDefinition() {
     }
 
-    public TriggerDefinition(com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition) {
+    public TriggerDefinition(com.bytechef.component.definition.TriggerDefinition triggerDefinition) {
         super(triggerDefinition);
 
         this.editorDescriptionDataSource = OptionalUtils.mapOrElse(

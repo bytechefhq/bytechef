@@ -18,7 +18,6 @@ package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.registry.domain.Option;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import java.time.LocalDateTime;
 import java.util.Collections;

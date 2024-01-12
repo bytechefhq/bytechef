@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.registry.domain;
+package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -35,7 +35,7 @@ public class Option {
     private Option() {
     }
 
-    public Option(com.bytechef.hermes.definition.Option<?> option) {
+    public Option(com.bytechef.platform.workflow.task.dispatcher.definition.Option<?> option) {
         this.description = OptionalUtils.orElse(option.getDescription(), null);
         this.displayCondition = option.getDisplayCondition();
         this.label = option.getLabel();

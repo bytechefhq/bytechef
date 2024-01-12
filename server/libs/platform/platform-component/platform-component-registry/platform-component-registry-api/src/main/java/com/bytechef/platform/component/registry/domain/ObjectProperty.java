@@ -18,7 +18,6 @@ package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.registry.domain.Option;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,13 +39,13 @@ public class ObjectProperty extends ValueProperty<Map<String, Object>> {
     private ObjectProperty() {
     }
 
-    public ObjectProperty(com.bytechef.hermes.component.definition.Property.ObjectProperty objectProperty) {
+    public ObjectProperty(com.bytechef.component.definition.Property.ObjectProperty objectProperty) {
         super(objectProperty);
 
         this.additionalProperties = CollectionUtils.map(
             OptionalUtils.orElse(objectProperty.getAdditionalProperties(), List.of()),
             valueProperty -> (ValueProperty<?>) toProperty(
-                (com.bytechef.hermes.component.definition.Property) valueProperty));
+                (com.bytechef.component.definition.Property) valueProperty));
         this.multipleValues = OptionalUtils.orElse(objectProperty.getMultipleValues(), true);
         this.objectType = OptionalUtils.orElse(objectProperty.getObjectType(), null);
         this.options =
@@ -56,7 +55,7 @@ public class ObjectProperty extends ValueProperty<Map<String, Object>> {
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(objectProperty.getProperties(), List.of()),
             valueProperty -> (ValueProperty<?>) toProperty(
-                (com.bytechef.hermes.component.definition.Property) valueProperty));
+                (com.bytechef.component.definition.Property) valueProperty));
     }
 
     @Override

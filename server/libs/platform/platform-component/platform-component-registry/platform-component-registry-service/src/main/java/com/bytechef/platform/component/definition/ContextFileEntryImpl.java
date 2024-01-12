@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.component.definition;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.hermes.component.definition.ActionContext;
 
 /**
  * @author Ivica Cardic

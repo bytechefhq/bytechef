@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.jdbc.handler.loader;
 
-import com.bytechef.hermes.component.JdbcComponentDefinitionFactory;
+import com.bytechef.component.JdbcComponentDefinitionFactory;
 import com.bytechef.platform.component.handler.ComponentTaskHandler;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.jdbc.handler.JdbcComponentHandler;

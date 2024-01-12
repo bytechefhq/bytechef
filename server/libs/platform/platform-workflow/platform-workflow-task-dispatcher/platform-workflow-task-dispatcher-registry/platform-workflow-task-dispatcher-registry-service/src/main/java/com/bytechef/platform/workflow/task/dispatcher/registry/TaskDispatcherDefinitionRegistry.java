@@ -18,9 +18,9 @@ package com.bytechef.platform.workflow.task.dispatcher.registry;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.registry.util.PropertyUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;

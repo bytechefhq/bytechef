@@ -16,11 +16,11 @@
 
 package com.bytechef.platform.component.registry.facade;
 
-import com.bytechef.hermes.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.trigger.TriggerOutput;
 import com.bytechef.platform.component.registry.trigger.WebhookRequest;
-import com.bytechef.platform.registry.domain.Option;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;

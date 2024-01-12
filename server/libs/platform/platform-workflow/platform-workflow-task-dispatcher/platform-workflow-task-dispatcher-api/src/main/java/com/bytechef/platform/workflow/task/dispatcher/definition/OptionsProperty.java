@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.definition.ComponentDefinition;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public class ComponentHandlerWrapper implements ComponentHandler {
+public interface OptionsProperty {
 
-    private final ComponentDefinition componentDefinition;
-
-    public ComponentHandlerWrapper(ComponentDefinition componentDefinition) {
-        this.componentDefinition = componentDefinition;
-    }
-
-    @Override
-    public ComponentDefinition getDefinition() {
-        return componentDefinition;
-    }
+    /**
+     *
+     * @return
+     */
+    Optional<List<Option<?>>> getOptions();
 }

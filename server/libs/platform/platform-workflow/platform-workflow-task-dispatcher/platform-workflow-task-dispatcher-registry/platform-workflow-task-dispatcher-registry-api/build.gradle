@@ -1,5 +1,4 @@
 dependencies {
-    api(project(":server:libs:platform:platform-registry-api"))
     api(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 
     implementation("org.apache.commons:commons-lang3")

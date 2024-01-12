@@ -7,7 +7,7 @@
 
 package com.bytechef.platform.component.registry.remote.web.rest.service;
 
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

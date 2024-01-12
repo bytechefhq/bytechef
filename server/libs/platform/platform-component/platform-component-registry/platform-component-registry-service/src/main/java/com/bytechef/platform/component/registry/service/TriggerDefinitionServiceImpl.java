@@ -19,29 +19,29 @@ package com.bytechef.platform.component.registry.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.DynamicOptionsProperty;
-import com.bytechef.hermes.component.definition.EditorDescriptionDataSource.TriggerEditorDescriptionFunction;
-import com.bytechef.hermes.component.definition.OptionsDataSource;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.PropertiesDataSource;
-import com.bytechef.hermes.component.definition.Property.DynamicPropertiesProperty;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.TriggerSampleOutputFunction;
-import com.bytechef.hermes.component.definition.TriggerContext;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRefreshFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition.DynamicWebhookRequestFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerDisableConsumer;
-import com.bytechef.hermes.component.definition.TriggerDefinition.ListenerEnableConsumer;
-import com.bytechef.hermes.component.definition.TriggerDefinition.PollFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition.PollOutput;
-import com.bytechef.hermes.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.hermes.component.definition.TriggerDefinition.WebhookOutput;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.DynamicOptionsProperty;
+import com.bytechef.component.definition.EditorDescriptionDataSource.TriggerEditorDescriptionFunction;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OutputSchemaDataSource;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.PropertiesDataSource;
+import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
+import com.bytechef.component.definition.SampleOutputDataSource;
+import com.bytechef.component.definition.SampleOutputDataSource.TriggerSampleOutputFunction;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer;
+import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableFunction;
+import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookRefreshFunction;
+import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookRequestFunction;
+import com.bytechef.component.definition.TriggerDefinition.ListenerDisableConsumer;
+import com.bytechef.component.definition.TriggerDefinition.ListenerEnableConsumer;
+import com.bytechef.component.definition.TriggerDefinition.PollFunction;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.platform.component.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.definition.HttpParametersImpl;
 import com.bytechef.platform.component.definition.ParametersImpl;
@@ -49,13 +49,13 @@ import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.OperationType;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
+import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.domain.ValueProperty;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.registry.trigger.TriggerOutput;
 import com.bytechef.platform.component.registry.trigger.WebhookRequest;
-import com.bytechef.platform.registry.domain.Option;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -286,7 +286,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         ComponentConnection connection, @NonNull TriggerContext context) {
 
         TriggerOutput triggerOutput;
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         TriggerType triggerType = triggerDefinition.getType();
@@ -328,7 +328,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull WebhookRequest webhookRequest,
         ComponentConnection connection, @NonNull TriggerContext context) {
 
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return executeWebhookValidate(
@@ -402,7 +402,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     private static TriggerOutput executePollingTrigger(
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition,
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition,
         Map<String, ?> inputParameters, Map<String, ?> closureParameters, TriggerContext triggerContext,
         PollFunction pollFunction) {
 
@@ -454,7 +454,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     private boolean executeWebhookValidate(
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition, Parameters inputParameters,
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition, Parameters inputParameters,
         WebhookRequest webhookRequest, TriggerContext context) {
 
         return triggerDefinition.getWebhookValidate()
@@ -490,7 +490,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private DynamicWebhookRefreshFunction getDynamicWebhookRefreshFunction(
         String componentName, int componentVersion, String triggerName) {
 
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getDynamicWebhookRefresh());
@@ -499,7 +499,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private DynamicWebhookDisableConsumer getDynamicWebhookDisableConsumer(
         String componentName, int componentVersion, String triggerName) {
 
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getDynamicWebhookDisable());
@@ -508,7 +508,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private DynamicWebhookEnableFunction getDynamicWebhookEnableFunction(
         String componentName, int componentVersion, String triggerName) {
 
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getDynamicWebhookEnable());
@@ -520,7 +520,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.mapOrElse(
@@ -533,7 +533,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private ListenerDisableConsumer getListenerDisableConsumer(
         String componentName, int componentVersion, String triggerName) {
 
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getListenerDisable());
@@ -542,7 +542,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private ListenerEnableConsumer getListenerEnableConsumer(
         String componentName, int componentVersion, String triggerName) {
 
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getListenerEnable());
@@ -551,7 +551,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private OutputSchemaDataSource.TriggerOutputSchemaFunction getOutputSchemaFunction(
         String componentName, int componentVersion, String triggerName) {
 
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(
@@ -563,7 +563,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private TriggerSampleOutputFunction getSampleOutputFunction(
         String componentName, int componentVersion, String triggerName) {
 
-        com.bytechef.hermes.component.definition.TriggerDefinition triggerDefinition =
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         SampleOutputDataSource sampleOutputDataSource = OptionalUtils.get(

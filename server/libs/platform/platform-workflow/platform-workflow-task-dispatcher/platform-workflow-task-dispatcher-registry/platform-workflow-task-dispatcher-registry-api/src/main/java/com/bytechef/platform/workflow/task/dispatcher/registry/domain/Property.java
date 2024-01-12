@@ -16,11 +16,13 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
-import com.bytechef.hermes.definition.BaseProperty;
-import com.bytechef.platform.registry.domain.AbstractProperty;
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property.Type;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Objects;
+import java.util.Optional;
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -40,13 +42,29 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
     @JsonSubTypes.Type(value = TimeProperty.class, name = "TIME"),
 })
 @SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_SUPERCLASS")
-public abstract class Property extends AbstractProperty {
+public abstract class Property {
+
+    private boolean advancedOption;
+    private String description;
+    private String displayCondition;
+    private boolean expressionEnabled; // Defaults to true
+    private boolean hidden;
+    private boolean required;
+    private String name;
+    private Type type;
 
     protected Property() {
     }
 
-    public Property(BaseProperty property) {
-        super(property);
+    public Property(com.bytechef.platform.workflow.task.dispatcher.definition.Property property) {
+        this.advancedOption = OptionalUtils.orElse(property.getAdvancedOption(), false);
+        this.description = OptionalUtils.orElse(property.getDescription(), null);
+        this.displayCondition = OptionalUtils.orElse(property.getDisplayCondition(), null);
+        this.expressionEnabled = OptionalUtils.orElse(property.getExpressionEnabled(), true);
+        this.hidden = OptionalUtils.orElse(property.getHidden(), false);
+        this.required = OptionalUtils.orElse(property.getRequired(), false);
+        this.name = property.getName();
+        this.type = property.getType();
     }
 
     @SuppressWarnings("unchecked")
@@ -74,11 +92,80 @@ public abstract class Property extends AbstractProperty {
                 (com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty) property);
             case STRING -> (P) toStringProperty(
                 (com.bytechef.platform.workflow.task.dispatcher.definition.Property.StringProperty) property);
-            case TIME -> (P) toTimeProperty((BaseProperty.TimeProperty) property);
+            case TIME -> (P) toTimeProperty(
+                (com.bytechef.platform.workflow.task.dispatcher.definition.Property.TimeProperty) property);
         };
     }
 
     public abstract Object accept(PropertyVisitor propertyVisitor);
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof Property that)) {
+            return false;
+        }
+
+        return advancedOption == that.advancedOption && expressionEnabled == that.expressionEnabled
+            && hidden == that.hidden && required == that.required
+            && Objects.equals(displayCondition, that.displayCondition)
+            && Objects.equals(name, that.name) && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+            advancedOption, displayCondition, expressionEnabled, hidden, required, name, type);
+    }
+
+    public boolean getAdvancedOption() {
+        return advancedOption;
+    }
+
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
+    }
+
+    public Optional<String> getDisplayCondition() {
+        return Optional.ofNullable(displayCondition);
+    }
+
+    public boolean getExpressionEnabled() {
+        return expressionEnabled;
+    }
+
+    public boolean getHidden() {
+        return hidden;
+    }
+
+    public boolean getRequired() {
+        return required;
+    }
+
+    public Optional<String> getName() {
+        return Optional.ofNullable(name);
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    @Override
+    public String toString() {
+        return "Property" +
+            "advancedOption=" + advancedOption +
+            ", description='" + description + '\'' +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", expressionEnabled=" + expressionEnabled +
+            ", hidden=" + hidden +
+            ", required=" + required +
+            ", name='" + name + '\'' +
+            ", type=" + type +
+            '}';
+    }
 
     private static ArrayProperty toArrayProperty(
         com.bytechef.platform.workflow.task.dispatcher.definition.Property.ArrayProperty arrayProperty) {
@@ -134,7 +221,9 @@ public abstract class Property extends AbstractProperty {
         return new StringProperty(stringProperty);
     }
 
-    private static TimeProperty toTimeProperty(BaseProperty.TimeProperty timeProperty) {
+    private static TimeProperty toTimeProperty(
+        com.bytechef.platform.workflow.task.dispatcher.definition.Property.TimeProperty timeProperty) {
+
         return new TimeProperty(timeProperty);
     }
 

@@ -18,8 +18,6 @@ package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.BaseProperty;
-import com.bytechef.platform.registry.domain.Option;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +34,9 @@ public class StringProperty extends ValueProperty<String> {
     private StringProperty() {
     }
 
-    public StringProperty(BaseProperty.StringProperty stringProperty) {
+    public StringProperty(
+        com.bytechef.platform.workflow.task.dispatcher.definition.Property.StringProperty stringProperty) {
+
         super(stringProperty);
 
         this.maxLength = OptionalUtils.orElse(stringProperty.getMaxLength(), null);

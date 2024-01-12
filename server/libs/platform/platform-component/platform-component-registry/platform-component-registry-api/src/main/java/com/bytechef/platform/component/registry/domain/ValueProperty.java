@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.BaseProperty.ControlType;
+import com.bytechef.component.definition.Property.ControlType;
 import java.util.Optional;
 
 /**
@@ -34,7 +34,7 @@ public abstract class ValueProperty<V> extends Property {
     protected ValueProperty() {
     }
 
-    public ValueProperty(com.bytechef.hermes.component.definition.Property.ValueProperty<V> valueProperty) {
+    public ValueProperty(com.bytechef.component.definition.Property.ValueProperty<V> valueProperty) {
         super(valueProperty);
 
         this.controlType = valueProperty.getControlType();

@@ -14,47 +14,54 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.domain;
+package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public class OptionsDataSource {
+public class Help {
 
-    private final List<String> loadOptionsDependsOn;
+    private String body;
+    private String learnMoreUrl;
 
-    public OptionsDataSource(com.bytechef.component.definition.OptionsDataSource optionsDataSource) {
-        this.loadOptionsDependsOn = OptionalUtils.orElse(optionsDataSource.getLoadOptionsDependsOn(), List.of());
+    private Help() {
     }
 
-    public List<String> getLoadOptionsDependsOn() {
-        return loadOptionsDependsOn;
+    public Help(com.bytechef.platform.workflow.task.dispatcher.definition.Help help) {
+        this.body = help.getBody();
+        this.learnMoreUrl = OptionalUtils.orElse(help.getLearnMoreUrl(), null);
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public String getLearnMoreUrl() {
+        return learnMoreUrl;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof OptionsDataSource that))
+        if (!(o instanceof Help help))
             return false;
-        return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn);
+        return Objects.equals(body, help.body) && Objects.equals(learnMoreUrl, help.learnMoreUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(loadOptionsDependsOn);
+        return Objects.hash(body, learnMoreUrl);
     }
 
     @Override
     public String toString() {
-        return "OptionsDataSource{" +
-            "loadOptionsDependsOn=" + loadOptionsDependsOn +
+        return "Help{" +
+            "body='" + body + '\'' +
+            ", learnMoreUrl='" + learnMoreUrl + '\'' +
             '}';
     }
 }

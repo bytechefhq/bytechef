@@ -8,10 +8,10 @@
 package com.bytechef.platform.component.registry.remote.client.facade;
 
 import com.bytechef.commons.rest.client.DefaultRestClient;
+import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClient;
-import com.bytechef.platform.registry.domain.Option;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;

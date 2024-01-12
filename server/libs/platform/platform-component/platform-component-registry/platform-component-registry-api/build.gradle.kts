@@ -1,6 +1,5 @@
 dependencies {
     api(project(":server:sdks:java:component-api"))
-    api(project(":server:libs:platform:platform-registry-api"))
 
     implementation("org.apache.commons:commons-lang3")
     implementation("com.fasterxml.jackson.core:jackson-annotations")

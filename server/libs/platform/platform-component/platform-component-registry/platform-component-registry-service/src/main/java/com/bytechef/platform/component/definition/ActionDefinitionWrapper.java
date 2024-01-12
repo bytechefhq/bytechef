@@ -17,12 +17,12 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.EditorDescriptionDataSource;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
-import com.bytechef.hermes.component.definition.Property;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource;
-import com.bytechef.hermes.definition.Help;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.EditorDescriptionDataSource;
+import com.bytechef.component.definition.Help;
+import com.bytechef.component.definition.OutputSchemaDataSource;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.SampleOutputDataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -17,11 +17,10 @@
 package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.platform.component.registry.domain.ConnectionDefinitionBasic;
+import com.bytechef.platform.component.registry.domain.Help;
 import com.bytechef.platform.component.registry.domain.OptionsDataSource;
-import com.bytechef.platform.component.registry.domain.Property;
+import com.bytechef.platform.component.registry.domain.Resources;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
-import com.bytechef.platform.registry.domain.Help;
-import com.bytechef.platform.registry.domain.Resources;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -35,7 +34,13 @@ import org.mapstruct.Mapper;
 @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
 public interface OptionalMapper {
 
-    default Property mapToComponentToProperty(Optional<Property> value) {
+    default Help mapToHComponentHelp(Optional<Help> value) {
+        return value.orElse(null);
+    }
+
+    default com.bytechef.platform.component.registry.domain.Property mapToComponentToProperty(
+        Optional<com.bytechef.platform.component.registry.domain.Property> value) {
+
         return value.orElse(null);
     }
 
@@ -54,10 +59,6 @@ public interface OptionalMapper {
     }
 
     default Double mapToDouble(Optional<Double> value) {
-        return value.orElse(null);
-    }
-
-    default Help mapToHelp(Optional<Help> value) {
         return value.orElse(null);
     }
 
@@ -85,7 +86,7 @@ public interface OptionalMapper {
         return value.orElse(null);
     }
 
-    default Resources mapToResourcesModel(Optional<Resources> value) {
+    default Resources mapToComponentResources(Optional<Resources> value) {
         return value.orElse(null);
     }
 
@@ -98,8 +99,20 @@ public interface OptionalMapper {
             .orElse(null);
     }
 
+    default com.bytechef.platform.workflow.task.dispatcher.registry.domain.Help mapToTaskDispatcherHelp(
+        Optional<com.bytechef.platform.workflow.task.dispatcher.registry.domain.Help> value) {
+
+        return value.orElse(null);
+    }
+
     default com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property mapToTaskDispatcherProperty(
         Optional<com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property> value) {
+
+        return value.orElse(null);
+    }
+
+    default com.bytechef.platform.workflow.task.dispatcher.registry.domain.Resources mapToTaskDispatcherResources(
+        Optional<com.bytechef.platform.workflow.task.dispatcher.registry.domain.Resources> value) {
 
         return value.orElse(null);
     }

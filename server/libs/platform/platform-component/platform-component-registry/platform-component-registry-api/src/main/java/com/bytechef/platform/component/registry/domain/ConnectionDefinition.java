@@ -35,7 +35,7 @@ public class ConnectionDefinition extends ConnectionDefinitionBasic {
     private ConnectionDefinition() {
     }
 
-    public ConnectionDefinition(com.bytechef.hermes.component.definition.ConnectionDefinition connectionDefinition) {
+    public ConnectionDefinition(com.bytechef.component.definition.ConnectionDefinition connectionDefinition) {
         super(connectionDefinition);
 
         this.authorizations = toAuthorizationDTOs(
@@ -83,7 +83,7 @@ public class ConnectionDefinition extends ConnectionDefinitionBasic {
     }
 
     private static List<Authorization>
-        toAuthorizationDTOs(List<? extends com.bytechef.hermes.component.definition.Authorization> authorizations) {
+        toAuthorizationDTOs(List<? extends com.bytechef.component.definition.Authorization> authorizations) {
         return authorizations.stream()
             .map(Authorization::new)
             .toList();

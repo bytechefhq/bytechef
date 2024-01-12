@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.handler.loader;
 
-import com.bytechef.hermes.component.ComponentHandler;
+import com.bytechef.component.ComponentHandler;
 import com.bytechef.platform.component.handler.ComponentTaskHandler;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import java.util.List;

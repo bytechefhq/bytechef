@@ -18,11 +18,11 @@ package com.bytechef.platform.component.registry.facade;
 
 import com.bytechef.platform.component.definition.factory.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
+import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.registry.domain.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;

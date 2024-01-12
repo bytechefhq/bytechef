@@ -17,9 +17,9 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Type;

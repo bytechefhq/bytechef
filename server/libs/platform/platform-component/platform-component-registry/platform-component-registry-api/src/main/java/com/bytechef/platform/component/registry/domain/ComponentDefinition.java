@@ -19,7 +19,6 @@ package com.bytechef.platform.component.registry.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.IconUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.registry.domain.Resources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +53,7 @@ public class ComponentDefinition {
         this.triggers = List.of();
     }
 
-    public ComponentDefinition(com.bytechef.hermes.component.definition.ComponentDefinition componentDefinition) {
+    public ComponentDefinition(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
         this.actions = getActions(componentDefinition);
         this.category = OptionalUtils.orElse(componentDefinition.getCategory(), null);
         this.connection =
@@ -163,7 +162,7 @@ public class ComponentDefinition {
     }
 
     private static List<ActionDefinitionBasic>
-        getActions(com.bytechef.hermes.component.definition.ComponentDefinition componentDefinition) {
+        getActions(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
 
         return OptionalUtils.mapOrElse(
             componentDefinition.getActions(),

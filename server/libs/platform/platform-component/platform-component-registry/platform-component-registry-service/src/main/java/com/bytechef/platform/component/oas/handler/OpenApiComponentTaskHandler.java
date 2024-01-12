@@ -18,8 +18,8 @@ package com.bytechef.platform.component.oas.handler;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.Context.Http.Response;
+import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.platform.component.handler.ComponentTaskHandler;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

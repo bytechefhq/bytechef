@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.registry.util;
+package com.bytechef.platform.workflow.task.dispatcher.registry.util;
 
-import com.bytechef.hermes.definition.BaseProperty.InputProperty;
-import com.bytechef.hermes.definition.BaseProperty.OutputProperty;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property.InputProperty;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property.OutputProperty;
 import java.util.List;
 
 /**

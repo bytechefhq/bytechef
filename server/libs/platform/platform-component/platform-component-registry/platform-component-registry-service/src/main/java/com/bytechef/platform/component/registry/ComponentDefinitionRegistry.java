@@ -16,21 +16,21 @@
 
 package com.bytechef.platform.component.registry;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
-import static com.bytechef.hermes.component.definition.ComponentDSL.trigger;
+import static com.bytechef.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.trigger;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.ConnectionDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.hermes.definition.BaseProperty;
+import com.bytechef.component.ComponentDefinitionFactory;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ConnectionDefinition;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.registry.factory.ComponentHandlerListFactory;
-import com.bytechef.platform.registry.util.PropertyUtils;
+import com.bytechef.platform.component.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -111,7 +111,7 @@ public class ComponentDefinitionRegistry {
         return OptionalUtils.orElse(componentDefinition.getActions(), Collections.emptyList());
     }
 
-    public BaseProperty getActionProperty(
+    public Property getActionProperty(
         String componentName, int componentVersion, String actionName, String propertyName) {
 
         ActionDefinition actionDefinition = getActionDefinition(componentName, componentVersion, actionName);
@@ -201,7 +201,7 @@ public class ComponentDefinitionRegistry {
         return OptionalUtils.orElse(componentDefinition.getTriggers(), Collections.emptyList());
     }
 
-    public BaseProperty getTriggerProperty(
+    public Property getTriggerProperty(
         String componentName, int componentVersion, String triggerName, String propertyName) {
 
         TriggerDefinition triggerDefinition = getTriggerDefinition(componentName, componentVersion, triggerName);
@@ -241,7 +241,7 @@ public class ComponentDefinitionRegistry {
                 if (OptionalUtils.isPresent(actionDefinition.getOutputSchema()) &&
                     OptionalUtils.isPresent(actionDefinition.getOutputSchemaDataSource())) {
 
-                    throw new IllegalStateException("Output schema can be define either as a property or function");
+                    throw new IllegalStateException("Output schema can be defined either as a property or function");
                 }
 
                 if (OptionalUtils.isPresent(actionDefinition.getOutputSchema()) &&

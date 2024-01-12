@@ -17,8 +17,7 @@
 package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.definition.BaseProperty;
-import com.bytechef.hermes.definition.BaseProperty.ControlType;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ControlType;
 import java.util.Optional;
 
 /**
@@ -35,7 +34,9 @@ public abstract class ValueProperty<V> extends Property {
     protected ValueProperty() {
     }
 
-    public ValueProperty(BaseProperty.ValueProperty<V> valueProperty) {
+    public ValueProperty(
+        com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty<V> valueProperty) {
+
         super(valueProperty);
 
         this.controlType = valueProperty.getControlType();

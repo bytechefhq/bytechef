@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.component.registry.facade;
 
-import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
+import com.bytechef.component.definition.Authorization.ApplyResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
 import java.util.Optional;

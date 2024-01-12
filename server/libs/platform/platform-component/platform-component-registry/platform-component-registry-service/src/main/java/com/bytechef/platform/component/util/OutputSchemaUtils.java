@@ -16,22 +16,22 @@
 
 package com.bytechef.platform.component.util;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.date;
-import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.number;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.ComponentDSL.time;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.date;
+import static com.bytechef.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.Property;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.Property;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;

@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.registry.domain;
 
-import com.bytechef.hermes.component.definition.Property;
+import com.bytechef.component.definition.Property;
 
 /**
  * @author Ivica Cardic

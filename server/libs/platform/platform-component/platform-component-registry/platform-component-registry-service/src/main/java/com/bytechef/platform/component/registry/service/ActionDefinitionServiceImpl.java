@@ -19,26 +19,26 @@ package com.bytechef.platform.component.registry.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.DynamicOptionsProperty;
-import com.bytechef.hermes.component.definition.EditorDescriptionDataSource;
-import com.bytechef.hermes.component.definition.OptionsDataSource;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
-import com.bytechef.hermes.component.definition.PropertiesDataSource;
-import com.bytechef.hermes.component.definition.Property.DynamicPropertiesProperty;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.DynamicOptionsProperty;
+import com.bytechef.component.definition.EditorDescriptionDataSource;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OutputSchemaDataSource;
+import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.component.definition.PropertiesDataSource;
+import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
+import com.bytechef.component.definition.SampleOutputDataSource;
+import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.platform.component.definition.ParametersImpl;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.OperationType;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
+import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.ValueProperty;
-import com.bytechef.platform.registry.domain.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +136,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
-        com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
+        com.bytechef.component.definition.ActionDefinition actionDefinition =
             resolveActionDefinition(componentName, componentVersion, actionName);
 
         return OptionalUtils.mapOrElse(
@@ -245,7 +245,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
             componentName, componentVersion);
 
-        com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
+        com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         getActionDefinition(componentName, componentVersion, actionName);
@@ -262,7 +262,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     private ActionOutputSchemaFunction getOutputSchemaFunction(
         String componentName, int componentVersion, String actionName) {
 
-        com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
+        com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(actionDefinition.getOutputSchemaDataSource());
@@ -273,7 +273,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     private ActionSampleOutputFunction getSampleOutputFunction(
         String componentName, int componentVersion, String actionName) {
 
-        com.bytechef.hermes.component.definition.ActionDefinition actionDefinition =
+        com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         SampleOutputDataSource sampleOutputDataSource = OptionalUtils.get(actionDefinition.getSampleOutputDataSource());
@@ -281,7 +281,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return (ActionSampleOutputFunction) sampleOutputDataSource.getSampleOutput();
     }
 
-    private com.bytechef.hermes.component.definition.ActionDefinition resolveActionDefinition(
+    private com.bytechef.component.definition.ActionDefinition resolveActionDefinition(
         String componentName, int componentVersion, String actionName) {
 
         return componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);

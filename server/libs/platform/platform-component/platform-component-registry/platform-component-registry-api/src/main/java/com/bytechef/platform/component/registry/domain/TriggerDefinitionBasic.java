@@ -17,9 +17,8 @@
 package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.TriggerDefinition;
-import com.bytechef.hermes.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.platform.registry.domain.Help;
+import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;

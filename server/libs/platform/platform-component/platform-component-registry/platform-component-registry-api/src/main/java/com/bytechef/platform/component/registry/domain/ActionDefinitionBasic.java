@@ -17,8 +17,7 @@
 package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.platform.registry.domain.Help;
+import com.bytechef.component.definition.ActionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import java.util.Optional;

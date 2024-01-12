@@ -17,9 +17,9 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.hermes.component.definition.ActionContext;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;

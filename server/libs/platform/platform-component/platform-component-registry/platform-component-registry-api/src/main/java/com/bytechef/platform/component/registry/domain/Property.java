@@ -16,10 +16,14 @@
 
 package com.bytechef.platform.component.registry.domain;
 
-import com.bytechef.platform.registry.domain.AbstractProperty;
+import static com.bytechef.component.definition.Property.*;
+
+import com.bytechef.commons.util.OptionalUtils;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -43,95 +47,179 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
     @JsonSubTypes.Type(value = TimeProperty.class, name = "TIME"),
 })
 @SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_SUPERCLASS")
-public abstract class Property extends AbstractProperty {
+public abstract class Property {
+
+    private boolean advancedOption;
+    private String description;
+    private String displayCondition;
+    private boolean expressionEnabled; // Defaults to true
+    private boolean hidden;
+    private boolean required;
+    private String name;
+    private Type type;
 
     protected Property() {
     }
 
-    public Property(com.bytechef.hermes.component.definition.Property property) {
-        super(property);
+    public Property(com.bytechef.component.definition.Property property) {
+        this.advancedOption = OptionalUtils.orElse(property.getAdvancedOption(), false);
+        this.description = OptionalUtils.orElse(property.getDescription(), null);
+        this.displayCondition = OptionalUtils.orElse(property.getDisplayCondition(), null);
+        this.expressionEnabled = OptionalUtils.orElse(property.getExpressionEnabled(), true);
+        this.hidden = OptionalUtils.orElse(property.getHidden(), false);
+        this.required = OptionalUtils.orElse(property.getRequired(), false);
+        this.name = property.getName();
+        this.type = property.getType();
     }
 
     @SuppressWarnings("unchecked")
-    public static <P extends Property> P toProperty(com.bytechef.hermes.component.definition.Property property) {
+    public static <P extends Property> P toProperty(com.bytechef.component.definition.Property property) {
         return switch (property.getType()) {
             case ARRAY ->
-                (P) toArrayProperty((com.bytechef.hermes.component.definition.Property.ArrayProperty) property);
+                (P) toArrayProperty((com.bytechef.component.definition.Property.ArrayProperty) property);
             case BOOLEAN ->
-                (P) toBooleanProperty((com.bytechef.hermes.component.definition.Property.BooleanProperty) property);
-            case DATE -> (P) toDateProperty((com.bytechef.hermes.component.definition.Property.DateProperty) property);
+                (P) toBooleanProperty((com.bytechef.component.definition.Property.BooleanProperty) property);
+            case DATE -> (P) toDateProperty((com.bytechef.component.definition.Property.DateProperty) property);
             case DATE_TIME ->
-                (P) toDateTimeProperty((com.bytechef.hermes.component.definition.Property.DateTimeProperty) property);
+                (P) toDateTimeProperty((com.bytechef.component.definition.Property.DateTimeProperty) property);
             case DYNAMIC_PROPERTIES -> (P) toDynamicPropertiesProperty(
-                (com.bytechef.hermes.component.definition.Property.DynamicPropertiesProperty) property);
+                (com.bytechef.component.definition.Property.DynamicPropertiesProperty) property);
             case INTEGER ->
-                (P) toIntegerProperty((com.bytechef.hermes.component.definition.Property.IntegerProperty) property);
-            case NULL -> (P) toNullProperty((com.bytechef.hermes.component.definition.Property.NullProperty) property);
+                (P) toIntegerProperty((com.bytechef.component.definition.Property.IntegerProperty) property);
+            case NULL -> (P) toNullProperty((com.bytechef.component.definition.Property.NullProperty) property);
             case NUMBER ->
-                (P) toNumberProperty((com.bytechef.hermes.component.definition.Property.NumberProperty) property);
+                (P) toNumberProperty((com.bytechef.component.definition.Property.NumberProperty) property);
             case OBJECT ->
-                (P) toObjectProperty((com.bytechef.hermes.component.definition.Property.ObjectProperty) property);
+                (P) toObjectProperty((com.bytechef.component.definition.Property.ObjectProperty) property);
             case STRING ->
-                (P) toStringProperty((com.bytechef.hermes.component.definition.Property.StringProperty) property);
-            case TIME -> (P) toTimeProperty((com.bytechef.hermes.component.definition.Property.TimeProperty) property);
+                (P) toStringProperty((com.bytechef.component.definition.Property.StringProperty) property);
+            case TIME -> (P) toTimeProperty((com.bytechef.component.definition.Property.TimeProperty) property);
         };
     }
 
     public abstract Object accept(PropertyVisitor propertyVisitor);
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof Property that)) {
+            return false;
+        }
+
+        return advancedOption == that.advancedOption && expressionEnabled == that.expressionEnabled
+            && hidden == that.hidden && required == that.required
+            && Objects.equals(displayCondition, that.displayCondition)
+            && Objects.equals(name, that.name) && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+            advancedOption, displayCondition, expressionEnabled, hidden, required, name, type);
+    }
+
+    public boolean getAdvancedOption() {
+        return advancedOption;
+    }
+
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
+    }
+
+    public Optional<String> getDisplayCondition() {
+        return Optional.ofNullable(displayCondition);
+    }
+
+    public boolean getExpressionEnabled() {
+        return expressionEnabled;
+    }
+
+    public boolean getHidden() {
+        return hidden;
+    }
+
+    public boolean getRequired() {
+        return required;
+    }
+
+    public Optional<String> getName() {
+        return Optional.ofNullable(name);
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    @Override
+    public String toString() {
+        return "Property" +
+            "advancedOption=" + advancedOption +
+            ", description='" + description + '\'' +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", expressionEnabled=" + expressionEnabled +
+            ", hidden=" + hidden +
+            ", required=" + required +
+            ", name='" + name + '\'' +
+            ", type=" + type +
+            '}';
+    }
+
     private static ArrayProperty
-        toArrayProperty(com.bytechef.hermes.component.definition.Property.ArrayProperty arrayProperty) {
+        toArrayProperty(com.bytechef.component.definition.Property.ArrayProperty arrayProperty) {
         return new ArrayProperty(arrayProperty);
     }
 
     private static BooleanProperty
-        toBooleanProperty(com.bytechef.hermes.component.definition.Property.BooleanProperty booleanProperty) {
+        toBooleanProperty(com.bytechef.component.definition.Property.BooleanProperty booleanProperty) {
         return new BooleanProperty(booleanProperty);
     }
 
     private static DateProperty
-        toDateProperty(com.bytechef.hermes.component.definition.Property.DateProperty dateProperty) {
+        toDateProperty(com.bytechef.component.definition.Property.DateProperty dateProperty) {
         return new DateProperty(dateProperty);
     }
 
     private static DateTimeProperty
-        toDateTimeProperty(com.bytechef.hermes.component.definition.Property.DateTimeProperty dateTimeProperty) {
+        toDateTimeProperty(com.bytechef.component.definition.Property.DateTimeProperty dateTimeProperty) {
         return new DateTimeProperty(dateTimeProperty);
     }
 
     private static DynamicPropertiesProperty toDynamicPropertiesProperty(
-        com.bytechef.hermes.component.definition.Property.DynamicPropertiesProperty dynamicPropertiesProperty) {
+        com.bytechef.component.definition.Property.DynamicPropertiesProperty dynamicPropertiesProperty) {
 
         return new DynamicPropertiesProperty(dynamicPropertiesProperty);
     }
 
     private static IntegerProperty
-        toIntegerProperty(com.bytechef.hermes.component.definition.Property.IntegerProperty integerProperty) {
+        toIntegerProperty(com.bytechef.component.definition.Property.IntegerProperty integerProperty) {
         return new IntegerProperty(integerProperty);
     }
 
     private static NullProperty
-        toNullProperty(com.bytechef.hermes.component.definition.Property.NullProperty nullProperty) {
+        toNullProperty(com.bytechef.component.definition.Property.NullProperty nullProperty) {
         return new NullProperty(nullProperty);
     }
 
     private static NumberProperty
-        toNumberProperty(com.bytechef.hermes.component.definition.Property.NumberProperty numberProperty) {
+        toNumberProperty(com.bytechef.component.definition.Property.NumberProperty numberProperty) {
         return new NumberProperty(numberProperty);
     }
 
     private static ObjectProperty
-        toObjectProperty(com.bytechef.hermes.component.definition.Property.ObjectProperty objectProperty) {
+        toObjectProperty(com.bytechef.component.definition.Property.ObjectProperty objectProperty) {
         return new ObjectProperty(objectProperty);
     }
 
     private static StringProperty
-        toStringProperty(com.bytechef.hermes.component.definition.Property.StringProperty stringProperty) {
+        toStringProperty(com.bytechef.component.definition.Property.StringProperty stringProperty) {
         return new StringProperty(stringProperty);
     }
 
     private static TimeProperty
-        toTimeProperty(com.bytechef.hermes.component.definition.Property.TimeProperty timeProperty) {
+        toTimeProperty(com.bytechef.component.definition.Property.TimeProperty timeProperty) {
         return new TimeProperty(timeProperty);
     }
 

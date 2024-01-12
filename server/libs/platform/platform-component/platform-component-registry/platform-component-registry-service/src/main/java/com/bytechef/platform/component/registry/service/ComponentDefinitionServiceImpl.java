@@ -42,7 +42,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
 
     @Override
     public ComponentDefinition getComponentDefinition(String name, Integer version) {
-        com.bytechef.hermes.component.definition.ComponentDefinition componentDefinition =
+        com.bytechef.component.definition.ComponentDefinition componentDefinition =
             componentDefinitionRegistry.getComponentDefinition(name, version);
 
         return new ComponentDefinition(componentDefinition);

@@ -18,9 +18,9 @@ package com.bytechef.platform.component.handler.loader;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.ComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ComponentHandlerWrapper;
 import java.util.ArrayList;

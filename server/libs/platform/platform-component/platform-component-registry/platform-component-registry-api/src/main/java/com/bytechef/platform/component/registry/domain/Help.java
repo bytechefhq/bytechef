@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.registry.domain;
+package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import java.util.Objects;
@@ -30,7 +30,7 @@ public class Help {
     private Help() {
     }
 
-    public Help(com.bytechef.hermes.definition.Help help) {
+    public Help(com.bytechef.component.definition.Help help) {
         this.body = help.getBody();
         this.learnMoreUrl = OptionalUtils.orElse(help.getLearnMoreUrl(), null);
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.registry.domain;
+package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,7 +36,7 @@ public class Resources {
     private Resources() {
     }
 
-    public Resources(com.bytechef.hermes.definition.Resources resources) {
+    public Resources(com.bytechef.platform.workflow.task.dispatcher.definition.Resources resources) {
         this.additionalUrls = OptionalUtils.orElse(resources.getAdditionalUrls(), Map.of());
         this.categories = OptionalUtils.orElse(resources.getCategories(), List.of());
         this.documentationUrl = Validate.notNull(resources.getDocumentationUrl(), "documentationUrl");

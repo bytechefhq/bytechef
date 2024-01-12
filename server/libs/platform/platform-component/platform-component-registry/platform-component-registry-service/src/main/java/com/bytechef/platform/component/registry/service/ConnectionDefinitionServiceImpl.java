@@ -16,29 +16,29 @@
 
 package com.bytechef.platform.component.registry.service;
 
-import static com.bytechef.hermes.component.definition.ConnectionDefinition.BaseUriFunction;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CODE;
+import static com.bytechef.component.definition.ConnectionDefinition.BaseUriFunction;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.CODE;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.hermes.component.definition.Authorization;
-import com.bytechef.hermes.component.definition.Authorization.ApiTokenLocation;
-import com.bytechef.hermes.component.definition.Authorization.ApplyFunction;
-import com.bytechef.hermes.component.definition.Authorization.ApplyResponse;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackFunction;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationCallbackResponse;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationUrlFunction;
-import com.bytechef.hermes.component.definition.Authorization.ClientIdFunction;
-import com.bytechef.hermes.component.definition.Authorization.PkceFunction;
-import com.bytechef.hermes.component.definition.Authorization.ScopesFunction;
-import com.bytechef.hermes.component.definition.Authorization.TokenUrlFunction;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.constant.AuthorizationConstants;
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.ApiTokenLocation;
+import com.bytechef.component.definition.Authorization.ApplyFunction;
+import com.bytechef.component.definition.Authorization.ApplyResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationCallbackFunction;
+import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.Authorization.AuthorizationUrlFunction;
+import com.bytechef.component.definition.Authorization.ClientIdFunction;
+import com.bytechef.component.definition.Authorization.PkceFunction;
+import com.bytechef.component.definition.Authorization.ScopesFunction;
+import com.bytechef.component.definition.Authorization.TokenUrlFunction;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.constant.AuthorizationConstants;
 import com.bytechef.platform.component.definition.ParametersImpl;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
@@ -183,7 +183,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
 
     public static String getDefaultBaseUri(Parameters connectionParameters) {
         return MapUtils.getString(connectionParameters,
-            com.bytechef.hermes.component.definition.ConnectionDefinition.BASE_URI);
+            com.bytechef.component.definition.ConnectionDefinition.BASE_URI);
     }
 
     public static String getDefaultClientId(Parameters connectionParameters) {
@@ -316,7 +316,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     public Optional<String> executeBaseUri(
         @NonNull String componentName, @NonNull ComponentConnection connection, @NonNull Context context) {
 
-        com.bytechef.hermes.component.definition.ConnectionDefinition connectionDefinition =
+        com.bytechef.component.definition.ConnectionDefinition connectionDefinition =
             componentDefinitionRegistry.getConnectionDefinition(componentName);
 
         BaseUriFunction baseUriFunction =
