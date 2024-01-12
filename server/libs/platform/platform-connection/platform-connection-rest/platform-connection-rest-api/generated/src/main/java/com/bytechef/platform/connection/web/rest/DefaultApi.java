@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-11T07:10:00.542563+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-12T19:50:46.524723+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "Default", description = "the Default API")
 public interface DefaultApi {
@@ -41,22 +41,22 @@ public interface DefaultApi {
     }
 
     /**
-     * GET /
+     * GET /dummy
      *
      * @return Successful operation. (status code 200)
      */
     @Operation(
-        operationId = "getInfo",
+        operationId = "getDummy",
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/"
+        value = "/dummy"
     )
     
-    default ResponseEntity<Void> getInfo(
+    default ResponseEntity<Void> getDummy(
         
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
