@@ -20,7 +20,7 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.ACCESS_KEY_I
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.REGION;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.SECRET_ACCESS_KEY;
 
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.Parameters;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;

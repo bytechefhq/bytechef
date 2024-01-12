@@ -16,6 +16,12 @@
 
 package com.bytechef.component.quickbooks.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.date;
+import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ASSET_ACCOUNT_ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_ITEM;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.EXPENSE_ACCOUNT_ID;
@@ -24,19 +30,13 @@ import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INV
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ITEM_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QUANTITY_ON_HAND;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.date;
-import static com.bytechef.hermes.component.definition.ComponentDSL.number;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableOption;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableOption;
-import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.hermes.component.definition.Parameters;
 import com.intuit.ipp.data.Account;
 import com.intuit.ipp.data.AccountTypeEnum;
 import com.intuit.ipp.data.Item;

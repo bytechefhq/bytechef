@@ -16,14 +16,14 @@
 
 package com.bytechef.component.dropbox.connection;
 
-import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE;
-import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
-import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_ID;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
+import static com.bytechef.component.definition.Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE;
+import static com.bytechef.component.definition.ComponentDSL.authorization;
+import static com.bytechef.component.definition.ComponentDSL.connection;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.CLIENT_ID;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
 
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
 /**
  * Provides the component connection definition.

@@ -16,9 +16,11 @@
 
 package com.bytechef.component.openai;
 
+import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.openai.constant.OpenAIConstants.OPENAI;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.openai.action.OpenAIAskChatGPTAction;
 import com.bytechef.component.openai.action.OpenAICreateAssistantAction;
 import com.bytechef.component.openai.action.OpenAICreateImageAction;
@@ -27,8 +29,6 @@ import com.bytechef.component.openai.action.OpenAICreateTranscriptionAction;
 import com.bytechef.component.openai.action.OpenAICreateTranslationAction;
 import com.bytechef.component.openai.action.OpenAIVisionPromptAction;
 import com.bytechef.component.openai.connection.OpenAIConnection;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

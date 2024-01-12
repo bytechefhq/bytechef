@@ -16,14 +16,14 @@
 
 package com.bytechef.component.jira;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.jira.action.JiraCreateIssueAction;
 import com.bytechef.component.jira.action.JiraGetIssueAction;
 import com.bytechef.component.jira.action.JiraSearchForIssuesUsingJqlAction;
 import com.bytechef.component.jira.connection.JiraConnection;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 
 /**
  * Provides the base implementation for the REST based component.

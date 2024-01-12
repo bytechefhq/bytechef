@@ -16,27 +16,27 @@
 
 package com.bytechef.component.openai.util;
 
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DALL_E_2;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DEFAULT_SIZE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.N;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STREAM;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableArrayProperty;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableIntegerProperty;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableObjectProperty;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableStringProperty;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.Property.OutputProperty;
-import com.bytechef.hermes.component.definition.Property.ValueProperty;
-import com.bytechef.hermes.definition.Option;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.OutputProperty;
+import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
 

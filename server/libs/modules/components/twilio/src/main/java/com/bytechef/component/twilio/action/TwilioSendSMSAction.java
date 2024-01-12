@@ -16,6 +16,17 @@
 
 package com.bytechef.component.twilio.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.PASSWORD;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.USERNAME;
 import static com.bytechef.component.twilio.constant.TwilioConstants.ACCOUNT_SID;
 import static com.bytechef.component.twilio.constant.TwilioConstants.ADDRESS_RETENTION;
 import static com.bytechef.component.twilio.constant.TwilioConstants.APPLICATION_SID;
@@ -44,23 +55,12 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.SOURCE;
 import static com.bytechef.component.twilio.constant.TwilioConstants.STATUS_CALLBACK;
 import static com.bytechef.component.twilio.constant.TwilioConstants.TO;
 import static com.bytechef.component.twilio.constant.TwilioConstants.VALIDITY_PERIOD;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.hermes.component.definition.ComponentDSL.dynamicProperties;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.number;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.PASSWORD;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.USERNAME;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.twilio.util.TwilioUtils;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.definition.BaseProperty;
+import com.bytechef.definition.BaseProperty;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;

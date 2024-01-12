@@ -18,11 +18,11 @@ package com.bytechef.component.email;
 
 import static com.bytechef.component.email.constant.EmailConstants.EMAIL;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.email.action.SendEmailAction;
 import com.bytechef.component.email.connection.EmailConnection;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

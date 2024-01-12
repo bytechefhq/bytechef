@@ -16,6 +16,12 @@
 
 package com.bytechef.component.pipedrive;
 
+import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.pipedrive.trigger.PipedriveNewActivityTrigger;
 import com.bytechef.component.pipedrive.trigger.PipedriveNewDealTrigger;
 import com.bytechef.component.pipedrive.trigger.PipedriveNewOrganizationTrigger;
@@ -24,12 +30,6 @@ import com.bytechef.component.pipedrive.trigger.PipedriveUpdatedDealTrigger;
 import com.bytechef.component.pipedrive.trigger.PipedriveUpdatedOrganizationTrigger;
 import com.bytechef.component.pipedrive.trigger.PipedriveUpdatedPersonTrigger;
 import com.bytechef.component.pipedrive.util.PipedriveUtils;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableIntegerProperty;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableProperty;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Objects;

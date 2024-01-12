@@ -16,14 +16,14 @@
 
 package com.bytechef.component.map;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.LIST;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.MAP;
 
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.component.ComponentDefinitionFactory;
+import com.bytechef.component.definition.ComponentDefinition;
 import org.springframework.stereotype.Component;
 
 /**

@@ -16,12 +16,12 @@
 
 package com.bytechef.component.rabbitmq.connection;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.connection;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.rabbitmq.constant.RabbitMqConstants;
-import com.bytechef.hermes.component.definition.ComponentDSL;
 
 /**
  * @author Ivica Cardic

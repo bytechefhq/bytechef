@@ -16,24 +16,24 @@
 
 package com.bytechef.component.html.helper.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.ATTRIBUTE;
 import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.CONTENT;
 import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.EXTRACT_CONTENT;
 import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.QUERY_SELECTOR;
 import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.RETURN_ARRAY;
 import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.RETURN_VALUE;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
-import com.bytechef.hermes.definition.BaseProperty;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
+import com.bytechef.definition.BaseProperty;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;

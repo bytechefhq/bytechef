@@ -16,6 +16,13 @@
 
 package com.bytechef.component.openai.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.TOKEN;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_ASSISTANT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DESCRIPTION;
 import static com.bytechef.component.openai.constant.OpenAIConstants.FILE_IDS;
@@ -27,18 +34,11 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.NAME;
 import static com.bytechef.component.openai.constant.OpenAIConstants.PARAMETERS;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOOLS;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TYPE;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.Context.TypeReference;
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context.TypeReference;
+import com.bytechef.component.definition.Parameters;
 import com.theokanning.openai.assistants.Assistant;
 import com.theokanning.openai.assistants.AssistantRequest;
 import com.theokanning.openai.service.OpenAiService;

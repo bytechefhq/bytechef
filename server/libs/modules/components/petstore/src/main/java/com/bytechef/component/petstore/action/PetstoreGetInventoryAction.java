@@ -16,12 +16,12 @@
 
 package com.bytechef.component.petstore.action;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.Context.Http.ResponseType;
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL;
 import java.util.Map;
 
 /**

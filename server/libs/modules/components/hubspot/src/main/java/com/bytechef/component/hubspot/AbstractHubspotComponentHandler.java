@@ -16,13 +16,13 @@
 
 package com.bytechef.component.hubspot;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.hubspot.action.HubspotCreateContactAction;
 import com.bytechef.component.hubspot.action.HubspotUpdateContactAction;
 import com.bytechef.component.hubspot.connection.HubspotConnection;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 
 /**
  * Provides the base implementation for the REST based component.

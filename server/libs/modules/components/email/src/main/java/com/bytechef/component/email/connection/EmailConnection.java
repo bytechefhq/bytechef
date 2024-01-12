@@ -16,19 +16,19 @@
 
 package com.bytechef.component.email.connection;
 
+import static com.bytechef.component.definition.ComponentDSL.authorization;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.connection;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.PASSWORD;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.USERNAME;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
-import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.PASSWORD;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.USERNAME;
 
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.email.constant.EmailConstants;
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
 public class EmailConnection {
 

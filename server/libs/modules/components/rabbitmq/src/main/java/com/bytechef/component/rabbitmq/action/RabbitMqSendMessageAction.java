@@ -16,20 +16,20 @@
 
 package com.bytechef.component.rabbitmq.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.HOSTNAME;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.MESSAGE;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PASSWORD;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.PORT;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.QUEUE;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.USERNAME;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.Parameters;
 import com.rabbitmq.client.Channel;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

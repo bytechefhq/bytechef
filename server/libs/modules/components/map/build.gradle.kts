@@ -10,7 +10,6 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-worker:atlas-worker-impl"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
-    implementation(project(":server:libs:hermes:hermes-component:hermes-component-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-service"))
     implementation(project(":server:libs:modules:task-dispatchers:map"))
 

@@ -20,12 +20,12 @@ import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.FILENA
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.ROWS;
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.SHEET_NAME;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.xlsx.file.XlsxFileComponentHandlerTest;
 import com.bytechef.component.xlsx.file.action.XlsxFileReadAction.ReadConfiguration;
 import com.bytechef.component.xlsx.file.constant.XlsxFileConstants;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Parameters;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;

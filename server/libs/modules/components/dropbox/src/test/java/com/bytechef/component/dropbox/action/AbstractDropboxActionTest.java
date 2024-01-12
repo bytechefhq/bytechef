@@ -16,12 +16,12 @@
 
 package com.bytechef.component.dropbox.action;
 
+import static com.bytechef.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION_FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FILENAME;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.dropbox.util.DropboxUtils;
-import com.bytechef.hermes.component.definition.Parameters;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

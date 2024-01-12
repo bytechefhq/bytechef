@@ -16,9 +16,9 @@
 
 package com.bytechef.component.google.drive.util;
 
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.Parameters;
 import com.google.api.client.http.HttpExecuteInterceptor;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;

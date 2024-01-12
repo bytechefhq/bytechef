@@ -20,9 +20,9 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.FIL
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILE_ENTRY;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.FileInputStream;

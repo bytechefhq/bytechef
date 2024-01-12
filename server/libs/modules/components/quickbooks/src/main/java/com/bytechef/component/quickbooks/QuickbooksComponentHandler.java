@@ -16,15 +16,15 @@
 
 package com.bytechef.component.quickbooks;
 
+import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QUICKBOOKS;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateCustomerAction;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateItemAction;
 import com.bytechef.component.quickbooks.action.QuickbooksDownloadCustomerPdfAction;
 import com.bytechef.component.quickbooks.connection.QuickbooksConnection;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

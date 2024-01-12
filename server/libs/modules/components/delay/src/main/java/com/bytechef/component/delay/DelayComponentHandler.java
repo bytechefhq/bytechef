@@ -18,10 +18,10 @@ package com.bytechef.component.delay;
 
 import static com.bytechef.component.delay.constant.DelayConstants.DELAY;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.delay.action.DelaySleepAction;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

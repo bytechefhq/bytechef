@@ -16,12 +16,12 @@
 
 package com.bytechef.component.airtable;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.airtable.action.AirtableCreateRecordAction;
 import com.bytechef.component.airtable.connection.AirtableConnection;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ComponentDefinition;
 
 /**
  * Provides the base implementation for the REST based component.

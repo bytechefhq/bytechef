@@ -16,17 +16,17 @@
 
 package com.bytechef.component.pipedrive.connection;
 
-import static com.bytechef.hermes.component.definition.Authorization.ApiTokenLocation;
-import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
-import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ADD_TO;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_ID;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.VALUE;
+import static com.bytechef.component.definition.Authorization.ApiTokenLocation;
+import static com.bytechef.component.definition.Authorization.AuthorizationType;
+import static com.bytechef.component.definition.ComponentDSL.authorization;
+import static com.bytechef.component.definition.ComponentDSL.connection;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.ADD_TO;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.CLIENT_ID;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.VALUE;
 
-import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL;
 import java.util.List;
 
 /**

@@ -16,16 +16,16 @@
 
 package com.bytechef.component.object.helper.action;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.component.object.helper.constant.ObjectHelperConstants;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 
 /**
  * @author Ivica Cardic

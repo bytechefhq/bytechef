@@ -16,11 +16,11 @@
 
 package com.bytechef.component.mysql;
 
+import static com.bytechef.component.definition.ComponentDSL.jdbcComponent;
 import static com.bytechef.component.mysql.constant.MySQLConstants.MYSQL;
-import static com.bytechef.hermes.component.definition.ComponentDSL.jdbcComponent;
 
-import com.bytechef.hermes.component.JdbcComponentDefinitionFactory;
-import com.bytechef.hermes.component.definition.JdbcComponentDefinition;
+import com.bytechef.component.JdbcComponentDefinitionFactory;
+import com.bytechef.component.definition.JdbcComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

@@ -16,9 +16,9 @@
 
 package com.bytechef.component.quickbooks.util;
 
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.Parameters;
 import com.intuit.ipp.core.Context;
 import com.intuit.ipp.core.ServiceType;
 import com.intuit.ipp.exception.FMSException;

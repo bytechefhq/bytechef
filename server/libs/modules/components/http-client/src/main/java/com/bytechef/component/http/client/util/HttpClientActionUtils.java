@@ -16,21 +16,21 @@
 
 package com.bytechef.component.http.client.util;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ActionContext.FileEntry;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.RequestMethod;
+import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.InputProperty;
 import com.bytechef.component.http.client.constant.HttpClientConstants;
-import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.Http;
-import com.bytechef.hermes.component.definition.Context.Http.Body;
-import com.bytechef.hermes.component.definition.Context.Http.BodyContentType;
-import com.bytechef.hermes.component.definition.Context.Http.RequestMethod;
-import com.bytechef.hermes.component.definition.Context.Http.ResponseType;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.Property.InputProperty;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;

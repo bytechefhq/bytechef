@@ -16,16 +16,16 @@
 
 package com.bytechef.component.file.storage.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.DOWNLOAD;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.FILENAME;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.file.storage.constant.FileStorageConstants;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.Parameters;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;

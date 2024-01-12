@@ -24,10 +24,10 @@ import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.PAGE_S
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.READ_AS_STRING;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.FileEntry;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.xlsx.file.XlsxFileComponentHandlerTest;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
-import com.bytechef.hermes.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.FileInputStream;

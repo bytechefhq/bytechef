@@ -16,12 +16,12 @@
 
 package com.bytechef.component.var;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.var.action.VarSetAction;
 import com.bytechef.component.var.constant.VarConstants;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

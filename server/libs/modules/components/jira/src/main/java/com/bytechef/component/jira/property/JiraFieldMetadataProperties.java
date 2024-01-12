@@ -16,12 +16,12 @@
 
 package com.bytechef.component.jira.property;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL;
 import java.util.List;
 
 /**

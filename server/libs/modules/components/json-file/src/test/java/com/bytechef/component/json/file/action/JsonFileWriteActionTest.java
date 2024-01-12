@@ -21,10 +21,10 @@ import static com.bytechef.component.json.file.constant.JsonFileConstants.FILE_T
 import static com.bytechef.component.json.file.constant.JsonFileConstants.SOURCE;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.json.file.JsonFileComponentHandlerTest;
 import com.bytechef.component.json.file.constant.JsonFileConstants;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Parameters;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;

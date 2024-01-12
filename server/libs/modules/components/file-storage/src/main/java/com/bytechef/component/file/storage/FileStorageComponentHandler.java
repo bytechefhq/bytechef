@@ -16,14 +16,14 @@
 
 package com.bytechef.component.file.storage;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.file.storage.action.FileStorageDownloadAction;
 import com.bytechef.component.file.storage.action.FileStorageReadAction;
 import com.bytechef.component.file.storage.action.FileStorageWriteAction;
 import com.bytechef.component.file.storage.constant.FileStorageConstants;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

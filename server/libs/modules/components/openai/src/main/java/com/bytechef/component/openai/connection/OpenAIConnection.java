@@ -16,13 +16,13 @@
 
 package com.bytechef.component.openai.connection;
 
-import static com.bytechef.hermes.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
-import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
-import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN;
+import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
+import static com.bytechef.component.definition.ComponentDSL.authorization;
+import static com.bytechef.component.definition.ComponentDSL.connection;
+import static com.bytechef.component.definition.ComponentDSL.string;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.TOKEN;
 
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 
 /**
  * @author Monika Domiter

@@ -16,12 +16,12 @@
 
 package com.bytechef.component.openai.action;
 
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.TOKEN;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import org.junit.jupiter.api.BeforeEach;
 
 /**

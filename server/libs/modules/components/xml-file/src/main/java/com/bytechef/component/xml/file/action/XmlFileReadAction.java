@@ -16,26 +16,26 @@
 
 package com.bytechef.component.xml.file.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.FILE_ENTRY;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.IS_ARRAY;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.PAGE_NUMBER;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.PAGE_SIZE;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.PATH;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.READ;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.FileEntry;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;

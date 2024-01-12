@@ -19,8 +19,8 @@ package com.bytechef.component.file.storage.action;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.FILE_ENTRY;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

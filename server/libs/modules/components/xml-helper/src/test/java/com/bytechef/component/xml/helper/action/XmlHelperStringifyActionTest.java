@@ -19,8 +19,8 @@ package com.bytechef.component.xml.helper.action;
 import static com.bytechef.component.xml.helper.constant.XmlHelperConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

@@ -18,10 +18,10 @@ package com.bytechef.component.object.helper.action;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.object.helper.constant.ObjectHelperConstants;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Parameters;
 import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

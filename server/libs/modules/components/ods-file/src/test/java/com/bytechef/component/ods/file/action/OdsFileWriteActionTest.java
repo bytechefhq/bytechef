@@ -18,11 +18,11 @@ package com.bytechef.component.ods.file.action;
 
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.ods.file.OdsFileComponentHandlerTest;
 import com.bytechef.component.ods.file.constant.OdsFileConstants;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Parameters;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;

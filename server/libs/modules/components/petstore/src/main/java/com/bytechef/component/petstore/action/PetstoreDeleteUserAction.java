@@ -16,11 +16,11 @@
 
 package com.bytechef.component.petstore.action;
 
-import static com.bytechef.hermes.component.OpenApiComponentHandler.PropertyType;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
+import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL;
 import java.util.Map;
 
 /**

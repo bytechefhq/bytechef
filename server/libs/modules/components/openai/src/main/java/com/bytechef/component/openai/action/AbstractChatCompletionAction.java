@@ -16,6 +16,12 @@
 
 package com.bytechef.component.openai.action;
 
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.number;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DESCRIPTION;
 import static com.bytechef.component.openai.constant.OpenAIConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.openai.constant.OpenAIConstants.FUNCTION;
@@ -36,14 +42,8 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.TOOL_CHOICE
 import static com.bytechef.component.openai.constant.OpenAIConstants.TOP_P;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TYPE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.number;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL;
 
 /**
  * @author Monika Domiter

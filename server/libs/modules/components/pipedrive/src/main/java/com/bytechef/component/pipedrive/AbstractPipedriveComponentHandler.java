@@ -16,8 +16,10 @@
 
 package com.bytechef.component.pipedrive;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.pipedrive.action.PipedriveAddDealAction;
 import com.bytechef.component.pipedrive.action.PipedriveAddLeadAction;
 import com.bytechef.component.pipedrive.action.PipedriveAddOrganizationAction;
@@ -39,8 +41,6 @@ import com.bytechef.component.pipedrive.action.PipedriveSearchLeadsAction;
 import com.bytechef.component.pipedrive.action.PipedriveSearchOrganizationAction;
 import com.bytechef.component.pipedrive.action.PipedriveSearchPersonsAction;
 import com.bytechef.component.pipedrive.connection.PipedriveConnection;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 
 /**
  * Provides the base implementation for the REST based component.

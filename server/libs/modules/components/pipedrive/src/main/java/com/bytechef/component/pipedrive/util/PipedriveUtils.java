@@ -16,12 +16,12 @@
 
 package com.bytechef.component.pipedrive.util;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.option;
 
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.Context.Http;
-import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.hermes.definition.Option;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

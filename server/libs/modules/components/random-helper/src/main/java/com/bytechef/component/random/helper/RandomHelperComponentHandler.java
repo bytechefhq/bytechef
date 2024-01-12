@@ -16,13 +16,13 @@
 
 package com.bytechef.component.random.helper;
 
+import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.random.helper.constant.RandomHelperConstants.RANDOM_HELPER;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.random.helper.action.RandomHelperRandomFloatAction;
 import com.bytechef.component.random.helper.action.RandomHelperRandomIntAction;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

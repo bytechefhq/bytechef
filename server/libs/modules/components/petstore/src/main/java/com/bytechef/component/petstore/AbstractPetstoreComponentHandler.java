@@ -16,8 +16,10 @@
 
 package com.bytechef.component.petstore;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.petstore.action.PetstoreAddPetAction;
 import com.bytechef.component.petstore.action.PetstoreCreateUserAction;
 import com.bytechef.component.petstore.action.PetstoreCreateUsersWithListInputAction;
@@ -36,8 +38,6 @@ import com.bytechef.component.petstore.action.PetstoreUpdatePetWithFormAction;
 import com.bytechef.component.petstore.action.PetstoreUpdateUserAction;
 import com.bytechef.component.petstore.action.PetstoreUploadFileAction;
 import com.bytechef.component.petstore.connection.PetstoreConnection;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 
 /**
  * Provides the base implementation for the REST based component.

@@ -21,8 +21,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.quickbooks.action.QuickbooksDownloadCustomerPdfAction;
-import com.bytechef.hermes.component.definition.ActionContext;
 import com.intuit.ipp.data.Customer;
 import com.intuit.ipp.exception.FMSException;
 import java.io.IOException;

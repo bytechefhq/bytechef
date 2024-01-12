@@ -16,9 +16,9 @@
 
 package com.bytechef.component.data.storage.constant;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.option;
 
-import com.bytechef.hermes.definition.Option;
+import com.bytechef.definition.Option;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 

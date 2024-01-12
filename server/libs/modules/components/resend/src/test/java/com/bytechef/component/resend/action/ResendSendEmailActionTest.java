@@ -16,6 +16,7 @@
 
 package com.bytechef.component.resend.action;
 
+import static com.bytechef.component.definition.constant.AuthorizationConstants.TOKEN;
 import static com.bytechef.component.resend.constant.ResendConstants.BCC;
 import static com.bytechef.component.resend.constant.ResendConstants.CC;
 import static com.bytechef.component.resend.constant.ResendConstants.FROM;
@@ -26,7 +27,6 @@ import static com.bytechef.component.resend.constant.ResendConstants.SUBJECT;
 import static com.bytechef.component.resend.constant.ResendConstants.TAGS;
 import static com.bytechef.component.resend.constant.ResendConstants.TEXT;
 import static com.bytechef.component.resend.constant.ResendConstants.TO;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
@@ -35,9 +35,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.resend.util.ResendUtils;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Parameters;
 import com.resend.Resend;
 import com.resend.core.exception.ResendException;
 import com.resend.services.emails.Emails;

@@ -16,6 +16,12 @@
 
 package com.bytechef.component.json.file.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.FILE_ENTRY;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.FILE_TYPE;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.IS_ARRAY;
@@ -23,21 +29,15 @@ import static com.bytechef.component.json.file.constant.JsonFileConstants.PAGE_N
 import static com.bytechef.component.json.file.constant.JsonFileConstants.PAGE_SIZE;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.PATH;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.READ;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.FileEntry;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.component.json.file.constant.JsonFileConstants;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

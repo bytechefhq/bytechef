@@ -16,10 +16,10 @@
 
 package com.bytechef.component.hubspot;
 
+import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.bytechef.component.hubspot.trigger.HubspotSubscribeTrigger;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 import java.util.List;
 

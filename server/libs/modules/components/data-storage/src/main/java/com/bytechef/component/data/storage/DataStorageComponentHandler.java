@@ -16,8 +16,9 @@
 
 package com.bytechef.component.data.storage;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.data.storage.action.DataStorageAppendValueToListAction;
 import com.bytechef.component.data.storage.action.DataStorageAtomicIncrementAction;
 import com.bytechef.component.data.storage.action.DataStorageAwaitGetValueAction;
@@ -27,8 +28,7 @@ import com.bytechef.component.data.storage.action.DataStorageGetAllEntriesAction
 import com.bytechef.component.data.storage.action.DataStorageGetValueAction;
 import com.bytechef.component.data.storage.action.DataStorageSetValueAction;
 import com.bytechef.component.data.storage.action.DataStorageSetValueInListAction;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ComponentDefinition;
 
 /**
  * @author Ivica Cardic

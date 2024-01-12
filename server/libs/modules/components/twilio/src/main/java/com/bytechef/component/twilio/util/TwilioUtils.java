@@ -16,20 +16,20 @@
 
 package com.bytechef.component.twilio.util;
 
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.twilio.constant.TwilioConstants.BODY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT;
 import static com.bytechef.component.twilio.constant.TwilioConstants.FROM;
 import static com.bytechef.component.twilio.constant.TwilioConstants.MEDIA_URL;
 import static com.bytechef.component.twilio.constant.TwilioConstants.MESSAGING_SERVICE_SID;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SOURCE;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.Property;
-import com.bytechef.hermes.definition.BaseProperty;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.definition.BaseProperty;
 import java.util.List;
 
 /**

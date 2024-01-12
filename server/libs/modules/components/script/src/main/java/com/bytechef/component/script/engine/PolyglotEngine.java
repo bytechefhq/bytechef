@@ -19,7 +19,7 @@ package com.bytechef.component.script.engine;
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.component.script.constant.ScriptConstants.SCRIPT;
 
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.Parameters;
 import java.util.Map;
 import java.util.function.Function;
 import org.graalvm.polyglot.Context;

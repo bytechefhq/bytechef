@@ -16,6 +16,11 @@
 
 package com.bytechef.component.openai.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CONTENT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.DETAIL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.IMAGE_URL;
@@ -25,15 +30,10 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.ROLE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.TYPE;
 import static com.bytechef.component.openai.constant.OpenAIConstants.URL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.VISION_PROMPT;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.OutputSchemaDataSource;
 import com.bytechef.component.openai.util.OpenAIUtils;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource;
 
 /**
  * @author Monika Domiter

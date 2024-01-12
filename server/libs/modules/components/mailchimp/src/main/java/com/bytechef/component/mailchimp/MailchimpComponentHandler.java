@@ -16,17 +16,17 @@
 
 package com.bytechef.component.mailchimp;
 
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 
+import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.mailchimp.trigger.MailchimpSubscribeTrigger;
 import com.bytechef.component.mailchimp.util.MailchimpUtils;
-import com.bytechef.hermes.component.OpenApiComponentHandler;
-import com.bytechef.hermes.component.definition.ActionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableComponentDefinition;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableProperty;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableStringProperty;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.google.auto.service.AutoService;
 import java.util.List;
 import java.util.Objects;

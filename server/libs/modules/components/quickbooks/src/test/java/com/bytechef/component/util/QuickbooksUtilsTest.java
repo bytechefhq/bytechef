@@ -19,8 +19,8 @@ package com.bytechef.component.util;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
-import com.bytechef.hermes.component.definition.Parameters;
 import com.intuit.ipp.core.Context;
 import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.security.OAuth2Authorizer;

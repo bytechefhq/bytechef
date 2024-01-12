@@ -16,8 +16,9 @@
 
 package com.bytechef.component.data.mapper;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.data.mapper.action.DataMapperMapKeysAction;
 import com.bytechef.component.data.mapper.action.DataMapperMapListToObjectAction;
 import com.bytechef.component.data.mapper.action.DataMapperMapMultipleValuesBetweenObjectsAction;
@@ -25,8 +26,7 @@ import com.bytechef.component.data.mapper.action.DataMapperMapObjectsAction;
 import com.bytechef.component.data.mapper.action.DataMapperMapObjectsToListAction;
 import com.bytechef.component.data.mapper.action.DataMapperMapOneValueAction;
 import com.bytechef.component.data.mapper.action.DataMapperMapValuesAction;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

@@ -16,13 +16,13 @@
 
 package com.bytechef.component.action;
 
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
-import com.bytechef.hermes.component.definition.Parameters;
 import com.intuit.ipp.core.IEntity;
 import com.intuit.ipp.services.DataService;
 import org.junit.jupiter.api.AfterEach;

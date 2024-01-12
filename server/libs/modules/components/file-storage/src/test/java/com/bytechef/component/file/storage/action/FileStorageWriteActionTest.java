@@ -20,9 +20,9 @@ import static com.bytechef.component.file.storage.constant.FileStorageConstants.
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.FILENAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.file.storage.FileStorageComponentHandlerTest;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Parameters;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import org.assertj.core.util.Files;

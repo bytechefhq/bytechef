@@ -28,8 +28,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateCustomerAction;
-import com.bytechef.hermes.component.definition.ActionContext;
 import com.intuit.ipp.data.Customer;
 import com.intuit.ipp.exception.FMSException;
 import org.junit.jupiter.api.Test;

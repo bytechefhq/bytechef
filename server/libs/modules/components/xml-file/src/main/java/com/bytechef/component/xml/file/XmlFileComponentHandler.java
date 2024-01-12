@@ -16,13 +16,13 @@
 
 package com.bytechef.component.xml.file;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.xml.file.action.XmlFileReadAction;
 import com.bytechef.component.xml.file.action.XmlFileWriteAction;
 import com.bytechef.component.xml.file.constant.XmlFileConstants;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

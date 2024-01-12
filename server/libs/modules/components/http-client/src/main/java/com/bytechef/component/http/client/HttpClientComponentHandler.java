@@ -16,8 +16,10 @@
 
 package com.bytechef.component.http.client;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.http.client.action.HttpClientDeleteAction;
 import com.bytechef.component.http.client.action.HttpClientGetAction;
 import com.bytechef.component.http.client.action.HttpClientHeadAction;
@@ -26,8 +28,6 @@ import com.bytechef.component.http.client.action.HttpClientPostAction;
 import com.bytechef.component.http.client.action.HttpClientPutAction;
 import com.bytechef.component.http.client.connection.HttpClientConnection;
 import com.bytechef.component.http.client.constant.HttpClientConstants;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

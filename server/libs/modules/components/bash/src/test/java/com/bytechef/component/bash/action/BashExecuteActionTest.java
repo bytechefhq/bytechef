@@ -21,8 +21,8 @@ package com.bytechef.component.bash.action;
 import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
 
 import com.bytechef.component.bash.BashComponentHandlerTest;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Assertions;

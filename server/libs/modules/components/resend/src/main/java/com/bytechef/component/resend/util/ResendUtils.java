@@ -18,9 +18,9 @@ package com.bytechef.component.resend.util;
 
 import static com.bytechef.component.resend.constant.ResendConstants.ATTACHMENTS;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.FileEntry;
+import com.bytechef.component.definition.Parameters;
 import com.resend.services.emails.model.Attachment;
 import java.util.ArrayList;
 import java.util.Base64;

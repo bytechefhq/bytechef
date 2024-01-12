@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
-import com.bytechef.hermes.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.UploadBuilder;
 import java.io.IOException;

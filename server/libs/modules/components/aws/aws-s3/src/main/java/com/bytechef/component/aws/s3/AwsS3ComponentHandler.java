@@ -17,16 +17,16 @@
 package com.bytechef.component.aws.s3;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.AWS_S3;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
+import static com.bytechef.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.aws.s3.action.AwsS3GetObjectAction;
 import com.bytechef.component.aws.s3.action.AwsS3GetUrlAction;
 import com.bytechef.component.aws.s3.action.AwsS3ListObjectsAction;
 import com.bytechef.component.aws.s3.action.AwsS3PresignGetObjectAction;
 import com.bytechef.component.aws.s3.action.AwsS3PutObjectAction;
 import com.bytechef.component.aws.s3.connection.AwsS3Connection;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

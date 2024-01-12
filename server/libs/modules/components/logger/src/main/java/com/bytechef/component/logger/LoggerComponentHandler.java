@@ -18,13 +18,13 @@ package com.bytechef.component.logger;
 
 import static com.bytechef.component.logger.constant.LoggerConstants.LOGGER;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.logger.action.LoggerDebugAction;
 import com.bytechef.component.logger.action.LoggerErrorAction;
 import com.bytechef.component.logger.action.LoggerInfoAction;
 import com.bytechef.component.logger.action.LoggerWarnAction;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

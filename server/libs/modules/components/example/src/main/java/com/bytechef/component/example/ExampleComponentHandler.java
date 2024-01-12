@@ -16,12 +16,12 @@
 
 package com.bytechef.component.example;
 
+import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.googledrive.constant.ExampleConstants.EXAMPLE;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.googledrive.action.ExampleDummyAction;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

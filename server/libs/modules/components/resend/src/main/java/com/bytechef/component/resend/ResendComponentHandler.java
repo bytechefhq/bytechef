@@ -16,13 +16,13 @@
 
 package com.bytechef.component.resend;
 
+import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.resend.constant.ResendConstants.RESEND;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.resend.action.ResendSendEmailAction;
 import com.bytechef.component.resend.connection.ResendConnection;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

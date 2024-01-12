@@ -16,21 +16,21 @@
 
 package com.bytechef.component.twilio.action;
 
+import static com.bytechef.component.definition.constant.AuthorizationConstants.PASSWORD;
+import static com.bytechef.component.definition.constant.AuthorizationConstants.USERNAME;
 import static com.bytechef.component.twilio.constant.TwilioConstants.ACCOUNT_SID;
 import static com.bytechef.component.twilio.constant.TwilioConstants.BODY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.FROM;
 import static com.bytechef.component.twilio.constant.TwilioConstants.MEDIA_URL;
 import static com.bytechef.component.twilio.constant.TwilioConstants.MESSAGING_SERVICE_SID;
 import static com.bytechef.component.twilio.constant.TwilioConstants.TO;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.PASSWORD;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.rest.api.v2010.account.MessageCreator;

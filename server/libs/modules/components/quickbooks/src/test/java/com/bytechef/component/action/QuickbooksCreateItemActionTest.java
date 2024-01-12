@@ -29,8 +29,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateItemAction;
-import com.bytechef.hermes.component.definition.ActionContext;
 import com.intuit.ipp.data.Item;
 import com.intuit.ipp.data.ItemTypeEnum;
 import com.intuit.ipp.data.ReferenceType;

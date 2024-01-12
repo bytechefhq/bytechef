@@ -16,16 +16,16 @@
 
 package com.bytechef.component.schedule;
 
+import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.SCHEDULE;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentDefinitionFactory;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.schedule.trigger.ScheduleCronTrigger;
 import com.bytechef.component.schedule.trigger.ScheduleEveryDayTrigger;
 import com.bytechef.component.schedule.trigger.ScheduleEveryMonthTrigger;
 import com.bytechef.component.schedule.trigger.ScheduleEveryWeekTrigger;
 import com.bytechef.component.schedule.trigger.ScheduleIntervalTrigger;
-import com.bytechef.hermes.component.ComponentDefinitionFactory;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import org.springframework.stereotype.Component;
 

@@ -16,6 +16,12 @@
 
 package com.bytechef.component.xlsx.file.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.FILE_ENTRY;
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.HEADER_ROW;
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.INCLUDE_EMPTY_CELLS;
@@ -23,23 +29,17 @@ import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.PAGE_N
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.PAGE_SIZE;
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.READ_AS_STRING;
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.SHEET_NAME;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.FileEntry;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
+import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.component.xlsx.file.constant.XlsxFileConstants;
 import com.bytechef.component.xlsx.file.constant.XlsxFileConstants.FileFormat;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.Context;
-import com.bytechef.hermes.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.hermes.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;

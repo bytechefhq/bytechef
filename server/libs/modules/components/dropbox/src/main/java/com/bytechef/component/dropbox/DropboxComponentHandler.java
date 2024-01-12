@@ -16,9 +16,11 @@
 
 package com.bytechef.component.dropbox;
 
+import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DROPBOX;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.dropbox.action.DropboxCopyAction;
 import com.bytechef.component.dropbox.action.DropboxCreateNewFolderAction;
 import com.bytechef.component.dropbox.action.DropboxCreateNewTextFileAction;
@@ -29,8 +31,6 @@ import com.bytechef.component.dropbox.action.DropboxMoveAction;
 import com.bytechef.component.dropbox.action.DropboxSearchAction;
 import com.bytechef.component.dropbox.action.DropboxUploadFileAction;
 import com.bytechef.component.dropbox.connection.DropboxConnection;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
