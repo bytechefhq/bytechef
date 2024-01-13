@@ -16,6 +16,8 @@
 
 package com.bytechef.component.twilio.action;
 
+import static com.bytechef.component.definition.Authorization.PASSWORD;
+import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.dateTime;
@@ -25,8 +27,6 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.PASSWORD;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.USERNAME;
 import static com.bytechef.component.twilio.constant.TwilioConstants.ACCOUNT_SID;
 import static com.bytechef.component.twilio.constant.TwilioConstants.ADDRESS_RETENTION;
 import static com.bytechef.component.twilio.constant.TwilioConstants.APPLICATION_SID;
@@ -59,8 +59,8 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.VALIDITY_PE
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.twilio.util.TwilioUtils;
-import com.bytechef.definition.BaseProperty;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
@@ -85,7 +85,7 @@ public class TwilioSendSMSAction {
                 .description(
                     "The recipient's phone number in E.164 format (for SMS/MMS) or channel address, e.g. " +
                         "whatsapp:+15552229999.")
-                .controlType(BaseProperty.ControlType.PHONE)
+                .controlType(Property.ControlType.PHONE)
                 .required(true),
             string(STATUS_CALLBACK)
                 .label("Status callback")
@@ -94,7 +94,7 @@ public class TwilioSendSMSAction {
                         "contain a valid hostname and underscores are not allowed. If you include this parameter " +
                         "with the messaging_service_sid, Twilio uses this URL instead of the Status Callback URL of " +
                         "the Messaging Service.")
-                .controlType(BaseProperty.ControlType.URL)
+                .controlType(Property.ControlType.URL)
                 .required(false),
             string(APPLICATION_SID)
                 .label("Application SID")

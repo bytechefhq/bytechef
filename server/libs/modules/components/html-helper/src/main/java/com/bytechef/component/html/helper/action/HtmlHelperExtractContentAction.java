@@ -31,9 +31,9 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
-import com.bytechef.definition.BaseProperty;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;
@@ -53,7 +53,7 @@ public class HtmlHelperExtractContentAction {
             string(CONTENT)
                 .label("HTML content to extract content from.")
                 .description("The HTML content.")
-                .controlType(BaseProperty.ControlType.TEXT_AREA)
+                .controlType(Property.ControlType.TEXT_AREA)
                 .required(true),
             string(QUERY_SELECTOR)
                 .label("CSS Selector")

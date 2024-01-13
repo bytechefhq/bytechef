@@ -16,7 +16,7 @@
 
 package com.bytechef.component.openai.action;
 
-import static com.bytechef.component.definition.constant.AuthorizationConstants.TOKEN;
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

@@ -16,11 +16,11 @@
 
 package com.bytechef.component.twilio.connection;
 
+import static com.bytechef.component.definition.Authorization.PASSWORD;
+import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.PASSWORD;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.USERNAME;
 
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;

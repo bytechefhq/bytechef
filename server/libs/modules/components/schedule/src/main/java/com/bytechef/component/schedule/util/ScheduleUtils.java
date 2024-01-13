@@ -17,7 +17,7 @@
 package com.bytechef.component.schedule.util;
 
 import com.bytechef.component.definition.ComponentDSL;
-import com.bytechef.definition.Option;
+import com.bytechef.component.definition.Option;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;

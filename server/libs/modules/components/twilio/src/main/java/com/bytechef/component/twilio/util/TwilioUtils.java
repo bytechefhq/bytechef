@@ -29,7 +29,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.definition.BaseProperty;
 import java.util.List;
 
 /**
@@ -88,7 +87,7 @@ public class TwilioUtils {
                         "Message. If you are using messaging_service_sid, this parameter can be empty (Twilio " +
                         "assigns a from value from the Messaging Service's Sender Pool) or you can provide a " +
                         "specific sender from your Sender Pool.")
-                .controlType(BaseProperty.ControlType.PHONE)
+                .controlType(Property.ControlType.PHONE)
                 .required(true);
         } else {
             stringProperty = string(MESSAGING_SERVICE_SID)

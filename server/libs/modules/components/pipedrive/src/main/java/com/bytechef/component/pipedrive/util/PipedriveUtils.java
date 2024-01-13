@@ -20,8 +20,8 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

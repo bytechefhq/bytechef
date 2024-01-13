@@ -16,12 +16,12 @@
 
 package com.bytechef.component.openai.action;
 
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.TOKEN;
 import static com.bytechef.component.openai.constant.OpenAIConstants.CREATE_SPEECH;
 import static com.bytechef.component.openai.constant.OpenAIConstants.INPUT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.MODEL;

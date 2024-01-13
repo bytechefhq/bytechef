@@ -16,7 +16,7 @@
 
 package com.bytechef.component.mailchimp;
 
-import static com.bytechef.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;

@@ -16,14 +16,14 @@
 
 package com.bytechef.component.mailchimp.util;
 
+import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.AUTHORIZATION;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource;
-import com.bytechef.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

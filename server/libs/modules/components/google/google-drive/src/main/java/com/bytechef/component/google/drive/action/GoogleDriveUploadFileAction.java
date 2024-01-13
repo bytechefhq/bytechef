@@ -28,10 +28,10 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.drive.util.GoogleUtils;
-import com.bytechef.definition.Option;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;

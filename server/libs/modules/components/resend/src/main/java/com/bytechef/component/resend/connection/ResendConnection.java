@@ -17,10 +17,10 @@
 package com.bytechef.component.resend.connection;
 
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.TOKEN;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 

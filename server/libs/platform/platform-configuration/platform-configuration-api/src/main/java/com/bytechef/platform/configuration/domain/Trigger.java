@@ -22,8 +22,8 @@ package com.bytechef.platform.configuration.domain;
 public interface Trigger {
     /**
      * Get the type of the trigger. Type strings are mapped to
-     * {@link com.bytechef.platform.worker.trigger.handler.TriggerHandler} implementations designed to handle that type of
-     * trigger.
+     * {@link com.bytechef.platform.worker.trigger.handler.TriggerHandler} implementations designed to handle that type
+     * of trigger.
      *
      * @return String
      */

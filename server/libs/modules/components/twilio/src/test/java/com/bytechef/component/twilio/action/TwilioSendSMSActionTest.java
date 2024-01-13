@@ -16,8 +16,8 @@
 
 package com.bytechef.component.twilio.action;
 
-import static com.bytechef.component.definition.constant.AuthorizationConstants.PASSWORD;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.USERNAME;
+import static com.bytechef.component.definition.Authorization.PASSWORD;
+import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.twilio.constant.TwilioConstants.ACCOUNT_SID;
 import static com.bytechef.component.twilio.constant.TwilioConstants.BODY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.FROM;

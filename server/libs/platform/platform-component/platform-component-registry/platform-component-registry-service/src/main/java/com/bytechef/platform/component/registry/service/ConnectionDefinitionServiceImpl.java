@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.component.registry.service;
 
-import static com.bytechef.component.definition.ConnectionDefinition.BaseUriFunction;
 import static com.bytechef.component.definition.Authorization.CODE;
+import static com.bytechef.component.definition.ConnectionDefinition.BaseUriFunction;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;

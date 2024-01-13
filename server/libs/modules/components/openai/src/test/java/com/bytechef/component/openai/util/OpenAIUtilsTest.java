@@ -25,10 +25,10 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property.OutputProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.openai.action.AbstractOpenAIActionTest;
-import com.bytechef.definition.Option;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;

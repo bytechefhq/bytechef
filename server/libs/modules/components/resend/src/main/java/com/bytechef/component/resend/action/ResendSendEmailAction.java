@@ -16,12 +16,12 @@
 
 package com.bytechef.component.resend.action;
 
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.TOKEN;
 import static com.bytechef.component.resend.constant.ResendConstants.ATTACHMENTS;
 import static com.bytechef.component.resend.constant.ResendConstants.BCC;
 import static com.bytechef.component.resend.constant.ResendConstants.CC;
@@ -43,8 +43,8 @@ import static com.bytechef.component.resend.constant.ResendConstants.VALUE;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.resend.util.ResendUtils;
-import com.bytechef.definition.BaseProperty;
 import com.resend.Resend;
 import com.resend.core.exception.ResendException;
 import com.resend.services.emails.model.Attachment;
@@ -66,7 +66,7 @@ public final class ResendSendEmailAction {
             string(FROM)
                 .label("From")
                 .description("Sender email address.")
-                .controlType(BaseProperty.ControlType.EMAIL)
+                .controlType(Property.ControlType.EMAIL)
                 .required(true),
             array(TO)
                 .label("To")
@@ -74,7 +74,7 @@ public final class ResendSendEmailAction {
                 .items(
                     string(EMAIL)
                         .label(EMAIL_ADDRESS)
-                        .controlType(BaseProperty.ControlType.EMAIL))
+                        .controlType(Property.ControlType.EMAIL))
                 .maxItems(50)
                 .required(true),
             string(SUBJECT)
@@ -87,7 +87,7 @@ public final class ResendSendEmailAction {
                 .items(
                     string(EMAIL)
                         .label(EMAIL_ADDRESS)
-                        .controlType(BaseProperty.ControlType.EMAIL))
+                        .controlType(Property.ControlType.EMAIL))
                 .required(false),
             array(CC)
                 .label("Cc")
@@ -95,7 +95,7 @@ public final class ResendSendEmailAction {
                 .items(
                     string(EMAIL)
                         .label(EMAIL_ADDRESS)
-                        .controlType(BaseProperty.ControlType.EMAIL))
+                        .controlType(Property.ControlType.EMAIL))
                 .required(false),
             array(REPLY_TO)
                 .label("Reply to")
@@ -103,7 +103,7 @@ public final class ResendSendEmailAction {
                 .items(
                     string(EMAIL)
                         .label(EMAIL_ADDRESS)
-                        .controlType(BaseProperty.ControlType.EMAIL))
+                        .controlType(Property.ControlType.EMAIL))
                 .required(false),
             string(HTML)
                 .label("HTML")

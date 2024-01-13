@@ -33,10 +33,10 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.OutputProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
-import com.bytechef.definition.Option;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.definition.BaseProperty;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -105,7 +104,7 @@ class TwilioUtilsTest {
                 "assigns a from value from the Messaging Service's Sender Pool) or you can provide a " +
                 "specific sender from your Sender Pool.",
             fromProperty.getDescription().get());
-        assertEquals(BaseProperty.ControlType.PHONE, fromProperty.getControlType());
+        assertEquals(Property.ControlType.PHONE, fromProperty.getControlType());
         assertEquals(true, fromProperty.getRequired().get());
     }
 

@@ -31,10 +31,10 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.PropertiesDataSource;
-import com.bytechef.definition.BaseProperty;
-import com.bytechef.definition.Option;
+import com.bytechef.component.definition.Property;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -101,18 +101,18 @@ public class AirtableUtils {
                         "duration" -> string(field.name());
                     case "checkbox" -> bool(field.name());
                     case "email" -> string(field.name())
-                        .controlType(BaseProperty.ControlType.EMAIL);
+                        .controlType(Property.ControlType.EMAIL);
                     case "multilineText" -> string(field.name())
-                        .controlType(BaseProperty.ControlType.TEXT_AREA);
+                        .controlType(Property.ControlType.TEXT_AREA);
                     case "multipleSelects" -> array(field.name())
                         .items(string())
                         .options(getOptions(field));
                     case "number" -> number(field.name());
                     case "phoneNumber" -> string(field.name())
-                        .controlType(BaseProperty.ControlType.PHONE);
+                        .controlType(Property.ControlType.PHONE);
                     case "singleSelect" -> string(field.name()).options(
                         getOptions(field));
-                    case "url" -> string(field.name()).controlType(BaseProperty.ControlType.URL);
+                    case "url" -> string(field.name()).controlType(Property.ControlType.URL);
                     default -> throw new IllegalArgumentException(
                         "Unknown Airtable field type='%s'".formatted(field.type()));
                 };

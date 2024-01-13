@@ -16,7 +16,7 @@
 
 package com.bytechef.component.resend.action;
 
-import static com.bytechef.component.definition.constant.AuthorizationConstants.TOKEN;
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.resend.constant.ResendConstants.BCC;
 import static com.bytechef.component.resend.constant.ResendConstants.CC;
 import static com.bytechef.component.resend.constant.ResendConstants.FROM;

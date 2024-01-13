@@ -16,7 +16,7 @@
 
 package com.bytechef.component.dropbox.action;
 
-import static com.bytechef.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.DESTINATION_FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.SOURCE_FILENAME;
 

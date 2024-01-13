@@ -17,13 +17,13 @@
 package com.bytechef.component.petstore.connection;
 
 import static com.bytechef.component.definition.Authorization.AuthorizationType;
+import static com.bytechef.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
+import static com.bytechef.component.definition.Authorization.KEY;
+import static com.bytechef.component.definition.Authorization.VALUE;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.CLIENT_ID;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.KEY;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.VALUE;
 
 import com.bytechef.component.definition.ComponentDSL;
 import java.util.List;

@@ -16,28 +16,27 @@
 
 package com.bytechef.component.http.client.connection;
 
+import static com.bytechef.component.definition.Authorization.ADD_TO;
+import static com.bytechef.component.definition.Authorization.AUTHORIZATION_URL;
+import static com.bytechef.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
+import static com.bytechef.component.definition.Authorization.HEADER_PREFIX;
+import static com.bytechef.component.definition.Authorization.KEY;
+import static com.bytechef.component.definition.Authorization.PASSWORD;
+import static com.bytechef.component.definition.Authorization.SCOPES;
+import static com.bytechef.component.definition.Authorization.TOKEN;
+import static com.bytechef.component.definition.Authorization.TOKEN_URL;
+import static com.bytechef.component.definition.Authorization.USERNAME;
+import static com.bytechef.component.definition.Authorization.VALUE;
 import static com.bytechef.component.definition.ComponentDSL.authorization;
 import static com.bytechef.component.definition.ComponentDSL.connection;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.ADD_TO;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.AUTHORIZATION_URL;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.CLIENT_ID;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.HEADER_PREFIX;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.KEY;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.PASSWORD;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.SCOPES;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.TOKEN;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.TOKEN_URL;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.USERNAME;
-import static com.bytechef.component.definition.constant.AuthorizationConstants.VALUE;
 
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.constant.AuthorizationConstants;
-import com.bytechef.definition.BaseProperty;
+import com.bytechef.component.definition.Property;
 
 public class HttpClientConnection {
 
@@ -52,7 +51,7 @@ public class HttpClientConnection {
                         string(KEY)
                             .label("Key")
                             .required(true)
-                            .defaultValue(AuthorizationConstants.API_TOKEN),
+                            .defaultValue(Authorization.API_TOKEN),
                         string(VALUE).label("Value")
                             .required(true),
                         string(ADD_TO)
@@ -111,11 +110,11 @@ public class HttpClientConnection {
                             .required(true),
                         string(HEADER_PREFIX)
                             .label("Header Prefix")
-                            .defaultValue(AuthorizationConstants.BEARER),
+                            .defaultValue(Authorization.BEARER),
                         string(SCOPES)
                             .label("Scopes")
                             .description("Optional comma-delimited list of scopes")
-                            .controlType(BaseProperty.ControlType.TEXT_AREA)),
+                            .controlType(Property.ControlType.TEXT_AREA)),
             authorization(
                 Authorization.AuthorizationType.OAUTH2_IMPLICIT_CODE
                     .name()
@@ -133,11 +132,11 @@ public class HttpClientConnection {
                             .required(true),
                         string(HEADER_PREFIX)
                             .label("Header Prefix")
-                            .defaultValue(AuthorizationConstants.BEARER),
+                            .defaultValue(Authorization.BEARER),
                         string(SCOPES)
                             .label("Scopes")
                             .description("Optional comma-delimited list of scopes")
-                            .controlType(BaseProperty.ControlType.TEXT_AREA)),
+                            .controlType(Property.ControlType.TEXT_AREA)),
             authorization(
                 Authorization.AuthorizationType.OAUTH2_CLIENT_CREDENTIALS
                     .name()
@@ -154,9 +153,9 @@ public class HttpClientConnection {
                             .required(true),
                         string(HEADER_PREFIX)
                             .label("Header Prefix")
-                            .defaultValue(AuthorizationConstants.BEARER),
+                            .defaultValue(Authorization.BEARER),
                         string(SCOPES)
                             .label("Scopes")
                             .description("Optional comma-delimited list of scopes")
-                            .controlType(BaseProperty.ControlType.TEXT_AREA)));
+                            .controlType(Property.ControlType.TEXT_AREA)));
 }

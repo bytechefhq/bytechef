@@ -35,10 +35,10 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.component.script.constant.ScriptConstants;
-import com.bytechef.definition.BaseProperty;
 
 /**
  * @author Matija Petanjek
@@ -58,7 +58,7 @@ public class ScriptRAction {
             string(SCRIPT)
                 .label("R code")
                 .description("Add your R custom logic here.")
-                .controlType(BaseProperty.ControlType.CODE_EDITOR)
+                .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
         .outputSchema(getOutputSchemaFunction())
         .sampleOutput(getSampleOutputFunction())
