@@ -19,8 +19,8 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.constant.AuthorizationConstants;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
@@ -237,7 +237,7 @@ public class HttpClientExecutorTest {
             headers, new HashMap<>(), configuration, "componentName", new ComponentConnection(1, Map.of(), null),
             Mockito.mock(Context.class));
 
-        Assertions.assertEquals(Map.of(AuthorizationConstants.API_TOKEN, List.of("token_value")), headers);
+        Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), headers);
 
 //        Mockito.when(context.fetchConnection())
 //            .thenReturn(
@@ -257,7 +257,7 @@ public class HttpClientExecutorTest {
             new HashMap<>(), queryParameters, configuration, "componentName",
             new ComponentConnection(1, Map.of(), null), Mockito.mock(Context.class));
 
-        Assertions.assertEquals(Map.of(AuthorizationConstants.API_TOKEN, List.of("token_value")), queryParameters);
+        Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), queryParameters);
 
 //        Mockito.when(context.fetchConnection())
 //            .thenReturn(

@@ -16,7 +16,6 @@
 
 package com.bytechef.component.definition;
 
-import com.bytechef.component.definition.constant.AuthorizationConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +26,26 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 public interface Authorization {
+
+    String ACCESS_TOKEN = "access_token";
+    String ADD_TO = "addTo";
+    String API_TOKEN = "api_token";
+    String AUTHORIZATION = "Authorization";
+    String AUTHORIZATION_URL = "authorizationUrl";
+    String BEARER = "Bearer";
+    String CLIENT_ID = "clientId";
+    String CLIENT_SECRET = "clientSecret";
+    String CODE = "code";
+    String HEADER_PREFIX = "headerPrefix";
+    String KEY = "key";
+    String PASSWORD = "password";
+    String REFRESH_TOKEN = "refresh_token";
+    String REFRESH_URL = "refreshUrl";
+    String SCOPES = "scopes";
+    String TOKEN = "token";
+    String TOKEN_URL = "tokenUrl";
+    String USERNAME = "username";
+    String VALUE = "value";
 
     /**
      *
@@ -378,8 +397,8 @@ public interface Authorization {
         public Map<String, Object> toMap() {
             Map<String, Object> map = new HashMap<>();
 
-            map.put(AuthorizationConstants.ACCESS_TOKEN, accessToken);
-            map.put(AuthorizationConstants.REFRESH_TOKEN, refreshToken);
+            map.put(ACCESS_TOKEN, accessToken);
+            map.put(REFRESH_TOKEN, refreshToken);
 
             map.putAll(additionalParameters);
 

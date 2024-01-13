@@ -20,9 +20,9 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationCallbackResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.component.definition.constant.AuthorizationConstants;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.facade.ConnectionDefinitionFacade;
@@ -89,7 +89,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         Connection connection = connectionDTO.toConnection();
 
         if (StringUtils.isNotBlank(connection.getAuthorizationName()) &&
-            connection.containsParameter(AuthorizationConstants.CODE)) {
+            connection.containsParameter(Authorization.CODE)) {
 
             // TODO add support for OAUTH2_AUTHORIZATION_CODE_PKCE
 

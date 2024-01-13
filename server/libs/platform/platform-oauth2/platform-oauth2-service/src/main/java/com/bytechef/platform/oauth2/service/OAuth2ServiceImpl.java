@@ -17,7 +17,7 @@
 package com.bytechef.platform.oauth2.service;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.definition.constant.AuthorizationConstants;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.platform.oauth2.config.OAuth2Properties;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ public class OAuth2ServiceImpl implements OAuth2Service {
     public Map<String, ?> checkPredefinedParameters(String componentName, Map<String, ?> parameters) {
         Map<String, Object> newParameters = new HashMap<>(parameters);
 
-        if (StringUtils.isBlank(MapUtils.getString(parameters, AuthorizationConstants.CLIENT_ID))) {
+        if (StringUtils.isBlank(MapUtils.getString(parameters, Authorization.CLIENT_ID))) {
             Map<String, OAuth2Properties.OAuth2App> oAuth2AppMap = oAuth2Properties.getPredefinedApps();
 
             if (oAuth2AppMap.containsKey(componentName)) {
@@ -51,8 +51,8 @@ public class OAuth2ServiceImpl implements OAuth2Service {
 
                 newParameters.putAll(
                     Map.of(
-                        AuthorizationConstants.CLIENT_ID, oAuth2App.clientId(),
-                        AuthorizationConstants.CLIENT_SECRET, oAuth2App.clientSecret()));
+                        Authorization.CLIENT_ID, oAuth2App.clientId(),
+                        Authorization.CLIENT_SECRET, oAuth2App.clientSecret()));
             } else {
                 throw new IllegalStateException(
                     "Component definition %s does not exist".formatted(componentName));
