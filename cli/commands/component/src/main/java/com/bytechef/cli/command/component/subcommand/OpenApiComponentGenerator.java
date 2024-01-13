@@ -16,7 +16,7 @@
 
 package com.bytechef.cli.command.component.subcommand;
 
-import com.bytechef.hermes.component.OpenApiComponentHandler;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -92,20 +92,18 @@ public class OpenApiComponentGenerator {
     private static final Logger logger = LoggerFactory.getLogger(OpenApiComponentGenerator.class);
 
     private static final ClassName AUTHORIZATION_CLASS_NAME = ClassName.get(
-        "com.bytechef.hermes.component.definition", "Authorization");
-    private static final ClassName AUTHORIZATION_CONSTANTS_CLASS_NAME = ClassName.get(
-        "com.bytechef.hermes.component.definition.constant", "AuthorizationConstants");
-    public static final String COM_BYTECHEF_HERMES_COMPONENT_PACKAGE = "com.bytechef.hermes.component";
+        "com.bytechef.component.definition", "Authorization");
+    public static final String COM_BYTECHEF_COMPONENT_PACKAGE = "com.bytechef.component";
     public static final ClassName COMPONENT_DEFINITION_CLASS_NAME = ClassName
-        .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDefinition");
+        .get(COM_BYTECHEF_COMPONENT_PACKAGE + ".definition", "ComponentDefinition");
     public static final ClassName CONNECTION_DEFINITION_CLASS_NAME = ClassName
-        .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ConnectionDefinition");
+        .get(COM_BYTECHEF_COMPONENT_PACKAGE + ".definition", "ConnectionDefinition");
     public static final ClassName COMPONENT_DSL_CLASS_NAME = ClassName
-        .get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE + ".definition", "ComponentDSL");
+        .get(COM_BYTECHEF_COMPONENT_PACKAGE + ".definition", "ComponentDSL");
     private static final ClassName CONTEXT_HTTP_CLASS = ClassName
-        .get("com.bytechef.hermes.component.definition", "Context", "Http");
+        .get("com.bytechef.component.definition", "Context", "Http");
     private static final ClassName OPEN_API_COMPONENT_HANDLER_CLASS = ClassName
-        .get("com.bytechef.hermes.component", "OpenApiComponentHandler");
+        .get("com.bytechef.component", "OpenApiComponentHandler");
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper() {
         {
             enable(SerializationFeature.INDENT_OUTPUT);
@@ -180,19 +178,20 @@ public class OpenApiComponentGenerator {
     }
 
     private JavaFile.Builder addStaticImport(JavaFile.Builder builder) {
-        return builder.addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "ADD_TO")
-            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "AUTHORIZATION_URL")
-            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "CLIENT_ID")
-            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "CLIENT_SECRET")
-            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "HEADER_PREFIX")
-            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "KEY")
-            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "PASSWORD")
-            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "REFRESH_URL")
-            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "SCOPES")
-            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "TOKEN")
-            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "TOKEN_URL")
-            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "USERNAME")
-            .addStaticImport(AUTHORIZATION_CONSTANTS_CLASS_NAME, "VALUE")
+        return builder
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "ADD_TO")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "AUTHORIZATION_URL")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "CLIENT_ID")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "CLIENT_SECRET")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "HEADER_PREFIX")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "KEY")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "PASSWORD")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "REFRESH_URL")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "SCOPES")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "TOKEN")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "TOKEN_URL")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "USERNAME")
+            .addStaticImport(AUTHORIZATION_CLASS_NAME, "VALUE")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "action")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "array")
             .addStaticImport(COMPONENT_DSL_CLASS_NAME, "authorization")
@@ -272,9 +271,7 @@ public class OpenApiComponentGenerator {
         List<String> javacOpts = new ArrayList<>();
 
         javacOpts.add("-classpath");
-        javacOpts.add(
-            "libs/auto-service-annotations-1.1.1.jar:libs/hermes-component-api-1.0.jar:" +
-                "libs/hermes-definition-api-1.0.jar");
+        javacOpts.add("libs/auto-service-annotations-1.1.1.jar:libs/component-api-1.0.jar");
 
         Path parentPath = sourcePath.getParent();
 
@@ -1749,7 +1746,7 @@ public class OpenApiComponentGenerator {
                     """)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addSuperinterface(
-                    ClassName.get(COM_BYTECHEF_HERMES_COMPONENT_PACKAGE, "OpenApiComponentHandler"))
+                    ClassName.get(COM_BYTECHEF_COMPONENT_PACKAGE, "OpenApiComponentHandler"))
                 .addField(FieldSpec.builder(COMPONENT_DEFINITION_CLASS_NAME, "componentDefinition")
                     .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
                     .initializer(getComponentCodeBlock(sourceDirPath))
@@ -1806,7 +1803,7 @@ public class OpenApiComponentGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .addField(FieldSpec.builder(
                     ClassName.get(
-                        "com.bytechef.hermes.component.definition",
+                        "com.bytechef.component.definition",
                         "ComponentDSL",
                         "ModifiableActionDefinition"),
                     "ACTION_DEFINITION")
@@ -1833,7 +1830,7 @@ public class OpenApiComponentGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .addField(FieldSpec.builder(
                     ClassName.get(
-                        "com.bytechef.hermes.component.definition",
+                        "com.bytechef.component.definition",
                         "ComponentDSL",
                         "ModifiableConnectionDefinition"),
                     "CONNECTION_DEFINITION")
@@ -1866,7 +1863,7 @@ public class OpenApiComponentGenerator {
                     .addAnnotation(
                         AnnotationSpec.builder(ClassName.get("com.google.auto.service", "AutoService"))
                             .addMember("value", "$T.class",
-                                ClassName.get("com.bytechef.hermes.component", "OpenApiComponentHandler"))
+                                ClassName.get("com.bytechef.component", "OpenApiComponentHandler"))
                             .build())
                     .addModifiers(Modifier.PUBLIC)
                     .superclass(ClassName.get(
@@ -1943,7 +1940,7 @@ public class OpenApiComponentGenerator {
                         ClassName.get("java.util", "List"),
                         ParameterizedTypeName.get(
                             ClassName.get(
-                                "com.bytechef.hermes.component.definition", "ComponentDSL", "ModifiableValueProperty"),
+                                "com.bytechef.component.definition", "ComponentDSL", "ModifiableValueProperty"),
                             WildcardTypeName.subtypeOf(Object.class), WildcardTypeName.subtypeOf(Object.class))),
                     "PROPERTIES")
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
