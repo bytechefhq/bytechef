@@ -58,6 +58,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:filesystem"))
     implementation(project(":server:libs:modules:components:google:google-calendar"))
     implementation(project(":server:libs:modules:components:google:google-drive"))
+    implementation(project(":server:libs:modules:components:google:google-mail"))
     implementation(project(":server:libs:modules:components:map"))
     implementation(project(":server:libs:modules:components:mailchimp"))
     implementation(project(":server:libs:modules:components:mysql"))
