@@ -3,7 +3,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
-import getInputType from '@/pages/automation/project/utils/getInputType';
+import getInputControlType from '@/pages/automation/project/utils/getInputControlType';
 import {PropertyType} from '@/types/projectTypes';
 import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
 import Editor from '@monaco-editor/react';
@@ -102,7 +102,7 @@ const Property = ({
 
     const isValidPropertyType = INPUT_PROPERTY_CONTROL_TYPES.includes(controlType!);
 
-    const isNumericalInput = getInputType(controlType) === 'number' || type === 'INTEGER' || type === 'NUMBER';
+    const isNumericalInput = type === 'INTEGER' || type === 'NUMBER';
 
     const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
 
@@ -204,7 +204,7 @@ const Property = ({
 
                 {showMentionInput && !!dataPills?.length && (
                     <MentionsInput
-                        controlType={controlType || getInputType(controlType)}
+                        controlType={controlType || getInputControlType(controlType)}
                         dataPills={dataPills}
                         defaultValue={defaultValue}
                         description={description}
@@ -303,7 +303,7 @@ const Property = ({
                                 ref={inputRef}
                                 required={required}
                                 title={type}
-                                type={hidden ? 'hidden' : getInputType(controlType)}
+                                type={hidden ? 'hidden' : getInputControlType(controlType)}
                                 value={isNumericalInput ? integerValue || defaultValue : defaultValue}
                             />
                         )}

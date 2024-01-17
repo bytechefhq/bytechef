@@ -1,4 +1,4 @@
-export default function getInputType(controlType: string | undefined) {
+export default function getInputControlType(controlType: string | undefined) {
     if (!controlType) {
         return 'text';
     }
