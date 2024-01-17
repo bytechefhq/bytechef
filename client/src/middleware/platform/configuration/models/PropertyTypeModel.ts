@@ -30,6 +30,7 @@ export const PropertyTypeModel = {
     Number: 'NUMBER',
     String: 'STRING',
     Object: 'OBJECT',
+    Task: 'TASK',
     Time: 'TIME'
 } as const;
 export type PropertyTypeModel = typeof PropertyTypeModel[keyof typeof PropertyTypeModel];

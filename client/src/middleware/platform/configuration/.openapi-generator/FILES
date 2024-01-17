@@ -42,6 +42,7 @@ models/TaskDispatcherDefinitionBasicModel.ts
 models/TaskDispatcherDefinitionModel.ts
 models/TaskDispatcherOperationRequestModel.ts
 models/TaskDispatcherOutputSchemaModel.ts
+models/TaskPropertyModel.ts
 models/TimePropertyModel.ts
 models/TriggerDefinitionBasicModel.ts
 models/TriggerDefinitionModel.ts

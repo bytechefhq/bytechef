@@ -22,13 +22,13 @@ export class DefaultApi extends runtime.BaseAPI {
 
     /**
      */
-    async getInfoRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async getDummyRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/`,
+            path: `/dummy`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -39,8 +39,8 @@ export class DefaultApi extends runtime.BaseAPI {
 
     /**
      */
-    async getInfo(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getInfoRaw(initOverrides);
+    async getDummy(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.getDummyRaw(initOverrides);
     }
 
 }

@@ -36,6 +36,7 @@ export * from './TaskDispatcherDefinitionBasicModel';
 export * from './TaskDispatcherDefinitionModel';
 export * from './TaskDispatcherOperationRequestModel';
 export * from './TaskDispatcherOutputSchemaModel';
+export * from './TaskPropertyModel';
 export * from './TimePropertyModel';
 export * from './TriggerDefinitionBasicModel';
 export * from './TriggerDefinitionModel';

@@ -43,7 +43,7 @@ export interface ValuePropertyModel extends PropertyModel {
      * @type {ControlTypeModel}
      * @memberof ValuePropertyModel
      */
-    controlType?: ControlTypeModel;
+    controlType: ControlTypeModel;
     /**
      * The property label.
      * @type {string}
@@ -63,6 +63,7 @@ export interface ValuePropertyModel extends PropertyModel {
  */
 export function instanceOfValuePropertyModel(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "controlType" in value;
 
     return isInstance;
 }
@@ -77,7 +78,7 @@ export function ValuePropertyModelFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         ...PropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'controlType': !exists(json, 'controlType') ? undefined : ControlTypeModelFromJSON(json['controlType']),
+        'controlType': ControlTypeModelFromJSON(json['controlType']),
         'label': !exists(json, 'label') ? undefined : json['label'],
         'placeholder': !exists(json, 'placeholder') ? undefined : json['placeholder'],
     };

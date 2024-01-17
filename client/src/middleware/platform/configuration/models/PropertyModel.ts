@@ -32,6 +32,7 @@ import {
      NumberPropertyModelFromJSONTyped,
      ObjectPropertyModelFromJSONTyped,
      StringPropertyModelFromJSONTyped,
+     TaskPropertyModelFromJSONTyped,
      TimePropertyModelFromJSONTyped
 } from './index';
 
@@ -141,6 +142,9 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         }
         if (json['type'] === 'STRING') {
             return StringPropertyModelFromJSONTyped(json, true);
+        }
+        if (json['type'] === 'TASK') {
+            return TaskPropertyModelFromJSONTyped(json, true);
         }
         if (json['type'] === 'TIME') {
             return TimePropertyModelFromJSONTyped(json, true);
