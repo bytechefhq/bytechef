@@ -21,14 +21,14 @@ import {
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ProjectInstanceModel, ProjectModel, TagModel} from '@/middleware/automation/configuration';
-import {useUpdateProjectInstanceTagsMutation} from '@/mutations/projectInstanceTags.mutations';
+import {useUpdateProjectInstanceTagsMutation} from '@/mutations/automation/projectInstanceTags.mutations';
 import {
     useDeleteProjectInstanceMutation,
     useEnableProjectInstanceMutation,
-} from '@/mutations/projectInstances.mutations';
+} from '@/mutations/automation/projectInstances.mutations';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
-import {ProjectInstanceTagKeys} from '@/queries/projectInstanceTags.queries';
-import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
+import {ProjectInstanceTagKeys} from '@/queries/automation/projectInstanceTags.queries';
+import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';

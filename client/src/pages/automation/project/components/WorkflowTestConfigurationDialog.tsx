@@ -17,11 +17,11 @@ import {WorkflowTestConfigurationModel} from '@/middleware/platform/workflow/tes
 import {
     useCreateWorkflowTestConfigurationMutation,
     useUpdateWorkflowTestConfigurationMutation,
-} from '@/mutations/workflowTestConfigurations.mutations';
+} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import ConnectionDialog from '@/pages/automation/connections/components/ConnectionDialog';
-import {useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
-import {useGetConnectionsQuery} from '@/queries/connections.queries';
-import {WorkflowTestConfigurationKeys} from '@/queries/workflowTestConfigurations.queries';
+import {useGetConnectionsQuery} from '@/queries/automation/connections.queries';
+import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
+import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
 import {PropertyType} from '@/types/projectTypes';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import * as Portal from '@radix-ui/react-portal';

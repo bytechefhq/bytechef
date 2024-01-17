@@ -19,10 +19,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ConnectionModel, TagModel} from '@/middleware/automation/connection';
-import {useUpdateConnectionTagsMutation} from '@/mutations/connectionTags.mutations';
-import {useDeleteConnectionMutation} from '@/mutations/connections.mutations';
-import {ComponentDefinitionKeys, useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
-import {ConnectionKeys} from '@/queries/connections.queries';
+import {useUpdateConnectionTagsMutation} from '@/mutations/automation/connectionTags.mutations';
+import {useDeleteConnectionMutation} from '@/mutations/automation/connections.mutations';
+import {ConnectionKeys} from '@/queries/automation/connections.queries';
+import {ComponentDefinitionKeys, useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
 import {Component1Icon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';

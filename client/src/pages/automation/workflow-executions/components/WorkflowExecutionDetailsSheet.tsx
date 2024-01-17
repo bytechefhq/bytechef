@@ -1,5 +1,5 @@
 import {Sheet, SheetContent} from '@/components/ui/sheet';
-import {useGetWorkflowExecutionQuery} from '@/queries/workflowExecutions.queries';
+import {useGetWorkflowExecutionQuery} from '@/queries/automation/workflowExecutions.queries';
 
 import useWorkflowExecutionDetailsDialogStore from '../stores/useWorkflowExecutionDetailsDialogStore';
 import WorkflowExecutionDetailsAccordion from './WorkflowExecutionDetailsAccordion';

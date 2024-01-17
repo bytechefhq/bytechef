@@ -1,10 +1,10 @@
 import Input from '@/components/Input/Input';
 import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
-import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
+import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowNodesTabs from '@/pages/automation/project/components/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import getFormattedName from '@/pages/automation/project/utils/getFormattedName';
-import {ProjectKeys} from '@/queries/projects.queries';
+import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {ClickedItemType} from '@/types/types';
 import getRandomId from '@/utils/getRandomId';
 import {Component1Icon} from '@radix-ui/react-icons';

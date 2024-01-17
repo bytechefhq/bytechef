@@ -10,8 +10,11 @@ import Properties from 'components/Properties/Properties';
 import {
     useGetComponentActionDefinitionQuery,
     useGetComponentActionOutputSchemaQuery,
-} from 'queries/actionDefinitions.queries';
-import {useGetComponentDefinitionQuery, useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
+} from 'queries/platform/actionDefinitions.queries';
+import {
+    useGetComponentDefinitionQuery,
+    useGetComponentDefinitionsQuery,
+} from 'queries/platform/componentDefinitions.queries';
 import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 

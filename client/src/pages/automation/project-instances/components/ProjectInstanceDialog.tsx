@@ -9,13 +9,16 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
-import {ProjectInstanceTagKeys} from '@/queries/projectInstanceTags.queries';
-import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
-import {ProjectKeys} from '@/queries/projects.queries';
+import {ProjectInstanceTagKeys} from '@/queries/automation/projectInstanceTags.queries';
+import {ProjectInstanceKeys} from '@/queries/automation/projectInstances.queries';
+import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {ProjectInstanceModel} from 'middleware/automation/configuration';
-import {useCreateProjectInstanceMutation, useUpdateProjectInstanceMutation} from 'mutations/projectInstances.mutations';
+import {
+    useCreateProjectInstanceMutation,
+    useUpdateProjectInstanceMutation,
+} from 'mutations/automation/projectInstances.mutations';
 import {MouseEvent, ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';

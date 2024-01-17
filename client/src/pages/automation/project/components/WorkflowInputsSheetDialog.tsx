@@ -14,8 +14,8 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
-import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
-import {ProjectKeys} from '@/queries/projects.queries';
+import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
+import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {WorkflowDefinition} from '@/types/types';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';

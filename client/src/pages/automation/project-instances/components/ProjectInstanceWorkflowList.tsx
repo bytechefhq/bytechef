@@ -1,9 +1,9 @@
 import {ProjectInstanceWorkflowModel} from '@/middleware/automation/configuration';
 import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
 import ProjectInstanceWorkflowListItem from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowListItem';
-import {useGetProjectWorkflowsQuery} from '@/queries/projects.queries';
-import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
-import {useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
+import {useGetProjectWorkflowsQuery} from '@/queries/automation/projects.queries';
+import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
+import {useGetComponentDefinitionsQuery} from 'queries/platform/componentDefinitions.queries';
 
 const ProjectInstanceWorkflowList = ({
     projectId,

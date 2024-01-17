@@ -31,17 +31,17 @@ import {RightSidebar} from '@/layouts/RightSidebar';
 import {ProjectModel} from '@/middleware/automation/configuration';
 import {WorkflowModel} from '@/middleware/platform/configuration';
 import {WorkflowTestApi, WorkflowTestExecutionModel} from '@/middleware/platform/workflow/test';
-import {useCreateProjectWorkflowMutation} from '@/mutations/projectWorkflows.mutations';
+import {useCreateProjectWorkflowMutation} from '@/mutations/automation/projectWorkflows.mutations';
 import {
     useDeleteProjectMutation,
     useDuplicateProjectMutation,
     usePublishProjectMutation,
-} from '@/mutations/projects.mutations';
+} from '@/mutations/automation/projects.mutations';
 import {
     useDeleteWorkflowMutation,
     useDuplicateWorkflowMutation,
     useUpdateWorkflowMutation,
-} from '@/mutations/workflows.mutations';
+} from '@/mutations/automation/workflows.mutations';
 import WorkflowCodeEditorSheet from '@/pages/automation/project/components/WorkflowCodeEditorSheet';
 import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
 import WorkflowInputsSheet from '@/pages/automation/project/components/WorkflowInputsSheet';
@@ -51,12 +51,12 @@ import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowD
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import WorkflowExecutionDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordion';
-import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
-import {ProjectCategoryKeys} from '@/queries/projectCategories.queries';
-import {ProjectTagKeys} from '@/queries/projectTags.quries';
-import {ProjectKeys, useGetProjectQuery, useGetProjectWorkflowsQuery} from '@/queries/projects.queries';
-import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';
-import {useGetWorkflowTestConfigurationsQuery} from '@/queries/workflowTestConfigurations.queries';
+import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
+import {ProjectTagKeys} from '@/queries/automation/projectTags.quries';
+import {ProjectKeys, useGetProjectQuery, useGetProjectWorkflowsQuery} from '@/queries/automation/projects.queries';
+import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
+import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
+import {useGetWorkflowTestConfigurationsQuery} from '@/queries/platform/workflowTestConfigurations.queries';
 import {ChevronDownIcon, DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {

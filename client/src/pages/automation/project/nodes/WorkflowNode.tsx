@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
-import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
+import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowNodesPopoverMenu from '@/pages/automation/project/components/WorkflowNodesPopoverMenu';
-import {ProjectKeys} from '@/queries/projects.queries';
+import {ProjectKeys} from '@/queries/automation/projects.queries';
 import {WorkflowDefinition} from '@/types/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {PencilIcon, TrashIcon} from 'lucide-react';

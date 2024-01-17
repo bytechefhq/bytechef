@@ -2,8 +2,8 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
-import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
-import {useGetConnectionTagsQuery, useGetConnectionsQuery} from '@/queries/connections.queries';
+import {useGetConnectionTagsQuery, useGetConnectionsQuery} from '@/queries/automation/connections.queries';
+import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
 import {Link2Icon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
@@ -18,7 +18,7 @@ export enum Type {
     Tag,
 }
 
-const Connections = () => {
+export const Connections = () => {
     const [searchParams] = useSearchParams();
 
     const defaultCurrentState = {
@@ -62,8 +62,9 @@ const Connections = () => {
     let pageTitle: string | undefined;
 
     if (filterData.type === Type.Component) {
-        pageTitle = componentDefinitions?.find((componentDefinition) => componentDefinition.name === filterData.id)
-            ?.title;
+        pageTitle = componentDefinitions?.find(
+            (componentDefinition) => componentDefinition.name === filterData.id
+        )?.title;
     } else {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
@@ -166,5 +167,3 @@ const Connections = () => {
         </LayoutContainer>
     );
 };
-
-export default Connections;

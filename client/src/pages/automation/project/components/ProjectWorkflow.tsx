@@ -6,8 +6,8 @@ import 'reactflow/dist/base.css';
 
 import './ProjectWorkflow.css';
 
-import {useGetActionDefinitionsQuery} from '@/queries/actionDefinitions.queries';
-import {useGetComponentDefinitionsQuery} from '@/queries/componentDefinitions.queries';
+import {useGetActionDefinitionsQuery} from '@/queries/platform/actionDefinitions.queries';
+import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';

@@ -3,8 +3,8 @@ import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/shee
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {toast} from '@/components/ui/use-toast';
 import {WorkflowModel} from '@/middleware/automation/configuration';
-import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
-import {ProjectKeys} from '@/queries/projects.queries';
+import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
+import {ProjectKeys} from '@/queries/automation/projects.queries';
 import Editor from '@monaco-editor/react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';

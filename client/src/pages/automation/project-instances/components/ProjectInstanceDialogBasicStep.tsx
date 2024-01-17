@@ -2,8 +2,8 @@ import ComboBox, {ComboBoxItemType} from '@/components/ComboBox';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
-import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstanceTags.queries';
-import {useGetProjectsQuery} from '@/queries/projects.queries';
+import {useGetProjectInstanceTagsQuery} from '@/queries/automation/projectInstanceTags.queries';
+import {useGetProjectsQuery} from '@/queries/automation/projects.queries';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import {ProjectInstanceModel, ProjectModel} from 'middleware/automation/configuration';
 import {

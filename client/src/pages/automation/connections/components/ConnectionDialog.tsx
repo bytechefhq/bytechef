@@ -18,7 +18,7 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {TokenPayload} from '@/pages/automation/connections/oauth2/useOAuth2';
-import {useGetOAuth2AuthorizationParametersQuery, useGetOAuth2PropertiesQuery} from '@/queries/oauth2.queries';
+import {useGetOAuth2AuthorizationParametersQuery, useGetOAuth2PropertiesQuery} from '@/queries/platform/oauth2.queries';
 import {Cross2Icon, QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
@@ -31,10 +31,13 @@ import {
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
 } from 'middleware/platform/configuration';
-import {useCreateConnectionMutation, useUpdateConnectionMutation} from 'mutations/connections.mutations';
-import {ComponentDefinitionKeys, useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
-import {useGetConnectionDefinitionQuery, useGetConnectionDefinitionsQuery} from 'queries/connectionDefinitions.queries';
-import {ConnectionKeys, useGetConnectionTagsQuery} from 'queries/connections.queries';
+import {useCreateConnectionMutation, useUpdateConnectionMutation} from 'mutations/automation/connections.mutations';
+import {ConnectionKeys, useGetConnectionTagsQuery} from 'queries/automation/connections.queries';
+import {ComponentDefinitionKeys, useGetComponentDefinitionsQuery} from 'queries/platform/componentDefinitions.queries';
+import {
+    useGetConnectionDefinitionQuery,
+    useGetConnectionDefinitionsQuery,
+} from 'queries/platform/connectionDefinitions.queries';
 import {ReactNode, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 

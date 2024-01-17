@@ -8,16 +8,16 @@ import LayoutContainer from '@/layouts/LayoutContainer';
 import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
 import {ProjectModel} from '@/middleware/automation/configuration';
-import {useGetProjectInstancesQuery} from '@/queries/projectInstances.queries';
-import {useGetWorkflowExecutionsQuery} from '@/queries/workflowExecutions.queries';
-import {useGetWorkflowsQuery} from '@/queries/workflows.queries';
+import {useGetProjectInstancesQuery} from '@/queries/automation/projectInstances.queries';
+import {useGetWorkflowExecutionsQuery} from '@/queries/automation/workflowExecutions.queries';
+import {useGetWorkflowsQuery} from '@/queries/automation/workflows.queries';
 import {ActivityIcon} from 'lucide-react';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
     WorkflowExecutionModel,
     WorkflowExecutionModelFromJSON,
 } from 'middleware/automation/workflow/execution';
-import {useGetProjectsQuery} from 'queries/projects.queries';
+import {useGetProjectsQuery} from 'queries/automation/projects.queries';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
@@ -55,7 +55,7 @@ const ProjectLabel = ({project}: {project: ProjectModel}) => (
     </div>
 );
 
-const WorkflowExecutions = () => {
+export const WorkflowExecutions = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
@@ -369,5 +369,3 @@ const WorkflowExecutions = () => {
         </LayoutContainer>
     );
 };
-
-export default WorkflowExecutions;

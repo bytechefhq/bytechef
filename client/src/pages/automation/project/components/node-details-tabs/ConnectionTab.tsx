@@ -1,17 +1,17 @@
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {useUpdateWorkflowTestConfigurationConnectionMutation} from '@/mutations/workflowTestConfigurations.mutations';
+import {useUpdateWorkflowTestConfigurationConnectionMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import {
     WorkflowTestConfigurationKeys,
     useGetWorkflowTestConfigurationConnectionsQuery,
-} from '@/queries/workflowTestConfigurations.queries';
+} from '@/queries/platform/workflowTestConfigurations.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import EmptyList from 'components/EmptyList';
 import {LinkIcon, PlusIcon} from 'lucide-react';
 import {ComponentDefinitionModel} from 'middleware/platform/configuration';
 import ConnectionDialog from 'pages/automation/connections/components/ConnectionDialog';
-import {useGetConnectionsQuery} from 'queries/connections.queries';
+import {useGetConnectionsQuery} from 'queries/automation/connections.queries';
 import {useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
