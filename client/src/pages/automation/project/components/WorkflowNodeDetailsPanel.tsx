@@ -177,7 +177,9 @@ const WorkflowNodeDetailsPanel = ({
         !!currentActionDefinition?.outputSchemaDataSource && activeTab === 'output'
     );
 
-    const connectionKey = workflow.tasks?.filter((task) => task.name === currentNode.name)[0]?.connections![0]?.key;
+    const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode.name);
+
+    const connectionKey = currentWorkflowTask?.connections?.[0]?.key;
 
     const getExistingProperties = (properties: Array<PropertyType>): Array<PropertyType> =>
         properties.filter((property) => {
