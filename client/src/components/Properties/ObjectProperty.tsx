@@ -27,7 +27,7 @@ const ObjectProperty = ({
 }: ObjectPropertyProps) => {
     const [additionalPropertiesDialogOpen, setAdditionalPropertiesDialogOpen] = useState(false);
 
-    const {additionalProperties, label, name, properties, type} = property;
+    const {additionalProperties, label, multipleValues, name, objectType, properties} = property;
 
     if (type === 'FILE_ENTRY' && dataPills?.length) {
         return (
@@ -80,7 +80,7 @@ const ObjectProperty = ({
                 })}
             </ul>
 
-            {!!additionalProperties?.length && (
+            {!!additionalProperties?.length && multipleValues && (
                 <div className={twMerge(!!properties?.length && 'mt-2', 'relative w-full self-start')}>
                     <Button
                         className="rounded-sm bg-gray-100 text-xs font-medium hover:bg-gray-200"
