@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-15T17:51:13.706642+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-17T06:47:46.507285+01:00[Europe/Zagreb]")
 public class TaskDispatcherDefinitionModel {
 
   private String description;
@@ -37,6 +37,8 @@ public class TaskDispatcherDefinitionModel {
   private String name;
 
   private TaskDispatcherOutputSchemaModel outputSchema;
+
+  private Boolean outputSchemaDataSource;
 
   @Valid
   private List<@Valid PropertyModel> properties;
@@ -50,6 +52,8 @@ public class TaskDispatcherDefinitionModel {
 
   @Valid
   private List<@Valid PropertyModel> variableProperties;
+
+  private Boolean variablePropertiesDataSource;
 
   private Integer version;
 
@@ -143,6 +147,26 @@ public class TaskDispatcherDefinitionModel {
 
   public void setOutputSchema(TaskDispatcherOutputSchemaModel outputSchema) {
     this.outputSchema = outputSchema;
+  }
+
+  public TaskDispatcherDefinitionModel outputSchemaDataSource(Boolean outputSchemaDataSource) {
+    this.outputSchemaDataSource = outputSchemaDataSource;
+    return this;
+  }
+
+  /**
+   * Does task dispatcher has defined dynamic output schema.
+   * @return outputSchemaDataSource
+  */
+  
+  @Schema(name = "outputSchemaDataSource", description = "Does task dispatcher has defined dynamic output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputSchemaDataSource")
+  public Boolean getOutputSchemaDataSource() {
+    return outputSchemaDataSource;
+  }
+
+  public void setOutputSchemaDataSource(Boolean outputSchemaDataSource) {
+    this.outputSchemaDataSource = outputSchemaDataSource;
   }
 
   public TaskDispatcherDefinitionModel properties(List<@Valid PropertyModel> properties) {
@@ -269,6 +293,26 @@ public class TaskDispatcherDefinitionModel {
     this.variableProperties = variableProperties;
   }
 
+  public TaskDispatcherDefinitionModel variablePropertiesDataSource(Boolean variablePropertiesDataSource) {
+    this.variablePropertiesDataSource = variablePropertiesDataSource;
+    return this;
+  }
+
+  /**
+   * Does task dispatcher has defined dynamic variable properties.
+   * @return variablePropertiesDataSource
+  */
+  
+  @Schema(name = "variablePropertiesDataSource", description = "Does task dispatcher has defined dynamic variable properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("variablePropertiesDataSource")
+  public Boolean getVariablePropertiesDataSource() {
+    return variablePropertiesDataSource;
+  }
+
+  public void setVariablePropertiesDataSource(Boolean variablePropertiesDataSource) {
+    this.variablePropertiesDataSource = variablePropertiesDataSource;
+  }
+
   public TaskDispatcherDefinitionModel version(Integer version) {
     this.version = version;
     return this;
@@ -302,17 +346,19 @@ public class TaskDispatcherDefinitionModel {
         Objects.equals(this.icon, taskDispatcherDefinition.icon) &&
         Objects.equals(this.name, taskDispatcherDefinition.name) &&
         Objects.equals(this.outputSchema, taskDispatcherDefinition.outputSchema) &&
+        Objects.equals(this.outputSchemaDataSource, taskDispatcherDefinition.outputSchemaDataSource) &&
         Objects.equals(this.properties, taskDispatcherDefinition.properties) &&
         Objects.equals(this.resources, taskDispatcherDefinition.resources) &&
         Objects.equals(this.taskProperties, taskDispatcherDefinition.taskProperties) &&
         Objects.equals(this.title, taskDispatcherDefinition.title) &&
         Objects.equals(this.variableProperties, taskDispatcherDefinition.variableProperties) &&
+        Objects.equals(this.variablePropertiesDataSource, taskDispatcherDefinition.variablePropertiesDataSource) &&
         Objects.equals(this.version, taskDispatcherDefinition.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, icon, name, outputSchema, properties, resources, taskProperties, title, variableProperties, version);
+    return Objects.hash(description, icon, name, outputSchema, outputSchemaDataSource, properties, resources, taskProperties, title, variableProperties, variablePropertiesDataSource, version);
   }
 
   @Override
@@ -323,11 +369,13 @@ public class TaskDispatcherDefinitionModel {
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
+    sb.append("    outputSchemaDataSource: ").append(toIndentedString(outputSchemaDataSource)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
     sb.append("    taskProperties: ").append(toIndentedString(taskProperties)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    variableProperties: ").append(toIndentedString(variableProperties)).append("\n");
+    sb.append("    variablePropertiesDataSource: ").append(toIndentedString(variablePropertiesDataSource)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();

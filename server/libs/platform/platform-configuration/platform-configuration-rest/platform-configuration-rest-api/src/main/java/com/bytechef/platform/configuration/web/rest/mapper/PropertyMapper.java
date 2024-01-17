@@ -45,9 +45,12 @@ import com.bytechef.platform.configuration.web.rest.model.ObjectPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.OptionsDataSourceModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.StringPropertyModel;
+import com.bytechef.platform.configuration.web.rest.model.TaskPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.TimePropertyModel;
 import java.util.Collections;
 import java.util.List;
+
+import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskProperty;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
@@ -190,8 +193,9 @@ public class PropertyMapper {
         }
 
         @Override
-        default DatePropertyModel
-            visit(com.bytechef.platform.workflow.task.dispatcher.registry.domain.DateProperty dateProperty) {
+        default DatePropertyModel visit(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.DateProperty dateProperty) {
+
             return map(dateProperty);
         }
 
@@ -244,6 +248,13 @@ public class PropertyMapper {
         }
 
         @Override
+        default TaskPropertyModel visit(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskProperty taskProperty) {
+
+            return map(taskProperty);
+        }
+
+        @Override
         default TimePropertyModel visit(
             com.bytechef.platform.workflow.task.dispatcher.registry.domain.TimeProperty timeProperty) {
 
@@ -285,6 +296,8 @@ public class PropertyMapper {
         @Mapping(target = "optionsDataSource", ignore = true)
         StringPropertyModel map(
             com.bytechef.platform.workflow.task.dispatcher.registry.domain.StringProperty stringProperty);
+
+        TaskPropertyModel map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskProperty taskProperty);
 
         @Mapping(target = "optionsDataSource", ignore = true)
         TimePropertyModel map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.TimeProperty timeProperty);

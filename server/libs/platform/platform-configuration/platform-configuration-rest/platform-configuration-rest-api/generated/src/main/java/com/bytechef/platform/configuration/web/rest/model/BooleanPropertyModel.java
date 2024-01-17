@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "BooleanProperty", description = "A boolean property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-15T17:51:13.706642+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-17T06:47:46.507285+01:00[Europe/Zagreb]")
 public class BooleanPropertyModel extends ValuePropertyModel {
 
   private Boolean defaultValue;
@@ -41,6 +41,17 @@ public class BooleanPropertyModel extends ValuePropertyModel {
 
   @Valid
   private List<@Valid OptionModel> options;
+
+  public BooleanPropertyModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public BooleanPropertyModel(ControlTypeModel controlType) {
+    super(controlType);
+  }
 
   public BooleanPropertyModel defaultValue(Boolean defaultValue) {
     this.defaultValue = defaultValue;

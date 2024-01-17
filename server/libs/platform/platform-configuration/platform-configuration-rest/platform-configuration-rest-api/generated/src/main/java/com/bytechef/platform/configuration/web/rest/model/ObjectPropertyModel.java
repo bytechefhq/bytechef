@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ObjectProperty", description = "An object property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-15T17:51:13.706642+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-17T06:47:46.507285+01:00[Europe/Zagreb]")
 public class ObjectPropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -53,6 +53,17 @@ public class ObjectPropertyModel extends ValuePropertyModel {
 
   @Valid
   private List<@Valid PropertyModel> properties;
+
+  public ObjectPropertyModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public ObjectPropertyModel(ControlTypeModel controlType) {
+    super(controlType);
+  }
 
   public ObjectPropertyModel additionalProperties(List<@Valid PropertyModel> additionalProperties) {
     this.additionalProperties = additionalProperties;

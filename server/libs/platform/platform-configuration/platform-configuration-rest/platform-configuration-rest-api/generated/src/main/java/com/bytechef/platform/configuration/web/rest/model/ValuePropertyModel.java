@@ -44,10 +44,11 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NUMBER"),
   @JsonSubTypes.Type(value = ObjectPropertyModel.class, name = "OBJECT"),
   @JsonSubTypes.Type(value = StringPropertyModel.class, name = "STRING"),
+  @JsonSubTypes.Type(value = TaskPropertyModel.class, name = "TASK"),
   @JsonSubTypes.Type(value = TimePropertyModel.class, name = "TIME")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-15T17:51:13.706642+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-17T06:47:46.507285+01:00[Europe/Zagreb]")
 public class ValuePropertyModel extends PropertyModel {
 
   private ControlTypeModel controlType;
@@ -55,6 +56,18 @@ public class ValuePropertyModel extends PropertyModel {
   private String label;
 
   private String placeholder;
+
+  public ValuePropertyModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public ValuePropertyModel(ControlTypeModel controlType) {
+    super();
+    this.controlType = controlType;
+  }
 
   public ValuePropertyModel controlType(ControlTypeModel controlType) {
     this.controlType = controlType;
@@ -65,8 +78,8 @@ public class ValuePropertyModel extends PropertyModel {
    * Get controlType
    * @return controlType
   */
-  @Valid 
-  @Schema(name = "controlType", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull @Valid 
+  @Schema(name = "controlType", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("controlType")
   public ControlTypeModel getControlType() {
     return controlType;

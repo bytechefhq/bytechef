@@ -43,6 +43,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherD
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherOperationRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherOutputSchemaModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TimePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionModel.java

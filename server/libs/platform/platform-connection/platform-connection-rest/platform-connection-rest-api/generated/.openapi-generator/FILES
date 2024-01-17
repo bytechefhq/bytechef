@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 README.md
 pom.xml
 src/main/java/com/bytechef/platform/connection/web/rest/ApiUtil.java

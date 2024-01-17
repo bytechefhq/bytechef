@@ -2,9 +2,8 @@ package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.platform.configuration.web.rest.model.ControlTypeModel;
+import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyTypeModel;
-import com.bytechef.platform.configuration.web.rest.model.ValuePropertyModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,77 +22,68 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A null property type.
+ * A task property used in task dispatchers.
  */
 
-@Schema(name = "NullProperty", description = "A null property type.")
+@Schema(name = "TaskProperty", description = "A task property used in task dispatchers.")
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-17T06:47:46.507285+01:00[Europe/Zagreb]")
-public class NullPropertyModel extends ValuePropertyModel {
+public class TaskPropertyModel extends PropertyModel {
 
-  public NullPropertyModel() {
-    super();
+  private String name;
+
+  public TaskPropertyModel name(String name) {
+    this.name = name;
+    return this;
   }
 
   /**
-   * Constructor with only required parameters
-   */
-  public NullPropertyModel(ControlTypeModel controlType) {
-    super(controlType);
+   * The task name.
+   * @return name
+  */
+  
+  @Schema(name = "name", description = "The task name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("name")
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
 
-  public NullPropertyModel controlType(ControlTypeModel controlType) {
-    super.controlType(controlType);
-    return this;
-  }
-
-  public NullPropertyModel label(String label) {
-    super.label(label);
-    return this;
-  }
-
-  public NullPropertyModel placeholder(String placeholder) {
-    super.placeholder(placeholder);
-    return this;
-  }
-
-  public NullPropertyModel advancedOption(Boolean advancedOption) {
+  public TaskPropertyModel advancedOption(Boolean advancedOption) {
     super.advancedOption(advancedOption);
     return this;
   }
 
-  public NullPropertyModel description(String description) {
+  public TaskPropertyModel description(String description) {
     super.description(description);
     return this;
   }
 
-  public NullPropertyModel displayCondition(String displayCondition) {
+  public TaskPropertyModel displayCondition(String displayCondition) {
     super.displayCondition(displayCondition);
     return this;
   }
 
-  public NullPropertyModel expressionEnabled(Boolean expressionEnabled) {
+  public TaskPropertyModel expressionEnabled(Boolean expressionEnabled) {
     super.expressionEnabled(expressionEnabled);
     return this;
   }
 
-  public NullPropertyModel hidden(Boolean hidden) {
+  public TaskPropertyModel hidden(Boolean hidden) {
     super.hidden(hidden);
     return this;
   }
 
-  public NullPropertyModel name(String name) {
-    super.name(name);
-    return this;
-  }
-
-  public NullPropertyModel required(Boolean required) {
+  public TaskPropertyModel required(Boolean required) {
     super.required(required);
     return this;
   }
 
-  public NullPropertyModel type(PropertyTypeModel type) {
+  public TaskPropertyModel type(PropertyTypeModel type) {
     super.type(type);
     return this;
   }
@@ -105,19 +95,22 @@ public class NullPropertyModel extends ValuePropertyModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    return true;
+    TaskPropertyModel taskProperty = (TaskPropertyModel) o;
+    return Objects.equals(this.name, taskProperty.name) &&
+        super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode());
+    return Objects.hash(name, super.hashCode());
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class NullPropertyModel {\n");
+    sb.append("class TaskPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
     return sb.toString();
   }
