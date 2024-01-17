@@ -1470,6 +1470,7 @@ components:
           NUMBER: "#/components/schemas/NumberProperty"
           OBJECT: "#/components/schemas/ObjectProperty"
           STRING: "#/components/schemas/StringProperty"
+          TASK: "#/components/schemas/TaskProperty"
           TIME: "#/components/schemas/TimeProperty"
     PropertyType:
       description: "A type of property."
@@ -1487,6 +1488,7 @@ components:
       - "NUMBER"
       - "STRING"
       - "OBJECT"
+      - "TASK"
       - "TIME"
     Resources:
       description: "A set of available resources."
@@ -1542,6 +1544,9 @@ components:
           type: "string"
         outputSchema:
           $ref: "#/components/schemas/TaskDispatcherOutputSchema"
+        outputSchemaDataSource:
+          description: "Does task dispatcher has defined dynamic output schema."
+          type: "boolean"
         properties:
           description: "The list of task dispatcher properties."
           type: "array"
@@ -1562,6 +1567,9 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
+        variablePropertiesDataSource:
+          description: "Does task dispatcher has defined dynamic variable properties."
+          type: "boolean"
         version:
           type: "integer"
           description: "The version of a task dispatcher."
@@ -1607,6 +1615,16 @@ components:
         sampleOutput:
           description: "The sample value of the task dispatcher's output."
           type: "object"
+    TaskProperty:
+      description: "A task property used in task dispatchers."
+      type: "object"
+      allOf:
+        - $ref: "#/components/schemas/Property"
+        - type: "object"
+          properties:
+            name:
+              description: "The task name."
+              type: "string"
     TimeProperty:
       description: "A time property."
       type: "object"
@@ -1704,6 +1722,8 @@ components:
       allOf:
       - $ref: "#/components/schemas/Property"
       - type: "object"
+        required:
+          - "controlType"
         properties:
           controlType:
             $ref: "#/components/schemas/ControlType"
