@@ -34,7 +34,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ObjectProperty", description = "An object property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-12T19:36:44.956144+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-15T17:51:13.706642+01:00[Europe/Zagreb]")
 public class ObjectPropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -45,8 +45,6 @@ public class ObjectPropertyModel extends ValuePropertyModel {
   private Object exampleValue;
 
   private Boolean multipleValues;
-
-  private String objectType;
 
   @Valid
   private List<@Valid OptionModel> options;
@@ -142,26 +140,6 @@ public class ObjectPropertyModel extends ValuePropertyModel {
 
   public void setMultipleValues(Boolean multipleValues) {
     this.multipleValues = multipleValues;
-  }
-
-  public ObjectPropertyModel objectType(String objectType) {
-    this.objectType = objectType;
-    return this;
-  }
-
-  /**
-   * The object type.
-   * @return objectType
-  */
-  
-  @Schema(name = "objectType", description = "The object type.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("objectType")
-  public String getObjectType() {
-    return objectType;
-  }
-
-  public void setObjectType(String objectType) {
-    this.objectType = objectType;
   }
 
   public ObjectPropertyModel options(List<@Valid OptionModel> options) {
@@ -308,7 +286,6 @@ public class ObjectPropertyModel extends ValuePropertyModel {
         Objects.equals(this.defaultValue, objectProperty.defaultValue) &&
         Objects.equals(this.exampleValue, objectProperty.exampleValue) &&
         Objects.equals(this.multipleValues, objectProperty.multipleValues) &&
-        Objects.equals(this.objectType, objectProperty.objectType) &&
         Objects.equals(this.options, objectProperty.options) &&
         Objects.equals(this.optionsDataSource, objectProperty.optionsDataSource) &&
         Objects.equals(this.properties, objectProperty.properties) &&
@@ -317,7 +294,7 @@ public class ObjectPropertyModel extends ValuePropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(additionalProperties, defaultValue, exampleValue, multipleValues, objectType, options, optionsDataSource, properties, super.hashCode());
+    return Objects.hash(additionalProperties, defaultValue, exampleValue, multipleValues, options, optionsDataSource, properties, super.hashCode());
   }
 
   @Override
@@ -329,7 +306,6 @@ public class ObjectPropertyModel extends ValuePropertyModel {
     sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
     sb.append("    exampleValue: ").append(toIndentedString(exampleValue)).append("\n");
     sb.append("    multipleValues: ").append(toIndentedString(multipleValues)).append("\n");
-    sb.append("    objectType: ").append(toIndentedString(objectType)).append("\n");
     sb.append("    options: ").append(toIndentedString(options)).append("\n");
     sb.append("    optionsDataSource: ").append(toIndentedString(optionsDataSource)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");

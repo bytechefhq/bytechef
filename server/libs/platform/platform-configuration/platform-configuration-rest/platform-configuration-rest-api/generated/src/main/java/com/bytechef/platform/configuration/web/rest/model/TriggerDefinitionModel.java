@@ -2,6 +2,7 @@ package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.platform.configuration.web.rest.model.ComponentOutputSchemaModel;
 import com.bytechef.platform.configuration.web.rest.model.HelpModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerTypeModel;
@@ -28,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-12T19:36:44.956144+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-15T17:51:13.706642+01:00[Europe/Zagreb]")
 public class TriggerDefinitionModel {
 
   private String componentName;
@@ -43,16 +44,12 @@ public class TriggerDefinitionModel {
 
   private String name;
 
-  private PropertyModel outputSchema;
+  private ComponentOutputSchemaModel outputSchema;
 
   private Boolean outputSchemaDataSource;
 
   @Valid
   private List<@Valid PropertyModel> properties;
-
-  private Object sampleOutput;
-
-  private Boolean sampleOutputDataSource;
 
   private String title;
 
@@ -190,7 +187,7 @@ public class TriggerDefinitionModel {
     this.name = name;
   }
 
-  public TriggerDefinitionModel outputSchema(PropertyModel outputSchema) {
+  public TriggerDefinitionModel outputSchema(ComponentOutputSchemaModel outputSchema) {
     this.outputSchema = outputSchema;
     return this;
   }
@@ -202,11 +199,11 @@ public class TriggerDefinitionModel {
   @Valid 
   @Schema(name = "outputSchema", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputSchema")
-  public PropertyModel getOutputSchema() {
+  public ComponentOutputSchemaModel getOutputSchema() {
     return outputSchema;
   }
 
-  public void setOutputSchema(PropertyModel outputSchema) {
+  public void setOutputSchema(ComponentOutputSchemaModel outputSchema) {
     this.outputSchema = outputSchema;
   }
 
@@ -256,46 +253,6 @@ public class TriggerDefinitionModel {
 
   public void setProperties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
-  }
-
-  public TriggerDefinitionModel sampleOutput(Object sampleOutput) {
-    this.sampleOutput = sampleOutput;
-    return this;
-  }
-
-  /**
-   * The sample value of the action's output.
-   * @return sampleOutput
-  */
-  
-  @Schema(name = "sampleOutput", description = "The sample value of the action's output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("sampleOutput")
-  public Object getSampleOutput() {
-    return sampleOutput;
-  }
-
-  public void setSampleOutput(Object sampleOutput) {
-    this.sampleOutput = sampleOutput;
-  }
-
-  public TriggerDefinitionModel sampleOutputDataSource(Boolean sampleOutputDataSource) {
-    this.sampleOutputDataSource = sampleOutputDataSource;
-    return this;
-  }
-
-  /**
-   * Does trigger has defined dynamic sample output.
-   * @return sampleOutputDataSource
-  */
-  
-  @Schema(name = "sampleOutputDataSource", description = "Does trigger has defined dynamic sample output.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("sampleOutputDataSource")
-  public Boolean getSampleOutputDataSource() {
-    return sampleOutputDataSource;
-  }
-
-  public void setSampleOutputDataSource(Boolean sampleOutputDataSource) {
-    this.sampleOutputDataSource = sampleOutputDataSource;
   }
 
   public TriggerDefinitionModel title(String title) {
@@ -356,15 +313,13 @@ public class TriggerDefinitionModel {
         Objects.equals(this.outputSchema, triggerDefinition.outputSchema) &&
         Objects.equals(this.outputSchemaDataSource, triggerDefinition.outputSchemaDataSource) &&
         Objects.equals(this.properties, triggerDefinition.properties) &&
-        Objects.equals(this.sampleOutput, triggerDefinition.sampleOutput) &&
-        Objects.equals(this.sampleOutputDataSource, triggerDefinition.sampleOutputDataSource) &&
         Objects.equals(this.title, triggerDefinition.title) &&
         Objects.equals(this.type, triggerDefinition.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, editorDescriptionDataSource, help, name, outputSchema, outputSchemaDataSource, properties, sampleOutput, sampleOutputDataSource, title, type);
+    return Objects.hash(componentName, componentVersion, description, editorDescriptionDataSource, help, name, outputSchema, outputSchemaDataSource, properties, title, type);
   }
 
   @Override
@@ -380,8 +335,6 @@ public class TriggerDefinitionModel {
     sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
     sb.append("    outputSchemaDataSource: ").append(toIndentedString(outputSchemaDataSource)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
-    sb.append("    sampleOutput: ").append(toIndentedString(sampleOutput)).append("\n");
-    sb.append("    sampleOutputDataSource: ").append(toIndentedString(sampleOutputDataSource)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");

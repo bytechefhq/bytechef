@@ -12,6 +12,9 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -23,66 +26,108 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A null property type.
+ * An file entry property type.
  */
 
-@Schema(name = "NullProperty", description = "A null property type.")
+@Schema(name = "FileEntryProperty", description = "An file entry property type.")
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-15T17:51:13.706642+01:00[Europe/Zagreb]")
-public class NullPropertyModel extends ValuePropertyModel {
+public class FileEntryPropertyModel extends ValuePropertyModel {
+
+  @Valid
+  private List<@Valid ValuePropertyModel> properties;
+
+  public FileEntryPropertyModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public FileEntryPropertyModel(PropertyTypeModel type) {
+    super();
+  }
+
+  public FileEntryPropertyModel properties(List<@Valid ValuePropertyModel> properties) {
+    this.properties = properties;
+    return this;
+  }
+
+  public FileEntryPropertyModel addPropertiesItem(ValuePropertyModel propertiesItem) {
+    if (this.properties == null) {
+      this.properties = new ArrayList<>();
+    }
+    this.properties.add(propertiesItem);
+    return this;
+  }
+
+  /**
+   * The list of valid file entry property types.
+   * @return properties
+  */
+  @Valid 
+  @Schema(name = "properties", description = "The list of valid file entry property types.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("properties")
+  public List<@Valid ValuePropertyModel> getProperties() {
+    return properties;
+  }
+
+  public void setProperties(List<@Valid ValuePropertyModel> properties) {
+    this.properties = properties;
+  }
 
 
-  public NullPropertyModel controlType(ControlTypeModel controlType) {
+  public FileEntryPropertyModel controlType(ControlTypeModel controlType) {
     super.controlType(controlType);
     return this;
   }
 
-  public NullPropertyModel label(String label) {
+  public FileEntryPropertyModel label(String label) {
     super.label(label);
     return this;
   }
 
-  public NullPropertyModel placeholder(String placeholder) {
+  public FileEntryPropertyModel placeholder(String placeholder) {
     super.placeholder(placeholder);
     return this;
   }
 
-  public NullPropertyModel advancedOption(Boolean advancedOption) {
+  public FileEntryPropertyModel advancedOption(Boolean advancedOption) {
     super.advancedOption(advancedOption);
     return this;
   }
 
-  public NullPropertyModel description(String description) {
+  public FileEntryPropertyModel description(String description) {
     super.description(description);
     return this;
   }
 
-  public NullPropertyModel displayCondition(String displayCondition) {
+  public FileEntryPropertyModel displayCondition(String displayCondition) {
     super.displayCondition(displayCondition);
     return this;
   }
 
-  public NullPropertyModel expressionEnabled(Boolean expressionEnabled) {
+  public FileEntryPropertyModel expressionEnabled(Boolean expressionEnabled) {
     super.expressionEnabled(expressionEnabled);
     return this;
   }
 
-  public NullPropertyModel hidden(Boolean hidden) {
+  public FileEntryPropertyModel hidden(Boolean hidden) {
     super.hidden(hidden);
     return this;
   }
 
-  public NullPropertyModel name(String name) {
+  public FileEntryPropertyModel name(String name) {
     super.name(name);
     return this;
   }
 
-  public NullPropertyModel required(Boolean required) {
+  public FileEntryPropertyModel required(Boolean required) {
     super.required(required);
     return this;
   }
 
-  public NullPropertyModel type(PropertyTypeModel type) {
+  public FileEntryPropertyModel type(PropertyTypeModel type) {
     super.type(type);
     return this;
   }
@@ -94,19 +139,22 @@ public class NullPropertyModel extends ValuePropertyModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    return true;
+    FileEntryPropertyModel fileEntryProperty = (FileEntryPropertyModel) o;
+    return Objects.equals(this.properties, fileEntryProperty.properties) &&
+        super.equals(o);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode());
+    return Objects.hash(properties, super.hashCode());
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class NullPropertyModel {\n");
+    sb.append("class FileEntryPropertyModel {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("}");
     return sb.toString();
   }

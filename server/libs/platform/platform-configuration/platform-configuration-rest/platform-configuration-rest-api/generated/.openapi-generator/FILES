@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 README.md
 pom.xml
 src/main/java/com/bytechef/platform/configuration/web/rest/ActionDefinitionApi.java
@@ -17,12 +16,14 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/BooleanProperty
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentOperationRequestModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentOutputSchemaModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ControlTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DatePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DateTimePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/DynamicPropertiesPropertyModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/FileEntryPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/GetOAuth2AuthorizationParametersRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/HelpModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/IntegerPropertyModel.java
@@ -41,6 +42,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/StringPropertyM
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherOperationRequestModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherOutputSchemaModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TimePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionModel.java

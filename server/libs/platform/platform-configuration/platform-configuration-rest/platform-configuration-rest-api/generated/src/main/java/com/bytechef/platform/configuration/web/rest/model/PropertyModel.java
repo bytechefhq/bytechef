@@ -36,6 +36,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = DatePropertyModel.class, name = "DATE"),
   @JsonSubTypes.Type(value = DateTimePropertyModel.class, name = "DATE_TIME"),
   @JsonSubTypes.Type(value = DynamicPropertiesPropertyModel.class, name = "DYNAMIC_PROPERTIES"),
+  @JsonSubTypes.Type(value = FileEntryPropertyModel.class, name = "FILE_ENTRY"),
   @JsonSubTypes.Type(value = IntegerPropertyModel.class, name = "INTEGER"),
   @JsonSubTypes.Type(value = NullPropertyModel.class, name = "NULL"),
   @JsonSubTypes.Type(value = NumberPropertyModel.class, name = "NUMBER"),
@@ -45,7 +46,7 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-12T19:36:44.956144+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-15T17:51:13.706642+01:00[Europe/Zagreb]")
 public class PropertyModel {
 
   private Boolean advancedOption;

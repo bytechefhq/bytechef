@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.ResourcesModel;
+import com.bytechef.platform.configuration.web.rest.model.TaskDispatcherOutputSchemaModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-12T19:36:44.956144+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-15T17:51:13.706642+01:00[Europe/Zagreb]")
 public class TaskDispatcherDefinitionModel {
 
   private String description;
@@ -35,7 +36,7 @@ public class TaskDispatcherDefinitionModel {
 
   private String name;
 
-  private PropertyModel outputSchema;
+  private TaskDispatcherOutputSchemaModel outputSchema;
 
   @Valid
   private List<@Valid PropertyModel> properties;
@@ -124,7 +125,7 @@ public class TaskDispatcherDefinitionModel {
     this.name = name;
   }
 
-  public TaskDispatcherDefinitionModel outputSchema(PropertyModel outputSchema) {
+  public TaskDispatcherDefinitionModel outputSchema(TaskDispatcherOutputSchemaModel outputSchema) {
     this.outputSchema = outputSchema;
     return this;
   }
@@ -136,11 +137,11 @@ public class TaskDispatcherDefinitionModel {
   @Valid 
   @Schema(name = "outputSchema", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("outputSchema")
-  public PropertyModel getOutputSchema() {
+  public TaskDispatcherOutputSchemaModel getOutputSchema() {
     return outputSchema;
   }
 
-  public void setOutputSchema(PropertyModel outputSchema) {
+  public void setOutputSchema(TaskDispatcherOutputSchemaModel outputSchema) {
     this.outputSchema = outputSchema;
   }
 

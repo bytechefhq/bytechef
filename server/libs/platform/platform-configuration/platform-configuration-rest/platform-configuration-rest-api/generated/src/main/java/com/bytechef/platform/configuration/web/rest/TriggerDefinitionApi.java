@@ -6,6 +6,7 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.platform.configuration.web.rest.model.ComponentOperationRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.ComponentOutputSchemaModel;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionBasicModel;
@@ -36,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-12T19:36:44.956144+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-15T17:51:13.706642+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "trigger-definition", description = "The Platform Trigger Definition API")
 public interface TriggerDefinitionApi {
@@ -79,7 +80,7 @@ public interface TriggerDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"outputSchema\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"description\" : \"description\", \"outputSchemaDataSource\" : true, \"componentVersion\" : 0, \"title\" : \"title\", \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"sampleOutputDataSource\" : true, \"editorDescriptionDataSource\" : true, \"name\" : \"name\", \"componentName\" : \"componentName\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true } ], \"sampleOutput\" : \"{}\" }";
+                    String exampleString = "{ \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : { \"definition\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"sampleOutput\" : \"{}\" }, \"editorDescriptionDataSource\" : true, \"name\" : \"name\", \"description\" : \"description\", \"outputSchemaDataSource\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -189,7 +190,7 @@ public interface TriggerDefinitionApi {
         tags = { "trigger-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The output schema.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = PropertyModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ComponentOutputSchemaModel.class))
             })
         }
     )
@@ -200,7 +201,7 @@ public interface TriggerDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<PropertyModel> getComponentTriggerOutputSchema(
+    default ResponseEntity<ComponentOutputSchemaModel> getComponentTriggerOutputSchema(
         @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
@@ -209,7 +210,7 @@ public interface TriggerDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }";
+                    String exampleString = "{ \"definition\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"sampleOutput\" : \"{}\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -323,45 +324,6 @@ public interface TriggerDefinitionApi {
 
 
     /**
-     * POST /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/sample-output : Get a trigger sample output shown in the editor
-     * Get a trigger sample output shown in the editor.
-     *
-     * @param componentName The name of the component. (required)
-     * @param componentVersion The version of a component. (required)
-     * @param triggerName The name of a trigger. (required)
-     * @param componentOperationRequestModel  (optional)
-     * @return The output schema. (status code 200)
-     */
-    @Operation(
-        operationId = "getComponentTriggerSampleOutput",
-        summary = "Get a trigger sample output shown in the editor",
-        description = "Get a trigger sample output shown in the editor.",
-        tags = { "trigger-definition" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The output schema.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = Object.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/sample-output",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    
-    default ResponseEntity<Object> getComponentTriggerSampleOutput(
-        @Parameter(name = "componentName", description = "The name of the component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
-        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
-        @Parameter(name = "triggerName", description = "The name of a trigger.", required = true, in = ParameterIn.PATH) @PathVariable("triggerName") String triggerName,
-        @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) ComponentOperationRequestModel componentOperationRequestModel
-    ) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
      * GET /trigger-definitions : Get all trigger definitions
      * Get all trigger definitions.
      *
@@ -391,7 +353,7 @@ public interface TriggerDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"outputSchema\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"description\" : \"description\", \"outputSchemaDataSource\" : true, \"componentVersion\" : 0, \"title\" : \"title\", \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"sampleOutputDataSource\" : true, \"editorDescriptionDataSource\" : true, \"name\" : \"name\", \"componentName\" : \"componentName\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true } ], \"sampleOutput\" : \"{}\" }, { \"outputSchema\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"description\" : \"description\", \"outputSchemaDataSource\" : true, \"componentVersion\" : 0, \"title\" : \"title\", \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"sampleOutputDataSource\" : true, \"editorDescriptionDataSource\" : true, \"name\" : \"name\", \"componentName\" : \"componentName\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true } ], \"sampleOutput\" : \"{}\" } ]";
+                    String exampleString = "[ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : { \"definition\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"sampleOutput\" : \"{}\" }, \"editorDescriptionDataSource\" : true, \"name\" : \"name\", \"description\" : \"description\", \"outputSchemaDataSource\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true } ] }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : { \"definition\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"sampleOutput\" : \"{}\" }, \"editorDescriptionDataSource\" : true, \"name\" : \"name\", \"description\" : \"description\", \"outputSchemaDataSource\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true } ] } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

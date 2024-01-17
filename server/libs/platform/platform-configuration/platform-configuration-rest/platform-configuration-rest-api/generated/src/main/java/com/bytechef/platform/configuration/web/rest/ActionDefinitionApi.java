@@ -8,6 +8,7 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentOperationRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.ComponentOutputSchemaModel;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -36,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-12T19:36:44.956144+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-15T17:51:13.706642+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "action-definition", description = "The Platform Action Definition API")
 public interface ActionDefinitionApi {
@@ -75,7 +76,7 @@ public interface ActionDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"sampleOutputDataSource\" : true, \"outputSchema\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"editorDescriptionDataSource\" : true, \"name\" : \"name\", \"description\" : \"description\", \"outputSchemaDataSource\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true } ], \"sampleOutput\" : \"{}\" }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"sampleOutputDataSource\" : true, \"outputSchema\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"editorDescriptionDataSource\" : true, \"name\" : \"name\", \"description\" : \"description\", \"outputSchemaDataSource\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true } ], \"sampleOutput\" : \"{}\" } ]";
+                    String exampleString = "[ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : { \"definition\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"sampleOutput\" : \"{}\" }, \"editorDescriptionDataSource\" : true, \"name\" : \"name\", \"description\" : \"description\", \"outputSchemaDataSource\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true } ] }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : { \"definition\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"sampleOutput\" : \"{}\" }, \"editorDescriptionDataSource\" : true, \"name\" : \"name\", \"description\" : \"description\", \"outputSchemaDataSource\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true } ] } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -120,7 +121,7 @@ public interface ActionDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"sampleOutputDataSource\" : true, \"outputSchema\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"editorDescriptionDataSource\" : true, \"name\" : \"name\", \"description\" : \"description\", \"outputSchemaDataSource\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true } ], \"sampleOutput\" : \"{}\" }";
+                    String exampleString = "{ \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"outputSchema\" : { \"definition\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"sampleOutput\" : \"{}\" }, \"editorDescriptionDataSource\" : true, \"name\" : \"name\", \"description\" : \"description\", \"outputSchemaDataSource\" : true, \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"title\" : \"title\", \"properties\" : [ { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -230,7 +231,7 @@ public interface ActionDefinitionApi {
         tags = { "action-definition" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The output schema.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = PropertyModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ComponentOutputSchemaModel.class))
             })
         }
     )
@@ -241,7 +242,7 @@ public interface ActionDefinitionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<PropertyModel> getComponentActionOutputSchema(
+    default ResponseEntity<ComponentOutputSchemaModel> getComponentActionOutputSchema(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
@@ -250,7 +251,7 @@ public interface ActionDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }";
+                    String exampleString = "{ \"definition\" : { \"displayCondition\" : \"displayCondition\", \"hidden\" : true, \"name\" : \"name\", \"description\" : \"description\", \"advancedOption\" : true, \"required\" : true, \"expressionEnabled\" : true }, \"sampleOutput\" : \"{}\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -358,45 +359,6 @@ public interface ActionDefinitionApi {
                 }
             }
         });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * POST /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/sample-output : Get an action sample output shown in the editor
-     * Get an action sample output shown in the editor.
-     *
-     * @param componentName The name of a component. (required)
-     * @param componentVersion The version of a component. (required)
-     * @param actionName The name of an action. (required)
-     * @param componentOperationRequestModel  (optional)
-     * @return The output schema. (status code 200)
-     */
-    @Operation(
-        operationId = "getComponentActionSampleOutput",
-        summary = "Get an action sample output shown in the editor",
-        description = "Get an action sample output shown in the editor.",
-        tags = { "action-definition" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The output schema.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = Object.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/sample-output",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    
-    default ResponseEntity<Object> getComponentActionSampleOutput(
-        @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
-        @Parameter(name = "componentVersion", description = "The version of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
-        @Parameter(name = "actionName", description = "The name of an action.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
-        @Parameter(name = "ComponentOperationRequestModel", description = "") @Valid @RequestBody(required = false) ComponentOperationRequestModel componentOperationRequestModel
-    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
