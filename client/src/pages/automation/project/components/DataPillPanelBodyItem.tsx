@@ -30,7 +30,7 @@ const DataPillPanelBodyItem = ({
             >
                 <div className="flex items-center space-x-4">
                     {icon && (
-                        <div className="flex h-5 w-5 items-center">
+                        <div className="flex size-5 items-center">
                             <InlineSVG src={icon} />
                         </div>
                     )}
@@ -46,11 +46,11 @@ const DataPillPanelBodyItem = ({
                     {currentComponentAction?.actionName}
                 </span>
 
-                <ChevronDownIcon className="h-5 w-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
+                <ChevronDownIcon className="size-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
             </AccordionTrigger>
 
             <AccordionContent
-                className="h-full w-full space-y-2 border-b border-gray-100 px-4 pb-4"
+                className="size-full space-y-2 border-b border-gray-100 px-4 pb-4"
                 key={`accordion-content-${componentAction.workflowNodeName}`}
             >
                 {filteredProperties.length ? (

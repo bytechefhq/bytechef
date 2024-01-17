@@ -62,7 +62,7 @@ const DataPill = ({
                 className="inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-gray-100 px-2 py-0.5 text-sm hover:bg-gray-50"
                 onClick={() => addDataPillToInput(componentAlias)}
             >
-                <InlineSVG className="h-6 w-6" src={componentIcon} />
+                <InlineSVG className="size-6" src={componentIcon} />
 
                 <span>{componentAlias}</span>
             </div>

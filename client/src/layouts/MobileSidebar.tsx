@@ -58,7 +58,7 @@ export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen, us
                                     >
                                         <span className="sr-only">Close sidebar</span>
 
-                                        <Cross2Icon aria-hidden="true" className="h-4 w-4 cursor-pointer text-white" />
+                                        <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer text-white" />
                                     </button>
                                 </div>
                             </Transition.Child>
@@ -78,7 +78,7 @@ export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen, us
                                             >
                                                 <item.icon
                                                     aria-hidden="true"
-                                                    className="mr-4 h-6 w-6 text-gray-400 group-hover:text-gray-500"
+                                                    className="mr-4 size-6 text-gray-400 group-hover:text-gray-500"
                                                 />
 
                                                 {item.name}
@@ -94,7 +94,7 @@ export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen, us
                                         <div>
                                             <img
                                                 alt=""
-                                                className="inline-block h-10 w-10 rounded-full"
+                                                className="inline-block size-10 rounded-full"
                                                 src={user.imageUrl}
                                             />
                                         </div>

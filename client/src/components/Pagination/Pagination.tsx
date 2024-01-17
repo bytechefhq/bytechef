@@ -120,7 +120,7 @@ const Pagination = ({onClick, pageNumber, pageSize, totalElements, totalPages}: 
                         >
                             <span className="sr-only">Previous</span>
 
-                            <ChevronLeftIcon aria-hidden="true" className="h-5 w-5" />
+                            <ChevronLeftIcon aria-hidden="true" className="size-5" />
                         </button>
 
                         {renderPageLinks()}
@@ -136,7 +136,7 @@ const Pagination = ({onClick, pageNumber, pageSize, totalElements, totalPages}: 
                         >
                             <span className="sr-only">Next</span>
 
-                            <ChevronRightIcon aria-hidden="true" className="h-5 w-5" />
+                            <ChevronRightIcon aria-hidden="true" className="size-5" />
                         </button>
                     </nav>
                 </div>

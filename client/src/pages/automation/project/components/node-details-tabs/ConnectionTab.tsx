@@ -89,7 +89,7 @@ const ConnectionTab = ({
                             title="Create a new connection"
                             variant="outline"
                         >
-                            <PlusIcon className="h-5 w-5" />
+                            <PlusIcon className="size-5" />
                         </Button>
                     </div>
 
@@ -115,7 +115,7 @@ const ConnectionTab = ({
                             Create a connection
                         </Button>
                     }
-                    icon={<LinkIcon className="h-6 w-6 text-gray-400" />}
+                    icon={<LinkIcon className="size-6 text-gray-400" />}
                     message="You have not created any connections for this component yet."
                     title="No Connections"
                 />
@@ -131,7 +131,7 @@ const ConnectionTab = ({
                             onClick={() => setShowConnectionNote(false)}
                             title="Close the note"
                         >
-                            <Cross2Icon aria-hidden="true" className="h-4 w-4 cursor-pointer" />
+                            <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
                         </button>
                     </div>
 

@@ -28,13 +28,13 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node}: WorkflowNodesTabs
         >
             {node.icon ? (
                 <InlineSVG
-                    className="mr-2 h-7 w-7 flex-none"
-                    loader={<Component1Icon className="mr-2 h-7 w-7 flex-none" />}
+                    className="mr-2 size-7 flex-none"
+                    loader={<Component1Icon className="mr-2 size-7 flex-none" />}
                     src={node.icon}
                     title={node.title}
                 />
             ) : (
-                <Component1Icon className="mr-2 h-7 w-7 flex-none" />
+                <Component1Icon className="mr-2 size-7 flex-none" />
             )}
 
             <div className="flex flex-col">

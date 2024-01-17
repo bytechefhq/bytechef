@@ -76,9 +76,9 @@ const WorkflowNodesPopoverMenuList = memo(
                         icon: (
                             <>
                                 {clickedItem.icon ? (
-                                    <InlineSVG className="h-9 w-9 text-gray-700" src={clickedItem.icon} />
+                                    <InlineSVG className="size-9 text-gray-700" src={clickedItem.icon} />
                                 ) : (
-                                    <Component1Icon className="h-9 w-9 text-gray-700" />
+                                    <Component1Icon className="size-9 text-gray-700" />
                                 )}
                             </>
                         ),
@@ -183,11 +183,11 @@ const WorkflowNodesPopoverMenuList = memo(
                                             <>
                                                 {clickedItem.icon ? (
                                                     <InlineSVG
-                                                        className="h-9 w-9 text-gray-700"
+                                                        className="size-9 text-gray-700"
                                                         src={clickedItem.icon}
                                                     />
                                                 ) : (
-                                                    <Component1Icon className="h-9 w-9 text-gray-700" />
+                                                    <Component1Icon className="size-9 text-gray-700" />
                                                 )}
                                             </>
                                         ),

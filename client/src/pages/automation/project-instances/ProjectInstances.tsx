@@ -99,7 +99,7 @@ const ProjectInstances = () => {
                                 (tags && !!tags.length ? (
                                     tags?.map((item) => (
                                         <LeftSidebarNavItem
-                                            icon={<TagIcon className="mr-1 h-4 w-4" />}
+                                            icon={<TagIcon className="mr-1 size-4" />}
                                             item={{
                                                 filterData: filterData?.id === item.id && filterData.type === Type.Tag,
                                                 id: item.id!,
@@ -183,7 +183,7 @@ const ProjectInstances = () => {
                 ) : (
                     <EmptyList
                         button={<ProjectInstanceDialog triggerNode={<Button>Create Instance</Button>} />}
-                        icon={<Layers3Icon className="h-12 w-12 text-gray-400" />}
+                        icon={<Layers3Icon className="size-12 text-gray-400" />}
                         message="Get started by creating a new project instance."
                         title="No instances of projects"
                     />

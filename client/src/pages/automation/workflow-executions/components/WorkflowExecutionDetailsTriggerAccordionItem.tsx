@@ -18,7 +18,7 @@ const WorkflowExecutionDetailsTriggerAccordionItem = ({
             <AccordionTrigger className="flex w-full items-center justify-between border-gray-100 bg-white px-2 py-3 data-[state=closed]:border-b">
                 <div className="flex items-center text-sm">
                     {triggerExecution?.component?.icon && (
-                        <InlineSVG className="mr-1 h-6 w-6" src={triggerExecution?.component?.icon} />
+                        <InlineSVG className="mr-1 size-6" src={triggerExecution?.component?.icon} />
                     )}
 
                     <span>{component?.title}</span>
@@ -31,9 +31,9 @@ const WorkflowExecutionDetailsTriggerAccordionItem = ({
                 <div className="flex items-center">
                     <span className="ml-auto mr-2 text-xs">{duration}ms</span>
 
-                    {triggerExecution.status === 'COMPLETED' && <CheckCircledIcon className="h-5 w-5 text-green-500" />}
+                    {triggerExecution.status === 'COMPLETED' && <CheckCircledIcon className="size-5 text-green-500" />}
 
-                    {triggerExecution.status === 'FAILED' && <CrossCircledIcon className="h-5 w-5 text-red-500" />}
+                    {triggerExecution.status === 'FAILED' && <CrossCircledIcon className="size-5 text-red-500" />}
                 </div>
             </AccordionTrigger>
 

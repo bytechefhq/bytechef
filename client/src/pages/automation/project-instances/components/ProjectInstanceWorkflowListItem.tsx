@@ -67,7 +67,7 @@ const ProjectInstanceWorkflowListItem = ({
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <InlineSVG
-                                            className="h-5 w-5 flex-none"
+                                            className="size-5 flex-none"
                                             key={name}
                                             src={
                                                 componentDefinition?.icon
@@ -89,7 +89,7 @@ const ProjectInstanceWorkflowListItem = ({
                 {projectInstanceWorkflow?.lastExecutionDate ? (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                            <CalendarIcon aria-hidden="true" className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400" />
+                            <CalendarIcon aria-hidden="true" className="mr-0.5 size-3.5 shrink-0 text-gray-400" />
 
                             <span>
                                 {`Executed at ${projectInstanceWorkflow.lastExecutionDate?.toLocaleDateString()} ${projectInstanceWorkflow.lastExecutionDate?.toLocaleTimeString()}`}
@@ -126,7 +126,7 @@ const ProjectInstanceWorkflowListItem = ({
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost">
-                            <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                            <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
                         </Button>
                     </DropdownMenuTrigger>
 

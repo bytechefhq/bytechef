@@ -474,7 +474,7 @@ const WorkflowNodeDetailsPanel = ({
                                 {currentComponent?.description && (
                                     <Tooltip delayDuration={500}>
                                         <TooltipTrigger>
-                                            <InfoCircledIcon className="h-4 w-4" />
+                                            <InfoCircledIcon className="size-4" />
                                         </TooltipTrigger>
 
                                         <TooltipContent className="max-w-md" side="bottom">
@@ -488,7 +488,7 @@ const WorkflowNodeDetailsPanel = ({
                                     className="ml-auto pr-0"
                                     onClick={() => setWorkflowNodeDetailsPanelOpen(false)}
                                 >
-                                    <Cross2Icon aria-hidden="true" className="h-4 w-4 cursor-pointer" />
+                                    <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
                                 </button>
                             </Dialog.Title>
 
@@ -523,7 +523,7 @@ const WorkflowNodeDetailsPanel = ({
                                 )}
 
                                 <div className="relative h-full overflow-y-scroll">
-                                    <div className="absolute left-0 top-0 h-full w-full">
+                                    <div className="absolute left-0 top-0 size-full">
                                         {activeTab === 'description' && (
                                             <DescriptionTab
                                                 componentDefinition={currentComponent}

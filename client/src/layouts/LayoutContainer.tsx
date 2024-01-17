@@ -88,11 +88,11 @@ const LayoutContainer = ({
                                 >
                                     <div className="absolute right-0 top-0 -mr-14 p-1">
                                         <button
-                                            className="flex h-12 w-12 items-center justify-center rounded-full focus:bg-gray-600 focus:outline-none"
+                                            className="flex size-12 items-center justify-center rounded-full focus:bg-gray-600 focus:outline-none"
                                             onClick={() => setSidebarOpen(false)}
                                             type="button"
                                         >
-                                            <Cross2Icon aria-hidden="true" className="h-4 w-4 text-white" />
+                                            <Cross2Icon aria-hidden="true" className="size-4 text-white" />
 
                                             <span className="sr-only">Close sidebar</span>
                                         </button>

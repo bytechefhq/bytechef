@@ -24,7 +24,7 @@ export function RightSidebar({
                                 >
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <item.icon aria-hidden="true" className="h-6 w-6" />
+                                            <item.icon aria-hidden="true" className="size-6" />
                                         </TooltipTrigger>
 
                                         <TooltipContent side="left">{item.name}</TooltipContent>

@@ -33,7 +33,7 @@ export function DesktopSidebar({
                                 >
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <item.icon aria-hidden="true" className="h-7 w-7" />
+                                            <item.icon aria-hidden="true" className="size-7" />
                                         </TooltipTrigger>
 
                                         <TooltipContent side="right">{item.name}</TooltipContent>

@@ -370,7 +370,7 @@ const ConnectionDialog = ({componentDefinition, connection, onClose, triggerNode
 
                                 <DialogClose asChild>
                                     <Button size="icon" variant="ghost">
-                                        <Cross2Icon className="h-4 w-4 opacity-70" />
+                                        <Cross2Icon className="size-4 opacity-70" />
                                     </Button>
                                 </DialogClose>
                             </div>
@@ -608,7 +608,7 @@ const ConnectionDialog = ({componentDefinition, connection, onClose, triggerNode
                         {!oAuth2AuthorizationParametersLoading && wizardStep === 'oauth_step' && (
                             <div>
                                 <Alert className="border-blue-50 bg-blue-50 text-blue-700">
-                                    <RocketIcon className="h-4 w-4" />
+                                    <RocketIcon className="size-4" />
 
                                     <AlertTitle>Heads up!</AlertTitle>
 
@@ -721,7 +721,7 @@ const RedirectUriInput = ({redirectUri}: {redirectUri?: string}) => {
                 size="icon"
                 variant="ghost"
             >
-                <ClipboardIcon aria-hidden="true" className="h-4 w-4 text-gray-400" />
+                <ClipboardIcon aria-hidden="true" className="size-4 text-gray-400" />
             </Button>
         </div>
     );

@@ -89,7 +89,7 @@ export const Connections = () => {
                                 ) : (
                                     tags?.map((item) => (
                                         <LeftSidebarNavItem
-                                            icon={<TagIcon className="mr-1 h-4 w-4" />}
+                                            icon={<TagIcon className="mr-1 size-4" />}
                                             item={{
                                                 filterData: filterData?.id === item.id && filterData.type === Type.Tag,
                                                 id: item.id!,
@@ -158,7 +158,7 @@ export const Connections = () => {
                 ) : (
                     <EmptyList
                         button={<ConnectionDialog triggerNode={<Button>Create Connection</Button>} />}
-                        icon={<Link2Icon className="h-12 w-12 text-gray-400" />}
+                        icon={<Link2Icon className="size-12 text-gray-400" />}
                         message="You do not have any Connections created yet."
                         title="No Connections"
                     />

@@ -120,7 +120,7 @@ const WorkflowInputsSheetDialog = ({
 
                                 <DialogClose asChild>
                                     <Button size="icon" variant="ghost">
-                                        <Cross2Icon className="h-4 w-4 opacity-70" />
+                                        <Cross2Icon className="size-4 opacity-70" />
                                     </Button>
                                 </DialogClose>
                             </div>

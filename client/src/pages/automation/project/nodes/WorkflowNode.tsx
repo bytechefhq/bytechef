@@ -130,7 +130,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                                 title="Edit a trigger"
                                 variant="outline"
                             >
-                                <PencilIcon className="h-4 w-4" />
+                                <PencilIcon className="size-4" />
                             </Button>
                         </WorkflowNodesPopoverMenu>
                     ) : (
@@ -140,7 +140,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                             title="Delete a node"
                             variant="outline"
                         >
-                            <TrashIcon className="h-4 w-4" />
+                            <TrashIcon className="size-4" />
                         </Button>
                     )}
                 </div>

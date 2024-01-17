@@ -40,9 +40,9 @@ export default function useHandleDrop(): [
             data: {
                 componentName: droppedNode.name,
                 icon: droppedNode?.icon ? (
-                    <InlineSVG className="h-9 w-9 text-gray-700" src={droppedNode?.icon} />
+                    <InlineSVG className="size-9 text-gray-700" src={droppedNode?.icon} />
                 ) : (
-                    <PlayIcon className="h-9 w-9 text-gray-700" />
+                    <PlayIcon className="size-9 text-gray-700" />
                 ),
                 label: droppedNode?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
@@ -119,9 +119,9 @@ export default function useHandleDrop(): [
             data: {
                 componentName: droppedNode.name,
                 icon: droppedNode?.icon ? (
-                    <InlineSVG className="h-9 w-9 text-gray-700" src={droppedNode.icon} />
+                    <InlineSVG className="size-9 text-gray-700" src={droppedNode.icon} />
                 ) : (
-                    <PlayIcon className="h-9 w-9 text-gray-700" />
+                    <PlayIcon className="size-9 text-gray-700" />
                 ),
                 label: droppedNode?.title,
                 name: getFormattedName(droppedNode.name!, nodes),

@@ -98,7 +98,7 @@ const ProjectWorkflowListItem = ({
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <InlineSVG
-                                            className="h-5 w-5 flex-none"
+                                            className="size-5 flex-none"
                                             key={name}
                                             src={
                                                 componentDefinition?.icon
@@ -119,7 +119,7 @@ const ProjectWorkflowListItem = ({
             <div className="flex justify-end gap-x-4">
                 <Tooltip>
                     <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                        <CalendarIcon aria-hidden="true" className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400" />
+                        <CalendarIcon aria-hidden="true" className="mr-0.5 size-3.5 shrink-0 text-gray-400" />
 
                         <span>
                             {`Modified at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
@@ -132,7 +132,7 @@ const ProjectWorkflowListItem = ({
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button size="icon" variant="ghost">
-                            <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                            <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
                         </Button>
                     </DropdownMenuTrigger>
 

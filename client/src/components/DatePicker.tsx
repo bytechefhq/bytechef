@@ -16,7 +16,7 @@ const DatePicker = ({onChange, value}: {onChange: (date: Date | undefined) => vo
                     className={cn('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}
                     variant="outline"
                 >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarIcon className="mr-2 size-4" />
 
                     {date ? format(date, 'PPP') : <span>Pick a date</span>}
                 </Button>

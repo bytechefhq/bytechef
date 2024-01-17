@@ -37,11 +37,11 @@ const ComboBox = ({items, maxHeight = false, name, onBlur, onChange, value}: Com
             }}
             value={comboBoxItem.value}
         >
-            {comboBoxItem.icon && <InlineSVG className="mr-2 h-6 w-6 flex-none" src={comboBoxItem.icon} />}
+            {comboBoxItem.icon && <InlineSVG className="mr-2 size-6 flex-none" src={comboBoxItem.icon} />}
 
             {comboBoxItem.label}
 
-            <CheckIcon className={cn('ml-auto h-4 w-4', comboBoxItem.value === value ? 'opacity-100' : 'opacity-0')} />
+            <CheckIcon className={cn('ml-auto size-4', comboBoxItem.value === value ? 'opacity-100' : 'opacity-0')} />
         </CommandItem>
     ));
 
@@ -59,7 +59,7 @@ const ComboBox = ({items, maxHeight = false, name, onBlur, onChange, value}: Com
                 >
                     {value ? (
                         <span className="flex w-full items-center">
-                            {item?.icon && <InlineSVG className="mr-2 h-6 w-6 flex-none" src={item?.icon} />}
+                            {item?.icon && <InlineSVG className="mr-2 size-6 flex-none" src={item?.icon} />}
 
                             {item?.label}
                         </span>
@@ -67,7 +67,7 @@ const ComboBox = ({items, maxHeight = false, name, onBlur, onChange, value}: Com
                         'Select...'
                     )}
 
-                    <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    <CaretSortIcon className="ml-2 size-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>
 

@@ -42,11 +42,11 @@ const WorkflowExecutionDetailsAccordion = ({
                     </span>
 
                     {taskExecutionsCompleted && triggerExecutionCompleted && (
-                        <CheckCircledIcon className="h-5 w-5 text-green-500" />
+                        <CheckCircledIcon className="size-5 text-green-500" />
                     )}
 
                     {(!taskExecutionsCompleted || !triggerExecutionCompleted) && (
-                        <CrossCircledIcon className="h-5 w-5 text-red-500" />
+                        <CrossCircledIcon className="size-5 text-red-500" />
                     )}
                 </div>
 

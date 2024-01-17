@@ -89,10 +89,10 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                         <div className="flex items-center justify-between">
                             <div className="relative flex items-center">
                                 {componentDefinition?.icon && (
-                                    <InlineSVG className="mr-1 h-6 w-6 flex-none" src={componentDefinition.icon} />
+                                    <InlineSVG className="mr-1 size-6 flex-none" src={componentDefinition.icon} />
                                 )}
 
-                                {!componentDefinition?.icon && <Component1Icon className="mr-1 h-6 w-6 flex-none" />}
+                                {!componentDefinition?.icon && <Component1Icon className="mr-1 size-6 flex-none" />}
 
                                 <span className="mr-2 text-base font-semibold">{connection.name}</span>
                             </div>
@@ -134,7 +134,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                                     <TooltipTrigger className="flex items-center text-sm text-gray-500 sm:mt-0">
                                         <CalendarIcon
                                             aria-hidden="true"
-                                            className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
+                                            className="mr-0.5 size-3.5 shrink-0 text-gray-400"
                                         />
 
                                         <span>
@@ -150,7 +150,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button size="icon" variant="ghost">
-                                    <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                                    <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
                                 </Button>
                             </DropdownMenuTrigger>
 

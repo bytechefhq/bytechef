@@ -31,7 +31,7 @@ const WorkflowInputsSheet = ({onClose, projectId, workflow}: WorkflowInputsSheet
                         />
 
                         <SheetPrimitive.Close asChild>
-                            <Cross2Icon className="h-4 w-4 cursor-pointer opacity-70" />
+                            <Cross2Icon className="size-4 cursor-pointer opacity-70" />
                         </SheetPrimitive.Close>
                     </div>
                 </div>

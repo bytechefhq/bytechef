@@ -14,7 +14,7 @@ const WorkflowExecutionDetailsTaskAccordionItem = ({taskExecution}: {taskExecuti
             <AccordionTrigger className="flex w-full items-center justify-between border-gray-100 bg-white px-2 py-3 data-[state=closed]:border-b">
                 <div className="flex items-center space-x-1 text-sm">
                     {taskExecution?.component?.icon && (
-                        <InlineSVG className="mr-1 h-6 w-6" src={taskExecution?.component?.icon} />
+                        <InlineSVG className="mr-1 size-6" src={taskExecution?.component?.icon} />
                     )}
 
                     <span>{component?.title}</span>
@@ -25,9 +25,9 @@ const WorkflowExecutionDetailsTaskAccordionItem = ({taskExecution}: {taskExecuti
                 <div className="flex items-center">
                     <span className="ml-auto mr-2 text-xs">{duration}ms</span>
 
-                    {taskExecution.status === 'COMPLETED' && <CheckCircledIcon className="h-5 w-5 text-green-500" />}
+                    {taskExecution.status === 'COMPLETED' && <CheckCircledIcon className="size-5 text-green-500" />}
 
-                    {taskExecution.status === 'FAILED' && <CrossCircledIcon className="h-5 w-5 text-red-500" />}
+                    {taskExecution.status === 'FAILED' && <CrossCircledIcon className="size-5 text-red-500" />}
                 </div>
             </AccordionTrigger>
 

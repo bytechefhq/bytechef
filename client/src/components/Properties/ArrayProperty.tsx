@@ -36,7 +36,7 @@ const ArrayProperty = ({dataPills, property}: {dataPills?: Array<DataPillType>; 
                                 size="sm"
                                 variant="ghost"
                             >
-                                <PlusIcon className="h-4 w-4" /> Add item
+                                <PlusIcon className="size-4" /> Add item
                             </Button>
                         }
                         menuItems={formattedArrayItems}
@@ -48,7 +48,7 @@ const ArrayProperty = ({dataPills, property}: {dataPills?: Array<DataPillType>; 
                         size="sm"
                         variant="ghost"
                     >
-                        <PlusIcon className="h-4 w-4" /> Add item
+                        <PlusIcon className="size-4" /> Add item
                     </Button>
                 )}
             </div>

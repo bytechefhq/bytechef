@@ -97,7 +97,7 @@ const DataPillPanel = ({
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <InfoCircledIcon className="ml-1 h-4 w-4" />
+                                    <InfoCircledIcon className="ml-1 size-4" />
                                 </TooltipTrigger>
 
                                 <TooltipContent>
@@ -111,7 +111,7 @@ const DataPillPanel = ({
                                 className="ml-auto pr-0"
                                 onClick={() => setDataPillPanelOpen(false)}
                             >
-                                <Cross2Icon aria-hidden="true" className="h-4 w-4 cursor-pointer" />
+                                <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
                             </button>
                         </Dialog.Title>
 

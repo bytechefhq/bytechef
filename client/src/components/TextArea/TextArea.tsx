@@ -59,7 +59,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 
                 {error && (
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <ExclamationTriangleIcon aria-hidden="true" className="h-5 w-5 text-red-500" />
+                        <ExclamationTriangleIcon aria-hidden="true" className="size-5 text-red-500" />
                     </div>
                 )}
             </div>

@@ -24,7 +24,7 @@ const ContextualDialog = ({
             <span className="font-medium">{title}</span>
 
             <button onClick={handleCancelClick}>
-                <Cross2Icon aria-hidden="true" className="h-4 w-4 cursor-pointer" />
+                <Cross2Icon aria-hidden="true" className="size-4 cursor-pointer" />
             </button>
         </header>
 

@@ -4,7 +4,7 @@ import useOAuth2, {CodePayload, TokenPayload} from '../oauth2/useOAuth2';
 
 const LoadingIcon = () => (
     <svg
-        className="-ml-1 mr-1 h-4 w-4 animate-spin text-white"
+        className="-ml-1 mr-1 size-4 animate-spin text-white"
         fill="none"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"

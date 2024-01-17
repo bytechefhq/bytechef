@@ -31,11 +31,11 @@ const WorkflowExecutionDetailsSheetWorkflowView = ({
                     size="sm"
                     variant="outline"
                 >
-                    <PencilIcon className="mr-1 h-4 w-4 cursor-pointer" /> Edit
+                    <PencilIcon className="mr-1 size-4 cursor-pointer" /> Edit
                 </Button>
 
                 <SheetPrimitive.Close asChild>
-                    <Cross2Icon className="h-4 w-4 cursor-pointer opacity-70" />
+                    <Cross2Icon className="size-4 cursor-pointer opacity-70" />
                 </SheetPrimitive.Close>
             </div>
         </div>

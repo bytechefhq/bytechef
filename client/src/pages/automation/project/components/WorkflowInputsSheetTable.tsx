@@ -127,7 +127,7 @@ const WorkflowInputsSheetTable = ({
                                 <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                                            <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
                                         </DropdownMenuTrigger>
 
                                         <DropdownMenuContent align="end">
@@ -161,7 +161,7 @@ const WorkflowInputsSheetTable = ({
             ) : (
                 <div className="flex h-full flex-col justify-center">
                     <div className="flex flex-col items-center self-center align-middle">
-                        <AlignJustifyIcon className="h-24 w-24 text-gray-300" />
+                        <AlignJustifyIcon className="size-24 text-gray-300" />
 
                         <h3 className="mt-2 text-sm font-semibold">No inputs</h3>
 
@@ -172,7 +172,7 @@ const WorkflowInputsSheetTable = ({
                                 projectId={projectId}
                                 triggerNode={
                                     <Button>
-                                        <PlusIcon aria-hidden="true" className="-ml-0.5 mr-1.5 h-5 w-5" />
+                                        <PlusIcon aria-hidden="true" className="-ml-0.5 mr-1.5 size-5" />
                                         Create Input
                                     </Button>
                                 }

@@ -161,8 +161,8 @@ const WorkflowEditor = ({
                         componentName: componentDefinition.name,
                         icon: (
                             <InlineSVG
-                                className="h-9 w-9"
-                                loader={<Component1Icon className="h-9 w-9 flex-none text-gray-900" />}
+                                className="size-9"
+                                loader={<Component1Icon className="size-9 flex-none text-gray-900" />}
                                 src={componentDefinition.icon!}
                             />
                         ),

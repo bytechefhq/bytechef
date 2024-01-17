@@ -26,7 +26,7 @@ const DropdownMenu = ({customTriggerComponent, id = 0, menuItems}: DropdownMenuP
                 customTriggerComponent
             ) : (
                 <div className="flex h-8 w-7 cursor-pointer items-center justify-center rounded hover:bg-gray-100">
-                    <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                    <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
                 </div>
             )}
         </Trigger>

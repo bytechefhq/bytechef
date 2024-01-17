@@ -25,7 +25,7 @@ const Tag = ({onDeleteTag, tag}: TagProps) => (
         {tag.name}
 
         <Cross2Icon
-            className="ml-1.5 h-4 w-4 cursor-pointer rounded-full hover:bg-gray-200"
+            className="ml-1.5 size-4 cursor-pointer rounded-full hover:bg-gray-200"
             onClick={() => onDeleteTag(tag)}
         />
     </span>
@@ -110,14 +110,14 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                 />
             ) : (
                 <div
-                    className="flex h-6 w-6 cursor-pointer items-center justify-center rounded border border-gray-100 hover:bg-gray-200"
+                    className="flex size-6 cursor-pointer items-center justify-center rounded border border-gray-100 hover:bg-gray-200"
                     onClick={(event) => {
                         event.preventDefault();
 
                         setIsNewTagWindowVisible(true);
                     }}
                 >
-                    <PlusIcon className="h-3 w-3" />
+                    <PlusIcon className="size-3" />
                 </div>
             )}
         </div>

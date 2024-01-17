@@ -88,7 +88,7 @@ const ObjectProperty = ({
                         size="sm"
                         variant="ghost"
                     >
-                        <PlusIcon className="h-4 w-4" /> Add property
+                        <PlusIcon className="size-4" /> Add property
                     </Button>
 
                     {additionalPropertiesDialogOpen && (

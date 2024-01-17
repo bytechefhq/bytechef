@@ -129,7 +129,7 @@ const ProjectInstanceListItem = ({project, projectInstance, remainingTags}: Proj
                                         : `${project.workflowIds?.length} workflows`}
                                 </span>
 
-                                <ChevronDownIcon className="h-4 w-4 duration-300 group-data-[state=open]:rotate-180" />
+                                <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                             </CollapsibleTrigger>
 
                             <div onClick={(event) => event.preventDefault()}>
@@ -169,7 +169,7 @@ const ProjectInstanceListItem = ({project, projectInstance, remainingTags}: Proj
                                     <>
                                         <CalendarIcon
                                             aria-hidden="true"
-                                            className="mr-0.5 h-3.5 w-3.5 shrink-0 text-gray-400"
+                                            className="mr-0.5 size-3.5 shrink-0 text-gray-400"
                                         />
 
                                         <span>
@@ -190,7 +190,7 @@ const ProjectInstanceListItem = ({project, projectInstance, remainingTags}: Proj
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button size="icon" variant="ghost">
-                                <DotsVerticalIcon className="h-4 w-4 hover:cursor-pointer" />
+                                <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
                             </Button>
                         </DropdownMenuTrigger>
 

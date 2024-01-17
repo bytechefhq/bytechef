@@ -86,7 +86,7 @@ const Projects = () => {
                                 (tags?.length ? (
                                     tags?.map((item) => (
                                         <LeftSidebarNavItem
-                                            icon={<TagIcon className="mr-1 h-4 w-4" />}
+                                            icon={<TagIcon className="mr-1 size-4" />}
                                             item={{
                                                 filterData: filterData?.id === item.id && filterData.type === Type.Tag,
                                                 id: item.id!,
@@ -157,7 +157,7 @@ const Projects = () => {
                 ) : (
                     <EmptyList
                         button={<ProjectDialog project={undefined} triggerNode={<Button>Create Project</Button>} />}
-                        icon={<FolderIcon className="h-12 w-12 text-gray-400" />}
+                        icon={<FolderIcon className="size-12 text-gray-400" />}
                         message="Get started by creating a new project."
                         title="No projects"
                     />

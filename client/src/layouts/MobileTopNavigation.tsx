@@ -15,7 +15,7 @@ export function MobileTopNavigation({setMobileMenuOpen}: {setMobileMenuOpen: (va
                     <Button onClick={() => setMobileMenuOpen(true)} size="icon" variant="ghost">
                         <span className="sr-only">Open sidebar</span>
 
-                        <Menu aria-hidden="true" className="h-6 w-6" />
+                        <Menu aria-hidden="true" className="size-6" />
                     </Button>
                 </div>
             </div>

@@ -107,7 +107,7 @@ const WorkflowTestConfigurationDialog = ({
                                 <DialogTitle>Workflow Test Configuration</DialogTitle>
 
                                 <DialogClose asChild>
-                                    <Cross2Icon className="h-4 w-4 cursor-pointer opacity-70" />
+                                    <Cross2Icon className="size-4 cursor-pointer opacity-70" />
                                 </DialogClose>
                             </div>
 
@@ -213,7 +213,7 @@ const WorkflowTestConfigurationDialog = ({
                                                                                 type="button"
                                                                                 variant="outline"
                                                                             >
-                                                                                <PlusIcon className="h-5 w-5" />
+                                                                                <PlusIcon className="size-5" />
                                                                             </Button>
                                                                         </div>
                                                                     </FormControl>

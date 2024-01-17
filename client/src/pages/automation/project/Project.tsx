@@ -511,7 +511,7 @@ const Project = () => {
                                             >
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
-                                                        <PlusIcon className="mx-2 h-5 w-5" />
+                                                        <PlusIcon className="mx-2 size-5" />
                                                     </TooltipTrigger>
 
                                                     <TooltipContent>Create new workflow</TooltipContent>
@@ -642,7 +642,7 @@ const Project = () => {
                             ) : (
                                 <div className="absolute inset-x-0 bottom-0 top-2/4">
                                     <div className="flex w-full flex-col items-center gap-y-6 text-gray-500">
-                                        <RefreshCwOffIcon className="h-16 w-16 text-gray-300" />
+                                        <RefreshCwOffIcon className="size-16 text-gray-300" />
 
                                         <span>Workflow has not yet been executed.</span>
                                     </div>
@@ -652,7 +652,7 @@ const Project = () => {
                             <div className="absolute inset-x-0 bottom-0 top-2/4">
                                 <div className="flex w-full flex-col items-center">
                                     <span className="flex animate-spin space-x-2 text-gray-400">
-                                        <RefreshCwIcon className="h-16 w-16" />
+                                        <RefreshCwIcon className="size-16" />
                                     </span>
 
                                     <span className="text-gray-500">Workflow is running...</span>

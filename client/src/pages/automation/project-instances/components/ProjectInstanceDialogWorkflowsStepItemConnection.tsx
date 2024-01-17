@@ -67,7 +67,7 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                                         type="button"
                                         variant="outline"
                                     >
-                                        <PlusIcon className="h-5 w-5" />
+                                        <PlusIcon className="size-5" />
                                     </Button>
                                 </div>
                             </FormControl>

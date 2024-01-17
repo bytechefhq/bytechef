@@ -188,16 +188,16 @@ const Property = ({
             <div className="relative w-full">
                 {showInputTypeSwitchButton && (
                     <Button
-                        className="absolute right-0 top-0 h-auto w-auto p-0.5"
+                        className="absolute right-0 top-0 size-auto p-0.5"
                         onClick={handleInputTypeSwitchButtonClick}
                         size="icon"
                         title="Switch input type"
                         variant="ghost"
                     >
                         {mentionInput ? (
-                            <FormInputIcon className="h-5 w-5 text-gray-800" />
+                            <FormInputIcon className="size-5 text-gray-800" />
                         ) : (
-                            <FunctionSquareIcon className="h-5 w-5 text-gray-800" />
+                            <FunctionSquareIcon className="size-5 text-gray-800" />
                         )}
                     </Button>
                 )}
@@ -320,7 +320,7 @@ const Property = ({
                         )}
 
                         {controlType === 'CODE_EDITOR' && (
-                            <div className="h-full w-full border-2">
+                            <div className="size-full border-2">
                                 <Editor
                                     defaultValue="// Add your custom code here..."
                                     language={actionName}
