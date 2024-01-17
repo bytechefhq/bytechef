@@ -7,11 +7,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The action maps values of a given object to fresh keys and returns a new object containing those newly mapped keys.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "mapKeys",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "Object containing one or more properties.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -20,19 +24,18 @@
       "name": "input",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Object containing one or more properties.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "The collection of of \"mappings\" where \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -41,12 +44,12 @@
       "name": "mappings",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "The collection of of \"mappings\" where \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.",
       "exampleValue": null,
       "label": "Mappings",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -55,16 +58,15 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -73,7 +75,6 @@
           "name": "from",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
@@ -84,6 +85,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -92,7 +94,6 @@
           "name": "to",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
@@ -102,28 +103,19 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
-    "sampleOutput": null,
     "title": "Map Keys",
-    "perform": { },
     "outputSchema": null,
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -132,11 +124,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Map an array of key value objects to a single object.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "mapListToObject",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "An array of key value objects.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -145,7 +141,6 @@
       "name": "input",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "An array of key value objects.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
@@ -154,10 +149,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "The value's key will serve as the key in the newly created object.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -166,7 +162,6 @@
       "name": "fieldKey",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The value's key will serve as the key in the newly created object.",
       "exampleValue": null,
       "label": "Field Key",
       "placeholder": null,
@@ -177,6 +172,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The value of the key will become the value in the new object.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -185,7 +181,6 @@
       "name": "fieldValue",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The value of the key will become the value in the new object.",
       "exampleValue": null,
       "label": "Field Key",
       "placeholder": null,
@@ -195,18 +190,9 @@
       "options": null,
       "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "Map list to object",
-    "perform": { },
     "outputSchema": null,
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -215,11 +201,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Transform object properties by assigning new values and generate a new object with updated properties.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "mapMultipleValuesBetweenObjects",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "Object containing one or more properties.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -228,19 +218,18 @@
       "name": "input",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Object containing one or more properties.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "Object containing one or more properties.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -249,19 +238,18 @@
       "name": "value",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Object containing one or more properties.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "The collection of of \"mappings\" where \"From\" corresponds to an existing key in the Input, while the key \"To\" is utilized to determine the value to which the \"From\" key should be set, by referring to its key in the Values.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -270,12 +258,12 @@
       "name": "mappings",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "The collection of of \"mappings\" where \"From\" corresponds to an existing key in the Input, while the key \"To\" is utilized to determine the value to which the \"From\" key should be set, by referring to its key in the Values.",
       "exampleValue": null,
       "label": "Mappings",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -284,16 +272,15 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -302,7 +289,6 @@
           "name": "from",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
@@ -313,6 +299,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -321,7 +308,6 @@
           "name": "to",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
@@ -331,28 +317,19 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
-    "sampleOutput": null,
     "title": "Map multiple values between objects\n",
-    "perform": { },
     "outputSchema": null,
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -361,11 +338,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Transform the fields of an object and assign them new keys.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "mapObjects",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The value type.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -374,7 +355,6 @@
       "name": "type",
       "type": "INTEGER",
       "defaultValue": null,
-      "description": "The value type.",
       "exampleValue": null,
       "label": "Type",
       "placeholder": null,
@@ -391,10 +371,11 @@
         "label": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
+      "description": "The object containing one or more properties.",
       "displayCondition": "type === 1",
       "expressionEnabled": null,
       "hidden": null,
@@ -403,19 +384,18 @@
       "name": "input",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "The object containing one or more properties.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "The array containing one or more properties.",
       "displayCondition": "type === 2",
       "expressionEnabled": null,
       "hidden": null,
@@ -424,7 +404,6 @@
       "name": "input",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "The array containing one or more properties.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
@@ -433,10 +412,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "The collection of of \"mappings\"  where the \"From\" key as the key and the value as the key that needs mapping. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -445,12 +425,12 @@
       "name": "mappings",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "The collection of of \"mappings\"  where the \"From\" key as the key and the value as the key that needs mapping. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.",
       "exampleValue": null,
       "label": "Mapping",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -459,16 +439,15 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -477,7 +456,6 @@
           "name": "from",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
@@ -488,6 +466,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -496,7 +475,6 @@
           "name": "to",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
@@ -506,17 +484,18 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "Should fields from the original object that do not have mappings be included?",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -525,7 +504,6 @@
       "name": "includeUnmapped",
       "type": "BOOLEAN",
       "defaultValue": true,
-      "description": "Should fields from the original object that do not have mappings be included?",
       "exampleValue": null,
       "label": "Include Unmapped",
       "placeholder": null,
@@ -543,6 +521,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
+      "description": "Should fields that have null values be included?",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -551,7 +530,6 @@
       "name": "includeNulls",
       "type": "BOOLEAN",
       "defaultValue": true,
-      "description": "Should fields that have null values be included?",
       "exampleValue": null,
       "label": "Include Nulls",
       "placeholder": null,
@@ -569,6 +547,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
+      "description": "Should fields with empty string values be included?",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -577,7 +556,6 @@
       "name": "includeEmptyStrings",
       "type": "BOOLEAN",
       "defaultValue": true,
-      "description": "Should fields with empty string values be included?",
       "exampleValue": null,
       "label": "Include empty strings",
       "placeholder": null,
@@ -595,6 +573,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
+      "description": "A list of fields that are required on the mapped object.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -603,12 +582,12 @@
       "name": "requiredFields",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "A list of fields that are required on the mapped object.",
       "exampleValue": null,
       "label": "Required fields",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -617,7 +596,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -631,21 +609,12 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
-    "sampleOutput": null,
     "title": "Map objects",
-    "perform": { },
     "outputSchema": null,
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -654,11 +623,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Transform an object or array of objects into an array of key-value pairs.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "mapObjectsToList",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The value type.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -667,7 +640,6 @@
       "name": "type",
       "type": "INTEGER",
       "defaultValue": null,
-      "description": "The value type.",
       "exampleValue": null,
       "label": "Type",
       "placeholder": null,
@@ -684,10 +656,11 @@
         "label": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
+      "description": "The object containing one or more properties.",
       "displayCondition": "type === 1",
       "expressionEnabled": null,
       "hidden": null,
@@ -696,19 +669,18 @@
       "name": "input",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "The object containing one or more properties.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "The array containing one or more properties.",
       "displayCondition": "type === 1",
       "expressionEnabled": null,
       "hidden": null,
@@ -717,7 +689,6 @@
       "name": "input",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "The array containing one or more properties.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
@@ -726,10 +697,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "The key name to which keys should be mapped.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -738,7 +710,6 @@
       "name": "fieldKey",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The key name to which keys should be mapped.",
       "exampleValue": null,
       "label": "Field key",
       "placeholder": null,
@@ -749,6 +720,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The key name to which values should be mapped.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -757,7 +729,6 @@
       "name": "valueKey",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The key name to which values should be mapped.",
       "exampleValue": null,
       "label": "Value key",
       "placeholder": null,
@@ -767,18 +738,9 @@
       "options": null,
       "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "Map objects to list",
-    "perform": { },
     "outputSchema": null,
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -787,11 +749,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The action maps a given value by matching it with the defined mappings, and it returns the outcome of the mapping. In case there is no mapping specified for the value, it returns the default value, and if there is no default defined, it returns null.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "mapOneValue",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The value type.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -800,7 +766,6 @@
       "name": "type",
       "type": "INTEGER",
       "defaultValue": null,
-      "description": "The value type.",
       "exampleValue": null,
       "label": "Value Type",
       "placeholder": null,
@@ -857,10 +822,11 @@
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
+      "description": "The value you want to map.",
       "displayCondition": "type === 1",
       "expressionEnabled": null,
       "hidden": null,
@@ -869,7 +835,6 @@
       "name": "value",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "The value you want to map.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
@@ -878,10 +843,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "The value you want to map.",
       "displayCondition": "type === 2",
       "expressionEnabled": null,
       "hidden": null,
@@ -890,7 +856,6 @@
       "name": "value",
       "type": "BOOLEAN",
       "defaultValue": null,
-      "description": "The value you want to map.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
@@ -908,6 +873,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
+      "description": "The value you want to map.",
       "displayCondition": "type === 3",
       "expressionEnabled": null,
       "hidden": null,
@@ -916,15 +882,15 @@
       "name": "value",
       "type": "DATE",
       "defaultValue": null,
-      "description": "The value you want to map.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
+      "description": "The value you want to map.",
       "displayCondition": "type === 4",
       "expressionEnabled": null,
       "hidden": null,
@@ -933,15 +899,15 @@
       "name": "value",
       "type": "DATE_TIME",
       "defaultValue": null,
-      "description": "The value you want to map.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
+      "description": "The value you want to map.",
       "displayCondition": "type === 5",
       "expressionEnabled": null,
       "hidden": null,
@@ -950,17 +916,17 @@
       "name": "value",
       "type": "INTEGER",
       "defaultValue": null,
-      "description": "The value you want to map.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
+      "description": "The value you want to map.",
       "displayCondition": "type === 6",
       "expressionEnabled": null,
       "hidden": null,
@@ -969,13 +935,13 @@
       "name": "value",
       "type": "NULL",
       "defaultValue": null,
-      "description": "The value you want to map.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "controlType": null
     }, {
       "advancedOption": null,
+      "description": "The value you want to map.",
       "displayCondition": "type === 7",
       "expressionEnabled": null,
       "hidden": null,
@@ -984,7 +950,6 @@
       "name": "value",
       "type": "NUMBER",
       "defaultValue": null,
-      "description": "The value you want to map.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
@@ -994,10 +959,11 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
+      "description": "The value you want to map.",
       "displayCondition": "type === 8",
       "expressionEnabled": null,
       "hidden": null,
@@ -1006,12 +972,12 @@
       "name": "value",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "The value you want to map.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1020,7 +986,6 @@
         "name": null,
         "type": "ARRAY",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1029,10 +994,11 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1041,7 +1007,6 @@
         "name": null,
         "type": "BOOLEAN",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1059,6 +1024,7 @@
         "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1067,15 +1033,15 @@
         "name": null,
         "type": "DATE",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "DATE",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1084,15 +1050,15 @@
         "name": null,
         "type": "DATE_TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1101,17 +1067,17 @@
         "name": null,
         "type": "INTEGER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1120,13 +1086,13 @@
         "name": null,
         "type": "NULL",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "controlType": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1135,7 +1101,6 @@
         "name": null,
         "type": "NUMBER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1145,10 +1110,11 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1157,19 +1123,18 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1178,7 +1143,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1189,6 +1153,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1197,22 +1162,21 @@
         "name": null,
         "type": "TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "TIME"
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "The value you want to map.",
       "displayCondition": "type === 9",
       "expressionEnabled": null,
       "hidden": null,
@@ -1221,7 +1185,6 @@
       "name": "value",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The value you want to map.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
@@ -1232,6 +1195,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The value you want to map.",
       "displayCondition": "type === 10",
       "expressionEnabled": null,
       "hidden": null,
@@ -1240,15 +1204,15 @@
       "name": "value",
       "type": "TIME",
       "defaultValue": null,
-      "description": "The value you want to map.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     }, {
       "advancedOption": null,
+      "description": "If there is no existing mapping, assign this value a default mapping.",
       "displayCondition": "type === 1",
       "expressionEnabled": null,
       "hidden": null,
@@ -1257,7 +1221,6 @@
       "name": "defaultValue",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "If there is no existing mapping, assign this value a default mapping.",
       "exampleValue": null,
       "label": "Default value",
       "placeholder": null,
@@ -1266,10 +1229,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "If there is no existing mapping, assign this value a default mapping.",
       "displayCondition": "type === 2",
       "expressionEnabled": null,
       "hidden": null,
@@ -1278,7 +1242,6 @@
       "name": "defaultValue",
       "type": "BOOLEAN",
       "defaultValue": null,
-      "description": "If there is no existing mapping, assign this value a default mapping.",
       "exampleValue": null,
       "label": "Default value",
       "placeholder": null,
@@ -1296,6 +1259,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
+      "description": "If there is no existing mapping, assign this value a default mapping.",
       "displayCondition": "type === 3",
       "expressionEnabled": null,
       "hidden": null,
@@ -1304,15 +1268,15 @@
       "name": "defaultValue",
       "type": "DATE",
       "defaultValue": null,
-      "description": "If there is no existing mapping, assign this value a default mapping.",
       "exampleValue": null,
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
+      "description": "If there is no existing mapping, assign this value a default mapping.",
       "displayCondition": "type === 4",
       "expressionEnabled": null,
       "hidden": null,
@@ -1321,15 +1285,15 @@
       "name": "defaultValue",
       "type": "DATE_TIME",
       "defaultValue": null,
-      "description": "If there is no existing mapping, assign this value a default mapping.",
       "exampleValue": null,
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
+      "description": "If there is no existing mapping, assign this value a default mapping.",
       "displayCondition": "type === 5",
       "expressionEnabled": null,
       "hidden": null,
@@ -1338,17 +1302,17 @@
       "name": "defaultValue",
       "type": "INTEGER",
       "defaultValue": null,
-      "description": "If there is no existing mapping, assign this value a default mapping.",
       "exampleValue": null,
       "label": "Default value",
       "placeholder": null,
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
+      "description": "If there is no existing mapping, assign this value a default mapping.",
       "displayCondition": "type === 6",
       "expressionEnabled": null,
       "hidden": null,
@@ -1357,13 +1321,13 @@
       "name": "defaultValue",
       "type": "NULL",
       "defaultValue": null,
-      "description": "If there is no existing mapping, assign this value a default mapping.",
       "exampleValue": null,
       "label": "Default value",
       "placeholder": null,
       "controlType": null
     }, {
       "advancedOption": null,
+      "description": "If there is no existing mapping, assign this value a default mapping.",
       "displayCondition": "type === 7",
       "expressionEnabled": null,
       "hidden": null,
@@ -1372,7 +1336,6 @@
       "name": "defaultValue",
       "type": "NUMBER",
       "defaultValue": null,
-      "description": "If there is no existing mapping, assign this value a default mapping.",
       "exampleValue": null,
       "label": "Default value",
       "placeholder": null,
@@ -1382,10 +1345,11 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
+      "description": "If there is no existing mapping, assign this value a default mapping.",
       "displayCondition": "type === 8",
       "expressionEnabled": null,
       "hidden": null,
@@ -1394,19 +1358,18 @@
       "name": "defaultValue",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "If there is no existing mapping, assign this value a default mapping.",
       "exampleValue": null,
       "label": "Default value",
       "placeholder": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "If there is no existing mapping, assign this value a default mapping.",
       "displayCondition": "type === 9",
       "expressionEnabled": null,
       "hidden": null,
@@ -1415,7 +1378,6 @@
       "name": "defaultValue",
       "type": "STRING",
       "defaultValue": null,
-      "description": "If there is no existing mapping, assign this value a default mapping.",
       "exampleValue": null,
       "label": "Default value",
       "placeholder": null,
@@ -1426,6 +1388,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "If there is no existing mapping, assign this value a default mapping.",
       "displayCondition": "type === 10",
       "expressionEnabled": null,
       "hidden": null,
@@ -1434,15 +1397,15 @@
       "name": "defaultValue",
       "type": "TIME",
       "defaultValue": null,
-      "description": "If there is no existing mapping, assign this value a default mapping.",
       "exampleValue": null,
       "label": "Default value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     }, {
       "advancedOption": null,
+      "description": "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1451,12 +1414,12 @@
       "name": "mappings",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "The collection of \"mappings\" associated with a certain value. When the specified value matches the \"From\" value, the connector will provide the corresponding \"To\" value.",
       "exampleValue": null,
       "label": "Mappings",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1465,16 +1428,15 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 1",
           "expressionEnabled": null,
           "hidden": null,
@@ -1483,7 +1445,6 @@
           "name": "from",
           "type": "ARRAY",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
@@ -1492,10 +1453,11 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 2",
           "expressionEnabled": null,
           "hidden": null,
@@ -1504,7 +1466,6 @@
           "name": "from",
           "type": "BOOLEAN",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
@@ -1522,6 +1483,7 @@
           "controlType": "CHECKBOX"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 3",
           "expressionEnabled": null,
           "hidden": null,
@@ -1530,15 +1492,15 @@
           "name": "from",
           "type": "DATE",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 4",
           "expressionEnabled": null,
           "hidden": null,
@@ -1547,15 +1509,15 @@
           "name": "from",
           "type": "DATE_TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 5",
           "expressionEnabled": null,
           "hidden": null,
@@ -1564,17 +1526,17 @@
           "name": "from",
           "type": "INTEGER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 6",
           "expressionEnabled": null,
           "hidden": null,
@@ -1583,13 +1545,13 @@
           "name": "from",
           "type": "NULL",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
           "controlType": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 7",
           "expressionEnabled": null,
           "hidden": null,
@@ -1598,7 +1560,6 @@
           "name": "from",
           "type": "NUMBER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
@@ -1608,10 +1569,11 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 8",
           "expressionEnabled": null,
           "hidden": null,
@@ -1620,19 +1582,18 @@
           "name": "from",
           "type": "OBJECT",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
           "additionalProperties": null,
           "multipleValues": null,
-          "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 9",
           "expressionEnabled": null,
           "hidden": null,
@@ -1641,7 +1602,6 @@
           "name": "from",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
@@ -1652,6 +1612,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 10",
           "expressionEnabled": null,
           "hidden": null,
@@ -1660,15 +1621,15 @@
           "name": "from",
           "type": "TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 1",
           "expressionEnabled": null,
           "hidden": null,
@@ -1677,7 +1638,6 @@
           "name": "to",
           "type": "ARRAY",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
@@ -1686,10 +1646,11 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 2",
           "expressionEnabled": null,
           "hidden": null,
@@ -1698,7 +1659,6 @@
           "name": "to",
           "type": "BOOLEAN",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
@@ -1716,6 +1676,7 @@
           "controlType": "CHECKBOX"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 3",
           "expressionEnabled": null,
           "hidden": null,
@@ -1724,15 +1685,15 @@
           "name": "to",
           "type": "DATE",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 4",
           "expressionEnabled": null,
           "hidden": null,
@@ -1741,15 +1702,15 @@
           "name": "to",
           "type": "DATE_TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 5",
           "expressionEnabled": null,
           "hidden": null,
@@ -1758,17 +1719,17 @@
           "name": "to",
           "type": "INTEGER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 6",
           "expressionEnabled": null,
           "hidden": null,
@@ -1777,13 +1738,13 @@
           "name": "to",
           "type": "NULL",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
           "controlType": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 7",
           "expressionEnabled": null,
           "hidden": null,
@@ -1792,7 +1753,6 @@
           "name": "to",
           "type": "NUMBER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
@@ -1802,10 +1762,11 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 8",
           "expressionEnabled": null,
           "hidden": null,
@@ -1814,19 +1775,18 @@
           "name": "to",
           "type": "OBJECT",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
           "additionalProperties": null,
           "multipleValues": null,
-          "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 9",
           "expressionEnabled": null,
           "hidden": null,
@@ -1835,7 +1795,6 @@
           "name": "to",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
@@ -1846,6 +1805,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 10",
           "expressionEnabled": null,
           "hidden": null,
@@ -1854,36 +1814,26 @@
           "name": "to",
           "type": "TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
-    "sampleOutput": null,
     "title": "Map one value",
-    "perform": { },
     "outputSchema": null,
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "dataMapper",
@@ -1892,11 +1842,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "When provided with an object or an array of objects, the function maps one or more values to new values. It can be restricted to specific keys of the object. The resulting data structure is a new object or array with the original structure and mapped values.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "mapValues",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The value type.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1905,7 +1859,6 @@
       "name": "type",
       "type": "INTEGER",
       "defaultValue": null,
-      "description": "The value type.",
       "exampleValue": null,
       "label": "Type",
       "placeholder": null,
@@ -1922,10 +1875,11 @@
         "label": "Array",
         "value": 2
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
+      "description": "The object to map.",
       "displayCondition": "type === 1",
       "expressionEnabled": null,
       "hidden": null,
@@ -1934,19 +1888,18 @@
       "name": "input",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "The object to map.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "The array of values to map.",
       "displayCondition": "type === 2",
       "expressionEnabled": null,
       "hidden": null,
@@ -1955,7 +1908,6 @@
       "name": "input",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "The array of values to map.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
@@ -1964,10 +1916,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "The collection of of \"mappings\" where \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1976,12 +1929,12 @@
       "name": "mappings",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "The collection of of \"mappings\" where \"From\" refers to a particular key from the Input, while \"To\" represents the name of a new key that is assigned the corresponding value of the \"From\" key.",
       "exampleValue": null,
       "label": "Mappings",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1990,16 +1943,15 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 1",
           "expressionEnabled": null,
           "hidden": null,
@@ -2008,7 +1960,6 @@
           "name": "from",
           "type": "ARRAY",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
@@ -2017,10 +1968,11 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 2",
           "expressionEnabled": null,
           "hidden": null,
@@ -2029,7 +1981,6 @@
           "name": "from",
           "type": "BOOLEAN",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
@@ -2047,6 +1998,7 @@
           "controlType": "CHECKBOX"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 3",
           "expressionEnabled": null,
           "hidden": null,
@@ -2055,15 +2007,15 @@
           "name": "from",
           "type": "DATE",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 4",
           "expressionEnabled": null,
           "hidden": null,
@@ -2072,15 +2024,15 @@
           "name": "from",
           "type": "DATE_TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 5",
           "expressionEnabled": null,
           "hidden": null,
@@ -2089,17 +2041,17 @@
           "name": "from",
           "type": "INTEGER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 6",
           "expressionEnabled": null,
           "hidden": null,
@@ -2108,13 +2060,13 @@
           "name": "from",
           "type": "NULL",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
           "controlType": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 7",
           "expressionEnabled": null,
           "hidden": null,
@@ -2123,7 +2075,6 @@
           "name": "from",
           "type": "NUMBER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
@@ -2133,10 +2084,11 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 8",
           "expressionEnabled": null,
           "hidden": null,
@@ -2145,19 +2097,18 @@
           "name": "from",
           "type": "OBJECT",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
           "additionalProperties": null,
           "multipleValues": null,
-          "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 9",
           "expressionEnabled": null,
           "hidden": null,
@@ -2166,7 +2117,6 @@
           "name": "from",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
@@ -2177,6 +2127,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 10",
           "expressionEnabled": null,
           "hidden": null,
@@ -2185,15 +2136,15 @@
           "name": "from",
           "type": "TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "From",
           "placeholder": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 1",
           "expressionEnabled": null,
           "hidden": null,
@@ -2202,7 +2153,6 @@
           "name": "to",
           "type": "ARRAY",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
@@ -2211,10 +2161,11 @@
           "minItems": null,
           "multipleValues": null,
           "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "ARRAY_BUILDER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 2",
           "expressionEnabled": null,
           "hidden": null,
@@ -2223,7 +2174,6 @@
           "name": "to",
           "type": "BOOLEAN",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
@@ -2241,6 +2191,7 @@
           "controlType": "CHECKBOX"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 3",
           "expressionEnabled": null,
           "hidden": null,
@@ -2249,15 +2200,15 @@
           "name": "to",
           "type": "DATE",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 4",
           "expressionEnabled": null,
           "hidden": null,
@@ -2266,15 +2217,15 @@
           "name": "to",
           "type": "DATE_TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 5",
           "expressionEnabled": null,
           "hidden": null,
@@ -2283,17 +2234,17 @@
           "name": "to",
           "type": "INTEGER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 6",
           "expressionEnabled": null,
           "hidden": null,
@@ -2302,13 +2253,13 @@
           "name": "to",
           "type": "NULL",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
           "controlType": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 7",
           "expressionEnabled": null,
           "hidden": null,
@@ -2317,7 +2268,6 @@
           "name": "to",
           "type": "NUMBER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
@@ -2327,10 +2277,11 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 8",
           "expressionEnabled": null,
           "hidden": null,
@@ -2339,19 +2290,18 @@
           "name": "to",
           "type": "OBJECT",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
           "additionalProperties": null,
           "multipleValues": null,
-          "objectType": null,
           "options": null,
           "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "OBJECT_BUILDER"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 9",
           "expressionEnabled": null,
           "hidden": null,
@@ -2360,7 +2310,6 @@
           "name": "to",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
@@ -2371,6 +2320,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": "type === 10",
           "expressionEnabled": null,
           "hidden": null,
@@ -2379,36 +2329,26 @@
           "name": "to",
           "type": "TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": "To",
           "placeholder": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
-    "sampleOutput": null,
     "title": "Map values",
-    "perform": { },
     "outputSchema": null,
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

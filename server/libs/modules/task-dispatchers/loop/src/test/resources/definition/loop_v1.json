@@ -3,6 +3,8 @@
   "help": null,
   "icon": "path:assets/loop.svg",
   "name": "loop",
+  "outputSchema": null,
+  "outputSchemaFunction": null,
   "properties": [ {
     "advancedOption": null,
     "displayCondition": null,
@@ -22,7 +24,7 @@
     "minItems": null,
     "multipleValues": null,
     "options": null,
-    "controlType": "ARRAY_BUILDER"
+    "controlType": "MULTI_SELECT"
   }, {
     "advancedOption": null,
     "displayCondition": null,
@@ -59,58 +61,16 @@
     "metadata": { },
     "required": null,
     "name": "iteratee",
-    "type": "OBJECT",
+    "type": "TASK",
     "defaultValue": null,
-    "description": "The task or task dispatcher to use.",
+    "description": null,
     "exampleValue": null,
     "label": null,
     "placeholder": null,
-    "options": null,
-    "additionalProperties": null,
-    "multipleValues": null,
-    "objectType": "TASK",
-    "properties": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": null
   } ],
   "title": "Loop",
-  "variableProperties": [ {
-    "advancedOption": null,
-    "displayCondition": null,
-    "expressionEnabled": null,
-    "hidden": null,
-    "metadata": { },
-    "required": null,
-    "name": "item",
-    "type": "STRING",
-    "defaultValue": null,
-    "description": null,
-    "exampleValue": null,
-    "label": null,
-    "placeholder": null,
-    "options": null,
-    "controlType": "TEXT",
-    "maxLength": null,
-    "minLength": null
-  }, {
-    "advancedOption": null,
-    "displayCondition": null,
-    "expressionEnabled": null,
-    "hidden": null,
-    "metadata": { },
-    "required": null,
-    "name": "index",
-    "type": "STRING",
-    "defaultValue": null,
-    "description": null,
-    "exampleValue": null,
-    "label": null,
-    "placeholder": null,
-    "options": null,
-    "controlType": "TEXT",
-    "maxLength": null,
-    "minLength": null
-  } ],
-  "version": 1,
-  "outputSchemaDataSource": null,
-  "outputSchema": null
+  "variableProperties": null,
+  "variablePropertiesFunction": { },
+  "version": 1
 }

@@ -136,10 +136,9 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         when(mockedParameters.getRequiredBoolean(STREAM))
             .thenReturn(true);
 
-        OutputSchema outputSchema = OpenAIUtils.getOutputSchema(
-            mockedParameters, mockedParameters, mockedContext);
+        OutputSchema outputSchema = OpenAIUtils.getOutputSchema(mockedParameters, mockedParameters, mockedContext);
 
-        Assertions.assertEquals(OpenAIUtils.outputSchemaResponseForStream, outputSchema.sampleOutput());
+        Assertions.assertEquals(OpenAIUtils.outputSchemaResponseForStream, outputSchema.definition());
     }
 
     @Test

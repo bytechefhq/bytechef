@@ -3,12 +3,13 @@
   "help": null,
   "icon": "path:assets/loopbreak.svg",
   "name": "loop-break",
+  "outputSchema": null,
+  "outputSchemaFunction": null,
   "properties": null,
   "resources": null,
   "taskProperties": null,
   "title": "Loop Break",
   "variableProperties": null,
-  "version": 1,
-  "outputSchema": null,
-  "outputSchemaDataSource": null
+  "variablePropertiesFunction": null,
+  "version": 1
 }

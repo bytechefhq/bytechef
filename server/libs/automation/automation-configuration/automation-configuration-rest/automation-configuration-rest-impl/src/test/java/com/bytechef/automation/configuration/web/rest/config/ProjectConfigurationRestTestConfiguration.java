@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Configuration;
     "com.bytechef.automation.configuration.web.rest",
     "com.bytechef.automation.configuration.web.rest.adapter",
     "com.bytechef.automation.configuration.web.rest.mapper",
+    "com.bytechef.platform.configuration.web.rest.adapter",
+    "com.bytechef.platform.configuration.web.rest.mapper"
 })
 @Configuration
 @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")

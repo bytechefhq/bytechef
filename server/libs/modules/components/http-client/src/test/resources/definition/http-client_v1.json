@@ -7,11 +7,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The request method to use.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "get",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The URI to make the request to",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -20,7 +24,6 @@
       "name": "uri",
       "type": "STRING",
       "defaultValue": "",
-      "description": "The URI to make the request to",
       "exampleValue": null,
       "label": "URI",
       "placeholder": "https://example.com/index.html",
@@ -31,6 +34,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Download the response even if SSL certificate validation is not possible.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -39,7 +43,6 @@
       "name": "allowUnauthorizedCerts",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Download the response even if SSL certificate validation is not possible.",
       "exampleValue": null,
       "label": "Allow Unauthorized Certs",
       "placeholder": null,
@@ -57,6 +60,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
+      "description": "The format in which the data gets returned from the URL.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -65,7 +69,6 @@
       "name": "responseType",
       "type": "STRING",
       "defaultValue": "JSON",
-      "description": "The format in which the data gets returned from the URL.",
       "exampleValue": null,
       "label": "Response Format",
       "placeholder": null,
@@ -96,6 +99,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The name of the file if the response is returned as a file object.",
       "displayCondition": "responseType === 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
@@ -104,7 +108,6 @@
       "name": "responseFilename",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The name of the file if the response is returned as a file object.",
       "exampleValue": null,
       "label": "Response Filename",
       "placeholder": null,
@@ -115,6 +118,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Headers to send.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -123,12 +127,12 @@
       "name": "headers",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Headers to send.",
       "exampleValue": null,
       "label": "Headers",
       "placeholder": "Add header",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -137,7 +141,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -148,13 +151,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Query parameters to send.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -163,12 +166,12 @@
       "name": "queryParameters",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Query parameters to send.",
       "exampleValue": null,
       "label": "Query Parameters",
       "placeholder": "Add parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -177,7 +180,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -188,24 +190,14 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "GET",
-    "outputSchema": null,
     "perform": { },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -214,11 +206,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The request method to use.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "post",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The URI to make the request to",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -227,7 +223,6 @@
       "name": "uri",
       "type": "STRING",
       "defaultValue": "",
-      "description": "The URI to make the request to",
       "exampleValue": null,
       "label": "URI",
       "placeholder": "https://example.com/index.html",
@@ -238,6 +233,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Download the response even if SSL certificate validation is not possible.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -246,7 +242,6 @@
       "name": "allowUnauthorizedCerts",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Download the response even if SSL certificate validation is not possible.",
       "exampleValue": null,
       "label": "Allow Unauthorized Certs",
       "placeholder": null,
@@ -264,6 +259,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
+      "description": "The format in which the data gets returned from the URL.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -272,7 +268,6 @@
       "name": "responseType",
       "type": "STRING",
       "defaultValue": "JSON",
-      "description": "The format in which the data gets returned from the URL.",
       "exampleValue": null,
       "label": "Response Format",
       "placeholder": null,
@@ -303,6 +298,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The name of the file if the response is returned as a file object.",
       "displayCondition": "responseType === 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
@@ -311,7 +307,6 @@
       "name": "responseFilename",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The name of the file if the response is returned as a file object.",
       "exampleValue": null,
       "label": "Response Filename",
       "placeholder": null,
@@ -322,6 +317,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Headers to send.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -330,12 +326,12 @@
       "name": "headers",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Headers to send.",
       "exampleValue": null,
       "label": "Headers",
       "placeholder": "Add header",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -344,7 +340,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -355,13 +350,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Query parameters to send.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -370,12 +365,12 @@
       "name": "queryParameters",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Query parameters to send.",
       "exampleValue": null,
       "label": "Query Parameters",
       "placeholder": "Add parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -384,7 +379,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -395,13 +389,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Body Parameters to send.",
       "displayCondition": "bodyContentType === 'JSON'",
       "expressionEnabled": null,
       "hidden": null,
@@ -410,12 +404,12 @@
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Body Parameters to send.",
       "exampleValue": null,
       "label": "Body Content - JSON",
       "placeholder": "Add Parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -424,7 +418,6 @@
         "name": null,
         "type": "ARRAY",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -433,10 +426,11 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -445,7 +439,6 @@
         "name": null,
         "type": "BOOLEAN",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -463,6 +456,7 @@
         "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -471,15 +465,15 @@
         "name": null,
         "type": "DATE",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -488,15 +482,15 @@
         "name": null,
         "type": "DATE_TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -505,17 +499,17 @@
         "name": null,
         "type": "INTEGER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -524,13 +518,13 @@
         "name": null,
         "type": "NULL",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "controlType": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -539,7 +533,6 @@
         "name": null,
         "type": "NUMBER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -549,10 +542,11 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -561,19 +555,18 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -582,7 +575,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -593,6 +585,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -601,22 +594,21 @@
         "name": null,
         "type": "TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "XML content to send.",
       "displayCondition": "bodyContentType === 'XML'",
       "expressionEnabled": null,
       "hidden": null,
@@ -625,19 +617,18 @@
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "XML content to send.",
       "exampleValue": null,
       "label": "Body Content - XML",
       "placeholder": "Add Parameter",
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Body parameters to send.",
       "displayCondition": "bodyContentType === 'FORM_DATA'",
       "expressionEnabled": null,
       "hidden": null,
@@ -646,12 +637,12 @@
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Body parameters to send.",
       "exampleValue": null,
       "label": "Body Content - Form Data",
       "placeholder": "Add Parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -660,7 +651,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -671,24 +661,21 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
         "metadata": { },
         "required": null,
         "name": null,
-        "type": "OBJECT",
+        "type": "FILE_ENTRY",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "objectType": "FILE_ENTRY",
-        "options": null,
         "properties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -697,7 +684,6 @@
           "name": "extension",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -708,6 +694,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -716,7 +703,6 @@
           "name": "mimeType",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -727,6 +713,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -735,7 +722,6 @@
           "name": "name",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -746,6 +732,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -754,7 +741,6 @@
           "name": "url",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -764,17 +750,16 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "FILE_ENTRY"
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Body parameters to send.",
       "displayCondition": "bodyContentType === 'FORM_URL_ENCODED'",
       "expressionEnabled": null,
       "hidden": null,
@@ -783,12 +768,12 @@
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Body parameters to send.",
       "exampleValue": null,
       "label": "Body Content - Form URL-Encoded",
       "placeholder": "Add Parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -797,7 +782,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -808,13 +792,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The raw text to send.",
       "displayCondition": "bodyContentType === 'RAW'",
       "expressionEnabled": null,
       "hidden": null,
@@ -823,7 +807,6 @@
       "name": "bodyContent",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The raw text to send.",
       "exampleValue": null,
       "label": "Body Content - Raw",
       "placeholder": null,
@@ -834,24 +817,21 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The object property which contains a reference to the file to upload.",
       "displayCondition": "bodyContentType === 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
       "required": null,
       "name": "bodyContent",
-      "type": "OBJECT",
+      "type": "FILE_ENTRY",
       "defaultValue": null,
-      "description": "The object property which contains a reference to the file to upload.",
       "exampleValue": null,
       "label": "Body Content - Binary",
       "placeholder": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": "FILE_ENTRY",
-      "options": null,
       "properties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -860,7 +840,6 @@
         "name": "extension",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -871,6 +850,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -879,7 +859,6 @@
         "name": "mimeType",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -890,6 +869,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -898,7 +878,6 @@
         "name": "name",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -909,6 +888,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -917,7 +897,6 @@
         "name": "url",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -927,10 +906,10 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "FILE_ENTRY"
     }, {
       "advancedOption": true,
+      "description": "Content-Type to use when sending body parameters.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -939,7 +918,6 @@
       "name": "bodyContentType",
       "type": "STRING",
       "defaultValue": "",
-      "description": "Content-Type to use when sending body parameters.",
       "exampleValue": null,
       "label": "Body Content Type",
       "placeholder": null,
@@ -980,6 +958,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Mime-Type to use when sending raw body content.",
       "displayCondition": "['BINARY', 'RAW'].includes('bodyContentType')",
       "expressionEnabled": null,
       "hidden": null,
@@ -988,7 +967,6 @@
       "name": "bodyContentMimeType",
       "type": "STRING",
       "defaultValue": "text/plain",
-      "description": "Mime-Type to use when sending raw body content.",
       "exampleValue": null,
       "label": "Content Type",
       "placeholder": "text/plain",
@@ -999,6 +977,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Returns the full response data instead of only the body.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1007,7 +986,6 @@
       "name": "fullResponse",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Returns the full response data instead of only the body.",
       "exampleValue": null,
       "label": "Full Response",
       "placeholder": null,
@@ -1025,6 +1003,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Follow non-GET HTTP 3xx redirects.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1033,7 +1012,6 @@
       "name": "followAllRedirects",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Follow non-GET HTTP 3xx redirects.",
       "exampleValue": null,
       "label": "Follow All Redirects",
       "placeholder": null,
@@ -1051,6 +1029,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Follow GET HTTP 3xx redirects.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1059,7 +1038,6 @@
       "name": "followRedirect",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Follow GET HTTP 3xx redirects.",
       "exampleValue": null,
       "label": "Follow GET Redirect",
       "placeholder": null,
@@ -1077,6 +1055,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Succeeds also when the status code is not 2xx.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1085,7 +1064,6 @@
       "name": "ignoreResponseCode",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Succeeds also when the status code is not 2xx.",
       "exampleValue": null,
       "label": "Ignore Response Code",
       "placeholder": null,
@@ -1103,6 +1081,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "HTTP proxy to use.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1111,7 +1090,6 @@
       "name": "proxy",
       "type": "STRING",
       "defaultValue": "",
-      "description": "HTTP proxy to use.",
       "exampleValue": null,
       "label": "Proxy",
       "placeholder": "https://myproxy:3128",
@@ -1122,6 +1100,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Time in ms to wait for the server to send a response before aborting the request.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1130,28 +1109,18 @@
       "name": "timeout",
       "type": "INTEGER",
       "defaultValue": 1000,
-      "description": "Time in ms to wait for the server to send a response before aborting the request.",
       "exampleValue": null,
       "label": "Timeout",
       "placeholder": null,
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "POST",
-    "outputSchema": null,
     "perform": { },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -1160,11 +1129,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The request method to use.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "put",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The URI to make the request to",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1173,7 +1146,6 @@
       "name": "uri",
       "type": "STRING",
       "defaultValue": "",
-      "description": "The URI to make the request to",
       "exampleValue": null,
       "label": "URI",
       "placeholder": "https://example.com/index.html",
@@ -1184,6 +1156,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Download the response even if SSL certificate validation is not possible.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1192,7 +1165,6 @@
       "name": "allowUnauthorizedCerts",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Download the response even if SSL certificate validation is not possible.",
       "exampleValue": null,
       "label": "Allow Unauthorized Certs",
       "placeholder": null,
@@ -1210,6 +1182,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
+      "description": "The format in which the data gets returned from the URL.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1218,7 +1191,6 @@
       "name": "responseType",
       "type": "STRING",
       "defaultValue": "JSON",
-      "description": "The format in which the data gets returned from the URL.",
       "exampleValue": null,
       "label": "Response Format",
       "placeholder": null,
@@ -1249,6 +1221,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The name of the file if the response is returned as a file object.",
       "displayCondition": "responseType === 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
@@ -1257,7 +1230,6 @@
       "name": "responseFilename",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The name of the file if the response is returned as a file object.",
       "exampleValue": null,
       "label": "Response Filename",
       "placeholder": null,
@@ -1268,6 +1240,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Headers to send.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1276,12 +1249,12 @@
       "name": "headers",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Headers to send.",
       "exampleValue": null,
       "label": "Headers",
       "placeholder": "Add header",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1290,7 +1263,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1301,13 +1273,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Query parameters to send.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1316,12 +1288,12 @@
       "name": "queryParameters",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Query parameters to send.",
       "exampleValue": null,
       "label": "Query Parameters",
       "placeholder": "Add parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1330,7 +1302,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1341,13 +1312,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Body Parameters to send.",
       "displayCondition": "bodyContentType === 'JSON'",
       "expressionEnabled": null,
       "hidden": null,
@@ -1356,12 +1327,12 @@
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Body Parameters to send.",
       "exampleValue": null,
       "label": "Body Content - JSON",
       "placeholder": "Add Parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1370,7 +1341,6 @@
         "name": null,
         "type": "ARRAY",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1379,10 +1349,11 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1391,7 +1362,6 @@
         "name": null,
         "type": "BOOLEAN",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1409,6 +1379,7 @@
         "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1417,15 +1388,15 @@
         "name": null,
         "type": "DATE",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1434,15 +1405,15 @@
         "name": null,
         "type": "DATE_TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1451,17 +1422,17 @@
         "name": null,
         "type": "INTEGER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1470,13 +1441,13 @@
         "name": null,
         "type": "NULL",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "controlType": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1485,7 +1456,6 @@
         "name": null,
         "type": "NUMBER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1495,10 +1465,11 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1507,19 +1478,18 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1528,7 +1498,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1539,6 +1508,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1547,22 +1517,21 @@
         "name": null,
         "type": "TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "XML content to send.",
       "displayCondition": "bodyContentType === 'XML'",
       "expressionEnabled": null,
       "hidden": null,
@@ -1571,19 +1540,18 @@
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "XML content to send.",
       "exampleValue": null,
       "label": "Body Content - XML",
       "placeholder": "Add Parameter",
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Body parameters to send.",
       "displayCondition": "bodyContentType === 'FORM_DATA'",
       "expressionEnabled": null,
       "hidden": null,
@@ -1592,12 +1560,12 @@
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Body parameters to send.",
       "exampleValue": null,
       "label": "Body Content - Form Data",
       "placeholder": "Add Parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1606,7 +1574,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1617,24 +1584,21 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
         "metadata": { },
         "required": null,
         "name": null,
-        "type": "OBJECT",
+        "type": "FILE_ENTRY",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "objectType": "FILE_ENTRY",
-        "options": null,
         "properties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1643,7 +1607,6 @@
           "name": "extension",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1654,6 +1617,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1662,7 +1626,6 @@
           "name": "mimeType",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1673,6 +1636,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1681,7 +1645,6 @@
           "name": "name",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1692,6 +1655,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1700,7 +1664,6 @@
           "name": "url",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1710,17 +1673,16 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "FILE_ENTRY"
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Body parameters to send.",
       "displayCondition": "bodyContentType === 'FORM_URL_ENCODED'",
       "expressionEnabled": null,
       "hidden": null,
@@ -1729,12 +1691,12 @@
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Body parameters to send.",
       "exampleValue": null,
       "label": "Body Content - Form URL-Encoded",
       "placeholder": "Add Parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1743,7 +1705,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1754,13 +1715,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The raw text to send.",
       "displayCondition": "bodyContentType === 'RAW'",
       "expressionEnabled": null,
       "hidden": null,
@@ -1769,7 +1730,6 @@
       "name": "bodyContent",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The raw text to send.",
       "exampleValue": null,
       "label": "Body Content - Raw",
       "placeholder": null,
@@ -1780,24 +1740,21 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The object property which contains a reference to the file to upload.",
       "displayCondition": "bodyContentType === 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
       "required": null,
       "name": "bodyContent",
-      "type": "OBJECT",
+      "type": "FILE_ENTRY",
       "defaultValue": null,
-      "description": "The object property which contains a reference to the file to upload.",
       "exampleValue": null,
       "label": "Body Content - Binary",
       "placeholder": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": "FILE_ENTRY",
-      "options": null,
       "properties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1806,7 +1763,6 @@
         "name": "extension",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1817,6 +1773,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1825,7 +1782,6 @@
         "name": "mimeType",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1836,6 +1792,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1844,7 +1801,6 @@
         "name": "name",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1855,6 +1811,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1863,7 +1820,6 @@
         "name": "url",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1873,10 +1829,10 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "FILE_ENTRY"
     }, {
       "advancedOption": true,
+      "description": "Content-Type to use when sending body parameters.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1885,7 +1841,6 @@
       "name": "bodyContentType",
       "type": "STRING",
       "defaultValue": "",
-      "description": "Content-Type to use when sending body parameters.",
       "exampleValue": null,
       "label": "Body Content Type",
       "placeholder": null,
@@ -1926,6 +1881,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Mime-Type to use when sending raw body content.",
       "displayCondition": "['BINARY', 'RAW'].includes('bodyContentType')",
       "expressionEnabled": null,
       "hidden": null,
@@ -1934,7 +1890,6 @@
       "name": "bodyContentMimeType",
       "type": "STRING",
       "defaultValue": "text/plain",
-      "description": "Mime-Type to use when sending raw body content.",
       "exampleValue": null,
       "label": "Content Type",
       "placeholder": "text/plain",
@@ -1945,6 +1900,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Returns the full response data instead of only the body.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1953,7 +1909,6 @@
       "name": "fullResponse",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Returns the full response data instead of only the body.",
       "exampleValue": null,
       "label": "Full Response",
       "placeholder": null,
@@ -1971,6 +1926,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Follow non-GET HTTP 3xx redirects.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1979,7 +1935,6 @@
       "name": "followAllRedirects",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Follow non-GET HTTP 3xx redirects.",
       "exampleValue": null,
       "label": "Follow All Redirects",
       "placeholder": null,
@@ -1997,6 +1952,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Follow GET HTTP 3xx redirects.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2005,7 +1961,6 @@
       "name": "followRedirect",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Follow GET HTTP 3xx redirects.",
       "exampleValue": null,
       "label": "Follow GET Redirect",
       "placeholder": null,
@@ -2023,6 +1978,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Succeeds also when the status code is not 2xx.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2031,7 +1987,6 @@
       "name": "ignoreResponseCode",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Succeeds also when the status code is not 2xx.",
       "exampleValue": null,
       "label": "Ignore Response Code",
       "placeholder": null,
@@ -2049,6 +2004,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "HTTP proxy to use.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2057,7 +2013,6 @@
       "name": "proxy",
       "type": "STRING",
       "defaultValue": "",
-      "description": "HTTP proxy to use.",
       "exampleValue": null,
       "label": "Proxy",
       "placeholder": "https://myproxy:3128",
@@ -2068,6 +2023,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Time in ms to wait for the server to send a response before aborting the request.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2076,28 +2032,18 @@
       "name": "timeout",
       "type": "INTEGER",
       "defaultValue": 1000,
-      "description": "Time in ms to wait for the server to send a response before aborting the request.",
       "exampleValue": null,
       "label": "Timeout",
       "placeholder": null,
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "PUT",
-    "outputSchema": null,
     "perform": { },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -2106,11 +2052,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The request method to use.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "patch",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The URI to make the request to",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2119,7 +2069,6 @@
       "name": "uri",
       "type": "STRING",
       "defaultValue": "",
-      "description": "The URI to make the request to",
       "exampleValue": null,
       "label": "URI",
       "placeholder": "https://example.com/index.html",
@@ -2130,6 +2079,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Download the response even if SSL certificate validation is not possible.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2138,7 +2088,6 @@
       "name": "allowUnauthorizedCerts",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Download the response even if SSL certificate validation is not possible.",
       "exampleValue": null,
       "label": "Allow Unauthorized Certs",
       "placeholder": null,
@@ -2156,6 +2105,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
+      "description": "The format in which the data gets returned from the URL.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2164,7 +2114,6 @@
       "name": "responseType",
       "type": "STRING",
       "defaultValue": "JSON",
-      "description": "The format in which the data gets returned from the URL.",
       "exampleValue": null,
       "label": "Response Format",
       "placeholder": null,
@@ -2195,6 +2144,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The name of the file if the response is returned as a file object.",
       "displayCondition": "responseType === 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
@@ -2203,7 +2153,6 @@
       "name": "responseFilename",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The name of the file if the response is returned as a file object.",
       "exampleValue": null,
       "label": "Response Filename",
       "placeholder": null,
@@ -2214,6 +2163,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Headers to send.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2222,12 +2172,12 @@
       "name": "headers",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Headers to send.",
       "exampleValue": null,
       "label": "Headers",
       "placeholder": "Add header",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2236,7 +2186,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -2247,13 +2196,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Query parameters to send.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2262,12 +2211,12 @@
       "name": "queryParameters",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Query parameters to send.",
       "exampleValue": null,
       "label": "Query Parameters",
       "placeholder": "Add parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2276,7 +2225,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -2287,13 +2235,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Body Parameters to send.",
       "displayCondition": "bodyContentType === 'JSON'",
       "expressionEnabled": null,
       "hidden": null,
@@ -2302,12 +2250,12 @@
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Body Parameters to send.",
       "exampleValue": null,
       "label": "Body Content - JSON",
       "placeholder": "Add Parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2316,7 +2264,6 @@
         "name": null,
         "type": "ARRAY",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -2325,10 +2272,11 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "ARRAY_BUILDER"
+        "controlType": "ARRAY_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2337,7 +2285,6 @@
         "name": null,
         "type": "BOOLEAN",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -2355,6 +2302,7 @@
         "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2363,15 +2311,15 @@
         "name": null,
         "type": "DATE",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE"
+        "controlType": "DATE",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2380,15 +2328,15 @@
         "name": null,
         "type": "DATE_TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "DATE_TIME"
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2397,17 +2345,17 @@
         "name": null,
         "type": "INTEGER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "INTEGER"
+        "controlType": "INTEGER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2416,13 +2364,13 @@
         "name": null,
         "type": "NULL",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "controlType": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2431,7 +2379,6 @@
         "name": null,
         "type": "NUMBER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -2441,10 +2388,11 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "NUMBER"
+        "controlType": "NUMBER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2453,19 +2401,18 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": null,
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2474,7 +2421,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -2485,6 +2431,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2493,22 +2440,21 @@
         "name": null,
         "type": "TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "optionsDataSource": null,
-        "controlType": "TIME"
+        "controlType": "TIME",
+        "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "XML content to send.",
       "displayCondition": "bodyContentType === 'XML'",
       "expressionEnabled": null,
       "hidden": null,
@@ -2517,19 +2463,18 @@
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "XML content to send.",
       "exampleValue": null,
       "label": "Body Content - XML",
       "placeholder": "Add Parameter",
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Body parameters to send.",
       "displayCondition": "bodyContentType === 'FORM_DATA'",
       "expressionEnabled": null,
       "hidden": null,
@@ -2538,12 +2483,12 @@
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Body parameters to send.",
       "exampleValue": null,
       "label": "Body Content - Form Data",
       "placeholder": "Add Parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2552,7 +2497,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -2563,24 +2507,21 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
         "metadata": { },
         "required": null,
         "name": null,
-        "type": "OBJECT",
+        "type": "FILE_ENTRY",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "objectType": "FILE_ENTRY",
-        "options": null,
         "properties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -2589,7 +2530,6 @@
           "name": "extension",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -2600,6 +2540,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -2608,7 +2549,6 @@
           "name": "mimeType",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -2619,6 +2559,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -2627,7 +2568,6 @@
           "name": "name",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -2638,6 +2578,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -2646,7 +2587,6 @@
           "name": "url",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -2656,17 +2596,16 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "FILE_ENTRY"
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Body parameters to send.",
       "displayCondition": "bodyContentType === 'FORM_URL_ENCODED'",
       "expressionEnabled": null,
       "hidden": null,
@@ -2675,12 +2614,12 @@
       "name": "bodyContent",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Body parameters to send.",
       "exampleValue": null,
       "label": "Body Content - Form URL-Encoded",
       "placeholder": "Add Parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2689,7 +2628,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -2700,13 +2638,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The raw text to send.",
       "displayCondition": "bodyContentType === 'RAW'",
       "expressionEnabled": null,
       "hidden": null,
@@ -2715,7 +2653,6 @@
       "name": "bodyContent",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The raw text to send.",
       "exampleValue": null,
       "label": "Body Content - Raw",
       "placeholder": null,
@@ -2726,24 +2663,21 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The object property which contains a reference to the file to upload.",
       "displayCondition": "bodyContentType === 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
       "metadata": { },
       "required": null,
       "name": "bodyContent",
-      "type": "OBJECT",
+      "type": "FILE_ENTRY",
       "defaultValue": null,
-      "description": "The object property which contains a reference to the file to upload.",
       "exampleValue": null,
       "label": "Body Content - Binary",
       "placeholder": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": "FILE_ENTRY",
-      "options": null,
       "properties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2752,7 +2686,6 @@
         "name": "extension",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -2763,6 +2696,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2771,7 +2705,6 @@
         "name": "mimeType",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -2782,6 +2715,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2790,7 +2724,6 @@
         "name": "name",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -2801,6 +2734,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -2809,7 +2743,6 @@
         "name": "url",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -2819,10 +2752,10 @@
         "options": null,
         "optionsDataSource": null
       } ],
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "FILE_ENTRY"
     }, {
       "advancedOption": true,
+      "description": "Content-Type to use when sending body parameters.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2831,7 +2764,6 @@
       "name": "bodyContentType",
       "type": "STRING",
       "defaultValue": "",
-      "description": "Content-Type to use when sending body parameters.",
       "exampleValue": null,
       "label": "Body Content Type",
       "placeholder": null,
@@ -2872,6 +2804,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Mime-Type to use when sending raw body content.",
       "displayCondition": "['BINARY', 'RAW'].includes('bodyContentType')",
       "expressionEnabled": null,
       "hidden": null,
@@ -2880,7 +2813,6 @@
       "name": "bodyContentMimeType",
       "type": "STRING",
       "defaultValue": "text/plain",
-      "description": "Mime-Type to use when sending raw body content.",
       "exampleValue": null,
       "label": "Content Type",
       "placeholder": "text/plain",
@@ -2891,6 +2823,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Returns the full response data instead of only the body.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2899,7 +2832,6 @@
       "name": "fullResponse",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Returns the full response data instead of only the body.",
       "exampleValue": null,
       "label": "Full Response",
       "placeholder": null,
@@ -2917,6 +2849,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Follow non-GET HTTP 3xx redirects.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2925,7 +2858,6 @@
       "name": "followAllRedirects",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Follow non-GET HTTP 3xx redirects.",
       "exampleValue": null,
       "label": "Follow All Redirects",
       "placeholder": null,
@@ -2943,6 +2875,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Follow GET HTTP 3xx redirects.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2951,7 +2884,6 @@
       "name": "followRedirect",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Follow GET HTTP 3xx redirects.",
       "exampleValue": null,
       "label": "Follow GET Redirect",
       "placeholder": null,
@@ -2969,6 +2901,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Succeeds also when the status code is not 2xx.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2977,7 +2910,6 @@
       "name": "ignoreResponseCode",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Succeeds also when the status code is not 2xx.",
       "exampleValue": null,
       "label": "Ignore Response Code",
       "placeholder": null,
@@ -2995,6 +2927,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "HTTP proxy to use.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3003,7 +2936,6 @@
       "name": "proxy",
       "type": "STRING",
       "defaultValue": "",
-      "description": "HTTP proxy to use.",
       "exampleValue": null,
       "label": "Proxy",
       "placeholder": "https://myproxy:3128",
@@ -3014,6 +2946,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Time in ms to wait for the server to send a response before aborting the request.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3022,28 +2955,18 @@
       "name": "timeout",
       "type": "INTEGER",
       "defaultValue": 1000,
-      "description": "Time in ms to wait for the server to send a response before aborting the request.",
       "exampleValue": null,
       "label": "Timeout",
       "placeholder": null,
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "PATCH",
-    "outputSchema": null,
     "perform": { },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -3052,11 +2975,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The request method to use.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "delete",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The URI to make the request to",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3065,7 +2992,6 @@
       "name": "uri",
       "type": "STRING",
       "defaultValue": "",
-      "description": "The URI to make the request to",
       "exampleValue": null,
       "label": "URI",
       "placeholder": "https://example.com/index.html",
@@ -3076,6 +3002,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Download the response even if SSL certificate validation is not possible.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3084,7 +3011,6 @@
       "name": "allowUnauthorizedCerts",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Download the response even if SSL certificate validation is not possible.",
       "exampleValue": null,
       "label": "Allow Unauthorized Certs",
       "placeholder": null,
@@ -3102,6 +3028,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
+      "description": "The format in which the data gets returned from the URL.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3110,7 +3037,6 @@
       "name": "responseType",
       "type": "STRING",
       "defaultValue": "JSON",
-      "description": "The format in which the data gets returned from the URL.",
       "exampleValue": null,
       "label": "Response Format",
       "placeholder": null,
@@ -3141,6 +3067,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The name of the file if the response is returned as a file object.",
       "displayCondition": "responseType === 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
@@ -3149,7 +3076,6 @@
       "name": "responseFilename",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The name of the file if the response is returned as a file object.",
       "exampleValue": null,
       "label": "Response Filename",
       "placeholder": null,
@@ -3160,6 +3086,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Headers to send.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3168,12 +3095,12 @@
       "name": "headers",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Headers to send.",
       "exampleValue": null,
       "label": "Headers",
       "placeholder": "Add header",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3182,7 +3109,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -3193,13 +3119,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Query parameters to send.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3208,12 +3134,12 @@
       "name": "queryParameters",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Query parameters to send.",
       "exampleValue": null,
       "label": "Query Parameters",
       "placeholder": "Add parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3222,7 +3148,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -3233,13 +3158,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Returns the full response data instead of only the body.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3248,7 +3173,6 @@
       "name": "fullResponse",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Returns the full response data instead of only the body.",
       "exampleValue": null,
       "label": "Full Response",
       "placeholder": null,
@@ -3266,6 +3190,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Follow non-GET HTTP 3xx redirects.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3274,7 +3199,6 @@
       "name": "followAllRedirects",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Follow non-GET HTTP 3xx redirects.",
       "exampleValue": null,
       "label": "Follow All Redirects",
       "placeholder": null,
@@ -3292,6 +3216,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Follow GET HTTP 3xx redirects.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3300,7 +3225,6 @@
       "name": "followRedirect",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Follow GET HTTP 3xx redirects.",
       "exampleValue": null,
       "label": "Follow GET Redirect",
       "placeholder": null,
@@ -3318,6 +3242,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Succeeds also when the status code is not 2xx.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3326,7 +3251,6 @@
       "name": "ignoreResponseCode",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Succeeds also when the status code is not 2xx.",
       "exampleValue": null,
       "label": "Ignore Response Code",
       "placeholder": null,
@@ -3344,6 +3268,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "HTTP proxy to use.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3352,7 +3277,6 @@
       "name": "proxy",
       "type": "STRING",
       "defaultValue": "",
-      "description": "HTTP proxy to use.",
       "exampleValue": null,
       "label": "Proxy",
       "placeholder": "https://myproxy:3128",
@@ -3363,6 +3287,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Time in ms to wait for the server to send a response before aborting the request.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3371,28 +3296,18 @@
       "name": "timeout",
       "type": "INTEGER",
       "defaultValue": 1000,
-      "description": "Time in ms to wait for the server to send a response before aborting the request.",
       "exampleValue": null,
       "label": "Timeout",
       "placeholder": null,
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "DELETE",
-    "outputSchema": null,
     "perform": { },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -3401,11 +3316,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "The request method to use.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "head",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The URI to make the request to",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3414,7 +3333,6 @@
       "name": "uri",
       "type": "STRING",
       "defaultValue": "",
-      "description": "The URI to make the request to",
       "exampleValue": null,
       "label": "URI",
       "placeholder": "https://example.com/index.html",
@@ -3425,6 +3343,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Download the response even if SSL certificate validation is not possible.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3433,7 +3352,6 @@
       "name": "allowUnauthorizedCerts",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Download the response even if SSL certificate validation is not possible.",
       "exampleValue": null,
       "label": "Allow Unauthorized Certs",
       "placeholder": null,
@@ -3451,6 +3369,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
+      "description": "The format in which the data gets returned from the URL.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3459,7 +3378,6 @@
       "name": "responseType",
       "type": "STRING",
       "defaultValue": "JSON",
-      "description": "The format in which the data gets returned from the URL.",
       "exampleValue": null,
       "label": "Response Format",
       "placeholder": null,
@@ -3490,6 +3408,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The name of the file if the response is returned as a file object.",
       "displayCondition": "responseType === 'BINARY'",
       "expressionEnabled": null,
       "hidden": null,
@@ -3498,7 +3417,6 @@
       "name": "responseFilename",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The name of the file if the response is returned as a file object.",
       "exampleValue": null,
       "label": "Response Filename",
       "placeholder": null,
@@ -3509,6 +3427,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Headers to send.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3517,12 +3436,12 @@
       "name": "headers",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Headers to send.",
       "exampleValue": null,
       "label": "Headers",
       "placeholder": "Add header",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3531,7 +3450,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -3542,13 +3460,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Query parameters to send.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3557,12 +3475,12 @@
       "name": "queryParameters",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Query parameters to send.",
       "exampleValue": null,
       "label": "Query Parameters",
       "placeholder": "Add parameter",
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3571,7 +3489,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -3582,13 +3499,13 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Returns the full response data instead of only the body.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3597,7 +3514,6 @@
       "name": "fullResponse",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Returns the full response data instead of only the body.",
       "exampleValue": null,
       "label": "Full Response",
       "placeholder": null,
@@ -3615,6 +3531,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Follow non-GET HTTP 3xx redirects.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3623,7 +3540,6 @@
       "name": "followAllRedirects",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Follow non-GET HTTP 3xx redirects.",
       "exampleValue": null,
       "label": "Follow All Redirects",
       "placeholder": null,
@@ -3641,6 +3557,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Follow GET HTTP 3xx redirects.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3649,7 +3566,6 @@
       "name": "followRedirect",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Follow GET HTTP 3xx redirects.",
       "exampleValue": null,
       "label": "Follow GET Redirect",
       "placeholder": null,
@@ -3667,6 +3583,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "Succeeds also when the status code is not 2xx.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3675,7 +3592,6 @@
       "name": "ignoreResponseCode",
       "type": "BOOLEAN",
       "defaultValue": false,
-      "description": "Succeeds also when the status code is not 2xx.",
       "exampleValue": null,
       "label": "Ignore Response Code",
       "placeholder": null,
@@ -3693,6 +3609,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": true,
+      "description": "HTTP proxy to use.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3701,7 +3618,6 @@
       "name": "proxy",
       "type": "STRING",
       "defaultValue": "",
-      "description": "HTTP proxy to use.",
       "exampleValue": null,
       "label": "Proxy",
       "placeholder": "https://myproxy:3128",
@@ -3712,6 +3628,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": true,
+      "description": "Time in ms to wait for the server to send a response before aborting the request.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -3720,28 +3637,18 @@
       "name": "timeout",
       "type": "INTEGER",
       "defaultValue": 1000,
-      "description": "Time in ms to wait for the server to send a response before aborting the request.",
       "exampleValue": null,
       "label": "Timeout",
       "placeholder": null,
       "maxValue": null,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "HEAD",
-    "outputSchema": null,
     "perform": { },
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "outputSchema": null
   } ],
   "category": null,
   "connection": {
@@ -3751,6 +3658,7 @@
       "name": "api_key",
       "properties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3759,7 +3667,6 @@
         "name": "key",
         "type": "STRING",
         "defaultValue": "api_token",
-        "description": null,
         "exampleValue": null,
         "label": "Key",
         "placeholder": null,
@@ -3770,6 +3677,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3778,7 +3686,6 @@
         "name": "value",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Value",
         "placeholder": null,
@@ -3789,6 +3696,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3797,7 +3705,6 @@
         "name": "addTo",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Add to",
         "placeholder": null,
@@ -3821,8 +3728,6 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -3830,6 +3735,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "authorizationCallback": null
     }, {
       "detectOn": null,
@@ -3837,6 +3744,7 @@
       "name": "bearer_token",
       "properties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3845,7 +3753,6 @@
         "name": "token",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Token",
         "placeholder": null,
@@ -3859,8 +3766,6 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -3868,6 +3773,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "authorizationCallback": null
     }, {
       "detectOn": null,
@@ -3875,6 +3782,7 @@
       "name": "basic_auth",
       "properties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3883,7 +3791,6 @@
         "name": "username",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Username",
         "placeholder": null,
@@ -3894,6 +3801,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3902,7 +3810,6 @@
         "name": "password",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Password",
         "placeholder": null,
@@ -3916,8 +3823,6 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -3925,6 +3830,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "authorizationCallback": null
     }, {
       "detectOn": null,
@@ -3932,6 +3839,7 @@
       "name": "digest_auth",
       "properties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3940,7 +3848,6 @@
         "name": "username",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Username",
         "placeholder": null,
@@ -3951,6 +3858,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3959,7 +3867,6 @@
         "name": "password",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Password",
         "placeholder": null,
@@ -3973,8 +3880,6 @@
       "title": "Digest Auth",
       "type": "DIGEST_AUTH",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -3982,6 +3887,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "authorizationCallback": null
     }, {
       "detectOn": null,
@@ -3989,6 +3896,7 @@
       "name": "oauth2_authorization_code",
       "properties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -3997,7 +3905,6 @@
         "name": "authorizationUrl",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Authorization URL",
         "placeholder": null,
@@ -4008,6 +3915,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4016,7 +3924,6 @@
         "name": "tokenUrl",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Token URL",
         "placeholder": null,
@@ -4027,6 +3934,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4035,7 +3943,6 @@
         "name": "clientId",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Client Id",
         "placeholder": null,
@@ -4046,6 +3953,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4054,7 +3962,6 @@
         "name": "clientSecret",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Client Secret",
         "placeholder": null,
@@ -4065,6 +3972,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4073,7 +3981,6 @@
         "name": "headerPrefix",
         "type": "STRING",
         "defaultValue": "Bearer",
-        "description": null,
         "exampleValue": null,
         "label": "Header Prefix",
         "placeholder": null,
@@ -4084,6 +3991,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": "Optional comma-delimited list of scopes",
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4092,7 +4000,6 @@
         "name": "scopes",
         "type": "STRING",
         "defaultValue": null,
-        "description": "Optional comma-delimited list of scopes",
         "exampleValue": null,
         "label": "Scopes",
         "placeholder": null,
@@ -4106,8 +4013,6 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -4115,6 +4020,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "authorizationCallback": null
     }, {
       "detectOn": null,
@@ -4122,6 +4029,7 @@
       "name": "oauth2_implicit_code",
       "properties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4130,7 +4038,6 @@
         "name": "authorizationUrl",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Authorization URL",
         "placeholder": null,
@@ -4141,6 +4048,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4149,7 +4057,6 @@
         "name": "clientId",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Client Id",
         "placeholder": null,
@@ -4160,6 +4067,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4168,7 +4076,6 @@
         "name": "clientSecret",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Client Secret",
         "placeholder": null,
@@ -4179,6 +4086,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4187,7 +4095,6 @@
         "name": "headerPrefix",
         "type": "STRING",
         "defaultValue": "Bearer",
-        "description": null,
         "exampleValue": null,
         "label": "Header Prefix",
         "placeholder": null,
@@ -4198,6 +4105,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": "Optional comma-delimited list of scopes",
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4206,7 +4114,6 @@
         "name": "scopes",
         "type": "STRING",
         "defaultValue": null,
-        "description": "Optional comma-delimited list of scopes",
         "exampleValue": null,
         "label": "Scopes",
         "placeholder": null,
@@ -4220,8 +4127,6 @@
       "title": "OAuth2 Implicit Code",
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -4229,6 +4134,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "authorizationCallback": null
     }, {
       "detectOn": null,
@@ -4236,6 +4143,7 @@
       "name": "oauth2_client_credentials",
       "properties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4244,7 +4152,6 @@
         "name": "tokenUrl",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Token URL",
         "placeholder": null,
@@ -4255,6 +4162,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4263,7 +4171,6 @@
         "name": "clientId",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Client Id",
         "placeholder": null,
@@ -4274,6 +4181,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4282,7 +4190,6 @@
         "name": "clientSecret",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Client Secret",
         "placeholder": null,
@@ -4293,6 +4200,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4301,7 +4209,6 @@
         "name": "headerPrefix",
         "type": "STRING",
         "defaultValue": "Bearer",
-        "description": null,
         "exampleValue": null,
         "label": "Header Prefix",
         "placeholder": null,
@@ -4312,6 +4219,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": "Optional comma-delimited list of scopes",
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -4320,7 +4228,6 @@
         "name": "scopes",
         "type": "STRING",
         "defaultValue": null,
-        "description": "Optional comma-delimited list of scopes",
         "exampleValue": null,
         "label": "Scopes",
         "placeholder": null,
@@ -4334,8 +4241,6 @@
       "title": "OAuth2 Client Credentials",
       "type": "OAUTH2_CLIENT_CREDENTIALS",
       "acquire": null,
-      "authorizationUrl": null,
-      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -4343,6 +4248,8 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "authorizationCallback": null
     } ],
     "componentName": "httpClient",
@@ -4350,6 +4257,7 @@
     "componentTitle": "HTTP Client",
     "properties": [ {
       "advancedOption": null,
+      "description": null,
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -4358,7 +4266,6 @@
       "name": "baseUri",
       "type": "STRING",
       "defaultValue": null,
-      "description": null,
       "exampleValue": null,
       "label": "Base URI",
       "placeholder": null,

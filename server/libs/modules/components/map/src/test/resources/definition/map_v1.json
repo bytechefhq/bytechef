@@ -7,11 +7,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": null,
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "map",
+    "outputSchemaDefaultFunction": false,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "List of items to iterate over.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -20,7 +24,6 @@
       "name": "list",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "List of items to iterate over.",
       "exampleValue": null,
       "label": "List of items",
       "placeholder": null,
@@ -32,13 +35,9 @@
       "optionsDataSource": null,
       "controlType": "ARRAY_BUILDER"
     } ],
-    "sampleOutput": null,
     "title": null,
     "outputSchema": null,
-    "perform": null,
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null
+    "perform": null
   } ],
   "category": null,
   "connection": null,

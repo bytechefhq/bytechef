@@ -20,13 +20,11 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
 import com.bytechef.platform.component.handler.loader.AbstractComponentHandlerLoader;
 import com.bytechef.platform.component.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.platform.component.util.OpenApiClientUtils;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -39,8 +37,7 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
             .execute(
                 inputParameters, OptionalUtils.orElse(actionDefinition.getProperties(), List.of()),
                 OptionalUtils.orElse(actionDefinition.getOutputSchema(), null),
-                OptionalUtils.orElse(actionDefinition.getMetadata(), null), context)
-            .getBody(new Context.TypeReference<Map<String, ?>>() {});
+                OptionalUtils.orElse(actionDefinition.getMetadata(), null), context);
 
     public OpenApiComponentHandlerLoader() {
         super(

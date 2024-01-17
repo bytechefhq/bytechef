@@ -7,11 +7,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Execute an SQL query.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "query",
+    "outputSchemaDefaultFunction": false,
+    "outputSchemaFunction": { },
     "properties": [ {
       "advancedOption": null,
+      "description": "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -20,7 +24,6 @@
       "name": "query",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.",
       "exampleValue": null,
       "label": "Query",
       "placeholder": "SELECT id, name FROM customer WHERE age > :age AND height <= :height",
@@ -31,6 +34,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The list of properties which should be used as query parameters.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -39,12 +43,12 @@
       "name": "parameters",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "The list of properties which should be used as query parameters.",
       "exampleValue": null,
       "label": "Parameters",
       "placeholder": null,
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -53,7 +57,6 @@
         "name": null,
         "type": "BOOLEAN",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -71,6 +74,7 @@
         "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -79,7 +83,6 @@
         "name": null,
         "type": "DATE_TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -88,6 +91,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -96,7 +100,6 @@
         "name": null,
         "type": "NUMBER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -110,6 +113,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -118,7 +122,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -129,22 +132,12 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "Query",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    },
     "perform": { },
     "outputSchema": null
   }, {
@@ -155,11 +148,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Insert rows in database.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "insert",
+    "outputSchemaDefaultFunction": false,
+    "outputSchemaFunction": { },
     "properties": [ {
       "advancedOption": null,
+      "description": "Name of the schema the table belongs to.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -168,7 +165,6 @@
       "name": "schema",
       "type": "STRING",
       "defaultValue": "public",
-      "description": "Name of the schema the table belongs to.",
       "exampleValue": null,
       "label": "Schema",
       "placeholder": null,
@@ -179,6 +175,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Name of the table in which to insert data to.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -187,7 +184,6 @@
       "name": "table",
       "type": "STRING",
       "defaultValue": null,
-      "description": "Name of the table in which to insert data to.",
       "exampleValue": null,
       "label": "Table",
       "placeholder": null,
@@ -198,6 +194,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The list of the properties which should used as columns for the new rows.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -206,12 +203,12 @@
       "name": "columns",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "The list of the properties which should used as columns for the new rows.",
       "exampleValue": null,
       "label": "Columns",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -220,7 +217,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -238,6 +234,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "List of rows.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -246,12 +243,12 @@
       "name": "rows",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "List of rows.",
       "exampleValue": null,
       "label": "Rows",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -260,12 +257,12 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -274,7 +271,6 @@
           "name": null,
           "type": "ARRAY",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -287,6 +283,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -295,7 +292,6 @@
           "name": null,
           "type": "BOOLEAN",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -313,6 +309,7 @@
           "controlType": "CHECKBOX"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -321,7 +318,6 @@
           "name": null,
           "type": "DATE",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -330,6 +326,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -338,7 +335,6 @@
           "name": null,
           "type": "DATE_TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -347,6 +343,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -355,7 +352,6 @@
           "name": null,
           "type": "INTEGER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -366,6 +362,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -374,13 +371,13 @@
           "name": null,
           "type": "NULL",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
           "controlType": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -389,7 +386,6 @@
           "name": null,
           "type": "NUMBER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -403,6 +399,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -411,19 +408,18 @@
           "name": null,
           "type": "OBJECT",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
           "additionalProperties": null,
           "multipleValues": null,
-          "objectType": null,
           "options": null,
           "properties": null,
           "controlType": "OBJECT_BUILDER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -432,7 +428,6 @@
           "name": null,
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -443,6 +438,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -451,7 +447,6 @@
           "name": null,
           "type": "TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -460,7 +455,6 @@
           "optionsDataSource": null
         } ],
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": null,
         "controlType": "OBJECT_BUILDER",
@@ -473,16 +467,7 @@
       "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "Insert",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    },
     "perform": { },
     "outputSchema": null
   }, {
@@ -493,11 +478,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Update rows in database.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "update",
+    "outputSchemaDefaultFunction": false,
+    "outputSchemaFunction": { },
     "properties": [ {
       "advancedOption": null,
+      "description": "Name of the schema the table belongs to.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -506,7 +495,6 @@
       "name": "schema",
       "type": "STRING",
       "defaultValue": "public",
-      "description": "Name of the schema the table belongs to.",
       "exampleValue": null,
       "label": "Schema",
       "placeholder": null,
@@ -517,6 +505,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Name of the table in which to update data in.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -525,7 +514,6 @@
       "name": "table",
       "type": "STRING",
       "defaultValue": null,
-      "description": "Name of the table in which to update data in.",
       "exampleValue": null,
       "label": "Table",
       "placeholder": null,
@@ -536,6 +524,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The list of the properties which should used as columns for the updated rows.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -544,12 +533,12 @@
       "name": "columns",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "The list of the properties which should used as columns for the updated rows.",
       "exampleValue": null,
       "label": "Columns",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -558,7 +547,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -576,6 +564,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The name of the property which decides which rows in the database should be updated.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -584,7 +573,6 @@
       "name": "updateKey",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The name of the property which decides which rows in the database should be updated.",
       "exampleValue": null,
       "label": "Update Key",
       "placeholder": "id",
@@ -595,6 +583,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "List of rows.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -603,12 +592,12 @@
       "name": "rows",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "List of rows.",
       "exampleValue": null,
       "label": "Rows",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -617,12 +606,12 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -631,7 +620,6 @@
           "name": null,
           "type": "ARRAY",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -644,6 +632,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -652,7 +641,6 @@
           "name": null,
           "type": "BOOLEAN",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -670,6 +658,7 @@
           "controlType": "CHECKBOX"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -678,7 +667,6 @@
           "name": null,
           "type": "DATE",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -687,6 +675,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -695,7 +684,6 @@
           "name": null,
           "type": "DATE_TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -704,6 +692,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -712,7 +701,6 @@
           "name": null,
           "type": "INTEGER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -723,6 +711,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -731,13 +720,13 @@
           "name": null,
           "type": "NULL",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
           "controlType": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -746,7 +735,6 @@
           "name": null,
           "type": "NUMBER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -760,6 +748,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -768,19 +757,18 @@
           "name": null,
           "type": "OBJECT",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
           "additionalProperties": null,
           "multipleValues": null,
-          "objectType": null,
           "options": null,
           "properties": null,
           "controlType": "OBJECT_BUILDER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -789,7 +777,6 @@
           "name": null,
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -800,6 +787,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -808,7 +796,6 @@
           "name": null,
           "type": "TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -817,7 +804,6 @@
           "optionsDataSource": null
         } ],
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": null,
         "controlType": "OBJECT_BUILDER",
@@ -830,16 +816,7 @@
       "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "Update",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    },
     "perform": { },
     "outputSchema": null
   }, {
@@ -850,11 +827,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Delete rows from database.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "delete",
+    "outputSchemaDefaultFunction": false,
+    "outputSchemaFunction": { },
     "properties": [ {
       "advancedOption": null,
+      "description": "Name of the schema the table belongs to.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -863,7 +844,6 @@
       "name": "schema",
       "type": "STRING",
       "defaultValue": "public",
-      "description": "Name of the schema the table belongs to.",
       "exampleValue": null,
       "label": "Schema",
       "placeholder": null,
@@ -874,6 +854,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Name of the table in which to update data in.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -882,7 +863,6 @@
       "name": "table",
       "type": "STRING",
       "defaultValue": null,
-      "description": "Name of the table in which to update data in.",
       "exampleValue": null,
       "label": "Table",
       "placeholder": null,
@@ -893,6 +873,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Name of the property which decides which rows in the database should be deleted.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -901,7 +882,6 @@
       "name": "deleteKey",
       "type": "STRING",
       "defaultValue": null,
-      "description": "Name of the property which decides which rows in the database should be deleted.",
       "exampleValue": null,
       "label": "Update Key",
       "placeholder": "id",
@@ -912,6 +892,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "List of rows.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -920,12 +901,12 @@
       "name": "rows",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "List of rows.",
       "exampleValue": null,
       "label": "Rows",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -934,12 +915,12 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -948,7 +929,6 @@
           "name": null,
           "type": "ARRAY",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -961,6 +941,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -969,7 +950,6 @@
           "name": null,
           "type": "BOOLEAN",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -987,6 +967,7 @@
           "controlType": "CHECKBOX"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -995,7 +976,6 @@
           "name": null,
           "type": "DATE",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1004,6 +984,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1012,7 +993,6 @@
           "name": null,
           "type": "DATE_TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1021,6 +1001,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1029,7 +1010,6 @@
           "name": null,
           "type": "INTEGER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1040,6 +1020,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1048,13 +1029,13 @@
           "name": null,
           "type": "NULL",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
           "controlType": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1063,7 +1044,6 @@
           "name": null,
           "type": "NUMBER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1077,6 +1057,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1085,19 +1066,18 @@
           "name": null,
           "type": "OBJECT",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
           "additionalProperties": null,
           "multipleValues": null,
-          "objectType": null,
           "options": null,
           "properties": null,
           "controlType": "OBJECT_BUILDER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1106,7 +1086,6 @@
           "name": null,
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1117,6 +1096,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1125,7 +1105,6 @@
           "name": null,
           "type": "TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1134,7 +1113,6 @@
           "optionsDataSource": null
         } ],
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": null,
         "controlType": "OBJECT_BUILDER",
@@ -1147,16 +1125,7 @@
       "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "Delete",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    },
     "perform": { },
     "outputSchema": null
   }, {
@@ -1167,11 +1136,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Execute an SQL DML or DML statement.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "execute",
+    "outputSchemaDefaultFunction": false,
+    "outputSchemaFunction": { },
     "properties": [ {
       "advancedOption": null,
+      "description": "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1180,7 +1153,6 @@
       "name": "execute",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.",
       "exampleValue": null,
       "label": "Execute",
       "placeholder": "UPDATE TABLE product set name = :name WHERE product > :product AND price <= :price",
@@ -1191,6 +1163,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "List of rows.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1199,12 +1172,12 @@
       "name": "rows",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "List of rows.",
       "exampleValue": null,
       "label": "Rows",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1213,12 +1186,12 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1227,7 +1200,6 @@
           "name": null,
           "type": "ARRAY",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1240,6 +1212,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1248,7 +1221,6 @@
           "name": null,
           "type": "BOOLEAN",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1266,6 +1238,7 @@
           "controlType": "CHECKBOX"
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1274,7 +1247,6 @@
           "name": null,
           "type": "DATE",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1283,6 +1255,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1291,7 +1264,6 @@
           "name": null,
           "type": "DATE_TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1300,6 +1272,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1308,7 +1281,6 @@
           "name": null,
           "type": "INTEGER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1319,6 +1291,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1327,13 +1300,13 @@
           "name": null,
           "type": "NULL",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
           "controlType": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1342,7 +1315,6 @@
           "name": null,
           "type": "NUMBER",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1356,6 +1328,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1364,19 +1337,18 @@
           "name": null,
           "type": "OBJECT",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
           "additionalProperties": null,
           "multipleValues": null,
-          "objectType": null,
           "options": null,
           "properties": null,
           "controlType": "OBJECT_BUILDER",
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1385,7 +1357,6 @@
           "name": null,
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1396,6 +1367,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -1404,7 +1376,6 @@
           "name": null,
           "type": "TIME",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -1413,7 +1384,6 @@
           "optionsDataSource": null
         } ],
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": null,
         "controlType": "OBJECT_BUILDER",
@@ -1427,6 +1397,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The list of properties which should be used as parameters.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1435,12 +1406,12 @@
       "name": "parameters",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "The list of properties which should be used as parameters.",
       "exampleValue": null,
       "label": "Parameters",
       "placeholder": null,
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1449,7 +1420,6 @@
         "name": null,
         "type": "BOOLEAN",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1467,6 +1437,7 @@
         "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1475,7 +1446,6 @@
         "name": null,
         "type": "DATE_TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1484,6 +1454,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1492,7 +1463,6 @@
         "name": null,
         "type": "NUMBER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1506,6 +1476,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -1514,7 +1485,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -1525,22 +1495,12 @@
         "optionsDataSource": null
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
       "controlType": "OBJECT_BUILDER",
       "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "Execute",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    },
     "perform": { },
     "outputSchema": null
   } ],
@@ -1552,6 +1512,7 @@
     "componentTitle": "MySQL",
     "properties": [ {
       "advancedOption": null,
+      "description": null,
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1560,7 +1521,6 @@
       "name": "host",
       "type": "STRING",
       "defaultValue": null,
-      "description": null,
       "exampleValue": null,
       "label": "Host",
       "placeholder": null,
@@ -1571,6 +1531,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": null,
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1579,7 +1540,6 @@
       "name": "port",
       "type": "INTEGER",
       "defaultValue": null,
-      "description": null,
       "exampleValue": null,
       "label": "Port",
       "placeholder": null,
@@ -1590,6 +1550,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": null,
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1598,7 +1559,6 @@
       "name": "database",
       "type": "STRING",
       "defaultValue": null,
-      "description": null,
       "exampleValue": null,
       "label": "Database",
       "placeholder": null,
@@ -1609,6 +1569,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": null,
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1617,7 +1578,6 @@
       "name": "username",
       "type": "STRING",
       "defaultValue": null,
-      "description": null,
       "exampleValue": null,
       "label": "Username",
       "placeholder": null,
@@ -1628,6 +1588,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": null,
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1636,7 +1597,6 @@
       "name": "password",
       "type": "STRING",
       "defaultValue": null,
-      "description": null,
       "exampleValue": null,
       "label": "Password",
       "placeholder": null,

@@ -151,6 +151,6 @@ public class JsonFileReadAction {
             result = context.json(json -> json.read((String) context.file(file -> file.readToString(fileEntry))));
         }
 
-        return Map.of("result", result);
+        return result;
     }
 }

@@ -7,11 +7,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Executes custom Java code.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "java",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "Initialize parameter values used in the custom code.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -20,12 +24,12 @@
       "name": "input",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Initialize parameter values used in the custom code.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -34,7 +38,6 @@
         "name": null,
         "type": "ARRAY",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -43,10 +46,11 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -55,7 +59,6 @@
         "name": null,
         "type": "BOOLEAN",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -73,6 +76,7 @@
         "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -81,15 +85,15 @@
         "name": null,
         "type": "DATE",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "DATE",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -98,15 +102,15 @@
         "name": null,
         "type": "DATE_TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -115,17 +119,17 @@
         "name": null,
         "type": "INTEGER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -134,13 +138,13 @@
         "name": null,
         "type": "NULL",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "controlType": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -149,7 +153,6 @@
         "name": null,
         "type": "NUMBER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -159,10 +162,11 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -171,19 +175,18 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -192,7 +195,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -203,6 +205,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -211,22 +214,21 @@
         "name": null,
         "type": "TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "TIME"
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "Add your Java custom logic here.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -235,7 +237,6 @@
       "name": "script",
       "type": "STRING",
       "defaultValue": null,
-      "description": "Add your Java custom logic here.",
       "exampleValue": null,
       "label": "Java code",
       "placeholder": null,
@@ -245,18 +246,9 @@
       "options": null,
       "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "Java",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    },
-    "perform": { },
-    "outputSchema": null
+    "outputSchema": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "script",
@@ -265,11 +257,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Executes custom JavaScript code.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "javascript",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "Initialize parameter values used in the custom code.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -278,12 +274,12 @@
       "name": "input",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Initialize parameter values used in the custom code.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -292,7 +288,6 @@
         "name": null,
         "type": "ARRAY",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -301,10 +296,11 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -313,7 +309,6 @@
         "name": null,
         "type": "BOOLEAN",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -331,6 +326,7 @@
         "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -339,15 +335,15 @@
         "name": null,
         "type": "DATE",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "DATE",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -356,15 +352,15 @@
         "name": null,
         "type": "DATE_TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -373,17 +369,17 @@
         "name": null,
         "type": "INTEGER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -392,13 +388,13 @@
         "name": null,
         "type": "NULL",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "controlType": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -407,7 +403,6 @@
         "name": null,
         "type": "NUMBER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -417,10 +412,11 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -429,19 +425,18 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -450,7 +445,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -461,6 +455,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -469,22 +464,21 @@
         "name": null,
         "type": "TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "TIME"
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "Add your JavaScript custom logic here.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -493,7 +487,6 @@
       "name": "script",
       "type": "STRING",
       "defaultValue": null,
-      "description": "Add your JavaScript custom logic here.",
       "exampleValue": null,
       "label": "JavaScript code",
       "placeholder": null,
@@ -503,18 +496,9 @@
       "options": null,
       "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "JavaScript",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    },
-    "perform": { },
-    "outputSchema": null
+    "outputSchema": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "script",
@@ -523,11 +507,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Executes custom Python code.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "python",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "Initialize parameter values used in the custom code.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -536,12 +524,12 @@
       "name": "input",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Initialize parameter values used in the custom code.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -550,7 +538,6 @@
         "name": null,
         "type": "ARRAY",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -559,10 +546,11 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -571,7 +559,6 @@
         "name": null,
         "type": "BOOLEAN",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -589,6 +576,7 @@
         "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -597,15 +585,15 @@
         "name": null,
         "type": "DATE",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "DATE",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -614,15 +602,15 @@
         "name": null,
         "type": "DATE_TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -631,17 +619,17 @@
         "name": null,
         "type": "INTEGER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -650,13 +638,13 @@
         "name": null,
         "type": "NULL",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "controlType": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -665,7 +653,6 @@
         "name": null,
         "type": "NUMBER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -675,10 +662,11 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -687,19 +675,18 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -708,7 +695,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -719,6 +705,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -727,22 +714,21 @@
         "name": null,
         "type": "TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "TIME"
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "Add your Python custom logic here.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -751,7 +737,6 @@
       "name": "script",
       "type": "STRING",
       "defaultValue": null,
-      "description": "Add your Python custom logic here.",
       "exampleValue": null,
       "label": "Python code",
       "placeholder": null,
@@ -761,18 +746,9 @@
       "options": null,
       "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "Python",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    },
-    "perform": { },
-    "outputSchema": null
+    "outputSchema": null,
+    "perform": { }
   }, {
     "batch": null,
     "componentName": "script",
@@ -781,11 +757,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Executes custom Ruby code.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "ruby",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "Initialize parameter values used in the custom code.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -794,12 +774,12 @@
       "name": "input",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Initialize parameter values used in the custom code.",
       "exampleValue": null,
       "label": "Input",
       "placeholder": null,
       "additionalProperties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -808,7 +788,6 @@
         "name": null,
         "type": "ARRAY",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -817,10 +796,11 @@
         "minItems": null,
         "multipleValues": null,
         "options": null,
-        "controlType": "ARRAY_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "ARRAY_BUILDER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -829,7 +809,6 @@
         "name": null,
         "type": "BOOLEAN",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -847,6 +826,7 @@
         "controlType": "CHECKBOX"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -855,15 +835,15 @@
         "name": null,
         "type": "DATE",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "DATE",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -872,15 +852,15 @@
         "name": null,
         "type": "DATE_TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "DATE_TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "DATE_TIME"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -889,17 +869,17 @@
         "name": null,
         "type": "INTEGER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "maxValue": null,
         "minValue": null,
         "options": null,
-        "controlType": "INTEGER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "INTEGER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -908,13 +888,13 @@
         "name": null,
         "type": "NULL",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "controlType": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -923,7 +903,6 @@
         "name": null,
         "type": "NUMBER",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -933,10 +912,11 @@
         "minValue": null,
         "numberPrecision": null,
         "options": null,
-        "controlType": "NUMBER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "NUMBER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -945,19 +925,18 @@
         "name": null,
         "type": "OBJECT",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "additionalProperties": null,
         "multipleValues": null,
-        "objectType": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -966,7 +945,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -977,6 +955,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -985,22 +964,21 @@
         "name": null,
         "type": "TIME",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
         "options": null,
-        "controlType": "TIME",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "TIME"
       } ],
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "Add your Ruby custom logic here.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1009,7 +987,6 @@
       "name": "script",
       "type": "STRING",
       "defaultValue": null,
-      "description": "Add your Ruby custom logic here.",
       "exampleValue": null,
       "label": "Ruby code",
       "placeholder": null,
@@ -1019,18 +996,9 @@
       "options": null,
       "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "Ruby",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    },
-    "perform": { },
-    "outputSchema": null
+    "outputSchema": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

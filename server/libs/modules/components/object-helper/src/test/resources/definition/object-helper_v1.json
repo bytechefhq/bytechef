@@ -7,11 +7,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Converts the JSON string to object/array.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "parse",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The JSON string to convert to the data.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -20,7 +24,6 @@
       "name": "source",
       "type": "STRING",
       "defaultValue": null,
-      "description": "The JSON string to convert to the data.",
       "exampleValue": null,
       "label": "Source",
       "placeholder": null,
@@ -30,18 +33,9 @@
       "options": null,
       "optionsDataSource": null
     } ],
-    "sampleOutput": null,
     "title": "Convert from JSON string",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    },
-    "outputSchema": null,
-    "perform": { }
+    "perform": { },
+    "outputSchema": null
   }, {
     "batch": null,
     "componentName": "objectHelper",
@@ -50,11 +44,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Writes the object/array to a JSON string.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "stringify",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The value type.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -63,7 +61,6 @@
       "name": "type",
       "type": "INTEGER",
       "defaultValue": null,
-      "description": "The value type.",
       "exampleValue": null,
       "label": "Type",
       "placeholder": null,
@@ -80,10 +77,11 @@
         "label": "Array",
         "value": 2
       } ],
-      "optionsDataSource": null,
-      "controlType": "SELECT"
+      "controlType": "SELECT",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The data to convert to JSON string.",
       "displayCondition": "type === 1",
       "expressionEnabled": null,
       "hidden": null,
@@ -92,19 +90,18 @@
       "name": "source",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "The data to convert to JSON string.",
       "exampleValue": null,
       "label": "Source",
       "placeholder": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "optionsDataSource": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "The data to convert to JSON string.",
       "displayCondition": "type === 2",
       "expressionEnabled": null,
       "hidden": null,
@@ -113,7 +110,6 @@
       "name": "source",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "The data to convert to JSON string.",
       "exampleValue": null,
       "label": "Source",
       "placeholder": null,
@@ -122,35 +118,12 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "ARRAY_BUILDER"
-    } ],
-    "sampleOutput": null,
-    "title": "Convert to JSON string",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "outputSchema": {
-      "advancedOption": null,
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": null,
-      "name": null,
-      "type": "STRING",
-      "defaultValue": null,
-      "description": null,
-      "exampleValue": null,
-      "label": null,
-      "placeholder": null,
-      "controlType": "TEXT",
-      "maxLength": null,
-      "minLength": null,
-      "options": null,
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
-    },
-    "perform": { }
+    } ],
+    "title": "Convert to JSON string",
+    "perform": { },
+    "outputSchema": null
   } ],
   "category": null,
   "connection": null,

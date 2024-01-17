@@ -3,6 +3,8 @@
   "help": null,
   "icon": "path:assets/condition.svg",
   "name": "condition",
+  "outputSchema": null,
+  "outputSchemaFunction": null,
   "properties": [ {
     "advancedOption": null,
     "displayCondition": null,
@@ -60,7 +62,6 @@
       "options": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "properties": [ {
         "advancedOption": null,
         "displayCondition": null,
@@ -142,7 +143,7 @@
         } ],
         "controlType": "CHECKBOX"
       } ],
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "displayCondition": null,
@@ -160,7 +161,6 @@
       "options": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "properties": [ {
         "advancedOption": null,
         "displayCondition": null,
@@ -222,7 +222,7 @@
         "options": null,
         "controlType": "DATE_TIME"
       } ],
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "displayCondition": null,
@@ -240,7 +240,6 @@
       "options": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "properties": [ {
         "advancedOption": null,
         "displayCondition": null,
@@ -337,7 +336,7 @@
         "numberPrecision": null,
         "controlType": "NUMBER"
       } ],
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
       "displayCondition": null,
@@ -355,7 +354,6 @@
       "options": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "properties": [ {
         "advancedOption": null,
         "displayCondition": null,
@@ -469,13 +467,13 @@
         "maxLength": null,
         "minLength": null
       } ],
-      "controlType": "OBJECT_BUILDER"
+      "controlType": "SELECT"
     } ],
     "maxItems": null,
     "minItems": null,
     "multipleValues": null,
     "options": null,
-    "controlType": "ARRAY_BUILDER"
+    "controlType": "MULTI_SELECT"
   }, {
     "advancedOption": null,
     "displayCondition": "rawExpression === false",
@@ -546,24 +544,19 @@
       "metadata": { },
       "required": null,
       "name": null,
-      "type": "OBJECT",
+      "type": "TASK",
       "defaultValue": null,
-      "description": "The task or task dispatcher to use.",
+      "description": null,
       "exampleValue": null,
       "label": null,
       "placeholder": null,
-      "options": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": "TASK",
-      "properties": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": null
     } ],
     "maxItems": null,
     "minItems": null,
     "multipleValues": null,
     "options": null,
-    "controlType": "ARRAY_BUILDER"
+    "controlType": "MULTI_SELECT"
   }, {
     "advancedOption": null,
     "displayCondition": null,
@@ -586,28 +579,22 @@
       "metadata": { },
       "required": null,
       "name": null,
-      "type": "OBJECT",
+      "type": "TASK",
       "defaultValue": null,
-      "description": "The task or task dispatcher to use.",
+      "description": null,
       "exampleValue": null,
       "label": null,
       "placeholder": null,
-      "options": null,
-      "additionalProperties": null,
-      "multipleValues": null,
-      "objectType": "TASK",
-      "properties": null,
-      "controlType": "OBJECT_BUILDER"
+      "controlType": null
     } ],
     "maxItems": null,
     "minItems": null,
     "multipleValues": null,
     "options": null,
-    "controlType": "ARRAY_BUILDER"
+    "controlType": "MULTI_SELECT"
   } ],
   "title": "Condition",
   "variableProperties": null,
-  "version": 1,
-  "outputSchema": null,
-  "outputSchemaDataSource": null
+  "variablePropertiesFunction": null,
+  "version": 1
 }

@@ -7,11 +7,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Assign value to a variable that can be used in the following steps.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "set",
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "The value type.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -20,7 +24,6 @@
       "name": "type",
       "type": "INTEGER",
       "defaultValue": null,
-      "description": "The value type.",
       "exampleValue": null,
       "label": "Type",
       "placeholder": null,
@@ -77,10 +80,11 @@
         "label": "Time",
         "value": 10
       } ],
-      "controlType": "SELECT",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "SELECT"
     }, {
       "advancedOption": null,
+      "description": "Value of any type to set.",
       "displayCondition": "type === 1",
       "expressionEnabled": null,
       "hidden": null,
@@ -89,7 +93,6 @@
       "name": "value",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "Value of any type to set.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
@@ -98,10 +101,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "Value of any type to set.",
       "displayCondition": "type === 2",
       "expressionEnabled": null,
       "hidden": null,
@@ -110,7 +114,6 @@
       "name": "value",
       "type": "BOOLEAN",
       "defaultValue": null,
-      "description": "Value of any type to set.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
@@ -128,6 +131,7 @@
       "controlType": "CHECKBOX"
     }, {
       "advancedOption": null,
+      "description": "Value of any type to set.",
       "displayCondition": "type === 3",
       "expressionEnabled": null,
       "hidden": null,
@@ -136,15 +140,15 @@
       "name": "value",
       "type": "DATE",
       "defaultValue": null,
-      "description": "Value of any type to set.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE"
     }, {
       "advancedOption": null,
+      "description": "Value of any type to set.",
       "displayCondition": "type === 4",
       "expressionEnabled": null,
       "hidden": null,
@@ -153,15 +157,15 @@
       "name": "value",
       "type": "DATE_TIME",
       "defaultValue": null,
-      "description": "Value of any type to set.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "DATE_TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "DATE_TIME"
     }, {
       "advancedOption": null,
+      "description": "Value of any type to set.",
       "displayCondition": "type === 5",
       "expressionEnabled": null,
       "hidden": null,
@@ -170,17 +174,17 @@
       "name": "value",
       "type": "INTEGER",
       "defaultValue": null,
-      "description": "Value of any type to set.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
+      "description": "Value of any type to set.",
       "displayCondition": "type === 6",
       "expressionEnabled": null,
       "hidden": null,
@@ -189,13 +193,13 @@
       "name": "value",
       "type": "NULL",
       "defaultValue": null,
-      "description": "Value of any type to set.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "controlType": null
     }, {
       "advancedOption": null,
+      "description": "Value of any type to set.",
       "displayCondition": "type === 7",
       "expressionEnabled": null,
       "hidden": null,
@@ -204,7 +208,6 @@
       "name": "value",
       "type": "NUMBER",
       "defaultValue": null,
-      "description": "Value of any type to set.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
@@ -214,10 +217,11 @@
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "controlType": "NUMBER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "NUMBER"
     }, {
       "advancedOption": null,
+      "description": "Value of any type to set.",
       "displayCondition": "type === 8",
       "expressionEnabled": null,
       "hidden": null,
@@ -226,19 +230,18 @@
       "name": "value",
       "type": "OBJECT",
       "defaultValue": null,
-      "description": "Value of any type to set.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "additionalProperties": null,
       "multipleValues": null,
-      "objectType": null,
       "options": null,
       "properties": null,
-      "controlType": "OBJECT_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "OBJECT_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "Value of any type to set.",
       "displayCondition": "type === 9",
       "expressionEnabled": null,
       "hidden": null,
@@ -247,7 +250,6 @@
       "name": "value",
       "type": "STRING",
       "defaultValue": null,
-      "description": "Value of any type to set.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
@@ -258,6 +260,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Value of any type to set.",
       "displayCondition": "type === 10",
       "expressionEnabled": null,
       "hidden": null,
@@ -266,26 +269,16 @@
       "name": "value",
       "type": "TIME",
       "defaultValue": null,
-      "description": "Value of any type to set.",
       "exampleValue": null,
       "label": "Value",
       "placeholder": null,
       "options": null,
-      "controlType": "TIME",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "TIME"
     } ],
-    "sampleOutput": null,
     "title": "Set value",
-    "perform": { },
     "outputSchema": null,
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": {
-      "outputSchema": { }
-    },
-    "sampleOutputDataSource": {
-      "sampleOutputFunction": { },
-      "sampleOutput": { }
-    }
+    "perform": { }
   } ],
   "category": null,
   "connection": null,

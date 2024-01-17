@@ -7,11 +7,15 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Send an email to any address.",
+    "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "send",
+    "outputSchemaDefaultFunction": false,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
+      "description": "From who to send the email.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -20,17 +24,17 @@
       "name": "from",
       "type": "INTEGER",
       "defaultValue": null,
-      "description": "From who to send the email.",
       "exampleValue": null,
       "label": "From Email",
       "placeholder": null,
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
+      "description": "Who to send the email to.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -39,12 +43,12 @@
       "name": "to",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "Who to send the email to.",
       "exampleValue": null,
       "label": "To Email",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -53,7 +57,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -67,10 +70,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "Who to CC on the email.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -79,12 +83,12 @@
       "name": "cc",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "Who to CC on the email.",
       "exampleValue": null,
       "label": "CC Email",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -93,7 +97,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -107,10 +110,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "Who to BCC on the email.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -119,12 +123,12 @@
       "name": "bcc",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "Who to BCC on the email.",
       "exampleValue": null,
       "label": "BCC Email",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -133,7 +137,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -147,10 +150,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "When someone replies to this email, where should it go to?",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -159,12 +163,12 @@
       "name": "replyTo",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "When someone replies to this email, where should it go to?",
       "exampleValue": null,
       "label": "Reply To",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -173,7 +177,6 @@
         "name": null,
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
@@ -187,10 +190,11 @@
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": null,
+      "description": "Your email subject.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -199,7 +203,6 @@
       "name": "subject",
       "type": "STRING",
       "defaultValue": null,
-      "description": "Your email subject.",
       "exampleValue": null,
       "label": "Subject",
       "placeholder": null,
@@ -210,6 +213,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "Your email content. Will be sent as a HTML email.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -218,7 +222,6 @@
       "name": "content",
       "type": "STRING",
       "defaultValue": null,
-      "description": "Your email content. Will be sent as a HTML email.",
       "exampleValue": null,
       "label": "Content",
       "placeholder": null,
@@ -229,6 +232,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "A list of attachments to send with the email.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -237,30 +241,26 @@
       "name": "attachments",
       "type": "ARRAY",
       "defaultValue": null,
-      "description": "A list of attachments to send with the email.",
       "exampleValue": null,
       "label": "Attachments",
       "placeholder": null,
       "items": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
         "metadata": { },
         "required": null,
         "name": null,
-        "type": "OBJECT",
+        "type": "FILE_ENTRY",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": null,
         "placeholder": null,
-        "additionalProperties": null,
-        "multipleValues": null,
-        "objectType": "FILE_ENTRY",
-        "options": null,
         "properties": [ {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -269,7 +269,6 @@
           "name": "extension",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -280,6 +279,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -288,7 +288,6 @@
           "name": "mimeType",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -299,6 +298,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -307,7 +307,6 @@
           "name": "name",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -318,6 +317,7 @@
           "optionsDataSource": null
         }, {
           "advancedOption": null,
+          "description": null,
           "displayCondition": null,
           "expressionEnabled": null,
           "hidden": null,
@@ -326,7 +326,6 @@
           "name": "url",
           "type": "STRING",
           "defaultValue": null,
-          "description": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
@@ -336,23 +335,18 @@
           "options": null,
           "optionsDataSource": null
         } ],
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "controlType": "FILE_ENTRY"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     } ],
-    "sampleOutput": null,
     "title": "Send",
-    "editorDescriptionDataSource": null,
-    "outputSchemaDataSource": null,
-    "sampleOutputDataSource": null,
-    "perform": { },
-    "outputSchema": null
+    "outputSchema": null,
+    "perform": { }
   } ],
   "category": null,
   "connection": {
@@ -362,6 +356,7 @@
       "name": "basic_auth",
       "properties": [ {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -370,7 +365,6 @@
         "name": "username",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Username",
         "placeholder": null,
@@ -381,6 +375,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
+        "description": null,
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -389,7 +384,6 @@
         "name": "password",
         "type": "STRING",
         "defaultValue": null,
-        "description": null,
         "exampleValue": null,
         "label": "Password",
         "placeholder": null,
@@ -403,7 +397,8 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
-      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientSecret": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -411,14 +406,14 @@
       "refreshUrl": null,
       "scopes": null,
       "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null
+      "authorizationCallback": null
     } ],
     "componentName": "email",
     "componentDescription": "The Email connector sends emails using an SMTP email server.",
     "componentTitle": "Email",
     "properties": [ {
       "advancedOption": null,
+      "description": null,
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -427,7 +422,6 @@
       "name": "host",
       "type": "STRING",
       "defaultValue": null,
-      "description": null,
       "exampleValue": null,
       "label": "Host",
       "placeholder": null,
@@ -438,6 +432,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
+      "description": "",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -446,17 +441,17 @@
       "name": "port",
       "type": "INTEGER",
       "defaultValue": 25,
-      "description": "",
       "exampleValue": null,
       "label": "Port",
       "placeholder": null,
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": null,
+      "description": "If selected the connection will use TLS when connecting to server.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -465,7 +460,6 @@
       "name": "tls",
       "type": "BOOLEAN",
       "defaultValue": null,
-      "description": "If selected the connection will use TLS when connecting to server.",
       "exampleValue": null,
       "label": "Use TLS",
       "placeholder": null,

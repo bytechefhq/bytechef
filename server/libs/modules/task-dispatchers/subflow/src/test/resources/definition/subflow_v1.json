@@ -3,6 +3,8 @@
   "help": null,
   "icon": "path:assets/subflow.svg",
   "name": "subflow",
+  "outputSchema": null,
+  "outputSchemaFunction": null,
   "properties": [ {
     "advancedOption": null,
     "displayCondition": null,
@@ -169,15 +171,13 @@
       "controlType": "TIME"
     } ],
     "multipleValues": null,
-    "objectType": null,
     "properties": null,
-    "controlType": "OBJECT_BUILDER"
+    "controlType": "SELECT"
   } ],
   "resources": null,
   "taskProperties": null,
   "title": "Subflow",
   "variableProperties": null,
-  "version": 1,
-  "outputSchemaDataSource": null,
-  "outputSchema": null
+  "variablePropertiesFunction": null,
+  "version": 1
 }
