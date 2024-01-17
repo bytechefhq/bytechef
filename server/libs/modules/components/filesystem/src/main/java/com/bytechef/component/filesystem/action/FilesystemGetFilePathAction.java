@@ -41,7 +41,8 @@ public class FilesystemGetFilePathAction {
             .description("The path to full filename.")
             .placeholder("/data/your_file.pdf")
             .required(true))
-        .outputSchema(string(), "/sample_data")
+        .outputSchema(string())
+        .sampleOutput("/sample_data")
         .perform(FilesystemGetFilePathAction::perform);
 
     /**

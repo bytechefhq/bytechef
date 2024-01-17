@@ -121,7 +121,8 @@ public class PipedriveNewActivityTrigger {
                     object("file").properties(
                         string("id"),
                         string("clean_name"),
-                        string("url"))),
+                        string("url"))))
+        .sampleOutput(
             """
                 {
                     "id": 8,

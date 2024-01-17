@@ -126,7 +126,8 @@ public class PipedriveNewPersonTrigger {
                     integer("label"),
                     string("org_name"),
                     string("owner_name"),
-                    string("cc_email")),
+                    string("cc_email")))
+        .sampleOutput(
             """
                 {
                     "id": 1,

@@ -200,33 +200,31 @@ public class PipedriveSearchDealsAction {
                         .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", ResponseType.JSON)),
-            Map.<String, Object>ofEntries(Map.entry("success", true),
-                Map.entry("data",
-                    Map.<String, Object>ofEntries(Map.entry("items", List.of(Map.<String, Object>ofEntries(
-                        Map.entry("result_score", 1.22),
-                        Map.entry("item", Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("type", "deal"),
-                            Map.entry("title", "Jane Doe deal"), Map.entry("value", 100), Map.entry("currency", "USD"),
-                            Map.entry("status", "open"), Map.entry("visible_to", 3),
-                            Map.entry("owner", Map.<String, Object>ofEntries(Map.entry("id", 1))),
-                            Map.entry("stage",
-                                Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "Lead In"))),
-                            Map.entry("person",
-                                Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "Jane Doe"))),
-                            Map.entry("organization", ""), Map.entry("custom_fields", List.of()),
-                            Map.entry("notes", List.of())))))))),
-                Map.entry("additional_data",
-                    Map.<String, Object>ofEntries(Map.entry("description", "The additional data of the list"),
-                        Map.entry("type", "object"),
-                        Map.entry("properties",
-                            Map.<String, Object>ofEntries(
-                                Map.entry("start",
-                                    Map.<String, Object>ofEntries(Map.entry("type", "integer"),
-                                        Map.entry("description", "Pagination start"))),
-                                Map.entry("limit",
-                                    Map.<String, Object>ofEntries(Map.entry("type", "integer"),
-                                        Map.entry("description", "Items shown per page"))),
-                                Map.entry("more_items_in_collection",
-                                    Map.<String, Object>ofEntries(Map.entry("type", "boolean"), Map.entry("description",
-                                        "If there are more list items in the collection than displayed or not")))))))));
+                        "responseType", ResponseType.JSON)))
+        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
+            Map.entry("data", Map.<String, Object>ofEntries(Map.entry("items", List.of(Map.<String, Object>ofEntries(
+                Map.entry("result_score", 1.22),
+                Map.entry("item", Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("type", "deal"),
+                    Map.entry("title", "Jane Doe deal"), Map.entry("value", 100), Map.entry("currency", "USD"),
+                    Map.entry("status", "open"), Map.entry("visible_to", 3),
+                    Map.entry("owner", Map.<String, Object>ofEntries(Map.entry("id", 1))),
+                    Map.entry("stage", Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "Lead In"))),
+                    Map.entry("person",
+                        Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("name", "Jane Doe"))),
+                    Map.entry("organization", ""), Map.entry("custom_fields", List.of()),
+                    Map.entry("notes", List.of())))))))),
+            Map.entry("additional_data",
+                Map.<String, Object>ofEntries(Map.entry("description", "The additional data of the list"),
+                    Map.entry("type", "object"),
+                    Map.entry("properties",
+                        Map.<String, Object>ofEntries(
+                            Map.entry("start",
+                                Map.<String, Object>ofEntries(Map.entry("type", "integer"),
+                                    Map.entry("description", "Pagination start"))),
+                            Map.entry("limit",
+                                Map.<String, Object>ofEntries(Map.entry("type", "integer"),
+                                    Map.entry("description", "Items shown per page"))),
+                            Map.entry("more_items_in_collection",
+                                Map.<String, Object>ofEntries(Map.entry("type", "boolean"), Map.entry("description",
+                                    "If there are more list items in the collection than displayed or not")))))))));
 }

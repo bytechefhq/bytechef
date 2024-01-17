@@ -111,7 +111,8 @@ public class PipedriveNewOrganizationTrigger {
                     string("address_postal_code"),
                     string("address_formatted_address"),
                     string("owner_name"),
-                    string("cc_email")),
+                    string("cc_email")))
+        .sampleOutput(
             """
                 {
                     "id": 1,

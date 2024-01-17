@@ -138,7 +138,8 @@ public class PipedriveSearchOrganizationAction {
                         .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", ResponseType.JSON)),
+                        "responseType", ResponseType.JSON)))
+        .sampleOutput(
             Map.<String, Object>ofEntries(
                 Map.entry("success", true), Map
                     .entry("data",

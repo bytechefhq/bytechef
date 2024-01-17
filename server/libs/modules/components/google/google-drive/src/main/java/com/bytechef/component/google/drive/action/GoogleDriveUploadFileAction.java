@@ -63,8 +63,8 @@ public final class GoogleDriveUploadFileAction {
         .outputSchema(
             object()
                 .properties(
-                    string("id")),
-            Map.of("id", "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"))
+                    string("id")))
+        .sampleOutput(Map.of("id", "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"))
         .perform(GoogleDriveUploadFileAction::perform);
 
     private GoogleDriveUploadFileAction() {

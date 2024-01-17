@@ -85,12 +85,11 @@ public class JiraCreateIssueAction {
             .description("Details about a created issue or subtask.")
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)),
-            Map.<String, Object>ofEntries(Map.entry("id", 10000.0), Map.entry("key", "ED-24"),
-                Map.entry("self", "https://your-domain.atlassian.net/rest/api/3/issue/10000"),
-                Map.entry("transition",
-                    Map.<String, Object>ofEntries(Map.entry("status", 200),
-                        Map.entry("errorCollection",
-                            Map.<String, Object>ofEntries(Map.entry("errorMessages", List.of()),
-                                Map.entry("errors", Map.<String, Object>ofEntries())))))));
+                    "responseType", ResponseType.JSON)))
+        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("id", 10000.0), Map.entry("key", "ED-24"),
+            Map.entry("self", "https://your-domain.atlassian.net/rest/api/3/issue/10000"),
+            Map.entry("transition",
+                Map.<String, Object>ofEntries(Map.entry("status", 200),
+                    Map.entry("errorCollection", Map.<String, Object>ofEntries(Map.entry("errorMessages", List.of()),
+                        Map.entry("errors", Map.<String, Object>ofEntries())))))));
 }

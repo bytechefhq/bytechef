@@ -39,7 +39,8 @@ public class FileStorageReadAction {
             .description(
                 "The object property which contains a reference to the file to read from.")
             .required(true))
-        .outputSchema(string(), "sample content")
+        .outputSchema(string())
+        .sampleOutput("Sample content")
         .perform(FileStorageReadAction::perform);
 
     protected static String perform(

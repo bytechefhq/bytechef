@@ -47,7 +47,8 @@ public class FilesystemRmAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
-        .outputSchema(bool(), true)
+        .outputSchema(bool())
+        .sampleOutput(true)
         .perform(FilesystemRmAction::perform);
 
     /**

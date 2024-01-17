@@ -42,7 +42,8 @@ public class FilesystemMkdirAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
-        .outputSchema(string(), "/sample_data")
+        .outputSchema(string())
+        .sampleOutput("/sample_data")
         .perform(FilesystemMkdirAction::perform);
 
     /**

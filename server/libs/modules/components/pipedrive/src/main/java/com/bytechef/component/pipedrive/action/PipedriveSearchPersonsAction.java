@@ -167,22 +167,21 @@ public class PipedriveSearchPersonsAction {
                         .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", ResponseType.JSON)),
-            Map.<String, Object>ofEntries(Map.entry("success", true),
-                Map.entry("data",
-                    Map.<String, Object>ofEntries(Map.entry("items",
-                        List.of(Map.<String, Object>ofEntries(Map.entry("result_score", 0.5092),
-                            Map.entry("item",
-                                Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("type", "person"),
-                                    Map.entry("name", "Jane Doe"), Map.entry("phones", List.of("+372 555555555")),
-                                    Map.entry("emails", List.of("jane@pipedrive.com")), Map.entry("visible_to", 3),
-                                    Map.entry("owner", Map.<String, Object>ofEntries(Map.entry("id", 1))),
-                                    Map.entry("organization",
-                                        Map.<String, Object>ofEntries(Map.entry("id", 1),
-                                            Map.entry("name", "Organization name"), Map.entry("address", ""))),
-                                    Map.entry("custom_fields", List.of()), Map.entry("notes", List.of())))))))),
-                Map.entry("additional_data", Map
-                    .<String, Object>ofEntries(
-                        Map.entry("pagination", Map.<String, Object>ofEntries(Map.entry("start", 0),
-                            Map.entry("limit", 100), Map.entry("more_items_in_collection", false)))))));
+                        "responseType", ResponseType.JSON)))
+        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
+            Map.entry("data",
+                Map.<String, Object>ofEntries(Map.entry("items",
+                    List.of(Map.<String, Object>ofEntries(Map.entry("result_score", 0.5092),
+                        Map.entry("item",
+                            Map.<String, Object>ofEntries(Map.entry("id", 1), Map.entry("type", "person"),
+                                Map.entry("name", "Jane Doe"), Map.entry("phones", List.of("+372 555555555")),
+                                Map.entry("emails", List.of("jane@pipedrive.com")), Map.entry("visible_to", 3),
+                                Map.entry("owner", Map.<String, Object>ofEntries(Map.entry("id", 1))),
+                                Map.entry("organization",
+                                    Map.<String, Object>ofEntries(Map.entry("id", 1),
+                                        Map.entry("name", "Organization name"), Map.entry("address", ""))),
+                                Map.entry("custom_fields", List.of()), Map.entry("notes", List.of())))))))),
+            Map.entry("additional_data", Map
+                .<String, Object>ofEntries(Map.entry("pagination", Map.<String, Object>ofEntries(Map.entry("start", 0),
+                    Map.entry("limit", 100), Map.entry("more_items_in_collection", false)))))));
 }

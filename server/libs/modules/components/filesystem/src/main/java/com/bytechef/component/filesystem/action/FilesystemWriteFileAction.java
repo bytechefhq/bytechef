@@ -52,7 +52,8 @@ public class FilesystemWriteFileAction {
                 .description("The path to which the file should be written.")
                 .placeholder("/data/your_file.pdf")
                 .required(true))
-        .outputSchema(integer(), "1024")
+        .outputSchema(integer())
+        .sampleOutput("1024")
         .perform(FilesystemWriteFileAction::perform);
 
     protected static Map<String, ?> perform(

@@ -41,7 +41,8 @@ public class FilesystemReadFileAction {
             .description("The path of the file to read.")
             .placeholder("/data/your_file.pdf")
             .required(true))
-        .outputSchema(string(), "sample content")
+        .outputSchema(string())
+        .sampleOutput("Sample content")
         .perform(FilesystemReadFileAction::perform);
 
     protected static Map<String, ?> perform(

@@ -36,7 +36,8 @@ public class FilesystemCreateTempDirAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TEMP_DIR)
         .title("Create Temp Directory")
         .description("Creates a temporary directory on the filesystem.")
-        .outputSchema(string(), "/sample_tmp_dir")
+        .outputSchema(string())
+        .sampleOutput("/sample_tmp_dir")
         .perform(FilesystemCreateTempDirAction::perform);
 
     protected static String perform(
