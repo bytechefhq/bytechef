@@ -17,16 +17,9 @@
 package com.bytechef.task.dispatcher.each;
 
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.array;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.bool;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.date;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.dateTime;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.integer;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.number;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.object;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.time;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.EACH;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITEM;
@@ -51,8 +44,7 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         .properties(
             array(LIST)
                 .label("List of items")
-                .description("List of items to iterate over.")
-                .items(array(), bool(), date(), dateTime(), integer(), number(), object(), string(), time()))
+                .description("List of items to iterate over."))
         .taskProperties(task(ITERATEE))
         .variableProperties(string(ITEM), string(INDEX));
 

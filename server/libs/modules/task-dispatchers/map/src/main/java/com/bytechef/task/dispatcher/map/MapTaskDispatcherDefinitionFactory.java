@@ -17,16 +17,9 @@
 package com.bytechef.task.dispatcher.map;
 
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.array;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.bool;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.date;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.dateTime;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.integer;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.number;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.object;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.string;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.time;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.INDEX;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITEM;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.ITERATEE;
@@ -34,7 +27,7 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.MAP;
 
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
-import com.bytechef.platform.workflow.task.dispatcher.definition.OutputSchemaDataSource.OutputSchemaFunction;
+import com.bytechef.platform.workflow.task.dispatcher.definition.OutputSchemaFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import org.springframework.stereotype.Component;
 
@@ -50,9 +43,9 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
             "Produces a new collection of values by mapping each value in list through defined task, in parallel. When execution is finished on all items, the `map` task will return a list of execution results in an order which corresponds to the order of the source list.")
         .icon("path:assets/map.svg")
         .properties(
-            array(LIST).label("List of items")
-                .description("List of items to iterate over.")
-                .items(array(), bool(), date(), dateTime(), integer(), number(), object(), string(), time()))
+            array(LIST)
+                .label("List of items")
+                .description("List of items to iterate over."))
         .outputSchema(getOutputSchemaFunction())
         .taskProperties(task(ITERATEE))
         .variableProperties(string(ITEM), string(INDEX));
