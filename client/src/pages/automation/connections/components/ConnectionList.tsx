@@ -1,4 +1,4 @@
-import {ConnectionModel, TagModel} from '@/middleware/helios/connection';
+import {ConnectionModel, TagModel} from '@/middleware/automation/connection';
 
 import ConnectionListItem from './ConnectionListItem';
 

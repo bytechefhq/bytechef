@@ -7,7 +7,7 @@ import {Label} from '@/components/ui/label';
 import LayoutContainer from '@/layouts/LayoutContainer';
 import PageFooter from '@/layouts/PageFooter';
 import PageHeader from '@/layouts/PageHeader';
-import {ProjectModel} from '@/middleware/helios/configuration';
+import {ProjectModel} from '@/middleware/automation/configuration';
 import {useGetProjectInstancesQuery} from '@/queries/projectInstances.queries';
 import {useGetWorkflowExecutionsQuery} from '@/queries/workflowExecutions.queries';
 import {useGetWorkflowsQuery} from '@/queries/workflows.queries';
@@ -16,7 +16,7 @@ import {
     GetWorkflowExecutionsPageJobStatusEnum,
     WorkflowExecutionModel,
     WorkflowExecutionModelFromJSON,
-} from 'middleware/helios/execution';
+} from 'middleware/automation/workflow/execution';
 import {useGetProjectsQuery} from 'queries/projects.queries';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';

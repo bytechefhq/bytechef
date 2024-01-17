@@ -12,8 +12,8 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {WorkflowConnectionModel, WorkflowInputModel, WorkflowModel} from '@/middleware/hermes/configuration';
-import {WorkflowTestConfigurationModel} from '@/middleware/hermes/test';
+import {WorkflowConnectionModel, WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
+import {WorkflowTestConfigurationModel} from '@/middleware/platform/workflow/test';
 import {
     useCreateWorkflowTestConfigurationMutation,
     useUpdateWorkflowTestConfigurationMutation,

@@ -3,8 +3,8 @@ import {
     GetOAuth2AuthorizationParametersRequestModel,
     OAuth2AuthorizationParametersModel,
     OAuth2PropertiesModel,
-} from '@/middleware/hermes/configuration';
-import {Oauth2Api} from '@/middleware/hermes/configuration/apis/Oauth2Api';
+} from '@/middleware/platform/configuration';
+import {Oauth2Api} from '@/middleware/platform/configuration/apis/Oauth2Api';
 import {ConnectionKeys} from '@/queries/connections.queries';
 import {useQuery} from '@tanstack/react-query';
 

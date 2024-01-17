@@ -12,7 +12,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
-import {CategoryModel, ProjectModel, TagModel} from '@/middleware/helios/configuration';
+import {CategoryModel, ProjectModel, TagModel} from '@/middleware/automation/configuration';
 import {useCreateProjectMutation, useUpdateProjectMutation} from '@/mutations/projects.mutations';
 import {ProjectCategoryKeys, useGetProjectCategoriesQuery} from '@/queries/projectCategories.queries';
 import {ProjectTagKeys, useGetProjectTagsQuery} from '@/queries/projectTags.quries';

@@ -5,7 +5,7 @@ import {
     ConnectionTagApi,
     GetConnectionsRequest,
     TagModel,
-} from '@/middleware/helios/connection';
+} from '@/middleware/automation/connection';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {

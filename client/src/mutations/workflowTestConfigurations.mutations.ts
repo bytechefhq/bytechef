@@ -5,7 +5,7 @@ import {
     WorkflowTestConfigurationApi,
     WorkflowTestConfigurationConnectionModel,
     WorkflowTestConfigurationModel,
-} from '@/middleware/hermes/test';
+} from '@/middleware/platform/workflow/test';
 import {useMutation} from '@tanstack/react-query';
 
 type CreateWorkflowTestConfigurationMutationProps = {

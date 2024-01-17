@@ -3,7 +3,7 @@ import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
-import {ActionDefinitionBasicModel} from 'middleware/hermes/configuration';
+import {ActionDefinitionBasicModel} from 'middleware/platform/configuration';
 import {twMerge} from 'tailwind-merge';
 
 const ActionSelect = ({

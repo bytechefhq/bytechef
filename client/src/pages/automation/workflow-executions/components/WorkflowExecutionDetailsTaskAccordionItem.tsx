@@ -1,7 +1,7 @@
 import WorkflowExecutionDetailsAccordionContent from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordionContent';
 import {AccordionItem, AccordionTrigger} from '@radix-ui/react-accordion';
 import {CheckCircledIcon, CrossCircledIcon} from '@radix-ui/react-icons';
-import {TaskExecutionModel} from 'middleware/helios/execution';
+import {TaskExecutionModel} from 'middleware/automation/workflow/execution';
 import InlineSVG from 'react-inlinesvg';
 
 const WorkflowExecutionDetailsTaskAccordionItem = ({taskExecution}: {taskExecution: TaskExecutionModel}) => {

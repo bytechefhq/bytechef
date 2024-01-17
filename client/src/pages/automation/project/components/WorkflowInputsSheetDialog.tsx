@@ -13,7 +13,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {WorkflowInputModel, WorkflowModel} from '@/middleware/hermes/configuration';
+import {WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {WorkflowDefinition} from '@/types/types';

@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {CategoryApi, CategoryModel} from '@/middleware/helios/configuration';
+import {CategoryApi, CategoryModel} from '@/middleware/automation/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ProjectCategoryKeys = {

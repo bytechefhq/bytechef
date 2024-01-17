@@ -1,5 +1,5 @@
 import Input from '@/components/Input/Input';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
 import WorkflowNodesTabs from '@/pages/automation/project/components/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';

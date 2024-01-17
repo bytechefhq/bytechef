@@ -1,4 +1,4 @@
-import {TriggerExecutionModel} from '@/middleware/helios/execution';
+import {TriggerExecutionModel} from '@/middleware/automation/workflow/execution';
 import WorkflowExecutionDetailsAccordionContent from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordionContent';
 import {AccordionItem, AccordionTrigger} from '@radix-ui/react-accordion';
 import {CheckCircledIcon, CrossCircledIcon} from '@radix-ui/react-icons';

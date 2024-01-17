@@ -14,7 +14,7 @@ import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';
 import {ProjectKeys} from '@/queries/projects.queries';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {ProjectInstanceModel} from 'middleware/helios/configuration';
+import {ProjectInstanceModel} from 'middleware/automation/configuration';
 import {useCreateProjectInstanceMutation, useUpdateProjectInstanceMutation} from 'mutations/projectInstances.mutations';
 import {MouseEvent, ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';

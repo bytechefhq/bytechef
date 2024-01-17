@@ -1,4 +1,4 @@
-import {ConnectionTagApi, UpdateConnectionTagsRequest} from '@/middleware/helios/connection';
+import {ConnectionTagApi, UpdateConnectionTagsRequest} from '@/middleware/automation/connection';
 import {useMutation} from '@tanstack/react-query';
 
 type UpdateConnectionTagsMutationProps = {

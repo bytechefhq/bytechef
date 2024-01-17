@@ -4,7 +4,7 @@ import {
     PageModel,
     WorkflowExecutionApi,
     WorkflowExecutionModel,
-} from '@/middleware/helios/execution';
+} from '@/middleware/automation/workflow/execution';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

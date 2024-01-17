@@ -19,7 +19,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ProjectModel, ProjectModelStatusEnum, TagModel} from '@/middleware/helios/configuration';
+import {ProjectModel, ProjectModelStatusEnum, TagModel} from '@/middleware/automation/configuration';
 import {useUpdateProjectTagsMutation} from '@/mutations/projectTags.mutations';
 import {useCreateProjectWorkflowMutation} from '@/mutations/projectWorkflows.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/mutations/projects.mutations';

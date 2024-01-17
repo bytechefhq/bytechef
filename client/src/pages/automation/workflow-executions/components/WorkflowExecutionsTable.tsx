@@ -1,6 +1,6 @@
 import {Badge} from '@/components/ui/badge';
 import {CellContext, createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
-import {JobBasicModel, WorkflowExecutionModel} from 'middleware/helios/execution';
+import {JobBasicModel, WorkflowExecutionModel} from 'middleware/automation/workflow/execution';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowExecutionDetailsDialogStore from '../stores/useWorkflowExecutionDetailsDialogStore';

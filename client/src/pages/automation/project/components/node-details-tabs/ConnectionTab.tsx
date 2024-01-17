@@ -9,7 +9,7 @@ import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import EmptyList from 'components/EmptyList';
 import {LinkIcon, PlusIcon} from 'lucide-react';
-import {ComponentDefinitionModel} from 'middleware/hermes/configuration';
+import {ComponentDefinitionModel} from 'middleware/platform/configuration';
 import ConnectionDialog from 'pages/automation/connections/components/ConnectionDialog';
 import {useGetConnectionsQuery} from 'queries/connections.queries';
 import {useState} from 'react';

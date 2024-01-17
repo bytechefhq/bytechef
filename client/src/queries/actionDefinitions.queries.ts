@@ -7,7 +7,7 @@ import {
     GetComponentActionDefinitionRequest,
     GetComponentActionOutputSchemaRequest,
     type PropertyModel,
-} from 'middleware/hermes/configuration';
+} from 'middleware/platform/configuration';
 
 export const ActionDefinitionKeys = {
     actionDefinition: (request: GetComponentActionDefinitionRequest) => [

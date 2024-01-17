@@ -1,5 +1,5 @@
-import {ProjectInstanceWorkflowModel} from '@/middleware/helios/configuration';
-import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
+import {ProjectInstanceWorkflowModel} from '@/middleware/automation/configuration';
+import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
 import ProjectInstanceWorkflowListItem from '@/pages/automation/project-instances/components/ProjectInstanceWorkflowListItem';
 import {useGetProjectWorkflowsQuery} from '@/queries/projects.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/taskDispatcherDefinitions.queries';

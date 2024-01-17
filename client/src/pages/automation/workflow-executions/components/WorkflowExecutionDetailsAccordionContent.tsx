@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
-import {ExecutionErrorModel} from '@/middleware/helios/execution';
+import {ExecutionErrorModel} from '@/middleware/automation/workflow/execution';
 import {AccordionContent} from '@radix-ui/react-accordion';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {ExpandIcon} from 'lucide-react';

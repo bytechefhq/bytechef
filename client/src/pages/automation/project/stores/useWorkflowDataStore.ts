@@ -1,7 +1,7 @@
-import {WorkflowModel} from '@/middleware/helios/configuration';
+import {WorkflowModel} from '@/middleware/automation/configuration';
 
 /* eslint-disable sort-keys */
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
 import {ComponentActionType, ComponentDataType, DataPillType} from '@/types/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';

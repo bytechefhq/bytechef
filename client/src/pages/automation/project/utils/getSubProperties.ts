@@ -1,4 +1,4 @@
-import {ComponentDefinitionBasicModel} from '@/middleware/hermes/execution/models';
+import {ComponentDefinitionBasicModel} from '@/middleware/platform/workflow/execution';
 import {PropertyType} from '@/types/projectTypes';
 
 export default function getSubProperties(

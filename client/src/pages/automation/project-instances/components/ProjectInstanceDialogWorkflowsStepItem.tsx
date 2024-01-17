@@ -1,6 +1,6 @@
 import {Switch} from '@/components/ui/switch';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {ProjectInstanceModel, WorkflowConnectionModel, WorkflowModel} from '@/middleware/helios/configuration';
+import {ProjectInstanceModel, WorkflowConnectionModel, WorkflowModel} from '@/middleware/automation/configuration';
 import ProjectInstanceDialogWorkflowsStepItemConfiguration from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConfiguration';
 import ProjectInstanceDialogWorkflowsStepItemConnection from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItemConnection';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';

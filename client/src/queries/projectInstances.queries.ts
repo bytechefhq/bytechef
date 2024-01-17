@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {ProjectInstanceApi, ProjectInstanceModel} from '@/middleware/helios/configuration';
+import {ProjectInstanceApi, ProjectInstanceModel} from '@/middleware/automation/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ProjectInstanceKeys = {

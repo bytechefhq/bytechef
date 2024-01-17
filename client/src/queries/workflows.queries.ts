@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {WorkflowApi, WorkflowModel} from '@/middleware/helios/configuration';
+import {WorkflowApi, WorkflowModel} from '@/middleware/automation/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowKeys = {

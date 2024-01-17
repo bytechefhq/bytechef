@@ -17,8 +17,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ProjectModel, WorkflowModel} from '@/middleware/helios/configuration';
-import {ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
+import {ProjectModel, WorkflowModel} from '@/middleware/automation/configuration';
+import {ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
 import {
     useDeleteWorkflowMutation,
     useDuplicateWorkflowMutation,

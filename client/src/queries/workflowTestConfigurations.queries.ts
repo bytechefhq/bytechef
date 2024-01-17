@@ -3,7 +3,7 @@ import {
     WorkflowTestConfigurationApi,
     WorkflowTestConfigurationConnectionModel,
     WorkflowTestConfigurationModel,
-} from '@/middleware/hermes/test';
+} from '@/middleware/platform/workflow/test';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

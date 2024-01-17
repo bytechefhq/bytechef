@@ -4,7 +4,7 @@ import {ProjectKeys} from '@/queries/projects.queries';
 import getRandomId from '@/utils/getRandomId';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon} from 'lucide-react';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionBasicModel} from 'middleware/platform/configuration';
 import InlineSVG from 'react-inlinesvg';
 import {Edge, Node, useReactFlow} from 'reactflow';
 

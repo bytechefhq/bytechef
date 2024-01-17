@@ -1,5 +1,5 @@
 import {useMutation} from '@tanstack/react-query';
-import {ProjectApi, ProjectModel, PublishProjectRequest} from 'middleware/helios/configuration';
+import {ProjectApi, ProjectModel, PublishProjectRequest} from 'middleware/automation/configuration';
 
 type CreateProjectMutationProps = {
     onSuccess?: (result: ProjectModel, variables: ProjectModel) => void;

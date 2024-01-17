@@ -1,5 +1,5 @@
 import {Component1Icon} from '@radix-ui/react-icons';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from 'middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from 'middleware/platform/configuration';
 import {HTMLAttributes, MouseEvent} from 'react';
 import InlineSVG from 'react-inlinesvg';
 

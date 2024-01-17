@@ -4,7 +4,7 @@ import {
     ConnectionDefinitionModel,
     GetComponentConnectionDefinitionRequest,
     GetComponentConnectionDefinitionsRequest,
-} from '@/middleware/hermes/configuration';
+} from '@/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectDefinitionKeys = {

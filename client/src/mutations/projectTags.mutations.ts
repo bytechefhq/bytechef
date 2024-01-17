@@ -1,4 +1,4 @@
-import {ProjectTagApi, UpdateProjectTagsRequest} from '@/middleware/helios/configuration';
+import {ProjectTagApi, UpdateProjectTagsRequest} from '@/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 type UpdateProjectTagsMutationProps = {

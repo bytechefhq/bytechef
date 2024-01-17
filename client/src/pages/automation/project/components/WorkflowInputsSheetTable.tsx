@@ -16,7 +16,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {WorkflowInputModel, WorkflowModel} from '@/middleware/hermes/configuration';
+import {WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
 import WorkflowInputsSheetDialog from '@/pages/automation/project/components/WorkflowInputsSheetDialog';
 import {ProjectKeys} from '@/queries/projects.queries';

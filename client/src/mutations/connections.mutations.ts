@@ -1,4 +1,4 @@
-import {ConnectionApi, ConnectionModel} from '@/middleware/helios/connection';
+import {ConnectionApi, ConnectionModel} from '@/middleware/automation/connection';
 import {useMutation} from '@tanstack/react-query';
 
 type CreateConnectionMutationProps = {

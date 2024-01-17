@@ -2,7 +2,7 @@ import {
     EnableProjectInstanceRequest,
     ProjectInstanceApi,
     ProjectInstanceModel,
-} from '@/middleware/helios/configuration';
+} from '@/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 type CreateProjectInstanceMutationProps = {

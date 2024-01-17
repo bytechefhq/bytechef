@@ -1,4 +1,4 @@
-import {ActionDefinitionModel, ComponentDefinitionBasicModel} from '@/middleware/hermes/configuration';
+import {ActionDefinitionModel, ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
 import getFilteredProperties from '@/pages/automation/project/utils/getFilteredProperties';
 import {PropertyType} from '@/types/projectTypes';
 import {Accordion, AccordionItem} from '@radix-ui/react-accordion';

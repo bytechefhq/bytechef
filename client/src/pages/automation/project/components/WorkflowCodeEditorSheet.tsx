@@ -2,7 +2,7 @@ import {Button} from '@/components/ui/button';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {toast} from '@/components/ui/use-toast';
-import {WorkflowModel} from '@/middleware/helios/configuration';
+import {WorkflowModel} from '@/middleware/automation/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/workflows.mutations';
 import {ProjectKeys} from '@/queries/projects.queries';
 import Editor from '@monaco-editor/react';

@@ -2,7 +2,7 @@ import {Button} from '@/components/ui/button';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {PencilIcon} from 'lucide-react';
-import {WorkflowExecutionModel} from 'middleware/helios/execution';
+import {WorkflowExecutionModel} from 'middleware/automation/workflow/execution';
 import {useNavigate} from 'react-router-dom';
 
 const WorkflowExecutionDetailsSheetWorkflowView = ({

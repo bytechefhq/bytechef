@@ -1,4 +1,4 @@
-import {CreateProjectWorkflowRequest, ProjectApi, WorkflowModel} from '@/middleware/helios/configuration';
+import {CreateProjectWorkflowRequest, ProjectApi, WorkflowModel} from '@/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 type CreateProjectWorkflowMutationProps = {

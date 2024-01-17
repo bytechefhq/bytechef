@@ -25,12 +25,12 @@ import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Properties from 'components/Properties/Properties';
 import useCopyToClipboard from 'hooks/useCopyToClipboard';
 import {ClipboardIcon} from 'lucide-react';
-import {ConnectionModel, TagModel} from 'middleware/helios/connection';
+import {ConnectionModel, TagModel} from 'middleware/automation/connection';
 import {
     AuthorizationModel,
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
-} from 'middleware/hermes/configuration';
+} from 'middleware/platform/configuration';
 import {useCreateConnectionMutation, useUpdateConnectionMutation} from 'mutations/connections.mutations';
 import {ComponentDefinitionKeys, useGetComponentDefinitionsQuery} from 'queries/componentDefinitions.queries';
 import {useGetConnectionDefinitionQuery, useGetConnectionDefinitionsQuery} from 'queries/connectionDefinitions.queries';

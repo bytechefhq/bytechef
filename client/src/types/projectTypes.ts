@@ -10,7 +10,7 @@ import {
     ObjectPropertyModel,
     StringPropertyModel,
     TimePropertyModel,
-} from 'middleware/hermes/configuration';
+} from 'middleware/platform/configuration';
 
 export type PropertyType = ArrayPropertyModel &
     BooleanPropertyModel &

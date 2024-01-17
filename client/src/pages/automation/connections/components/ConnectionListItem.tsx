@@ -18,7 +18,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ConnectionModel, TagModel} from '@/middleware/helios/connection';
+import {ConnectionModel, TagModel} from '@/middleware/automation/connection';
 import {useUpdateConnectionTagsMutation} from '@/mutations/connectionTags.mutations';
 import {useDeleteConnectionMutation} from '@/mutations/connections.mutations';
 import {ComponentDefinitionKeys, useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';

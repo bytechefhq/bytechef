@@ -1,6 +1,6 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {useProjectInstancesEnabledStore} from '@/pages/automation/project-instances/stores/useProjectInstancesEnabledStore';
-import {ProjectInstanceModel, ProjectModel, TagModel} from 'middleware/helios/configuration';
+import {ProjectInstanceModel, ProjectModel, TagModel} from 'middleware/automation/configuration';
 
 import ProjectInstanceListItem from './ProjectInstanceListItem';
 import ProjectInstanceWorkflowList from './ProjectInstanceWorkflowList';

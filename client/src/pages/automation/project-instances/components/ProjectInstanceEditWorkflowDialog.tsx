@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
-import {ProjectInstanceModel, ProjectInstanceWorkflowModel, WorkflowModel} from '@/middleware/helios/configuration';
+import {ProjectInstanceModel, ProjectInstanceWorkflowModel, WorkflowModel} from '@/middleware/automation/configuration';
 import {useUpdateProjectInstanceWorkflowMutation} from '@/mutations/projectInstanceWorkflows.mutations';
 import ProjectInstanceDialogWorkflowsStepItem from '@/pages/automation/project-instances/components/ProjectInstanceDialogWorkflowsStepItem';
 import {ProjectInstanceKeys} from '@/queries/projectInstances.queries';

@@ -1,5 +1,5 @@
 import Input from '@/components/Input/Input';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
 import {useEffect, useState} from 'react';
 
 import WorkflowNodesTabs from './WorkflowNodesTabs';

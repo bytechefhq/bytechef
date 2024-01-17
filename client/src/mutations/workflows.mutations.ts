@@ -4,7 +4,7 @@ import {
     UpdateWorkflowRequest,
     WorkflowApi,
     WorkflowModel,
-} from '@/middleware/helios/configuration';
+} from '@/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 type DeleteWorkflowMutationProps = {

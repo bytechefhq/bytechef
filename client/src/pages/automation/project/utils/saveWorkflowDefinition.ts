@@ -1,4 +1,4 @@
-import {ComponentDefinitionApi, WorkflowModel, WorkflowTaskModel} from '@/middleware/hermes/configuration';
+import {ComponentDefinitionApi, WorkflowModel, WorkflowTaskModel} from '@/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/queries/componentDefinitions.queries';
 import {WorkflowDefinition} from '@/types/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';

@@ -3,7 +3,7 @@ import {Textarea} from '@/components/ui/textarea';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {ComponentDataType} from '@/types/types';
 import Input from 'components/Input/Input';
-import {ComponentDefinitionModel} from 'middleware/hermes/configuration';
+import {ComponentDefinitionModel} from 'middleware/platform/configuration';
 import {ChangeEvent} from 'react';
 
 const DescriptionTab = ({

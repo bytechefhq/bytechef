@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ProjectInstanceModel, ProjectModel, TagModel} from '@/middleware/helios/configuration';
+import {ProjectInstanceModel, ProjectModel, TagModel} from '@/middleware/automation/configuration';
 import {useUpdateProjectInstanceTagsMutation} from '@/mutations/projectInstanceTags.mutations';
 import {
     useDeleteProjectInstanceMutation,

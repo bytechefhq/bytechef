@@ -1,6 +1,6 @@
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
-import {ProjectApi, ProjectModel, WorkflowApi, WorkflowModel} from 'middleware/helios/configuration';
+import {ProjectApi, ProjectModel, WorkflowApi, WorkflowModel} from 'middleware/automation/configuration';
 
 export const ProjectKeys = {
     filteredProjects: (filters: {categoryId?: number; tagId?: number} | undefined) => [

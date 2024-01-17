@@ -28,9 +28,9 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/components/ui/use-toast';
 import {RightSidebar} from '@/layouts/RightSidebar';
-import {ProjectModel} from '@/middleware/helios/configuration';
-import {WorkflowModel} from '@/middleware/hermes/configuration';
-import {WorkflowTestExecutionApi, WorkflowTestExecutionModel} from '@/middleware/hermes/test';
+import {ProjectModel} from '@/middleware/automation/configuration';
+import {WorkflowModel} from '@/middleware/platform/configuration';
+import {WorkflowTestApi, WorkflowTestExecutionModel} from '@/middleware/platform/workflow/test';
 import {useCreateProjectWorkflowMutation} from '@/mutations/projectWorkflows.mutations';
 import {
     useDeleteProjectMutation,
@@ -79,7 +79,7 @@ import ToggleGroup, {IToggleItem} from './components/ToggleGroup';
 import WorkflowNodesSidebar from './components/WorkflowNodesSidebar';
 import useLeftSidebarStore from './stores/useLeftSidebarStore';
 
-const workflowTestExecutionApi = new WorkflowTestExecutionApi();
+const workflowTestApi = new WorkflowTestApi();
 
 const headerToggleItems: IToggleItem[] = [
     {
@@ -305,7 +305,7 @@ const Project = () => {
         setWorkflowIsRunning(true);
 
         if (workflow?.id) {
-            workflowTestExecutionApi
+            workflowTestApi
                 .testWorkflow({
                     id: workflow?.id,
                 })

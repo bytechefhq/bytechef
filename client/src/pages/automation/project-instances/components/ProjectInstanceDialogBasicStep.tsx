@@ -5,7 +5,7 @@ import {Textarea} from '@/components/ui/textarea';
 import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstanceTags.queries';
 import {useGetProjectsQuery} from '@/queries/projects.queries';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
-import {ProjectInstanceModel, ProjectModel} from 'middleware/helios/configuration';
+import {ProjectInstanceModel, ProjectModel} from 'middleware/automation/configuration';
 import {
     Control,
     UseFormGetValues,

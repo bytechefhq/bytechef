@@ -1,5 +1,5 @@
 import Properties from '@/components/Properties/Properties';
-import {ProjectInstanceModel, WorkflowModel} from '@/middleware/helios/configuration';
+import {ProjectInstanceModel, WorkflowModel} from '@/middleware/automation/configuration';
 import {PropertyType} from '@/types/projectTypes';
 import {UseFormRegister} from 'react-hook-form';
 import {FieldValues} from 'react-hook-form/dist/types';

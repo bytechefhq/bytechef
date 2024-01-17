@@ -1,6 +1,6 @@
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {ClickedItemType} from '@/types/types';
-import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from 'middleware/hermes/configuration';
+import {ComponentDefinitionBasicModel, TaskDispatcherDefinitionModel} from 'middleware/platform/configuration';
 
 import WorkflowNodesTabsItem from './WorkflowNodesTabsItem';
 

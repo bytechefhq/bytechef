@@ -2,7 +2,7 @@ import {
     ProjectInstanceTagApi,
     UpdateProjectInstanceTagsRequest,
     UpdateProjectTagsRequest,
-} from '@/middleware/helios/configuration';
+} from '@/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 type UpdateProjectInstanceTagsMutationProps = {

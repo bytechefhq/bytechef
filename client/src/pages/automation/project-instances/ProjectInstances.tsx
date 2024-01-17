@@ -2,7 +2,7 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
-import {ProjectInstanceModel} from '@/middleware/helios/configuration';
+import {ProjectInstanceModel} from '@/middleware/automation/configuration';
 import {useGetProjectInstanceTagsQuery} from '@/queries/projectInstanceTags.queries';
 import {useGetProjectInstancesQuery} from '@/queries/projectInstances.queries';
 import {useGetProjectsQuery} from '@/queries/projects.queries';

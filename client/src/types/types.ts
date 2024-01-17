@@ -3,7 +3,7 @@ import {
     ComponentDefinitionModel,
     ConnectionDefinitionBasicModel,
     TaskDispatcherDefinitionModel,
-} from '@/middleware/hermes/configuration';
+} from '@/middleware/platform/configuration';
 
 export type DataPillType = {
     componentAlias?: string;

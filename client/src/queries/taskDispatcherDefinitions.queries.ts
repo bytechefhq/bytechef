@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {TaskDispatcherDefinitionApi, TaskDispatcherDefinitionModel} from '@/middleware/hermes/configuration';
+import {TaskDispatcherDefinitionApi, TaskDispatcherDefinitionModel} from '@/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const TaskDispatcherKeys = {

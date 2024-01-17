@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {ProjectInstanceModel, WorkflowConnectionModel} from '@/middleware/helios/configuration';
+import {ProjectInstanceModel, WorkflowConnectionModel} from '@/middleware/automation/configuration';
 import ConnectionDialog from '@/pages/automation/connections/components/ConnectionDialog';
 import {useGetComponentDefinitionQuery} from '@/queries/componentDefinitions.queries';
 import {useGetConnectionsQuery} from '@/queries/connections.queries';
