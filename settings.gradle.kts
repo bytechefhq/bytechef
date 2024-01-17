@@ -132,6 +132,7 @@ include("server:libs:platform:platform-file-storage:platform-file-storage-api")
 include("server:libs:platform:platform-file-storage:platform-file-storage-service")
 include("server:libs:platform:platform-oauth2:platform-oauth2-api")
 include("server:libs:platform:platform-oauth2:platform-oauth2-service")
+include("server:libs:platform:platform-registry-api")
 include("server:libs:platform:platform-scheduler:platform-scheduler-api")
 include("server:libs:platform:platform-scheduler:platform-scheduler-impl")
 include("server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api")
@@ -208,6 +209,9 @@ include("server:libs:test:test-support")
 include("server:libs:test:test-int-support")
 
 include("server:sdks:java:component-api")
+include("server:sdks:java:definition-api")
+
+// EE
 
 include("ee:server:apps:api-gateway-app")
 include("ee:server:apps:config-server-app")

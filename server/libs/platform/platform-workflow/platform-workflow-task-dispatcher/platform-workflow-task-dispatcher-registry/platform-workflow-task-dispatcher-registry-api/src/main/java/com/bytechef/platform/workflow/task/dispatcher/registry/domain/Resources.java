@@ -39,7 +39,7 @@ public class Resources {
     public Resources(com.bytechef.platform.workflow.task.dispatcher.definition.Resources resources) {
         this.additionalUrls = OptionalUtils.orElse(resources.getAdditionalUrls(), Map.of());
         this.categories = OptionalUtils.orElse(resources.getCategories(), List.of());
-        this.documentationUrl = Validate.notNull(resources.getDocumentationUrl(), "documentationUrl");
+        this.documentationUrl = Validate.notNull(resources.documentationUrl(), "documentationUrl");
     }
 
     public Map<String, String> getAdditionalUrls() {

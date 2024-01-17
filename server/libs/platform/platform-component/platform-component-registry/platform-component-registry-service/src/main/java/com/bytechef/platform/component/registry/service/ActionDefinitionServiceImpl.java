@@ -98,7 +98,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, String searchText, ComponentConnection connection,
         @NonNull ActionContext context) {
 
-        ActionOptionsFunction optionsFunction = getComponentOptionsFunction(
+        ActionOptionsFunction<?> optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, actionName, propertyName);
 
         try {
@@ -186,15 +186,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return actionDefinitions;
     }
 
-    private ActionOptionsFunction getComponentOptionsFunction(
+    private ActionOptionsFunction<?> getComponentOptionsFunction(
         String componentName, int componentVersion, String actionName, String propertyName) {
 
-        DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
+        DynamicOptionsProperty<?> dynamicOptionsProperty = (DynamicOptionsProperty<?>) componentDefinitionRegistry
             .getActionProperty(componentName, componentVersion, actionName, propertyName);
 
-        OptionsDataSource<?> optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
+        OptionsDataSource optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
 
-        return (ActionOptionsFunction) optionsDataSource.getOptions();
+        return (ActionOptionsFunction<?>) optionsDataSource.getOptions();
     }
 
     private PropertiesDataSource.ActionPropertiesFunction getComponentPropertiesFunction(

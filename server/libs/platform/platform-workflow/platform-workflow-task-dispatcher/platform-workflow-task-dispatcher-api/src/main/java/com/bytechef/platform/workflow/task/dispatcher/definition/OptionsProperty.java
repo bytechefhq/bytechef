@@ -16,17 +16,18 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
+import com.bytechef.definition.BaseOptionsProperty;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public interface OptionsProperty {
+public interface OptionsProperty<T> extends BaseOptionsProperty<T, Option<T>> {
 
     /**
      *
      * @return
      */
-    Optional<List<Option<?>>> getOptions();
+    Optional<List<? extends Option<T>>> getOptions();
 }

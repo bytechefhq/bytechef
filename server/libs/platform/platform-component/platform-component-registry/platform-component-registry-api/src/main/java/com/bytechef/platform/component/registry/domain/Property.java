@@ -16,13 +16,12 @@
 
 package com.bytechef.platform.component.registry.domain;
 
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Property.Type;
+import com.bytechef.platform.registry.domain.BaseProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -47,54 +46,38 @@ import org.springframework.lang.Nullable;
     @JsonSubTypes.Type(value = TimeProperty.class, name = "TIME"),
 })
 @SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_SUPERCLASS")
-public abstract class Property {
+public abstract class Property extends BaseProperty {
 
-    private boolean advancedOption;
-    private String description;
-    private String displayCondition;
-    private boolean expressionEnabled; // Defaults to true
-    private boolean hidden;
-    private boolean required;
-    private String name;
     private Type type;
 
     protected Property() {
     }
 
     public Property(com.bytechef.component.definition.Property property) {
-        this.advancedOption = OptionalUtils.orElse(property.getAdvancedOption(), false);
-        this.description = OptionalUtils.orElse(property.getDescription(), null);
-        this.displayCondition = OptionalUtils.orElse(property.getDisplayCondition(), null);
-        this.expressionEnabled = OptionalUtils.orElse(property.getExpressionEnabled(), true);
-        this.hidden = OptionalUtils.orElse(property.getHidden(), false);
-        this.required = OptionalUtils.orElse(property.getRequired(), false);
-        this.name = property.getName();
+        super(property);
+
         this.type = property.getType();
     }
 
     @SuppressWarnings("unchecked")
     public static <P extends Property> P toProperty(com.bytechef.component.definition.Property property) {
         return switch (property.getType()) {
-            case ARRAY ->
-                (P) toArrayProperty((com.bytechef.component.definition.Property.ArrayProperty) property);
-            case BOOLEAN ->
-                (P) toBooleanProperty((com.bytechef.component.definition.Property.BooleanProperty) property);
+            case ARRAY -> (P) toArrayProperty((com.bytechef.component.definition.Property.ArrayProperty) property);
+            case BOOLEAN -> (P) toBooleanProperty(
+                (com.bytechef.component.definition.Property.BooleanProperty) property);
             case DATE -> (P) toDateProperty((com.bytechef.component.definition.Property.DateProperty) property);
-            case DATE_TIME ->
-                (P) toDateTimeProperty((com.bytechef.component.definition.Property.DateTimeProperty) property);
+            case DATE_TIME -> (P) toDateTimeProperty(
+                (com.bytechef.component.definition.Property.DateTimeProperty) property);
             case DYNAMIC_PROPERTIES -> (P) toDynamicPropertiesProperty(
                 (com.bytechef.component.definition.Property.DynamicPropertiesProperty) property);
-            case INTEGER ->
-                (P) toIntegerProperty((com.bytechef.component.definition.Property.IntegerProperty) property);
+            case INTEGER -> (P) toIntegerProperty(
+                (com.bytechef.component.definition.Property.IntegerProperty) property);
             case FILE_ENTRY ->
                 (P) toFileEntryProperty((com.bytechef.component.definition.Property.FileEntryProperty) property);
             case NULL -> (P) toNullProperty((com.bytechef.component.definition.Property.NullProperty) property);
-            case NUMBER ->
-                (P) toNumberProperty((com.bytechef.component.definition.Property.NumberProperty) property);
-            case OBJECT ->
-                (P) toObjectProperty((com.bytechef.component.definition.Property.ObjectProperty) property);
-            case STRING ->
-                (P) toStringProperty((com.bytechef.component.definition.Property.StringProperty) property);
+            case NUMBER -> (P) toNumberProperty((com.bytechef.component.definition.Property.NumberProperty) property);
+            case OBJECT -> (P) toObjectProperty((com.bytechef.component.definition.Property.ObjectProperty) property);
+            case STRING -> (P) toStringProperty((com.bytechef.component.definition.Property.StringProperty) property);
             case TIME -> (P) toTimeProperty((com.bytechef.component.definition.Property.TimeProperty) property);
         };
     }
@@ -103,54 +86,12 @@ public abstract class Property {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof Property that)) {
-            return false;
-        }
-
-        return advancedOption == that.advancedOption && expressionEnabled == that.expressionEnabled
-            && hidden == that.hidden && required == that.required
-            && Objects.equals(displayCondition, that.displayCondition)
-            && Objects.equals(name, that.name) && type == that.type;
+        return super.equals(o) && type == ((Property) o).getType();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-            advancedOption, displayCondition, expressionEnabled, hidden, required, name, type);
-    }
-
-    public boolean getAdvancedOption() {
-        return advancedOption;
-    }
-
-    @Nullable
-    public String getDescription() {
-        return description;
-    }
-
-    @Nullable
-    public String getDisplayCondition() {
-        return displayCondition;
-    }
-
-    public boolean getExpressionEnabled() {
-        return expressionEnabled;
-    }
-
-    public boolean getHidden() {
-        return hidden;
-    }
-
-    public boolean getRequired() {
-        return required;
-    }
-
-    public String getName() {
-        return name;
+        return Objects.hash(super.hashCode(), type);
     }
 
     public Type getType() {
@@ -159,16 +100,9 @@ public abstract class Property {
 
     @Override
     public String toString() {
-        return "Property" +
-            "advancedOption=" + advancedOption +
-            ", description='" + description + '\'' +
-            ", displayCondition='" + displayCondition + '\'' +
-            ", expressionEnabled=" + expressionEnabled +
-            ", hidden=" + hidden +
-            ", required=" + required +
-            ", name='" + name + '\'' +
-            ", type=" + type +
-            '}';
+        return "Property{" +
+            "type=" + type +
+            "} " + super.toString();
     }
 
     private static ArrayProperty toArrayProperty(

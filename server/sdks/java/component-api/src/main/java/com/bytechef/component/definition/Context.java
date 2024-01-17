@@ -16,7 +16,6 @@
 
 package com.bytechef.component.definition;
 
-import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;

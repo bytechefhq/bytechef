@@ -20,13 +20,13 @@ import static com.bytechef.component.definition.Context.Http.RequestMethod;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.OpenApiComponentHandler.PropertyType;
-import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.OutputSchema;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ValueProperty;

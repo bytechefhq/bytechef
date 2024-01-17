@@ -16,25 +16,11 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Optional;
+import com.bytechef.definition.BaseHelp;
 
 /**
  * @author Ivica Cardic
  *
  */
-@SuppressFBWarnings("EI")
-public interface Help {
-
-    /**
-     *
-     * @return
-     */
-    String getBody();
-
-    /**
-     *
-     * @return
-     */
-    Optional<String> getLearnMoreUrl();
+public interface Help extends BaseHelp {
 }

@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.component.jackson;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.platform.component.definition.ContextFileEntryImpl;
+import com.bytechef.component.definition.FileEntry;
+import com.bytechef.platform.component.definition.FileEntryImpl;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -30,15 +30,15 @@ import org.springframework.boot.jackson.JsonComponent;
  * @author Ivica Cardic
  */
 @JsonComponent
-public class ActionContextFileEntryDeserializer extends JsonDeserializer<ActionContext.FileEntry> {
+public class ActionContextFileEntryDeserializer extends JsonDeserializer<FileEntry> {
 
     @Override
-    public ActionContext.FileEntry deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+    public FileEntry deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
         ObjectCodec objectCodec = jp.getCodec();
 
         JsonNode jsonNode = objectCodec.readTree(jp);
 
-        return new ContextFileEntryImpl(
+        return new FileEntryImpl(
             asText("extension", jsonNode), asText("mimeType", jsonNode), asText("name", jsonNode),
             asText("url", jsonNode));
     }

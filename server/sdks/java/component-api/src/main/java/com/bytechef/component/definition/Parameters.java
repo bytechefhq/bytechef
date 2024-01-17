@@ -57,9 +57,9 @@ public interface Parameters extends Map<String, Object> {
 
     Duration getDuration(String key, Duration defaultDuration);
 
-    ActionContext.FileEntry getFileEntry(String key);
+    FileEntry getFileEntry(String key);
 
-    List<ActionContext.FileEntry> getFileEntries(String key, List<ActionContext.FileEntry> defaultValue);
+    List<FileEntry> getFileEntries(String key, List<FileEntry> defaultValue);
 
     Float getFloat(String key);
 
@@ -131,7 +131,7 @@ public interface Parameters extends Map<String, Object> {
 
     double getRequiredDouble(String key);
 
-    ActionContext.FileEntry getRequiredFileEntry(String key);
+    FileEntry getRequiredFileEntry(String key);
 
     float getRequiredFloat(String key);
 

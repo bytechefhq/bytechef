@@ -17,8 +17,8 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -144,13 +144,13 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
-    public ActionContext.FileEntry getFileEntry(String key) {
-        return MapUtils.get(map, key, ActionContext.FileEntry.class);
+    public FileEntry getFileEntry(String key) {
+        return MapUtils.get(map, key, FileEntry.class);
     }
 
     @Override
-    public List<ActionContext.FileEntry> getFileEntries(String key, List<ActionContext.FileEntry> defaultValue) {
-        return getList(key, ActionContext.FileEntry.class, defaultValue);
+    public List<FileEntry> getFileEntries(String key, List<FileEntry> defaultValue) {
+        return getList(key, FileEntry.class, defaultValue);
     }
 
     @Override
@@ -360,8 +360,8 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
-    public ActionContext.FileEntry getRequiredFileEntry(String key) {
-        return MapUtils.getRequired(map, key, ActionContext.FileEntry.class);
+    public FileEntry getRequiredFileEntry(String key) {
+        return MapUtils.getRequired(map, key, FileEntry.class);
     }
 
     @Override

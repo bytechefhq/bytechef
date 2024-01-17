@@ -22,7 +22,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public interface OptionsDataSource<F extends OptionsDataSource.OptionsFunction> {
+public interface OptionsDataSource {
 
     /**
      *
@@ -36,7 +36,7 @@ public interface OptionsDataSource<F extends OptionsDataSource.OptionsFunction> 
      *
      * @return
      */
-    F getOptions();
+    OptionsFunction getOptions();
 
     /**
      *
@@ -48,7 +48,7 @@ public interface OptionsDataSource<F extends OptionsDataSource.OptionsFunction> 
      *
      */
     @FunctionalInterface
-    interface ActionOptionsFunction extends OptionsFunction {
+    interface ActionOptionsFunction<T> extends OptionsFunction {
 
         /**
          *
@@ -59,7 +59,7 @@ public interface OptionsDataSource<F extends OptionsDataSource.OptionsFunction> 
          * @return
          * @throws Exception
          */
-        List<? extends Option<?>> apply(
+        List<? extends Option<T>> apply(
             Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
             throws Exception;
     }
@@ -68,7 +68,7 @@ public interface OptionsDataSource<F extends OptionsDataSource.OptionsFunction> 
      *
      */
     @FunctionalInterface
-    interface TriggerOptionsFunction extends OptionsFunction {
+    interface TriggerOptionsFunction<T> extends OptionsFunction {
 
         /**
          *
@@ -79,7 +79,7 @@ public interface OptionsDataSource<F extends OptionsDataSource.OptionsFunction> 
          * @return
          * @throws Exception
          */
-        List<? extends Option<?>> apply(
+        List<? extends Option<T>> apply(
             Parameters inputParameters, Parameters connectionParameters, String searchText, TriggerContext context)
             throws Exception;
     }

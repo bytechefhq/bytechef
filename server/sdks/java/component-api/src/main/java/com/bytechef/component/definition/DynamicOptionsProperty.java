@@ -21,7 +21,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public interface DynamicOptionsProperty extends OptionsProperty {
+public interface DynamicOptionsProperty<T> extends OptionsProperty<T> {
 
     /**
      *

@@ -18,7 +18,6 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -27,6 +26,7 @@ import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
@@ -248,7 +248,7 @@ public class HttpClientExecutor {
             name, fileEntry.getName(),
             MoreBodyPublishers.ofMediaType(
                 BodyPublishers.ofInputStream(() -> fileStorageService.getFileStream(
-                    FileEntryConstants.FILES_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry())),
+                    FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry())),
                 MediaType.parse(fileEntry.getMimeType())));
     }
 
@@ -301,7 +301,7 @@ public class HttpClientExecutor {
     private BodyPublisher getBinaryBodyPublisher(Body body, FileEntry fileEntry) {
         return MoreBodyPublishers.ofMediaType(
             BodyPublishers.ofInputStream(() -> fileStorageService.getFileStream(
-                FileEntryConstants.FILES_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry())),
+                FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry())),
             MediaType.parse(body.getMimeType() == null ? fileEntry.getMimeType() : body.getMimeType()));
     }
 
@@ -370,7 +370,7 @@ public class HttpClientExecutor {
             }
         }
 
-        return new ContextFileEntryImpl(
+        return new FileEntryImpl(
             fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, filename, httpResponseBody));
     }
 

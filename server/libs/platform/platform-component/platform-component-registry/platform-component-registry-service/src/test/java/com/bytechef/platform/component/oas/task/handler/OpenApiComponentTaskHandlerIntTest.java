@@ -50,7 +50,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.config.JacksonConfiguration;
-import com.bytechef.platform.component.definition.ContextFileEntryImpl;
+import com.bytechef.platform.component.definition.FileEntryImpl;
 import com.bytechef.platform.component.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.platform.component.oas.handler.loader.OpenApiComponentHandlerLoader;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
@@ -565,7 +565,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
         FileEntry fileEntry = FILE_STORAGE_SERVICE.storeFileContent("data", "text.txt", "This is text");
 
-        taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", new ContextFileEntryImpl(fileEntry)));
+        taskExecution = getTaskExecution(Map.of("petId", 10, "fileEntry", new FileEntryImpl(fileEntry)));
 
         response = (Response) openApiComponentTaskHandler.handle(taskExecution);
 

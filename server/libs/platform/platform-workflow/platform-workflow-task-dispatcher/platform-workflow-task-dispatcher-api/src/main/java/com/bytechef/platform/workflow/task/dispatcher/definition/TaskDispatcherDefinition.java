@@ -96,6 +96,8 @@ public interface TaskDispatcherDefinition {
      */
     Optional<List<? extends ValueProperty<?>>> getVariableProperties();
 
+    Optional<VariablePropertiesFunction> getVariablePropertiesFunction();
+
     /**
      *
      * @return

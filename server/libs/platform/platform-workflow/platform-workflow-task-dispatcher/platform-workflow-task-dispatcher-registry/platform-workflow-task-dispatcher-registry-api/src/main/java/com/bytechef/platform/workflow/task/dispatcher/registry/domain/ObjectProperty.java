@@ -22,16 +22,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
-public class ObjectProperty extends ValueProperty<Map<String, Object>> {
+public class ObjectProperty extends ValueProperty<Map<String, ?>> {
 
     private List<? extends Property> additionalProperties;
     private boolean multipleValues;
-    private String objectType;
     private List<Option> options;
     private List<? extends Property> properties;
 
@@ -40,18 +38,16 @@ public class ObjectProperty extends ValueProperty<Map<String, Object>> {
 
     public ObjectProperty(
         com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty objectProperty) {
+
         super(objectProperty);
 
         this.additionalProperties = CollectionUtils.map(
             OptionalUtils.orElse(objectProperty.getAdditionalProperties(), List.of()),
             valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         this.multipleValues = OptionalUtils.orElse(objectProperty.getMultipleValues(), true);
-        this.objectType = OptionalUtils.orElse(objectProperty.getObjectType(), null);
-        this.options =
-            CollectionUtils.map(OptionalUtils.orElse(objectProperty.getOptions(), List.of()), Option::new);
+        this.options = CollectionUtils.map(OptionalUtils.orElse(objectProperty.getOptions(), List.of()), Option::new);
         this.properties = CollectionUtils.map(
-            OptionalUtils.orElse(objectProperty.getProperties(), List.of()),
-            Property::toProperty);
+            OptionalUtils.orElse(objectProperty.getProperties(), List.of()), Property::toProperty);
     }
 
     @Override
@@ -65,11 +61,6 @@ public class ObjectProperty extends ValueProperty<Map<String, Object>> {
 
     public boolean isMultipleValues() {
         return multipleValues;
-    }
-
-    @Nullable
-    public String getObjectType() {
-        return objectType;
     }
 
     public List<Option> getOptions() {
@@ -91,14 +82,13 @@ public class ObjectProperty extends ValueProperty<Map<String, Object>> {
         }
 
         return multipleValues == that.multipleValues &&
-            Objects.equals(additionalProperties, that.additionalProperties) &&
-            Objects.equals(objectType, that.objectType) && Objects.equals(options, that.options) &&
+            Objects.equals(additionalProperties, that.additionalProperties) && Objects.equals(options, that.options) &&
             Objects.equals(properties, that.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, multipleValues, objectType, options, properties);
+        return Objects.hash(additionalProperties, multipleValues, options, properties);
     }
 
     @Override
@@ -106,7 +96,6 @@ public class ObjectProperty extends ValueProperty<Map<String, Object>> {
         return "ObjectProperty{" +
             "additionalProperties=" + additionalProperties +
             ", multipleValues=" + multipleValues +
-            ", objectType='" + objectType + '\'' +
             ", options=" + options +
             ", properties=" + properties +
             ", controlType=" + controlType +

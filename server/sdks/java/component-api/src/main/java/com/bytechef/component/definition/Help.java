@@ -16,25 +16,13 @@
 
 package com.bytechef.component.definition;
 
+import com.bytechef.definition.BaseHelp;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  *
  */
 @SuppressFBWarnings("EI")
-public interface Help {
-
-    /**
-     *
-     * @return
-     */
-    String getBody();
-
-    /**
-     *
-     * @return
-     */
-    Optional<String> getLearnMoreUrl();
+public interface Help extends BaseHelp {
 }

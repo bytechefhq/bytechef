@@ -16,10 +16,31 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
+import com.bytechef.definition.BaseOutputSchema;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-public record OutputSchema(ValueProperty<?> definition, Object sampleOutput) {
+public record OutputSchema(ValueProperty<?> definition, Object sampleOutput)
+    implements BaseOutputSchema<ValueProperty<?>> {
+
+    public OutputSchema(ValueProperty<?> definition) {
+        this(definition, null);
+    }
+
+    public OutputSchema {
+        Objects.requireNonNull(definition, "'definition' mut not be null");
+    }
+
+    @Override
+    public ValueProperty<?> getDefinition() {
+        return definition;
+    }
+
+    @Override
+    public Object getSampleOutput() {
+        return sampleOutput;
+    }
 }

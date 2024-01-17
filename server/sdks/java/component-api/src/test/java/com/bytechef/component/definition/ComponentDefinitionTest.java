@@ -158,7 +158,7 @@ public class ComponentDefinitionTest {
             .defaultValue(2)
             .description("description")
             .label("label")
-            .options(ComponentDSL.option("option1", 1L), ComponentDSL.option("option2", 2L))
+            .options(ComponentDSL.option("option1", 1.0), ComponentDSL.option("option2", 2.0))
             .placeholder("placeholder")
             .required(true);
 

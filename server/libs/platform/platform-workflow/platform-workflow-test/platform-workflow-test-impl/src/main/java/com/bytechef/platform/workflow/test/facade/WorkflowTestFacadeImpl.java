@@ -116,7 +116,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
 
                     OutputSchema outputSchema = triggerDefinition.getOutputSchema();
 
-                    return outputSchema.sampleOutput();
+                    return outputSchema.getSampleOutput();
                 });
 
             if (sampleOutput == null) {

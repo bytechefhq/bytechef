@@ -16,6 +16,7 @@
 
 package com.bytechef.component.definition;
 
+import com.bytechef.definition.BaseProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,7 +29,7 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_INTERFACE")
-public interface Property {
+public interface Property extends BaseProperty {
 
     /**
      *
@@ -75,94 +76,38 @@ public interface Property {
     /**
      *
      */
-    Optional<Boolean> getAdvancedOption();
-
-    /**
-     *
-     */
-    Optional<String> getDescription();
-
-    /**
-     *
-     */
-    Optional<String> getDisplayCondition();
-
-    /**
-     *
-     */
-    Optional<Boolean> getExpressionEnabled();
-
-    /**
-     *
-     */
-    Optional<Boolean> getHidden();
-
-    /**
-     *
-     */
-    Map<String, Object> getMetadata();
-
-    /**
-     *
-     */
-    String getName();
-
-    /**
-     *
-     */
-    Optional<Boolean> getRequired();
-
-    /**
-     *
-     */
     Type getType();
 
     /**
      *
      */
-    interface ArrayProperty extends DynamicOptionsProperty, ValueProperty<List<Object>> {
+    interface ArrayProperty
+        extends BaseArrayProperty<ValueProperty<?>>, DynamicOptionsProperty<Object>, ValueProperty<List<?>> {
 
         /**
          *
          * @return
          */
         Optional<List<? extends Property.ValueProperty<?>>> getItems();
-
-        /**
-         *
-         * @return
-         */
-        Optional<Long> getMaxItems();
-
-        /**
-         *
-         * @return
-         */
-        Optional<Long> getMinItems();
-
-        /**
-         *
-         * @return
-         */
-        Optional<Boolean> getMultipleValues();
     }
 
     /**
      *
      */
-    interface BooleanProperty extends OptionsProperty, ValueProperty<Boolean> {
+    interface BooleanProperty extends BaseBooleanProperty, OptionsProperty<Boolean>, ValueProperty<Boolean> {
     }
 
     /**
      *
      */
-    interface DateProperty extends DynamicOptionsProperty, ValueProperty<LocalDate> {
+    interface DateProperty extends BaseDateProperty, DynamicOptionsProperty<LocalDate>, ValueProperty<LocalDate> {
     }
 
     /**
      *
      */
-    interface DateTimeProperty extends DynamicOptionsProperty, ValueProperty<LocalDateTime> {
+    interface DateTimeProperty
+        extends BaseDateTimeProperty, DynamicOptionsProperty<LocalDateTime>, ValueProperty<LocalDateTime> {
     }
 
     /**
@@ -178,13 +123,13 @@ public interface Property {
         /**
          *
          */
-        PropertiesDataSource getDynamicPropertiesDataSource();
+        PropertiesDataSource<?> getDynamicPropertiesDataSource();
     }
 
     /**
      *
      */
-    interface FileEntryProperty extends ValueProperty<Map<String, ?>> {
+    interface FileEntryProperty extends BaseFileEntryProperty<ValueProperty<?>>, ValueProperty<Map<String, ?>> {
 
         /**
          *
@@ -196,130 +141,54 @@ public interface Property {
     /**
      *
      */
-    interface IntegerProperty extends DynamicOptionsProperty, ValueProperty<Long> {
-
-        /**
-         *
-         */
-        Optional<Long> getMaxValue();
-
-        /**
-         *
-         */
-        Optional<Long> getMinValue();
+    interface IntegerProperty extends BaseIntegerProperty, DynamicOptionsProperty<Long>, ValueProperty<Long> {
     }
 
     /**
      *
      */
-    interface NullProperty extends ValueProperty<Void> {
+    interface NullProperty extends BaseNullProperty, ValueProperty<Void> {
     }
 
     /**
      *
      */
-    interface NumberProperty extends DynamicOptionsProperty, ValueProperty<Double> {
-
-        /**
-         *
-         */
-        Optional<Integer> getMaxNumberPrecision();
-
-        /**
-         *
-         */
-        Optional<Double> getMaxValue();
-
-        /**
-         *
-         */
-        Optional<Double> getMinValue();
-
-        /**
-         *
-         */
-        Optional<Integer> getMinNumberPrecision();
-
-        /**
-         *
-         */
-        Optional<Integer> getNumberPrecision();
+    interface NumberProperty extends BaseNumberProperty, DynamicOptionsProperty<Double>, ValueProperty<Double> {
     }
 
     /**
      *
      */
-    interface ObjectProperty extends DynamicOptionsProperty, ValueProperty<Map<String, ?>> {
+    interface ObjectProperty
+        extends BaseObjectProperty<ValueProperty<?>>, DynamicOptionsProperty<Object>, ValueProperty<Map<String, ?>> {
 
         /**
          *
          */
         Optional<List<? extends Property.ValueProperty<?>>> getAdditionalProperties();
-
-        /**
-         *
-         */
-        Optional<Boolean> getMultipleValues();
-
-        /**
-         *
-         */
-        Optional<List<? extends Property.ValueProperty<?>>> getProperties();
     }
 
     /**
      *
      */
-    interface StringProperty extends DynamicOptionsProperty, ValueProperty<String> {
-
-        /**
-         *
-         * @return
-         */
-        Optional<Integer> getMaxLength();
-
-        /**
-         *
-         * @return
-         */
-        Optional<Integer> getMinLength();
+    interface StringProperty extends BaseStringProperty, DynamicOptionsProperty<String>, ValueProperty<String> {
     }
 
     /**
      *
      */
-    interface TimeProperty extends DynamicOptionsProperty, ValueProperty<LocalTime> {
+    interface TimeProperty extends BaseTimeProperty, DynamicOptionsProperty<LocalTime>, ValueProperty<LocalTime> {
     }
 
     /**
      *
      * @param <V>
      */
-    interface ValueProperty<V> extends Property {
+    interface ValueProperty<V> extends BaseValueProperty<V>, Property {
 
         /**
          *
          */
         ControlType getControlType();
-
-        /**
-         *
-         */
-        Optional<V> getDefaultValue();
-
-        /**
-         *
-         */
-        Optional<V> getExampleValue();
-
-        /**
-         *
-         */
-        Optional<String> getLabel();
-
-        /**
-         *
-         */
-        Optional<String> getPlaceholder();
     }
 }

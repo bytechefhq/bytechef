@@ -19,8 +19,9 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
-import com.bytechef.platform.component.registry.util.OutputSchemaUtils;
+import com.bytechef.platform.registry.util.OutputSchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -486,15 +487,15 @@ public class ContextImpl implements Context {
 
     private static class OutputSchemaImpl implements OutputSchema {
 
-        private static final org.slf4j.Logger logger = LoggerFactory.getLogger(OutputSchemaImpl.class);
-
         private OutputSchemaImpl() {
         }
 
         @Override
         public com.bytechef.component.definition.OutputSchema get(Object value) {
             return new com.bytechef.component.definition.OutputSchema(
-                OutputSchemaUtils.getOutputSchemaDefinition(value), value);
+                (Property.ValueProperty<?>) OutputSchemaUtils.getOutputSchemaDefinition(
+                    value, new ValuePropertyFactory(value)),
+                value);
         }
     }
 
@@ -560,4 +561,5 @@ public class ContextImpl implements Context {
             return XmlUtils.write(object, rootName);
         }
     }
+
 }

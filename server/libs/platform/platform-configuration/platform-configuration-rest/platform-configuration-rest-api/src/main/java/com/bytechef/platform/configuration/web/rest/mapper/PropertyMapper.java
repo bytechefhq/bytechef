@@ -49,8 +49,6 @@ import com.bytechef.platform.configuration.web.rest.model.TaskPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.TimePropertyModel;
 import java.util.Collections;
 import java.util.List;
-
-import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskProperty;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;

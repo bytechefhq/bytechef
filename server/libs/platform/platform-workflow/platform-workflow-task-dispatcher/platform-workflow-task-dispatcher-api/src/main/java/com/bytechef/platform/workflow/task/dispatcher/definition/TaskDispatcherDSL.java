@@ -67,7 +67,11 @@ public final class TaskDispatcherDSL {
     }
 
     public static ModifiableFileEntryProperty fileEntry() {
-        return new ModifiableFileEntryProperty();
+        return fileEntry(null);
+    }
+
+    public static ModifiableFileEntryProperty fileEntry(String name) {
+        return new ModifiableFileEntryProperty(name);
     }
 
     public static ModifiableIntegerProperty integer() {
@@ -76,6 +80,14 @@ public final class TaskDispatcherDSL {
 
     public static ModifiableIntegerProperty integer(String name) {
         return new ModifiableIntegerProperty(name);
+    }
+
+    public static ModifiableNullProperty nullable() {
+        return new ModifiableNullProperty();
+    }
+
+    public static ModifiableNullProperty nullable(String name) {
+        return new ModifiableNullProperty(name);
     }
 
     public static ModifiableNumberProperty number() {
@@ -162,39 +174,31 @@ public final class TaskDispatcherDSL {
         return new ModifiableTimeProperty();
     }
 
-    public static ModifiableTimeProperty time(String name) {
-        return new ModifiableTimeProperty(name);
-    }
-
-    public static ModifiableObjectProperty task() {
+    public static ModifiableTaskProperty task() {
         return task(null);
     }
 
-    public static ModifiableObjectProperty task(String name) {
-        return buildObject(name, "The task or task dispatcher to use.", "TASK");
+    public static ModifiableTaskProperty task(String name) {
+        return new ModifiableTaskProperty(name);
+    }
+
+    public static ModifiableTimeProperty time(String name) {
+        return new ModifiableTimeProperty(name);
     }
 
     public static ModifiableTaskDispatcherDefinition taskDispatcher(String name) {
         return new ModifiableTaskDispatcherDefinition(name);
     }
 
-    private static ModifiableObjectProperty buildObject(
-        String name, String description, String objectType) {
-
-        return new ModifiableObjectProperty(name)
-            .description(description)
-            .objectType(objectType);
-    }
-
     public static class ModifiableArrayProperty
-        extends ModifiableValueProperty<List<Object>, ModifiableArrayProperty>
+        extends ModifiableValueProperty<List<?>, ModifiableArrayProperty>
         implements Property.ArrayProperty {
 
         private List<? extends ModifiableValueProperty<?, ?>> items;
         private Long maxItems;
         private Long minItems;
         private Boolean multipleValues;
-        private List<Option<?>> options;
+        private List<Option<Object>> options;
 
         private ModifiableArrayProperty() {
             this(null);
@@ -330,7 +334,7 @@ public final class TaskDispatcherDSL {
             return this;
         }
 
-        public ModifiableArrayProperty options(List<? extends Option<?>> options) {
+        public ModifiableArrayProperty options(List<? extends Option<Object>> options) {
             this.options = new ArrayList<>(options);
 
             return this;
@@ -342,7 +346,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<Object>>> getOptions() {
             return Optional.ofNullable(options);
         }
 
@@ -371,7 +375,7 @@ public final class TaskDispatcherDSL {
         extends ModifiableValueProperty<Boolean, ModifiableBooleanProperty>
         implements Property.BooleanProperty {
 
-        private final List<Option<?>> options = List.of(
+        private final List<Option<Boolean>> options = List.of(
             option("True", true),
             option("False", true));
 
@@ -401,7 +405,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<Boolean>>> getOptions() {
             return Optional.of(options);
         }
     }
@@ -410,7 +414,7 @@ public final class TaskDispatcherDSL {
         extends ModifiableValueProperty<LocalDate, ModifiableDateProperty>
         implements Property.DateProperty {
 
-        private List<Option<?>> options;
+        private List<Option<LocalDate>> options;
 
         private ModifiableDateProperty() {
             this(null);
@@ -451,7 +455,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<LocalDate>>> getOptions() {
             return Optional.ofNullable(options);
         }
     }
@@ -460,7 +464,7 @@ public final class TaskDispatcherDSL {
         extends ModifiableValueProperty<LocalDateTime, ModifiableDateTimeProperty>
         implements Property.DateTimeProperty {
 
-        private List<Option<?>> options;
+        private List<Option<LocalDateTime>> options;
 
         private ModifiableDateTimeProperty() {
             this(null);
@@ -501,7 +505,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<LocalDateTime>>> getOptions() {
             return Optional.ofNullable(options);
         }
     }
@@ -559,7 +563,7 @@ public final class TaskDispatcherDSL {
         extends ModifiableValueProperty<Long, ModifiableIntegerProperty>
         implements Property.IntegerProperty {
 
-        private List<Option<?>> options;
+        private List<Option<Long>> options;
         private Long maxValue;
         private Long minValue;
 
@@ -596,7 +600,7 @@ public final class TaskDispatcherDSL {
         }
 
         @SafeVarargs
-        public final ModifiableIntegerProperty options(Option<Integer>... options) {
+        public final ModifiableIntegerProperty options(Option<Long>... options) {
             if (options != null) {
                 this.options = List.of(options);
             }
@@ -604,7 +608,7 @@ public final class TaskDispatcherDSL {
             return this;
         }
 
-        public ModifiableIntegerProperty options(List<Option<Integer>> options) {
+        public ModifiableIntegerProperty options(List<Option<Long>> options) {
             if (options != null) {
                 this.options = Collections.unmodifiableList(options);
             }
@@ -632,8 +636,26 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<Long>>> getOptions() {
             return Optional.ofNullable(options);
+        }
+    }
+
+    public static final class ModifiableNullProperty
+        extends ModifiableValueProperty<Void, ModifiableNullProperty>
+        implements Property.NullProperty {
+
+        private ModifiableNullProperty() {
+            this(null);
+        }
+
+        public ModifiableNullProperty(String name) {
+            super(name, Type.NULL);
+        }
+
+        @Override
+        public ControlType getControlType() {
+            return null;
         }
     }
 
@@ -641,7 +663,7 @@ public final class TaskDispatcherDSL {
         extends ModifiableValueProperty<Double, ModifiableNumberProperty>
         implements Property.NumberProperty {
 
-        private List<Option<?>> options;
+        private List<Option<Double>> options;
         private Integer maxNumberPrecision;
         private Double maxValue;
         private Integer minNumberPrecision;
@@ -735,7 +757,7 @@ public final class TaskDispatcherDSL {
         }
 
         @SafeVarargs
-        public final ModifiableNumberProperty options(Option<? extends Number>... options) {
+        public final ModifiableNumberProperty options(Option<Double>... options) {
             if (options != null) {
                 this.options = List.of(options);
             }
@@ -778,19 +800,18 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<Double>>> getOptions() {
             return Optional.ofNullable(options);
         }
     }
 
     public static class ModifiableObjectProperty
-        extends ModifiableValueProperty<Map<String, Object>, ModifiableObjectProperty>
+        extends ModifiableValueProperty<Map<String, ?>, ModifiableObjectProperty>
         implements Property.ObjectProperty {
 
-        private List<Option<?>> options;
+        private List<Option<Object>> options;
         private List<? extends ModifiableValueProperty<?, ?>> additionalProperties;
         private Boolean multipleValues;
-        private String objectType;
         private List<? extends ModifiableValueProperty<?, ?>> properties;
 
         private ModifiableObjectProperty() {
@@ -832,12 +853,6 @@ public final class TaskDispatcherDSL {
 
         public ModifiableObjectProperty multipleValues(boolean multipleValues) {
             this.multipleValues = multipleValues;
-
-            return this;
-        }
-
-        public ModifiableObjectProperty objectType(String objectType) {
-            this.objectType = objectType;
 
             return this;
         }
@@ -892,12 +907,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<String> getObjectType() {
-            return Optional.ofNullable(objectType);
-        }
-
-        @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<Object>>> getOptions() {
             return Optional.ofNullable(options);
         }
 
@@ -1093,7 +1103,7 @@ public final class TaskDispatcherDSL {
     public static class ModifiableStringProperty
         extends ModifiableValueProperty<String, ModifiableStringProperty> implements Property.StringProperty {
 
-        private List<Option<?>> options;
+        private List<Option<String>> options;
         private ControlType controlType;
         private Integer maxLength;
         private Integer minLength;
@@ -1175,7 +1185,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<String>>> getOptions() {
             return Optional.ofNullable(options == null ? null : new ArrayList<>(options));
         }
     }
@@ -1193,6 +1203,7 @@ public final class TaskDispatcherDSL {
         private List<? extends ModifiableValueProperty<?, ?>> taskProperties;
         private String title;
         private List<? extends ModifiableValueProperty<?, ?>> variableProperties;
+        private VariablePropertiesFunction variablePropertiesFunction;
         private int version = 1;
 
         private ModifiableTaskDispatcherDefinition(String name) {
@@ -1246,7 +1257,7 @@ public final class TaskDispatcherDSL {
         }
 
         public ModifiableTaskDispatcherDefinition resources(String documentationUrl, List<String> categories) {
-            this.resources = new ResourcesImpl(documentationUrl, null, null);
+            this.resources = new ResourcesImpl(documentationUrl, categories, null);
 
             return this;
         }
@@ -1296,6 +1307,14 @@ public final class TaskDispatcherDSL {
             P... variableProperties) {
 
             this.variableProperties = List.of(variableProperties);
+
+            return this;
+        }
+
+        public ModifiableTaskDispatcherDefinition variableProperties(
+            VariablePropertiesFunction variablePropertiesFunction) {
+
+            this.variablePropertiesFunction = variablePropertiesFunction;
 
             return this;
         }
@@ -1356,8 +1375,31 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
+        public Optional<VariablePropertiesFunction> getVariablePropertiesFunction() {
+            return Optional.ofNullable(variablePropertiesFunction);
+        }
+
+        @Override
         public int getVersion() {
             return version;
+        }
+    }
+
+    public static final class ModifiableTaskProperty
+        extends ModifiableValueProperty<Void, ModifiableNullProperty>
+        implements Property.TaskProperty {
+
+        private ModifiableTaskProperty() {
+            this(null);
+        }
+
+        public ModifiableTaskProperty(String name) {
+            super(name, Type.TASK);
+        }
+
+        @Override
+        public ControlType getControlType() {
+            return null;
         }
     }
 
@@ -1365,7 +1407,7 @@ public final class TaskDispatcherDSL {
         extends ModifiableValueProperty<LocalTime, ModifiableTimeProperty>
         implements Property.TimeProperty {
 
-        private List<Option<?>> options;
+        private List<Option<LocalTime>> options;
 
         private ModifiableTimeProperty() {
             this(null);
@@ -1402,7 +1444,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<LocalTime>>> getOptions() {
             return Optional.ofNullable(options);
         }
     }
@@ -1467,27 +1509,13 @@ public final class TaskDispatcherDSL {
         }
     }
 
-    private static final class ResourcesImpl implements Resources {
-
-        private final Map<String, String> additionalUrls;
-        private final List<String> categories;
-        private final String documentationUrl;
-
-        @SuppressFBWarnings("EI")
-        public ResourcesImpl(String documentationUrl, List<String> categories, Map<String, String> additionalUrls) {
-            this.additionalUrls = additionalUrls;
-            this.categories = categories;
-            this.documentationUrl = documentationUrl;
-        }
+    @SuppressFBWarnings("EI")
+    private record ResourcesImpl(
+        String documentationUrl, List<String> categories, Map<String, String> additionalUrls) implements Resources {
 
         @Override
         public Optional<List<String>> getCategories() {
             return Optional.ofNullable(categories == null ? null : Collections.unmodifiableList(categories));
-        }
-
-        @Override
-        public String getDocumentationUrl() {
-            return documentationUrl;
         }
 
         @Override

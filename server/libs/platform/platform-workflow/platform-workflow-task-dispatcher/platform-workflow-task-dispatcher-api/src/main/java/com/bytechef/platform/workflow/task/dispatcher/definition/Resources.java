@@ -16,30 +16,10 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import com.bytechef.definition.BaseResources;
 
 /**
  * @author Ivica Cardic
  */
-public interface Resources {
-
-    /**
-     *
-     * @return
-     */
-    Optional<List<String>> getCategories();
-
-    /**
-     *
-     * @return
-     */
-    String getDocumentationUrl();
-
-    /**
-     *
-     * @return
-     */
-    Optional<Map<String, String>> getAdditionalUrls();
+public interface Resources extends BaseResources {
 }

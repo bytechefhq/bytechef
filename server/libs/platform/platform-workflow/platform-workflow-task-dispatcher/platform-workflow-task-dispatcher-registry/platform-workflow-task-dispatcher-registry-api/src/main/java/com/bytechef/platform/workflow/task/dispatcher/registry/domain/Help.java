@@ -16,52 +16,17 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
-import com.bytechef.commons.util.OptionalUtils;
-import java.util.Objects;
+import com.bytechef.platform.registry.domain.BaseHelp;
 
 /**
  * @author Ivica Cardic
  */
-public class Help {
-
-    private String body;
-    private String learnMoreUrl;
+public class Help extends BaseHelp {
 
     private Help() {
     }
 
     public Help(com.bytechef.platform.workflow.task.dispatcher.definition.Help help) {
-        this.body = help.getBody();
-        this.learnMoreUrl = OptionalUtils.orElse(help.getLearnMoreUrl(), null);
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public String getLearnMoreUrl() {
-        return learnMoreUrl;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof Help help))
-            return false;
-        return Objects.equals(body, help.body) && Objects.equals(learnMoreUrl, help.learnMoreUrl);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(body, learnMoreUrl);
-    }
-
-    @Override
-    public String toString() {
-        return "Help{" +
-            "body='" + body + '\'' +
-            ", learnMoreUrl='" + learnMoreUrl + '\'' +
-            '}';
+        super(help);
     }
 }

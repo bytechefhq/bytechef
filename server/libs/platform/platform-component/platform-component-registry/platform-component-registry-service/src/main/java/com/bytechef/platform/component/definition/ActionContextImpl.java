@@ -18,6 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
@@ -126,18 +127,18 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         @Override
         public InputStream getStream(FileEntry fileEntry) {
             return fileStorageService.getFileStream(
-                FileEntryConstants.FILES_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
+                FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
         public String readToString(FileEntry fileEntry) {
             return fileStorageService.readFileToString(
-                FileEntryConstants.FILES_DIR, ((ContextFileEntryImpl) fileEntry).getFileEntry());
+                FileEntryConstants.FILES_DIR, ((FileEntryImpl) fileEntry).getFileEntry());
         }
 
         @Override
         public FileEntry storeContent(String fileName, String data) {
-            return new ContextFileEntryImpl(
+            return new FileEntryImpl(
                 fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, data));
         }
 
@@ -176,7 +177,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         @Override
         public FileEntry storeContent(String fileName, InputStream inputStream) {
             try {
-                return new ContextFileEntryImpl(
+                return new FileEntryImpl(
                     fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, inputStream));
             } catch (Exception exception) {
                 throw new ComponentExecutionException("Unable to store file " + fileName, exception);

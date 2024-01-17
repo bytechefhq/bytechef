@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
+import com.bytechef.definition.BaseProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,7 +29,7 @@ import java.util.Optional;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_INTERFACE")
-public interface Property {
+public interface Property extends BaseProperty {
 
     /**
      *
@@ -65,48 +66,9 @@ public interface Property {
         NUMBER,
         OBJECT,
         STRING,
+        TASK,
         TIME,
     }
-
-    /**
-     *
-     */
-    Optional<Boolean> getAdvancedOption();
-
-    /**
-     *
-     */
-    Optional<String> getDescription();
-
-    /**
-     *
-     */
-    Optional<String> getDisplayCondition();
-
-    /**
-     *
-     */
-    Optional<Boolean> getExpressionEnabled();
-
-    /**
-     *
-     */
-    Optional<Boolean> getHidden();
-
-    /**
-     *
-     */
-    Map<String, Object> getMetadata();
-
-    /**
-     *
-     */
-    String getName();
-
-    /**
-     *
-     */
-    Optional<Boolean> getRequired();
 
     /**
      *
@@ -116,194 +78,105 @@ public interface Property {
     /**
      *
      */
-    interface ArrayProperty extends OptionsProperty, ValueProperty<List<Object>> {
+    interface ArrayProperty
+        extends BaseArrayProperty<Property.ValueProperty<?>>, OptionsProperty<Object>, ValueProperty<List<?>> {
 
         /**
          *
          * @return
          */
         Optional<List<? extends Property.ValueProperty<?>>> getItems();
-
-        /**
-         *
-         */
-        Optional<Long> getMaxItems();
-
-        /**
-         *
-         */
-        Optional<Long> getMinItems();
-
-        /**
-         *
-         */
-        Optional<Boolean> getMultipleValues();
     }
 
     /**
      *
      */
-    interface BooleanProperty extends OptionsProperty, ValueProperty<Boolean> {
+    interface BooleanProperty extends BaseBooleanProperty, OptionsProperty<Boolean>, ValueProperty<Boolean> {
     }
 
     /**
      *
      */
-    interface DateProperty extends OptionsProperty, ValueProperty<LocalDate> {
+    interface DateProperty extends BaseDateProperty, OptionsProperty<LocalDate>, ValueProperty<LocalDate> {
     }
 
     /**
      *
      */
-    interface DateTimeProperty extends OptionsProperty, ValueProperty<LocalDateTime> {
+    interface DateTimeProperty
+        extends BaseDateTimeProperty, OptionsProperty<LocalDateTime>, ValueProperty<LocalDateTime> {
     }
 
     /**
      *
      */
-    interface FileEntryProperty extends ValueProperty<Map<String, ?>> {
+    interface FileEntryProperty extends BaseFileEntryProperty<ValueProperty<?>>, ValueProperty<Map<String, ?>> {
 
         /**
          *
          * @return
          */
-        List<? extends Property.ValueProperty<?>> getProperties();
+        List<? extends ValueProperty<?>> getProperties();
     }
 
     /**
      *
      */
-    interface IntegerProperty extends OptionsProperty, ValueProperty<Long> {
-
-        /**
-         *
-         */
-        Optional<Long> getMaxValue();
-
-        /**
-         *
-         */
-        Optional<Long> getMinValue();
+    interface IntegerProperty extends BaseIntegerProperty, OptionsProperty<Long>, ValueProperty<Long> {
     }
 
     /**
      *
      */
-    interface NullProperty extends ValueProperty<Void> {
+    interface NullProperty extends BaseNullProperty, ValueProperty<Void> {
     }
 
     /**
      *
      */
-    interface NumberProperty extends OptionsProperty, ValueProperty<Double> {
-
-        /**
-         *
-         */
-        Optional<Integer> getMaxNumberPrecision();
-
-        /**
-         *
-         */
-        Optional<Double> getMaxValue();
-
-        /**
-         *
-         */
-        Optional<Double> getMinValue();
-
-        /**
-         *
-         */
-        Optional<Integer> getMinNumberPrecision();
-
-        /**
-         *
-         */
-        Optional<Integer> getNumberPrecision();
+    interface NumberProperty extends BaseNumberProperty, OptionsProperty<Double>, ValueProperty<Double> {
     }
 
     /**
      *
      */
-    interface ObjectProperty extends OptionsProperty, ValueProperty<Map<String, Object>> {
+    interface ObjectProperty
+        extends BaseObjectProperty<ValueProperty<?>>, OptionsProperty<Object>, ValueProperty<Map<String, ?>> {
 
         /**
          *
          * @return
          */
-        Optional<List<? extends Property.ValueProperty<?>>> getAdditionalProperties();
-
-        /**
-         *
-         */
-        Optional<Boolean> getMultipleValues();
-
-        /**
-         *
-         */
-        Optional<String> getObjectType();
-
-        /**
-         *
-         * @return
-         */
-        Optional<List<? extends Property.ValueProperty<?>>> getProperties();
+        Optional<List<? extends ValueProperty<?>>> getProperties();
     }
 
     /**
      *
      */
-    interface StringProperty extends OptionsProperty, ValueProperty<String> {
-
-        /**
-         *
-         * @return
-         */
-        Optional<Integer> getMaxLength();
-
-        /**
-         *
-         * @return
-         */
-        Optional<Integer> getMinLength();
+    interface StringProperty extends BaseStringProperty, OptionsProperty<String>, ValueProperty<String> {
     }
 
     /**
      *
      */
-    interface TimeProperty extends OptionsProperty, ValueProperty<LocalTime> {
+    interface TaskProperty extends Property {
+    }
+
+    /**
+     *
+     */
+    interface TimeProperty extends BaseTimeProperty, OptionsProperty<LocalTime>, ValueProperty<LocalTime> {
     }
 
     /**
      *
      * @param <V>
      */
-    interface ValueProperty<V> extends Property {
+    interface ValueProperty<V> extends BaseValueProperty<V>, Property {
 
         /**
          *
          */
         ControlType getControlType();
-
-        /**
-         *
-         */
-        Optional<V> getDefaultValue();
-
-        /**
-         *
-         */
-        Optional<V> getExampleValue();
-
-        /**
-         *
-         */
-        Optional<String> getLabel();
-
-        /**
-         *
-         */
-        Optional<String> getPlaceholder();
     }
 }

@@ -21,6 +21,7 @@ import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
@@ -115,7 +116,7 @@ public class HttpClientExecutorTest {
 
     @Test
     public void testCreateBodyPublisher() {
-        ActionContext.FileEntry fileEntry = Mockito.mock(ActionContext.FileEntry.class);
+        FileEntry fileEntry = Mockito.mock(FileEntry.class);
 
         Mockito.when(fileEntry.getName())
             .thenReturn("fileName");
@@ -182,7 +183,7 @@ public class HttpClientExecutorTest {
 
         //
 
-        fileEntry = Mockito.mock(ActionContext.FileEntry.class);
+        fileEntry = Mockito.mock(FileEntry.class);
 
         Mockito.when(fileEntry.getMimeType())
             .thenReturn("text/plain");
@@ -405,7 +406,7 @@ public class HttpClientExecutorTest {
 
         //
 
-        ActionContext.FileEntry fileEntry = Mockito.mock(ActionContext.FileEntry.class);
+        FileEntry fileEntry = Mockito.mock(FileEntry.class);
 
         Mockito
             .when(context.file(file -> file.storeContent(Mockito.anyString(), (InputStream) Mockito.any())))

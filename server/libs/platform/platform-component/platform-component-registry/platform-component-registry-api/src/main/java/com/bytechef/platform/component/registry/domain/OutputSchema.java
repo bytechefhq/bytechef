@@ -16,8 +16,14 @@
 
 package com.bytechef.platform.component.registry.domain;
 
+import com.bytechef.platform.registry.domain.BaseOutputSchema;
+
 /**
  * @author Ivica Cardic
  */
-public record OutputSchema(Property definition, Object sampleOutput) {
+public class OutputSchema extends BaseOutputSchema<Property> {
+
+    public OutputSchema(Property definition, Object sampleOutput) {
+        super(definition, sampleOutput);
+    }
 }

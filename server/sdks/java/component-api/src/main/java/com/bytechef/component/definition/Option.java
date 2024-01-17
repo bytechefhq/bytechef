@@ -16,34 +16,10 @@
 
 package com.bytechef.component.definition;
 
-import java.util.Optional;
+import com.bytechef.definition.BaseOption;
 
 /**
  * @author Ivica Cardic
  */
-public interface Option<T> {
-
-    /**
-     *
-     * @return
-     */
-    Optional<String> getDescription();
-
-    /**
-     *
-     * @return
-     */
-    String getDisplayCondition();
-
-    /**
-     *
-     * @return
-     */
-    String getLabel();
-
-    /**
-     *
-     * @return
-     */
-    T getValue();
+public interface Option<T> extends BaseOption<T> {
 }

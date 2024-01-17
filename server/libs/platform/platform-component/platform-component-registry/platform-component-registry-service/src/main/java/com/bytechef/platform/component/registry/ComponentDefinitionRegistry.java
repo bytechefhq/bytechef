@@ -31,7 +31,7 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.registry.factory.ComponentHandlerListFactory;
-import com.bytechef.platform.util.PropertyUtils;
+import com.bytechef.platform.registry.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -237,25 +237,18 @@ public class ComponentDefinitionRegistry {
 
             for (ActionDefinition actionDefinition : actionDefinitions) {
                 PropertyUtils.checkInputProperties(
-                    CollectionUtils.map(
-                        OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::getName));
+                    OptionalUtils.orElse(actionDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(
-                    OptionalUtils.mapOrElse(
-                        OptionalUtils.mapOptional(actionDefinition.getOutputSchema(), OutputSchema::definition),
-                        Property::getName, null));
+                    OptionalUtils.map(actionDefinition.getOutputSchema(), OutputSchema::definition));
             }
 
             List<? extends TriggerDefinition> triggerDefinitions = OptionalUtils.orElse(
                 componentDefinition.getTriggers(), List.of());
 
             for (TriggerDefinition triggerDefinition : triggerDefinitions) {
-                PropertyUtils.checkInputProperties(
-                    CollectionUtils.map(
-                        OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::getName));
+                PropertyUtils.checkInputProperties(OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(
-                    OptionalUtils.mapOrElse(
-                        OptionalUtils.mapOptional(triggerDefinition.getOutputSchema(), OutputSchema::definition),
-                        Property::getName, null));
+                    OptionalUtils.map(triggerDefinition.getOutputSchema(), OutputSchema::definition));
 
                 if (triggerDefinition.getType() == null) {
                     throw new IllegalStateException(

@@ -18,10 +18,9 @@ package com.bytechef.platform.workflow.task.dispatcher.registry;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.util.PropertyUtils;
+import com.bytechef.platform.registry.util.PropertyUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputSchema;
-import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -76,12 +75,9 @@ public class TaskDispatcherDefinitionRegistry {
     private void validate(List<TaskDispatcherDefinition> taskDispatcherDefinitions) {
         for (TaskDispatcherDefinition taskDispatcherDefinition : taskDispatcherDefinitions) {
             PropertyUtils.checkInputProperties(
-                CollectionUtils.map(
-                    OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()), Property::getName));
+                OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()));
             PropertyUtils.checkOutputProperty(
-                OptionalUtils.mapOrElse(
-                    OptionalUtils.mapOptional(taskDispatcherDefinition.getOutputSchema(), OutputSchema::definition),
-                    Property::getName, null));
+                OptionalUtils.map(taskDispatcherDefinition.getOutputSchema(), OutputSchema::definition));
         }
     }
 }

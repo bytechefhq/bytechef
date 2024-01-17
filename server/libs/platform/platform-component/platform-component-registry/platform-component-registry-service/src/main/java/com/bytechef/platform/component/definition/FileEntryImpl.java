@@ -16,27 +16,26 @@
 
 package com.bytechef.platform.component.definition;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.file.storage.domain.FileEntry;
 
 /**
  * @author Ivica Cardic
  */
-public class ContextFileEntryImpl implements ActionContext.FileEntry {
+public class FileEntryImpl implements com.bytechef.component.definition.FileEntry {
 
     private String extension;
     private String mimeType;
     private String name;
     private String url;
 
-    private ContextFileEntryImpl() {
+    private FileEntryImpl() {
     }
 
-    public ContextFileEntryImpl(FileEntry fileEntry) {
+    public FileEntryImpl(FileEntry fileEntry) {
         this(fileEntry.getExtension(), fileEntry.getMimeType(), fileEntry.getName(), fileEntry.getUrl());
     }
 
-    public ContextFileEntryImpl(String extension, String mimeType, String name, String url) {
+    public FileEntryImpl(String extension, String mimeType, String name, String url) {
         this.extension = extension;
         this.mimeType = mimeType;
         this.name = name;

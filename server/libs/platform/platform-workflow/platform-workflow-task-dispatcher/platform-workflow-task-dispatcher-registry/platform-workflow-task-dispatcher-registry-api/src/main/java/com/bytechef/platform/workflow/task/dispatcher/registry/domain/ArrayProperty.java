@@ -26,7 +26,7 @@ import org.springframework.lang.Nullable;
 /**
  * @author Ivica Cardic
  */
-public class ArrayProperty extends ValueProperty<List<Object>> {
+public class ArrayProperty extends ValueProperty<List<?>> {
 
     private List<? extends Property> items;
     private Long maxItems;

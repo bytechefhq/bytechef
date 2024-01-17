@@ -211,7 +211,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, String searchText,
         ComponentConnection connection, @NonNull TriggerContext context) {
 
-        OptionsDataSource.TriggerOptionsFunction optionsFunction = getComponentOptionsFunction(
+        OptionsDataSource.TriggerOptionsFunction<?> optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, triggerName, propertyName);
 
         try {
@@ -422,24 +422,25 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             .orElse(true);
     }
 
-    private OptionsDataSource.TriggerOptionsFunction getComponentOptionsFunction(
+    private OptionsDataSource.TriggerOptionsFunction<?> getComponentOptionsFunction(
         String componentName, int componentVersion, String triggerName, String propertyName) {
 
-        DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
+        DynamicOptionsProperty<?> dynamicOptionsProperty = (DynamicOptionsProperty<?>) componentDefinitionRegistry
             .getTriggerProperty(componentName, componentVersion, triggerName, propertyName);
 
         OptionsDataSource optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
 
-        return (OptionsDataSource.TriggerOptionsFunction) optionsDataSource.getOptions();
+        return (OptionsDataSource.TriggerOptionsFunction<?>) optionsDataSource.getOptions();
     }
 
     private PropertiesDataSource.TriggerPropertiesFunction getComponentPropertiesFunction(
         String componentName, int componentVersion, String triggerName, String propertyName) {
 
-        DynamicPropertiesProperty property = (DynamicPropertiesProperty) componentDefinitionRegistry.getTriggerProperty(
-            componentName, componentVersion, triggerName, propertyName);
+        DynamicPropertiesProperty property =
+            (DynamicPropertiesProperty) componentDefinitionRegistry.getTriggerProperty(
+                componentName, componentVersion, triggerName, propertyName);
 
-        PropertiesDataSource propertiesDataSource = property.getDynamicPropertiesDataSource();
+        PropertiesDataSource<?> propertiesDataSource = property.getDynamicPropertiesDataSource();
 
         return (PropertiesDataSource.TriggerPropertiesFunction) propertiesDataSource.getProperties();
     }

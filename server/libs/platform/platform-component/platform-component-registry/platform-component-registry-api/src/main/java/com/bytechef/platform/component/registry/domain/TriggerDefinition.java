@@ -18,7 +18,7 @@ package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.component.registry.util.OutputSchemaUtils;
+import com.bytechef.platform.registry.util.OutputSchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -45,8 +45,13 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
         this.editorDescriptionDataSource = OptionalUtils.mapOrElse(
             triggerDefinition.getEditorDescriptionFunction(), editorDescriptionDataSource -> true, false);
-        this.outputSchema =
-            OptionalUtils.mapOrElse(triggerDefinition.getOutputSchema(), OutputSchemaUtils::toOutputSchema, null);
+        this.outputSchema = OptionalUtils.mapOrElse(
+            triggerDefinition.getOutputSchema(),
+            outputSchema -> OutputSchemaUtils.toOutputSchema(
+                outputSchema,
+                (baseValueProperty, sampleOutput) -> new OutputSchema(
+                    Property.toProperty((com.bytechef.component.definition.Property) baseValueProperty), sampleOutput)),
+            null);
         this.outputSchemaDataSource = OptionalUtils.mapOrElse(
             triggerDefinition.getOutputSchemaFunction(), outputSchemaDataSource -> true,
             triggerDefinition.isOutputSchemaDefaultFunction());

@@ -157,11 +157,19 @@ public final class ComponentDSL {
         return new ModifiableOption<>(label, value, description);
     }
 
-    public static ModifiableOption<Integer> option(String label, int value) {
+    public static ModifiableOption<Long> option(String label, int value) {
+        return new ModifiableOption<>(label, (long) value);
+    }
+
+    public static ModifiableOption<Long> option(String label, int value, String description) {
+        return new ModifiableOption<>(label, (long) value, description);
+    }
+
+    public static ModifiableOption<Long> option(String label, long value) {
         return new ModifiableOption<>(label, value);
     }
 
-    public static ModifiableOption<Integer> option(String label, int value, String description) {
+    public static ModifiableOption<Long> option(String label, long value, String description) {
         return new ModifiableOption<>(label, value, description);
     }
 
@@ -472,15 +480,14 @@ public final class ComponentDSL {
     }
 
     public static final class ModifiableArrayProperty
-        extends ModifiableValueProperty<List<Object>, ModifiableArrayProperty>
-        implements Property.ArrayProperty {
+        extends ModifiableValueProperty<List<?>, ModifiableArrayProperty> implements Property.ArrayProperty {
 
         private List<? extends ModifiableValueProperty<?, ?>> items;
         private List<String> loadOptionsDependsOn;
         private Long maxItems;
         private Long minItems;
         private Boolean multipleValues;
-        private List<Option<?>> options;
+        private List<? extends Option<Object>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableArrayProperty() {
@@ -625,8 +632,9 @@ public final class ComponentDSL {
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public ModifiableArrayProperty options(List<? extends Option<?>> options) {
-            this.options = new ArrayList<>(options);
+            this.options = new ArrayList<>((List<? extends Option<Object>>)options);
 
             return this;
         }
@@ -667,7 +675,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<Object>>> getOptions() {
             return Optional.ofNullable(options);
         }
 
@@ -962,7 +970,7 @@ public final class ComponentDSL {
         extends ModifiableValueProperty<Boolean, ModifiableBooleanProperty>
         implements Property.BooleanProperty {
 
-        private final List<Option<?>> options = List.of(
+        private final List<Option<Boolean>> options = List.of(
             option("True", true),
             option("False", true));
 
@@ -992,7 +1000,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<Boolean>>> getOptions() {
             return Optional.of(options);
         }
 
@@ -1504,7 +1512,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public PropertiesDataSource getDynamicPropertiesDataSource() {
+        public PropertiesDataSource<?> getDynamicPropertiesDataSource() {
             if (propertiesFunction == null) {
                 return null;
             }
@@ -1514,13 +1522,20 @@ public final class ComponentDSL {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+
+            if (o == null || getClass() != o.getClass()) {
                 return false;
-            if (!super.equals(o))
+            }
+
+            if (!super.equals(o)) {
                 return false;
+            }
+
             ModifiableDynamicPropertiesProperty that = (ModifiableDynamicPropertiesProperty) o;
+
             return Objects.equals(loadPropertiesDependsOn, that.loadPropertiesDependsOn)
                 && Objects.equals(propertiesFunction, that.propertiesFunction);
         }
@@ -1587,7 +1602,7 @@ public final class ComponentDSL {
         private List<String> loadOptionsDependsOn;
         private Long maxValue;
         private Long minValue;
-        private List<Option<?>> options;
+        private List<Option<Long>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableIntegerProperty() {
@@ -1631,7 +1646,7 @@ public final class ComponentDSL {
         }
 
         @SafeVarargs
-        public final ModifiableIntegerProperty options(Option<Integer>... options) {
+        public final ModifiableIntegerProperty options(Option<Long>... options) {
             if (options != null) {
                 this.options = List.of(options);
             }
@@ -1639,7 +1654,7 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableIntegerProperty options(List<Option<Integer>> options) {
+        public ModifiableIntegerProperty options(List<Option<Long>> options) {
             if (options != null) {
                 this.options = Collections.unmodifiableList(options);
             }
@@ -1697,7 +1712,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<Long>>> getOptions() {
             return Optional.ofNullable(options);
         }
 
@@ -1850,7 +1865,7 @@ public final class ComponentDSL {
         implements Property.DateProperty {
 
         private List<String> loadOptionsDependsOn;
-        private List<Option<?>> options;
+        private List<Option<LocalDate>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableDateProperty() {
@@ -1929,7 +1944,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<LocalDate>>> getOptions() {
             return Optional.ofNullable(options);
         }
 
@@ -1947,7 +1962,7 @@ public final class ComponentDSL {
         implements Property.DateTimeProperty {
 
         private List<String> loadOptionsDependsOn;
-        private List<Option<?>> options;
+        private List<Option<LocalDateTime>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableDateTimeProperty() {
@@ -2026,7 +2041,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<LocalDateTime>>> getOptions() {
             return Optional.ofNullable(options);
         }
 
@@ -2067,7 +2082,7 @@ public final class ComponentDSL {
         private Integer minNumberPrecision;
         private Double minValue;
         private Integer numberPrecision;
-        private List<Option<?>> options;
+        private List<Option<Double>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableNumberProperty() {
@@ -2165,7 +2180,7 @@ public final class ComponentDSL {
         }
 
         @SafeVarargs
-        public final ModifiableNumberProperty options(Option<? extends Number>... options) {
+        public final ModifiableNumberProperty options(Option<Double>... options) {
             if (options != null) {
                 this.options = List.of(options);
             }
@@ -2242,7 +2257,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<Double>>> getOptions() {
             return Optional.ofNullable(options);
         }
 
@@ -2262,7 +2277,7 @@ public final class ComponentDSL {
         private List<? extends ModifiableValueProperty<?, ?>> additionalProperties;
         private List<String> loadOptionsDependsOn;
         private Boolean multipleValues;
-        private List<Option<?>> options;
+        private List<Option<Object>> options;
         private OptionsFunction optionsFunction;
         private List<? extends ModifiableValueProperty<?, ?>> properties;
 
@@ -2402,7 +2417,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<Object>>> getOptions() {
             return Optional.ofNullable(options);
         }
 
@@ -2646,7 +2661,7 @@ public final class ComponentDSL {
         private List<String> loadOptionsDependsOn;
         private Integer maxLength;
         private Integer minLength;
-        private List<Option<?>> options;
+        private List<Option<String>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableStringProperty() {
@@ -2765,7 +2780,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<String>>> getOptions() {
             return Optional.ofNullable(options == null ? null : new ArrayList<>(options));
         }
 
@@ -2783,7 +2798,7 @@ public final class ComponentDSL {
         implements Property.TimeProperty {
 
         private List<String> loadOptionsDependsOn;
-        private List<Option<?>> options;
+        private List<Option<LocalTime>> options;
         private OptionsFunction optionsFunction;
 
         private ModifiableTimeProperty() {
@@ -2858,7 +2873,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<Option<?>>> getOptions() {
+        public Optional<List<? extends Option<LocalTime>>> getOptions() {
             return Optional.ofNullable(options);
         }
 
@@ -3396,7 +3411,8 @@ public final class ComponentDSL {
         }
     }
 
-    private static class PropertiesDataSourceImpl implements PropertiesDataSource {
+    private static class PropertiesDataSourceImpl
+        implements PropertiesDataSource<PropertiesDataSource.PropertiesFunction> {
 
         private final List<String> loadPropertiesDependsOn;
         private final PropertiesFunction propertiesFunction;
@@ -3426,27 +3442,13 @@ public final class ComponentDSL {
         }
     }
 
-    private static final class ResourcesImpl implements Resources {
-
-        private final Map<String, String> additionalUrls;
-        private final List<String> categories;
-        private final String documentationUrl;
-
-        @SuppressFBWarnings("EI")
-        public ResourcesImpl(String documentationUrl, List<String> categories, Map<String, String> additionalUrls) {
-            this.additionalUrls = additionalUrls;
-            this.categories = categories;
-            this.documentationUrl = documentationUrl;
-        }
+    @SuppressFBWarnings("EI")
+    private record ResourcesImpl(
+        String documentationUrl, List<String> categories, Map<String, String> additionalUrls) implements Resources {
 
         @Override
         public Optional<List<String>> getCategories() {
             return Optional.ofNullable(categories == null ? null : Collections.unmodifiableList(categories));
-        }
-
-        @Override
-        public String getDocumentationUrl() {
-            return documentationUrl;
         }
 
         @Override

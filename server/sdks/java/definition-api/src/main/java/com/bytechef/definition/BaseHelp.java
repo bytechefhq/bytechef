@@ -14,30 +14,26 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.util;
+package com.bytechef.definition;
 
-import java.util.List;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public class PropertyUtils {
+@SuppressFBWarnings("EI")
+public interface BaseHelp {
 
-    public static void checkInputProperties(List<String> names) {
-        for (String name : names) {
-            if (name == null || name.isEmpty()) {
-                throw new IllegalStateException("Defined properties cannot to have empty names");
-            }
-        }
-    }
+    /**
+     *
+     * @return
+     */
+    String getBody();
 
-    public static void checkOutputProperty(String name) {
-        if (name == null) {
-            return;
-        }
-
-        if (!name.isEmpty()) {
-            throw new IllegalStateException("Defined property %s must have empty name".formatted(name));
-        }
-    }
+    /**
+     *
+     * @return
+     */
+    Optional<String> getLearnMoreUrl();
 }

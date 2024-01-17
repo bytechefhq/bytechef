@@ -17,12 +17,15 @@
 package com.bytechef.component.definition;
 
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.definition.BaseOutputSchema;
+
 import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-public record OutputSchema(ValueProperty<?> definition, Object sampleOutput) {
+public record OutputSchema(ValueProperty<?> definition, Object sampleOutput)
+    implements BaseOutputSchema<ValueProperty<?>> {
 
     public OutputSchema(ValueProperty<?> definition) {
         this(definition, null);
@@ -30,5 +33,15 @@ public record OutputSchema(ValueProperty<?> definition, Object sampleOutput) {
 
     public OutputSchema {
         Objects.requireNonNull(definition, "'definition' mut not be null");
+    }
+
+    @Override
+    public ValueProperty<?> getDefinition() {
+        return definition;
+    }
+
+    @Override
+    public Object getSampleOutput() {
+        return sampleOutput;
     }
 }

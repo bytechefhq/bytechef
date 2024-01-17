@@ -16,13 +16,12 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
-import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.registry.domain.BaseProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.Type;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
-import org.springframework.lang.Nullable;
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -42,28 +41,16 @@ import org.springframework.lang.Nullable;
     @JsonSubTypes.Type(value = TimeProperty.class, name = "TIME"),
 })
 @SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_SUPERCLASS")
-public abstract class Property {
+public abstract class Property extends BaseProperty {
 
-    private boolean advancedOption;
-    private String description;
-    private String displayCondition;
-    private boolean expressionEnabled; // Defaults to true
-    private boolean hidden;
-    private boolean required;
-    private String name;
     private Type type;
 
     protected Property() {
     }
 
     public Property(com.bytechef.platform.workflow.task.dispatcher.definition.Property property) {
-        this.advancedOption = OptionalUtils.orElse(property.getAdvancedOption(), false);
-        this.description = OptionalUtils.orElse(property.getDescription(), null);
-        this.displayCondition = OptionalUtils.orElse(property.getDisplayCondition(), null);
-        this.expressionEnabled = OptionalUtils.orElse(property.getExpressionEnabled(), true);
-        this.hidden = OptionalUtils.orElse(property.getHidden(), false);
-        this.required = OptionalUtils.orElse(property.getRequired(), false);
-        this.name = property.getName();
+        super(property);
+
         this.type = property.getType();
     }
 
@@ -92,6 +79,8 @@ public abstract class Property {
                 (com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty) property);
             case STRING -> (P) toStringProperty(
                 (com.bytechef.platform.workflow.task.dispatcher.definition.Property.StringProperty) property);
+            case TASK -> (P) toTaskProperty(
+                (com.bytechef.platform.workflow.task.dispatcher.definition.Property.TaskProperty) property);
             case TIME -> (P) toTimeProperty(
                 (com.bytechef.platform.workflow.task.dispatcher.definition.Property.TimeProperty) property);
         };
@@ -101,55 +90,12 @@ public abstract class Property {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof Property that)) {
-            return false;
-        }
-
-        return advancedOption == that.advancedOption && expressionEnabled == that.expressionEnabled
-            && hidden == that.hidden && required == that.required
-            && Objects.equals(displayCondition, that.displayCondition)
-            && Objects.equals(name, that.name) && type == that.type;
+        return super.equals(o) && type == ((Property) o).getType();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(
-            advancedOption, displayCondition, expressionEnabled, hidden, required, name, type);
-    }
-
-    public boolean getAdvancedOption() {
-        return advancedOption;
-    }
-
-    @Nullable
-    public String getDescription() {
-        return description;
-    }
-
-    @Nullable
-    public String getDisplayCondition() {
-        return displayCondition;
-    }
-
-    public boolean getExpressionEnabled() {
-        return expressionEnabled;
-    }
-
-    public boolean getHidden() {
-        return hidden;
-    }
-
-    public boolean getRequired() {
-        return required;
-    }
-
-    @Nullable
-    public String getName() {
-        return name;
+        return Objects.hash(super.hashCode(), type);
     }
 
     public Type getType() {
@@ -158,16 +104,9 @@ public abstract class Property {
 
     @Override
     public String toString() {
-        return "Property" +
-            "advancedOption=" + advancedOption +
-            ", description='" + description + '\'' +
-            ", displayCondition='" + displayCondition + '\'' +
-            ", expressionEnabled=" + expressionEnabled +
-            ", hidden=" + hidden +
-            ", required=" + required +
-            ", name='" + name + '\'' +
-            ", type=" + type +
-            '}';
+        return "Property{" +
+            "type=" + type +
+            "} " + super.toString();
     }
 
     private static ArrayProperty toArrayProperty(
@@ -230,6 +169,12 @@ public abstract class Property {
         return new StringProperty(stringProperty);
     }
 
+    private static TaskProperty toTaskProperty(
+        com.bytechef.platform.workflow.task.dispatcher.definition.Property.TaskProperty taskProperty) {
+
+        return new TaskProperty(taskProperty);
+    }
+
     private static TimeProperty toTimeProperty(
         com.bytechef.platform.workflow.task.dispatcher.definition.Property.TimeProperty timeProperty) {
 
@@ -257,6 +202,8 @@ public abstract class Property {
         Object visit(ObjectProperty objectProperty);
 
         Object visit(StringProperty stringProperty);
+
+        Object visit(TaskProperty taskProperty);
 
         Object visit(TimeProperty timeProperty);
     }

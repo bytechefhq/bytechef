@@ -112,29 +112,4 @@ public interface ActionContext extends Context {
         void setValue(Data.Scope scope, String key, Object data);
     }
 
-    /**
-     *
-     */
-    interface FileEntry {
-
-        /**
-         * @return
-         */
-        String getExtension();
-
-        /**
-         * @return
-         */
-        String getMimeType();
-
-        /**
-         * @return
-         */
-        String getName();
-
-        /**
-         * @return
-         */
-        String getUrl();
-    }
 }
