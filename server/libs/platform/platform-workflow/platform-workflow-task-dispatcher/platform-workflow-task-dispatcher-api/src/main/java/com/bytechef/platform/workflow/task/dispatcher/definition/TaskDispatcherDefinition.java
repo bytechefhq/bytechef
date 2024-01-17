@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +81,7 @@ public interface TaskDispatcherDefinition {
      *
      * @return
      */
-    Optional<List<? extends ValueProperty<?>>> getTaskProperties();
+    Optional<List<? extends Property>> getTaskProperties();
 
     /**
      *
@@ -94,8 +93,12 @@ public interface TaskDispatcherDefinition {
      *
      * @return
      */
-    Optional<List<? extends ValueProperty<?>>> getVariableProperties();
+    Optional<List<? extends Property>> getVariableProperties();
 
+    /**
+     *
+     * @return
+     */
     Optional<VariablePropertiesFunction> getVariablePropertiesFunction();
 
     /**

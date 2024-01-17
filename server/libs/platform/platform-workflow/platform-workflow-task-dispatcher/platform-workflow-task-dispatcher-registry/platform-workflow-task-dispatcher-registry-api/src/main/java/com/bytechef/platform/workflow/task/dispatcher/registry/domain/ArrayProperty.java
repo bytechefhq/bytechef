@@ -44,7 +44,7 @@ public class ArrayProperty extends ValueProperty<List<?>> {
 
         this.items = CollectionUtils.map(
             OptionalUtils.orElse(arrayProperty.getItems(), List.of()),
-            valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
+            property -> (Property) toProperty(property));
         this.maxItems = OptionalUtils.orElse(arrayProperty.getMaxItems(), null);
         this.minItems = OptionalUtils.orElse(arrayProperty.getMinItems(), null);
         this.multipleValues = OptionalUtils.orElse(arrayProperty.getMultipleValues(), true);

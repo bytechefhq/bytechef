@@ -71,7 +71,7 @@ public interface BaseProperty {
     /**
      *
      */
-    interface BaseArrayProperty<I extends BaseValueProperty<?>> extends BaseValueProperty<List<?>> {
+    interface BaseArrayProperty<I extends BaseProperty> extends BaseValueProperty<List<?>> {
 
         /**
          *
@@ -184,7 +184,7 @@ public interface BaseProperty {
     /**
      *
      */
-    interface BaseObjectProperty<P extends BaseValueProperty<?>> extends BaseValueProperty<Map<String, ?>> {
+    interface BaseObjectProperty<P extends BaseProperty> extends BaseValueProperty<Map<String, ?>> {
 
         /**
          *

@@ -21,7 +21,7 @@ import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
-import com.bytechef.platform.registry.util.OutputSchemaUtils;
+import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -493,8 +493,7 @@ public class ContextImpl implements Context {
         @Override
         public com.bytechef.component.definition.OutputSchema get(Object value) {
             return new com.bytechef.component.definition.OutputSchema(
-                (Property.ValueProperty<?>) OutputSchemaUtils.getOutputSchemaDefinition(
-                    value, new ValuePropertyFactory(value)),
+                (Property.ValueProperty<?>) SchemaUtils.getSchemaDefinition(value, new PropertyFactoryFunction(value)),
                 value);
         }
     }

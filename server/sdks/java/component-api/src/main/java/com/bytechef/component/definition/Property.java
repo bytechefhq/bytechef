@@ -166,6 +166,11 @@ public interface Property extends BaseProperty {
          *
          */
         Optional<List<? extends Property.ValueProperty<?>>> getAdditionalProperties();
+
+        /**
+         *
+         */
+        Optional<List<? extends Property.ValueProperty<?>>> getProperties();
     }
 
     /**

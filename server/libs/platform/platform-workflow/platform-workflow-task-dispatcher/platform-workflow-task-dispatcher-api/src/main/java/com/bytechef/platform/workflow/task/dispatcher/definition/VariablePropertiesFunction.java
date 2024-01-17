@@ -29,5 +29,5 @@ public interface VariablePropertiesFunction {
      * @param inputParameters
      * @return
      */
-    List<Property.ValueProperty<?>> apply(Map<String, ?> inputParameters) throws Exception;
+    List<Property> apply(Map<String, ?> inputParameters) throws Exception;
 }

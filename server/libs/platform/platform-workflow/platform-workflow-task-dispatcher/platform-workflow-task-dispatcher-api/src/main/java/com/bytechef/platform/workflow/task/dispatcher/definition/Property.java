@@ -78,14 +78,13 @@ public interface Property extends BaseProperty {
     /**
      *
      */
-    interface ArrayProperty
-        extends BaseArrayProperty<Property.ValueProperty<?>>, OptionsProperty<Object>, ValueProperty<List<?>> {
+    interface ArrayProperty extends BaseArrayProperty<Property>, OptionsProperty<Object>, ValueProperty<List<?>> {
 
         /**
          *
          * @return
          */
-        Optional<List<? extends Property.ValueProperty<?>>> getItems();
+        Optional<List<? extends Property>> getItems();
     }
 
     /**
@@ -141,13 +140,19 @@ public interface Property extends BaseProperty {
      *
      */
     interface ObjectProperty
-        extends BaseObjectProperty<ValueProperty<?>>, OptionsProperty<Object>, ValueProperty<Map<String, ?>> {
+        extends BaseObjectProperty<Property>, OptionsProperty<Object>, ValueProperty<Map<String, ?>> {
 
         /**
          *
          * @return
          */
-        Optional<List<? extends ValueProperty<?>>> getProperties();
+        Optional<List<? extends Property>> getAdditionalProperties();
+
+        /**
+         *
+         * @return
+         */
+        Optional<List<? extends Property>> getProperties();
     }
 
     /**

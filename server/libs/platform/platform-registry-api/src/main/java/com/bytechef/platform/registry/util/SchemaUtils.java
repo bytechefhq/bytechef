@@ -25,11 +25,11 @@ import com.bytechef.definition.BaseProperty.BaseDateProperty;
 import com.bytechef.definition.BaseProperty.BaseDateTimeProperty;
 import com.bytechef.definition.BaseProperty.BaseFileEntryProperty;
 import com.bytechef.definition.BaseProperty.BaseIntegerProperty;
+import com.bytechef.definition.BaseProperty.BaseNullProperty;
 import com.bytechef.definition.BaseProperty.BaseNumberProperty;
 import com.bytechef.definition.BaseProperty.BaseObjectProperty;
 import com.bytechef.definition.BaseProperty.BaseStringProperty;
 import com.bytechef.definition.BaseProperty.BaseTimeProperty;
-import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.registry.domain.BaseOutputSchema;
 import com.bytechef.platform.registry.domain.BaseProperty;
 import java.time.LocalDate;
@@ -40,59 +40,58 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
-public class OutputSchemaUtils {
+public class SchemaUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(OutputSchemaUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(SchemaUtils.class);
 
-    public static BaseValueProperty<?> getOutputSchemaDefinition(
-        Object value, OutputSchemaValuePropertyFactory propertyFactoryFunction) {
+    public static com.bytechef.definition.BaseProperty getSchemaDefinition(
+        Object value, SchemaPropertyFactoryFunction propertyFactoryFunction) {
 
-        return getOutputSchemaDefinition(null, value, propertyFactoryFunction);
+        return getSchemaDefinition(null, value, propertyFactoryFunction);
     }
 
-    public static BaseValueProperty<?> getOutputSchemaDefinition(
-        String name, Object value, OutputSchemaValuePropertyFactory propertyFactoryFunction) {
+    public static com.bytechef.definition.BaseProperty getSchemaDefinition(
+        String name, Object value, SchemaPropertyFactoryFunction propertyFactoryFunction) {
 
-        BaseValueProperty<?> outputProperty;
+        com.bytechef.definition.BaseProperty outputProperty;
         Class<?> valueClass = value.getClass();
 
         if (value instanceof List<?> || valueClass.isArray()) {
-            outputProperty = propertyFactoryFunction.create(name, BaseArrayProperty.class);
+            outputProperty = propertyFactoryFunction.apply(name, BaseArrayProperty.class);
         } else if (value instanceof Boolean) {
-            outputProperty = propertyFactoryFunction.create(name, BaseBooleanProperty.class);
+            outputProperty = propertyFactoryFunction.apply(name, BaseBooleanProperty.class);
         } else if (value instanceof Date || value instanceof LocalDate) {
-            outputProperty = propertyFactoryFunction.create(name, BaseDateProperty.class);
+            outputProperty = propertyFactoryFunction.apply(name, BaseDateProperty.class);
         } else if (value instanceof LocalDateTime) {
-            outputProperty = propertyFactoryFunction.create(name, BaseDateTimeProperty.class);
+            outputProperty = propertyFactoryFunction.apply(name, BaseDateTimeProperty.class);
         } else if (value instanceof BaseFileEntry) {
-            outputProperty = propertyFactoryFunction.create(name, BaseFileEntryProperty.class);
+            outputProperty = propertyFactoryFunction.apply(name, BaseFileEntryProperty.class);
         } else if (value instanceof Integer) {
-            outputProperty = propertyFactoryFunction.create(name, BaseIntegerProperty.class);
+            outputProperty = propertyFactoryFunction.apply(name, BaseIntegerProperty.class);
         } else if (value instanceof Number) {
-            outputProperty = propertyFactoryFunction.create(name, BaseNumberProperty.class);
+            outputProperty = propertyFactoryFunction.apply(name, BaseNumberProperty.class);
         } else if (value instanceof Map<?, ?>) {
-            outputProperty = propertyFactoryFunction.create(name, BaseObjectProperty.class);
+            outputProperty = propertyFactoryFunction.apply(name, BaseObjectProperty.class);
         } else if (value instanceof String) {
-            outputProperty = propertyFactoryFunction.create(name, BaseStringProperty.class);
+            outputProperty = propertyFactoryFunction.apply(name, BaseStringProperty.class);
         } else if (value instanceof LocalTime) {
-            outputProperty = propertyFactoryFunction.create(name, BaseTimeProperty.class);
+            outputProperty = propertyFactoryFunction.apply(name, BaseTimeProperty.class);
         } else {
             try {
-                outputProperty = getOutputSchemaDefinition(
+                outputProperty = getSchemaDefinition(
                     JsonUtils.convertValue(value, Map.class), propertyFactoryFunction);
             } catch (IllegalArgumentException e) {
                 if (logger.isDebugEnabled()) {
                     logger.debug(e.getMessage(), e);
                 }
 
-                outputProperty = propertyFactoryFunction.create(name, BaseValueProperty.class);
+                outputProperty = propertyFactoryFunction.apply(name, com.bytechef.definition.BaseProperty.class);
             }
         }
 
@@ -100,8 +99,8 @@ public class OutputSchemaUtils {
     }
 
     public static <P extends BaseProperty, O extends BaseOutputSchema<P>> O toOutputSchema(
-        com.bytechef.definition.BaseOutputSchema<? extends BaseValueProperty<?>> outputSchema,
-        BiFunction<BaseValueProperty<?>, Object, O> outputSchemaFactoryFunction) {
+        com.bytechef.definition.BaseOutputSchema<? extends com.bytechef.definition.BaseProperty> outputSchema,
+        OutputSchemaFactoryFunction<P, O> outputSchemaFactoryFunction) {
 
         Object sampleOutput = outputSchema.getSampleOutput();
 
@@ -120,12 +119,13 @@ public class OutputSchemaUtils {
         return outputSchemaFactoryFunction.apply(outputSchema.getDefinition(), sampleOutput);
     }
 
-    private static Object getSampleOutput(BaseValueProperty<?> definitionProperty) {
+    private static Object getSampleOutput(com.bytechef.definition.BaseProperty definitionProperty) {
         return switch (definitionProperty) {
-            case BaseArrayProperty<? extends BaseValueProperty<?>> p -> {
+            case BaseArrayProperty<? extends com.bytechef.definition.BaseProperty> p -> {
                 List<Object> items = new ArrayList<>();
 
-                List<? extends BaseValueProperty<?>> properties = OptionalUtils.orElse(p.getItems(), List.of());
+                List<? extends com.bytechef.definition.BaseProperty> properties = OptionalUtils.orElse(
+                    p.getItems(), List.of());
 
                 if (!properties.isEmpty()) {
                     items.add(getSampleOutput(properties.getFirst()));
@@ -141,12 +141,14 @@ public class OutputSchemaUtils {
                     "extension", "sampleExtension", "mimeType", "sampleMimeType", "name", "sampleName", "url",
                     "file:///tmp/fileName.txt");
             case BaseIntegerProperty p -> 57;
-            case com.bytechef.definition.BaseProperty.BaseNullProperty p -> null;
+            case BaseNullProperty p -> null;
             case BaseNumberProperty p -> 23.34;
-            case BaseObjectProperty<?> p -> {
+            case BaseObjectProperty<? extends com.bytechef.definition.BaseProperty> p -> {
                 Map<String, Object> map = new HashMap<>();
 
-                for (BaseValueProperty<?> property : OptionalUtils.orElse(p.getProperties(), List.of())) {
+                for (com.bytechef.definition.BaseProperty property : OptionalUtils.orElse(
+                    p.getProperties(), List.of())) {
+
                     map.put(property.getName(), getSampleOutput(property));
                 }
 
@@ -159,9 +161,16 @@ public class OutputSchemaUtils {
         };
     }
 
-    public interface OutputSchemaValuePropertyFactory {
+    @FunctionalInterface
+    public interface OutputSchemaFactoryFunction<P extends BaseProperty, S extends BaseOutputSchema<P>> {
 
-        @SuppressWarnings("rawtypes")
-        BaseValueProperty<?> create(String name, Class<? extends BaseValueProperty> baseValuePropertyClass);
+        S apply(com.bytechef.definition.BaseProperty property, Object value);
+    }
+
+    @FunctionalInterface
+    public interface SchemaPropertyFactoryFunction {
+
+        com.bytechef.definition.BaseProperty apply(
+            String name, Class<? extends com.bytechef.definition.BaseProperty> basePropertyClass);
     }
 }

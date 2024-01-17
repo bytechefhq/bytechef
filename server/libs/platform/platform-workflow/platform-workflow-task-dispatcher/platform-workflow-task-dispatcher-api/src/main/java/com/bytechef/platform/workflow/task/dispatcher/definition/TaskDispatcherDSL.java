@@ -194,7 +194,7 @@ public final class TaskDispatcherDSL {
         extends ModifiableValueProperty<List<?>, ModifiableArrayProperty>
         implements Property.ArrayProperty {
 
-        private List<? extends ModifiableValueProperty<?, ?>> items;
+        private List<? extends ModifiableProperty<?>> items;
         private Long maxItems;
         private Long minItems;
         private Boolean multipleValues;
@@ -295,11 +295,11 @@ public final class TaskDispatcherDSL {
         }
 
         @SafeVarargs
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableArrayProperty items(P... properties) {
+        public final <P extends ModifiableProperty<?>> ModifiableArrayProperty items(P... properties) {
             return items(properties == null ? List.of() : List.of(properties));
         }
 
-        public <P extends ModifiableValueProperty<?, ?>> ModifiableArrayProperty items(List<P> properties) {
+        public <P extends ModifiableProperty<?>> ModifiableArrayProperty items(List<P> properties) {
             if (properties != null) {
                 this.items = new ArrayList<>(properties);
             }
@@ -351,7 +351,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getItems() {
+        public Optional<List<? extends Property>> getItems() {
             return Optional.ofNullable(items);
         }
 
@@ -812,7 +812,7 @@ public final class TaskDispatcherDSL {
         private List<Option<Object>> options;
         private List<? extends ModifiableValueProperty<?, ?>> additionalProperties;
         private Boolean multipleValues;
-        private List<? extends ModifiableValueProperty<?, ?>> properties;
+        private List<? extends ModifiableProperty<?>> properties;
 
         private ModifiableObjectProperty() {
             this(null);
@@ -892,7 +892,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getAdditionalProperties() {
+        public Optional<List<? extends Property>> getAdditionalProperties() {
             return Optional.ofNullable(
                 additionalProperties == null ? null : new ArrayList<>(additionalProperties));
         }
@@ -912,7 +912,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getProperties() {
+        public Optional<List<? extends Property>> getProperties() {
             return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
         }
     }
@@ -1200,9 +1200,9 @@ public final class TaskDispatcherDSL {
         private OutputSchemaFunction outputSchemaFunction;
         private List<? extends Property> properties;
         private Resources resources;
-        private List<? extends ModifiableValueProperty<?, ?>> taskProperties;
+        private List<? extends ModifiableProperty<?>> taskProperties;
         private String title;
-        private List<? extends ModifiableValueProperty<?, ?>> variableProperties;
+        private List<? extends ModifiableProperty<?>> variableProperties;
         private VariablePropertiesFunction variablePropertiesFunction;
         private int version = 1;
 
@@ -1282,7 +1282,7 @@ public final class TaskDispatcherDSL {
         }
 
         @SafeVarargs
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition taskProperties(
+        public final <P extends ModifiableProperty<?>> ModifiableTaskDispatcherDefinition taskProperties(
             P... taskProperties) {
 
             this.taskProperties = List.of(taskProperties);
@@ -1303,7 +1303,7 @@ public final class TaskDispatcherDSL {
         }
 
         @SafeVarargs
-        public final <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition variableProperties(
+        public final <P extends ModifiableProperty<?>> ModifiableTaskDispatcherDefinition variableProperties(
             P... variableProperties) {
 
             this.variableProperties = List.of(variableProperties);
@@ -1360,7 +1360,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getTaskProperties() {
+        public Optional<List<? extends Property>> getTaskProperties() {
             return Optional.ofNullable(taskProperties);
         }
 
@@ -1370,7 +1370,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<? extends ValueProperty<?>>> getVariableProperties() {
+        public Optional<List<? extends Property>> getVariableProperties() {
             return Optional.ofNullable(variableProperties);
         }
 

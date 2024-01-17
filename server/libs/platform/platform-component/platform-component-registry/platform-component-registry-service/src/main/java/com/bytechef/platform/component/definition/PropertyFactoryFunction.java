@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.task.dispatcher.definition;
+package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
-import com.bytechef.platform.registry.util.OutputSchemaUtils;
-import com.bytechef.platform.registry.util.OutputSchemaUtils.OutputSchemaValuePropertyFactory;
-import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.ModifiableArrayProperty;
-import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.ModifiableObjectProperty;
-import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.ModifiableValueProperty;
+import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.registry.util.SchemaUtils.SchemaPropertyFactoryFunction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,33 +32,32 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public record ValuePropertyFactory(Object value) implements OutputSchemaValuePropertyFactory {
+record PropertyFactoryFunction(Object value) implements SchemaPropertyFactoryFunction {
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public BaseValueProperty<?> create(String name, Class<? extends BaseValueProperty> baseValueProperty) {
+    public BaseValueProperty<?> apply(String name, Class<? extends BaseProperty> baseValueProperty) {
         if (baseValueProperty == BaseProperty.BaseArrayProperty.class) {
             return getArrayProperty(name, value);
         } else if (baseValueProperty == BaseProperty.BaseBooleanProperty.class) {
-            return TaskDispatcherDSL.bool(name);
+            return ComponentDSL.bool(name);
         } else if (baseValueProperty == BaseProperty.BaseDateProperty.class) {
-            return TaskDispatcherDSL.date(name);
+            return ComponentDSL.date(name);
         } else if (baseValueProperty == BaseProperty.BaseDateTimeProperty.class) {
-            return TaskDispatcherDSL.dateTime(name);
+            return ComponentDSL.dateTime(name);
         } else if (baseValueProperty == BaseProperty.BaseFileEntryProperty.class) {
-            return TaskDispatcherDSL.fileEntry(name);
+            return ComponentDSL.fileEntry(name);
         } else if (baseValueProperty == BaseProperty.BaseIntegerProperty.class) {
-            return TaskDispatcherDSL.integer(name);
+            return ComponentDSL.integer(name);
         } else if (baseValueProperty == BaseProperty.BaseNumberProperty.class) {
-            return TaskDispatcherDSL.number(name);
+            return ComponentDSL.number(name);
         } else if (baseValueProperty == BaseProperty.BaseObjectProperty.class) {
             return getObjectProperty();
         } else if (baseValueProperty == BaseProperty.BaseStringProperty.class) {
-            return TaskDispatcherDSL.string(name);
+            return ComponentDSL.string(name);
         } else if (baseValueProperty == BaseProperty.BaseTimeProperty.class) {
-            return TaskDispatcherDSL.time(name);
+            return ComponentDSL.time(name);
         } else {
-            return TaskDispatcherDSL.object(name);
+            return ComponentDSL.object(name);
         }
     }
 
@@ -66,16 +66,15 @@ public record ValuePropertyFactory(Object value) implements OutputSchemaValuePro
         Class<?> valueClass = value.getClass();
 
         if (valueClass.isArray()) {
-            arrayProperty = TaskDispatcherDSL.array(name);
+            arrayProperty = ComponentDSL.array(name);
         } else {
-            arrayProperty = TaskDispatcherDSL.array(name);
+            arrayProperty = ComponentDSL.array(name);
 
             List<?> list = (List<?>) value;
 
             if (!list.isEmpty()) {
                 arrayProperty.items(
-                    (ModifiableValueProperty<?, ?>) OutputSchemaUtils.getOutputSchemaDefinition(null, list.getFirst(),
-                        this));
+                    (ModifiableValueProperty<?, ?>) SchemaUtils.getSchemaDefinition(null, list.getFirst(), this));
             }
         }
 
@@ -83,13 +82,13 @@ public record ValuePropertyFactory(Object value) implements OutputSchemaValuePro
     }
 
     private ModifiableObjectProperty getObjectProperty() {
-        ModifiableObjectProperty objectProperty = TaskDispatcherDSL.object();
+        ModifiableObjectProperty objectProperty = ComponentDSL.object();
 
         List<BaseValueProperty<?>> properties = new ArrayList<>();
         Map<?, ?> map = (Map<?, ?>) value;
 
         for (Map.Entry<?, ?> entry : map.entrySet()) {
-            properties.add(OutputSchemaUtils.getOutputSchemaDefinition(
+            properties.add((BaseValueProperty<?>) SchemaUtils.getSchemaDefinition(
                 (String) entry.getKey(), entry.getValue(), this));
         }
 

@@ -19,7 +19,7 @@ package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.IconUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.registry.util.OutputSchemaUtils;
+import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -61,15 +61,7 @@ public class TaskDispatcherDefinition {
         this.help = OptionalUtils.mapOrElse(taskDispatcherDefinition.getHelp(), Help::new, null);
         this.icon = OptionalUtils.mapOrElse(taskDispatcherDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = taskDispatcherDefinition.getName();
-        this.outputSchema = OptionalUtils.mapOrElse(
-            taskDispatcherDefinition.getOutputSchema(),
-            outputSchema -> OutputSchemaUtils.toOutputSchema(
-                outputSchema,
-                (baseValueProperty, sampleOutput) -> new OutputSchema(
-                    Property.toProperty(
-                        (com.bytechef.platform.workflow.task.dispatcher.definition.Property) baseValueProperty),
-                    sampleOutput)),
-            null);
+        this.outputSchema = getOutputSchema(taskDispatcherDefinition);
         this.outputSchemaDataSource = OptionalUtils.mapOrElse(
             taskDispatcherDefinition.getOutputSchemaFunction(), outputSchemaDataSource -> true, false);
         this.properties = CollectionUtils.map(
@@ -77,13 +69,13 @@ public class TaskDispatcherDefinition {
         this.resources = OptionalUtils.mapOrElse(taskDispatcherDefinition.getResources(), Resources::new, null);
         this.taskProperties = CollectionUtils.map(
             OptionalUtils.orElse(taskDispatcherDefinition.getTaskProperties(), List.of()),
-            valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
+            valueProperty -> (Property) Property.toProperty(valueProperty));
         this.title = OptionalUtils.orElse(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getName());
         this.variableProperties = CollectionUtils.map(
             OptionalUtils.orElse(taskDispatcherDefinition.getVariableProperties(), List.of()),
-            valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
-        this.variablePropertiesDataSource = OptionalUtils.map(
-            taskDispatcherDefinition.getOutputSchemaFunction(), outputSchemaDataSource -> true);
+            valueProperty -> (Property) Property.toProperty(valueProperty));
+        this.variablePropertiesDataSource = OptionalUtils.mapOrElse(
+            taskDispatcherDefinition.getOutputSchemaFunction(), outputSchemaDataSource -> true, false);
         this.version = taskDispatcherDefinition.getVersion();
     }
 
@@ -168,6 +160,20 @@ public class TaskDispatcherDefinition {
 
     public boolean isVariablePropertiesDataSource() {
         return variablePropertiesDataSource;
+    }
+
+    private static OutputSchema getOutputSchema(
+        com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition) {
+
+        return OptionalUtils.mapOrElse(
+            taskDispatcherDefinition.getOutputSchema(),
+            outputSchema -> SchemaUtils.toOutputSchema(
+                outputSchema,
+                (baseValueProperty, sampleOutput) -> new OutputSchema(
+                    Property.toProperty(
+                        (com.bytechef.platform.workflow.task.dispatcher.definition.Property) baseValueProperty),
+                    sampleOutput)),
+            null);
     }
 
     @Override

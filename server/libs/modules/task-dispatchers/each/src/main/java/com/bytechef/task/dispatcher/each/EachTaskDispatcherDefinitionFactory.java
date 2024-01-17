@@ -27,11 +27,12 @@ import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConst
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.LIST;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.registry.util.OutputSchemaUtils;
+import com.bytechef.platform.registry.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty;
+import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactoryFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.definition.ValuePropertyFactory;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -59,8 +60,8 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         return TASK_DISPATCHER_DEFINITION;
     }
 
-    private static List<ValueProperty<?>> getVariableProperties(Map<String, ?> inputParameters) {
-        List<ValueProperty<?>> properties;
+    private static List<Property> getVariableProperties(Map<String, ?> inputParameters) {
+        List<Property> properties;
 
         List<?> list = MapUtils.getRequiredList(inputParameters, LIST);
 
@@ -68,8 +69,8 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
             properties = List.of();
         } else {
             properties = List.of(
-                (ValueProperty<?>) OutputSchemaUtils.getOutputSchemaDefinition(
-                    ITEM, new ValuePropertyFactory(list.getFirst())),
+                (ValueProperty<?>) SchemaUtils.getSchemaDefinition(
+                    ITEM, new PropertyFactoryFunction(list.getFirst())),
                 integer(INDEX));
         }
 

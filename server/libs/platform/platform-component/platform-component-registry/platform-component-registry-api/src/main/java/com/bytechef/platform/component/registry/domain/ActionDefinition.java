@@ -18,7 +18,7 @@ package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.registry.util.OutputSchemaUtils;
+import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -44,10 +44,10 @@ public class ActionDefinition extends ActionDefinitionBasic {
             actionDefinition.getEditorDescriptionFunction(), editorDescriptionDataSource -> true, false);
         this.outputSchema = OptionalUtils.mapOrElse(
             actionDefinition.getOutputSchema(),
-            outputSchema -> OutputSchemaUtils.toOutputSchema(
+            outputSchema -> SchemaUtils.toOutputSchema(
                 outputSchema,
-                (baseValueProperty, sampleOutput) -> new OutputSchema(
-                    Property.toProperty((com.bytechef.component.definition.Property) baseValueProperty), sampleOutput)),
+                (baseProperty, sampleOutput) -> new OutputSchema(
+                    Property.toProperty((com.bytechef.component.definition.Property) baseProperty), sampleOutput)),
             null);
         this.outputSchemaDataSource = OptionalUtils.mapOrElse(
             actionDefinition.getOutputSchemaFunction(), outputSchemaDataSource -> true,
