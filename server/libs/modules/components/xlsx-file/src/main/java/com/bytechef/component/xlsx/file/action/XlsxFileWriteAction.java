@@ -34,8 +34,8 @@ import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.SHEET_
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.WRITE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.xlsx.file.constant.XlsxFileConstants;
 import java.io.ByteArrayInputStream;

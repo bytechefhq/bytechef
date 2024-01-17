@@ -57,7 +57,7 @@ public class PipedriveUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static ActionOptionsFunction getOptions(String path, String dependsOn) {
+    public static ActionOptionsFunction<String> getOptions(String path, String dependsOn) {
         return (inputParameters, connectionParameters, searchText, context) -> {
             Map<String, ?> response = context
                 .http(http -> http.get(path))
@@ -71,10 +71,10 @@ public class PipedriveUtils {
 
             context.logger(logger -> logger.debug("Response for path='%s': %s".formatted(path, response)));
 
-            List<Option<?>> options = new ArrayList<>();
+            List<Option<String>> options = new ArrayList<>();
 
             for (Map<?, ?> list : (List<Map<?, ?>>) response.get("data")) {
-                options.add(option((String) list.get("name"), list.get("id")));
+                options.add(option((String) list.get("name"), (String) list.get("id")));
             }
 
             return options;

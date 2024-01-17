@@ -47,7 +47,7 @@ public class AirtableUtils {
 
     private static final List<String> SKIP_FIELDS = List.of("singleCollaborator", "multipleCollaborators");
 
-    public static OptionsDataSource.ActionOptionsFunction getBaseIdOptions() {
+    public static OptionsDataSource.ActionOptionsFunction<String> getBaseIdOptions() {
         return (inputParameters, connectionParameters, searchText, context) -> {
             Map<String, List<Map<?, ?>>> response = context
                 .http(http -> http.get("https://api.airtable.com/v0/meta/bases"))
@@ -136,7 +136,7 @@ public class AirtableUtils {
         };
     }
 
-    public static OptionsDataSource.ActionOptionsFunction getTableIdOptions() {
+    public static OptionsDataSource.ActionOptionsFunction<String> getTableIdOptions() {
         return (inputParameters, connectionParameters, searchText, context) -> {
             String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
                 inputParameters.getRequiredString(BASE_ID));
@@ -152,11 +152,11 @@ public class AirtableUtils {
         };
     }
 
-    private static List<Option<?>> getOptions(Map<String, List<Map<?, ?>>> response, String name) {
-        List<Option<?>> options = new ArrayList<>();
+    private static List<Option<String>> getOptions(Map<String, List<Map<?, ?>>> response, String name) {
+        List<Option<String>> options = new ArrayList<>();
 
         for (Map<?, ?> list : response.get(name)) {
-            options.add(option((String) list.get("name"), list.get("id")));
+            options.add(option((String) list.get("name"), (String) list.get("id")));
         }
 
         return options;

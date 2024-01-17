@@ -39,13 +39,13 @@ public class DataStorageConstants {
     public static final String TYPE = "type";
 
     @SuppressFBWarnings("MS")
-    public static final List<Option<Integer>> SCOPE_OPTIONS = List.of(
+    public static final List<Option<Long>> SCOPE_OPTIONS = List.of(
         option("Current Execution", 1),
         option("Workflow Instance", 2),
         option("Workflow", 3),
         option("Account", 4));
 
-    public static final List<Option<Integer>> TYPE_OPTIONS = List.of(
+    public static final List<Option<Long>> TYPE_OPTIONS = List.of(
         option("Array", 1),
         option("Boolean", 2),
         option("Date", 3),

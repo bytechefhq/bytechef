@@ -634,7 +634,7 @@ public final class ComponentDSL {
 
         @SuppressWarnings("unchecked")
         public ModifiableArrayProperty options(List<? extends Option<?>> options) {
-            this.options = new ArrayList<>((List<? extends Option<Object>>)options);
+            this.options = new ArrayList<>((List<? extends Option<Object>>) options);
 
             return this;
         }

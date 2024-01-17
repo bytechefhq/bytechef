@@ -35,8 +35,8 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.TEMPERATURE
 import static com.bytechef.component.openai.constant.OpenAIConstants.WHISPER_1;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.theokanning.openai.audio.CreateTranslationRequest;
 import com.theokanning.openai.audio.TranslationResult;

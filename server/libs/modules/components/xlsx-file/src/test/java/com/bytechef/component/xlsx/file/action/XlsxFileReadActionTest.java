@@ -25,7 +25,7 @@ import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.READ_A
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionContext.FileEntry;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.xlsx.file.XlsxFileComponentHandlerTest;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

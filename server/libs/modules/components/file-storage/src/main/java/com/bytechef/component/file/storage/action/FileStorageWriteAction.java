@@ -24,8 +24,8 @@ import static com.bytechef.component.file.storage.constant.FileStorageConstants.
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.WRITE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 
 /**

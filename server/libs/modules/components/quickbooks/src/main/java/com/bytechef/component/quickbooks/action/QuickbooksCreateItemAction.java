@@ -70,7 +70,7 @@ public final class QuickbooksCreateItemAction {
             string(INCOME_ACCOUNT_ID)
                 .label("Income account ID")
                 .description("Income account id.")
-                .options((ActionOptionsFunction) QuickbooksCreateItemAction::getIncomeAccountIdOptions),
+                .options((ActionOptionsFunction<String>) QuickbooksCreateItemAction::getIncomeAccountIdOptions),
             string(TYPE)
                 .label("Type")
                 .description("Type of item.")
@@ -81,7 +81,7 @@ public final class QuickbooksCreateItemAction {
             string(ASSET_ACCOUNT_ID)
                 .label("Asset account ID")
                 .description("Asset account id.")
-                .options((ActionOptionsFunction) QuickbooksCreateItemAction::getAssetAccountIdOptions),
+                .options((ActionOptionsFunction<String>) QuickbooksCreateItemAction::getAssetAccountIdOptions),
             date(INVENTORY_START_DATE)
                 .label("Inventory start date")
                 .description(
@@ -90,7 +90,7 @@ public final class QuickbooksCreateItemAction {
             string(EXPENSE_ACCOUNT_ID)
                 .label("Expense account ID")
                 .description("Expense account id")
-                .options((ActionOptionsFunction) QuickbooksCreateItemAction::getExpenseAccountIdOptions))
+                .options((ActionOptionsFunction<String>) QuickbooksCreateItemAction::getExpenseAccountIdOptions))
         .outputSchema(
             object()
                 .properties(

@@ -19,6 +19,7 @@ package com.bytechef.component.ods.file.action;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.ods.file.OdsFileComponentHandlerTest;
 import com.bytechef.component.ods.file.constant.OdsFileConstants;
@@ -233,8 +234,8 @@ public class OdsFileReadActionTest {
 
         Mockito
             .when(parameters.getRequired(Mockito.eq(OdsFileConstants.FILE_ENTRY),
-                Mockito.eq(ActionContext.FileEntry.class)))
-            .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
+                Mockito.eq(FileEntry.class)))
+            .thenReturn(Mockito.mock(FileEntry.class));
         Mockito.when(parameters.getBoolean(Mockito.eq(OdsFileConstants.HEADER_ROW), Mockito.eq(true)))
             .thenReturn(headerRow);
         Mockito.when(parameters.getBoolean(Mockito.eq(OdsFileConstants.INCLUDE_EMPTY_CELLS), Mockito.eq(false)))
@@ -248,7 +249,7 @@ public class OdsFileReadActionTest {
             .thenReturn(readAsString);
 
         if (file != null) {
-            Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(ActionContext.FileEntry.class))))
+            Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(FileEntry.class))))
                 .thenReturn(new FileInputStream(file));
         }
 

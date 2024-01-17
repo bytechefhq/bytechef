@@ -21,6 +21,7 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.FIL
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.filesystem.FilesystemComponentHandlerTest;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,11 +45,11 @@ public class FilesystemWriteFileActionTest {
         File file = getSampleFile();
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(ActionContext.FileEntry.class))))
+        Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(FileEntry.class))))
             .thenReturn(new FileInputStream(file));
 
         Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
-            .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
+            .thenReturn(Mockito.mock(FileEntry.class));
         Mockito.when(parameters.getRequiredString(Mockito.eq(FILENAME)))
             .thenReturn(file.getAbsolutePath());
 

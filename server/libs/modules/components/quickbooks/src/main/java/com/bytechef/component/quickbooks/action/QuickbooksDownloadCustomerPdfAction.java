@@ -24,9 +24,9 @@ import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CUS
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DOWNLOAD_CUSTOMER_PDF;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableOption;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;

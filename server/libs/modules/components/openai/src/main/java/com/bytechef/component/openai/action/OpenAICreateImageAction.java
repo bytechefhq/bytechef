@@ -86,7 +86,7 @@ public class OpenAICreateImageAction {
             string(SIZE)
                 .label("Size")
                 .description("The size of the generated images.")
-                .options((ActionOptionsFunction) OpenAIUtils::getSizeOptions)
+                .options((ActionOptionsFunction<String>) OpenAIUtils::getSizeOptions)
                 .defaultValue(DEFAULT_SIZE)
                 .required(false),
             string(STYLE)

@@ -26,8 +26,8 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.UPLOAD_FILE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -59,7 +59,7 @@ public final class GoogleDriveUploadFileAction {
                 .label("Folder")
                 .description(
                     "The id of a folder where the file is uploaded.")
-                .options((ActionOptionsFunction) GoogleDriveUploadFileAction::getOptionsFunction))
+                .options((ActionOptionsFunction<String>) GoogleDriveUploadFileAction::getOptionsFunction))
         .outputSchema(
             object()
                 .properties(

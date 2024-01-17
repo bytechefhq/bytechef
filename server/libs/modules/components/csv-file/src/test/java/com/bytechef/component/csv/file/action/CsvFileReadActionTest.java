@@ -21,6 +21,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.bytechef.component.csv.file.CsvFileComponentHandlerTest;
 import com.bytechef.component.csv.file.constant.CsvFileConstants;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
@@ -273,7 +274,7 @@ public class CsvFileReadActionTest {
         Mockito.when(parameters.getString(Mockito.eq(CsvFileConstants.DELIMITER), Mockito.eq(",")))
             .thenReturn(",");
         Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(CsvFileConstants.FILE_ENTRY)))
-            .thenReturn(Mockito.mock(ActionContext.FileEntry.class));
+            .thenReturn(Mockito.mock(FileEntry.class));
         Mockito.when(parameters.getBoolean(Mockito.eq(CsvFileConstants.HEADER_ROW), Mockito.eq(true)))
             .thenReturn(headerRow);
         Mockito.when(parameters.getBoolean(Mockito.eq(CsvFileConstants.INCLUDE_EMPTY_CELLS), Mockito.eq(false)))
@@ -286,7 +287,7 @@ public class CsvFileReadActionTest {
             .thenReturn(readAsString);
 
         if (file != null) {
-            Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(ActionContext.FileEntry.class))))
+            Mockito.when(context.file(file1 -> file1.getStream(Mockito.any(FileEntry.class))))
                 .thenReturn(new FileInputStream(file));
         }
 

@@ -29,9 +29,9 @@ import static com.bytechef.component.xml.file.constant.XmlFileConstants.PATH;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.READ;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.io.InputStream;
 import java.util.List;

@@ -18,7 +18,6 @@ package com.bytechef.component.definition;
 
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseOutputSchema;
-
 import java.util.Objects;
 
 /**

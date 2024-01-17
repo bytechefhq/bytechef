@@ -30,8 +30,8 @@ import static com.bytechef.component.json.file.constant.JsonFileConstants.TYPE;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.WRITE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.json.file.constant.JsonFileConstants;
 import java.io.ByteArrayInputStream;

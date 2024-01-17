@@ -26,10 +26,10 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.csv.file.constant.CsvFileConstants;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import java.io.ByteArrayInputStream;

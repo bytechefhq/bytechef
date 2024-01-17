@@ -29,8 +29,8 @@ import static com.bytechef.component.email.constant.EmailConstants.SEND;
 import static com.bytechef.component.email.constant.EmailConstants.TLS;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import jakarta.activation.DataHandler;
 import jakarta.mail.Authenticator;

@@ -37,6 +37,7 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.WHISPER_1;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.theokanning.openai.audio.CreateTranscriptionRequest;
 import com.theokanning.openai.audio.TranscriptionResult;
@@ -195,7 +196,7 @@ public class OpenAICreateTranscriptionAction {
         createTranscriptionRequest.setResponseFormat(inputParameters.getString(RESPONSE_FORMAT));
         createTranscriptionRequest.setTemperature(inputParameters.getDouble(TEMPERATURE));
 
-        ActionContext.FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
+        FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE);
 
         return openAiService.createTranscription(
             createTranscriptionRequest, (File) context.file(file -> file.toTempFile(fileEntry)));

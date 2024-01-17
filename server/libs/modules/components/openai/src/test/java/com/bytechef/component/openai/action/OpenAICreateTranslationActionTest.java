@@ -29,7 +29,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext.FileEntry;
+import com.bytechef.component.definition.FileEntry;
 import com.theokanning.openai.audio.CreateTranslationRequest;
 import com.theokanning.openai.audio.TranslationResult;
 import com.theokanning.openai.service.OpenAiService;
