@@ -135,8 +135,7 @@ public class JiraGetIssueAction {
             .description("Details about an issue.")
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)))
-        .sampleOutput(
+                    "responseType", ResponseType.JSON)),
             Map.<String, Object>ofEntries(Map.entry("id", 10002.0),
                 Map.entry("self", "https://your-domain.atlassian.net/rest/api/3/issue/10002"), Map.entry("key", "ED-1"),
                 Map.entry("fields", Map.<String, Object>ofEntries(

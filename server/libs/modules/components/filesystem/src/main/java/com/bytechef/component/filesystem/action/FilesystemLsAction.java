@@ -17,7 +17,10 @@
 package com.bytechef.component.filesystem.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.LS;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
@@ -54,6 +57,14 @@ public class FilesystemLsAction {
                 .label("Recursive")
                 .description("Should subdirectories be included.")
                 .defaultValue(false))
+        .outputSchema(
+            array()
+                .items(
+                    object()
+                        .properties(
+                            string("fileName"),
+                            string("relativePath"),
+                            integer("size"))))
         .perform(FilesystemLsAction::perform);
 
     protected static List<FileInfo> perform(
@@ -63,46 +74,52 @@ public class FilesystemLsAction {
         boolean recursive = inputParameters.getBoolean(RECURSIVE, false);
 
         try (Stream<Path> stream = Files.walk(root)) {
-            return stream.filter(p -> {
-                Path parent = p.getParent();
-
-                return recursive || parent.equals(root);
-            })
+            return stream
+                .filter(path -> filter(path, recursive, root))
                 .filter(Files::isRegularFile)
-                .map(p -> new FileInfo(root, p))
+                .map(path -> getFileInfo(path, root))
                 .collect(Collectors.toList());
         }
     }
 
-    public static class FileInfo {
-        private final Path path;
-        private final Path root;
+    private static boolean filter(Path path, boolean recursive, Path root) {
+        Path parent = path.getParent();
 
+        return recursive || parent.equals(root);
+    }
+
+    private static FileInfo getFileInfo(Path path, Path root) {
+        File file = path.toFile();
+
+        if (!file.exists() || !file.isFile()) {
+            throw new IllegalArgumentException("Path does not pint to valid file");
+        }
+
+        return new FileInfo(
+            String.valueOf(path.getFileName()), String.valueOf(root.relativize(path)), file.length());
+    }
+
+    public static class FileInfo {
+        private final String fileName;
+        private final String relativePath;
         private final long size;
 
         @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
-        public FileInfo(Path root, Path path) {
-            Validate.notNull(root, "Root path is required");
-            Validate.notNull(path, "File path is required");
+        public FileInfo(String fileName, String relativePath, long size) {
+            Validate.notNull(fileName, "fileName is required");
+            Validate.notNull(relativePath, "relativePath is required");
 
-            this.root = root;
-            this.path = path;
-
-            File file = path.toFile();
-
-            if (!file.exists() || !file.isFile()) {
-                throw new IllegalArgumentException("Path does not pint to valid file");
-            }
-
-            size = file.length();
+            this.fileName = fileName;
+            this.relativePath = relativePath;
+            this.size = size;
         }
 
-        public String getName() {
-            return String.valueOf(path.getFileName());
+        public String getFilename() {
+            return fileName;
         }
 
         public String getRelativePath() {
-            return String.valueOf(root.relativize(path));
+            return relativePath;
         }
 
         public long getSize() {

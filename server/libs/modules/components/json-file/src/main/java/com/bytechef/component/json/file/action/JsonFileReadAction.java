@@ -33,10 +33,7 @@ import static com.bytechef.component.json.file.constant.JsonFileConstants.READ;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.component.json.file.constant.JsonFileConstants;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -90,24 +87,13 @@ public class JsonFileReadAction {
                 .description("The page number to get.")
                 .displayCondition("%s === true".formatted(IS_ARRAY))
                 .advancedOption(true))
-        .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputFunction())
+        .outputSchema()
         .perform(JsonFileReadAction::perform);
 
     protected static JsonFileConstants.FileType getFileType(Parameters inputParameters) {
         String fileType = inputParameters.getString(FILE_TYPE, JsonFileConstants.FileType.JSON.name());
 
         return JsonFileConstants.FileType.valueOf(fileType.toUpperCase());
-    }
-
-    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> context.outputSchema(
-            outputSchema -> outputSchema.get(perform(inputParameters, connectionParameters, context)));
-    }
-
-    protected static ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
     }
 
     @SuppressWarnings("unchecked")
@@ -165,6 +151,6 @@ public class JsonFileReadAction {
             result = context.json(json -> json.read((String) context.file(file -> file.readToString(fileEntry))));
         }
 
-        return result;
+        return Map.of("result", result);
     }
 }

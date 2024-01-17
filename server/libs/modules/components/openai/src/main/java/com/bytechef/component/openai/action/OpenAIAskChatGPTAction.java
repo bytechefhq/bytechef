@@ -42,7 +42,6 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.USER;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.TypeReference;
-import com.bytechef.component.definition.OutputSchemaDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.openai.util.OpenAIUtils;
 import com.theokanning.openai.completion.chat.ChatCompletionChunk;
@@ -50,6 +49,7 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.service.OpenAiService;
 import io.reactivex.Flowable;
 import java.time.Duration;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -100,8 +100,11 @@ public class OpenAIAskChatGPTAction extends AbstractChatCompletionAction {
             TOOLS_PROPERTY,
             TOOL_CHOICE_PROPERTY,
             USER_PROPERTY)
-        .outputSchema((OutputSchemaDataSource.ActionOutputSchemaFunction) OpenAIUtils::getOutputSchemaResponse)
+        .outputSchema(OpenAIUtils::getOutputSchema)
         .perform(OpenAIAskChatGPTAction::perform);
+
+    private OpenAIAskChatGPTAction() {
+    }
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
@@ -110,14 +113,14 @@ public class OpenAIAskChatGPTAction extends AbstractChatCompletionAction {
 
         ChatCompletionRequest chatCompletionRequest = new ChatCompletionRequest();
 
-        if (Boolean.TRUE.equals(inputParameters.getRequiredBoolean(STREAM))) {
+        if (inputParameters.getRequiredBoolean(STREAM)) {
             setChatCompletionRequestValues(inputParameters, chatCompletionRequest);
             chatCompletionRequest.setStream(true);
 
             Flowable<ChatCompletionChunk> chatCompletionChunkFlowable =
                 openAiService.streamChatCompletion(chatCompletionRequest);
 
-            return chatCompletionChunkFlowable.toList();
+            return Map.of("stream", chatCompletionChunkFlowable.toList());
         } else {
             setChatCompletionRequestValues(inputParameters, chatCompletionRequest);
             chatCompletionRequest.setStream(false);
@@ -140,8 +143,5 @@ public class OpenAIAskChatGPTAction extends AbstractChatCompletionAction {
         chatCompletionRequest.setTemperature(inputParameters.getDouble(TEMPERATURE));
         chatCompletionRequest.setTopP(inputParameters.getDouble(TOP_P));
         chatCompletionRequest.setUser(inputParameters.getString(USER));
-    }
-
-    private OpenAIAskChatGPTAction() {
     }
 }

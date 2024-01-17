@@ -21,10 +21,7 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.component.object.helper.constant.ObjectHelperConstants;
 
 /**
@@ -39,19 +36,8 @@ public class ObjectHelperParseAction {
             .label("Source")
             .description("The JSON string to convert to the data.")
             .required(true))
-        .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputFunction())
+        .outputSchema()
         .perform(ObjectHelperParseAction::perform);
-
-    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> context.outputSchema(
-            outputSchema -> outputSchema.get(perform(inputParameters, connectionParameters, context)));
-    }
-
-    protected static ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
-    }
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {

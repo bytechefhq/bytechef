@@ -262,7 +262,7 @@ public class TwilioSendSMSAction {
 
     }
 
-    public static Message perform(
+    protected static Message perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         String username = connectionParameters.getRequiredString(USERNAME);

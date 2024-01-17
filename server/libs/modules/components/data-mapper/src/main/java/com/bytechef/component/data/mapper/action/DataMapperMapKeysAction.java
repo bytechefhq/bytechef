@@ -23,14 +23,11 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 
 /**
  * @author Ivica Cardic
@@ -58,19 +55,8 @@ public class DataMapperMapKeysAction {
                             string(TO)
                                 .label("To")))
                 .required(true))
-        .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputFunction())
+        .outputSchema()
         .perform(DataMapperMapKeysAction::perform);
-
-    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> context.outputSchema(
-            outputSchema -> outputSchema.get(perform(inputParameters, connectionParameters, context)));
-    }
-
-    protected static ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
-    }
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {

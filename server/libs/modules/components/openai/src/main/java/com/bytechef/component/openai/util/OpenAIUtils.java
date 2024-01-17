@@ -29,13 +29,12 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.PROMPT;
 import static com.bytechef.component.openai.constant.OpenAIConstants.STREAM;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
-import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.OutputSchema;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property.OutputProperty;
+import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,30 +44,32 @@ import java.util.List;
  */
 public class OpenAIUtils {
 
-    public static final ModifiableArrayProperty outputSchemaResponseForStream =
-        array()
-            .items(
-                string("id"),
-                string("object"),
-                integer("created"),
-                string("model"),
-                array("choices")
+    public static final ObjectProperty outputSchemaResponseForStream =
+        object()
+            .properties(
+                array("stream")
                     .items(
-                        object()
-                            .properties(
-                                integer("index"),
-                                object("message")
+                        string("id"),
+                        string("object"),
+                        integer("created"),
+                        string("model"),
+                        array("choices")
+                            .items(
+                                object()
                                     .properties(
-                                        string("role"),
-                                        string("content"),
-                                        string("name"),
-                                        object("functionCall")
+                                        integer("index"),
+                                        object("message")
                                             .properties(
+                                                string("role"),
+                                                string("content"),
                                                 string("name"),
-                                                object("arguments"))),
-                                string("finishReason"))));
+                                                object("functionCall")
+                                                    .properties(
+                                                        string("name"),
+                                                        object("arguments"))),
+                                        string("finishReason")))));
 
-    public static final ModifiableObjectProperty outputSchemaResponse =
+    public static final ObjectProperty outputSchemaResponse =
         object()
             .properties(
                 string("id"),
@@ -145,15 +146,15 @@ public class OpenAIUtils {
         return List.of(string, n);
     }
 
-    public static OutputProperty<?> getOutputSchemaResponse(
+    public static OutputSchema getOutputSchema(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         boolean stream = inputParameters.getRequiredBoolean(STREAM);
 
         if (stream) {
-            return outputSchemaResponseForStream;
+            return new OutputSchema(outputSchemaResponseForStream);
         } else {
-            return outputSchemaResponse;
+            return new OutputSchema(outputSchemaResponse);
         }
     }
 }

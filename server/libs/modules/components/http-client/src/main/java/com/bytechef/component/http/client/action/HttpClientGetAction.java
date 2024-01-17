@@ -21,10 +21,7 @@ import static com.bytechef.component.definition.Context.Http.RequestMethod;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.component.http.client.constant.HttpClientConstants;
 import com.bytechef.component.http.client.util.HttpClientActionUtils;
 
@@ -44,19 +41,8 @@ public class HttpClientGetAction {
                 //
 
                 HttpClientConstants.COMMON_PROPERTIES))
-        .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputFunction())
+        .outputSchema()
         .perform(HttpClientGetAction::perform);
-
-    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> context.outputSchema(
-            outputSchema -> outputSchema.get(perform(inputParameters, connectionParameters, context)));
-    }
-
-    protected static ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
-    }
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {

@@ -29,11 +29,9 @@ import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.RE
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;
@@ -77,21 +75,10 @@ public class HtmlHelperExtractContentAction {
                 .label("Return Array")
                 .description(
                     "If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string."))
-        .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputFunction())
+        .outputSchema()
         .perform(HtmlHelperExtractContentAction::perform);
 
-    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> context.outputSchema(
-            outputSchema -> outputSchema.get(perform(inputParameters, connectionParameters, context)));
-    }
-
-    protected static ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
-    }
-
-    protected static Object perform(
+    protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Object result;
@@ -109,7 +96,7 @@ public class HtmlHelperExtractContentAction {
             result = items.collect(Collectors.joining(" "));
         }
 
-        return result;
+        return Map.of("result", result);
     }
 
     private static String getValue(Element element, Parameters inputParameters) {

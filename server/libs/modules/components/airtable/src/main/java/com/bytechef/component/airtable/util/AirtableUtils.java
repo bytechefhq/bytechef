@@ -72,7 +72,7 @@ public class AirtableUtils {
 
             Map<String, List<AirtableTable>> tablesMap = context.json(json -> json.read(
                 (String) context.http(http -> http.get(url)
-                    .configuration(Http.responseType(ResponseType.TEXT))
+                    .configuration(Http.responseType(ResponseType.JSON))
                     .execute()
                     .getBody(new Context.TypeReference<String>() {})),
                 new Context.TypeReference<>() {}));

@@ -34,10 +34,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.component.xlsx.file.constant.XlsxFileConstants;
 import com.bytechef.component.xlsx.file.constant.XlsxFileConstants.FileFormat;
 import java.io.IOException;
@@ -103,21 +100,10 @@ public class XlsxFileReadAction {
                     "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
                 .defaultValue("Sheet")
                 .advancedOption(true))
-        .outputSchema(getOutputSchemaFunction())
-        .sampleOutput(getSampleOutputFunction())
+        .outputSchema()
         .perform(XlsxFileReadAction::perform);
 
-    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> context.outputSchema(
-            outputSchema -> outputSchema.get(perform(inputParameters, connectionParameters, context)));
-    }
-
-    protected static ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
-    }
-
-    protected static Object perform(
+    protected static List<Map<String, ?>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         FileEntry fileEntry = inputParameters.getRequired(FILE_ENTRY, FileEntry.class);

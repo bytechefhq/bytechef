@@ -34,10 +34,9 @@ import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.SHEET_
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.WRITE;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.component.xlsx.file.constant.XlsxFileConstants;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -79,18 +78,12 @@ public class XlsxFileWriteAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .sampleOutput(getSampleOutputFunction())
         .perform(XlsxFileWriteAction::perform);
 
     private static String getaDefaultFileName() {
         String xlsxName = XlsxFileConstants.FileFormat.XLSX.name();
 
         return "file." + xlsxName.toLowerCase();
-    }
-
-    protected static ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
     }
 
     private static Workbook getWorkbook() {
@@ -100,7 +93,7 @@ public class XlsxFileWriteAction {
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    protected static Object perform(
+    protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String fileName = inputParameters.getString(FILENAME, getaDefaultFileName());

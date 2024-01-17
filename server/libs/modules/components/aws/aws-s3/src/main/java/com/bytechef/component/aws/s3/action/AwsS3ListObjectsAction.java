@@ -72,7 +72,7 @@ public class AwsS3ListObjectsAction {
         }
     }
 
-    private record S3ObjectDescription(String bucket, S3Object s3Object) {
+    protected record S3ObjectDescription(String bucket, S3Object s3Object) {
 
         public String getKey() {
             return s3Object.key();

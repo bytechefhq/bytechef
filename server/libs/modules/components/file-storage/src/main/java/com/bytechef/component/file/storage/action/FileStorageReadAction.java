@@ -25,8 +25,6 @@ import static com.bytechef.component.file.storage.constant.FileStorageConstants.
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource;
-import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 
 /**
  * @author Ivica Cardic
@@ -41,17 +39,10 @@ public class FileStorageReadAction {
             .description(
                 "The object property which contains a reference to the file to read from.")
             .required(true))
-        .outputSchema(string())
-        .sampleOutput("Sample string")
-        .sampleOutput(getSampleOutputFunction())
+        .outputSchema(string(), "sample content")
         .perform(FileStorageReadAction::perform);
 
-    protected static SampleOutputDataSource.ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
-    }
-
-    protected static Object perform(
+    protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context.file(file -> file.readToString(inputParameters.getRequiredFileEntry(FILE_ENTRY)));

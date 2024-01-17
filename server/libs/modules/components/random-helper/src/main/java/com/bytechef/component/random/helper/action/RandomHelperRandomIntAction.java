@@ -41,6 +41,7 @@ public class RandomHelperRandomIntAction {
                 .description("The maximum possible generated value.")
                 .required(true)
                 .defaultValue(100))
+        .outputSchema(integer())
         .perform(RandomHelperRandomIntAction::perform);
 
     /**

@@ -271,8 +271,7 @@ public class PipedriveGetOrganizationAction {
                         .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", ResponseType.JSON)))
-        .sampleOutput(
+                        "responseType", ResponseType.JSON)),
             Map.<String, Object>ofEntries(Map.entry("success", true),
                 Map.entry("data",
                     Map.<String, Object>ofEntries(Map.entry("allOf", List.of(

@@ -49,7 +49,7 @@ public class BashExecuteAction {
             .label("Script")
             .description("Script written in bash.")
             .required(true))
-        .outputSchema(string())
+        .outputSchema(string(), "Sample Result")
         .perform(BashExecuteAction::perform);
 
     protected static String perform(

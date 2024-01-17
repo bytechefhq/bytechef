@@ -17,6 +17,7 @@
 package com.bytechef.component.filesystem.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.CREATE_TEMP_DIR;
 
 import com.bytechef.component.definition.ActionContext;
@@ -35,9 +36,10 @@ public class FilesystemCreateTempDirAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TEMP_DIR)
         .title("Create Temp Directory")
         .description("Creates a temporary directory on the filesystem.")
+        .outputSchema(string(), "/sample_tmp_dir")
         .perform(FilesystemCreateTempDirAction::perform);
 
-    protected static Object perform(
+    protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         Path path = Files.createTempDirectory("createTempDir_");

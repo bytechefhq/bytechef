@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
-import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.STRINGIFY;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.TYPE;
@@ -55,7 +54,7 @@ public class ObjectHelperStringifyAction {
                 .description("The data to convert to JSON string.")
                 .displayCondition("type === 2")
                 .required(true))
-        .outputSchema(string())
+        .outputSchema()
         .perform(ObjectHelperStringifyAction::perform);
 
     protected static String perform(

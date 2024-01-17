@@ -34,7 +34,6 @@ import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.component.mailchimp.util.MailchimpUtils;
 import java.util.Map;
 
@@ -114,11 +113,11 @@ public class MailchimpSubscribeTrigger {
         return new DynamicWebhookEnableOutput(Map.of("id", response.get("id")), null);
     }
 
-    protected static WebhookOutput dynamicWebhookRequest(
+    protected static Object dynamicWebhookRequest(
         Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
         TriggerContext context) {
 
-        return WebhookOutput.map((Map<?, ?>) body.getContent());
+        return body.getContent();
     }
 }

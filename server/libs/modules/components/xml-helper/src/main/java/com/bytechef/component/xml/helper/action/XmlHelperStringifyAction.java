@@ -56,7 +56,7 @@ public class XmlHelperStringifyAction {
         .outputSchema(string())
         .perform(XmlHelperStringifyAction::perform);
 
-    protected static Object perform(
+    protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return context.xml(xml -> xml.write(inputParameters.getRequired(XmlHelperConstants.SOURCE)));

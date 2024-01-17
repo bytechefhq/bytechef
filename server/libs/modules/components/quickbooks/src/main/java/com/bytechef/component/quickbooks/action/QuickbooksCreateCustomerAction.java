@@ -102,6 +102,7 @@ public final class QuickbooksCreateCustomerAction {
                     "Given name or first name of a person. The DisplayName attribute or at least one of Title, " +
                         "GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.")
                 .maxLength(100))
+        .description("Has conditionally required parameters.")
         .outputSchema(
             object()
                 .properties(
@@ -139,7 +140,6 @@ public final class QuickbooksCreateCustomerAction {
                         .label("Account number"),
                     string("businessNumber")
                         .label("Business number")))
-        .description("Has conditionally required parameters.")
         .perform(QuickbooksCreateCustomerAction::perform);
 
     private QuickbooksCreateCustomerAction() {

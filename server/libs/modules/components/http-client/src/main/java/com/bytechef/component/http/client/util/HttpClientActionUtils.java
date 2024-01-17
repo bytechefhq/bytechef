@@ -29,7 +29,7 @@ import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property.InputProperty;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.http.client.constant.HttpClientConstants;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -42,8 +42,8 @@ import java.util.Map;
  */
 public class HttpClientActionUtils {
 
-    public static List<? extends InputProperty> options(boolean includeBodyContentProperties) {
-        List<InputProperty> properties = new ArrayList<>();
+    public static List<? extends Property> options(boolean includeBodyContentProperties) {
+        List<Property> properties = new ArrayList<>();
 
         if (includeBodyContentProperties) {
             properties.add(string(HttpClientConstants.BODY_CONTENT_TYPE)
@@ -142,14 +142,14 @@ public class HttpClientActionUtils {
     }
 
     @SafeVarargs
-    public static InputProperty[] toArray(List<? extends InputProperty>... propertiesArray) {
-        List<? super InputProperty> allProperties = new ArrayList<>();
+    public static Property[] toArray(List<? extends Property>... propertiesArray) {
+        List<? super Property> allProperties = new ArrayList<>();
 
-        for (List<? extends InputProperty> properties : propertiesArray) {
+        for (List<? extends Property> properties : propertiesArray) {
             allProperties.addAll(properties);
         }
 
-        return allProperties.toArray(InputProperty[]::new);
+        return allProperties.toArray(Property[]::new);
     }
 
     private static BodyContentType getBodyContentType(Parameters inputParameters) {

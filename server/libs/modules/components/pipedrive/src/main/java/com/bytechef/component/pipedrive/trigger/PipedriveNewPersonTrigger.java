@@ -35,7 +35,6 @@ import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.component.pipedrive.util.PipedriveUtils;
 import java.util.Map;
 
@@ -127,8 +126,7 @@ public class PipedriveNewPersonTrigger {
                     integer("label"),
                     string("org_name"),
                     string("owner_name"),
-                    string("cc_email")))
-        .sampleOutput(
+                    string("cc_email")),
             """
                 {
                     "id": 1,
@@ -238,10 +236,10 @@ public class PipedriveNewPersonTrigger {
     }
 
     @SuppressWarnings("unchecked")
-    protected static WebhookOutput dynamicWebhookRequest(
+    protected static Object dynamicWebhookRequest(
         Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
         WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output, Context context) {
 
-        return WebhookOutput.map((Map<?, ?>) ((Map<String, ?>) body.getContent()).get("current"));
+        return ((Map<String, ?>) body.getContent()).get("current");
     }
 }

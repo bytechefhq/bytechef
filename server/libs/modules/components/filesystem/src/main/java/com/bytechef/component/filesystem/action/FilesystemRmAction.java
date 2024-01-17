@@ -17,6 +17,7 @@
 package com.bytechef.component.filesystem.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.PATH;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.RM;
@@ -31,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -45,6 +47,7 @@ public class FilesystemRmAction {
                 .label("Path")
                 .description("The path of a directory.")
                 .required(true))
+        .outputSchema(bool(), true)
         .perform(FilesystemRmAction::perform);
 
     /**
@@ -54,13 +57,13 @@ public class FilesystemRmAction {
      * A directory to be deleted does not have to be empty.
      * </p>
      */
-    protected static Object perform(
+    protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         File file = new File(inputParameters.getRequiredString(PATH));
 
         try {
-            return deleteRecursively(file.toPath());
+            return Map.of("deleted", deleteRecursively(file.toPath()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

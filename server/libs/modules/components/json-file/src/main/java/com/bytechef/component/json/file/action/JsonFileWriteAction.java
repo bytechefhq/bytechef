@@ -30,10 +30,9 @@ import static com.bytechef.component.json.file.constant.JsonFileConstants.TYPE;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.WRITE;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.component.json.file.constant.JsonFileConstants;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -85,7 +84,6 @@ public class JsonFileWriteAction {
                 .defaultValue("file.json")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .sampleOutput(getSampleOutputFunction())
         .perform(JsonFileWriteAction::perform);
 
     private static String getDefaultFileName(JsonFileConstants.FileType fileType, String defaultFilename) {
@@ -94,13 +92,8 @@ public class JsonFileWriteAction {
             : defaultFilename;
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
-    }
-
     @SuppressWarnings("unchecked")
-    protected static Object perform(
+    protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         JsonFileConstants.FileType fileType = JsonFileReadAction.getFileType(inputParameters);
@@ -121,9 +114,8 @@ public class JsonFileWriteAction {
         }
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-            return context.file(
-                file -> file.storeContent(
-                    getDefaultFileName(fileType, inputParameters.getString(FILENAME)), inputStream));
+            return context.file(file -> file.storeContent(
+                getDefaultFileName(fileType, inputParameters.getString(FILENAME)), inputStream));
         }
     }
 }

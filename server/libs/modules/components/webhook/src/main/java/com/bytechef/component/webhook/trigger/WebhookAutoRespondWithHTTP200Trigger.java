@@ -19,7 +19,6 @@ package com.bytechef.component.webhook.trigger;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.OutputSchemaDataSource;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.webhook.util.WebhookUtils;
 
@@ -33,17 +32,6 @@ public class WebhookAutoRespondWithHTTP200Trigger {
         .description(
             "The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming webhook request. This guarantees execution of the webhook trigger, but does not involve any validation of the received request.")
         .type(TriggerType.STATIC_WEBHOOK)
-        .outputSchema(getOutputSchemaFunction())
-        .staticWebhookRequest(WebhookUtils.getStaticWebhookRequestFunction());
-
-    protected static OutputSchemaDataSource.TriggerOutputSchemaFunction getOutputSchemaFunction() {
-        // TODO
-        return (inputParameters, connectionParameters, context) -> null;
-//        object()
-//            .properties(
-//                string(METHOD),
-//                object(HEADERS),
-//                object(PARAMETERS),
-//                any(BODY))
-    }
+        .outputSchema(WebhookUtils::getWebhookOutputSchema)
+        .staticWebhookRequest(WebhookUtils::getWebhookOutput);
 }

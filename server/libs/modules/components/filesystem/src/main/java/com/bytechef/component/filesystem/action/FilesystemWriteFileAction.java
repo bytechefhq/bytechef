@@ -19,7 +19,6 @@ package com.bytechef.component.filesystem.action;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILE_ENTRY;
@@ -53,10 +52,10 @@ public class FilesystemWriteFileAction {
                 .description("The path to which the file should be written.")
                 .placeholder("/data/your_file.pdf")
                 .required(true))
-        .outputSchema(object().properties(integer("bytes")))
+        .outputSchema(integer(), "1024")
         .perform(FilesystemWriteFileAction::perform);
 
-    protected static Object perform(
+    protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         String fileName = inputParameters.getRequiredString(FILENAME);

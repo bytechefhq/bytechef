@@ -33,9 +33,7 @@ import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.definition.TriggerDefinition.WebhookOutput;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -127,23 +125,23 @@ public class HubspotSubscribeTrigger {
                             integer("attemptNumber"),
                             integer("messageId"),
                             string("messageType")))))
-        .sampleOutput("""
-            [
-                {
-                    "objectId": 1246965,
-                    "propertyName": "lifecyclestage",
-                    "propertyValue": "subscriber",
-                    "changeSource": "ACADEMY",
-                    "eventId": 3816279340,
-                    "subscriptionId": 25,
-                    "portalId": 33,
-                    "appId": 1160452,
-                    "occurredAt": 1462216307945,
-                    "eventType":"contact.propertyChange",
-                    "attemptNumber": 0
-               }
-            ]
-            """)
+//        .sampleOutput("""
+//            [
+//                {
+//                    "objectId": 1246965,
+//                    "propertyName": "lifecyclestage",
+//                    "propertyValue": "subscriber",
+//                    "changeSource": "ACADEMY",
+//                    "eventId": 3816279340,
+//                    "subscriptionId": 25,
+//                    "portalId": 33,
+//                    "appId": 1160452,
+//                    "occurredAt": 1462216307945,
+//                    "eventType":"contact.propertyChange",
+//                    "attemptNumber": 0
+//               }
+//            ]
+//            """)
         .dynamicWebhookDisable(HubspotSubscribeTrigger::dynamicWebhookDisable)
         .dynamicWebhookEnable(HubspotSubscribeTrigger::dynamicWebhookEnable)
         .dynamicWebhookRequest(HubspotSubscribeTrigger::dynamicWebhookRequest);
@@ -186,12 +184,11 @@ public class HubspotSubscribeTrigger {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    protected static WebhookOutput dynamicWebhookRequest(
+    protected static Object dynamicWebhookRequest(
         Map<String, ?> inputParameters, Parameters connectionParameters, HttpHeaders headers,
         HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
         Context context) {
 
-        return WebhookOutput.list((List<Map<?, ?>>) body.getContent());
+        return body.getContent();
     }
 }

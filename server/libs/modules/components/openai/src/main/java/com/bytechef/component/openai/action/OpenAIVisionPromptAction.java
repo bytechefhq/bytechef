@@ -32,7 +32,6 @@ import static com.bytechef.component.openai.constant.OpenAIConstants.URL;
 import static com.bytechef.component.openai.constant.OpenAIConstants.VISION_PROMPT;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.component.definition.OutputSchemaDataSource;
 import com.bytechef.component.openai.util.OpenAIUtils;
 
 /**
@@ -102,7 +101,7 @@ public class OpenAIVisionPromptAction extends AbstractChatCompletionAction {
             TOOLS_PROPERTY,
             TOOL_CHOICE_PROPERTY,
             USER_PROPERTY)
-        .outputSchema((OutputSchemaDataSource.ActionOutputSchemaFunction) OpenAIUtils::getOutputSchemaResponse)
+        .outputSchema(OpenAIUtils::getOutputSchema)
         .perform(OpenAIAskChatGPTAction::perform);
 
     private OpenAIVisionPromptAction() {

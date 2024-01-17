@@ -30,10 +30,9 @@ import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import com.bytechef.component.ods.file.constant.OdsFileConstants;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
@@ -75,7 +74,6 @@ public class OdsFileWriteAction {
                 .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .sampleOutput(getSampleOutputFunction())
         .perform(OdsFileWriteAction::perform);
 
     private static Object[] getHeaderValues(Set<String> names) {
@@ -96,24 +94,18 @@ public class OdsFileWriteAction {
         return values;
     }
 
-    protected static ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
-    }
-
     @SuppressWarnings({
         "rawtypes", "unchecked"
     })
-    protected static Object perform(
+    protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String fileName = inputParameters.getString(OdsFileConstants.FILENAME, "file.ods");
         List<Map<String, ?>> rows = (List) inputParameters.getList(OdsFileConstants.ROWS, List.of());
         String sheetName = inputParameters.getString(OdsFileConstants.SHEET_NAME, "Sheet");
 
-        return context.file(
-            file -> file.storeContent(
-                fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))));
+        return context.file(file -> file.storeContent(
+            fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))));
     }
 
     private static byte[] write(List<Map<String, ?>> rows, WriteConfiguration configuration) throws IOException {

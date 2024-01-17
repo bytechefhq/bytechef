@@ -33,6 +33,7 @@ import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.rabbitmq.client.Channel;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -50,9 +51,10 @@ public class RabbitMqSendMessageAction {
             object(MESSAGE)
                 .description("The name of the queue to read from")
                 .required(true))
+        .outputSchema()
         .perform(RabbitMqSendMessageAction::perform);
 
-    protected static Object perform(
+    protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws IOException, TimeoutException {
 

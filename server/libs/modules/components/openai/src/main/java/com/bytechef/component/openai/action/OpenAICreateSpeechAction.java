@@ -108,8 +108,9 @@ public class OpenAICreateSpeechAction {
         createSpeechRequest.setSpeed(inputParameters.getDouble(SPEED));
 
         try (ResponseBody speech = openAiService.createSpeech(createSpeechRequest)) {
-            return context.file(file -> file.storeContent(
-                "file." + inputParameters.getString(RESPONSE_FORMAT), speech.byteStream()));
+            return context
+                .file(file -> file.storeContent(
+                    "file." + inputParameters.getString(RESPONSE_FORMAT), speech.byteStream()));
         }
     }
 }

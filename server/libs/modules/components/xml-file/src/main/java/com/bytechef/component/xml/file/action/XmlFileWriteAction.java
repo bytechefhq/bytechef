@@ -25,9 +25,9 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource;
 import com.bytechef.component.xml.file.constant.XmlFileConstants;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -68,15 +68,9 @@ public class XmlFileWriteAction {
                 .defaultValue("file.xml")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .sampleOutput(getSampleOutputFunction())
         .perform(XmlFileWriteAction::perform);
 
-    protected static SampleOutputDataSource.ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
-    }
-
-    protected static Object perform(
+    protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         Object source = inputParameters.getRequired(XmlFileConstants.SOURCE);
@@ -87,9 +81,8 @@ public class XmlFileWriteAction {
         }
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
-            return context.file(
-                file -> file.storeContent(inputParameters.getString(XmlFileConstants.FILENAME, "file.xml"),
-                    inputStream));
+            return context.file(file -> file.storeContent(
+                inputParameters.getString(XmlFileConstants.FILENAME, "file.xml"), inputStream));
         }
     }
 }

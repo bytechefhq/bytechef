@@ -31,8 +31,6 @@ import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -65,13 +63,7 @@ public class CsvFileWriteAction {
                 .defaultValue("file.csv")
                 .advancedOption(true))
         .outputSchema(fileEntry())
-        .sampleOutput(getSampleOutputFunction())
         .perform(CsvFileWriteAction::perform);
-
-    protected static ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputDataSource.SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
-    }
 
     protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {

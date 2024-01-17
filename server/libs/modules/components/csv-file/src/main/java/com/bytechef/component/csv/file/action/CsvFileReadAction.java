@@ -17,7 +17,6 @@
 package com.bytechef.component.csv.file.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
-import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.integer;
@@ -86,7 +85,7 @@ public class CsvFileReadAction {
                     "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
                 .defaultValue(false)
                 .advancedOption(true))
-        .outputSchema(array())
+        .outputSchema()
         .perform(CsvFileReadAction::perform);
 
     protected static List<Map<String, Object>> perform(

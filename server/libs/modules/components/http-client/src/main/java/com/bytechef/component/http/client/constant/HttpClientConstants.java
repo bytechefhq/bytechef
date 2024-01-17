@@ -32,7 +32,7 @@ import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Property.InputProperty;
+import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -65,7 +65,7 @@ public class HttpClientConstants {
     public static final String TIMEOUT = "timeout";
     public static final String URI = "uri";
 
-    public static final List<? extends InputProperty> BODY_CONTENT_PROPERTIES = Collections.unmodifiableList(
+    public static final List<? extends Property> BODY_CONTENT_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
             object(BODY_CONTENT)
                 .label("Body Content - JSON")
@@ -100,7 +100,7 @@ public class HttpClientConstants {
                 .description("The object property which contains a reference to the file to upload.")
                 .displayCondition("%s === '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
 
-    public static final List<? extends InputProperty> COMMON_PROPERTIES = Collections.unmodifiableList(
+    public static final List<? extends Property> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
 
             //

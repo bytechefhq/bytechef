@@ -22,14 +22,13 @@ import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
 import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
 
+import com.bytechef.component.definition.OutputSchema;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
-import com.bytechef.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.definition.TriggerDefinition.WebhookOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateFunction;
 import java.util.Map;
 import java.util.Objects;
@@ -39,26 +38,30 @@ import java.util.Objects;
  */
 public class WebhookUtils {
 
-    public static StaticWebhookRequestFunction getStaticWebhookRequestFunction() {
-        return (
-            Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
-            WebhookMethod method, TriggerContext triggerContext) -> {
+    public static Object getWebhookOutput(
+        Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+        WebhookMethod method, TriggerContext context) {
 
-            if (body == null) {
-                return WebhookOutput.map(
-                    Map.of(
-                        METHOD, method,
-                        HEADERS, headers,
-                        PARAMETERS, parameters));
-            } else {
-                return WebhookOutput.map(
-                    Map.of(
-                        BODY, body.getContent(),
-                        METHOD, method,
-                        HEADERS, headers,
-                        PARAMETERS, parameters));
-            }
-        };
+        if (body == null) {
+            return Map.of(
+                METHOD, method,
+                HEADERS, headers,
+                PARAMETERS, parameters);
+        } else {
+            return Map.of(
+                BODY, body.getContent(),
+                METHOD, method,
+                HEADERS, headers,
+                PARAMETERS, parameters);
+        }
+    }
+
+    public static OutputSchema getWebhookOutputSchema(
+        Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+        WebhookMethod method, TriggerContext context) {
+
+        return context.outputSchema(outputSchema -> outputSchema.get(
+            getWebhookOutput(inputParameters, headers, parameters, body, method, context)));
     }
 
     public static WebhookValidateFunction getWebhookValidateFunction() {

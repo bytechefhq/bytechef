@@ -52,7 +52,8 @@ public class PipedriveDeleteLeadAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)))
-        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
-            Map.entry("data", Map.<String, Object>ofEntries(Map.entry("id", "adf21080-0e10-11eb-879b-05d71fb426ec")))));
+                    "responseType", ResponseType.JSON)),
+            Map.<String, Object>ofEntries(Map.entry("success", true),
+                Map.entry("data",
+                    Map.<String, Object>ofEntries(Map.entry("id", "adf21080-0e10-11eb-879b-05d71fb426ec")))));
 }

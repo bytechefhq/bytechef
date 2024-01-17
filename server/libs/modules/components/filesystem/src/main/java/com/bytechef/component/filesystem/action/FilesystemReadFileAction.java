@@ -22,12 +22,12 @@ import static com.bytechef.component.filesystem.constant.FilesystemConstants.FIL
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.READ_FILE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -41,17 +41,17 @@ public class FilesystemReadFileAction {
             .description("The path of the file to read.")
             .placeholder("/data/your_file.pdf")
             .required(true))
-        .outputSchema(ComponentDSL.fileEntry())
+        .outputSchema(string(), "sample content")
         .perform(FilesystemReadFileAction::perform);
 
-    protected static Object perform(
+    protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws IOException {
 
         String filename = inputParameters.getRequiredString(FILENAME);
 
         try (InputStream inputStream = new FileInputStream(filename)) {
-            return context.file(file -> file.storeContent(filename, inputStream));
+            return Map.of("content", context.file(file -> file.storeContent(filename, inputStream)));
         }
     }
 }

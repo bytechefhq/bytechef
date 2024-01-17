@@ -47,6 +47,7 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.resend.util.ResendUtils;
 import com.resend.Resend;
 import com.resend.core.exception.ResendException;
+import com.resend.services.emails.Emails;
 import com.resend.services.emails.model.Attachment;
 import com.resend.services.emails.model.CreateEmailOptions;
 import com.resend.services.emails.model.CreateEmailResponse;
@@ -172,7 +173,8 @@ public final class ResendSendEmailAction {
             .tags(inputParameters.getList(TAGS, Tag.class, List.of()))
             .build();
 
-        return resend.emails()
-            .send(createEmailOptions);
+        Emails emails = resend.emails();
+
+        return emails.send(createEmailOptions);
     }
 }

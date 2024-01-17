@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.webhook.constant.WebhookConstants.CSRF_TOKEN;
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
-import com.bytechef.component.definition.OutputSchemaDataSource;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.webhook.util.WebhookUtils;
 
@@ -47,18 +46,7 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
                 .label("Timeout (ms)")
                 .description(
                     "The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes."))
-        .outputSchema(getOutputSchemaFunction())
-        .staticWebhookRequest(WebhookUtils.getStaticWebhookRequestFunction())
+        .outputSchema(WebhookUtils::getWebhookOutputSchema)
+        .staticWebhookRequest(WebhookUtils::getWebhookOutput)
         .webhookValidate(WebhookUtils.getWebhookValidateFunction());
-
-    protected static OutputSchemaDataSource.TriggerOutputSchemaFunction getOutputSchemaFunction() {
-        // TODO
-        return (inputParameters, connectionParameters, context) -> null;
-//            object()
-//            .properties(
-//                string(METHOD),
-//                object(HEADERS),
-//                object(PARAMETERS),
-//                any(BODY));
-    }
 }

@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.io.File;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -40,9 +41,8 @@ public class FilesystemGetFilePathAction {
             .description("The path to full filename.")
             .placeholder("/data/your_file.pdf")
             .required(true))
-        .perform(FilesystemGetFilePathAction::perform)
-        .outputSchema(string())
-        .sampleOutput("/data");
+        .outputSchema(string(), "/sample_data")
+        .perform(FilesystemGetFilePathAction::perform);
 
     /**
      * Gets the full path from a full filename, which is the prefix + path, and also excluding the final directory
@@ -52,11 +52,11 @@ public class FilesystemGetFilePathAction {
      * This method will handle a file in either Unix or Windows format. The method is entirely text based and returns
      * the text before the last forward or backslash.
      */
-    protected static Object perform(
+    protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String filename = inputParameters.getRequiredString(FILENAME);
 
-        return filename.substring(0, filename.lastIndexOf(File.separator));
+        return Map.of("path", filename.substring(0, filename.lastIndexOf(File.separator)));
     }
 }

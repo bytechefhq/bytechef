@@ -52,7 +52,7 @@ public class FilesystemLsActionTest {
         Assertions.assertEquals(
             Set.of("C.txt", "B.txt", "A.txt"),
             files.stream()
-                .map(FilesystemLsAction.FileInfo::getName)
+                .map(FilesystemLsAction.FileInfo::getFilename)
                 .collect(Collectors.toSet()));
     }
 
@@ -92,7 +92,7 @@ public class FilesystemLsActionTest {
         Assertions.assertEquals(
             Set.of("B.txt", "A.txt"),
             files.stream()
-                .map(FilesystemLsAction.FileInfo::getName)
+                .map(FilesystemLsAction.FileInfo::getFilename)
                 .collect(Collectors.toSet()));
     }
 

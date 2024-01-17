@@ -24,10 +24,9 @@ import static com.bytechef.component.file.storage.constant.FileStorageConstants.
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.WRITE;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 
 /**
  * @author Ivica Cardic
@@ -48,21 +47,15 @@ public class FileStorageWriteAction {
                     "Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
         .outputSchema(fileEntry())
-        .sampleOutput(getSampleOutputFunction())
         .perform(FileStorageWriteAction::perform);
 
-    protected static ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
-    }
-
-    protected static Object perform(
+    protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Object content = inputParameters.getRequired(CONTENT);
         String fileName = inputParameters.getString(FILENAME, "file.txt");
 
-        return context.file(
-            file -> file.storeContent(fileName, content instanceof String ? (String) content : content.toString()));
+        return context.file(file -> file.storeContent(
+            fileName, content instanceof String string ? string : content.toString()));
     }
 }

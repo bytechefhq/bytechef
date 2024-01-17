@@ -16,7 +16,6 @@
 
 package com.bytechef.component.rabbitmq.trigger;
 
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.trigger;
 import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.HOSTNAME;
@@ -30,6 +29,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TriggerOutputSchemaFunction.ListenerTriggerOutputSchemaFunction;
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -55,9 +55,15 @@ public class RabbitMqNewMessageTrigger {
             string(QUEUE)
                 .description("The name of the queue to read from")
                 .required(true))
-        .outputSchema(object())
+        .outputSchema(getOutputSchema())
         .listenerEnable(RabbitMqNewMessageTrigger::listenerEnable)
         .listenerDisable(RabbitMqNewMessageTrigger::listenerDisable);
+
+    protected static ListenerTriggerOutputSchemaFunction getOutputSchema() {
+        // TODO
+
+        return (inputParameters, connectionParameters, workflowExecutionId, context) -> null;
+    }
 
     protected static void listenerDisable(
         Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
@@ -85,7 +91,7 @@ public class RabbitMqNewMessageTrigger {
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
 
-            listenerEmitter.emit(context.json(json -> json.read(message)));
+            listenerEmitter.emit(context.json(json -> json.readMap(message)));
         };
 
         channel.basicConsume(inputParameters.getString(QUEUE), true, deliverCallback, consumerTag -> {});

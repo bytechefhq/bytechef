@@ -54,7 +54,7 @@ public class PipedriveDeleteDealAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON)))
-        .sampleOutput(Map.<String, Object>ofEntries(Map.entry("success", true),
-            Map.entry("data", Map.<String, Object>ofEntries(Map.entry("id", 123)))));
+                    "responseType", ResponseType.JSON)),
+            Map.<String, Object>ofEntries(Map.entry("success", true),
+                Map.entry("data", Map.<String, Object>ofEntries(Map.entry("id", 123)))));
 }
