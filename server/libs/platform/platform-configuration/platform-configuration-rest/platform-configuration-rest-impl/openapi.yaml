@@ -223,45 +223,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Property"
-  /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/sample-output:
-    post:
-      description: "Get an action sample output shown in the editor."
-      summary: "Get an action sample output shown in the editor"
-      tags:
-      - "action-definition"
-      operationId: "getComponentActionSampleOutput"
-      parameters:
-      - name: "componentName"
-        description: "The name of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "integer"
-      - name: "actionName"
-        description: "The name of an action."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComponentOperationRequest"
-      responses:
-        "200":
-          description: "The output schema."
-          content:
-            application/json:
-              schema:
-                type: "object"
+                $ref: "#/components/schemas/ComponentOutputSchema"
   ? /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/dynamic-properties
   : post:
       description: "Get dynamic properties for an action property shown in the editor."
@@ -603,45 +565,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Property"
-  /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/sample-output:
-    post:
-      description: "Get a trigger sample output shown in the editor."
-      summary: "Get a trigger sample output shown in the editor"
-      tags:
-      - "trigger-definition"
-      operationId: "getComponentTriggerSampleOutput"
-      parameters:
-      - name: "componentName"
-        description: "The name of the component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "integer"
-      - name: "triggerName"
-        description: "The name of a trigger."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComponentOperationRequest"
-      responses:
-        "200":
-          description: "The output schema."
-          content:
-            application/json:
-              schema:
-                type: "object"
+                $ref: "#/components/schemas/ComponentOutputSchema"
   ? /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/dynamic-properties
   : post:
       description: "Get dynamic properties for a trigger property shown in the editor."
@@ -893,9 +817,7 @@ paths:
           content:
             application/json:
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Property"
+                $ref: "#/components/schemas/TaskDispatcherOutputSchema"
   /trigger-definitions:
     get:
       description: "Get all trigger definitions."
@@ -952,7 +874,7 @@ components:
           description: "The action name."
           type: "string"
         outputSchema:
-          $ref: "#/components/schemas/Property"
+          $ref: "#/components/schemas/ComponentOutputSchema"
         outputSchemaDataSource:
           description: "Does action has defined dynamic output schema."
           type: "boolean"
@@ -961,12 +883,6 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
-        sampleOutput:
-          description: "The sample value of the action's output."
-          type: "object"
-        sampleOutputDataSource:
-          description: "Does action has defined dynamic sample output."
-          type: "boolean"
         title:
           description: "The title"
           type: "string"
@@ -1169,6 +1085,17 @@ components:
           type: "object"
           additionalProperties:
             type: "object"
+    ComponentOutputSchema:
+      type: "object"
+      required:
+        - definition
+        - sampleOutput
+      properties:
+        definition:
+          $ref: "#/components/schemas/Property"
+        sampleOutput:
+          description: "The sample value of the action's/trigger's output."
+          type: "object"
     ConnectionDefinition:
       description: "Definition of a connection to an outside service."
       type: "object"
@@ -1235,6 +1162,7 @@ components:
       - "DATE_TIME"
       - "EMAIL"
       - "INTEGER"
+      - "FILE_ENTRY"
       - "OBJECT_BUILDER"
       - "MULTI_SELECT"
       - "NUMBER"
@@ -1301,6 +1229,20 @@ components:
             type: "string"
           propertiesDataSource:
             $ref: "#/components/schemas/PropertiesDataSource"
+    FileEntryProperty:
+      description: "An file entry property type."
+      type: "object"
+      required:
+        - "type"
+      allOf:
+        - $ref: "#/components/schemas/ValueProperty"
+        - type: "object"
+          properties:
+            properties:
+              description: "The list of valid file entry property types."
+              type: "array"
+              items:
+                $ref: "#/components/schemas/ValueProperty"
     Help:
       description: "The help text that is meant to guide your users as to how to configure\
         \ this action or trigger."
@@ -1436,9 +1378,6 @@ components:
           multipleValues:
             description: "If the object can contain multiple additional properties."
             type: "boolean"
-          objectType:
-            description: "The object type."
-            type: "string"
           options:
             description: "The list of valid property options."
             type: "array"
@@ -1525,6 +1464,7 @@ components:
           DATE: "#/components/schemas/DateProperty"
           DATE_TIME: "#/components/schemas/DateTimeProperty"
           DYNAMIC_PROPERTIES: "#/components/schemas/DynamicPropertiesProperty"
+          FILE_ENTRY: "#/components/schemas/FileEntryProperty"
           INTEGER: "#/components/schemas/IntegerProperty"
           "NULL": "#/components/schemas/NullProperty"
           NUMBER: "#/components/schemas/NumberProperty"
@@ -1541,6 +1481,7 @@ components:
       - "DATE"
       - "DATE_TIME"
       - "DYNAMIC_PROPERTIES"
+      - "FILE_ENTRY"
       - "INTEGER"
       - "NULL"
       - "NUMBER"
@@ -1600,7 +1541,7 @@ components:
           description: "The task dispatcher name.."
           type: "string"
         outputSchema:
-          $ref: "#/components/schemas/Property"
+          $ref: "#/components/schemas/TaskDispatcherOutputSchema"
         properties:
           description: "The list of task dispatcher properties."
           type: "array"
@@ -1655,6 +1596,17 @@ components:
           type: "object"
           additionalProperties:
             type: "object"
+    TaskDispatcherOutputSchema:
+      type: "object"
+      required:
+        - definition
+        - sampleOutput
+      properties:
+        definition:
+          $ref: "#/components/schemas/Property"
+        sampleOutput:
+          description: "The sample value of the task dispatcher's output."
+          type: "object"
     TimeProperty:
       description: "A time property."
       type: "object"
@@ -1703,7 +1655,7 @@ components:
           description: "The action name."
           type: "string"
         outputSchema:
-          $ref: "#/components/schemas/Property"
+          $ref: "#/components/schemas/ComponentOutputSchema"
         outputSchemaDataSource:
           description: "Does trigger has defined dynamic output schema."
           type: "boolean"
@@ -1712,12 +1664,6 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Property"
-        sampleOutput:
-          description: "The sample value of the action's output."
-          type: "object"
-        sampleOutputDataSource:
-          description: "Does trigger has defined dynamic sample output."
-          type: "boolean"
         title:
           description: "The title"
           type: "string"
