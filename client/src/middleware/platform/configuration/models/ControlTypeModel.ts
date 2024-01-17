@@ -25,6 +25,7 @@ export const ControlTypeModel = {
     DateTime: 'DATE_TIME',
     Email: 'EMAIL',
     Integer: 'INTEGER',
+    FileEntry: 'FILE_ENTRY',
     ObjectBuilder: 'OBJECT_BUILDER',
     MultiSelect: 'MULTI_SELECT',
     Number: 'NUMBER',

@@ -26,6 +26,7 @@ import {
      DatePropertyModelFromJSONTyped,
      DateTimePropertyModelFromJSONTyped,
      DynamicPropertiesPropertyModelFromJSONTyped,
+     FileEntryPropertyModelFromJSONTyped,
      IntegerPropertyModelFromJSONTyped,
      NullPropertyModelFromJSONTyped,
      NumberPropertyModelFromJSONTyped,
@@ -122,6 +123,9 @@ export function PropertyModelFromJSONTyped(json: any, ignoreDiscriminator: boole
         }
         if (json['type'] === 'DYNAMIC_PROPERTIES') {
             return DynamicPropertiesPropertyModelFromJSONTyped(json, true);
+        }
+        if (json['type'] === 'FILE_ENTRY') {
+            return FileEntryPropertyModelFromJSONTyped(json, true);
         }
         if (json['type'] === 'INTEGER') {
             return IntegerPropertyModelFromJSONTyped(json, true);

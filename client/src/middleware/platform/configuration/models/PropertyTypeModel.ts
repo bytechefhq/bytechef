@@ -24,6 +24,7 @@ export const PropertyTypeModel = {
     Date: 'DATE',
     DateTime: 'DATE_TIME',
     DynamicProperties: 'DYNAMIC_PROPERTIES',
+    FileEntry: 'FILE_ENTRY',
     Integer: 'INTEGER',
     Null: 'NULL',
     Number: 'NUMBER',

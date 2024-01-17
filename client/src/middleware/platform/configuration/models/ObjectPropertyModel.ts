@@ -81,12 +81,6 @@ export interface ObjectPropertyModel extends ValuePropertyModel {
      */
     multipleValues?: boolean;
     /**
-     * The object type.
-     * @type {string}
-     * @memberof ObjectPropertyModel
-     */
-    objectType?: string;
-    /**
      * The list of valid property options.
      * @type {Array<OptionModel>}
      * @memberof ObjectPropertyModel
@@ -129,7 +123,6 @@ export function ObjectPropertyModelFromJSONTyped(json: any, ignoreDiscriminator:
         'defaultValue': !exists(json, 'defaultValue') ? undefined : json['defaultValue'],
         'exampleValue': !exists(json, 'exampleValue') ? undefined : json['exampleValue'],
         'multipleValues': !exists(json, 'multipleValues') ? undefined : json['multipleValues'],
-        'objectType': !exists(json, 'objectType') ? undefined : json['objectType'],
         'options': !exists(json, 'options') ? undefined : ((json['options'] as Array<any>).map(OptionModelFromJSON)),
         'optionsDataSource': !exists(json, 'optionsDataSource') ? undefined : OptionsDataSourceModelFromJSON(json['optionsDataSource']),
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
@@ -149,7 +142,6 @@ export function ObjectPropertyModelToJSON(value?: ObjectPropertyModel | null): a
         'defaultValue': value.defaultValue,
         'exampleValue': value.exampleValue,
         'multipleValues': value.multipleValues,
-        'objectType': value.objectType,
         'options': value.options === undefined ? undefined : ((value.options as Array<any>).map(OptionModelToJSON)),
         'optionsDataSource': OptionsDataSourceModelToJSON(value.optionsDataSource),
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),

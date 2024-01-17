@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ComponentOutputSchemaModel } from './ComponentOutputSchemaModel';
+import {
+    ComponentOutputSchemaModelFromJSON,
+    ComponentOutputSchemaModelFromJSONTyped,
+    ComponentOutputSchemaModelToJSON,
+} from './ComponentOutputSchemaModel';
 import type { HelpModel } from './HelpModel';
 import {
     HelpModelFromJSON,
@@ -70,10 +76,10 @@ export interface ActionDefinitionModel {
     name: string;
     /**
      * 
-     * @type {PropertyModel}
+     * @type {ComponentOutputSchemaModel}
      * @memberof ActionDefinitionModel
      */
-    outputSchema?: PropertyModel;
+    outputSchema?: ComponentOutputSchemaModel;
     /**
      * Does action has defined dynamic output schema.
      * @type {boolean}
@@ -86,18 +92,6 @@ export interface ActionDefinitionModel {
      * @memberof ActionDefinitionModel
      */
     properties?: Array<PropertyModel>;
-    /**
-     * The sample value of the action's output.
-     * @type {object}
-     * @memberof ActionDefinitionModel
-     */
-    sampleOutput?: object;
-    /**
-     * Does action has defined dynamic sample output.
-     * @type {boolean}
-     * @memberof ActionDefinitionModel
-     */
-    sampleOutputDataSource?: boolean;
     /**
      * The title
      * @type {string}
@@ -132,11 +126,9 @@ export function ActionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminato
         'editorDescriptionDataSource': !exists(json, 'editorDescriptionDataSource') ? undefined : json['editorDescriptionDataSource'],
         'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
-        'outputSchema': !exists(json, 'outputSchema') ? undefined : PropertyModelFromJSON(json['outputSchema']),
+        'outputSchema': !exists(json, 'outputSchema') ? undefined : ComponentOutputSchemaModelFromJSON(json['outputSchema']),
         'outputSchemaDataSource': !exists(json, 'outputSchemaDataSource') ? undefined : json['outputSchemaDataSource'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
-        'sampleOutput': !exists(json, 'sampleOutput') ? undefined : json['sampleOutput'],
-        'sampleOutputDataSource': !exists(json, 'sampleOutputDataSource') ? undefined : json['sampleOutputDataSource'],
         'title': !exists(json, 'title') ? undefined : json['title'],
     };
 }
@@ -156,11 +148,9 @@ export function ActionDefinitionModelToJSON(value?: ActionDefinitionModel | null
         'editorDescriptionDataSource': value.editorDescriptionDataSource,
         'help': HelpModelToJSON(value.help),
         'name': value.name,
-        'outputSchema': PropertyModelToJSON(value.outputSchema),
+        'outputSchema': ComponentOutputSchemaModelToJSON(value.outputSchema),
         'outputSchemaDataSource': value.outputSchemaDataSource,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
-        'sampleOutput': value.sampleOutput,
-        'sampleOutputDataSource': value.sampleOutputDataSource,
         'title': value.title,
     };
 }

@@ -18,6 +18,7 @@ import type {
   ActionDefinitionBasicModel,
   ActionDefinitionModel,
   ComponentOperationRequestModel,
+  ComponentOutputSchemaModel,
   OptionModel,
   PropertyModel,
 } from '../models/index';
@@ -28,6 +29,8 @@ import {
     ActionDefinitionModelToJSON,
     ComponentOperationRequestModelFromJSON,
     ComponentOperationRequestModelToJSON,
+    ComponentOutputSchemaModelFromJSON,
+    ComponentOutputSchemaModelToJSON,
     OptionModelFromJSON,
     OptionModelToJSON,
     PropertyModelFromJSON,
@@ -77,13 +80,6 @@ export interface GetComponentActionPropertyOptionsRequest {
     actionName: string;
     propertyName: string;
     searchText?: string;
-    componentOperationRequestModel?: ComponentOperationRequestModel;
-}
-
-export interface GetComponentActionSampleOutputRequest {
-    componentName: string;
-    componentVersion: number;
-    actionName: string;
     componentOperationRequestModel?: ComponentOperationRequestModel;
 }
 
@@ -251,7 +247,7 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
      * Get an action output schema shown in the editor.
      * Get an action output schema shown in the editor
      */
-    async getComponentActionOutputSchemaRaw(requestParameters: GetComponentActionOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PropertyModel>> {
+    async getComponentActionOutputSchemaRaw(requestParameters: GetComponentActionOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ComponentOutputSchemaModel>> {
         if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
             throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentActionOutputSchema.');
         }
@@ -278,14 +274,14 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
             body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PropertyModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ComponentOutputSchemaModelFromJSON(jsonValue));
     }
 
     /**
      * Get an action output schema shown in the editor.
      * Get an action output schema shown in the editor
      */
-    async getComponentActionOutputSchema(requestParameters: GetComponentActionOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PropertyModel> {
+    async getComponentActionOutputSchema(requestParameters: GetComponentActionOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ComponentOutputSchemaModel> {
         const response = await this.getComponentActionOutputSchemaRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -385,49 +381,6 @@ export class ActionDefinitionApi extends runtime.BaseAPI {
      */
     async getComponentActionPropertyOptions(requestParameters: GetComponentActionPropertyOptionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<OptionModel>> {
         const response = await this.getComponentActionPropertyOptionsRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get an action sample output shown in the editor.
-     * Get an action sample output shown in the editor
-     */
-    async getComponentActionSampleOutputRaw(requestParameters: GetComponentActionSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        if (requestParameters.componentName === null || requestParameters.componentName === undefined) {
-            throw new runtime.RequiredError('componentName','Required parameter requestParameters.componentName was null or undefined when calling getComponentActionSampleOutput.');
-        }
-
-        if (requestParameters.componentVersion === null || requestParameters.componentVersion === undefined) {
-            throw new runtime.RequiredError('componentVersion','Required parameter requestParameters.componentVersion was null or undefined when calling getComponentActionSampleOutput.');
-        }
-
-        if (requestParameters.actionName === null || requestParameters.actionName === undefined) {
-            throw new runtime.RequiredError('actionName','Required parameter requestParameters.actionName was null or undefined when calling getComponentActionSampleOutput.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/sample-output`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters.componentName))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters.componentVersion))).replace(`{${"actionName"}}`, encodeURIComponent(String(requestParameters.actionName))),
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: ComponentOperationRequestModelToJSON(requestParameters.componentOperationRequestModel),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse<any>(response);
-    }
-
-    /**
-     * Get an action sample output shown in the editor.
-     * Get an action sample output shown in the editor
-     */
-    async getComponentActionSampleOutput(requestParameters: GetComponentActionSampleOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
-        const response = await this.getComponentActionSampleOutputRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/ActionDefinitionApi.ts
 apis/ComponentDefinitionApi.ts
 apis/ConnectionDefinitionApi.ts
@@ -16,12 +15,14 @@ models/BooleanPropertyModel.ts
 models/ComponentDefinitionBasicModel.ts
 models/ComponentDefinitionModel.ts
 models/ComponentOperationRequestModel.ts
+models/ComponentOutputSchemaModel.ts
 models/ConnectionDefinitionBasicModel.ts
 models/ConnectionDefinitionModel.ts
 models/ControlTypeModel.ts
 models/DatePropertyModel.ts
 models/DateTimePropertyModel.ts
 models/DynamicPropertiesPropertyModel.ts
+models/FileEntryPropertyModel.ts
 models/GetOAuth2AuthorizationParametersRequestModel.ts
 models/HelpModel.ts
 models/IntegerPropertyModel.ts
@@ -40,6 +41,7 @@ models/StringPropertyModel.ts
 models/TaskDispatcherDefinitionBasicModel.ts
 models/TaskDispatcherDefinitionModel.ts
 models/TaskDispatcherOperationRequestModel.ts
+models/TaskDispatcherOutputSchemaModel.ts
 models/TimePropertyModel.ts
 models/TriggerDefinitionBasicModel.ts
 models/TriggerDefinitionModel.ts

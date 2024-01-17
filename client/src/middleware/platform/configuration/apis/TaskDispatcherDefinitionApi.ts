@@ -15,20 +15,20 @@
 
 import * as runtime from '../runtime';
 import type {
-  PropertyModel,
   TaskDispatcherDefinitionBasicModel,
   TaskDispatcherDefinitionModel,
   TaskDispatcherOperationRequestModel,
+  TaskDispatcherOutputSchemaModel,
 } from '../models/index';
 import {
-    PropertyModelFromJSON,
-    PropertyModelToJSON,
     TaskDispatcherDefinitionBasicModelFromJSON,
     TaskDispatcherDefinitionBasicModelToJSON,
     TaskDispatcherDefinitionModelFromJSON,
     TaskDispatcherDefinitionModelToJSON,
     TaskDispatcherOperationRequestModelFromJSON,
     TaskDispatcherOperationRequestModelToJSON,
+    TaskDispatcherOutputSchemaModelFromJSON,
+    TaskDispatcherOutputSchemaModelToJSON,
 } from '../models/index';
 
 export interface GetTaskDispatcherDefinitionRequest {
@@ -151,7 +151,7 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
      * Get a task dispatcher output schema shown in the editor.
      * Get a task dispatcher output schema shown in the editor
      */
-    async getTaskDispatcherOutputSchemaRaw(requestParameters: GetTaskDispatcherOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
+    async getTaskDispatcherOutputSchemaRaw(requestParameters: GetTaskDispatcherOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskDispatcherOutputSchemaModel>> {
         if (requestParameters.taskDispatcherName === null || requestParameters.taskDispatcherName === undefined) {
             throw new runtime.RequiredError('taskDispatcherName','Required parameter requestParameters.taskDispatcherName was null or undefined when calling getTaskDispatcherOutputSchema.');
         }
@@ -174,14 +174,14 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
             body: TaskDispatcherOperationRequestModelToJSON(requestParameters.taskDispatcherOperationRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PropertyModelFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => TaskDispatcherOutputSchemaModelFromJSON(jsonValue));
     }
 
     /**
      * Get a task dispatcher output schema shown in the editor.
      * Get a task dispatcher output schema shown in the editor
      */
-    async getTaskDispatcherOutputSchema(requestParameters: GetTaskDispatcherOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PropertyModel>> {
+    async getTaskDispatcherOutputSchema(requestParameters: GetTaskDispatcherOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskDispatcherOutputSchemaModel> {
         const response = await this.getTaskDispatcherOutputSchemaRaw(requestParameters, initOverrides);
         return await response.value();
     }
