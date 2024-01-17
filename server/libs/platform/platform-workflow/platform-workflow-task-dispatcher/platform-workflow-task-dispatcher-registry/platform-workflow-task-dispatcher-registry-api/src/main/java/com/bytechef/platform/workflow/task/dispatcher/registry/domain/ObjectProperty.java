@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -67,8 +67,9 @@ public class ObjectProperty extends ValueProperty<Map<String, Object>> {
         return multipleValues;
     }
 
-    public Optional<String> getObjectType() {
-        return Optional.ofNullable(objectType);
+    @Nullable
+    public String getObjectType() {
+        return objectType;
     }
 
     public List<Option> getOptions() {

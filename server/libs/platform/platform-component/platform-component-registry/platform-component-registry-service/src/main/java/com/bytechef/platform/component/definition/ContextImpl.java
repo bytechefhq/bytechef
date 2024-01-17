@@ -16,14 +16,11 @@
 
 package com.bytechef.platform.component.definition;
 
-import static com.bytechef.component.definition.ComponentDSL.object;
-
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
-import com.bytechef.platform.component.util.OutputSchemaUtils;
+import com.bytechef.platform.component.registry.util.OutputSchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -84,10 +81,11 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public Property.OutputProperty<?>
-        outputSchema(ContextFunction<OutputSchema, Property.OutputProperty<?>> outputSchemaFunction) {
+    public com.bytechef.component.definition.OutputSchema outputSchema(
+        ContextFunction<OutputSchema, com.bytechef.component.definition.OutputSchema> outputSchema) {
+
         try {
-            return outputSchemaFunction.apply(outputSchema);
+            return outputSchema.apply(this.outputSchema);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -494,8 +492,9 @@ public class ContextImpl implements Context {
         }
 
         @Override
-        public Property.OutputProperty<?> get(Object value) {
-            return OutputSchemaUtils.getOutputSchema(value);
+        public com.bytechef.component.definition.OutputSchema get(Object value) {
+            return new com.bytechef.component.definition.OutputSchema(
+                OutputSchemaUtils.getOutputSchemaDefinition(value), value);
         }
     }
 

@@ -9,6 +9,7 @@ package com.bytechef.platform.component.registry.remote.web.rest.facade;
 
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.platform.component.registry.domain.Option;
+import com.bytechef.platform.component.registry.domain.OutputSchema;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.trigger.TriggerOutput;
@@ -187,7 +188,7 @@ public class RemoteTriggerDefinitionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Property> executeOutputSchema(
+    public ResponseEntity<OutputSchema> executeOutputSchema(
         @Valid @RequestBody RemoteTriggerDefinitionFacadeController.OutputSchemaRequest outputSchemaRequest) {
 
         return ResponseEntity.ok(
@@ -195,25 +196,6 @@ public class RemoteTriggerDefinitionFacadeController {
                 outputSchemaRequest.componentName, outputSchemaRequest.componentVersion,
                 outputSchemaRequest.triggerName,
                 outputSchemaRequest.inputParameters, outputSchemaRequest.connectionId));
-    }
-
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/execute-sample-output",
-        consumes = {
-            "application/json"
-        },
-        produces = {
-            "application/json"
-        })
-    public ResponseEntity<Object> executeSampleOutput(
-        @Valid @RequestBody SampleOutputRequest sampleOutputRequest) {
-
-        return ResponseEntity.ok(
-            triggerDefinitionFacade.executeSampleOutput(
-                sampleOutputRequest.componentName, sampleOutputRequest.componentVersion,
-                sampleOutputRequest.triggerName,
-                sampleOutputRequest.inputParameters, sampleOutputRequest.connectionId));
     }
 
     @RequestMapping(

@@ -20,7 +20,6 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
-import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -62,8 +61,8 @@ public class ActionDefinitionBasic {
         return description;
     }
 
-    public Optional<Help> getHelp() {
-        return Optional.ofNullable(help);
+    public Help getHelp() {
+        return help;
     }
 
     public String getName() {

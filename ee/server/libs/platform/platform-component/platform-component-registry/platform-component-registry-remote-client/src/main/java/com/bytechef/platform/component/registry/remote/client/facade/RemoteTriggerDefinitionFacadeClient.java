@@ -10,6 +10,7 @@ package com.bytechef.platform.component.registry.remote.client.facade;
 import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.platform.component.registry.domain.Option;
+import com.bytechef.platform.component.registry.domain.OutputSchema;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClient;
@@ -116,7 +117,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
-    public Property executeOutputSchema(
+    public OutputSchema executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
@@ -154,17 +155,6 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
                 componentName, componentVersion, triggerName, inputParameters, workflowExecutionId, connectionId,
                 webhookUrl),
             DynamicWebhookEnableOutput.class);
-    }
-
-    @Override
-    public Object executeSampleOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId) {
-
-        return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-sample-output"),
-            new SampleOutputRequest(componentName, componentVersion, triggerName, inputParameters, connectionId),
-            Object.class);
     }
 
     @Override

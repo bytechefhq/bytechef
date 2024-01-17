@@ -19,10 +19,10 @@ package com.bytechef.platform.component.registry.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -49,8 +49,9 @@ public class Authorization {
         this.type = authorization.getType();
     }
 
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
+    @Nullable
+    public String getDescription() {
+        return description;
     }
 
     public String getName() {

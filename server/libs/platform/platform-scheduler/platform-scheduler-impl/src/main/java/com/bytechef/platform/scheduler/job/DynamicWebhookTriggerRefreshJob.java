@@ -21,7 +21,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.platform.component.registry.OperationType;
+import com.bytechef.platform.component.registry.component.OperationType;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;

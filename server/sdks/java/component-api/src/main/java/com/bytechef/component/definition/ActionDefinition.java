@@ -73,7 +73,7 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<EditorDescriptionDataSource> getEditorDescriptionDataSource();
+    Optional<ActionEditorDescriptionFunction> getEditorDescriptionFunction();
 
     /**
      * The code that should be executed when an action runs as a task inside the workflow engine.
@@ -104,37 +104,31 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<Property.OutputProperty<?>> getOutputSchema();
+    Optional<OutputSchema> getOutputSchema();
 
     /**
      *
      * @return
      */
-    Optional<OutputSchemaDataSource> getOutputSchemaDataSource();
+    Optional<ActionOutputSchemaFunction> getOutputSchemaFunction();
 
     /**
      *
      * @return
      */
-    Optional<List<? extends Property.InputProperty>> getProperties();
-
-    /**
-     *
-     * @return
-     */
-    Optional<Object> getSampleOutput();
-
-    /**
-     *
-     * @return
-     */
-    Optional<SampleOutputDataSource> getSampleOutputDataSource();
+    Optional<List<? extends Property>> getProperties();
 
     /**
      *
      * @return
      */
     Optional<String> getTitle();
+
+    /**
+     *
+     * @return
+     */
+    boolean isOutputSchemaDefaultFunction();
 
     /**
      *

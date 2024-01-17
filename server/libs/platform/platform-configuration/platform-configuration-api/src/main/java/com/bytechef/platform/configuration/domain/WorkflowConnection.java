@@ -19,7 +19,7 @@ package com.bytechef.platform.configuration.domain;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.component.registry.OperationType;
+import com.bytechef.platform.component.registry.component.OperationType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.Map;

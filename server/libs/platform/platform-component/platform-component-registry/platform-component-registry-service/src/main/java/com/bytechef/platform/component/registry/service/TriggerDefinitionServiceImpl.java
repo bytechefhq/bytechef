@@ -17,18 +17,13 @@
 package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
-import com.bytechef.component.definition.EditorDescriptionDataSource.TriggerEditorDescriptionFunction;
 import com.bytechef.component.definition.OptionsDataSource;
-import com.bytechef.component.definition.OutputSchemaDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
-import com.bytechef.component.definition.SampleOutputDataSource;
-import com.bytechef.component.definition.SampleOutputDataSource.TriggerSampleOutputFunction;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookDisableConsumer;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableFunction;
@@ -41,15 +36,16 @@ import com.bytechef.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.definition.TriggerDefinition.WebhookOutput;
+import com.bytechef.component.definition.TriggerEditorDescriptionFunction;
 import com.bytechef.platform.component.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.definition.HttpParametersImpl;
 import com.bytechef.platform.component.definition.ParametersImpl;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.platform.component.registry.OperationType;
+import com.bytechef.platform.component.registry.component.OperationType;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
+import com.bytechef.platform.component.registry.domain.OutputSchema;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.domain.ValueProperty;
@@ -230,52 +226,13 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public Property executeOutputSchema(
+    public OutputSchema executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 
-        OutputSchemaDataSource.TriggerOutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
-            componentName, componentVersion, triggerName);
+        // TODO
 
-        try {
-            return Property.toProperty(
-                outputSchemaFunction.apply(
-                    new ParametersImpl(inputParameters),
-                    connection == null ? null : new ParametersImpl(connection.parameters()), context));
-        } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters);
-        }
-    }
-
-    @Override
-    public Object executeSampleOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
-
-        TriggerSampleOutputFunction sampleOutputFunction = getSampleOutputFunction(
-            componentName, componentVersion, triggerName);
-
-        SampleOutputDataSource.SampleOutputResponse sampleOutputResponse;
-
-        try {
-            sampleOutputResponse = sampleOutputFunction.apply(
-                new ParametersImpl(inputParameters),
-                connection == null ? null : new ParametersImpl(connection.parameters()), context);
-        } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters);
-        }
-
-        Object sampleOutput = sampleOutputResponse.sampleOutput();
-
-        if (sampleOutput instanceof String string) {
-            try {
-                sampleOutput = JsonUtils.read(string);
-            } catch (Exception e) {
-                //
-            }
-        }
-
-        return sampleOutput;
+        return null;
     }
 
     @Override
@@ -385,7 +342,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         ComponentConnection connection, TriggerContext triggerContext,
         DynamicWebhookRequestFunction dynamicWebhookRequestFunction) {
 
-        WebhookOutput webhookOutput;
+        Object webhookOutput;
 
         try {
             webhookOutput = dynamicWebhookRequestFunction.apply(
@@ -398,7 +355,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             throw new ComponentExecutionException(e, inputParameters);
         }
 
-        return new TriggerOutput(webhookOutput.getValue(), null, false);
+        return new TriggerOutput(webhookOutput, null, false);
     }
 
     private static TriggerOutput executePollingTrigger(
@@ -415,7 +372,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             throw new ComponentExecutionException(e, inputParameters);
         }
 
-        List<Map<?, ?>> records = new ArrayList<>(
+        List<Object> records = new ArrayList<>(
             pollOutput.records() == null ? Collections.emptyList() : pollOutput.records());
 
         while (pollOutput.pollImmediately()) {
@@ -439,7 +396,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         Map<String, ?> inputParameters, WebhookRequest webhookRequest, TriggerContext triggerContext,
         StaticWebhookRequestFunction staticWebhookRequestFunction) {
 
-        WebhookOutput webhookOutput;
+        Object webhookOutput;
 
         try {
             webhookOutput = staticWebhookRequestFunction.apply(
@@ -450,7 +407,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             throw new ComponentExecutionException(e, inputParameters);
         }
 
-        return new TriggerOutput(webhookOutput.getValue(), null, false);
+        return new TriggerOutput(webhookOutput, null, false);
     }
 
     private boolean executeWebhookValidate(
@@ -523,10 +480,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
-        return OptionalUtils.mapOrElse(
-            triggerDefinition.getEditorDescriptionDataSource(),
-            editorDescriptionDataSource -> (TriggerEditorDescriptionFunction) editorDescriptionDataSource
-                .getEditorDescription(),
+        return OptionalUtils.orElse(
+            triggerDefinition.getEditorDescriptionFunction(),
             (inputParameters, context) -> componentDefinition.getTitle() + ": " + triggerDefinition.getTitle());
     }
 
@@ -546,29 +501,5 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getListenerEnable());
-    }
-
-    private OutputSchemaDataSource.TriggerOutputSchemaFunction getOutputSchemaFunction(
-        String componentName, int componentVersion, String triggerName) {
-
-        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
-            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
-
-        OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(
-            triggerDefinition.getOutputSchemaDataSource());
-
-        return (OutputSchemaDataSource.TriggerOutputSchemaFunction) outputSchemaDataSource.getOutputSchema();
-    }
-
-    private TriggerSampleOutputFunction getSampleOutputFunction(
-        String componentName, int componentVersion, String triggerName) {
-
-        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
-            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
-
-        SampleOutputDataSource sampleOutputDataSource = OptionalUtils.get(
-            triggerDefinition.getSampleOutputDataSource());
-
-        return (TriggerSampleOutputFunction) sampleOutputDataSource.getSampleOutput();
     }
 }

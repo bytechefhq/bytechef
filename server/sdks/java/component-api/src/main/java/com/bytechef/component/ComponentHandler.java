@@ -50,6 +50,6 @@ public interface ComponentHandler extends ComponentDefinitionFactory {
          * @param context
          * @return
          */
-        Object apply(String actionName, Map<String, ?> inputParameters, Context context);
+        Map<String, ?> apply(String actionName, Map<String, ?> inputParameters, Context context) throws Exception;
     }
 }

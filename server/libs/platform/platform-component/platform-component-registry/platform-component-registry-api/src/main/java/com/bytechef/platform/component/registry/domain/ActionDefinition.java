@@ -17,12 +17,11 @@
 package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.component.registry.util.OutputSchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -31,11 +30,9 @@ import java.util.Optional;
 public class ActionDefinition extends ActionDefinitionBasic {
 
     private boolean editorDescriptionDataSource;
-    private Property outputSchema;
+    private OutputSchema outputSchema;
     private boolean outputSchemaDataSource;
     private List<? extends Property> properties;
-    private Object sampleOutput;
-    private boolean sampleOutputDataSource;
 
     private ActionDefinition() {
     }
@@ -44,34 +41,47 @@ public class ActionDefinition extends ActionDefinitionBasic {
         super(actionDefinition);
 
         this.editorDescriptionDataSource = OptionalUtils.mapOrElse(
-            actionDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false);
+            actionDefinition.getEditorDescriptionFunction(), editorDescriptionDataSource -> true, false);
         this.outputSchema = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputSchema(), Property::toProperty, null);
+            actionDefinition.getOutputSchema(), OutputSchemaUtils::toOutputSchema, null);
         this.outputSchemaDataSource = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false);
+            actionDefinition.getOutputSchemaFunction(), outputSchemaDataSource -> true,
+            actionDefinition.isOutputSchemaDefaultFunction());
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
+    }
 
-        this.sampleOutput = OptionalUtils.orElse(actionDefinition.getSampleOutput(), null);
-
-        if (sampleOutput != null && sampleOutput instanceof String string) {
-            try {
-                sampleOutput = JsonUtils.read(string);
-            } catch (Exception e) {
-                sampleOutput = string;
-            }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
 
-        this.sampleOutputDataSource = OptionalUtils.mapOrElse(
-            actionDefinition.getSampleOutputDataSource(), sampleOutputDataSource -> true, false);
+        if (!(o instanceof ActionDefinition that)) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        return editorDescriptionDataSource == that.editorDescriptionDataSource
+            && outputSchemaDataSource == that.outputSchemaDataSource && Objects.equals(outputSchema, that.outputSchema)
+            && Objects.equals(properties, that.properties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), editorDescriptionDataSource, outputSchema, outputSchemaDataSource,
+            properties);
     }
 
     public boolean isEditorDescriptionDataSource() {
         return editorDescriptionDataSource;
     }
 
-    public Optional<Property> getOutputSchema() {
-        return Optional.ofNullable(outputSchema);
+    public OutputSchema getOutputSchema() {
+        return outputSchema;
     }
 
     public boolean isOutputSchemaDataSource() {
@@ -82,34 +92,6 @@ public class ActionDefinition extends ActionDefinitionBasic {
         return properties;
     }
 
-    public Optional<Object> getSampleOutput() {
-        return Optional.ofNullable(sampleOutput);
-    }
-
-    public boolean isSampleOutputDataSource() {
-        return sampleOutputDataSource;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof ActionDefinition that))
-            return false;
-        if (!super.equals(o))
-            return false;
-        return editorDescriptionDataSource == that.editorDescriptionDataSource
-            && outputSchemaDataSource == that.outputSchemaDataSource
-            && sampleOutputDataSource == that.sampleOutputDataSource && Objects.equals(outputSchema, that.outputSchema)
-            && Objects.equals(properties, that.properties) && Objects.equals(sampleOutput, that.sampleOutput);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), editorDescriptionDataSource, outputSchema, outputSchemaDataSource,
-            properties, sampleOutput, sampleOutputDataSource);
-    }
-
     @Override
     public String toString() {
         return "Definition{" +
@@ -117,8 +99,6 @@ public class ActionDefinition extends ActionDefinitionBasic {
             ", outputSchema=" + outputSchema +
             ", outputSchemaDataSource=" + outputSchemaDataSource +
             ", properties=" + properties +
-            ", sampleOutput=" + sampleOutput +
-            ", sampleOutputDataSource=" + sampleOutputDataSource +
             ", batch=" + batch +
             ", description='" + description + '\'' +
             ", help=" + help +
@@ -126,4 +106,5 @@ public class ActionDefinition extends ActionDefinitionBasic {
             ", title='" + title + '\'' +
             "} ";
     }
+
 }

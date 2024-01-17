@@ -34,16 +34,14 @@ public interface Property {
      *
      */
     enum ControlType {
-        ARRAY_BUILDER,
         CHECKBOX,
-        CODE_EDITOR,
         DATE,
         DATE_TIME,
         EMAIL,
+        FILE_ENTRY,
         INTEGER,
         MULTI_SELECT,
         NUMBER,
-        OBJECT_BUILDER,
         PASSWORD,
         PHONE,
         SELECT,
@@ -61,7 +59,7 @@ public interface Property {
         BOOLEAN,
         DATE,
         DATE_TIME,
-        DYNAMIC_PROPERTIES,
+        FILE_ENTRY,
         INTEGER,
         NULL,
         NUMBER,
@@ -118,8 +116,7 @@ public interface Property {
     /**
      *
      */
-    interface ArrayProperty
-        extends InputProperty, OptionsProperty, OutputProperty<List<Object>>, Property, ValueProperty<List<Object>> {
+    interface ArrayProperty extends OptionsProperty, ValueProperty<List<Object>> {
 
         /**
          *
@@ -146,35 +143,37 @@ public interface Property {
     /**
      *
      */
-    interface BooleanProperty
-        extends InputProperty, OptionsProperty, OutputProperty<Boolean>, Property, ValueProperty<Boolean> {
+    interface BooleanProperty extends OptionsProperty, ValueProperty<Boolean> {
     }
 
     /**
      *
      */
-    interface DateProperty
-        extends InputProperty, OptionsProperty, OutputProperty<LocalDate>, Property, ValueProperty<LocalDate> {
+    interface DateProperty extends OptionsProperty, ValueProperty<LocalDate> {
     }
 
     /**
      *
      */
-    interface DateTimeProperty
-        extends InputProperty, OptionsProperty, OutputProperty<LocalDateTime>, Property, ValueProperty<LocalDateTime> {
+    interface DateTimeProperty extends OptionsProperty, ValueProperty<LocalDateTime> {
     }
 
     /**
      *
      */
-    interface InputProperty extends Property {
+    interface FileEntryProperty extends ValueProperty<Map<String, ?>> {
+
+        /**
+         *
+         * @return
+         */
+        List<? extends Property.ValueProperty<?>> getProperties();
     }
 
     /**
      *
      */
-    interface IntegerProperty
-        extends InputProperty, OptionsProperty, OutputProperty<Long>, Property, ValueProperty<Long> {
+    interface IntegerProperty extends OptionsProperty, ValueProperty<Long> {
 
         /**
          *
@@ -190,14 +189,13 @@ public interface Property {
     /**
      *
      */
-    interface NullProperty extends InputProperty, OutputProperty<Void>, ValueProperty<Void> {
+    interface NullProperty extends ValueProperty<Void> {
     }
 
     /**
      *
      */
-    interface NumberProperty
-        extends InputProperty, OptionsProperty, OutputProperty<Double>, Property, ValueProperty<Double> {
+    interface NumberProperty extends OptionsProperty, ValueProperty<Double> {
 
         /**
          *
@@ -228,9 +226,7 @@ public interface Property {
     /**
      *
      */
-    interface ObjectProperty
-        extends InputProperty, OptionsProperty, OutputProperty<Map<String, Object>>, Property,
-        ValueProperty<Map<String, Object>> {
+    interface ObjectProperty extends OptionsProperty, ValueProperty<Map<String, Object>> {
 
         /**
          *
@@ -257,16 +253,8 @@ public interface Property {
 
     /**
      *
-     * @param <V>
      */
-    interface OutputProperty<V> extends ValueProperty<V> {
-    }
-
-    /**
-     *
-     */
-    interface StringProperty
-        extends InputProperty, OptionsProperty, OutputProperty<String>, Property, ValueProperty<String> {
+    interface StringProperty extends OptionsProperty, ValueProperty<String> {
 
         /**
          *
@@ -284,8 +272,7 @@ public interface Property {
     /**
      *
      */
-    interface TimeProperty
-        extends InputProperty, OptionsProperty, OutputProperty<LocalTime>, Property, ValueProperty<LocalTime> {
+    interface TimeProperty extends OptionsProperty, ValueProperty<LocalTime> {
     }
 
     /**

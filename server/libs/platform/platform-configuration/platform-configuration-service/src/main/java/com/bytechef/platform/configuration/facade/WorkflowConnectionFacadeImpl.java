@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.component.registry.OperationType;
+import com.bytechef.platform.component.registry.component.OperationType;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;

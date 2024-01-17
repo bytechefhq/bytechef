@@ -25,7 +25,7 @@ import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.platform.component.registry.OperationType;
+import com.bytechef.platform.component.registry.component.OperationType;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.component.registry.trigger.WebhookRequest;

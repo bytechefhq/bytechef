@@ -19,7 +19,7 @@ package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -42,8 +42,9 @@ public class Option {
         this.value = option.getValue();
     }
 
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
+    @Nullable
+    public String getDescription() {
+        return description;
     }
 
     public String getDisplayCondition() {
@@ -60,10 +61,14 @@ public class Option {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof Option option))
+        }
+
+        if (!(o instanceof Option option)) {
             return false;
+        }
+
         return Objects.equals(description, option.description)
             && Objects.equals(displayCondition, option.displayCondition) && Objects.equals(label, option.label)
             && Objects.equals(value, option.value);

@@ -22,7 +22,7 @@ import com.bytechef.component.definition.Property;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -63,28 +63,33 @@ public class NumberProperty extends ValueProperty<Double> {
         return maxNumberPrecision;
     }
 
-    public Optional<Double> getMaxValue() {
-        return Optional.ofNullable(maxValue);
+    @Nullable
+    public Double getMaxValue() {
+        return maxValue;
     }
 
+    @Nullable
     public Integer getMinNumberPrecision() {
         return minNumberPrecision;
     }
 
-    public Optional<Double> getMinValue() {
-        return Optional.ofNullable(minValue);
+    @Nullable
+    public Double getMinValue() {
+        return minValue;
     }
 
-    public Optional<Integer> getNumberPrecision() {
-        return Optional.ofNullable(numberPrecision);
+    @Nullable
+    public Integer getNumberPrecision() {
+        return numberPrecision;
     }
 
     public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
     }
 
-    public Optional<OptionsDataSource> getOptionsDataSource() {
-        return Optional.ofNullable(optionsDataSource);
+    @Nullable
+    public OptionsDataSource getOptionsDataSource() {
+        return optionsDataSource;
     }
 
     @Override

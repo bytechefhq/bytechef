@@ -30,9 +30,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class ConnectionDefinitionMapper {
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        OptionalMapper.class
-    })
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface ConnectionDefinitionBasicToConnectionDefinitionModelMapper
         extends Converter<ConnectionDefinitionBasic, ConnectionDefinitionBasicModel> {
 
@@ -40,9 +38,7 @@ public class ConnectionDefinitionMapper {
         ConnectionDefinitionBasicModel convert(ConnectionDefinitionBasic connectionDefinition);
     }
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        OptionalMapper.class
-    })
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface ConnectionDefinitionToConnectionDefinitionModelMapper
         extends Converter<ConnectionDefinition, ConnectionDefinitionModel> {
 
@@ -51,9 +47,7 @@ public class ConnectionDefinitionMapper {
         ConnectionDefinitionModel convert(ConnectionDefinition connectionDefinition);
     }
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        OptionalMapper.class
-    })
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface ConnectionDefinitionToConnectionDefinitionBasicModelMapper
         extends Converter<ConnectionDefinition, ConnectionDefinitionBasicModel> {
 

@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.registry.service;
 
+import com.bytechef.platform.workflow.task.dispatcher.registry.domain.OutputSchema;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.registry.domain.ValueProperty;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public interface TaskDispatcherDefinitionService {
 
-    List<? extends ValueProperty<?>> executeOutputSchema(String name, int version, Map<String, Object> inputParameters);
+    OutputSchema executeOutputSchema(String name, int version, Map<String, Object> inputParameters);
 
     TaskDispatcherDefinition getTaskDispatcherDefinition(String name, Integer version);
 

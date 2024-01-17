@@ -17,12 +17,13 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.component.registry.OperationType;
+import com.bytechef.platform.component.registry.component.OperationType;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentOperationRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.ComponentOutputSchemaModel;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -98,7 +99,7 @@ public class ActionDefinitionApiController implements ActionDefinitionApi {
     }
 
     @Override
-    public ResponseEntity<PropertyModel> getComponentActionOutputSchema(
+    public ResponseEntity<ComponentOutputSchemaModel> getComponentActionOutputSchema(
         String componentName, Integer componentVersion, String actionName,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
@@ -107,18 +108,7 @@ public class ActionDefinitionApiController implements ActionDefinitionApi {
                 actionDefinitionFacade.executeOutputSchema(
                     componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
                     componentOperationRequestModel.getConnectionId()),
-                PropertyModel.class));
-    }
-
-    @Override
-    public ResponseEntity<Object> getComponentActionSampleOutput(
-        String componentName, Integer componentVersion, String actionName,
-        ComponentOperationRequestModel componentOperationRequestModel) {
-
-        return ResponseEntity.ok(
-            actionDefinitionFacade.executeSampleOutput(
-                componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
-                componentOperationRequestModel.getConnectionId()));
+                ComponentOutputSchemaModel.class));
     }
 
     @Override

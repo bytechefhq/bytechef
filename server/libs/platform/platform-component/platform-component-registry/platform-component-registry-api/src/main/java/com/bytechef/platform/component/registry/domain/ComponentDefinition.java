@@ -23,7 +23,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -80,36 +80,41 @@ public class ComponentDefinition {
         return actions.size();
     }
 
-    public Optional<String> getCategory() {
-        return Optional.ofNullable(category);
+    public String getCategory() {
+        return category;
     }
 
-    public Optional<ConnectionDefinitionBasic> getConnection() {
-        return Optional.ofNullable(connection);
+    @Nullable
+    public ConnectionDefinitionBasic getConnection() {
+        return connection;
     }
 
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
+    @Nullable
+    public String getDescription() {
+        return description;
     }
 
-    public Optional<String> getIcon() {
-        return Optional.ofNullable(icon);
+    @Nullable
+    public String getIcon() {
+        return icon;
     }
 
     public String getName() {
         return name;
     }
 
-    public Optional<Resources> getResources() {
-        return Optional.ofNullable(resources);
+    @Nullable
+    public Resources getResources() {
+        return resources;
     }
 
     public List<String> getTags() {
         return tags;
     }
 
-    public Optional<String> getTitle() {
-        return Optional.ofNullable(title);
+    @Nullable
+    public String getTitle() {
+        return title;
     }
 
     public List<TriggerDefinitionBasic> getTriggers() {
@@ -126,10 +131,14 @@ public class ComponentDefinition {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof ComponentDefinition that))
+        }
+
+        if (!(o instanceof ComponentDefinition that)) {
             return false;
+        }
+
         return version == that.version && Objects.equals(actions, that.actions)
             && Objects.equals(category, that.category) && Objects.equals(connection, that.connection)
             && Objects.equals(description, that.description) && Objects.equals(icon, that.icon)
@@ -140,8 +149,8 @@ public class ComponentDefinition {
 
     @Override
     public int hashCode() {
-        return Objects.hash(actions, category, connection, description, icon, name, resources, tags, triggers, title,
-            version);
+        return Objects.hash(
+            actions, category, connection, description, icon, name, resources, tags, triggers, title, version);
     }
 
     @Override

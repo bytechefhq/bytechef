@@ -22,7 +22,7 @@ import com.bytechef.component.definition.Property;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -53,20 +53,23 @@ public class IntegerProperty extends ValueProperty<Long> {
         return propertyVisitor.visit(this);
     }
 
-    public Optional<Long> getMaxValue() {
-        return Optional.ofNullable(maxValue);
+    @Nullable
+    public Long getMaxValue() {
+        return maxValue;
     }
 
-    public Optional<Long> getMinValue() {
-        return Optional.ofNullable(minValue);
+    @Nullable
+    public Long getMinValue() {
+        return minValue;
     }
 
     public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
     }
 
-    public Optional<OptionsDataSource> getOptionsDataSource() {
-        return Optional.ofNullable(optionsDataSource);
+    @Nullable
+    public OptionsDataSource getOptionsDataSource() {
+        return optionsDataSource;
     }
 
     @Override

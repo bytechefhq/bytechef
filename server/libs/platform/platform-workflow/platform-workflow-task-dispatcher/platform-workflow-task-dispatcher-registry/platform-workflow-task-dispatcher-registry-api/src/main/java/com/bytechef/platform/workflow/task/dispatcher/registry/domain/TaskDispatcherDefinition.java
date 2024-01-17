@@ -18,11 +18,18 @@ package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.IconUtils;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -34,7 +41,8 @@ public class TaskDispatcherDefinition {
     private Help help;
     private String icon;
     private String name;
-    private Property outputSchema;
+    private OutputSchema outputSchema;
+    private boolean outputSchemaDataSource;
     private List<? extends Property> properties;
     private Resources resources;
     private List<? extends Property> taskProperties;
@@ -58,8 +66,11 @@ public class TaskDispatcherDefinition {
         this.help = OptionalUtils.mapOrElse(taskDispatcherDefinition.getHelp(), Help::new, null);
         this.icon = OptionalUtils.mapOrElse(taskDispatcherDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = taskDispatcherDefinition.getName();
-        this.outputSchema = OptionalUtils.mapOrElse(
-            taskDispatcherDefinition.getOutputSchema(), Property::toProperty, null);
+        this.outputSchema =
+            OptionalUtils.mapOrElse(
+                taskDispatcherDefinition.getOutputSchema(), TaskDispatcherDefinition::toOutputSchema, null);
+        this.outputSchemaDataSource = OptionalUtils.mapOrElse(
+            taskDispatcherDefinition.getOutputSchemaFunction(), outputSchemaDataSource -> true, false);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()), Property::toProperty);
         this.resources = OptionalUtils.mapOrElse(taskDispatcherDefinition.getResources(), Resources::new, null);
@@ -73,32 +84,62 @@ public class TaskDispatcherDefinition {
         this.version = taskDispatcherDefinition.getVersion();
     }
 
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof TaskDispatcherDefinition that)) {
+            return false;
+        }
+
+        return outputSchemaDataSource == that.outputSchemaDataSource && version == that.version
+            && Objects.equals(description, that.description) && Objects.equals(help, that.help)
+            && Objects.equals(icon, that.icon) && Objects.equals(name, that.name)
+            && Objects.equals(outputSchema, that.outputSchema) && Objects.equals(properties, that.properties)
+            && Objects.equals(resources, that.resources) && Objects.equals(taskProperties, that.taskProperties)
+            && Objects.equals(title, that.title) && Objects.equals(variableProperties, that.variableProperties);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+            description, help, icon, name, outputSchema, outputSchemaDataSource, properties, resources, taskProperties,
+            title, variableProperties, version);
+    }
+
+    @Nullable
+    public String getDescription() {
+        return description;
+    }
+
+    @Nullable
     public Help getHelp() {
         return help;
     }
 
-    public Optional<String> getIcon() {
-        return Optional.ofNullable(icon);
+    @Nullable
+    public String getIcon() {
+        return icon;
     }
 
     public String getName() {
         return name;
     }
 
-    public Optional<Property> getOutputSchema() {
-        return Optional.ofNullable(outputSchema);
+    @Nullable
+    public OutputSchema getOutputSchema() {
+        return outputSchema;
     }
 
     public List<? extends Property> getProperties() {
         return properties;
     }
 
-    public Optional<Resources> getResources() {
-        return Optional.ofNullable(resources);
+    @Nullable
+    public Resources getResources() {
+        return resources;
     }
 
     public List<? extends Property> getTaskProperties() {
@@ -117,23 +158,8 @@ public class TaskDispatcherDefinition {
         return version;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof TaskDispatcherDefinition that))
-            return false;
-        return version == that.version && Objects.equals(description, that.description)
-            && Objects.equals(help, that.help) && Objects.equals(icon, that.icon) && Objects.equals(name, that.name)
-            && Objects.equals(outputSchema, that.outputSchema) && Objects.equals(properties, that.properties)
-            && Objects.equals(resources, that.resources) && Objects.equals(taskProperties, that.taskProperties)
-            && Objects.equals(title, that.title) && Objects.equals(variableProperties, that.variableProperties);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(description, help, icon, name, outputSchema, properties, resources, taskProperties, title,
-            variableProperties, version);
+    public boolean isOutputSchemaDataSource() {
+        return outputSchemaDataSource;
     }
 
     @Override
@@ -151,5 +177,71 @@ public class TaskDispatcherDefinition {
             ", variableProperties=" + variableProperties +
             ", version=" + version +
             '}';
+    }
+
+    private static OutputSchema toOutputSchema(
+        com.bytechef.platform.workflow.task.dispatcher.definition.OutputSchema outputSchema) {
+
+        Object sampleOutput = outputSchema.sampleOutput();
+
+        if (sampleOutput == null) {
+            sampleOutput = getSampleOutput(outputSchema.definition());
+        }
+
+        if (sampleOutput instanceof String string) {
+            try {
+                sampleOutput = JsonUtils.read(string);
+            } catch (Exception e) {
+                //
+            }
+        }
+
+        return new OutputSchema(Property.toProperty(outputSchema.definition()), sampleOutput);
+    }
+
+    private static Object getSampleOutput(
+        com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty<?> definitionProperty) {
+
+        return switch (definitionProperty) {
+            case com.bytechef.platform.workflow.task.dispatcher.definition.Property.ArrayProperty p -> {
+                List<Object> items = new ArrayList<>();
+
+                List<? extends com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty<?>> properties =
+                    OptionalUtils.orElse(p.getItems(), List.of());
+
+                if (!properties.isEmpty()) {
+                    items.add(getSampleOutput(properties.getFirst()));
+                }
+
+                yield items;
+            }
+            case com.bytechef.platform.workflow.task.dispatcher.definition.Property.BooleanProperty p -> true;
+            case com.bytechef.platform.workflow.task.dispatcher.definition.Property.DateProperty p -> LocalDate.now();
+            case com.bytechef.platform.workflow.task.dispatcher.definition.Property.DateTimeProperty p ->
+                LocalDateTime.now();
+            case com.bytechef.platform.workflow.task.dispatcher.definition.Property.FileEntryProperty p ->
+                Map.of(
+                    "extension", "sampleExtension", "mimeType", "sampleMimeType", "name", "sampleName", "url",
+                    "file:///tmp/fileName.txt");
+            case com.bytechef.platform.workflow.task.dispatcher.definition.Property.IntegerProperty p -> 57;
+            case com.bytechef.platform.workflow.task.dispatcher.definition.Property.NullProperty p -> null;
+            case com.bytechef.platform.workflow.task.dispatcher.definition.Property.NumberProperty p -> 23.34;
+            case com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty p -> {
+                Map<String, Object> map = new HashMap<>();
+
+                for (com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty<?> property : OptionalUtils
+                    .orElse(p.getProperties(), List.of())) {
+
+                    map.put(property.getName(), getSampleOutput(property));
+                }
+
+                yield map;
+            }
+            case com.bytechef.platform.workflow.task.dispatcher.definition.Property.StringProperty p ->
+                "sample " + p.getName();
+            case com.bytechef.platform.workflow.task.dispatcher.definition.Property.TimeProperty p -> LocalTime.now();
+            default -> throw new IllegalArgumentException(
+                "Definition %s is not allowed".formatted(definitionProperty.getName()));
+        };
     }
 }

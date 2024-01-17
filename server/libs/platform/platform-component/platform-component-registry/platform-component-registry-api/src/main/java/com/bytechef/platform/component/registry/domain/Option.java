@@ -19,7 +19,7 @@ package com.bytechef.platform.component.registry.domain;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -42,8 +42,9 @@ public class Option {
         this.value = option.getValue();
     }
 
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
+    @Nullable
+    public String getDescription() {
+        return description;
     }
 
     public String getDisplayCondition() {

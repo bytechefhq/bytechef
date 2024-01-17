@@ -30,7 +30,6 @@ public interface TriggerDefinition {
 
     /**
      *
-     * @return
      */
     enum TriggerType {
         DYNAMIC_WEBHOOK,
@@ -42,7 +41,6 @@ public interface TriggerDefinition {
 
     /**
      *
-     * @return
      */
     enum WebhookMethod {
         DELETE,
@@ -132,7 +130,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<EditorDescriptionDataSource> getEditorDescriptionDataSource();
+    Optional<TriggerEditorDescriptionFunction> getEditorDescriptionFunction();
 
     /**
      *
@@ -162,13 +160,13 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<Property.OutputProperty<?>> getOutputSchema();
+    Optional<OutputSchema> getOutputSchema();
 
     /**
      *
      * @return
      */
-    Optional<OutputSchemaDataSource> getOutputSchemaDataSource();
+    Optional<TriggerOutputSchemaFunction> getOutputSchemaFunction();
 
     /**
      *
@@ -180,19 +178,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<List<? extends Property.InputProperty>> getProperties();
-
-    /**
-     *
-     * @return
-     */
-    Optional<Object> getSampleOutput();
-
-    /**
-     *
-     * @return
-     */
-    Optional<SampleOutputDataSource> getSampleOutputDataSource();
+    Optional<List<? extends Property>> getProperties();
 
     /**
      *
@@ -241,6 +227,12 @@ public interface TriggerDefinition {
 
     /**
      *
+     * @return
+     */
+    boolean isOutputSchemaDefaultFunction();
+
+    /**
+     *
      */
     interface DeduplicateFunction {
 
@@ -249,7 +241,7 @@ public interface TriggerDefinition {
          * @param record
          * @return
          */
-        String apply(Map<String, Object> record);
+        String apply(Object record);
     }
 
     /**
@@ -327,7 +319,7 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        WebhookOutput apply(
+        Object apply(
             Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
             HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
             TriggerContext context) throws Exception;
@@ -471,12 +463,8 @@ public interface TriggerDefinition {
      * @param pollImmediately
      */
     @SuppressFBWarnings("EI")
-    record PollOutput(
-        List<Map<?, ?>> records, Map<String, Object> closureParameters, boolean pollImmediately)
-        implements TriggerOutput {
-
-        @Override
-        public Object getValue() {
+    record PollOutput(List<?> records, Map<String, ?> closureParameters, boolean pollImmediately) {
+        public List<?> getRecords() {
             return records;
         }
     }
@@ -497,22 +485,10 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        WebhookOutput apply(
+        Object apply(
             Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
             WebhookMethod method, TriggerContext context) throws Exception;
 
-    }
-
-    /**
-     *
-     */
-    sealed interface TriggerOutput permits WebhookOutput, PollOutput {
-
-        /**
-         *
-         * @return
-         */
-        Object getValue();
     }
 
     /**
@@ -548,90 +524,6 @@ public interface TriggerDefinition {
             JSON,
             RAW,
             XML
-        }
-    }
-
-    /**
-     *
-     */
-    sealed interface WebhookOutput extends TriggerOutput
-        permits WebhookOutput.ListOutput, WebhookOutput.MapOutput, WebhookOutput.RawOutput {
-
-        default String getMessage() {
-            return "Successful operation.";
-        }
-
-        default int getStatusCode() {
-            return 200;
-        }
-
-        @Override
-        Object getValue();
-
-        /**
-         *
-         * @param records
-         * @return
-         */
-        static WebhookOutput list(List<Map<?, ?>> records) {
-            return new ListOutput(records);
-        }
-
-        /**
-         *
-         * @param record
-         * @return
-         */
-        static WebhookOutput map(Map<?, ?> record) {
-            return new MapOutput(record);
-        }
-
-        /**
-         *
-         * @param raw
-         * @return
-         */
-        static WebhookOutput raw(String raw) {
-            return new RawOutput(raw);
-        }
-
-        /**
-         *
-         * @param records
-         */
-        @SuppressFBWarnings("EI")
-        record ListOutput(List<Map<?, ?>> records) implements WebhookOutput {
-
-            @Override
-            public Object getValue() {
-                return records;
-            }
-        }
-
-        /**
-         *
-         * @param record
-         */
-        @SuppressFBWarnings("EI")
-        record MapOutput(Map<?, ?> record) implements WebhookOutput {
-
-            @Override
-            public Object getValue() {
-                return record;
-            }
-        }
-
-        /**
-         *
-         * @param raw
-         */
-        @SuppressFBWarnings("EI")
-        record RawOutput(String raw) implements WebhookOutput {
-
-            @Override
-            public Object getValue() {
-                return raw;
-            }
         }
     }
 

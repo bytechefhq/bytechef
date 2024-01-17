@@ -21,7 +21,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -39,6 +39,7 @@ public class ArrayProperty extends ValueProperty<List<Object>> {
 
     public ArrayProperty(
         com.bytechef.platform.workflow.task.dispatcher.definition.Property.ArrayProperty arrayProperty) {
+
         super(arrayProperty);
 
         this.items = CollectionUtils.map(
@@ -63,12 +64,14 @@ public class ArrayProperty extends ValueProperty<List<Object>> {
         return Collections.unmodifiableList(items);
     }
 
-    public Optional<Long> getMaxItems() {
-        return Optional.ofNullable(maxItems);
+    @Nullable
+    public Long getMaxItems() {
+        return maxItems;
     }
 
-    public Optional<Long> getMinItems() {
-        return Optional.ofNullable(minItems);
+    @Nullable
+    public Long getMinItems() {
+        return minItems;
     }
 
     public List<Option> getOptions() {
@@ -77,10 +80,14 @@ public class ArrayProperty extends ValueProperty<List<Object>> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof ArrayProperty that))
+        }
+
+        if (!(o instanceof ArrayProperty that)) {
             return false;
+        }
+
         return multipleValues == that.multipleValues && Objects.equals(items, that.items) &&
             Objects.equals(options, that.options);
     }

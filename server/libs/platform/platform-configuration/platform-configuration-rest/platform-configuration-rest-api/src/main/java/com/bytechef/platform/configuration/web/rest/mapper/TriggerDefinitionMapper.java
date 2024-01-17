@@ -28,9 +28,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class TriggerDefinitionMapper {
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        OptionalMapper.class
-    })
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface TriggerDefinitionToTriggerDefinitionModelMapper
         extends Converter<TriggerDefinition, TriggerDefinitionModel> {
 
@@ -38,9 +36,7 @@ public class TriggerDefinitionMapper {
         TriggerDefinitionModel convert(TriggerDefinition triggerDefinition);
     }
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        OptionalMapper.class
-    })
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface TriggerDefinitionToTriggerDefinitionBasicModelMapper
         extends Converter<TriggerDefinition, TriggerDefinitionBasicModel> {
 

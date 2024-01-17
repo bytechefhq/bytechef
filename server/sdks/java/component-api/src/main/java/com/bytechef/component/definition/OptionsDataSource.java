@@ -22,7 +22,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public interface OptionsDataSource {
+public interface OptionsDataSource<F extends OptionsDataSource.OptionsFunction> {
 
     /**
      *
@@ -36,7 +36,7 @@ public interface OptionsDataSource {
      *
      * @return
      */
-    OptionsFunction getOptions();
+    F getOptions();
 
     /**
      *

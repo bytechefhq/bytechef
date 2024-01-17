@@ -17,26 +17,25 @@
 package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.ActionEditorDescriptionFunction;
+import com.bytechef.component.definition.ActionOutputSchemaFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
-import com.bytechef.component.definition.EditorDescriptionDataSource;
 import com.bytechef.component.definition.OptionsDataSource;
-import com.bytechef.component.definition.OutputSchemaDataSource;
-import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
-import com.bytechef.component.definition.SampleOutputDataSource;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
 import com.bytechef.platform.component.definition.ParametersImpl;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.platform.component.registry.OperationType;
+import com.bytechef.platform.component.registry.component.OperationType;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
+import com.bytechef.platform.component.registry.domain.OutputSchema;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -70,7 +69,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             return CollectionUtils.map(
                 propertiesFunction.apply(
                     new ParametersImpl(inputParameters),
-                    connection == null ? null : new ParametersImpl(connection.parameters()), context),
+                    new ParametersImpl(connection == null ? Map.of() : connection.parameters()), context),
                 valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
@@ -82,7 +81,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
-        EditorDescriptionDataSource.ActionEditorDescriptionFunction editorDescriptionFunction =
+        ActionEditorDescriptionFunction editorDescriptionFunction =
             getEditorDescriptionFunction(
                 componentName, componentVersion, actionName);
 
@@ -99,14 +98,14 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, String searchText, ComponentConnection connection,
         @NonNull ActionContext context) {
 
-        OptionsDataSource.ActionOptionsFunction optionsFunction = getComponentOptionsFunction(
+        ActionOptionsFunction optionsFunction = getComponentOptionsFunction(
             componentName, componentVersion, actionName, propertyName);
 
         try {
             return CollectionUtils.map(
                 optionsFunction.apply(
                     new ParametersImpl(inputParameters),
-                    connection == null ? null : new ParametersImpl(connection.parameters()), searchText, context),
+                    new ParametersImpl(connection == null ? Map.of() : connection.parameters()), searchText, context),
                 Option::new);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
@@ -114,7 +113,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public Property executeOutputSchema(
+    public OutputSchema executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
@@ -122,10 +121,11 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentName, componentVersion, actionName);
 
         try {
-            return Property.toProperty(
-                outputSchemaFunction.apply(
-                    new ParametersImpl(inputParameters),
-                    connection == null ? null : new ParametersImpl(connection.parameters()), context));
+            com.bytechef.component.definition.OutputSchema outputSchema = outputSchemaFunction.apply(
+                new ParametersImpl(inputParameters),
+                new ParametersImpl(connection == null ? Map.of() : connection.parameters()), context);
+
+            return new OutputSchema(Property.toProperty(outputSchema.definition()), outputSchema.sampleOutput());
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters);
         }
@@ -137,56 +137,27 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
-            resolveActionDefinition(componentName, componentVersion, actionName);
+            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
-        return OptionalUtils.mapOrElse(
-            actionDefinition.getPerform(), performFunction -> {
+        return OptionalUtils.map(
+            actionDefinition.getPerform(),
+            performFunction -> {
                 try {
                     return performFunction.apply(
                         new ParametersImpl(inputParameters),
-                        connection == null ? null : new ParametersImpl(connection.parameters()), context);
+                        new ParametersImpl(connection == null ? Map.of() : connection.parameters()), context);
                 } catch (Exception e) {
                     throw new ComponentExecutionException(e, inputParameters);
                 }
-            },
-            null);
+            });
     }
 
     @Override
-    public Object executeSampleOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
+    public ActionDefinition getActionDefinition(
+        @NonNull String componentName, int componentVersion, @NonNull String actionName) {
 
-        ActionSampleOutputFunction sampleOutputFunction = getSampleOutputFunction(
-            componentName, componentVersion, actionName);
-
-        SampleOutputDataSource.SampleOutputResponse sampleOutputResponse;
-
-        try {
-            sampleOutputResponse = sampleOutputFunction.apply(
-                new ParametersImpl(inputParameters),
-                connection == null ? null : new ParametersImpl(connection.parameters()), context);
-        } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters);
-        }
-
-        Object sampleOutput = sampleOutputResponse.sampleOutput();
-
-        if (sampleOutput instanceof String string) {
-            try {
-                sampleOutput = JsonUtils.read(string);
-            } catch (Exception e) {
-                //
-            }
-        }
-
-        return sampleOutput;
-    }
-
-    @Override
-    public ActionDefinition
-        getActionDefinition(@NonNull String componentName, int componentVersion, @NonNull String actionName) {
-        return new ActionDefinition(resolveActionDefinition(componentName, componentVersion, actionName));
+        return new ActionDefinition(
+            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName));
     }
 
     @Override
@@ -215,15 +186,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return actionDefinitions;
     }
 
-    private OptionsDataSource.ActionOptionsFunction getComponentOptionsFunction(
+    private ActionOptionsFunction getComponentOptionsFunction(
         String componentName, int componentVersion, String actionName, String propertyName) {
 
         DynamicOptionsProperty dynamicOptionsProperty = (DynamicOptionsProperty) componentDefinitionRegistry
             .getActionProperty(componentName, componentVersion, actionName, propertyName);
 
-        OptionsDataSource optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
+        OptionsDataSource<?> optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
 
-        return (OptionsDataSource.ActionOptionsFunction) optionsDataSource.getOptions();
+        return (ActionOptionsFunction) optionsDataSource.getOptions();
     }
 
     private PropertiesDataSource.ActionPropertiesFunction getComponentPropertiesFunction(
@@ -233,13 +204,13 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             (DynamicPropertiesProperty) componentDefinitionRegistry.getActionProperty(
                 componentName, componentVersion, actionName, propertyName);
 
-        PropertiesDataSource propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
+        PropertiesDataSource<?> propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
 
         return (PropertiesDataSource.ActionPropertiesFunction) propertiesDataSource.getProperties();
 
     }
 
-    private EditorDescriptionDataSource.ActionEditorDescriptionFunction getEditorDescriptionFunction(
+    private ActionEditorDescriptionFunction getEditorDescriptionFunction(
         String componentName, int componentVersion, String actionName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
@@ -250,10 +221,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         getActionDefinition(componentName, componentVersion, actionName);
 
-        return OptionalUtils.mapOrElse(
-            actionDefinition.getEditorDescriptionDataSource(),
-            editorDescriptionDataSource -> (EditorDescriptionDataSource.ActionEditorDescriptionFunction) editorDescriptionDataSource
-                .getEditorDescription(),
+        return OptionalUtils.orElse(
+            actionDefinition.getEditorDescriptionFunction(),
             (inputParameters, context) -> OptionalUtils.orElse(
                 componentDefinition.getTitle(), componentDefinition.getName()) + ": " +
                 OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
@@ -265,25 +234,14 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
-        OutputSchemaDataSource outputSchemaDataSource = OptionalUtils.get(actionDefinition.getOutputSchemaDataSource());
+        return OptionalUtils.orElseGet(
+            actionDefinition.getOutputSchemaFunction(),
+            () -> {
+                PerformFunction performFunction = OptionalUtils.get(actionDefinition.getPerform());
 
-        return (ActionOutputSchemaFunction) outputSchemaDataSource.getOutputSchema();
-    }
-
-    private ActionSampleOutputFunction getSampleOutputFunction(
-        String componentName, int componentVersion, String actionName) {
-
-        com.bytechef.component.definition.ActionDefinition actionDefinition =
-            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
-
-        SampleOutputDataSource sampleOutputDataSource = OptionalUtils.get(actionDefinition.getSampleOutputDataSource());
-
-        return (ActionSampleOutputFunction) sampleOutputDataSource.getSampleOutput();
-    }
-
-    private com.bytechef.component.definition.ActionDefinition resolveActionDefinition(
-        String componentName, int componentVersion, String actionName) {
-
-        return componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
+                return (inputParameters, connectionParameters, context) -> context.outputSchema(
+                    outputSchema -> outputSchema.get(
+                        performFunction.apply(inputParameters, connectionParameters, context)));
+            });
     }
 }

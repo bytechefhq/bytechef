@@ -18,10 +18,10 @@ package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -43,8 +43,7 @@ public class ArrayProperty extends ValueProperty<List<Object>> {
 
         this.items = CollectionUtils.map(
             OptionalUtils.orElse(arrayProperty.getItems(), List.of()),
-            valueProperty -> (ValueProperty<?>) toProperty(
-                (com.bytechef.component.definition.Property) valueProperty));
+            valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
         this.maxItems = OptionalUtils.orElse(arrayProperty.getMaxItems(), null);
         this.minItems = OptionalUtils.orElse(arrayProperty.getMinItems(), null);
         this.multipleValues = OptionalUtils.orElse(arrayProperty.getMultipleValues(), true);
@@ -66,20 +65,24 @@ public class ArrayProperty extends ValueProperty<List<Object>> {
         return multipleValues;
     }
 
-    public Optional<Long> getMaxItems() {
-        return Optional.ofNullable(maxItems);
+    @Nullable
+    public Long getMaxItems() {
+        return maxItems;
     }
 
-    public Optional<Long> getMinItems() {
-        return Optional.ofNullable(minItems);
+    @Nullable
+    public Long getMinItems() {
+        return minItems;
     }
 
+    @Nullable
     public List<Option> getOptions() {
         return Collections.unmodifiableList(options);
     }
 
-    public Optional<OptionsDataSource> getOptionsDataSource() {
-        return Optional.ofNullable(optionsDataSource);
+    @Nullable
+    public OptionsDataSource getOptionsDataSource() {
+        return optionsDataSource;
     }
 
     @Override

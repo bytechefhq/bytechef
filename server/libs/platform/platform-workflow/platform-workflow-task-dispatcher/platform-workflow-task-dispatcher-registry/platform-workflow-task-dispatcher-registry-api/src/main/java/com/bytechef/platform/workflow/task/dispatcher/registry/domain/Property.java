@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -80,8 +80,8 @@ public abstract class Property {
             case DATE_TIME ->
                 (P) toDateTimeProperty(
                     (com.bytechef.platform.workflow.task.dispatcher.definition.Property.DateTimeProperty) property);
-            case DYNAMIC_PROPERTIES -> throw new IllegalStateException(
-                "DYNAMIC_PROPERTIES property type is not supported");
+            case FILE_ENTRY -> (P) toFileEntryProperty(
+                (com.bytechef.platform.workflow.task.dispatcher.definition.Property.FileEntryProperty) property);
             case INTEGER -> (P) toIntegerProperty(
                 (com.bytechef.platform.workflow.task.dispatcher.definition.Property.IntegerProperty) property);
             case NULL -> (P) toNullProperty(
@@ -125,12 +125,14 @@ public abstract class Property {
         return advancedOption;
     }
 
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
+    @Nullable
+    public String getDescription() {
+        return description;
     }
 
-    public Optional<String> getDisplayCondition() {
-        return Optional.ofNullable(displayCondition);
+    @Nullable
+    public String getDisplayCondition() {
+        return displayCondition;
     }
 
     public boolean getExpressionEnabled() {
@@ -145,8 +147,9 @@ public abstract class Property {
         return required;
     }
 
-    public Optional<String> getName() {
-        return Optional.ofNullable(name);
+    @Nullable
+    public String getName() {
+        return name;
     }
 
     public Type getType() {
@@ -189,6 +192,12 @@ public abstract class Property {
         com.bytechef.platform.workflow.task.dispatcher.definition.Property.DateTimeProperty dateTimeProperty) {
 
         return new DateTimeProperty(dateTimeProperty);
+    }
+
+    private static FileEntryProperty toFileEntryProperty(
+        com.bytechef.platform.workflow.task.dispatcher.definition.Property.FileEntryProperty fileEntryProperty) {
+
+        return new FileEntryProperty(fileEntryProperty);
     }
 
     private static IntegerProperty toIntegerProperty(
@@ -238,6 +247,8 @@ public abstract class Property {
         Object visit(DateTimeProperty dateTimeProperty);
 
         Object visit(IntegerProperty integerProperty);
+
+        Object visit(FileEntryProperty fileEntryProperty);
 
         Object visit(NullProperty nullProperty);
 

@@ -18,7 +18,6 @@ package com.bytechef.component.definition;
 
 import com.bytechef.component.definition.ActionContext.FileEntry;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
-import com.bytechef.component.definition.Property.OutputProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,7 +62,8 @@ public interface Context {
      * @param outputSchemaFunction
      * @return
      */
-    OutputProperty<?> outputSchema(ContextFunction<OutputSchema, OutputProperty<?>> outputSchemaFunction);
+    com.bytechef.component.definition.OutputSchema outputSchema(
+        ContextFunction<OutputSchema, com.bytechef.component.definition.OutputSchema> outputSchemaFunction);
 
     /**
      *
@@ -1045,7 +1045,7 @@ public interface Context {
          * @param value
          * @return
          */
-        OutputProperty<?> get(Object value);
+        com.bytechef.component.definition.OutputSchema get(Object value);
     }
 
     /**

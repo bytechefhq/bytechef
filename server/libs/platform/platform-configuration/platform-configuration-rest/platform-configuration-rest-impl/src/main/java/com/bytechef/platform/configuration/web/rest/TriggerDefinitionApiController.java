@@ -17,10 +17,11 @@
 package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.component.registry.OperationType;
+import com.bytechef.platform.component.registry.component.OperationType;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ComponentOperationRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.ComponentOutputSchemaModel;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionBasicModel;
@@ -87,7 +88,7 @@ public class TriggerDefinitionApiController implements TriggerDefinitionApi {
     }
 
     @Override
-    public ResponseEntity<PropertyModel> getComponentTriggerOutputSchema(
+    public ResponseEntity<ComponentOutputSchemaModel> getComponentTriggerOutputSchema(
         String componentName, Integer componentVersion, String triggerName,
         ComponentOperationRequestModel componentOperationRequestModel) {
 
@@ -96,18 +97,7 @@ public class TriggerDefinitionApiController implements TriggerDefinitionApi {
                 triggerDefinitionFacade.executeOutputSchema(
                     componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
                     componentOperationRequestModel.getConnectionId()),
-                PropertyModel.class));
-    }
-
-    @Override
-    public ResponseEntity<Object> getComponentTriggerSampleOutput(
-        String componentName, Integer componentVersion, String triggerName,
-        ComponentOperationRequestModel componentOperationRequestModel) {
-
-        return ResponseEntity.ok(
-            triggerDefinitionFacade.executeSampleOutput(
-                componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
-                componentOperationRequestModel.getConnectionId()));
+                ComponentOutputSchemaModel.class));
     }
 
     @Override

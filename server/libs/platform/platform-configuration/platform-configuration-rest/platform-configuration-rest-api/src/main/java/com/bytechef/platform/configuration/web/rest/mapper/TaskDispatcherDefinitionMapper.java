@@ -28,9 +28,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class TaskDispatcherDefinitionMapper {
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        OptionalMapper.class
-    })
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface TaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
         extends Converter<TaskDispatcherDefinition, TaskDispatcherDefinitionModel> {
 
@@ -38,10 +36,8 @@ public class TaskDispatcherDefinitionMapper {
         TaskDispatcherDefinitionModel convert(TaskDispatcherDefinition taskDispatcherDefinition);
     }
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        OptionalMapper.class
-    })
-    public interface ModifiableTaskDispatcherDefinitionToTaskDispatcherDefinitionModelMapper
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    public interface TaskDispatcherDefinitionToTaskDispatcherDefinitionBasicModelMapper
         extends Converter<TaskDispatcherDefinition, TaskDispatcherDefinitionBasicModel> {
 
         @Override

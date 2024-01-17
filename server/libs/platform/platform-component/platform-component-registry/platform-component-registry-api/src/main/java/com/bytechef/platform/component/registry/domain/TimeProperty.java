@@ -23,7 +23,7 @@ import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -53,8 +53,9 @@ public class TimeProperty extends ValueProperty<LocalTime> {
         return Collections.unmodifiableList(options);
     }
 
-    public Optional<OptionsDataSource> getOptionsDataSource() {
-        return Optional.ofNullable(optionsDataSource);
+    @Nullable
+    public OptionsDataSource getOptionsDataSource() {
+        return optionsDataSource;
     }
 
     @Override

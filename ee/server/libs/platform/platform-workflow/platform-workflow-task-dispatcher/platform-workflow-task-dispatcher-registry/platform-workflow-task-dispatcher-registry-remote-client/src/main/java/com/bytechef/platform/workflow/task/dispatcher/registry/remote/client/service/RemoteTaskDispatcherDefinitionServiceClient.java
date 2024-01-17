@@ -8,8 +8,8 @@
 package com.bytechef.platform.workflow.task.dispatcher.registry.remote.client.service;
 
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
+import com.bytechef.platform.workflow.task.dispatcher.registry.domain.OutputSchema;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.registry.domain.ValueProperty;
 import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -36,7 +36,7 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
     }
 
     @Override
-    public List<? extends ValueProperty<?>> executeOutputSchema(
+    public OutputSchema executeOutputSchema(
         String name, int version, Map<String, Object> inputParameters) {
 
         return loadBalancedRestClient.post(

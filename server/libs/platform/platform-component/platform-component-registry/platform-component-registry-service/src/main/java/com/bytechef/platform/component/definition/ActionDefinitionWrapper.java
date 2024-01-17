@@ -18,11 +18,11 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.EditorDescriptionDataSource;
+import com.bytechef.component.definition.ActionEditorDescriptionFunction;
+import com.bytechef.component.definition.ActionOutputSchemaFunction;
 import com.bytechef.component.definition.Help;
-import com.bytechef.component.definition.OutputSchemaDataSource;
+import com.bytechef.component.definition.OutputSchema;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.SampleOutputDataSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,16 +41,15 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     protected final int componentVersion;
     protected final Boolean deprecated;
     protected final String description;
-    protected final EditorDescriptionDataSource editorDescriptionDataSource;
+    protected final ActionEditorDescriptionFunction editorDescriptionFunction;
     protected final PerformFunction performFunction;
     protected final Help help;
     protected final Map<String, Object> metadata;
     protected final String name;
-    protected final Property.OutputProperty<?> outputSchema;
-    protected final OutputSchemaDataSource outputSchemaDataSource;
-    protected final List<? extends Property.InputProperty> properties;
-    protected final Object sampleOutput;
-    protected final SampleOutputDataSource sampleOutputDataSource;
+    protected final OutputSchema outputSchema;
+    protected final ActionOutputSchemaFunction outputSchemaFunction;
+    private final boolean outputSchemaDefaultFunction;
+    protected final List<? extends Property> properties;
     protected final String title;
 
     public ActionDefinitionWrapper(
@@ -63,17 +62,16 @@ public class ActionDefinitionWrapper implements ActionDefinition {
         this.componentVersion = actionDefinition.getComponentVersion();
         this.deprecated = OptionalUtils.orElse(actionDefinition.getDeprecated(), null);
         this.description = OptionalUtils.orElse(actionDefinition.getDescription(), null);
-        this.editorDescriptionDataSource =
-            OptionalUtils.orElse(actionDefinition.getEditorDescriptionDataSource(), null);
+        this.editorDescriptionFunction =
+            OptionalUtils.orElse(actionDefinition.getEditorDescriptionFunction(), null);
         this.performFunction = performFunctionSupplier.get();
         this.help = OptionalUtils.orElse(actionDefinition.getHelp(), null);
         this.metadata = OptionalUtils.orElse(actionDefinition.getMetadata(), null);
         this.name = actionDefinition.getName();
         this.outputSchema = OptionalUtils.orElse(actionDefinition.getOutputSchema(), null);
-        this.outputSchemaDataSource = OptionalUtils.orElse(actionDefinition.getOutputSchemaDataSource(), null);
+        this.outputSchemaFunction = OptionalUtils.orElse(actionDefinition.getOutputSchemaFunction(), null);
+        this.outputSchemaDefaultFunction = actionDefinition.isOutputSchemaDefaultFunction();
         this.properties = OptionalUtils.orElse(actionDefinition.getProperties(), null);
-        this.sampleOutput = OptionalUtils.orElse(actionDefinition.getSampleOutput(), null);
-        this.sampleOutputDataSource = OptionalUtils.orElse(actionDefinition.getSampleOutputDataSource(), null);
         this.title = OptionalUtils.orElse(actionDefinition.getTitle(), null);
     }
 
@@ -113,8 +111,8 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     }
 
     @Override
-    public Optional<EditorDescriptionDataSource> getEditorDescriptionDataSource() {
-        return Optional.ofNullable(editorDescriptionDataSource);
+    public Optional<ActionEditorDescriptionFunction> getEditorDescriptionFunction() {
+        return Optional.ofNullable(editorDescriptionFunction);
     }
 
     @Override
@@ -138,32 +136,27 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     }
 
     @Override
-    public Optional<Property.OutputProperty<?>> getOutputSchema() {
+    public Optional<OutputSchema> getOutputSchema() {
         return Optional.ofNullable(outputSchema);
     }
 
     @Override
-    public Optional<OutputSchemaDataSource> getOutputSchemaDataSource() {
-        return Optional.ofNullable(outputSchemaDataSource);
+    public Optional<ActionOutputSchemaFunction> getOutputSchemaFunction() {
+        return Optional.ofNullable(outputSchemaFunction);
     }
 
     @Override
-    public Optional<List<? extends Property.InputProperty>> getProperties() {
+    public Optional<List<? extends Property>> getProperties() {
         return Optional.ofNullable(properties);
-    }
-
-    @Override
-    public Optional<Object> getSampleOutput() {
-        return Optional.ofNullable(sampleOutput);
-    }
-
-    @Override
-    public Optional<SampleOutputDataSource> getSampleOutputDataSource() {
-        return Optional.ofNullable(sampleOutputDataSource);
     }
 
     @Override
     public Optional<String> getTitle() {
         return Optional.ofNullable(title);
+    }
+
+    @Override
+    public boolean isOutputSchemaDefaultFunction() {
+        return outputSchemaDefaultFunction;
     }
 }

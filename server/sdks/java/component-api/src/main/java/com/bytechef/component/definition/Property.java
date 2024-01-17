@@ -40,6 +40,7 @@ public interface Property {
         DATE,
         DATE_TIME,
         EMAIL,
+        FILE_ENTRY,
         INTEGER,
         MULTI_SELECT,
         NUMBER,
@@ -62,6 +63,7 @@ public interface Property {
         DATE,
         DATE_TIME,
         DYNAMIC_PROPERTIES,
+        FILE_ENTRY,
         INTEGER,
         NULL,
         NUMBER,
@@ -118,9 +120,7 @@ public interface Property {
     /**
      *
      */
-    interface ArrayProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<List<Object>>, Property,
-        ValueProperty<List<Object>> {
+    interface ArrayProperty extends DynamicOptionsProperty, ValueProperty<List<Object>> {
 
         /**
          *
@@ -150,29 +150,25 @@ public interface Property {
     /**
      *
      */
-    interface BooleanProperty
-        extends InputProperty, OptionsProperty, OutputProperty<Boolean>, Property, ValueProperty<Boolean> {
+    interface BooleanProperty extends OptionsProperty, ValueProperty<Boolean> {
     }
 
     /**
      *
      */
-    interface DateProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<LocalDate>, Property, ValueProperty<LocalDate> {
+    interface DateProperty extends DynamicOptionsProperty, ValueProperty<LocalDate> {
     }
 
     /**
      *
      */
-    interface DateTimeProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<LocalDateTime>, Property,
-        ValueProperty<LocalDateTime> {
+    interface DateTimeProperty extends DynamicOptionsProperty, ValueProperty<LocalDateTime> {
     }
 
     /**
      *
      */
-    interface DynamicPropertiesProperty extends InputProperty, Property {
+    interface DynamicPropertiesProperty extends Property {
 
         /**
          *
@@ -188,14 +184,19 @@ public interface Property {
     /**
      *
      */
-    interface InputProperty extends Property {
+    interface FileEntryProperty extends ValueProperty<Map<String, ?>> {
+
+        /**
+         *
+         * @return
+         */
+        List<? extends Property.ValueProperty<?>> getProperties();
     }
 
     /**
      *
      */
-    interface IntegerProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<Long>, Property, ValueProperty<Long> {
+    interface IntegerProperty extends DynamicOptionsProperty, ValueProperty<Long> {
 
         /**
          *
@@ -211,14 +212,13 @@ public interface Property {
     /**
      *
      */
-    interface NullProperty extends InputProperty, OutputProperty<Void>, ValueProperty<Void> {
+    interface NullProperty extends ValueProperty<Void> {
     }
 
     /**
      *
      */
-    interface NumberProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<Double>, Property, ValueProperty<Double> {
+    interface NumberProperty extends DynamicOptionsProperty, ValueProperty<Double> {
 
         /**
          *
@@ -249,9 +249,7 @@ public interface Property {
     /**
      *
      */
-    interface ObjectProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<Map<String, Object>>, Property,
-        ValueProperty<Map<String, Object>> {
+    interface ObjectProperty extends DynamicOptionsProperty, ValueProperty<Map<String, ?>> {
 
         /**
          *
@@ -266,26 +264,13 @@ public interface Property {
         /**
          *
          */
-        Optional<String> getObjectType();
-
-        /**
-         *
-         */
         Optional<List<? extends Property.ValueProperty<?>>> getProperties();
     }
 
     /**
      *
-     * @param <V>
      */
-    interface OutputProperty<V> extends Property.ValueProperty<V> {
-    }
-
-    /**
-     *
-     */
-    interface StringProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<String>, Property, ValueProperty<String> {
+    interface StringProperty extends DynamicOptionsProperty, ValueProperty<String> {
 
         /**
          *
@@ -303,8 +288,7 @@ public interface Property {
     /**
      *
      */
-    interface TimeProperty
-        extends DynamicOptionsProperty, InputProperty, OutputProperty<LocalTime>, Property, ValueProperty<LocalTime> {
+    interface TimeProperty extends DynamicOptionsProperty, ValueProperty<LocalTime> {
     }
 
     /**

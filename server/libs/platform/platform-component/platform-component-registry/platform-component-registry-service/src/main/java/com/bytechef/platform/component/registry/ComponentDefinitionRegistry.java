@@ -26,11 +26,12 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
+import com.bytechef.component.definition.OutputSchema;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.platform.component.registry.factory.ComponentHandlerListFactory;
-import com.bytechef.platform.component.util.PropertyUtils;
+import com.bytechef.platform.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -235,28 +236,26 @@ public class ComponentDefinitionRegistry {
                 componentDefinition.getActions(), List.of());
 
             for (ActionDefinition actionDefinition : actionDefinitions) {
-                PropertyUtils.checkInputProperties(OptionalUtils.orElse(actionDefinition.getProperties(), List.of()));
-                PropertyUtils.checkOutputProperty(OptionalUtils.orElse(actionDefinition.getOutputSchema(), null));
-
-                if (OptionalUtils.isPresent(actionDefinition.getOutputSchema()) &&
-                    OptionalUtils.isPresent(actionDefinition.getOutputSchemaDataSource())) {
-
-                    throw new IllegalStateException("Output schema can be defined either as a property or function");
-                }
-
-                if (OptionalUtils.isPresent(actionDefinition.getOutputSchema()) &&
-                    OptionalUtils.isPresent(actionDefinition.getOutputSchemaDataSource())) {
-
-                    throw new IllegalStateException("Output schema can be define either as a property or function");
-                }
+                PropertyUtils.checkInputProperties(
+                    CollectionUtils.map(
+                        OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::getName));
+                PropertyUtils.checkOutputProperty(
+                    OptionalUtils.mapOrElse(
+                        OptionalUtils.mapOptional(actionDefinition.getOutputSchema(), OutputSchema::definition),
+                        Property::getName, null));
             }
 
             List<? extends TriggerDefinition> triggerDefinitions = OptionalUtils.orElse(
                 componentDefinition.getTriggers(), List.of());
 
             for (TriggerDefinition triggerDefinition : triggerDefinitions) {
-                PropertyUtils.checkInputProperties(OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()));
-                PropertyUtils.checkOutputProperty(OptionalUtils.orElse(triggerDefinition.getOutputSchema(), null));
+                PropertyUtils.checkInputProperties(
+                    CollectionUtils.map(
+                        OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::getName));
+                PropertyUtils.checkOutputProperty(
+                    OptionalUtils.mapOrElse(
+                        OptionalUtils.mapOptional(triggerDefinition.getOutputSchema(), OutputSchema::definition),
+                        Property::getName, null));
 
                 if (triggerDefinition.getType() == null) {
                     throw new IllegalStateException(

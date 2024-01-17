@@ -17,12 +17,11 @@
 package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.component.registry.util.OutputSchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -31,11 +30,9 @@ import java.util.Optional;
 public class TriggerDefinition extends TriggerDefinitionBasic {
 
     private boolean editorDescriptionDataSource;
-    private Property outputSchema;
+    private OutputSchema outputSchema;
     private boolean outputSchemaDataSource;
     private List<? extends Property> properties;
-    private Object sampleOutput;
-    private boolean sampleOutputDataSource;
     private boolean webhookRawBody;
     private boolean workflowSyncExecution;
     private boolean workflowSyncValidation;
@@ -47,53 +44,61 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
         super(triggerDefinition);
 
         this.editorDescriptionDataSource = OptionalUtils.mapOrElse(
-            triggerDefinition.getEditorDescriptionDataSource(), editorDescriptionDataSource -> true, false);
-        this.outputSchema = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutputSchema(), Property::toProperty, null);
+            triggerDefinition.getEditorDescriptionFunction(), editorDescriptionDataSource -> true, false);
+        this.outputSchema =
+            OptionalUtils.mapOrElse(triggerDefinition.getOutputSchema(), OutputSchemaUtils::toOutputSchema, null);
         this.outputSchemaDataSource = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutputSchemaDataSource(), outputSchemaDataSource -> true, false);
+            triggerDefinition.getOutputSchemaFunction(), outputSchemaDataSource -> true,
+            triggerDefinition.isOutputSchemaDefaultFunction());
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::toProperty);
-
-        this.sampleOutput = OptionalUtils.orElse(triggerDefinition.getSampleOutput(), null);
-
-        if (sampleOutput != null && sampleOutput instanceof String string) {
-            try {
-                sampleOutput = JsonUtils.read(string);
-            } catch (Exception e) {
-                sampleOutput = string;
-            }
-        }
-
-        this.sampleOutputDataSource = OptionalUtils.mapOrElse(
-            triggerDefinition.getSampleOutputDataSource(), sampleOutputDataSource -> true, false);
         this.webhookRawBody = OptionalUtils.orElse(triggerDefinition.getWebhookRawBody(), false);
         this.workflowSyncExecution = OptionalUtils.orElse(triggerDefinition.getWorkflowSyncExecution(), false);
         this.workflowSyncValidation = OptionalUtils.orElse(triggerDefinition.getWorkflowSyncValidation(), false);
     }
 
-    public boolean isEditorDescriptionDataSource() {
-        return editorDescriptionDataSource;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof TriggerDefinition that)) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        return editorDescriptionDataSource == that.editorDescriptionDataSource
+            && outputSchemaDataSource == that.outputSchemaDataSource && webhookRawBody == that.webhookRawBody
+            && workflowSyncExecution == that.workflowSyncExecution
+            && workflowSyncValidation == that.workflowSyncValidation && Objects.equals(outputSchema, that.outputSchema)
+            && Objects.equals(properties, that.properties);
     }
 
-    public Optional<Property> getOutputSchema() {
-        return Optional.ofNullable(outputSchema);
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), editorDescriptionDataSource, outputSchema, outputSchemaDataSource,
+            properties, webhookRawBody, workflowSyncExecution,
+            workflowSyncValidation);
     }
 
-    public boolean isOutputSchemaDataSource() {
-        return outputSchemaDataSource;
+    public OutputSchema getOutputSchema() {
+        return outputSchema;
     }
 
     public List<? extends Property> getProperties() {
         return properties;
     }
 
-    public Object getSampleOutput() {
-        return sampleOutput;
+    public boolean isEditorDescriptionDataSource() {
+        return editorDescriptionDataSource;
     }
 
-    public boolean isSampleOutputDataSource() {
-        return sampleOutputDataSource;
+    public boolean isOutputSchemaDataSource() {
+        return outputSchemaDataSource;
     }
 
     public boolean isWebhookRawBody() {
@@ -109,37 +114,12 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof TriggerDefinition that))
-            return false;
-        if (!super.equals(o))
-            return false;
-        return editorDescriptionDataSource == that.editorDescriptionDataSource
-            && outputSchemaDataSource == that.outputSchemaDataSource
-            && sampleOutputDataSource == that.sampleOutputDataSource && webhookRawBody == that.webhookRawBody
-            && workflowSyncExecution == that.workflowSyncExecution
-            && workflowSyncValidation == that.workflowSyncValidation && Objects.equals(outputSchema, that.outputSchema)
-            && Objects.equals(properties, that.properties) && Objects.equals(sampleOutput, that.sampleOutput);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), editorDescriptionDataSource, outputSchema, outputSchemaDataSource,
-            properties, sampleOutput, sampleOutputDataSource, webhookRawBody, workflowSyncExecution,
-            workflowSyncValidation);
-    }
-
-    @Override
     public String toString() {
         return "TriggerDefinition{" +
             "editorDescriptionDataSource=" + editorDescriptionDataSource +
             ", outputSchema=" + outputSchema +
             ", outputSchemaDataSource=" + outputSchemaDataSource +
             ", properties=" + properties +
-            ", sampleOutput=" + sampleOutput +
-            ", sampleOutputDataSource=" + sampleOutputDataSource +
             ", webhookRawBody=" + webhookRawBody +
             ", workflowSyncExecution=" + workflowSyncExecution +
             ", workflowSyncValidation=" + workflowSyncValidation +

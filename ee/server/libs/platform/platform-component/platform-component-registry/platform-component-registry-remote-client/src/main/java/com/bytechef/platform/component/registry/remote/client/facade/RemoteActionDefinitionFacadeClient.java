@@ -9,6 +9,7 @@ package com.bytechef.platform.component.registry.remote.client.facade;
 
 import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.platform.component.registry.domain.Option;
+import com.bytechef.platform.component.registry.domain.OutputSchema;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClient;
@@ -66,7 +67,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public Property executeOutputSchema(
+    public OutputSchema executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
@@ -100,17 +101,6 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
             new PerformRequest(
                 componentName, componentVersion, actionName, type, instanceId, workflowId, jobId,
                 inputParameters, connectionId),
-            Object.class);
-    }
-
-    @Override
-    public Object executeSampleOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> inputParameters, Long connectionId) {
-
-        return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-sample-output"),
-            new SampleOutputRequest(actionName, inputParameters, componentName, componentVersion, connectionId),
             Object.class);
     }
 

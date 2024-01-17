@@ -17,10 +17,11 @@
 package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.platform.component.registry.OperationType;
+import com.bytechef.platform.component.registry.component.OperationType;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
+import com.bytechef.platform.component.registry.domain.OutputSchema;
 import com.bytechef.platform.component.registry.domain.Property;
 import java.util.List;
 import java.util.Map;
@@ -47,17 +48,12 @@ public interface ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, String searchText, @Nullable ComponentConnection connection,
         @NonNull ActionContext context);
 
-    Property executeOutputSchema(
+    OutputSchema executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull ActionContext context);
 
     Object executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
-        @NonNull ActionContext context);
-
-    Object executeSampleOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull ActionContext context);

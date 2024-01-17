@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @author Ivica Cardic
  */
-public interface PropertiesDataSource {
+public interface PropertiesDataSource<F extends PropertiesDataSource.PropertiesFunction> {
 
     /**
      *
@@ -35,7 +35,7 @@ public interface PropertiesDataSource {
      *
      * @return The function implementation
      */
-    PropertiesFunction getProperties();
+    F getProperties();
 
     /**
      *

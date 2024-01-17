@@ -14,32 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.task.dispatcher.definition;
-
-import java.util.Map;
+package com.bytechef.component.definition;
 
 /**
- * @author Ivica Cardic
+ *
  */
-public interface OutputSchemaDataSource {
+@FunctionalInterface
+public interface TriggerEditorDescriptionFunction {
 
     /**
-     * The function that returns output schema.
-     *
-     * @return The function implementation
+     * @param inputParameters
+     * @param context
+     * @return
      */
-    OutputSchemaFunction getOutputSchema();
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface OutputSchemaFunction {
-
-        /**
-         * @param inputParameters
-         * @return
-         */
-        Property.OutputProperty<?> apply(Map<String, ?> inputParameters) throws Exception;
-    }
+    String apply(Parameters inputParameters, TriggerContext context) throws Exception;
 }

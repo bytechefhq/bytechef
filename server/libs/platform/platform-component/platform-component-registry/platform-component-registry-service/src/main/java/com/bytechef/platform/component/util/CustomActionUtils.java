@@ -41,10 +41,7 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.definition.Help;
-import com.bytechef.component.definition.OutputSchemaDataSource.ActionOutputSchemaFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.SampleOutputDataSource.ActionSampleOutputFunction;
-import com.bytechef.component.definition.SampleOutputDataSource.SampleOutputResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +58,6 @@ public class CustomActionUtils {
     private static final String HEADERS = "headers";
     private static final String METHOD = "method";
     private static final String QUERY_PARAMETERS = "queryParameters";
-    private static final String OUTPUT_SCHEMA = "outputSchema";
     private static final String PATH = "path";
 
     public static ActionDefinition getCustomActionDefinition(ComponentDefinition componentDefinition) {
@@ -163,13 +159,10 @@ public class CustomActionUtils {
                 string(BODY_CONTENT_MIME_TYPE)
                     .label("Content Type")
                     .description("Mime-Type to use when sending raw body content.")
-                    .displayCondition(
-                        "'%s' === '%s'".formatted(
-                            Http.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
+                    .displayCondition("'%s' === '%s'".formatted(Http.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
                     .defaultValue("text/plain")
                     .placeholder("text/plain"))
-            .outputSchema(getOutputSchemaFunction())
-            .sampleOutput(getSampleOutputFunction())
+            .outputSchema()
             .perform(CustomActionUtils::perform);
 
         return customActionDefinition.help(
@@ -211,15 +204,5 @@ public class CustomActionUtils {
         }
 
         return body;
-    }
-
-    protected static ActionOutputSchemaFunction getOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> context.outputSchema(
-            outputSchema -> outputSchema.get(perform(inputParameters, connectionParameters, context)));
-    }
-
-    protected static ActionSampleOutputFunction getSampleOutputFunction() {
-        return (inputParameters, connectionParameters, context) -> new SampleOutputResponse(
-            perform(inputParameters, connectionParameters, context));
     }
 }

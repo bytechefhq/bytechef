@@ -11,9 +11,10 @@ import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.platform.component.registry.OperationType;
+import com.bytechef.platform.component.registry.component.OperationType;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
+import com.bytechef.platform.component.registry.domain.OutputSchema;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
@@ -118,15 +119,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public Property executeOutputSchema(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object executeSampleOutput(
+    public OutputSchema executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 

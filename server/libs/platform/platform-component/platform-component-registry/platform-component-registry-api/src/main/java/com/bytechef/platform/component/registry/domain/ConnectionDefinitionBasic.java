@@ -20,7 +20,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ConnectionDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -51,8 +51,9 @@ public class ConnectionDefinitionBasic {
         return authorizationRequired;
     }
 
-    public Optional<String> getComponentDescription() {
-        return Optional.ofNullable(componentDescription);
+    @Nullable
+    public String getComponentDescription() {
+        return componentDescription;
     }
 
     public String getComponentName() {

@@ -28,9 +28,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class ActionDefinitionMapper {
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        OptionalMapper.class
-    })
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface ActionDefinitionToActionDefinitionModelMapper
         extends Converter<ActionDefinition, ActionDefinitionModel> {
 
@@ -38,9 +36,7 @@ public class ActionDefinitionMapper {
         ActionDefinitionModel convert(ActionDefinition actionDefinition);
     }
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        OptionalMapper.class
-    })
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface ActionDefinitionToActionDefinitionBasicModelMapper
         extends Converter<ActionDefinition, ActionDefinitionBasicModel> {
 

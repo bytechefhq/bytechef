@@ -25,18 +25,14 @@ import org.springframework.core.convert.converter.Converter;
 
 public class ComponentDefinitionMapper {
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        OptionalMapper.class
-    })
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface ComponentDefinitionToComponentDefinitionModelMapper
         extends Converter<ComponentDefinition, ComponentDefinitionModel> {
 
         ComponentDefinitionModel convert(ComponentDefinition componentDefinition);
     }
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        OptionalMapper.class
-    })
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface ComponentDefinitionToComponentDefinitionBasicModelMapper
         extends Converter<ComponentDefinition, ComponentDefinitionBasicModel> {
 

@@ -27,9 +27,9 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.OutputSchema;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.InputProperty;
-import com.bytechef.component.definition.Property.OutputProperty;
+import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,15 +46,17 @@ public class OpenApiClientUtils {
     private static final String TYPE = "type";
 
     public static Response execute(
-        Map<String, ?> inputParameters, List<? extends InputProperty> properties,
-        @Nullable OutputProperty<?> outputSchema, Map<String, Object> metadata, Context context) {
+        Map<String, ?> inputParameters, List<? extends Property> properties,
+        @Nullable OutputSchema outputSchema, Map<String, Object> metadata, Context context) {
+
+        ValueProperty<?> outputSchemaDefinition = outputSchema == null ? null : outputSchema.definition();
 
         return context.http(http -> http.exchange(
             createUrl(inputParameters, metadata, properties), MapUtils.get(metadata, "method", RequestMethod.class)))
             .configuration(Http.responseType(
-                outputSchema == null
+                outputSchemaDefinition == null
                     ? null
-                    : MapUtils.get(outputSchema.getMetadata(), "responseType", ResponseType.class)))
+                    : MapUtils.get(outputSchemaDefinition.getMetadata(), "responseType", ResponseType.class)))
             .headers(getValuesMap(inputParameters, properties, PropertyType.HEADER))
             .body(
                 getBody(

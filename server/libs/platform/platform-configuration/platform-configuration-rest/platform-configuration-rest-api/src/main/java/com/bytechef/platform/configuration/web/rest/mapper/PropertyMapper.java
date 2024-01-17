@@ -22,6 +22,7 @@ import com.bytechef.platform.component.registry.domain.BooleanProperty;
 import com.bytechef.platform.component.registry.domain.DateProperty;
 import com.bytechef.platform.component.registry.domain.DateTimeProperty;
 import com.bytechef.platform.component.registry.domain.DynamicPropertiesProperty;
+import com.bytechef.platform.component.registry.domain.FileEntryProperty;
 import com.bytechef.platform.component.registry.domain.IntegerProperty;
 import com.bytechef.platform.component.registry.domain.NullProperty;
 import com.bytechef.platform.component.registry.domain.NumberProperty;
@@ -36,6 +37,7 @@ import com.bytechef.platform.configuration.web.rest.model.BooleanPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.DatePropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.DateTimePropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.DynamicPropertiesPropertyModel;
+import com.bytechef.platform.configuration.web.rest.model.FileEntryPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.IntegerPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.NullPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.NumberPropertyModel;
@@ -56,7 +58,7 @@ import org.springframework.core.convert.converter.Converter;
 public class PropertyMapper {
 
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        JsonNullableMapper.class, OptionalMapper.class
+        JsonNullableMapper.class
     })
     public interface ComponentPropertyMapper extends Converter<Property, PropertyModel>, Property.PropertyVisitor {
 
@@ -88,6 +90,11 @@ public class PropertyMapper {
         @Override
         default DynamicPropertiesPropertyModel visit(DynamicPropertiesProperty dynamicPropertiesProperty) {
             return map(dynamicPropertiesProperty);
+        }
+
+        @Override
+        default FileEntryPropertyModel visit(FileEntryProperty fileEntryProperty) {
+            return map(fileEntryProperty);
         }
 
         @Override
@@ -130,6 +137,8 @@ public class PropertyMapper {
 
         DynamicPropertiesPropertyModel map(DynamicPropertiesProperty dynamicPropertiesProperty);
 
+        FileEntryPropertyModel map(FileEntryProperty fileEntryProperty);
+
         IntegerPropertyModel map(IntegerProperty integerProperty);
 
         NullPropertyModel map(NullProperty nullProperty);
@@ -154,7 +163,7 @@ public class PropertyMapper {
     }
 
     @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        JsonNullableMapper.class, OptionalMapper.class
+        JsonNullableMapper.class
     })
     public interface TaskDispatcherPropertyMapper
         extends Converter<com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property, PropertyModel>,
@@ -194,6 +203,13 @@ public class PropertyMapper {
         }
 
         @Override
+        default FileEntryPropertyModel visit(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.FileEntryProperty fileEntryProperty) {
+
+            return map(fileEntryProperty);
+        }
+
+        @Override
         default IntegerPropertyModel visit(
             com.bytechef.platform.workflow.task.dispatcher.registry.domain.IntegerProperty integerProperty) {
 
@@ -228,48 +244,50 @@ public class PropertyMapper {
         }
 
         @Override
-        default TimePropertyModel
-            visit(com.bytechef.platform.workflow.task.dispatcher.registry.domain.TimeProperty timeProperty) {
+        default TimePropertyModel visit(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.TimeProperty timeProperty) {
+
             return map(timeProperty);
         }
 
         @Mapping(target = "optionsDataSource", ignore = true)
-        ArrayPropertyModel
-            map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.ArrayProperty arrayProperty);
+        ArrayPropertyModel map(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.ArrayProperty arrayProperty);
 
-        BooleanPropertyModel
-            map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.BooleanProperty booleanProperty);
-
-        @Mapping(target = "optionsDataSource", ignore = true)
-        DatePropertyModel
-            map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.DateProperty dateProperty);
+        BooleanPropertyModel map(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.BooleanProperty booleanProperty);
 
         @Mapping(target = "optionsDataSource", ignore = true)
-        DateTimePropertyModel
-            map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.DateTimeProperty dateTimeProperty);
+        DatePropertyModel map(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.DateProperty dateProperty);
 
         @Mapping(target = "optionsDataSource", ignore = true)
-        IntegerPropertyModel
-            map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.IntegerProperty integerProperty);
+        DateTimePropertyModel map(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.DateTimeProperty dateTimeProperty);
 
-        NullPropertyModel
-            map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.NullProperty nullProperty);
-
-        @Mapping(target = "optionsDataSource", ignore = true)
-        NumberPropertyModel
-            map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.NumberProperty numberProperty);
+        FileEntryPropertyModel map(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.FileEntryProperty fileEntryProperty);
 
         @Mapping(target = "optionsDataSource", ignore = true)
-        ObjectPropertyModel
-            map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.ObjectProperty objectProperty);
+        IntegerPropertyModel map(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.IntegerProperty integerProperty);
+
+        NullPropertyModel map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.NullProperty nullProperty);
 
         @Mapping(target = "optionsDataSource", ignore = true)
-        StringPropertyModel
-            map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.StringProperty stringProperty);
+        NumberPropertyModel map(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.NumberProperty numberProperty);
 
         @Mapping(target = "optionsDataSource", ignore = true)
-        TimePropertyModel
-            map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.TimeProperty timeProperty);
+        ObjectPropertyModel map(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.ObjectProperty objectProperty);
+
+        @Mapping(target = "optionsDataSource", ignore = true)
+        StringPropertyModel map(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.StringProperty stringProperty);
+
+        @Mapping(target = "optionsDataSource", ignore = true)
+        TimePropertyModel map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.TimeProperty timeProperty);
 
         default List<PropertyModel> map(
             List<? extends com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property> properties) {

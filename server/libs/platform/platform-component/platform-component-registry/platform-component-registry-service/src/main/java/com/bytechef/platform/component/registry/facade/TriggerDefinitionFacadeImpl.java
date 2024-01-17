@@ -20,6 +20,7 @@ import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableO
 import com.bytechef.platform.component.definition.factory.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
+import com.bytechef.platform.component.registry.domain.OutputSchema;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.component.registry.trigger.TriggerOutput;
@@ -150,25 +151,13 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public Property executeOutputSchema(
+    public OutputSchema executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return triggerDefinitionService.executeOutputSchema(
-            componentName, componentVersion, triggerName, inputParameters, componentConnection,
-            contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
-    }
-
-    @Override
-    public Object executeSampleOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId) {
-
-        ComponentConnection componentConnection = getComponentConnection(connectionId);
-
-        return triggerDefinitionService.executeSampleOutput(
             componentName, componentVersion, triggerName, inputParameters, componentConnection,
             contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }

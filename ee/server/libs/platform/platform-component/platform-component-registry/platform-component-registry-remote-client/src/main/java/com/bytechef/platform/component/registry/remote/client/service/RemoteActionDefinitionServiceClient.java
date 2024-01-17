@@ -10,10 +10,11 @@ package com.bytechef.platform.component.registry.remote.client.service;
 import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.platform.component.registry.OperationType;
+import com.bytechef.platform.component.registry.component.OperationType;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
+import com.bytechef.platform.component.registry.domain.OutputSchema;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClient;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
@@ -70,7 +71,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
-    public Property executeOutputSchema(
+    public OutputSchema executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
@@ -82,14 +83,6 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters,
         ComponentConnection connection, @NonNull ActionContext context) {
-
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object executeSampleOutput(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
         throw new UnsupportedOperationException();
     }

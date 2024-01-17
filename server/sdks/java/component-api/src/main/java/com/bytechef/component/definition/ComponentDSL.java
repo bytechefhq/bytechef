@@ -16,8 +16,11 @@
 
 package com.bytechef.component.definition;
 
-import com.bytechef.component.definition.EditorDescriptionDataSource.ActionEditorDescriptionFunction;
 import com.bytechef.component.definition.OptionsDataSource.OptionsFunction;
+import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
+import com.bytechef.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
+import com.bytechef.component.definition.Property.ObjectProperty;
+import com.bytechef.component.definition.Property.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -94,14 +97,12 @@ public final class ComponentDSL {
         return new ModifiableDynamicPropertiesProperty(name);
     }
 
-    public static ModifiableObjectProperty fileEntry() {
+    public static ModifiableFileEntryProperty fileEntry() {
         return fileEntry(null);
     }
 
-    public static ModifiableObjectProperty fileEntry(String name) {
-        return (ModifiableObjectProperty) buildObject(
-            name, null, "FILE_ENTRY", string("extension").required(true), string("mimeType").required(true),
-            string("name").required(true), string("url").required(true));
+    public static ModifiableFileEntryProperty fileEntry(String name) {
+        return new ModifiableFileEntryProperty(name);
     }
 
     public static ModifiableIntegerProperty integer() {
@@ -216,16 +217,6 @@ public final class ComponentDSL {
         return new ModifiableTriggerDefinition(name);
     }
 
-    @SafeVarargs
-    private static <P extends ModifiableValueProperty<?, ?>> ModifiableObjectProperty buildObject(
-        String name, String description, String objectType, P... properties) {
-
-        return new ModifiableObjectProperty(name)
-            .description(description)
-            .objectType(objectType)
-            .properties(properties);
-    }
-
     public static final class ModifiableActionDefinition implements ActionDefinition {
 
         private Boolean batch;
@@ -240,11 +231,10 @@ public final class ComponentDSL {
         private Help help;
         private Map<String, Object> metadata;
         private final String name;
-        private Property.OutputProperty<?> outputSchemaProperty;
-        private OutputSchemaDataSource.ActionOutputSchemaFunction outputSchemaFunction;
-        private List<? extends Property.InputProperty> properties;
-        private Object sampleOutput;
-        private SampleOutputDataSource.ActionSampleOutputFunction sampleOutputFunction;
+        private OutputSchema outputSchema;
+        private boolean outputSchemaDefaultFunction;
+        private ActionOutputSchemaFunction outputSchemaFunction;
+        private List<? extends Property> properties;
         private String title;
 
         private ModifiableActionDefinition(String name) {
@@ -320,71 +310,41 @@ public final class ComponentDSL {
             return this;
         }
 
-        public <P extends Property.OutputProperty<?>> ModifiableActionDefinition outputSchema(P outputSchema) {
-            this.outputSchemaProperty = outputSchema;
+        public ModifiableActionDefinition outputSchema() {
+            this.outputSchemaDefaultFunction = true;
 
             return this;
         }
 
-        public ModifiableActionDefinition outputSchema(OutputSchemaDataSource.ActionOutputSchemaFunction outputSchema) {
+        public ModifiableActionDefinition outputSchema(ValueProperty<?> definition) {
+            return outputSchema(definition, null);
+        }
+
+        public ModifiableActionDefinition outputSchema(OutputSchema outputSchema) {
+            this.outputSchema = outputSchema;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition outputSchema(ValueProperty<?> definition, Object sampleOutput) {
+            this.outputSchema = new OutputSchema(definition, sampleOutput);
+            this.outputSchemaDefaultFunction = true;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition outputSchema(ActionOutputSchemaFunction outputSchema) {
             this.outputSchemaFunction = outputSchema;
+            this.outputSchemaDefaultFunction = false;
 
             return this;
         }
 
         @SafeVarargs
-        public final <P extends Property.InputProperty> ModifiableActionDefinition properties(P... properties) {
+        public final <P extends Property> ModifiableActionDefinition properties(P... properties) {
             if (properties != null) {
                 this.properties = List.of(properties);
             }
-
-            return this;
-        }
-
-        public ModifiableActionDefinition sampleOutput(boolean sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition sampleOutput(LocalDate sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition sampleOutput(List<Map<String, ?>> sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition sampleOutput(LocalDateTime sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition sampleOutput(Map<String, ?> sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition sampleOutput(Number sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition sampleOutput(String sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition sampleOutput(SampleOutputDataSource.ActionSampleOutputFunction sampleOutput) {
-            this.sampleOutputFunction = sampleOutput;
 
             return this;
         }
@@ -393,6 +353,36 @@ public final class ComponentDSL {
             this.title = title;
 
             return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableActionDefinition that)) {
+                return false;
+            }
+
+            return componentVersion == that.componentVersion && Objects.equals(batch, that.batch)
+                && Objects.equals(componentName, that.componentName)
+                && Objects.equals(componentDescription, that.componentDescription)
+                && Objects.equals(componentTitle, that.componentTitle) && Objects.equals(deprecated, that.deprecated)
+                && Objects.equals(description, that.description)
+                && Objects.equals(editorDescriptionFunction, that.editorDescriptionFunction)
+                && Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help)
+                && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
+                && Objects.equals(outputSchema, that.outputSchema)
+                && Objects.equals(outputSchemaFunction, that.outputSchemaFunction)
+                && Objects.equals(properties, that.properties) && Objects.equals(title, that.title);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
+                deprecated, description, editorDescriptionFunction, performFunction, help, metadata, name, outputSchema,
+                outputSchemaFunction, properties, title);
         }
 
         @Override
@@ -431,11 +421,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<EditorDescriptionDataSource> getEditorDescriptionDataSource() {
-            return Optional.ofNullable(
-                editorDescriptionFunction == null
-                    ? null
-                    : new EditorDescriptionDataSourceImpl(editorDescriptionFunction));
+        public Optional<ActionEditorDescriptionFunction> getEditorDescriptionFunction() {
+            return Optional.ofNullable(editorDescriptionFunction);
         }
 
         @Override
@@ -459,30 +446,18 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<Property.OutputProperty<?>> getOutputSchema() {
-            return Optional.ofNullable(outputSchemaProperty);
+        public Optional<OutputSchema> getOutputSchema() {
+            return Optional.ofNullable(outputSchema);
         }
 
         @Override
-        public Optional<OutputSchemaDataSource> getOutputSchemaDataSource() {
-            return Optional.ofNullable(
-                outputSchemaFunction == null ? null : new OutputSchemaDataSourceImpl(outputSchemaFunction));
+        public Optional<ActionOutputSchemaFunction> getOutputSchemaFunction() {
+            return Optional.ofNullable(outputSchemaFunction);
         }
 
         @Override
-        public Optional<List<? extends Property.InputProperty>> getProperties() {
+        public Optional<List<? extends Property>> getProperties() {
             return Optional.ofNullable(properties);
-        }
-
-        @Override
-        public Optional<Object> getSampleOutput() {
-            return Optional.ofNullable(sampleOutput);
-        }
-
-        @Override
-        public Optional<SampleOutputDataSource> getSampleOutputDataSource() {
-            return Optional.ofNullable(
-                sampleOutputFunction == null ? null : new SampleOutputDataSourceImpl(sampleOutputFunction));
         }
 
         @Override
@@ -491,31 +466,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            ModifiableActionDefinition that = (ModifiableActionDefinition) o;
-            return componentVersion == that.componentVersion && Objects.equals(batch, that.batch)
-                && Objects.equals(componentName, that.componentName)
-                && Objects.equals(componentDescription, that.componentDescription)
-                && Objects.equals(componentTitle, that.componentTitle) && Objects.equals(deprecated, that.deprecated)
-                && Objects.equals(description, that.description)
-                && Objects.equals(editorDescriptionFunction, that.editorDescriptionFunction)
-                && Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help)
-                && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
-                && Objects.equals(outputSchemaProperty, that.outputSchemaProperty)
-                && Objects.equals(outputSchemaFunction, that.outputSchemaFunction)
-                && Objects.equals(properties, that.properties) && Objects.equals(sampleOutput, that.sampleOutput)
-                && Objects.equals(sampleOutputFunction, that.sampleOutputFunction) && Objects.equals(title, that.title);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
-                deprecated, description, editorDescriptionFunction, performFunction, help, metadata, name,
-                outputSchemaProperty, outputSchemaFunction, properties, sampleOutput, sampleOutputFunction, title);
+        public boolean isOutputSchemaDefaultFunction() {
+            return outputSchemaDefaultFunction;
         }
     }
 
@@ -695,7 +647,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<? extends Property.ValueProperty<?>>> getItems() {
+        public Optional<List<? extends ValueProperty<?>>> getItems() {
             return Optional.ofNullable(items);
         }
 
@@ -729,22 +681,28 @@ public final class ComponentDSL {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+
+            if (!(o instanceof ModifiableArrayProperty that)) {
                 return false;
-            if (!super.equals(o))
+            }
+
+            if (!super.equals(o)) {
                 return false;
-            ModifiableArrayProperty that = (ModifiableArrayProperty) o;
+            }
+
             return Objects.equals(items, that.items) && Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(maxItems, that.maxItems) && Objects.equals(minItems, that.minItems)
                 && Objects.equals(multipleValues, that.multipleValues) && Objects.equals(options, that.options)
                 && Objects.equals(optionsFunction, that.optionsFunction);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(super.hashCode(), items, loadOptionsDependsOn, multipleValues, options,
-                optionsFunction);
+            return Objects.hash(
+                super.hashCode(), items, loadOptionsDependsOn, multipleValues, options, optionsFunction);
         }
     }
 
@@ -759,7 +717,7 @@ public final class ComponentDSL {
         private List<Object> detectOn;
         private String description;
         private final String name;
-        private List<? extends Property.InputProperty> properties;
+        private List<? extends Property> properties;
         private RefreshFunction refreshFunction;
         private List<Object> refreshOn;
         private RefreshUrlFunction refreshUrlFunction;
@@ -839,7 +797,7 @@ public final class ComponentDSL {
         }
 
         @SafeVarargs
-        public final <P extends Property.InputProperty> ModifiableAuthorization properties(P... properties) {
+        public final <P extends Property> ModifiableAuthorization properties(P... properties) {
             if (properties != null) {
                 this.properties = List.of(properties);
             }
@@ -933,7 +891,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<? extends Property.InputProperty>> getProperties() {
+        public Optional<List<? extends Property>> getProperties() {
             return Optional.ofNullable(properties);
         }
 
@@ -969,11 +927,14 @@ public final class ComponentDSL {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+
+            if (!(o instanceof ModifiableAuthorization that)) {
                 return false;
-            ModifiableAuthorization that = (ModifiableAuthorization) o;
+            }
+
             return Objects.equals(acquireFunction, that.acquireFunction)
                 && Objects.equals(applyFunction, that.applyFunction)
                 && Objects.equals(authorizationCallbackFunction, that.authorizationCallbackFunction)
@@ -1037,13 +998,18 @@ public final class ComponentDSL {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+
+            if (!(o instanceof ModifiableBooleanProperty that)) {
                 return false;
-            if (!super.equals(o))
+            }
+
+            if (!super.equals(o)) {
                 return false;
-            ModifiableBooleanProperty that = (ModifiableBooleanProperty) o;
+            }
+
             return Objects.equals(options, that.options);
         }
 
@@ -1312,11 +1278,14 @@ public final class ComponentDSL {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+
+            if (!(o instanceof ModifiableComponentDefinition that)) {
                 return false;
-            ModifiableComponentDefinition that = (ModifiableComponentDefinition) o;
+            }
+
             return version == that.version && Objects.equals(actions, that.actions)
                 && Objects.equals(category, that.category) && Objects.equals(connection, that.connection)
                 && Objects.equals(customAction, that.customAction)
@@ -1343,7 +1312,7 @@ public final class ComponentDSL {
         private String componentName;
         private String componentDescription;
         private String componentTitle;
-        private List<? extends Property.InputProperty> properties;
+        private List<? extends Property> properties;
         private TestConsumer testConsumer;
         private int version = 1;
         private Boolean authorizationRequired;
@@ -1354,7 +1323,7 @@ public final class ComponentDSL {
         @SuppressWarnings({
             "rawtypes", "unchecked"
         })
-        public <P extends Property.ValueProperty<?>> ModifiableConnectionDefinition append(P property) {
+        public <P extends Property> ModifiableConnectionDefinition append(P property) {
             if (this.properties == null) {
                 this.properties = new ArrayList<>();
             }
@@ -1391,7 +1360,7 @@ public final class ComponentDSL {
         }
 
         @SafeVarargs
-        public final <P extends Property.InputProperty> ModifiableConnectionDefinition properties(P... properties) {
+        public final <P extends Property> ModifiableConnectionDefinition properties(P... properties) {
             if (properties != null) {
                 this.properties = List.of(properties);
             }
@@ -1408,6 +1377,31 @@ public final class ComponentDSL {
         @Override
         public boolean containsAuthorizations() {
             return authorizations != null && !authorizations.isEmpty();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableConnectionDefinition that)) {
+                return false;
+            }
+
+            return version == that.version && Objects.equals(authorizations, that.authorizations)
+                && Objects.equals(baseUriFunction, that.baseUriFunction)
+                && Objects.equals(componentName, that.componentName)
+                && Objects.equals(componentDescription, that.componentDescription)
+                && Objects.equals(componentTitle, that.componentTitle) && Objects.equals(properties, that.properties)
+                && Objects.equals(testConsumer, that.testConsumer)
+                && Objects.equals(authorizationRequired, that.authorizationRequired);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(authorizations, baseUriFunction, componentName, componentDescription, componentTitle,
+                properties, testConsumer, version, authorizationRequired);
         }
 
         @Override
@@ -1451,7 +1445,7 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<? extends Property.InputProperty>> getProperties() {
+        public Optional<List<? extends Property>> getProperties() {
             return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
         }
 
@@ -1464,33 +1458,11 @@ public final class ComponentDSL {
         public int getVersion() {
             return version;
         }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            ModifiableConnectionDefinition that = (ModifiableConnectionDefinition) o;
-            return version == that.version && Objects.equals(authorizations, that.authorizations)
-                && Objects.equals(baseUriFunction, that.baseUriFunction)
-                && Objects.equals(componentName, that.componentName)
-                && Objects.equals(componentDescription, that.componentDescription)
-                && Objects.equals(componentTitle, that.componentTitle) && Objects.equals(properties, that.properties)
-                && Objects.equals(testConsumer, that.testConsumer)
-                && Objects.equals(authorizationRequired, that.authorizationRequired);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(authorizations, baseUriFunction, componentName, componentDescription, componentTitle,
-                properties, testConsumer, version, authorizationRequired);
-        }
     }
 
     public static final class ModifiableDynamicPropertiesProperty
         extends ModifiableProperty<ModifiableDynamicPropertiesProperty>
-        implements Property.InputProperty, Property.DynamicPropertiesProperty {
+        implements Property.DynamicPropertiesProperty {
 
         private String header;
         private List<String> loadPropertiesDependsOn;
@@ -1514,15 +1486,13 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableDynamicPropertiesProperty
-            properties(PropertiesDataSource.ActionPropertiesFunction propertiesFunction) {
+        public ModifiableDynamicPropertiesProperty properties(ActionPropertiesFunction propertiesFunction) {
             this.propertiesFunction = propertiesFunction;
 
             return this;
         }
 
-        public ModifiableDynamicPropertiesProperty
-            properties(PropertiesDataSource.TriggerPropertiesFunction propertiesFunction) {
+        public ModifiableDynamicPropertiesProperty properties(TriggerPropertiesFunction propertiesFunction) {
             this.propertiesFunction = propertiesFunction;
 
             return this;
@@ -1558,6 +1528,55 @@ public final class ComponentDSL {
         @Override
         public int hashCode() {
             return Objects.hash(super.hashCode(), loadPropertiesDependsOn, propertiesFunction);
+        }
+    }
+
+    public static final class ModifiableFileEntryProperty
+        extends ModifiableValueProperty<Map<String, ?>, ModifiableFileEntryProperty>
+        implements Property.FileEntryProperty {
+
+        private final List<? extends ValueProperty<?>> properties = List.of(
+            string("extension").required(true), string("mimeType").required(true),
+            string("name").required(true), string("url").required(true));
+
+        private ModifiableFileEntryProperty() {
+            this(null);
+        }
+
+        private ModifiableFileEntryProperty(String name) {
+            super(name, Type.FILE_ENTRY);
+        }
+
+        @Override
+        public ControlType getControlType() {
+            return ControlType.FILE_ENTRY;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableFileEntryProperty that)) {
+                return false;
+            }
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            return Objects.equals(properties, that.properties);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), properties);
+        }
+
+        @Override
+        public List<? extends ValueProperty<?>> getProperties() {
+            return new ArrayList<>(properties);
         }
     }
 
@@ -1635,6 +1654,30 @@ public final class ComponentDSL {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableIntegerProperty that)) {
+                return false;
+            }
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(maxValue, that.maxValue) && Objects.equals(minValue, that.minValue)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadOptionsDependsOn, maxValue, minValue, options, optionsFunction);
+        }
+
+        @Override
         public ControlType getControlType() {
             if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.INTEGER;
@@ -1664,25 +1707,6 @@ public final class ComponentDSL {
                 optionsFunction == null
                     ? null
                     : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            if (!super.equals(o))
-                return false;
-            ModifiableIntegerProperty that = (ModifiableIntegerProperty) o;
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
-                && Objects.equals(maxValue, that.maxValue) && Objects.equals(minValue, that.minValue)
-                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), loadOptionsDependsOn, maxValue, minValue, options, optionsFunction);
         }
     }
 
@@ -1758,6 +1782,28 @@ public final class ComponentDSL {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableJdbcComponentDefinition that)) {
+                return false;
+            }
+
+            return version == that.version && Objects.equals(databaseJdbcName, that.databaseJdbcName)
+                && Objects.equals(icon, that.icon) && Objects.equals(jdbcDriverClassName, that.jdbcDriverClassName)
+                && Objects.equals(description, that.description) && Objects.equals(name, that.name)
+                && Objects.equals(resources, that.resources) && Objects.equals(title, that.title);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(databaseJdbcName, icon, jdbcDriverClassName, description, name, resources, title,
+                version);
+        }
+
+        @Override
         public String getDatabaseJdbcName() {
             return databaseJdbcName;
         }
@@ -1796,25 +1842,6 @@ public final class ComponentDSL {
         @Override
         public int getVersion() {
             return version;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            ModifiableJdbcComponentDefinition that = (ModifiableJdbcComponentDefinition) o;
-            return version == that.version && Objects.equals(databaseJdbcName, that.databaseJdbcName)
-                && Objects.equals(icon, that.icon) && Objects.equals(jdbcDriverClassName, that.jdbcDriverClassName)
-                && Objects.equals(description, that.description) && Objects.equals(name, that.name)
-                && Objects.equals(resources, that.resources) && Objects.equals(title, that.title);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(databaseJdbcName, icon, jdbcDriverClassName, description, name, resources, title,
-                version);
         }
     }
 
@@ -1870,6 +1897,29 @@ public final class ComponentDSL {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableDateProperty that)) {
+                return false;
+            }
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
+        }
+
+        @Override
         public ControlType getControlType() {
             if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.DATE;
@@ -1889,24 +1939,6 @@ public final class ComponentDSL {
                 optionsFunction == null
                     ? null
                     : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            if (!super.equals(o))
-                return false;
-            ModifiableDateProperty that = (ModifiableDateProperty) o;
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
-                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
         }
     }
 
@@ -1962,6 +1994,29 @@ public final class ComponentDSL {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableDateTimeProperty that)) {
+                return false;
+            }
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
+        }
+
+        @Override
         public ControlType getControlType() {
             if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.DATE_TIME;
@@ -1981,24 +2036,6 @@ public final class ComponentDSL {
                 optionsFunction == null
                     ? null
                     : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            if (!super.equals(o))
-                return false;
-            ModifiableDateTimeProperty that = (ModifiableDateTimeProperty) o;
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
-                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
         }
     }
 
@@ -2143,6 +2180,34 @@ public final class ComponentDSL {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableNumberProperty that)) {
+                return false;
+            }
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(maxNumberPrecision, that.maxNumberPrecision)
+                && Objects.equals(maxValue, that.maxValue)
+                && Objects.equals(minNumberPrecision, that.minNumberPrecision)
+                && Objects.equals(minValue, that.minValue) && Objects.equals(numberPrecision, that.numberPrecision)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadOptionsDependsOn, maxNumberPrecision, maxValue,
+                minNumberPrecision, minValue, numberPrecision, options, optionsFunction);
+        }
+
+        @Override
         public ControlType getControlType() {
             if ((options == null || options.isEmpty()) && optionsFunction == null) {
                 return ControlType.NUMBER;
@@ -2188,37 +2253,15 @@ public final class ComponentDSL {
                     ? null
                     : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
         }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            if (!super.equals(o))
-                return false;
-            ModifiableNumberProperty that = (ModifiableNumberProperty) o;
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
-                && Objects.equals(maxValue, that.maxValue) && Objects.equals(minValue, that.minValue)
-                && Objects.equals(numberPrecision, that.numberPrecision) && Objects.equals(options, that.options)
-                && Objects.equals(optionsFunction, that.optionsFunction);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), loadOptionsDependsOn, maxValue, minValue, numberPrecision, options,
-                optionsFunction);
-        }
     }
 
     public static final class ModifiableObjectProperty
-        extends ModifiableValueProperty<Map<String, Object>, ModifiableObjectProperty>
-        implements Property.ObjectProperty {
+        extends ModifiableValueProperty<Map<String, ?>, ModifiableObjectProperty>
+        implements ObjectProperty {
 
         private List<? extends ModifiableValueProperty<?, ?>> additionalProperties;
         private List<String> loadOptionsDependsOn;
         private Boolean multipleValues;
-        private String objectType;
         private List<Option<?>> options;
         private OptionsFunction optionsFunction;
         private List<? extends ModifiableValueProperty<?, ?>> properties;
@@ -2274,12 +2317,6 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableObjectProperty objectType(String objectType) {
-            this.objectType = objectType;
-
-            return this;
-        }
-
         @SafeVarargs
         public final ModifiableObjectProperty options(Option<Object>... options) {
             if (options != null) {
@@ -2321,7 +2358,33 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<? extends Property.ValueProperty<?>>> getAdditionalProperties() {
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableObjectProperty that)) {
+                return false;
+            }
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            return Objects.equals(additionalProperties, that.additionalProperties)
+                && Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(multipleValues, that.multipleValues) && Objects.equals(options, that.options)
+                && Objects.equals(optionsFunction, that.optionsFunction) && Objects.equals(properties, that.properties);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), additionalProperties, loadOptionsDependsOn, multipleValues, options,
+                optionsFunction, properties);
+        }
+
+        @Override
+        public Optional<List<? extends ValueProperty<?>>> getAdditionalProperties() {
             return Optional.ofNullable(additionalProperties == null ? null : new ArrayList<>(additionalProperties));
         }
 
@@ -2339,11 +2402,6 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<String> getObjectType() {
-            return Optional.ofNullable(objectType);
-        }
-
-        @Override
         public Optional<List<Option<?>>> getOptions() {
             return Optional.ofNullable(options);
         }
@@ -2357,30 +2415,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<? extends Property.ValueProperty<?>>> getProperties() {
+        public Optional<List<? extends ValueProperty<?>>> getProperties() {
             return Optional.ofNullable(properties == null ? null : new ArrayList<>(properties));
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            if (!super.equals(o))
-                return false;
-            ModifiableObjectProperty that = (ModifiableObjectProperty) o;
-            return Objects.equals(additionalProperties, that.additionalProperties)
-                && Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
-                && Objects.equals(multipleValues, that.multipleValues) && Objects.equals(objectType, that.objectType)
-                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction)
-                && Objects.equals(properties, that.properties);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), additionalProperties, loadOptionsDependsOn, multipleValues,
-                objectType, options, optionsFunction, properties);
         }
     }
 
@@ -2415,6 +2451,26 @@ public final class ComponentDSL {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableOption<?> that)) {
+                return false;
+            }
+
+            return Objects.equals(description, that.description)
+                && Objects.equals(displayCondition, that.displayCondition) && Objects.equals(label, that.label)
+                && Objects.equals(value, that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(description, displayCondition, label, value);
+        }
+
+        @Override
         public Optional<String> getDescription() {
             return Optional.ofNullable(description);
         }
@@ -2432,23 +2488,6 @@ public final class ComponentDSL {
         @Override
         public T getValue() {
             return value;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            ModifiableOption<?> that = (ModifiableOption<?>) o;
-            return Objects.equals(description, that.description)
-                && Objects.equals(displayCondition, that.displayCondition) && Objects.equals(label, that.label)
-                && Objects.equals(value, that.value);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(description, displayCondition, label, value);
         }
     }
 
@@ -2536,19 +2575,21 @@ public final class ComponentDSL {
                 return true;
             }
 
-            if (o == null || getClass() != o.getClass()) {
+            if (!(o instanceof ModifiableProperty<?> that)) {
                 return false;
             }
 
-            ModifiableProperty<?> that = (ModifiableProperty<?>) o;
-
-            return Objects.equals(displayCondition, that.displayCondition) && Objects.equals(name, that.name)
-                && type == that.type;
+            return Objects.equals(advancedOption, that.advancedOption) && Objects.equals(description, that.description)
+                && Objects.equals(displayCondition, that.displayCondition)
+                && Objects.equals(expressionEnabled, that.expressionEnabled) && Objects.equals(hidden, that.hidden)
+                && Objects.equals(metadata, that.metadata) && Objects.equals(required, that.required)
+                && Objects.equals(name, that.name) && type == that.type;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(displayCondition, name, type);
+            return Objects.hash(advancedOption, description, displayCondition, expressionEnabled, hidden, metadata,
+                required, name, type);
         }
 
         @Override
@@ -2677,13 +2718,18 @@ public final class ComponentDSL {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+
+            if (!(o instanceof ModifiableStringProperty that)) {
                 return false;
-            if (!super.equals(o))
+            }
+
+            if (!super.equals(o)) {
                 return false;
-            ModifiableStringProperty that = (ModifiableStringProperty) o;
+            }
+
             return controlType == that.controlType && Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
                 && Objects.equals(maxLength, that.maxLength) && Objects.equals(minLength, that.minLength)
                 && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
@@ -2784,6 +2830,29 @@ public final class ComponentDSL {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableTimeProperty that)) {
+                return false;
+            }
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
+                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
+        }
+
+        @Override
         public ControlType getControlType() {
             return ControlType.TIME;
         }
@@ -2799,24 +2868,6 @@ public final class ComponentDSL {
                 optionsFunction == null
                     ? null
                     : new OptionsDataSourceImpl(loadOptionsDependsOn, optionsFunction));
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            if (!super.equals(o))
-                return false;
-            ModifiableTimeProperty that = (ModifiableTimeProperty) o;
-            return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
-                && Objects.equals(options, that.options) && Objects.equals(optionsFunction, that.optionsFunction);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), loadOptionsDependsOn, options, optionsFunction);
         }
     }
 
@@ -2834,17 +2885,16 @@ public final class ComponentDSL {
         private DynamicWebhookEnableFunction dynamicWebhookEnableFunction;
         private DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction;
         private DynamicWebhookRequestFunction dynamicWebhookRequestFunction;
-        private EditorDescriptionDataSource.TriggerEditorDescriptionFunction editorDescriptionFunction;
+        private TriggerEditorDescriptionFunction editorDescriptionFunction;
         private Help help;
         private ListenerDisableConsumer listenerDisableConsumer;
         private ListenerEnableConsumer listenerEnableConsumer;
         private String name;
-        private Property.OutputProperty<?> outputSchemaProperty;
-        private OutputSchemaDataSource.TriggerOutputSchemaFunction outputSchemaFunction;
+        private OutputSchema outputSchema;
+        private boolean outputSchemaDefaultFunction;
+        private TriggerOutputSchemaFunction outputSchemaFunction;
         private PollFunction pollFunction;
-        private List<? extends Property.InputProperty> properties;
-        private Object sampleOutput;
-        private SampleOutputDataSource.TriggerSampleOutputFunction sampleOutputFunction;
+        private List<? extends Property> properties;
         private StaticWebhookRequestFunction staticWebhookRequest;
         private String title;
         private TriggerType type;
@@ -2905,8 +2955,7 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition
-            editorDescription(EditorDescriptionDataSource.TriggerEditorDescriptionFunction editorDescription) {
+        public ModifiableTriggerDefinition editorDescription(TriggerEditorDescriptionFunction editorDescription) {
             this.editorDescriptionFunction = editorDescription;
 
             return this;
@@ -2942,15 +2991,57 @@ public final class ComponentDSL {
             return this;
         }
 
-        public <P extends Property.OutputProperty<?>> ModifiableTriggerDefinition outputSchema(P outputSchema) {
-            this.outputSchemaProperty = outputSchema;
+        public ModifiableTriggerDefinition outputSchema(OutputSchema outputSchema) {
+            this.outputSchema = outputSchema;
+            this.outputSchemaDefaultFunction = true;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition outputSchema() {
+            this.outputSchemaDefaultFunction = true;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition outputSchema(ValueProperty<?> definition) {
+            return outputSchema(definition, null);
+        }
+
+        public ModifiableTriggerDefinition outputSchema(ValueProperty<?> definition, Object sampleOutput) {
+            this.outputSchema = new OutputSchema(definition, sampleOutput);
 
             return this;
         }
 
         public ModifiableTriggerDefinition
-            outputSchema(OutputSchemaDataSource.TriggerOutputSchemaFunction outputSchema) {
+            outputSchema(TriggerOutputSchemaFunction.DynamicWebhookTriggerOutputSchemaFunction outputSchema) {
             this.outputSchemaFunction = outputSchema;
+            this.outputSchemaDefaultFunction = false;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition
+            outputSchema(TriggerOutputSchemaFunction.ListenerTriggerOutputSchemaFunction outputSchema) {
+            this.outputSchemaFunction = outputSchema;
+            this.outputSchemaDefaultFunction = false;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition
+            outputSchema(TriggerOutputSchemaFunction.PollTriggerOutputSchemaFunction outputSchema) {
+            this.outputSchemaFunction = outputSchema;
+            this.outputSchemaDefaultFunction = false;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition
+            outputSchema(TriggerOutputSchemaFunction.StaticWebhookTriggerOutputSchemaFunction outputSchema) {
+            this.outputSchemaFunction = outputSchema;
+            this.outputSchemaDefaultFunction = false;
 
             return this;
         }
@@ -2962,59 +3053,10 @@ public final class ComponentDSL {
         }
 
         @SafeVarargs
-        public final <P extends Property.InputProperty> ModifiableTriggerDefinition properties(P... properties) {
+        public final <P extends Property> ModifiableTriggerDefinition properties(P... properties) {
             if (properties != null) {
                 this.properties = List.of(properties);
             }
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition sampleOutput(boolean sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition sampleOutput(LocalDate sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition sampleOutput(List<Map<String, ?>> sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition sampleOutput(LocalDateTime sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition sampleOutput(Map<String, ?> sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition sampleOutput(Number sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition sampleOutput(String sampleOutput) {
-            this.sampleOutput = sampleOutput;
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition
-            sampleOutput(SampleOutputDataSource.TriggerSampleOutputFunction sampleOutput) {
-            this.sampleOutputFunction = sampleOutput;
 
             return this;
         }
@@ -3059,6 +3101,50 @@ public final class ComponentDSL {
             this.workflowSyncValidation = workflowSyncValidation;
 
             return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableTriggerDefinition that)) {
+                return false;
+            }
+
+            return componentVersion == that.componentVersion && Objects.equals(batch, that.batch)
+                && Objects.equals(componentName, that.componentName)
+                && Objects.equals(componentDescription, that.componentDescription)
+                && Objects.equals(componentTitle, that.componentTitle)
+                && Objects.equals(deduplicateFunction, that.deduplicateFunction)
+                && Objects.equals(deprecated, that.deprecated) && Objects.equals(description, that.description)
+                && Objects.equals(dynamicWebhookDisableConsumer, that.dynamicWebhookDisableConsumer)
+                && Objects.equals(dynamicWebhookEnableFunction, that.dynamicWebhookEnableFunction)
+                && Objects.equals(dynamicWebhookRefreshFunction, that.dynamicWebhookRefreshFunction)
+                && Objects.equals(dynamicWebhookRequestFunction, that.dynamicWebhookRequestFunction)
+                && Objects.equals(editorDescriptionFunction, that.editorDescriptionFunction)
+                && Objects.equals(help, that.help)
+                && Objects.equals(listenerDisableConsumer, that.listenerDisableConsumer)
+                && Objects.equals(listenerEnableConsumer, that.listenerEnableConsumer)
+                && Objects.equals(name, that.name) && Objects.equals(outputSchema, that.outputSchema)
+                && Objects.equals(outputSchemaFunction, that.outputSchemaFunction)
+                && Objects.equals(pollFunction, that.pollFunction) && Objects.equals(properties, that.properties)
+                && Objects.equals(staticWebhookRequest, that.staticWebhookRequest) && Objects.equals(title, that.title)
+                && type == that.type && Objects.equals(webhookRawBody, that.webhookRawBody)
+                && Objects.equals(webhookValidateFunction, that.webhookValidateFunction)
+                && Objects.equals(workflowSyncExecution, that.workflowSyncExecution)
+                && Objects.equals(workflowSyncValidation, that.workflowSyncValidation);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
+                deduplicateFunction, deprecated, description, dynamicWebhookDisableConsumer,
+                dynamicWebhookEnableFunction, dynamicWebhookRefreshFunction, dynamicWebhookRequestFunction,
+                editorDescriptionFunction, help, listenerDisableConsumer, listenerEnableConsumer, name, outputSchema,
+                outputSchemaFunction, pollFunction, properties, staticWebhookRequest, title, type, webhookRawBody,
+                webhookValidateFunction, workflowSyncExecution, workflowSyncValidation);
         }
 
         @Override
@@ -3122,11 +3208,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<EditorDescriptionDataSource> getEditorDescriptionDataSource() {
-            return Optional.ofNullable(
-                editorDescriptionFunction == null
-                    ? null
-                    : new EditorDescriptionDataSourceImpl(editorDescriptionFunction));
+        public Optional<TriggerEditorDescriptionFunction> getEditorDescriptionFunction() {
+            return Optional.ofNullable(editorDescriptionFunction);
         }
 
         @Override
@@ -3150,14 +3233,13 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<Property.OutputProperty<?>> getOutputSchema() {
-            return Optional.ofNullable(outputSchemaProperty);
+        public Optional<OutputSchema> getOutputSchema() {
+            return Optional.ofNullable(outputSchema);
         }
 
         @Override
-        public Optional<OutputSchemaDataSource> getOutputSchemaDataSource() {
-            return Optional.ofNullable(
-                outputSchemaFunction == null ? null : new OutputSchemaDataSourceImpl(outputSchemaFunction));
+        public Optional<TriggerOutputSchemaFunction> getOutputSchemaFunction() {
+            return Optional.ofNullable(outputSchemaFunction);
         }
 
         @Override
@@ -3166,21 +3248,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<List<? extends Property.InputProperty>> getProperties() {
+        public Optional<List<? extends Property>> getProperties() {
             return Optional.ofNullable(properties);
-        }
-
-        @Override
-        public Optional<Object> getSampleOutput() {
-            return Optional.ofNullable(sampleOutput);
-        }
-
-        @Override
-        public Optional<SampleOutputDataSource> getSampleOutputDataSource() {
-            return Optional.ofNullable(
-                sampleOutputFunction == null
-                    ? null
-                    : new SampleOutputDataSourceImpl(sampleOutputFunction));
         }
 
         @Override
@@ -3217,10 +3286,15 @@ public final class ComponentDSL {
         public Optional<Boolean> getWorkflowSyncValidation() {
             return Optional.ofNullable(workflowSyncValidation);
         }
+
+        @Override
+        public boolean isOutputSchemaDefaultFunction() {
+            return outputSchemaDefaultFunction;
+        }
     }
 
     public abstract static class ModifiableValueProperty<V, P extends ModifiableValueProperty<V, P>>
-        extends ModifiableProperty<P> implements Property.ValueProperty<V> {
+        extends ModifiableProperty<P> implements ValueProperty<V> {
 
         protected V defaultValue;
         protected V exampleValue;
@@ -3266,15 +3340,6 @@ public final class ComponentDSL {
         }
     }
 
-    private record EditorDescriptionDataSourceImpl(
-        EditorDescriptionFunction editorDescription) implements EditorDescriptionDataSource {
-
-        @Override
-        public EditorDescriptionFunction getEditorDescription() {
-            return editorDescription;
-        }
-    }
-
     private static class OptionsDataSourceImpl implements OptionsDataSource {
 
         private final List<String> loadOptionsDependsOn;
@@ -3298,11 +3363,16 @@ public final class ComponentDSL {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+
+            if (o == null || getClass() != o.getClass()) {
                 return false;
+            }
+
             OptionsDataSourceImpl that = (OptionsDataSourceImpl) o;
+
             return Objects.equals(loadOptionsDependsOn, that.loadOptionsDependsOn)
                 && Objects.equals(options, that.options);
         }
@@ -3310,29 +3380,6 @@ public final class ComponentDSL {
         @Override
         public int hashCode() {
             return Objects.hash(loadOptionsDependsOn, options);
-        }
-    }
-
-    private record OutputSchemaDataSourceImpl(OutputSchemaFunction outputSchema) implements OutputSchemaDataSource {
-
-        @Override
-        public OutputSchemaFunction getOutputSchema() {
-            return outputSchema;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            OutputSchemaDataSourceImpl that = (OutputSchemaDataSourceImpl) o;
-            return Objects.equals(outputSchema, that.outputSchema);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(outputSchema);
         }
     }
 
@@ -3405,15 +3452,6 @@ public final class ComponentDSL {
         @Override
         public Optional<Map<String, String>> getAdditionalUrls() {
             return Optional.ofNullable(additionalUrls == null ? null : new HashMap<>(additionalUrls));
-        }
-    }
-
-    private record SampleOutputDataSourceImpl(
-        SampleOutputFunction sampleOutputFunction) implements SampleOutputDataSource {
-
-        @Override
-        public SampleOutputFunction getSampleOutput() {
-            return sampleOutputFunction;
         }
     }
 }

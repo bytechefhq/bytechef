@@ -23,7 +23,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefini
 import com.bytechef.component.definition.ComponentDSL.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Property.InputProperty;
+import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,12 +58,12 @@ public interface OpenApiComponentHandler extends ComponentHandler {
         return Arrays.stream(actionDefinitions)
             .map(this::modifyAction)
             .map(actionDefinition -> {
-                InputProperty[] properties = actionDefinition.getProperties()
+                Property[] properties = actionDefinition.getProperties()
                     .orElse(List.of())
                     .stream()
-                    .map(property -> (InputProperty) modifyProperty(
+                    .map(property -> (Property) modifyProperty(
                         actionDefinition, (ModifiableProperty<?>) property))
-                    .toArray(InputProperty[]::new);
+                    .toArray(Property[]::new);
 
                 return actionDefinition.properties(properties);
             })

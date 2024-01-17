@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -63,6 +64,10 @@ public final class TaskDispatcherDSL {
 
     public static ModifiableDateTimeProperty dateTime(String name) {
         return new ModifiableDateTimeProperty(name);
+    }
+
+    public static ModifiableFileEntryProperty fileEntry() {
+        return new ModifiableFileEntryProperty();
     }
 
     public static ModifiableIntegerProperty integer() {
@@ -333,11 +338,7 @@ public final class TaskDispatcherDSL {
 
         @Override
         public ControlType getControlType() {
-            if (options == null || options.isEmpty()) {
-                return ControlType.ARRAY_BUILDER;
-            } else {
-                return ControlType.MULTI_SELECT;
-            }
+            return ControlType.MULTI_SELECT;
         }
 
         @Override
@@ -502,6 +503,55 @@ public final class TaskDispatcherDSL {
         @Override
         public Optional<List<Option<?>>> getOptions() {
             return Optional.ofNullable(options);
+        }
+    }
+
+    public static final class ModifiableFileEntryProperty
+        extends ModifiableValueProperty<Map<String, ?>, ModifiableFileEntryProperty>
+        implements Property.FileEntryProperty {
+
+        private final List<? extends ValueProperty<?>> properties = List.of(
+            string("extension").required(true), string("mimeType").required(true),
+            string("name").required(true), string("url").required(true));
+
+        private ModifiableFileEntryProperty() {
+            this(null);
+        }
+
+        private ModifiableFileEntryProperty(String name) {
+            super(name, Type.FILE_ENTRY);
+        }
+
+        @Override
+        public ControlType getControlType() {
+            return ControlType.FILE_ENTRY;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiableFileEntryProperty that)) {
+                return false;
+            }
+
+            if (!super.equals(o)) {
+                return false;
+            }
+
+            return Objects.equals(properties, that.properties);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), properties);
+        }
+
+        @Override
+        public List<? extends ValueProperty<?>> getProperties() {
+            return new ArrayList<>(properties);
         }
     }
 
@@ -834,11 +884,7 @@ public final class TaskDispatcherDSL {
 
         @Override
         public ControlType getControlType() {
-            if (options == null || options.isEmpty()) {
-                return ControlType.OBJECT_BUILDER;
-            } else {
-                return ControlType.SELECT;
-            }
+            return ControlType.SELECT;
         }
 
         public Optional<Boolean> getMultipleValues() {
@@ -1140,9 +1186,9 @@ public final class TaskDispatcherDSL {
         private Help help;
         private String icon;
         private final String name;
-        private Property.OutputProperty<?> outputSchemaProperty;
-        private OutputSchemaDataSource.OutputSchemaFunction outputSchemaFunction;
-        private List<? extends Property.InputProperty> properties;
+        private OutputSchema outputSchema;
+        private OutputSchemaFunction outputSchemaFunction;
+        private List<? extends Property> properties;
         private Resources resources;
         private List<? extends ModifiableValueProperty<?, ?>> taskProperties;
         private String title;
@@ -1171,16 +1217,23 @@ public final class TaskDispatcherDSL {
             return this;
         }
 
-        public <P extends Property.OutputProperty<?>> ModifiableTaskDispatcherDefinition outputSchema(
-            P property) {
+        public ModifiableTaskDispatcherDefinition outputSchema(ValueProperty<?> definition) {
+            return outputSchema(definition, null);
+        }
 
-            this.outputSchemaProperty = Objects.requireNonNull(property);
+        public ModifiableTaskDispatcherDefinition outputSchema(OutputSchema outputSchema) {
+            this.outputSchema = outputSchema;
 
             return this;
         }
 
-        public ModifiableTaskDispatcherDefinition
-            outputSchema(OutputSchemaDataSource.OutputSchemaFunction outputSchema) {
+        public ModifiableTaskDispatcherDefinition outputSchema(ValueProperty<?> definition, Object sampleOutput) {
+            this.outputSchema = new OutputSchema(definition, sampleOutput);
+
+            return this;
+        }
+
+        public ModifiableTaskDispatcherDefinition outputSchema(OutputSchemaFunction outputSchema) {
             this.outputSchemaFunction = outputSchema;
 
             return this;
@@ -1207,7 +1260,7 @@ public final class TaskDispatcherDSL {
         }
 
         @SafeVarargs
-        public final <P extends Property.InputProperty> ModifiableTaskDispatcherDefinition properties(
+        public final <P extends Property> ModifiableTaskDispatcherDefinition properties(
             P... properties) {
 
             if (properties != null) {
@@ -1268,18 +1321,17 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<Property.OutputProperty<?>> getOutputSchema() {
-            return Optional.ofNullable(outputSchemaProperty);
+        public Optional<OutputSchema> getOutputSchema() {
+            return Optional.ofNullable(outputSchema);
         }
 
         @Override
-        public Optional<OutputSchemaDataSource> getOutputSchemaDataSource() {
-            return Optional.ofNullable(
-                outputSchemaFunction == null ? null : new OutputSchemaDataSourceImpl(outputSchemaFunction));
+        public Optional<OutputSchemaFunction> getOutputSchemaFunction() {
+            return Optional.ofNullable(outputSchemaFunction);
         }
 
         @Override
-        public Optional<List<? extends Property.InputProperty>> getProperties() {
+        public Optional<List<? extends Property>> getProperties() {
             return Optional.ofNullable(properties);
         }
 
@@ -1289,7 +1341,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<? extends Property.ValueProperty<?>>> getTaskProperties() {
+        public Optional<List<? extends ValueProperty<?>>> getTaskProperties() {
             return Optional.ofNullable(taskProperties);
         }
 
@@ -1299,7 +1351,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<? extends Property.ValueProperty<?>>> getVariableProperties() {
+        public Optional<List<? extends ValueProperty<?>>> getVariableProperties() {
             return Optional.ofNullable(variableProperties);
         }
 
@@ -1356,7 +1408,7 @@ public final class TaskDispatcherDSL {
     }
 
     public abstract static class ModifiableValueProperty<V, P extends ModifiableValueProperty<V, P>>
-        extends ModifiableProperty<P> implements Property.ValueProperty<V> {
+        extends ModifiableProperty<P> implements ValueProperty<V> {
 
         protected V defaultValue;
         private String description;
@@ -1412,14 +1464,6 @@ public final class TaskDispatcherDSL {
         @Override
         public Optional<String> getPlaceholder() {
             return Optional.ofNullable(placeholder);
-        }
-    }
-
-    private record OutputSchemaDataSourceImpl(OutputSchemaFunction outputSchema) implements OutputSchemaDataSource {
-
-        @Override
-        public OutputSchemaFunction getOutputSchema() {
-            return outputSchema;
         }
     }
 

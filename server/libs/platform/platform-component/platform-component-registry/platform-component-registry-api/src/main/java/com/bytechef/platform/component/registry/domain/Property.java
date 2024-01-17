@@ -16,14 +16,13 @@
 
 package com.bytechef.platform.component.registry.domain;
 
-import static com.bytechef.component.definition.Property.*;
-
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.Property.Type;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -39,6 +38,7 @@ import java.util.Optional;
     @JsonSubTypes.Type(value = DateProperty.class, name = "DATE"),
     @JsonSubTypes.Type(value = DateTimeProperty.class, name = "DATE_TIME"),
     @JsonSubTypes.Type(value = DynamicPropertiesProperty.class, name = "DYNAMIC_PROPERTIES"),
+    @JsonSubTypes.Type(value = FileEntryProperty.class, name = "FILE_ENTRY"),
     @JsonSubTypes.Type(value = IntegerProperty.class, name = "INTEGER"),
     @JsonSubTypes.Type(value = NumberProperty.class, name = "NUMBER"),
     @JsonSubTypes.Type(value = NullProperty.class, name = "NULL"),
@@ -86,6 +86,8 @@ public abstract class Property {
                 (com.bytechef.component.definition.Property.DynamicPropertiesProperty) property);
             case INTEGER ->
                 (P) toIntegerProperty((com.bytechef.component.definition.Property.IntegerProperty) property);
+            case FILE_ENTRY ->
+                (P) toFileEntryProperty((com.bytechef.component.definition.Property.FileEntryProperty) property);
             case NULL -> (P) toNullProperty((com.bytechef.component.definition.Property.NullProperty) property);
             case NUMBER ->
                 (P) toNumberProperty((com.bytechef.component.definition.Property.NumberProperty) property);
@@ -125,12 +127,14 @@ public abstract class Property {
         return advancedOption;
     }
 
-    public Optional<String> getDescription() {
-        return Optional.ofNullable(description);
+    @Nullable
+    public String getDescription() {
+        return description;
     }
 
-    public Optional<String> getDisplayCondition() {
-        return Optional.ofNullable(displayCondition);
+    @Nullable
+    public String getDisplayCondition() {
+        return displayCondition;
     }
 
     public boolean getExpressionEnabled() {
@@ -145,8 +149,8 @@ public abstract class Property {
         return required;
     }
 
-    public Optional<String> getName() {
-        return Optional.ofNullable(name);
+    public String getName() {
+        return name;
     }
 
     public Type getType() {
@@ -167,23 +171,27 @@ public abstract class Property {
             '}';
     }
 
-    private static ArrayProperty
-        toArrayProperty(com.bytechef.component.definition.Property.ArrayProperty arrayProperty) {
+    private static ArrayProperty toArrayProperty(
+        com.bytechef.component.definition.Property.ArrayProperty arrayProperty) {
+
         return new ArrayProperty(arrayProperty);
     }
 
-    private static BooleanProperty
-        toBooleanProperty(com.bytechef.component.definition.Property.BooleanProperty booleanProperty) {
+    private static BooleanProperty toBooleanProperty(
+        com.bytechef.component.definition.Property.BooleanProperty booleanProperty) {
+
         return new BooleanProperty(booleanProperty);
     }
 
-    private static DateProperty
-        toDateProperty(com.bytechef.component.definition.Property.DateProperty dateProperty) {
+    private static DateProperty toDateProperty(
+        com.bytechef.component.definition.Property.DateProperty dateProperty) {
+
         return new DateProperty(dateProperty);
     }
 
-    private static DateTimeProperty
-        toDateTimeProperty(com.bytechef.component.definition.Property.DateTimeProperty dateTimeProperty) {
+    private static DateTimeProperty toDateTimeProperty(
+        com.bytechef.component.definition.Property.DateTimeProperty dateTimeProperty) {
+
         return new DateTimeProperty(dateTimeProperty);
     }
 
@@ -193,37 +201,47 @@ public abstract class Property {
         return new DynamicPropertiesProperty(dynamicPropertiesProperty);
     }
 
-    private static IntegerProperty
-        toIntegerProperty(com.bytechef.component.definition.Property.IntegerProperty integerProperty) {
+    private static FileEntryProperty toFileEntryProperty(
+        com.bytechef.component.definition.Property.FileEntryProperty fileEntryProperty) {
+
+        return new FileEntryProperty(fileEntryProperty);
+    }
+
+    private static IntegerProperty toIntegerProperty(
+        com.bytechef.component.definition.Property.IntegerProperty integerProperty) {
+
         return new IntegerProperty(integerProperty);
     }
 
-    private static NullProperty
-        toNullProperty(com.bytechef.component.definition.Property.NullProperty nullProperty) {
+    private static NullProperty toNullProperty(
+        com.bytechef.component.definition.Property.NullProperty nullProperty) {
+
         return new NullProperty(nullProperty);
     }
 
-    private static NumberProperty
-        toNumberProperty(com.bytechef.component.definition.Property.NumberProperty numberProperty) {
+    private static NumberProperty toNumberProperty(
+        com.bytechef.component.definition.Property.NumberProperty numberProperty) {
+
         return new NumberProperty(numberProperty);
     }
 
-    private static ObjectProperty
-        toObjectProperty(com.bytechef.component.definition.Property.ObjectProperty objectProperty) {
+    private static ObjectProperty toObjectProperty(
+        com.bytechef.component.definition.Property.ObjectProperty objectProperty) {
+
         return new ObjectProperty(objectProperty);
     }
 
-    private static StringProperty
-        toStringProperty(com.bytechef.component.definition.Property.StringProperty stringProperty) {
+    private static StringProperty toStringProperty(
+        com.bytechef.component.definition.Property.StringProperty stringProperty) {
+
         return new StringProperty(stringProperty);
     }
 
-    private static TimeProperty
-        toTimeProperty(com.bytechef.component.definition.Property.TimeProperty timeProperty) {
+    private static TimeProperty toTimeProperty(com.bytechef.component.definition.Property.TimeProperty timeProperty) {
         return new TimeProperty(timeProperty);
     }
 
-    public static interface PropertyVisitor {
+    public interface PropertyVisitor {
 
         Object visit(ArrayProperty arrayProperty);
 
@@ -236,6 +254,8 @@ public abstract class Property {
         Object visit(DynamicPropertiesProperty dynamicPropertiesProperty);
 
         Object visit(IntegerProperty integerProperty);
+
+        Object visit(FileEntryProperty fileEntryProperty);
 
         Object visit(NullProperty nullProperty);
 

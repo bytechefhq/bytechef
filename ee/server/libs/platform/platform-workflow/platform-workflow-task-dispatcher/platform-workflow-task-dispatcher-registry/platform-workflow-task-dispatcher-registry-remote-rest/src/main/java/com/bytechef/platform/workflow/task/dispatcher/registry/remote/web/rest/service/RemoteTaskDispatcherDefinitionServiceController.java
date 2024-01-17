@@ -7,8 +7,8 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.registry.remote.web.rest.service;
 
+import com.bytechef.platform.workflow.task.dispatcher.registry.domain.OutputSchema;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.registry.domain.ValueProperty;
 import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -49,7 +49,7 @@ public class RemoteTaskDispatcherDefinitionServiceController {
         consumes = {
             "application/json"
         })
-    public ResponseEntity<List<? extends ValueProperty<?>>> executeOutputSchema(
+    public ResponseEntity<OutputSchema> executeOutputSchema(
         @Valid @RequestBody OutputSchemaRequest outputSchemaRequest) {
 
         return ResponseEntity.ok(

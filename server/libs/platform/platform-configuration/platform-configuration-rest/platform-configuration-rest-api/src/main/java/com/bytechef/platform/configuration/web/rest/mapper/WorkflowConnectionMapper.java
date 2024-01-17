@@ -19,15 +19,20 @@ package com.bytechef.platform.configuration.web.rest.mapper;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowConnectionModel;
+import java.util.Optional;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = OptionalMapper.class)
+@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
 public interface WorkflowConnectionMapper extends Converter<WorkflowConnection, WorkflowConnectionModel> {
 
     @Override
     WorkflowConnectionModel convert(WorkflowConnection workflowConnection);
+
+    default Long mapToLong(Optional<Long> value) {
+        return value.orElse(null);
+    }
 }

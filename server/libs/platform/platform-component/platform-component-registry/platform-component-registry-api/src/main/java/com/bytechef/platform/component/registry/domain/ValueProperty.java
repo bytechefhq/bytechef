@@ -18,7 +18,7 @@ package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Property.ControlType;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -48,20 +48,24 @@ public abstract class ValueProperty<V> extends Property {
         return controlType;
     }
 
-    public Optional<V> getDefaultValue() {
-        return Optional.ofNullable(defaultValue);
+    @Nullable
+    public V getDefaultValue() {
+        return defaultValue;
     }
 
-    public Optional<V> getExampleValue() {
-        return Optional.ofNullable(exampleValue);
+    @Nullable
+    public V getExampleValue() {
+        return exampleValue;
     }
 
-    public Optional<String> getLabel() {
-        return Optional.ofNullable(label);
+    @Nullable
+    public String getLabel() {
+        return label;
     }
 
-    public Optional<String> getPlaceholder() {
-        return Optional.ofNullable(placeholder);
+    @Nullable
+    public String getPlaceholder() {
+        return placeholder;
     }
 
     @Override

@@ -131,7 +131,7 @@ public interface Authorization {
      *
      * @return
      */
-    Optional<List<? extends Property.InputProperty>> getProperties();
+    Optional<List<? extends Property>> getProperties();
 
     /**
      * TODO

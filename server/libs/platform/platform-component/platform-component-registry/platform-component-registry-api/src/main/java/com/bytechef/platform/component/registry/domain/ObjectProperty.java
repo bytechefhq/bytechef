@@ -22,16 +22,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 /**
  * @author Ivica Cardic
  */
-public class ObjectProperty extends ValueProperty<Map<String, Object>> {
+public class ObjectProperty extends ValueProperty<Map<String, ?>> {
 
     private List<? extends Property> additionalProperties;
     private boolean multipleValues;
-    private String objectType;
     private List<Option> options;
     private OptionsDataSource optionsDataSource;
     private List<? extends Property> properties;
@@ -44,18 +43,15 @@ public class ObjectProperty extends ValueProperty<Map<String, Object>> {
 
         this.additionalProperties = CollectionUtils.map(
             OptionalUtils.orElse(objectProperty.getAdditionalProperties(), List.of()),
-            valueProperty -> (ValueProperty<?>) toProperty(
-                (com.bytechef.component.definition.Property) valueProperty));
+            valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
         this.multipleValues = OptionalUtils.orElse(objectProperty.getMultipleValues(), true);
-        this.objectType = OptionalUtils.orElse(objectProperty.getObjectType(), null);
         this.options =
             CollectionUtils.map(OptionalUtils.orElse(objectProperty.getOptions(), List.of()), Option::new);
         this.optionsDataSource = OptionalUtils.mapOrElse(
             objectProperty.getOptionsDataSource(), OptionsDataSource::new, null);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(objectProperty.getProperties(), List.of()),
-            valueProperty -> (ValueProperty<?>) toProperty(
-                (com.bytechef.component.definition.Property) valueProperty));
+            valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
     }
 
     @Override
@@ -67,26 +63,6 @@ public class ObjectProperty extends ValueProperty<Map<String, Object>> {
         return Collections.unmodifiableList(additionalProperties);
     }
 
-    public boolean isMultipleValues() {
-        return multipleValues;
-    }
-
-    public Optional<String> getObjectType() {
-        return Optional.ofNullable(objectType);
-    }
-
-    public List<Option> getOptions() {
-        return Collections.unmodifiableList(options);
-    }
-
-    public Optional<OptionsDataSource> getOptionsDataSource() {
-        return Optional.ofNullable(optionsDataSource);
-    }
-
-    public List<? extends Property> getProperties() {
-        return Collections.unmodifiableList(properties);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -94,13 +70,30 @@ public class ObjectProperty extends ValueProperty<Map<String, Object>> {
         if (!(o instanceof ObjectProperty that))
             return false;
         return multipleValues == that.multipleValues && Objects.equals(additionalProperties, that.additionalProperties)
-            && Objects.equals(objectType, that.objectType) && Objects.equals(options, that.options)
+            && Objects.equals(options, that.options)
             && Objects.equals(optionsDataSource, that.optionsDataSource) && Objects.equals(properties, that.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(additionalProperties, multipleValues, objectType, options, optionsDataSource, properties);
+        return Objects.hash(additionalProperties, multipleValues, options, optionsDataSource, properties);
+    }
+
+    public boolean isMultipleValues() {
+        return multipleValues;
+    }
+
+    public List<Option> getOptions() {
+        return Collections.unmodifiableList(options);
+    }
+
+    @Nullable
+    public OptionsDataSource getOptionsDataSource() {
+        return optionsDataSource;
+    }
+
+    public List<? extends Property> getProperties() {
+        return Collections.unmodifiableList(properties);
     }
 
     @Override
@@ -108,7 +101,6 @@ public class ObjectProperty extends ValueProperty<Map<String, Object>> {
         return "ObjectProperty{" +
             "additionalProperties=" + additionalProperties +
             ", multipleValues=" + multipleValues +
-            ", objectType='" + objectType + '\'' +
             ", options=" + options +
             ", optionsDataSource=" + optionsDataSource +
             ", properties=" + properties +

@@ -26,7 +26,7 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-    JsonNullableMapper.class, OptionalMapper.class
+    JsonNullableMapper.class
 })
 public interface OptionMapper extends Converter<Option, OptionModel> {
 

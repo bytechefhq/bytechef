@@ -27,9 +27,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class AuthorizationMapper {
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
-        OptionalMapper.class
-    })
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface AuthorizationToAuthorizationModelMapper extends Converter<Authorization, AuthorizationModel> {
 
         @Override

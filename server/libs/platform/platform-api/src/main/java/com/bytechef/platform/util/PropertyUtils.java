@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.task.dispatcher.registry.util;
+package com.bytechef.platform.util;
 
-import com.bytechef.platform.workflow.task.dispatcher.definition.Property.InputProperty;
-import com.bytechef.platform.workflow.task.dispatcher.definition.Property.OutputProperty;
 import java.util.List;
 
 /**
@@ -25,29 +23,21 @@ import java.util.List;
  */
 public class PropertyUtils {
 
-    public static <P extends InputProperty> void checkInputProperties(List<P> properties) {
-        if (properties == null) {
-            return;
-        }
-
-        for (InputProperty property : properties) {
-            String name = property.getName();
-
+    public static void checkInputProperties(List<String> names) {
+        for (String name : names) {
             if (name == null || name.isEmpty()) {
                 throw new IllegalStateException("Defined properties cannot to have empty names");
             }
         }
     }
 
-    public static <P extends OutputProperty<?>> void checkOutputProperty(P property) {
-        if (property == null) {
+    public static void checkOutputProperty(String name) {
+        if (name == null) {
             return;
         }
 
-        String name = property.getName();
-
-        if (name != null && !name.isEmpty()) {
-            throw new IllegalStateException("Defined properties must have empty names");
+        if (!name.isEmpty()) {
+            throw new IllegalStateException("Defined property %s must have empty name".formatted(name));
         }
     }
 }

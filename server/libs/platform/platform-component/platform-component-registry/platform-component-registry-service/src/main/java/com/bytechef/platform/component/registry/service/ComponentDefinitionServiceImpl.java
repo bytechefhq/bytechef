@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -95,7 +94,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
                 return true;
             }
 
-            if (connectionDefinitions != null && OptionalUtils.isPresent(componentDefinition.getConnection())) {
+            if (connectionDefinitions != null && componentDefinition.getConnection() != null) {
                 return true;
             }
 
