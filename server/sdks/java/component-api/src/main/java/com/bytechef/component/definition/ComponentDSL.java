@@ -21,6 +21,7 @@ import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFu
 import com.bytechef.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
 import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.definition.TriggerOutputSchemaFunction.DynamicWebhookTriggerOutputSchemaFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -239,9 +240,10 @@ public final class ComponentDSL {
         private Help help;
         private Map<String, Object> metadata;
         private final String name;
-        private OutputSchema outputSchema;
+        private ValueProperty<?> outputSchemaDefinition;
         private boolean outputSchemaDefaultFunction;
         private ActionOutputSchemaFunction outputSchemaFunction;
+        private Object outputSchemaSampleOutput;
         private List<? extends Property> properties;
         private String title;
 
@@ -325,18 +327,7 @@ public final class ComponentDSL {
         }
 
         public ModifiableActionDefinition outputSchema(ValueProperty<?> definition) {
-            return outputSchema(definition, null);
-        }
-
-        public ModifiableActionDefinition outputSchema(OutputSchema outputSchema) {
-            this.outputSchema = outputSchema;
-
-            return this;
-        }
-
-        public ModifiableActionDefinition outputSchema(ValueProperty<?> definition, Object sampleOutput) {
-            this.outputSchema = new OutputSchema(definition, sampleOutput);
-            this.outputSchemaDefaultFunction = true;
+            this.outputSchemaDefinition = definition;
 
             return this;
         }
@@ -353,6 +344,12 @@ public final class ComponentDSL {
             if (properties != null) {
                 this.properties = List.of(properties);
             }
+
+            return this;
+        }
+
+        public ModifiableActionDefinition sampleOutput(Object sampleOutput) {
+            this.outputSchemaSampleOutput = sampleOutput;
 
             return this;
         }
@@ -381,16 +378,19 @@ public final class ComponentDSL {
                 && Objects.equals(editorDescriptionFunction, that.editorDescriptionFunction)
                 && Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help)
                 && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
-                && Objects.equals(outputSchema, that.outputSchema)
+                && Objects.equals(outputSchemaDefinition, that.outputSchemaDefinition)
+                && Objects.equals(outputSchemaDefaultFunction, that.outputSchemaDefaultFunction)
                 && Objects.equals(outputSchemaFunction, that.outputSchemaFunction)
+                && Objects.equals(outputSchemaSampleOutput, that.outputSchemaSampleOutput)
                 && Objects.equals(properties, that.properties) && Objects.equals(title, that.title);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
-                deprecated, description, editorDescriptionFunction, performFunction, help, metadata, name, outputSchema,
-                outputSchemaFunction, properties, title);
+                deprecated, description, editorDescriptionFunction, performFunction, help, metadata, name,
+                outputSchemaDefinition, outputSchemaDefaultFunction, outputSchemaFunction, outputSchemaSampleOutput,
+                properties, title);
         }
 
         @Override
@@ -455,7 +455,10 @@ public final class ComponentDSL {
 
         @Override
         public Optional<OutputSchema> getOutputSchema() {
-            return Optional.ofNullable(outputSchema);
+            return Optional.ofNullable(
+                outputSchemaDefinition == null
+                    ? null
+                    : new OutputSchema(outputSchemaDefinition, outputSchemaSampleOutput));
         }
 
         @Override
@@ -2905,9 +2908,10 @@ public final class ComponentDSL {
         private ListenerDisableConsumer listenerDisableConsumer;
         private ListenerEnableConsumer listenerEnableConsumer;
         private String name;
-        private OutputSchema outputSchema;
         private boolean outputSchemaDefaultFunction;
+        private ValueProperty<?> outputSchemaDefinition;
         private TriggerOutputSchemaFunction outputSchemaFunction;
+        private Object outputSchemaSampleOutput;
         private PollFunction pollFunction;
         private List<? extends Property> properties;
         private StaticWebhookRequestFunction staticWebhookRequest;
@@ -3006,13 +3010,6 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition outputSchema(OutputSchema outputSchema) {
-            this.outputSchema = outputSchema;
-            this.outputSchemaDefaultFunction = true;
-
-            return this;
-        }
-
         public ModifiableTriggerDefinition outputSchema() {
             this.outputSchemaDefaultFunction = true;
 
@@ -3020,17 +3017,12 @@ public final class ComponentDSL {
         }
 
         public ModifiableTriggerDefinition outputSchema(ValueProperty<?> definition) {
-            return outputSchema(definition, null);
-        }
-
-        public ModifiableTriggerDefinition outputSchema(ValueProperty<?> definition, Object sampleOutput) {
-            this.outputSchema = new OutputSchema(definition, sampleOutput);
+            this.outputSchemaDefinition = definition;
 
             return this;
         }
 
-        public ModifiableTriggerDefinition
-            outputSchema(TriggerOutputSchemaFunction.DynamicWebhookTriggerOutputSchemaFunction outputSchema) {
+        public ModifiableTriggerDefinition outputSchema(DynamicWebhookTriggerOutputSchemaFunction outputSchema) {
             this.outputSchemaFunction = outputSchema;
             this.outputSchemaDefaultFunction = false;
 
@@ -3072,6 +3064,12 @@ public final class ComponentDSL {
             if (properties != null) {
                 this.properties = List.of(properties);
             }
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition sampleOutput(Object sampleOutput) {
+            this.outputSchemaSampleOutput = sampleOutput;
 
             return this;
         }
@@ -3142,11 +3140,15 @@ public final class ComponentDSL {
                 && Objects.equals(help, that.help)
                 && Objects.equals(listenerDisableConsumer, that.listenerDisableConsumer)
                 && Objects.equals(listenerEnableConsumer, that.listenerEnableConsumer)
-                && Objects.equals(name, that.name) && Objects.equals(outputSchema, that.outputSchema)
+                && Objects.equals(name, that.name)
+                && Objects.equals(outputSchemaDefinition, that.outputSchemaDefinition)
+                && Objects.equals(outputSchemaDefaultFunction, that.outputSchemaDefaultFunction)
                 && Objects.equals(outputSchemaFunction, that.outputSchemaFunction)
+                && Objects.equals(outputSchemaSampleOutput, that.outputSchemaSampleOutput)
                 && Objects.equals(pollFunction, that.pollFunction) && Objects.equals(properties, that.properties)
-                && Objects.equals(staticWebhookRequest, that.staticWebhookRequest) && Objects.equals(title, that.title)
-                && type == that.type && Objects.equals(webhookRawBody, that.webhookRawBody)
+                && Objects.equals(staticWebhookRequest, that.staticWebhookRequest)
+                && Objects.equals(title, that.title) && type == that.type
+                && Objects.equals(webhookRawBody, that.webhookRawBody)
                 && Objects.equals(webhookValidateFunction, that.webhookValidateFunction)
                 && Objects.equals(workflowSyncExecution, that.workflowSyncExecution)
                 && Objects.equals(workflowSyncValidation, that.workflowSyncValidation);
@@ -3157,9 +3159,10 @@ public final class ComponentDSL {
             return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
                 deduplicateFunction, deprecated, description, dynamicWebhookDisableConsumer,
                 dynamicWebhookEnableFunction, dynamicWebhookRefreshFunction, dynamicWebhookRequestFunction,
-                editorDescriptionFunction, help, listenerDisableConsumer, listenerEnableConsumer, name, outputSchema,
-                outputSchemaFunction, pollFunction, properties, staticWebhookRequest, title, type, webhookRawBody,
-                webhookValidateFunction, workflowSyncExecution, workflowSyncValidation);
+                editorDescriptionFunction, help, listenerDisableConsumer, listenerEnableConsumer, name,
+                outputSchemaDefinition, outputSchemaDefaultFunction, outputSchemaFunction, outputSchemaSampleOutput,
+                pollFunction, properties, staticWebhookRequest, title, type, webhookRawBody, webhookValidateFunction,
+                workflowSyncExecution, workflowSyncValidation);
         }
 
         @Override
@@ -3249,7 +3252,10 @@ public final class ComponentDSL {
 
         @Override
         public Optional<OutputSchema> getOutputSchema() {
-            return Optional.ofNullable(outputSchema);
+            return Optional.ofNullable(
+                outputSchemaDefinition == null
+                    ? null
+                    : new OutputSchema(outputSchemaDefinition, outputSchemaSampleOutput));
         }
 
         @Override
