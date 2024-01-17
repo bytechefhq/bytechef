@@ -1,3 +1,5 @@
+/// <reference types="vite-plugin-svgr/client" />
+
 import AnyIcon from 'assets/any.svg?react';
 import ArrayIcon from 'assets/array.svg?react';
 import BooleanIcon from 'assets/boolean.svg?react';
