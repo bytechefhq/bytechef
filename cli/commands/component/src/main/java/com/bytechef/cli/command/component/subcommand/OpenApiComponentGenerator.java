@@ -952,7 +952,15 @@ public class OpenApiComponentGenerator {
             if (item instanceof String) {
                 codeBlocks.add(CodeBlock.of("option($S, $S)", StringUtils.capitalize(item.toString()), item));
             } else {
-                codeBlocks.add(CodeBlock.of("option($S, $L)", StringUtils.capitalize(item.toString()), item));
+                codeBlocks.add(
+                    CodeBlock.of(
+                        "option($S, $L$L)",
+                        StringUtils.capitalize(item.toString()), item,
+                        switch (schema.getType()) {
+                            case "number" -> "D";
+                            case "integer" -> Objects.equals(schema.getFormat(), "int64") ? "L" : "";
+                            default -> "";
+                        }));
             }
         }
         return codeBlocks;
