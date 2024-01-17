@@ -20,11 +20,12 @@ const DataPillPanelBody = ({componentData, dataPillFilterQuery}: DataPillPanelBo
         <div className="absolute left-0 top-0 w-full">
             <Accordion className="h-full" collapsible type="single">
                 {componentData.map((componentAction: ComponentActionData, index: number) => {
-                    const outputSchema: PropertyType | undefined = componentData[index]?.outputSchema;
+                    const outputSchemaDefinition: PropertyType | undefined =
+                        componentData[index]?.outputSchema?.definition;
 
-                    const properties: Array<PropertyType> | undefined = outputSchema?.properties?.length
-                        ? outputSchema.properties
-                        : outputSchema?.items;
+                    const properties: Array<PropertyType> | undefined = outputSchemaDefinition?.properties?.length
+                        ? outputSchemaDefinition.properties
+                        : outputSchemaDefinition?.items;
 
                     let existingProperties = properties?.filter((property) => {
                         if (property.name) {
@@ -36,16 +37,15 @@ const DataPillPanelBody = ({componentData, dataPillFilterQuery}: DataPillPanelBo
                         }
                     });
 
-                    if (outputSchema?.type === 'OBJECT' && outputSchema.objectType === 'FILE_ENTRY') {
+                    if (outputSchemaDefinition && outputSchemaDefinition.type === 'FILE_ENTRY') {
                         existingProperties = [
                             {
-                                controlType: outputSchema.controlType,
-                                description: outputSchema.description,
-                                label: outputSchema.label,
-                                name: outputSchema.name || componentAction.workflowNodeName || 'fileEntry',
-                                objectType: outputSchema.objectType,
-                                required: outputSchema.required,
-                                type: outputSchema.type,
+                                controlType: outputSchemaDefinition.controlType,
+                                description: outputSchemaDefinition.description,
+                                label: outputSchemaDefinition.label,
+                                name: outputSchemaDefinition.name || componentAction.workflowNodeName || 'fileEntry',
+                                required: outputSchemaDefinition.required,
+                                type: outputSchemaDefinition.type,
                             },
                         ];
                     }

@@ -154,7 +154,7 @@ const WorkflowNodeDetailsPanel = ({
             return;
         }
 
-        const outputSchema: PropertyType | undefined = actionDefinitions[index]?.outputSchema;
+        const outputSchema: PropertyType | undefined = actionDefinitions[index]?.outputSchema?.definition;
 
         const properties = outputSchema?.properties?.length ? outputSchema.properties : outputSchema?.items;
 

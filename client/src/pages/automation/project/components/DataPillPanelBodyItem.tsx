@@ -60,7 +60,7 @@ const DataPillPanelBodyItem = ({
                             componentIcon={componentAction.componentDefinition.icon}
                         />
 
-                        {(componentAction.outputSchema as PropertyType)?.objectType !== 'FILE_ENTRY' && (
+                        {(componentAction.outputSchema?.definition as PropertyType)?.type !== 'FILE_ENTRY' && (
                             <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">
                                 {filteredProperties?.map((property) => (
                                     <DataPill

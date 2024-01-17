@@ -27,9 +27,9 @@ const ObjectProperty = ({
 }: ObjectPropertyProps) => {
     const [additionalPropertiesDialogOpen, setAdditionalPropertiesDialogOpen] = useState(false);
 
-    const {additionalProperties, label, name, objectType, properties} = property;
+    const {additionalProperties, label, name, properties, type} = property;
 
-    if (objectType === 'FILE_ENTRY' && dataPills?.length) {
+    if (type === 'FILE_ENTRY' && dataPills?.length) {
         return (
             <Property
                 actionName={actionName}

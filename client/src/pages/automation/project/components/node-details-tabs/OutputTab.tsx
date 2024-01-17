@@ -1,8 +1,10 @@
+import {ComponentOutputSchemaModel} from '@/middleware/platform/configuration';
+import {PropertyType} from '@/types/projectTypes';
+
 /// <reference types="vite-plugin-svgr/client" />
 
 import {TYPE_ICONS} from 'shared/typeIcons';
 
-import {PropertyType} from '../../../../../types/projectTypes';
 import {useWorkflowNodeDetailsPanelStore} from '../../stores/useWorkflowNodeDetailsPanelStore';
 
 const PropertyField = ({data, label = 'item'}: {data: PropertyType; label: string}) => (
@@ -41,22 +43,30 @@ const SchemaProperties = ({properties}: {properties: Array<PropertyType>}) => (
     </ul>
 );
 
-const OutputTab = ({outputSchema}: {outputSchema: PropertyType}) => {
+const OutputTab = ({outputSchema}: {outputSchema: ComponentOutputSchemaModel}) => {
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     return (
         <div className="max-h-full flex-[1_1_1px] p-4">
             <div className="mb-1 flex items-center">
-                <span title={outputSchema.type}>{TYPE_ICONS[outputSchema.type as keyof typeof TYPE_ICONS]}</span>
+                <span title={outputSchema.definition.type}>
+                    {TYPE_ICONS[outputSchema.definition.type as keyof typeof TYPE_ICONS]}
+                </span>
 
                 <span className="ml-2 text-sm text-gray-800">{currentNode.name}</span>
             </div>
 
-            {outputSchema.properties && <SchemaProperties properties={outputSchema.properties} />}
-
-            {!outputSchema.properties && !!outputSchema.controlType && (
-                <PropertyField data={outputSchema} label={outputSchema.controlType!} />
+            {(outputSchema.definition as PropertyType)?.properties && (
+                <SchemaProperties properties={(outputSchema.definition as PropertyType).properties!} />
             )}
+
+            {!(outputSchema.definition as PropertyType).properties &&
+                !!(outputSchema.definition as PropertyType).controlType && (
+                    <PropertyField
+                        data={outputSchema.definition}
+                        label={(outputSchema.definition as PropertyType).controlType!}
+                    />
+                )}
         </div>
     );
 };

@@ -3,10 +3,10 @@ import {useQuery} from '@tanstack/react-query';
 import {
     ActionDefinitionApi,
     ActionDefinitionModel,
+    ComponentOutputSchemaModel,
     GetActionDefinitionsRequest,
     GetComponentActionDefinitionRequest,
     GetComponentActionOutputSchemaRequest,
-    type PropertyModel,
 } from 'middleware/platform/configuration';
 
 export const ActionDefinitionKeys = {
@@ -45,7 +45,7 @@ export const useGetComponentActionOutputSchemaQuery = (
     request: GetComponentActionOutputSchemaRequest,
     enabled?: boolean
 ) =>
-    useQuery<PropertyModel, Error>({
+    useQuery<ComponentOutputSchemaModel, Error>({
         queryKey: ActionDefinitionKeys.filteredActionOutputSchemas(request),
         queryFn: () => new ActionDefinitionApi().getComponentActionOutputSchema(request),
         enabled: enabled === undefined ? true : enabled,
