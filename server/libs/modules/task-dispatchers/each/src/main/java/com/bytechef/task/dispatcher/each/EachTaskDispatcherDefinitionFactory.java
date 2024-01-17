@@ -17,7 +17,7 @@
 package com.bytechef.task.dispatcher.each;
 
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.array;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.string;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.integer;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.EACH;
@@ -26,8 +26,14 @@ import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConst
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.ITERATEE;
 import static com.bytechef.task.dispatcher.each.constant.EachTaskDispatcherConstants.LIST;
 
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.registry.util.OutputSchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.definition.ValuePropertyFactory;
+import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,10 +52,27 @@ public class EachTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .label("List of items")
                 .description("List of items to iterate over."))
         .taskProperties(task(ITERATEE))
-        .variableProperties(string(ITEM), string(INDEX));
+        .variableProperties(EachTaskDispatcherDefinitionFactory::getVariableProperties);
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
         return TASK_DISPATCHER_DEFINITION;
+    }
+
+    private static List<ValueProperty<?>> getVariableProperties(Map<String, ?> inputParameters) {
+        List<ValueProperty<?>> properties;
+
+        List<?> list = MapUtils.getRequiredList(inputParameters, LIST);
+
+        if (list.isEmpty()) {
+            properties = List.of();
+        } else {
+            properties = List.of(
+                (ValueProperty<?>) OutputSchemaUtils.getOutputSchemaDefinition(
+                    ITEM, new ValuePropertyFactory(list.getFirst())),
+                integer(INDEX));
+        }
+
+        return properties;
     }
 }

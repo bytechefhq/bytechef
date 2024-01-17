@@ -49,12 +49,13 @@ public class BranchTaskDispatcherDefinitionFactory implements TaskDispatcherDefi
         .taskProperties(
             array(CASES)
                 .description("The list of tasks to execute if the result of expression matches the 'key' value.")
-                .items(object()
-                    .properties(
-                        string(KEY),
-                        array(TASKS)
-                            .description("The list of tasks.")
-                            .items(task()))),
+                .items(
+                    object()
+                        .properties(
+                            string(KEY),
+                            array(TASKS)
+                                .description("The list of tasks.")
+                                .items(task()))),
             array(DEFAULT)
                 .description(
                     "The list of tasks to execute if the result of expression does not match any of 'key' values.")

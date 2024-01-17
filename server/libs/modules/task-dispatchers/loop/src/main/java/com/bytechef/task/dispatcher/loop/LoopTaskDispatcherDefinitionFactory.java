@@ -18,7 +18,7 @@ package com.bytechef.task.dispatcher.loop;
 
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.array;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.bool;
-import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.string;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.integer;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.INDEX;
@@ -28,8 +28,14 @@ import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConst
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.LOOP_FOREVER;
 
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.registry.util.OutputSchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.definition.ValuePropertyFactory;
+import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
@@ -50,10 +56,27 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
                 .description("Should loop iterate until condition set by 'Loop Break' statement is met.")
                 .defaultValue(false))
         .taskProperties(task(ITERATEE))
-        .variableProperties(string(ITEM), string(INDEX));
+        .variableProperties(LoopTaskDispatcherDefinitionFactory::getVariableProperties);
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
         return TASK_DISPATCHER_DEFINITION;
+    }
+
+    private static List<Property.ValueProperty<?>> getVariableProperties(Map<String, ?> inputParameters) {
+        List<Property.ValueProperty<?>> properties;
+
+        List<?> list = MapUtils.getRequiredList(inputParameters, LIST);
+
+        if (list.isEmpty()) {
+            properties = List.of();
+        } else {
+            properties = List.of(
+                (Property.ValueProperty<?>) OutputSchemaUtils.getOutputSchemaDefinition(
+                    ITEM, new ValuePropertyFactory(list.getFirst())),
+                integer(INDEX));
+        }
+
+        return properties;
     }
 }

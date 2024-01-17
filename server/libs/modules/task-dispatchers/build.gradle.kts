@@ -13,6 +13,7 @@ subprojects {
         implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
         implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
         implementation(project(":server:libs:core:commons:commons-util"))
+        implementation(project(":server:libs:platform:platform-registry-api"))
         implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 
         testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-service"))
