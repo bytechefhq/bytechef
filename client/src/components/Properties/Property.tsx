@@ -3,7 +3,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useDataPillPanelStore} from '@/pages/automation/project/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
-import getInputControlType from '@/pages/automation/project/utils/getInputControlType';
+import getInputHTMLType from '@/pages/automation/project/utils/getInputHTMLType';
 import {PropertyType} from '@/types/projectTypes';
 import {ComponentDataType, CurrentComponentType, DataPillType} from '@/types/types';
 import Editor from '@monaco-editor/react';
@@ -11,7 +11,7 @@ import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import Select, {ISelectOption} from 'components/Select/Select';
 import TextArea from 'components/TextArea/TextArea';
 import {FormInputIcon, FunctionSquareIcon} from 'lucide-react';
-import {ChangeEvent, KeyboardEvent, useRef, useState} from 'react';
+import {ChangeEvent, KeyboardEvent, useEffect, useRef, useState} from 'react';
 import {FieldValues, FormState, UseFormRegister} from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import {TYPE_ICONS} from 'shared/typeIcons';
@@ -60,8 +60,11 @@ const Property = ({
     property,
     register,
 }: PropertyProps) => {
+    const [errorMessage, setErrorMessage] = useState('');
+    const [hasError, setHasError] = useState(false);
+    const [inputValue, setInputValue] = useState('');
     const [mentionInput, setMentionInput] = useState(property.controlType !== 'SELECT');
-    const [integerValue, setIntegerValue] = useState('');
+    const [numericValue, setNumericValue] = useState('');
 
     const editorRef = useRef<ReactQuill>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -74,17 +77,37 @@ const Property = ({
 
     let defaultValue: string | undefined = property.defaultValue;
 
-    const {controlType, description, hidden, items, label, options, properties, required, type} = property;
+    const {
+        description,
+        hidden,
+        items,
+        label,
+        maxLength,
+        maxValue,
+        minLength,
+        minValue,
+        options,
+        properties,
+        required,
+        type,
+    } = property;
+
+    const {controlType} = property;
 
     if (!name) {
         type === 'OBJECT' || type === 'ARRAY' ? (name = 'item') : <></>;
     }
 
-    const hasError = (propertyName: string): boolean =>
-        formState?.touchedFields[path] &&
-        formState?.touchedFields[path]![propertyName] &&
-        formState?.errors[path] &&
-        (formState?.errors[path] as never)[propertyName];
+    useEffect(() => {
+        if (formState && name) {
+            setHasError(
+                formState.touchedFields[path] &&
+                    formState.touchedFields[path]![name] &&
+                    formState.errors[path] &&
+                    (formState.errors[path] as never)[name]
+            );
+        }
+    }, [formState, name, path]);
 
     const formattedOptions = options
         ?.map(({description, label, value}) => {
@@ -100,7 +123,7 @@ const Property = ({
         })
         .filter((option) => option !== null);
 
-    const isValidPropertyType = INPUT_PROPERTY_CONTROL_TYPES.includes(controlType!);
+    const isValidControlType = controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType);
 
     const isNumericalInput = type === 'INTEGER' || type === 'NUMBER';
 
@@ -129,6 +152,7 @@ const Property = ({
     }
 
     const handlePropertyChange = (event: ChangeEvent<HTMLInputElement>) => {
+        console.log('handlePropertyChange');
         if (currentComponentData) {
             const {action, name, properties} = currentComponentData;
 
@@ -173,6 +197,48 @@ const Property = ({
         }
     };
 
+    const handleInputBlur = () => {
+        if (isNumericalInput) {
+            const valueTooLow = minValue && parseFloat(numericValue) < minValue;
+            const valueTooHigh = maxValue && parseFloat(numericValue) > maxValue;
+
+            if (valueTooLow || valueTooHigh) {
+                setHasError(true);
+
+                setErrorMessage('Incorrect value');
+            } else {
+                setHasError(false);
+            }
+        } else {
+            const valueTooShort = minLength && inputValue.length < minLength;
+            const valueTooLong = maxLength && inputValue.length > maxLength;
+
+            setHasError(!!valueTooShort || !!valueTooLong);
+
+            setErrorMessage('Incorrect value');
+        }
+    };
+
+    const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+        if (isNumericalInput) {
+            const {value} = event.target;
+
+            const onlyNumericValue = type === 'NUMBER' ? value.replace(/[^0-9.-]/g, '') : value.replace(/\D/g, '');
+
+            if (!onlyNumericValue) {
+                return;
+            }
+
+            handlePropertyChange(event);
+
+            setNumericValue(onlyNumericValue);
+        } else {
+            handlePropertyChange(event);
+
+            setInputValue(event.target.value);
+        }
+    };
+
     return type === 'OBJECT' && !properties?.length && !items?.length ? (
         <></>
     ) : (
@@ -204,11 +270,11 @@ const Property = ({
 
                 {showMentionInput && !!dataPills?.length && (
                     <MentionsInput
-                        controlType={controlType || getInputControlType(controlType)}
+                        controlType={controlType}
                         dataPills={dataPills}
                         defaultValue={defaultValue}
                         description={description}
-                        label={label}
+                        label={label || name}
                         leadingIcon={typeIcon}
                         name={name}
                         onChange={handlePropertyChange}
@@ -259,52 +325,49 @@ const Property = ({
                             />
                         )}
 
-                        {register && isValidPropertyType && (
+                        {register && isValidControlType && (
                             <Input
                                 defaultValue={defaultValue}
                                 description={description}
-                                error={hasError(name!)}
+                                error={hasError}
                                 fieldsetClassName="flex-1 mb-0"
                                 key={name}
                                 label={label}
                                 leadingIcon={typeIcon}
                                 required={required}
-                                type={hidden ? 'hidden' : 'text'}
+                                type={hidden ? 'hidden' : getInputHTMLType(controlType)}
                                 {...register(`${path}.${name}`, {
+                                    maxLength,
+                                    minLength,
                                     required: required!,
                                 })}
                             />
                         )}
 
-                        {!register && isValidPropertyType && (
+                        {!register && isValidControlType && (
                             <Input
                                 description={description}
-                                error={hasError(name!)}
+                                error={hasError}
+                                errorMessage={errorMessage}
                                 fieldsetClassName="flex-1 mb-0"
                                 key={name}
                                 label={label || name}
                                 leadingIcon={typeIcon}
+                                max={maxValue}
+                                maxLength={maxLength}
+                                min={minValue}
+                                minLength={minLength}
                                 name={name!}
-                                onChange={(event) => {
-                                    if (isNumericalInput) {
-                                        const {value} = event.target;
-
-                                        const integerOnlyRegex = type === 'NUMBER' ? /^\d*\.?\d*$/ : /^\d*$/;
-
-                                        if (integerOnlyRegex.test(value)) {
-                                            handlePropertyChange(event);
-
-                                            setIntegerValue(value);
-                                        }
-                                    } else {
-                                        handlePropertyChange(event);
-                                    }
-                                }}
+                                onBlur={handleInputBlur}
+                                onChange={handleInputChange}
+                                placeholder={
+                                    isNumericalInput && minValue && maxValue ? `${minValue} - ${maxValue}` : ''
+                                }
                                 ref={inputRef}
                                 required={required}
                                 title={type}
-                                type={hidden ? 'hidden' : getInputControlType(controlType)}
-                                value={isNumericalInput ? integerValue || defaultValue : defaultValue}
+                                type={hidden ? 'hidden' : getInputHTMLType(controlType)}
+                                value={(isNumericalInput ? numericValue || defaultValue : defaultValue) || inputValue}
                             />
                         )}
 
