@@ -6,9 +6,9 @@
 
 ByteChef is an open-source, low-code, extendable API integration & workflow automation platform that allows you to automate work by connecting applications and building workflows across your organization.
 
-[//]: # ([Website]&#40;https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; • [Docs]&#40;https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; • [Blog]&#40;https://blog.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; • [Discord]&#40;https://discord.gg/PybnUM3Y&#41; • [Forum]&#40;https://github.com/bytechefhq/bytechef/discussions&#41; • [Twitter]&#40;https://twitter.com/bytechefhq&#41;)
+[//]: # ([Website]&#40;https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; • [Docs]&#40;https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; • [Blog]&#40;https://blog.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41; • [Discord]&#40;https://discord.gg/JcNSqJ7vK8; • [Forum]&#40;https://github.com/bytechefhq/bytechef/discussions&#41; • [Twitter]&#40;https://twitter.com/bytechefhq&#41;)
 
-[Website](https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) - [Discord](https://discord.gg/Y9Dejg5R) - [Twitter](https://twitter.com/bytechefhq)
+[Website](https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) - [Discord](https://discord.gg/JcNSqJ7vK8) - [Twitter](https://twitter.com/bytechefhq)
 
 [![CI Build](https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml/badge.svg)](https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml) [![License](https://img.shields.io/static/v1?label=license&message=Apache&nbsp;v2.0&color=brightgreen)](https://github.com/bytechefhq/bytechef/blob/master/LICENSE)
 
@@ -70,14 +70,14 @@ ByteChef can help you as:
 
 [//]: # (For general help using ByteChef, please refer to the official [documentation]&#40;https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme&#41;. For additional help, you can use one of these channels to ask a question:)
 
-[//]: # (- [Discord]&#40;https://discord.gg/VxCenmHB5P; - Discussions with the community and the team.)
+[//]: # (- [Discord]&#40;https://https://discord.gg/JcNSqJ7vK8; - Discussions with the community and the team.)
 [//]: # (- [GitHub]&#40;https://github.com/bytechefhq/bytechef/issues&#41; - For bug reports and feature requests.)
 [//]: # (- [Forum]&#40;https://github.com/bytechefhq/bytechef/discussions&#41; - Ask for help and propose new ideas.)
 [//]: # (- [Twitter]&#40;https://twitter.com/bytechefhq&#41; - Get the product updates easily.)
 
 For help, you can use one of these channels to ask a question:
 
-- [Discord](https://discord.gg/Y9Dejg5R) - Discussions with the community and the team.
+- [Discord](https://discord.gg/JcNSqJ7vK8) - Discussions with the community and the team.
 - [GitHub](https://github.com/bytechefhq/bytechef/issues) - For bug reports and feature requests.
 - [Twitter](https://twitter.com/bytechefhq) - Get the product updates easily.
 
