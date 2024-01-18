@@ -271,7 +271,9 @@ public class OpenApiComponentGenerator {
         List<String> javacOpts = new ArrayList<>();
 
         javacOpts.add("-classpath");
-        javacOpts.add("libs/auto-service-annotations-1.1.1.jar:libs/component-api-1.0.jar");
+        javacOpts.add(
+            "libs/auto-service-annotations-1.1.1.jar:libs/hermes-component-api-1.0.jar:" +
+                "libs/hermes-definition-api-1.0.jar");
 
         Path parentPath = sourcePath.getParent();
 
