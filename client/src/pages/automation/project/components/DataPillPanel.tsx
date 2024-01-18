@@ -66,8 +66,8 @@ const DataPillPanel = ({
         }
 
         const outputSchemaContent =
-            (action.outputSchema as PropertyType)?.properties ||
-            (action.outputSchema as PropertyType)?.items ||
+            (action.outputSchema?.definition as PropertyType)?.properties ||
+            (action.outputSchema?.definition as PropertyType)?.items ||
             action.outputSchemaDataSource;
 
         return action.workflowNodeName !== currentNode.name && action.componentDefinition && outputSchemaContent;

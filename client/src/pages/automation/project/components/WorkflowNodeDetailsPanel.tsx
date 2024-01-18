@@ -242,8 +242,8 @@ const WorkflowNodeDetailsPanel = ({
 
         if (name === 'output') {
             return (
-                (currentActionDefinition?.outputSchema as PropertyType)?.properties?.length ||
-                (currentActionDefinition?.outputSchema as PropertyType)?.items?.length ||
+                (currentActionDefinition?.outputSchema?.definition as PropertyType)?.properties?.length ||
+                (currentActionDefinition?.outputSchema?.definition as PropertyType)?.items?.length ||
                 currentActionDefinition?.outputSchemaDataSource
             );
         }
@@ -362,7 +362,7 @@ const WorkflowNodeDetailsPanel = ({
     }, [
         activeTab,
         componentDefinitionNames.length,
-        currentActionDefinition?.outputSchema,
+        currentActionDefinition?.outputSchema?.definition,
         currentActionFetched,
         currentActionProperties?.length,
         currentComponent?.name,
