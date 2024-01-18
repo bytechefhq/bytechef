@@ -16,12 +16,15 @@
 import * as runtime from '../runtime';
 import type {
   UpdateWorkflowTestConfigurationConnectionRequestModel,
+  UpdateWorkflowTestConfigurationInputsRequestModel,
   WorkflowTestConfigurationConnectionModel,
   WorkflowTestConfigurationModel,
 } from '../models/index';
 import {
     UpdateWorkflowTestConfigurationConnectionRequestModelFromJSON,
     UpdateWorkflowTestConfigurationConnectionRequestModelToJSON,
+    UpdateWorkflowTestConfigurationInputsRequestModelFromJSON,
+    UpdateWorkflowTestConfigurationInputsRequestModelToJSON,
     WorkflowTestConfigurationConnectionModelFromJSON,
     WorkflowTestConfigurationConnectionModelToJSON,
     WorkflowTestConfigurationModelFromJSON,
@@ -51,6 +54,11 @@ export interface UpdateWorkflowTestConfigurationConnectionRequest {
     operationName: string;
     key: string;
     updateWorkflowTestConfigurationConnectionRequestModel: UpdateWorkflowTestConfigurationConnectionRequestModel;
+}
+
+export interface UpdateWorkflowTestConfigurationInputsRequest {
+    workflowId: string;
+    updateWorkflowTestConfigurationInputsRequestModel: UpdateWorkflowTestConfigurationInputsRequestModel;
 }
 
 /**
@@ -232,7 +240,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
      * Update a workflow test configuration connection.
      * Update a workflow test configuration connection
      */
-    async updateWorkflowTestConfigurationConnectionRaw(requestParameters: UpdateWorkflowTestConfigurationConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestConfigurationConnectionModel>> {
+    async updateWorkflowTestConfigurationConnectionRaw(requestParameters: UpdateWorkflowTestConfigurationConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
             throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling updateWorkflowTestConfigurationConnection.');
         }
@@ -263,16 +271,53 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
             body: UpdateWorkflowTestConfigurationConnectionRequestModelToJSON(requestParameters.updateWorkflowTestConfigurationConnectionRequestModel),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowTestConfigurationConnectionModelFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      * Update a workflow test configuration connection.
      * Update a workflow test configuration connection
      */
-    async updateWorkflowTestConfigurationConnection(requestParameters: UpdateWorkflowTestConfigurationConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestConfigurationConnectionModel> {
-        const response = await this.updateWorkflowTestConfigurationConnectionRaw(requestParameters, initOverrides);
-        return await response.value();
+    async updateWorkflowTestConfigurationConnection(requestParameters: UpdateWorkflowTestConfigurationConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateWorkflowTestConfigurationConnectionRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Update a workflow test configuration inputs.
+     * Update a workflow test configuration inputs
+     */
+    async updateWorkflowTestConfigurationInputsRaw(requestParameters: UpdateWorkflowTestConfigurationInputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
+            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling updateWorkflowTestConfigurationInputs.');
+        }
+
+        if (requestParameters.updateWorkflowTestConfigurationInputsRequestModel === null || requestParameters.updateWorkflowTestConfigurationInputsRequestModel === undefined) {
+            throw new runtime.RequiredError('updateWorkflowTestConfigurationInputsRequestModel','Required parameter requestParameters.updateWorkflowTestConfigurationInputsRequestModel was null or undefined when calling updateWorkflowTestConfigurationInputs.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/workflow-test-configurations/{workflowId}/inputs`.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateWorkflowTestConfigurationInputsRequestModelToJSON(requestParameters.updateWorkflowTestConfigurationInputsRequestModel),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Update a workflow test configuration inputs.
+     * Update a workflow test configuration inputs
+     */
+    async updateWorkflowTestConfigurationInputs(requestParameters: UpdateWorkflowTestConfigurationInputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateWorkflowTestConfigurationInputsRaw(requestParameters, initOverrides);
     }
 
 }

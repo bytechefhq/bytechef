@@ -31,7 +31,7 @@ export interface WorkflowTriggerModel {
      * @type {Array<WorkflowConnectionModel>}
      * @memberof WorkflowTriggerModel
      */
-    connections?: Array<WorkflowConnectionModel>;
+    readonly connections?: Array<WorkflowConnectionModel>;
     /**
      * The human-readable description of the task.
      * @type {string}
@@ -103,7 +103,6 @@ export function WorkflowTriggerModelToJSON(value?: WorkflowTriggerModel | null):
     }
     return {
         
-        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(WorkflowConnectionModelToJSON)),
         'label': value.label,
         'name': value.name,
         'parameters': value.parameters,
