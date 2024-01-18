@@ -7,6 +7,7 @@ type InputProps = {
     description?: string;
     fieldsetClassName?: string;
     error?: boolean;
+    errorMessage?: string;
     label?: string;
     labelClassName?: string;
     leadingIcon?: ReactNode;
@@ -24,6 +25,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             description,
             disabled,
             error,
+            errorMessage,
             fieldsetClassName,
             id,
             label,
@@ -117,7 +119,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
             {error && (
                 <p className="mt-2 text-sm text-rose-600" id={`${name}-error`} role="alert">
-                    This field is required
+                    {errorMessage || 'This field is required.'}
                 </p>
             )}
         </fieldset>
