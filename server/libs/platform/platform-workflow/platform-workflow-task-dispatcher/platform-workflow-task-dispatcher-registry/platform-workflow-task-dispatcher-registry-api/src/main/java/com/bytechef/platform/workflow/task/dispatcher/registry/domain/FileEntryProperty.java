@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -63,7 +64,7 @@ public class FileEntryProperty extends ValueProperty<Map<String, ?>> {
     }
 
     public List<? extends ValueProperty<?>> getProperties() {
-        return properties;
+        return Collections.unmodifiableList(properties);
     }
 
     @Override

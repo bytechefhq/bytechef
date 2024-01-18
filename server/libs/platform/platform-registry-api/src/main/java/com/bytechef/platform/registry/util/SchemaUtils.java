@@ -32,6 +32,7 @@ import com.bytechef.definition.BaseProperty.BaseStringProperty;
 import com.bytechef.definition.BaseProperty.BaseTimeProperty;
 import com.bytechef.platform.registry.domain.BaseOutputSchema;
 import com.bytechef.platform.registry.domain.BaseProperty;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -119,6 +120,7 @@ public class SchemaUtils {
         return outputSchemaFactoryFunction.apply(outputSchema.getDefinition(), sampleOutput);
     }
 
+    @SuppressFBWarnings("DLS")
     private static Object getSampleOutput(com.bytechef.definition.BaseProperty definitionProperty) {
         return switch (definitionProperty) {
             case BaseArrayProperty<? extends com.bytechef.definition.BaseProperty> p -> {
@@ -133,16 +135,16 @@ public class SchemaUtils {
 
                 yield items;
             }
-            case BaseBooleanProperty p -> true;
-            case BaseDateProperty p -> LocalDate.now();
-            case BaseDateTimeProperty p -> LocalDateTime.now();
-            case BaseFileEntryProperty<?> p ->
+            case BaseBooleanProperty ignored -> true;
+            case BaseDateProperty ignored -> LocalDate.now();
+            case BaseDateTimeProperty ignored -> LocalDateTime.now();
+            case BaseFileEntryProperty<?> ignored ->
                 Map.of(
                     "extension", "sampleExtension", "mimeType", "sampleMimeType", "name", "sampleName", "url",
                     "file:///tmp/fileName.txt");
-            case BaseIntegerProperty p -> 57;
-            case BaseNullProperty p -> null;
-            case BaseNumberProperty p -> 23.34;
+            case BaseIntegerProperty ignored -> 57;
+            case BaseNullProperty ignored -> null;
+            case BaseNumberProperty ignored -> 23.34;
             case BaseObjectProperty<? extends com.bytechef.definition.BaseProperty> p -> {
                 Map<String, Object> map = new HashMap<>();
 
@@ -155,7 +157,7 @@ public class SchemaUtils {
                 yield map;
             }
             case BaseStringProperty p -> "sample " + p.getName();
-            case BaseTimeProperty p -> LocalTime.now();
+            case BaseTimeProperty ignored -> LocalTime.now();
             default -> throw new IllegalArgumentException(
                 "Definition %s is not allowed".formatted(definitionProperty.getName()));
         };
