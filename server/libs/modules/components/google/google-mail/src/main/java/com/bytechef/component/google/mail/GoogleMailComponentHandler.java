@@ -16,16 +16,16 @@
 
 package com.bytechef.component.google.mail;
 
+import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.google.mail.connection.GoogleMailConnection.CONNECTION_DEFINITION;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GOOGLE_MAIL;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.mail.action.GoogleMailGetMailAction;
 import com.bytechef.component.google.mail.action.GoogleMailGetThreadAction;
 import com.bytechef.component.google.mail.action.GoogleMailSearchEmailAction;
 import com.bytechef.component.google.mail.action.GoogleMailSendEmailAction;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**

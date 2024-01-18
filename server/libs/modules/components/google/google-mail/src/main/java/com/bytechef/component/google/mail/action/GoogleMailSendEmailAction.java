@@ -16,6 +16,10 @@
 
 package com.bytechef.component.google.mail.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ATTACHMENTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BCC;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BODY;
@@ -28,16 +32,13 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.RE
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SEND_EMAIL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SUBJECT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.definition.BaseProperty;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import jakarta.activation.DataHandler;
@@ -75,7 +76,7 @@ public class GoogleMailSendEmailAction {
                 .items(
                     string(EMAIL)
                         .label(EMAIL_ADDRESS)
-                        .controlType(BaseProperty.ControlType.EMAIL))
+                        .controlType(Property.ControlType.EMAIL))
                 .required(true),
             string(SUBJECT)
                 .label("Subject")
@@ -87,7 +88,7 @@ public class GoogleMailSendEmailAction {
                 .items(
                     string(EMAIL)
                         .label(EMAIL_ADDRESS)
-                        .controlType(BaseProperty.ControlType.EMAIL))
+                        .controlType(Property.ControlType.EMAIL))
                 .required(false),
             array(CC)
                 .label("Cc")
@@ -95,7 +96,7 @@ public class GoogleMailSendEmailAction {
                 .items(
                     string(EMAIL)
                         .label(EMAIL_ADDRESS)
-                        .controlType(BaseProperty.ControlType.EMAIL))
+                        .controlType(Property.ControlType.EMAIL))
                 .required(false),
             array(REPLY_TO)
                 .label("Reply to")
@@ -103,7 +104,7 @@ public class GoogleMailSendEmailAction {
                 .items(
                     string(EMAIL)
                         .label(EMAIL_ADDRESS)
-                        .controlType(BaseProperty.ControlType.EMAIL))
+                        .controlType(Property.ControlType.EMAIL))
                 .required(false),
             string(BODY)
                 .label("Body")
@@ -126,22 +127,26 @@ public class GoogleMailSendEmailAction {
         Gmail service = GoogleMailUtils.getMail(connectionParameters);
 
         Properties properties = new Properties();
+
         Session session = Session.getDefaultInstance(properties, null);
 
         MimeMessage mimeMessage = new MimeMessage(session);
 
         mimeMessage.setFrom(new InternetAddress(inputParameters.getRequiredString(FROM)));
-        mimeMessage.setRecipients(RecipientType.TO, InternetAddress.parse(
-            String.join(",", inputParameters.getRequiredList(TO, String.class))));
+        mimeMessage.setRecipients(
+            RecipientType.TO,
+            InternetAddress.parse(String.join(",", inputParameters.getRequiredList(TO, String.class))));
         mimeMessage.setSubject(inputParameters.getRequiredString(SUBJECT));
         mimeMessage.setText(inputParameters.getRequiredString(BODY));
-        mimeMessage.setRecipients(RecipientType.CC, InternetAddress.parse(
-            String.join(",", inputParameters.getList(CC, String.class, List.of()))));
+        mimeMessage.setRecipients(
+            RecipientType.CC,
+            InternetAddress.parse(String.join(",", inputParameters.getList(CC, String.class, List.of()))));
 
-        mimeMessage.setRecipients(RecipientType.BCC, InternetAddress.parse(
-            String.join(",", inputParameters.getList(BCC, String.class, List.of()))));
-        mimeMessage.setReplyTo(InternetAddress.parse(
-            String.join(",", inputParameters.getList(REPLY_TO, String.class, List.of()))));
+        mimeMessage.setRecipients(
+            RecipientType.BCC,
+            InternetAddress.parse(String.join(",", inputParameters.getList(BCC, String.class, List.of()))));
+        mimeMessage.setReplyTo(
+            InternetAddress.parse(String.join(",", inputParameters.getList(REPLY_TO, String.class, List.of()))));
 
         MimeBodyPart mimeBodyPart = new MimeBodyPart();
 
@@ -153,10 +158,11 @@ public class GoogleMailSendEmailAction {
 
         MimeBodyPart attachmentBodyPart = new MimeBodyPart();
 
-        for (ActionContext.FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
+        for (FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
             attachmentBodyPart.setDataHandler(
-                new DataHandler(new ByteArrayDataSource(
-                    (InputStream) actionContext.file(file -> file.getStream(fileEntry)), fileEntry.getMimeType())));
+                new DataHandler(
+                    new ByteArrayDataSource(
+                        (InputStream) actionContext.file(file -> file.getStream(fileEntry)), fileEntry.getMimeType())));
             attachmentBodyPart.setFileName(fileEntry.getName());
 
             multipart.addBodyPart(attachmentBodyPart);

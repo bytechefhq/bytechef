@@ -16,21 +16,21 @@
 
 package com.bytechef.component.google.mail.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.GET_MAIL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.METADATA_HEADERS;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.hermes.component.definition.Parameters;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class GoogleMailGetMailAction {
             string(ID)
                 .label("ID")
                 .description("The ID of the message to retrieve.")
-                .options((ActionOptionsFunction) GoogleMailUtils::getMessageIdOptions)
+                .options((ActionOptionsFunction<String>) GoogleMailUtils::getMessageIdOptions)
                 .required(true),
             FORMAT_PROPERTY,
             array(METADATA_HEADERS)

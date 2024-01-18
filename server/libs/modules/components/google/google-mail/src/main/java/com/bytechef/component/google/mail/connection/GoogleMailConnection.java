@@ -16,14 +16,14 @@
 
 package com.bytechef.component.google.mail.connection;
 
-import static com.bytechef.hermes.component.definition.ComponentDSL.authorization;
-import static com.bytechef.hermes.component.definition.ComponentDSL.connection;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_ID;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.CLIENT_SECRET;
+import static com.bytechef.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
+import static com.bytechef.component.definition.ComponentDSL.authorization;
+import static com.bytechef.component.definition.ComponentDSL.connection;
+import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.hermes.component.definition.Authorization.AuthorizationType;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import java.util.List;
 
 /**

@@ -16,13 +16,13 @@
 
 package com.bytechef.component.google.mail.util;
 
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
+import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import com.google.api.services.gmail.Gmail;
 import org.junit.jupiter.api.Test;
 
