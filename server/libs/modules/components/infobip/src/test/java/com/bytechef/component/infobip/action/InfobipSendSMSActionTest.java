@@ -16,13 +16,13 @@
 
 package com.bytechef.component.infobip.action;
 
+import static com.bytechef.component.definition.Authorization.VALUE;
 import static com.bytechef.component.infobip.constant.InfobipConstants.BULK_ID;
 import static com.bytechef.component.infobip.constant.InfobipConstants.INCLUDE_SMS_COUNT_IN_RESPONSE;
 import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGES;
 import static com.bytechef.component.infobip.constant.InfobipConstants.SENDING_SPEED_LIMIT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TRACKING;
 import static com.bytechef.component.infobip.constant.InfobipConstants.URL_OPTIONS;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -80,7 +80,8 @@ class InfobipSendSMSActionTest extends AbstractInfobipActionTest {
             SmsApi.class,
             ((smsApi, context) -> when(smsApi.sendSmsMessage(any()))
                 .thenReturn(mockedSendSmsMessageRequest)))) {
-            when(mockedSendSmsMessageRequest.execute()).thenReturn(mockedSmsResponse);
+            when(mockedSendSmsMessageRequest.execute())
+                .thenReturn(mockedSmsResponse);
 
             SmsResponse result = InfobipSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
 

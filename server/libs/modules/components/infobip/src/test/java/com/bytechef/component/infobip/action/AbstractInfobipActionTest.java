@@ -20,8 +20,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Parameters;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import com.infobip.ApiClient;
 import com.infobip.ApiKey;
 import org.junit.jupiter.api.AfterEach;
@@ -45,8 +45,7 @@ public abstract class AbstractInfobipActionTest {
     public void beforeEach() {
         apiClientMockedStatic = mockStatic(ApiClient.class);
 
-        apiClientMockedStatic.when(
-            () -> ApiClient.forApiKey(apiKeyArgumentCaptor.capture()))
+        apiClientMockedStatic.when(() -> ApiClient.forApiKey(apiKeyArgumentCaptor.capture()))
             .thenReturn(mockedBuilder);
 
         when(mockedBuilder.build()).thenReturn(mockedApiClient);

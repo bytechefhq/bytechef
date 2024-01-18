@@ -16,6 +16,7 @@
 
 package com.bytechef.component.infobip.action;
 
+import static com.bytechef.component.definition.Authorization.VALUE;
 import static com.bytechef.component.infobip.constant.InfobipConstants.APPLICATION_ID;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CALLBACK_DATA;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONTENT;
@@ -25,7 +26,6 @@ import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGE_I
 import static com.bytechef.component.infobip.constant.InfobipConstants.NOTIFY_URL;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
 import static com.bytechef.component.infobip.constant.InfobipConstants.URL_OPTIONS;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -50,8 +50,8 @@ import org.mockito.MockedConstruction;
  */
 class InfobipSendWhatsappTextMessageActionTest extends AbstractInfobipActionTest {
 
-    private final ArgumentCaptor<WhatsAppTextMessage> whatsAppTextMessageArgumentCaptor =
-        ArgumentCaptor.forClass(WhatsAppTextMessage.class);
+    private final ArgumentCaptor<WhatsAppTextMessage> whatsAppTextMessageArgumentCaptor = ArgumentCaptor.forClass(
+        WhatsAppTextMessage.class);
     private final WhatsAppSingleMessageInfo mockedWhatsAppSingleMessageInfo = mock(WhatsAppSingleMessageInfo.class);
     private final WhatsAppApi.SendWhatsAppTextMessageRequest mockedSendSmsMessageRequest =
         mock(WhatsAppApi.SendWhatsAppTextMessageRequest.class);
@@ -87,10 +87,11 @@ class InfobipSendWhatsappTextMessageActionTest extends AbstractInfobipActionTest
             WhatsAppApi.class,
             ((whatsAppApi, context) -> when(whatsAppApi.sendWhatsAppTextMessage(any()))
                 .thenReturn(mockedSendSmsMessageRequest)))) {
-            when(mockedSendSmsMessageRequest.execute()).thenReturn(mockedWhatsAppSingleMessageInfo);
+            when(mockedSendSmsMessageRequest.execute())
+                .thenReturn(mockedWhatsAppSingleMessageInfo);
 
-            WhatsAppSingleMessageInfo result =
-                InfobipSendWhatsappTextMesageAction.perform(mockedParameters, mockedParameters, mockedContext);
+            WhatsAppSingleMessageInfo result = InfobipSendWhatsappTextMesageAction.perform(
+                mockedParameters, mockedParameters, mockedContext);
 
             List<WhatsAppApi> whatsAppApis = whatsAppApiMockedConstruction.constructed();
 
