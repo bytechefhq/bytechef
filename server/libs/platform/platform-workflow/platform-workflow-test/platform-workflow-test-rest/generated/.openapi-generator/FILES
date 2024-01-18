@@ -1,10 +1,10 @@
-.openapi-generator-ignore
 README.md
 pom.xml
 src/main/java/com/bytechef/platform/workflow/test/web/rest/ApiUtil.java
 src/main/java/com/bytechef/platform/workflow/test/web/rest/WorkflowTestApi.java
 src/main/java/com/bytechef/platform/workflow/test/web/rest/WorkflowTestConfigurationApi.java
 src/main/java/com/bytechef/platform/workflow/test/web/rest/model/UpdateWorkflowTestConfigurationConnectionRequestModel.java
+src/main/java/com/bytechef/platform/workflow/test/web/rest/model/UpdateWorkflowTestConfigurationInputsRequestModel.java
 src/main/java/com/bytechef/platform/workflow/test/web/rest/model/WebhookRetryModel.java
 src/main/java/com/bytechef/platform/workflow/test/web/rest/model/WorkflowTestConfigurationConnectionModel.java
 src/main/java/com/bytechef/platform/workflow/test/web/rest/model/WorkflowTestConfigurationModel.java

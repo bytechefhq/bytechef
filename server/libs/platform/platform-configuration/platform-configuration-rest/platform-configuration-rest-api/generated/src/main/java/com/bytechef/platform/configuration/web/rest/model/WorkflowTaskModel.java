@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-17T06:47:46.507285+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-18T05:49:30.457496+01:00[Europe/Zagreb]")
 public class WorkflowTaskModel {
 
   @Valid
@@ -85,7 +85,7 @@ public class WorkflowTaskModel {
    * @return connections
   */
   @Valid 
-  @Schema(name = "connections", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "connections", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
   public List<@Valid WorkflowConnectionModel> getConnections() {
     return connections;

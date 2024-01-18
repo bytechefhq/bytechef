@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("TaskDispatcherOutputSchema")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-17T06:47:46.507285+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-18T05:49:30.457496+01:00[Europe/Zagreb]")
 public class TaskDispatcherOutputSchemaModel {
 
   private PropertyModel definition;

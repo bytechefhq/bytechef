@@ -6,6 +6,7 @@
 package com.bytechef.platform.workflow.test.web.rest;
 
 import com.bytechef.platform.workflow.test.web.rest.model.UpdateWorkflowTestConfigurationConnectionRequestModel;
+import com.bytechef.platform.workflow.test.web.rest.model.UpdateWorkflowTestConfigurationInputsRequestModel;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestConfigurationConnectionModel;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestConfigurationModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-12T21:05:11.088659+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-18T05:49:36.901615+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-test-configuration", description = "the workflow-test-configuration API")
 public interface WorkflowTestConfigurationApi {
@@ -269,33 +270,53 @@ public interface WorkflowTestConfigurationApi {
         description = "Update a workflow test configuration connection.",
         tags = { "workflow-test-configuration" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowTestConfigurationConnectionModel.class))
-            })
+            @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
         value = "/workflow-test-configurations/{workflowId}/connections/{operationName}/{key}",
-        produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<WorkflowTestConfigurationConnectionModel> updateWorkflowTestConfigurationConnection(
+    default ResponseEntity<Void> updateWorkflowTestConfigurationConnection(
         @Parameter(name = "workflowId", description = "The id of a testing workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
         @Parameter(name = "operationName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("operationName") String operationName,
         @Parameter(name = "key", description = "The key of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("key") String key,
         @Parameter(name = "UpdateWorkflowTestConfigurationConnectionRequestModel", description = "", required = true) @Valid @RequestBody UpdateWorkflowTestConfigurationConnectionRequestModel updateWorkflowTestConfigurationConnectionRequestModel
     ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * PUT /workflow-test-configurations/{workflowId}/inputs : Update a workflow test configuration inputs
+     * Update a workflow test configuration inputs.
+     *
+     * @param workflowId The id of a testing workflow. (required)
+     * @param updateWorkflowTestConfigurationInputsRequestModel  (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "updateWorkflowTestConfigurationInputs",
+        summary = "Update a workflow test configuration inputs",
+        description = "Update a workflow test configuration inputs.",
+        tags = { "workflow-test-configuration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/workflow-test-configurations/{workflowId}/inputs",
+        consumes = { "application/json" }
+    )
+    
+    default ResponseEntity<Void> updateWorkflowTestConfigurationInputs(
+        @Parameter(name = "workflowId", description = "The id of a testing workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @Parameter(name = "UpdateWorkflowTestConfigurationInputsRequestModel", description = "", required = true) @Valid @RequestBody UpdateWorkflowTestConfigurationInputsRequestModel updateWorkflowTestConfigurationInputsRequestModel
+    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
