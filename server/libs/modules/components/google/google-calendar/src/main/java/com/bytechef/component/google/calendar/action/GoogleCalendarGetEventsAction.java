@@ -16,6 +16,14 @@
 
 package com.bytechef.component.google.calendar.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.dateTime;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ACCESS_ROLE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALWAYS_INCLUDE_EMAIL;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DEFAULT;
@@ -52,20 +60,12 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TIME_ZONE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.UPDATED;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.UPDATE_MIN;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.dateTime;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OptionsDataSource;
-import com.bytechef.hermes.component.definition.Parameters;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Events;
@@ -238,13 +238,16 @@ public class GoogleCalendarGetEventsAction {
             .setShowHiddenInvitations(inputParameters.getBoolean(SHOW_HIDDEN_INVITATIONS))
             .setSingleEvents(inputParameters.getBoolean(SINGLE_EVENTS))
             .setSyncToken(inputParameters.getString(SYNC_TOKEN))
-            .setTimeMax(new DateTime(
-                GoogleCalendarUtils.convertToDateViaSqlTimestamp(inputParameters.getLocalDateTime(TIME_MAX))))
-            .setTimeMin(new DateTime(
-                GoogleCalendarUtils.convertToDateViaSqlTimestamp(inputParameters.getLocalDateTime(TIME_MIN))))
+            .setTimeMax(
+                new DateTime(
+                    GoogleCalendarUtils.convertToDateViaSqlTimestamp(inputParameters.getLocalDateTime(TIME_MAX))))
+            .setTimeMin(
+                new DateTime(
+                    GoogleCalendarUtils.convertToDateViaSqlTimestamp(inputParameters.getLocalDateTime(TIME_MIN))))
             .setTimeZone(inputParameters.getString(TIME_ZONE))
-            .setUpdatedMin(new DateTime(
-                GoogleCalendarUtils.convertToDateViaSqlTimestamp(inputParameters.getLocalDateTime(UPDATE_MIN))))
+            .setUpdatedMin(
+                new DateTime(
+                    GoogleCalendarUtils.convertToDateViaSqlTimestamp(inputParameters.getLocalDateTime(UPDATE_MIN))))
             .execute();
     }
 

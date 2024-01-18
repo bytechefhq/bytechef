@@ -16,15 +16,15 @@
 
 package com.bytechef.component.google.calendar;
 
+import static com.bytechef.component.definition.ComponentDSL.component;
 import static com.bytechef.component.google.calendar.connection.GoogleCalendarConnection.CONNECTION_DEFINITION;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.GOOGLE_CALENDAR;
-import static com.bytechef.hermes.component.definition.ComponentDSL.component;
 
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.calendar.action.GoogleCalendarCreateEventAction;
 import com.bytechef.component.google.calendar.action.GoogleCalendarCreateQuickEventAction;
 import com.bytechef.component.google.calendar.action.GoogleCalendarGetEventsAction;
-import com.bytechef.hermes.component.ComponentHandler;
-import com.bytechef.hermes.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
@@ -40,7 +40,8 @@ public class GoogleCalendarComponentHandler implements ComponentHandler {
                 "appointments, and reminders, synchronizing across multiple devices.")
         .icon("path:assets/google-calendar.svg")
         .connection(CONNECTION_DEFINITION)
-        .actions(GoogleCalendarCreateEventAction.ACTION_DEFINITION,
+        .actions(
+            GoogleCalendarCreateEventAction.ACTION_DEFINITION,
             GoogleCalendarCreateQuickEventAction.ACTION_DEFINITION,
             GoogleCalendarGetEventsAction.ACTION_DEFINITION);
 

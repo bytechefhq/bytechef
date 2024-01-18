@@ -26,7 +26,7 @@ class GoogleCalendarComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/google-calendar_v1.json",
-            new GoogleCalendarComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/google-calendar_v1.json", new GoogleCalendarComponentHandler().getDefinition());
     }
 }

@@ -16,6 +16,10 @@
 
 package com.bytechef.component.google.calendar.util;
 
+import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.AUTO_DECLINE_MODE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.BUILDING_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CHAT_STATUS;
@@ -36,16 +40,12 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TYPE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.WORKING_LOCATION;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.WORKING_LOCATION_PROPERTIES;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ComponentDSL;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.Property;
-import com.bytechef.hermes.definition.Option;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.google.api.client.http.HttpExecuteInterceptor;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
@@ -157,13 +157,12 @@ public class GoogleCalendarUtils {
             .required(false);
 
     public static EventDateTime createEventDateTime(EventDateTimeCustom eventDateTimeCustom) {
-
         EventDateTime eventDateTime = new EventDateTime();
 
         eventDateTime.setDate(new DateTime(GoogleCalendarUtils.convertToDateViaSqlDate(eventDateTimeCustom.date)));
         eventDateTime.setTimeZone(eventDateTimeCustom.timeZone);
-        eventDateTime
-            .setDateTime(new DateTime(GoogleCalendarUtils.convertToDateViaSqlTimestamp(eventDateTimeCustom.dateTime)));
+        eventDateTime.setDateTime(
+            new DateTime(GoogleCalendarUtils.convertToDateViaSqlTimestamp(eventDateTimeCustom.dateTime)));
 
         return eventDateTime;
     }
@@ -185,11 +184,10 @@ public class GoogleCalendarUtils {
                 .build();
     }
 
-    private record OAuthAuthentication(String token)
-        implements HttpRequestInitializer, HttpExecuteInterceptor {
+    private record OAuthAuthentication(String token) implements HttpRequestInitializer, HttpExecuteInterceptor {
 
-        private OAuthAuthentication(String token) {
-            this.token = Preconditions.checkNotNull(token);
+        private OAuthAuthentication {
+            Preconditions.checkNotNull(token);
         }
 
         public void initialize(HttpRequest request) {
@@ -214,15 +212,16 @@ public class GoogleCalendarUtils {
             .execute();
 
         List<Option<String>> options = new ArrayList<>();
+        Map<String, ColorDefinition> colorDefinitionMap = colors.getEvent();
 
-        for (Map.Entry<String, ColorDefinition> color : colors.getEvent()
-            .entrySet()) {
+        for (Map.Entry<String, ColorDefinition> color : colorDefinitionMap.entrySet()) {
+            ColorDefinition colorDefinition = color.getValue();
 
-            options.add(option(color.getKey(), color.getKey(),
-                "Background: " + color.getValue()
-                    .getBackground() +
-                    "Foreground: " + color.getValue()
-                        .getForeground()));
+            options.add(
+                option(
+                    color.getKey(), color.getKey(),
+                    "Background: " + colorDefinition.getBackground() + "Foreground: " +
+                        colorDefinition.getForeground()));
         }
 
         return options;
@@ -230,6 +229,7 @@ public class GoogleCalendarUtils {
 
     public static List<? extends Property.ValueProperty<?>> getEventTypeProperties(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
         String eventType = inputParameters.getString(EVENT_TYPE);
 
         if (eventType.equals(FOCUS_TIME)) {
@@ -256,9 +256,10 @@ public class GoogleCalendarUtils {
         options.add(option("Updated", "updated", "Order by last modification time (ascending)."));
 
         if (singleEvents) {
-            options.add(option("Start time", "startTime",
-                "Order by the start date/time (ascending). This is only available when querying " +
-                    "single events (i.e. the parameter singleEvents is True)"));
+            options.add(
+                option("Start time", "startTime",
+                    "Order by the start date/time (ascending). This is only available when querying " +
+                        "single events (i.e. the parameter singleEvents is True)"));
         }
 
         return options;

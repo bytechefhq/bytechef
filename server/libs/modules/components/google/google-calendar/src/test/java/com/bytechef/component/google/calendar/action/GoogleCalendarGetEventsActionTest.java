@@ -59,8 +59,8 @@ class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest
 
     private final ArgumentCaptor<Boolean> alwaysIncludeEmailArgumentCapture = ArgumentCaptor.forClass(Boolean.class);
     private final ArgumentCaptor<String> calendarIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    @SuppressWarnings("rawtypes")
 
+    @SuppressWarnings("rawtypes")
     private final ArgumentCaptor<List> eventTypesArgumentCaptor = ArgumentCaptor.forClass(List.class);
     private final ArgumentCaptor<String> iCalUIDArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Integer> maxAttendesArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
@@ -70,12 +70,12 @@ class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest
     private final Calendar.Events.List mockedList = mock(Calendar.Events.List.class);
     private final ArgumentCaptor<String> orderByArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> pageTokenArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    @SuppressWarnings("rawtypes")
 
+    @SuppressWarnings("rawtypes")
     private final ArgumentCaptor<List> privateExtendedPropertyArgumentCaptor = ArgumentCaptor.forClass(List.class);
     private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    @SuppressWarnings("rawtypes")
 
+    @SuppressWarnings("rawtypes")
     private final ArgumentCaptor<List> sharedExtendedPropertyArgumentCaptor = ArgumentCaptor.forClass(List.class);
     private final ArgumentCaptor<Boolean> showHiddenInvitationsArgumentCapture = ArgumentCaptor.forClass(Boolean.class);
     private final ArgumentCaptor<Boolean> singleEventsArgumentCapture = ArgumentCaptor.forClass(Boolean.class);
@@ -172,8 +172,7 @@ class GoogleCalendarGetEventsActionTest extends AbstractGoogleCalendarActionTest
 
         try (MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic =
             mockStatic(GoogleCalendarUtils.class)) {
-            googleCalendarUtilsMockedStatic.when(
-                () -> GoogleCalendarUtils.getCalendar(mockedParameters))
+            googleCalendarUtilsMockedStatic.when(() -> GoogleCalendarUtils.getCalendar(mockedParameters))
                 .thenReturn(mockedCalendar);
 
             googleCalendarUtilsMockedStatic.when(

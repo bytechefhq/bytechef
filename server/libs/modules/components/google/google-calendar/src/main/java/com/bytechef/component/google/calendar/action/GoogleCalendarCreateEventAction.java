@@ -16,6 +16,15 @@
 
 package com.bytechef.component.google.calendar.action;
 
+import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
+import static com.bytechef.component.definition.ComponentDSL.fileEntry;
+import static com.bytechef.component.definition.ComponentDSL.integer;
+import static com.bytechef.component.definition.ComponentDSL.object;
+import static com.bytechef.component.definition.ComponentDSL.option;
+import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ACCESS_CODE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ADDITIONAL_GUESTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ADD_ON_PARAMETERS;
@@ -106,22 +115,13 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.WIDTH;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.WORKING_LOCATION;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.WORKING_LOCATION_PROPERTIES;
-import static com.bytechef.hermes.component.definition.ComponentDSL.action;
-import static com.bytechef.hermes.component.definition.ComponentDSL.array;
-import static com.bytechef.hermes.component.definition.ComponentDSL.bool;
-import static com.bytechef.hermes.component.definition.ComponentDSL.dynamicProperties;
-import static com.bytechef.hermes.component.definition.ComponentDSL.fileEntry;
-import static com.bytechef.hermes.component.definition.ComponentDSL.integer;
-import static com.bytechef.hermes.component.definition.ComponentDSL.object;
-import static com.bytechef.hermes.component.definition.ComponentDSL.option;
-import static com.bytechef.hermes.component.definition.ComponentDSL.string;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.ActionContext.FileEntry;
-import com.bytechef.hermes.component.definition.ComponentDSL.ModifiableActionDefinition;
-import com.bytechef.hermes.component.definition.OptionsDataSource.ActionOptionsFunction;
-import com.bytechef.hermes.component.definition.Parameters;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.ConferenceData;
 import com.google.api.services.calendar.model.Event;
@@ -549,18 +549,18 @@ public class GoogleCalendarCreateEventAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
         throws IOException {
 
-        GoogleCalendarUtils.EventDateTimeCustom startEventDateTimeCustom =
-            inputParameters.get(START, GoogleCalendarUtils.EventDateTimeCustom.class);
+        GoogleCalendarUtils.EventDateTimeCustom startEventDateTimeCustom = inputParameters.get(
+            START, GoogleCalendarUtils.EventDateTimeCustom.class);
 
-        GoogleCalendarUtils.EventDateTimeCustom originalStartTimeEventDateTimeCustom =
-            inputParameters.get(ORIGINAL_START_TIME, GoogleCalendarUtils.EventDateTimeCustom.class);
+        GoogleCalendarUtils.EventDateTimeCustom originalStartTimeEventDateTimeCustom = inputParameters.get(
+            ORIGINAL_START_TIME, GoogleCalendarUtils.EventDateTimeCustom.class);
 
-        GoogleCalendarUtils.EventDateTimeCustom endEventDateTimeCustom =
-            inputParameters.get(END, GoogleCalendarUtils.EventDateTimeCustom.class);
+        GoogleCalendarUtils.EventDateTimeCustom endEventDateTimeCustom = inputParameters.get(
+            END, GoogleCalendarUtils.EventDateTimeCustom.class);
 
         EventDateTime startEventDateTime = GoogleCalendarUtils.createEventDateTime(startEventDateTimeCustom);
-        EventDateTime originalStartEventDateTime =
-            GoogleCalendarUtils.createEventDateTime(originalStartTimeEventDateTimeCustom);
+        EventDateTime originalStartEventDateTime = GoogleCalendarUtils.createEventDateTime(
+            originalStartTimeEventDateTimeCustom);
         EventDateTime endEventDateTime = GoogleCalendarUtils.createEventDateTime(endEventDateTimeCustom);
 
         List<FileEntry> fileEntries = inputParameters.getFileEntries(ATTACHMENTS, List.of());
@@ -568,10 +568,11 @@ public class GoogleCalendarCreateEventAction {
         List<EventAttachment> eventAttachments = new ArrayList<>();
 
         for (FileEntry fileEntry : fileEntries) {
-            eventAttachments.add(new EventAttachment()
-                .setTitle(fileEntry.getName())
-                .setMimeType(fileEntry.getMimeType())
-                .setFileUrl(fileEntry.getUrl()));
+            eventAttachments.add(
+                new EventAttachment()
+                    .setTitle(fileEntry.getName())
+                    .setMimeType(fileEntry.getMimeType())
+                    .setFileUrl(fileEntry.getUrl()));
         }
 
         Event event = new Event()

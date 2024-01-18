@@ -63,8 +63,7 @@ class GoogleCalendarCreateQuickEventActionTest extends AbstractGoogleCalendarAct
             .thenReturn(mockedEvent);
 
         try (MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class)) {
-            googleCalendarUtilsMockedStatic.when(
-                    () -> GoogleCalendarUtils.getCalendar(mockedParameters))
+            googleCalendarUtilsMockedStatic.when(() -> GoogleCalendarUtils.getCalendar(mockedParameters))
                 .thenReturn(mockedCalendar);
 
             Event result = GoogleCalendarCreateQuickEventAction.perform(mockedParameters, mockedParameters, mockedContext);

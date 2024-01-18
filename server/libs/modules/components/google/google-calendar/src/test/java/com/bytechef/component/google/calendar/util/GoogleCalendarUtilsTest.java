@@ -16,21 +16,21 @@
 
 package com.bytechef.component.google.calendar.util;
 
+import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FOCUS_TIME;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.OUT_OF_OFFICE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SINGLE_EVENTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.WORKING_LOCATION;
-import static com.bytechef.hermes.component.definition.constant.AuthorizationConstants.ACCESS_TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.hermes.component.definition.ActionContext;
-import com.bytechef.hermes.component.definition.Parameters;
-import com.bytechef.hermes.component.definition.Property;
-import com.bytechef.hermes.definition.Option;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.EventDateTime;
@@ -53,6 +53,7 @@ class GoogleCalendarUtilsTest {
 
         Date date = GoogleCalendarUtils.convertToDateViaSqlDate(dateToConvert);
         java.util.Calendar calendar = java.util.Calendar.getInstance();
+
         calendar.setTime(date);
 
         assertEquals(2010, calendar.get(java.util.Calendar.YEAR));
