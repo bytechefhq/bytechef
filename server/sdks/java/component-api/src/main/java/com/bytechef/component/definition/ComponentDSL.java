@@ -328,6 +328,7 @@ public final class ComponentDSL {
 
         public ModifiableActionDefinition outputSchema(ValueProperty<?> definition) {
             this.outputSchemaDefinition = definition;
+            this.outputSchemaDefaultFunction = true;
 
             return this;
         }
@@ -3018,6 +3019,7 @@ public final class ComponentDSL {
 
         public ModifiableTriggerDefinition outputSchema(ValueProperty<?> definition) {
             this.outputSchemaDefinition = definition;
+            this.outputSchemaDefaultFunction = true;
 
             return this;
         }
