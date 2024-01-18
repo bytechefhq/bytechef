@@ -21,7 +21,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.data.storage.service.DataStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.workflow.execution.constants.FileEntryConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -64,7 +63,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         try {
             return dataFunction.apply(data);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -78,7 +77,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
         try {
             return fileFunction.apply(file);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -161,7 +160,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
                     tempFilePath,
                     StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
-                throw new ComponentExecutionException(e);
+                throw new RuntimeException(e);
             }
 
             return tempFilePath;
@@ -180,7 +179,7 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
                 return new FileEntryImpl(
                     fileStorageService.storeFileContent(FileEntryConstants.FILES_DIR, fileName, inputStream));
             } catch (Exception exception) {
-                throw new ComponentExecutionException("Unable to store file " + fileName, exception);
+                throw new RuntimeException("Unable to store file " + fileName);
             }
         }
 

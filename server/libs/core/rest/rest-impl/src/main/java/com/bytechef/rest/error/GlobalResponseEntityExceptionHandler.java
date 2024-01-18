@@ -16,11 +16,9 @@
 
 package com.bytechef.rest.error;
 
-import com.bytechef.rest.utils.HeaderUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -42,12 +40,6 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalResponseEntityExceptionHandler.class);
 
-    private final String applicationName;
-
-    public GlobalResponseEntityExceptionHandler(@Value("${spring.applicationName}") String applicationName) {
-        this.applicationName = applicationName;
-    }
-
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Throwable.class)
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
@@ -63,27 +55,13 @@ public class GlobalResponseEntityExceptionHandler extends ResponseEntityExceptio
     }
 
     @ExceptionHandler
-    public ResponseEntity<Object> handleBadRequestAlertException(
-        final BadRequestAlertException exception, final WebRequest request) {
-
-        return handleExceptionInternal(
-            exception,
-            createProblemDetail(exception, exception.getStatusCode(), exception.getMessage(), null, null, request),
-            HeaderUtils.createFailureAlert(
-                applicationName, true, exception.getEntityName(), exception.getErrorKey(), exception.getMessage()),
-            exception.getStatusCode(), request);
-    }
-
-    @ExceptionHandler
     public ResponseEntity<ProblemDetail> handleConcurrencyFailureException(
         final ConcurrencyFailureException exception, final WebRequest request) {
 
         logger.error(exception.getMessage(), exception);
 
         return ResponseEntity
-            .of(
-                createProblemDetail(
-                    exception, HttpStatus.CONFLICT, "Concurrency Failure", null, null, request))
+            .of(createProblemDetail(exception, HttpStatus.CONFLICT, "Concurrency Failure", null, null, request))
             .build();
     }
 }

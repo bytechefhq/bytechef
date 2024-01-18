@@ -39,11 +39,11 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ParametersImpl;
-import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.domain.OAuth2AuthorizationParameters;
+import com.bytechef.platform.component.registry.exception.ComponentExecutionException;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -160,11 +160,11 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     HttpResponse.BodyHandlers.ofString());
 
                 if (httpResponse.statusCode() != 200) {
-                    throw new ComponentExecutionException("Invalid claim");
+                    throw new ComponentExecutionException("Invalid claim", ConnectionDefinition.class, 100);
                 }
 
                 if (httpResponse.body() == null) {
-                    throw new ComponentExecutionException("Invalid claim");
+                    throw new ComponentExecutionException("Invalid claim", ConnectionDefinition.class, 100);
                 }
 
                 Map<?, ?> body = JsonUtils.read(httpResponse.body(), Map.class);
@@ -207,7 +207,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             try {
                 refreshUrl = tokenUrlFunction.apply(connectionParameters, context);
             } catch (Exception e) {
-                throw new ComponentExecutionException(e);
+                throw new ComponentExecutionException(e, ConnectionDefinition.class, 101);
             }
         }
 
@@ -257,7 +257,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         try {
             return applyFunction.apply(new ParametersImpl(connection.parameters()), context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e);
+            throw new ComponentExecutionException(e, ConnectionDefinition.class, 102);
         }
     }
 
@@ -280,7 +280,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             try {
                 pkce = pkceFunction.apply(null, null, "SHA256", context);
             } catch (Exception e) {
-                throw new ComponentExecutionException(e);
+                throw new ComponentExecutionException(e, ConnectionDefinition.class, 103);
             }
 
             verifier = pkce.verifier();
@@ -307,7 +307,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 new ParametersImpl(connection.parameters()), MapUtils.getString(connection.parameters(), CODE),
                 redirectUri, verifier, context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e);
+            throw new ComponentExecutionException(e, ConnectionDefinition.class, 104);
         }
     }
 
@@ -386,7 +386,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 clientIdFunction.apply(connectionParameters, context),
                 scopesFunction.apply(connectionParameters, context));
         } catch (Exception e) {
-            throw new ComponentExecutionException(e);
+            throw new ComponentExecutionException(e, ConnectionDefinition.class, 105);
         }
     }
 

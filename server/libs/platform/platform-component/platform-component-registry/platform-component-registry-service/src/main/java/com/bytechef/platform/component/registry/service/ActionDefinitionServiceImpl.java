@@ -29,7 +29,6 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.platform.component.definition.ParametersImpl;
-import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.registry.component.OperationType;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
@@ -38,6 +37,7 @@ import com.bytechef.platform.component.registry.domain.Option;
 import com.bytechef.platform.component.registry.domain.OutputSchema;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.ValueProperty;
+import com.bytechef.platform.component.registry.exception.ComponentExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +72,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                     new ParametersImpl(connection == null ? Map.of() : connection.parameters()), context),
                 valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters);
+            throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 100);
         }
     }
 
@@ -88,7 +88,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         try {
             return editorDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters);
+            throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 101);
         }
     }
 
@@ -108,7 +108,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                     new ParametersImpl(connection == null ? Map.of() : connection.parameters()), searchText, context),
                 Option::new);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters);
+            throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 102);
         }
     }
 
@@ -127,7 +127,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
             return new OutputSchema(Property.toProperty(outputSchema.definition()), outputSchema.sampleOutput());
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters);
+            throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 103);
         }
     }
 
@@ -147,7 +147,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         new ParametersImpl(inputParameters),
                         new ParametersImpl(connection == null ? Map.of() : connection.parameters()), context);
                 } catch (Exception e) {
-                    throw new ComponentExecutionException(e, inputParameters);
+                    throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 104);
                 }
             });
     }
