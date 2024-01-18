@@ -1,4 +1,4 @@
-export default function getInputControlType(controlType: string | undefined) {
+export default function getInputHTMLType(controlType: string | undefined) {
     if (!controlType) {
         return 'text';
     }
@@ -11,7 +11,7 @@ export default function getInputControlType(controlType: string | undefined) {
         case 'EMAIL':
             return 'email';
         case 'NUMBER':
-            return 'number';
+            return 'text';
         case 'PASSWORD':
             return 'password';
         case 'PHONE':
