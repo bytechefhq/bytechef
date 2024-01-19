@@ -31,6 +31,8 @@ public class FileEntryProperty extends ValueProperty<Map<String, ?>> {
     private final List<? extends ValueProperty<?>> properties;
 
     public FileEntryProperty(Property.FileEntryProperty fileEntryProperty) {
+        super(fileEntryProperty);
+
         this.properties = CollectionUtils.map(
             fileEntryProperty.getProperties(),
             valueProperty -> (ValueProperty<?>) toProperty(valueProperty));
