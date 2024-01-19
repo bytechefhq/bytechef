@@ -40,22 +40,16 @@ export interface WorkflowTestConfigurationModel {
     readonly createdDate?: Date;
     /**
      * The input parameters used as workflow input values.
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: string; }}
      * @memberof WorkflowTestConfigurationModel
      */
-    inputs?: { [key: string]: object; };
+    inputs?: { [key: string]: string; };
     /**
      * The connections used by workflow test.
      * @type {Array<WorkflowTestConfigurationConnectionModel>}
      * @memberof WorkflowTestConfigurationModel
      */
     connections?: Array<WorkflowTestConfigurationConnectionModel>;
-    /**
-     * The id of a workflow test configuration.
-     * @type {number}
-     * @memberof WorkflowTestConfigurationModel
-     */
-    readonly id?: number;
     /**
      * The last modified by.
      * @type {string}
@@ -73,7 +67,7 @@ export interface WorkflowTestConfigurationModel {
      * @type {string}
      * @memberof WorkflowTestConfigurationModel
      */
-    workflowId?: string;
+    readonly workflowId?: string;
     /**
      * 
      * @type {number}
@@ -105,7 +99,6 @@ export function WorkflowTestConfigurationModelFromJSONTyped(json: any, ignoreDis
         'createdDate': !exists(json, 'createdDate') ? undefined : (new Date(json['createdDate'])),
         'inputs': !exists(json, 'inputs') ? undefined : json['inputs'],
         'connections': !exists(json, 'connections') ? undefined : ((json['connections'] as Array<any>).map(WorkflowTestConfigurationConnectionModelFromJSON)),
-        'id': !exists(json, 'id') ? undefined : json['id'],
         'lastModifiedBy': !exists(json, 'lastModifiedBy') ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': !exists(json, 'lastModifiedDate') ? undefined : (new Date(json['lastModifiedDate'])),
         'workflowId': !exists(json, 'workflowId') ? undefined : json['workflowId'],
@@ -124,7 +117,6 @@ export function WorkflowTestConfigurationModelToJSON(value?: WorkflowTestConfigu
         
         'inputs': value.inputs,
         'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(WorkflowTestConfigurationConnectionModelToJSON)),
-        'workflowId': value.workflowId,
         '__version': value.version,
     };
 }

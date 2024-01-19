@@ -21,10 +21,10 @@ import { exists, mapValues } from '../runtime';
 export interface UpdateWorkflowTestConfigurationInputsRequestModel {
     /**
      * The input parameters used as workflow input values.
-     * @type {{ [key: string]: object; }}
+     * @type {{ [key: string]: string; }}
      * @memberof UpdateWorkflowTestConfigurationInputsRequestModel
      */
-    inputs?: { [key: string]: object; };
+    inputs?: { [key: string]: string; };
 }
 
 /**

@@ -32,11 +32,12 @@ import {
 } from '../models/index';
 
 export interface CreateWorkflowTestConfigurationRequest {
+    workflowId: string;
     workflowTestConfigurationModel: WorkflowTestConfigurationModel;
 }
 
 export interface GetWorkflowTestConfigurationRequest {
-    id: number;
+    workflowId: string;
 }
 
 export interface GetWorkflowTestConfigurationConnectionsRequest {
@@ -45,7 +46,7 @@ export interface GetWorkflowTestConfigurationConnectionsRequest {
 }
 
 export interface UpdateWorkflowTestConfigurationRequest {
-    id: number;
+    workflowId: string;
     workflowTestConfigurationModel: WorkflowTestConfigurationModel;
 }
 
@@ -71,6 +72,10 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
      * Create a new workflow test configuration.
      */
     async createWorkflowTestConfigurationRaw(requestParameters: CreateWorkflowTestConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestConfigurationModel>> {
+        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
+            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling createWorkflowTestConfiguration.');
+        }
+
         if (requestParameters.workflowTestConfigurationModel === null || requestParameters.workflowTestConfigurationModel === undefined) {
             throw new runtime.RequiredError('workflowTestConfigurationModel','Required parameter requestParameters.workflowTestConfigurationModel was null or undefined when calling createWorkflowTestConfiguration.');
         }
@@ -82,7 +87,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/workflow-test-configurations`,
+            path: `/workflow-test-configurations/{workflowId}`.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -106,8 +111,8 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
      * Get a workflow test configuration
      */
     async getWorkflowTestConfigurationRaw(requestParameters: GetWorkflowTestConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestConfigurationModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getWorkflowTestConfiguration.');
+        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
+            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling getWorkflowTestConfiguration.');
         }
 
         const queryParameters: any = {};
@@ -115,7 +120,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/workflow-test-configurations/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/workflow-test-configurations/{workflowId}`.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -170,40 +175,12 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all workflow test configurations.
-     * Get all workflow test configurations
-     */
-    async getWorkflowTestConfigurationsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<WorkflowTestConfigurationModel>>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/workflow-test-configurations`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(WorkflowTestConfigurationModelFromJSON));
-    }
-
-    /**
-     * Get all workflow test configurations.
-     * Get all workflow test configurations
-     */
-    async getWorkflowTestConfigurations(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowTestConfigurationModel>> {
-        const response = await this.getWorkflowTestConfigurationsRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
      * Update an existing workflow test configuration.
      * Update an existing workflow test configuration
      */
     async updateWorkflowTestConfigurationRaw(requestParameters: UpdateWorkflowTestConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestConfigurationModel>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateWorkflowTestConfiguration.');
+        if (requestParameters.workflowId === null || requestParameters.workflowId === undefined) {
+            throw new runtime.RequiredError('workflowId','Required parameter requestParameters.workflowId was null or undefined when calling updateWorkflowTestConfiguration.');
         }
 
         if (requestParameters.workflowTestConfigurationModel === null || requestParameters.workflowTestConfigurationModel === undefined) {
@@ -217,7 +194,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/workflow-test-configurations/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/workflow-test-configurations/{workflowId}`.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters.workflowId))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
