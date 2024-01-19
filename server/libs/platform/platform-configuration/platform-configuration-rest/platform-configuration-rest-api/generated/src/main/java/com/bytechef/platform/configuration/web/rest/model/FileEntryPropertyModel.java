@@ -3,6 +3,7 @@ package com.bytechef.platform.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.ControlTypeModel;
+import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.ValuePropertyModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -31,11 +32,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "FileEntryProperty", description = "An file entry property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-18T05:49:30.457496+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-19T11:58:57.058637+01:00[Europe/Zagreb]")
 public class FileEntryPropertyModel extends ValuePropertyModel {
 
   @Valid
-  private List<@Valid ValuePropertyModel> properties;
+  private List<@Valid PropertyModel> properties;
 
   public FileEntryPropertyModel() {
     super();
@@ -48,12 +49,12 @@ public class FileEntryPropertyModel extends ValuePropertyModel {
     super(controlType);
   }
 
-  public FileEntryPropertyModel properties(List<@Valid ValuePropertyModel> properties) {
+  public FileEntryPropertyModel properties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
     return this;
   }
 
-  public FileEntryPropertyModel addPropertiesItem(ValuePropertyModel propertiesItem) {
+  public FileEntryPropertyModel addPropertiesItem(PropertyModel propertiesItem) {
     if (this.properties == null) {
       this.properties = new ArrayList<>();
     }
@@ -68,11 +69,11 @@ public class FileEntryPropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "properties", description = "The list of valid file entry property types.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("properties")
-  public List<@Valid ValuePropertyModel> getProperties() {
+  public List<@Valid PropertyModel> getProperties() {
     return properties;
   }
 
-  public void setProperties(List<@Valid ValuePropertyModel> properties) {
+  public void setProperties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
   }
 
