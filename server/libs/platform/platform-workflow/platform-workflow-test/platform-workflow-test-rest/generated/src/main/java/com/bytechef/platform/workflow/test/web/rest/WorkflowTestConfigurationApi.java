@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-18T05:49:36.901615+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-20T08:48:13.801332+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-test-configuration", description = "the workflow-test-configuration API")
 public interface WorkflowTestConfigurationApi {
@@ -45,9 +45,10 @@ public interface WorkflowTestConfigurationApi {
     }
 
     /**
-     * POST /workflow-test-configurations : Create a new workflow test configuration.
+     * POST /workflow-test-configurations/{workflowId} : Create a new workflow test configuration.
      * Create a new workflow test configuration.
      *
+     * @param workflowId The id of a workflow test configuration. (required)
      * @param workflowTestConfigurationModel  (required)
      * @return The workflow test configuration object. (status code 200)
      */
@@ -64,18 +65,19 @@ public interface WorkflowTestConfigurationApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/workflow-test-configurations",
+        value = "/workflow-test-configurations/{workflowId}",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
     
     default ResponseEntity<WorkflowTestConfigurationModel> createWorkflowTestConfiguration(
+        @Parameter(name = "workflowId", description = "The id of a workflow test configuration.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
         @Parameter(name = "WorkflowTestConfigurationModel", description = "", required = true) @Valid @RequestBody WorkflowTestConfigurationModel workflowTestConfigurationModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"{}\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"id\" : 6, \"connections\" : [ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }";
+                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -87,10 +89,10 @@ public interface WorkflowTestConfigurationApi {
 
 
     /**
-     * GET /workflow-test-configurations/{id} : Get a workflow test configuration
+     * GET /workflow-test-configurations/{workflowId} : Get a workflow test configuration
      * Get a workflow test configuration.
      *
-     * @param id The id of a workflow test configuration. (required)
+     * @param workflowId The id of a workflow test configuration. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -106,17 +108,17 @@ public interface WorkflowTestConfigurationApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/workflow-test-configurations/{id}",
+        value = "/workflow-test-configurations/{workflowId}",
         produces = { "application/json" }
     )
     
     default ResponseEntity<WorkflowTestConfigurationModel> getWorkflowTestConfiguration(
-        @Parameter(name = "id", description = "The id of a workflow test configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
+        @Parameter(name = "workflowId", description = "The id of a workflow test configuration.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"{}\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"id\" : 6, \"connections\" : [ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }";
+                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -171,50 +173,10 @@ public interface WorkflowTestConfigurationApi {
 
 
     /**
-     * GET /workflow-test-configurations : Get all workflow test configurations
-     * Get all workflow test configurations.
-     *
-     * @return Successful operation. (status code 200)
-     */
-    @Operation(
-        operationId = "getWorkflowTestConfigurations",
-        summary = "Get all workflow test configurations",
-        description = "Get all workflow test configurations.",
-        tags = { "workflow-test-configuration" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowTestConfigurationModel.class)))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/workflow-test-configurations",
-        produces = { "application/json" }
-    )
-    
-    default ResponseEntity<List<WorkflowTestConfigurationModel>> getWorkflowTestConfigurations(
-        
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"{}\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"id\" : 6, \"connections\" : [ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }, { \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"{}\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"id\" : 6, \"connections\" : [ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" } ]";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * PUT /workflow-test-configurations/{id} : Update an existing workflow test configuration
+     * PUT /workflow-test-configurations/{workflowId} : Update an existing workflow test configuration
      * Update an existing workflow test configuration.
      *
-     * @param id The id of a workflow test configuration. (required)
+     * @param workflowId The id of a workflow test configuration. (required)
      * @param workflowTestConfigurationModel  (required)
      * @return The updated workflow test configuration object. (status code 200)
      */
@@ -231,19 +193,19 @@ public interface WorkflowTestConfigurationApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/workflow-test-configurations/{id}",
+        value = "/workflow-test-configurations/{workflowId}",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
     
     default ResponseEntity<WorkflowTestConfigurationModel> updateWorkflowTestConfiguration(
-        @Parameter(name = "id", description = "The id of a workflow test configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "workflowId", description = "The id of a workflow test configuration.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
         @Parameter(name = "WorkflowTestConfigurationModel", description = "", required = true) @Valid @RequestBody WorkflowTestConfigurationModel workflowTestConfigurationModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"{}\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"id\" : 6, \"connections\" : [ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }";
+                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestConfiguration", description = "Contains configuration and connections required for the test execution of a particular workflow.")
 @JsonTypeName("WorkflowTestConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-18T05:49:36.901615+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-20T08:48:13.801332+01:00[Europe/Zagreb]")
 public class WorkflowTestConfigurationModel {
 
   private String createdBy;
@@ -38,12 +38,10 @@ public class WorkflowTestConfigurationModel {
   private LocalDateTime createdDate;
 
   @Valid
-  private Map<String, Object> inputs = new HashMap<>();
+  private Map<String, String> inputs = new HashMap<>();
 
   @Valid
   private List<@Valid WorkflowTestConfigurationConnectionModel> connections;
-
-  private Long id;
 
   private String lastModifiedBy;
 
@@ -94,12 +92,12 @@ public class WorkflowTestConfigurationModel {
     this.createdDate = createdDate;
   }
 
-  public WorkflowTestConfigurationModel inputs(Map<String, Object> inputs) {
+  public WorkflowTestConfigurationModel inputs(Map<String, String> inputs) {
     this.inputs = inputs;
     return this;
   }
 
-  public WorkflowTestConfigurationModel putInputsItem(String key, Object inputsItem) {
+  public WorkflowTestConfigurationModel putInputsItem(String key, String inputsItem) {
     if (this.inputs == null) {
       this.inputs = new HashMap<>();
     }
@@ -114,11 +112,11 @@ public class WorkflowTestConfigurationModel {
   
   @Schema(name = "inputs", description = "The input parameters used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
-  public Map<String, Object> getInputs() {
+  public Map<String, String> getInputs() {
     return inputs;
   }
 
-  public void setInputs(Map<String, Object> inputs) {
+  public void setInputs(Map<String, String> inputs) {
     this.inputs = inputs;
   }
 
@@ -148,26 +146,6 @@ public class WorkflowTestConfigurationModel {
 
   public void setConnections(List<@Valid WorkflowTestConfigurationConnectionModel> connections) {
     this.connections = connections;
-  }
-
-  public WorkflowTestConfigurationModel id(Long id) {
-    this.id = id;
-    return this;
-  }
-
-  /**
-   * The id of a workflow test configuration.
-   * @return id
-  */
-  
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow test configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("id")
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
   }
 
   public WorkflowTestConfigurationModel lastModifiedBy(String lastModifiedBy) {
@@ -220,7 +198,7 @@ public class WorkflowTestConfigurationModel {
    * @return workflowId
   */
   
-  @Schema(name = "workflowId", description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "workflowId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowId")
   public String getWorkflowId() {
     return workflowId;
@@ -263,7 +241,6 @@ public class WorkflowTestConfigurationModel {
         Objects.equals(this.createdDate, workflowTestConfiguration.createdDate) &&
         Objects.equals(this.inputs, workflowTestConfiguration.inputs) &&
         Objects.equals(this.connections, workflowTestConfiguration.connections) &&
-        Objects.equals(this.id, workflowTestConfiguration.id) &&
         Objects.equals(this.lastModifiedBy, workflowTestConfiguration.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, workflowTestConfiguration.lastModifiedDate) &&
         Objects.equals(this.workflowId, workflowTestConfiguration.workflowId) &&
@@ -272,7 +249,7 @@ public class WorkflowTestConfigurationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, inputs, connections, id, lastModifiedBy, lastModifiedDate, workflowId, version);
+    return Objects.hash(createdBy, createdDate, inputs, connections, lastModifiedBy, lastModifiedDate, workflowId, version);
   }
 
   @Override
@@ -283,7 +260,6 @@ public class WorkflowTestConfigurationModel {
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
