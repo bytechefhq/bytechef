@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.html.helper.constant;
+package com.bytechef.component.test.helper;
+
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Ivica Cardic
  */
-public class HtmlHelperConstants {
+public class TextHelperComponentHandlerTest {
 
-    public static final String ATTRIBUTE = "attribute";
-    public static final String CONTENT = "content";
-    public static final String EXTRACT_CONTENT = "extractContent";
-    public static final String HTML_HELPER = "htmlHelper";
-    public static final String QUERY_SELECTOR = "querySelector";
-    public static final String RETURN_VALUE = "returnValue";
-    public static final String RETURN_ARRAY = "returnArray";
+    @Test
+    public void testGetComponentDefinition() {
+        JsonFileAssert.assertEquals("definition/text-helper_v1.json", new TextHelperComponentHandler().getDefinition());
+    }
 }

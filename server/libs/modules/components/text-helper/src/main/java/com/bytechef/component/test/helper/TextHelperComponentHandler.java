@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.html.helper;
+package com.bytechef.component.test.helper;
 
 import static com.bytechef.component.definition.ComponentDSL.component;
-import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.HTML_HELPER;
+import static com.bytechef.component.test.helper.constant.TextHelperConstants.HTML_HELPER;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.html.helper.action.HtmlHelperExtractContentAction;
+import com.bytechef.component.test.helper.action.TextHelperExtractContentFromHtmlAction;
 import com.google.auto.service.AutoService;
 
 /**
  * @author Ivica Cardic
  */
 @AutoService(ComponentHandler.class)
-public class HtmlHelperComponentHandler implements ComponentHandler {
+public class TextHelperComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(HTML_HELPER)
-        .title("HTML Helper")
-        .description("Helper component which contains operations to help you work with HTML.")
-        .icon("path:assets/html-helper.svg")
-        .actions(HtmlHelperExtractContentAction.ACTION_DEFINITION);
+        .title("Text Helper")
+        .description("Helper component which contains operations to help you work with text.")
+        .icon("path:assets/text-helper.svg")
+        .actions(TextHelperExtractContentFromHtmlAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

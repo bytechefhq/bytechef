@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.html.helper.action;
+package com.bytechef.component.test.helper.action;
 
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
-import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.ATTRIBUTE;
-import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.CONTENT;
-import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.EXTRACT_CONTENT;
-import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.QUERY_SELECTOR;
-import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.RETURN_ARRAY;
-import static com.bytechef.component.html.helper.constant.HtmlHelperConstants.RETURN_VALUE;
+import static com.bytechef.component.test.helper.constant.TextHelperConstants.ATTRIBUTE;
+import static com.bytechef.component.test.helper.constant.TextHelperConstants.CONTENT;
+import static com.bytechef.component.test.helper.constant.TextHelperConstants.EXTRACT_CONTENT_FROM_HTML;
+import static com.bytechef.component.test.helper.constant.TextHelperConstants.QUERY_SELECTOR;
+import static com.bytechef.component.test.helper.constant.TextHelperConstants.RETURN_ARRAY;
+import static com.bytechef.component.test.helper.constant.TextHelperConstants.RETURN_VALUE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -42,10 +42,10 @@ import org.jsoup.select.Elements;
 /**
  * @author Ivica Cardic
  */
-public class HtmlHelperExtractContentAction {
+public class TextHelperExtractContentFromHtmlAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(EXTRACT_CONTENT)
-        .title("Extract Content")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(EXTRACT_CONTENT_FROM_HTML)
+        .title("Extract Content from HTML")
         .description("Extract content from the HTML content.")
         .properties(
             string(CONTENT)
@@ -76,7 +76,7 @@ public class HtmlHelperExtractContentAction {
                 .description(
                     "If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string."))
         .outputSchema()
-        .perform(HtmlHelperExtractContentAction::perform);
+        .perform(TextHelperExtractContentFromHtmlAction::perform);
 
     protected static Map<String, ?> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {

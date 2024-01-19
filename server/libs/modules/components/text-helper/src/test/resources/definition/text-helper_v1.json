@@ -2,15 +2,15 @@
   "actions": [ {
     "batch": null,
     "componentName": "htmlHelper",
-    "componentDescription": "Helper component which contains operations to help you work with HTML.",
-    "componentTitle": "HTML Helper",
+    "componentDescription": "Helper component which contains operations to help you work with text.",
+    "componentTitle": "Text Helper",
     "componentVersion": 1,
     "deprecated": null,
     "description": "Extract content from the HTML content.",
     "editorDescriptionFunction": null,
     "help": null,
     "metadata": null,
-    "name": "extractContent",
+    "name": "extractContentFromHtml",
     "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
@@ -131,22 +131,22 @@
       } ],
       "controlType": "CHECKBOX"
     } ],
-    "title": "Extract Content",
-    "outputSchema": null,
-    "perform": { }
+    "title": "Extract Content from HTML",
+    "perform": { },
+    "outputSchema": null
   } ],
   "category": null,
   "connection": null,
   "customAction": null,
   "customActionHelp": null,
-  "description": "Helper component which contains operations to help you work with HTML.",
-  "icon": "path:assets/html-helper.svg",
+  "description": "Helper component which contains operations to help you work with text.",
+  "icon": "path:assets/text-helper.svg",
   "tags": null,
   "metadata": null,
   "name": "htmlHelper",
   "resources": null,
   "version": 1,
-  "title": "HTML Helper",
+  "title": "Text Helper",
   "triggers": null,
   "allowedConnections": null
 }
