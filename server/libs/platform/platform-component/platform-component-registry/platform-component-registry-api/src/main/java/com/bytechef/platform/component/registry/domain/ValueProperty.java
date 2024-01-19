@@ -18,6 +18,7 @@ package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Property.ControlType;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 
 /**
@@ -40,7 +41,7 @@ public abstract class ValueProperty<V> extends Property {
         this.controlType = valueProperty.getControlType();
         this.defaultValue = OptionalUtils.orElse(valueProperty.getDefaultValue(), null);
         this.exampleValue = OptionalUtils.orElse(valueProperty.getExampleValue(), null);
-        this.label = OptionalUtils.orElse(valueProperty.getLabel(), valueProperty.getName());
+        this.label = OptionalUtils.orElse(valueProperty.getLabel(), StringUtils.capitalize(valueProperty.getName()));
         this.placeholder = OptionalUtils.orElse(valueProperty.getPlaceholder(), null);
     }
 
