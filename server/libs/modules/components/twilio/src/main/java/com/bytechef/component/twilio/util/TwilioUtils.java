@@ -17,6 +17,7 @@
 package com.bytechef.component.twilio.util;
 
 import static com.bytechef.component.definition.ComponentDSL.array;
+import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.twilio.constant.TwilioConstants.BODY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT;
@@ -27,9 +28,13 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.SOURCE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Monika Domiter
@@ -101,5 +106,18 @@ public class TwilioUtils {
         }
 
         return List.of(stringProperty);
+    }
+
+    public static List<Option<String>> getZoneIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+        Set<String> availableZoneIds = ZoneId.getAvailableZoneIds();
+
+        List<Option<String>> options = new ArrayList<>();
+        for (String zoneId : availableZoneIds) {
+            options.add(
+                option(zoneId, zoneId));
+        }
+
+        return options;
     }
 }

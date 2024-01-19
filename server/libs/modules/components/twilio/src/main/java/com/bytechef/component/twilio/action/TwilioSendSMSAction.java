@@ -19,6 +19,7 @@ package com.bytechef.component.twilio.action;
 import static com.bytechef.component.definition.Authorization.PASSWORD;
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDSL.action;
+import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.dynamicProperties;
@@ -36,6 +37,7 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_RETENTION;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_SID;
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_VARIABLES;
+import static com.bytechef.component.twilio.constant.TwilioConstants.DATE_TIME;
 import static com.bytechef.component.twilio.constant.TwilioConstants.FORCE_DELIVERY;
 import static com.bytechef.component.twilio.constant.TwilioConstants.FROM;
 import static com.bytechef.component.twilio.constant.TwilioConstants.MAX_PRICE;
@@ -43,7 +45,6 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.MEDIA_URL;
 import static com.bytechef.component.twilio.constant.TwilioConstants.MESSAGING_SERVICE_SID;
 import static com.bytechef.component.twilio.constant.TwilioConstants.PERSISTENT_ACTION;
 import static com.bytechef.component.twilio.constant.TwilioConstants.PROVIDE_FEEDBACK;
-import static com.bytechef.component.twilio.constant.TwilioConstants.RETAIN;
 import static com.bytechef.component.twilio.constant.TwilioConstants.RISK_CHECK;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SCHEDULE_TYPE;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SEND_AS_MMS;
@@ -55,16 +56,22 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.SOURCE;
 import static com.bytechef.component.twilio.constant.TwilioConstants.STATUS_CALLBACK;
 import static com.bytechef.component.twilio.constant.TwilioConstants.TO;
 import static com.bytechef.component.twilio.constant.TwilioConstants.VALIDITY_PERIOD;
+import static com.bytechef.component.twilio.constant.TwilioConstants.ZONE_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.twilio.util.TwilioUtils;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.rest.api.v2010.account.MessageCreator;
 import com.twilio.type.PhoneNumber;
+import java.math.BigDecimal;
 import java.net.URI;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -106,10 +113,10 @@ public class TwilioSendSMSAction {
             number(MAX_PRICE)
                 .label("Maximum price")
                 .description(
-                    "The maximum price in US dollars that you are willing to pay for this Message's delivery. The " +
-                        "value can have up to four decimal places. When the max_price parameter is provided, the " +
-                        "cost of a message is checked before it is sent. If the cost exceeds max_price, the message " +
-                        "is not sent and the Message status is failed.")
+                    "The maximum price in US dollars that you are willing to pay for this Message's delivery. When " +
+                        "the max_price parameter is provided, the cost of a message is checked before it is sent. If " +
+                        "the cost exceeds max_price, the message is not sent and the Message status is failed.")
+                .maxNumberPrecision(4)
                 .required(false),
             bool(PROVIDE_FEEDBACK)
                 .label("Provide feedback")
@@ -144,24 +151,26 @@ public class TwilioSendSMSAction {
                 .label("Content retention")
                 .description("Determines if the message content can be stored or redacted based on privacy settings.")
                 .options(
-                    option(RETAIN, RETAIN),
-                    option("discard", "discard"))
+                    option("Retain", "retain"),
+                    option("Discard", "discard"))
                 .required(false),
             string(ADDRESS_RETENTION)
                 .label("Address retention")
                 .description("Determines if the address can be stored or obfuscated based on privacy settings.")
                 .options(
-                    option(RETAIN, RETAIN),
-                    option("obfuscate", "obfuscate"))
+                    option("Retain", "retain"),
+                    option("Obfuscate", "obfuscate"))
                 .required(false),
             bool(SMART_ENCODED)
                 .label("Smart encoded")
                 .description(
                     "Whether to detect Unicode characters that have a similar GSM-7 character and replace them.")
                 .required(false),
-            string(PERSISTENT_ACTION)
+            array(PERSISTENT_ACTION)
                 .label("Persistent action")
                 .description("Rich actions for non-SMS/MMS channels. Used for sending location in WhatsApp messages.")
+                .items(
+                    string())
                 .required(false),
             bool(SHORTEN_URLS)
                 .label("Shorten URLs")
@@ -178,9 +187,17 @@ public class TwilioSendSMSAction {
                 .options(
                     option("fixed", "fixed"))
                 .required(false),
-            dateTime(SEND_AT)
+            object(SEND_AT)
                 .label("Send at")
                 .description("The time that Twilio will send the message. Must be in ISO 8601 format.")
+                .properties(
+                    dateTime(DATE_TIME)
+                        .label("Date time")
+                        .required(true),
+                    string(ZONE_ID)
+                        .label("Zone ID")
+                        .options((ActionOptionsFunction) TwilioUtils::getZoneIdOptions)
+                        .required(true))
                 .required(false),
             bool(SEND_AS_MMS)
                 .label("Send as MMS")
@@ -188,7 +205,7 @@ public class TwilioSendSMSAction {
                     "If set to true, Twilio delivers the message as a single MMS message, regardless of the presence " +
                         "of media.")
                 .required(false),
-            bool(CONTENT_VARIABLES)
+            string(CONTENT_VARIABLES)
                 .label("Content variables")
                 .description(
                     "For Content Editor/API only: Key-value pairs of Template variables and their substitution " +
@@ -221,7 +238,7 @@ public class TwilioSendSMSAction {
                     option("Media URL", MEDIA_URL))
                 .required(true),
             dynamicProperties(CONTENT)
-                .loadPropertiesDependsOn(MEDIA_URL)
+                .loadPropertiesDependsOn(CONTENT)
                 .properties(TwilioUtils::getContentProperties)
                 .required(false),
             string(CONTENT_SID)
@@ -238,24 +255,40 @@ public class TwilioSendSMSAction {
                 .properties(
                     string("body"),
                     string("numSegments"),
-                    object("direction"),
-                    object("from"),
+                    string("direction"),
+                    object("from")
+                        .properties(
+                            string("rawNumber")),
                     string("to"),
-                    dateTime("dateUpdated"),
+                    object("dateUpdated")
+                        .properties(
+                            dateTime(DATE_TIME),
+                            string(ZONE_ID)),
                     string("price"),
                     string("errorMessage"),
                     string("uri"),
                     string("accountSid"),
                     string("numMedia"),
-                    object("status"),
+                    string("status"),
                     string("messagingServiceSid"),
                     string("sid"),
-                    dateTime("dateSent"),
-                    dateTime("dateCreated"),
+                    object("dateSent")
+                        .properties(
+                            dateTime(DATE_TIME),
+                            string(ZONE_ID)),
+                    object("dateCreated")
+                        .properties(
+                            dateTime(DATE_TIME),
+                            string(ZONE_ID)),
                     integer("errorCode"),
-                    object("currency"),
+                    object("currency")
+                        .properties(
+                            string("currencyCode"),
+                            integer("defaultFractionDigits"),
+                            integer("numericCode")),
                     string("apiVersion"),
-                    object("subresourceUris")))
+                    object("subresourceUris")
+                        .additionalProperties(string())))
         .perform(TwilioSendSMSAction::perform);
 
     private TwilioSendSMSAction() {
@@ -277,60 +310,99 @@ public class TwilioSendSMSAction {
         List<URI> mediaURL = inputParameters.getList(MEDIA_URL, URI.class);
         String messagingServiceSID = inputParameters.getString(MESSAGING_SERVICE_SID);
 
-        // first case: to, from, body
+        // first case: to, messagingServiceSid, mediaUrl
 
         if (isFirstCase(from, body, pathAccountSid)) {
-            return Message.creator(new PhoneNumber(to), messagingServiceSID, mediaURL)
-                .create();
+            MessageCreator messageCreator = Message.creator(new PhoneNumber(to), messagingServiceSID, mediaURL);
+
+            return getMessage(inputParameters, messageCreator);
         }
 
-        // second case: pathAccountSid, to, from, body
+        // second case: pathAccountSid, to, messagingServiceSid, mediaUrl
 
         if (isSecondCase(from, body, pathAccountSid)) {
-            return Message.creator(pathAccountSid, new PhoneNumber(to), messagingServiceSID, mediaURL)
-                .create();
+            MessageCreator messageCreator =
+                Message.creator(pathAccountSid, new PhoneNumber(to), messagingServiceSID, mediaURL);
+
+            return getMessage(inputParameters, messageCreator);
         }
 
-        // third case: to, from, mediaUrl
+        // third case: to, messagingServiceSid, body
 
         if (isThirdCase(from, body, pathAccountSid)) {
-            return Message.creator(new PhoneNumber(to), messagingServiceSID, body)
-                .create();
+            MessageCreator messageCreator = Message.creator(new PhoneNumber(to), messagingServiceSID, body);
+
+            return getMessage(inputParameters, messageCreator);
         }
 
-        // fourth case: pathAccountSid, to, from, mediaUrl
+        // fourth case: pathAccountSid, to, messagingServiceSid, body
 
         if (isFourthCase(from, body, pathAccountSid)) {
-            return Message.creator(pathAccountSid, new PhoneNumber(to), messagingServiceSID, body)
-                .create();
+            MessageCreator messageCreator =
+                Message.creator(pathAccountSid, new PhoneNumber(to), messagingServiceSID, body);
+
+            return getMessage(inputParameters, messageCreator);
         }
 
-        // fifth case: to, messagingServiceSID, body
+        // fifth case: to, from, mediaUrl
 
         if (isFifthCase(from, body, pathAccountSid)) {
-            return Message.creator(new PhoneNumber(to), new PhoneNumber(from), mediaURL)
-                .create();
+            MessageCreator messageCreator = Message.creator(new PhoneNumber(to), new PhoneNumber(from), mediaURL);
+
+            return getMessage(inputParameters, messageCreator);
         }
 
-        // sixth case: pathAccountSid, to, messagingServiceSid, body
+        // sixth case: pathAccountSid, to, from, mediaUrl
 
         if (isSixthCase(from, body, pathAccountSid)) {
-            return Message.creator(pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), mediaURL)
-                .create();
+            MessageCreator messageCreator =
+                Message.creator(pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), mediaURL);
+
+            return getMessage(inputParameters, messageCreator);
         }
 
-        // seventh case: to, messagingServiceSid, mediaUrl
+        // seventh case: to, from, body
 
         if (isSeventhCase(from, body, pathAccountSid)) {
-            return Message.creator(new PhoneNumber(to), new PhoneNumber(from), body)
-                .create();
+            MessageCreator messageCreator = Message.creator(new PhoneNumber(to), new PhoneNumber(from), body);
+
+            return getMessage(inputParameters, messageCreator);
         }
 
-        // eighth case: pathAccountSid, to, messagingServiceSid, mediaUrl
+        // eighth case: pathAccountSid, to, from, body
 
-        return Message.creator(pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), body)
+        MessageCreator messageCreator =
+            Message.creator(pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), body);
+        return getMessage(inputParameters, messageCreator);
+
+    }
+
+    private static Message getMessage(Parameters inputParameters, MessageCreator messageCreator) {
+        if (inputParameters.getString(ZONE_ID) != null) {
+            messageCreator.setSendAt(ZonedDateTime.of(
+                inputParameters.getLocalDateTime(DATE_TIME),
+                ZoneId.of(inputParameters.getString(ZONE_ID))));
+        }
+
+        return messageCreator
+            .setStatusCallback(inputParameters.getString(STATUS_CALLBACK))
+            .setApplicationSid(inputParameters.getString(APPLICATION_SID))
+            .setMaxPrice(inputParameters.get(MAX_PRICE, BigDecimal.class))
+            .setProvideFeedback(inputParameters.getBoolean(PROVIDE_FEEDBACK))
+            .setAttempt(inputParameters.getInteger(ATTEMPT))
+            .setValidityPeriod(inputParameters.getInteger(VALIDITY_PERIOD))
+            .setForceDelivery(inputParameters.getBoolean(FORCE_DELIVERY))
+            .setContentRetention(Message.ContentRetention.forValue(inputParameters.getString(CONTENT_RETENTION)))
+            .setAddressRetention(Message.AddressRetention.forValue(inputParameters.getString(ADDRESS_RETENTION)))
+            .setSmartEncoded(inputParameters.getBoolean(SMART_ENCODED))
+            .setPersistentAction(inputParameters.getList(PERSISTENT_ACTION, String.class, List.of()))
+            .setShortenUrls(inputParameters.getBoolean(SHORTEN_URLS))
+            .setScheduleType(Message.ScheduleType.forValue(inputParameters.getString(SCHEDULE_TYPE)))
+            .setSendAsMms(inputParameters.getBoolean(SEND_AS_MMS))
+            .setContentVariables(inputParameters.getString(CONTENT_VARIABLES))
+            .setRiskCheck(Message.RiskCheck.forValue(inputParameters.getString(RISK_CHECK)))
+            .setContentSid(inputParameters.getString(CONTENT_SID))
             .create();
-
     }
 
     private static boolean isSeventhCase(String from, String body, String pathAccountSid) {

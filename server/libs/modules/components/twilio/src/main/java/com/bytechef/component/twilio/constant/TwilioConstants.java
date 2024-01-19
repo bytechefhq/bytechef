@@ -35,6 +35,7 @@ public class TwilioConstants {
     public static final String CONTENT_RETENTION = "contentRetention";
     public static final String CONTENT_SID = "contentSid";
     public static final String CONTENT_VARIABLES = "contentVariables";
+    public static final String DATE_TIME = "dateTime";
     public static final String FORCE_DELIVERY = "forceDelivery";
     public static final String FROM = "from";
     public static final String MAX_PRICE = "maxPrice";
@@ -43,7 +44,6 @@ public class TwilioConstants {
     public static final String PERSISTENT_ACTION = "persistentAction";
     public static final String PROVIDE_FEEDBACK = "provideFeedback";
     public static final String RISK_CHECK = "riskCheck";
-    public static final String RETAIN = "retain";
     public static final String SCHEDULE_TYPE = "scheduleType";
     public static final String SEND_AT = "sendAt";
     public static final String SEND_AS_MMS = "sendAsMms";
@@ -53,4 +53,5 @@ public class TwilioConstants {
     public static final String SMART_ENCODED = "smartEncoded";
     public static final String TO = "to";
     public static final String VALIDITY_PERIOD = "validityPeriod";
+    public static final String ZONE_ID = "zoneID";
 }
