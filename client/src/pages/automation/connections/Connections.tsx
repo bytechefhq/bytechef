@@ -67,9 +67,8 @@ export const Connections = () => {
     let pageTitle: string | undefined;
 
     if (filterData.type === Type.Component) {
-        pageTitle = componentDefinitions?.find(
-            (componentDefinition) => componentDefinition.name === filterData.id
-        )?.title;
+        pageTitle = componentDefinitions?.find((componentDefinition) => componentDefinition.name === filterData.id)
+            ?.title;
     } else {
         pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
     }
