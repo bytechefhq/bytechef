@@ -30,7 +30,7 @@ com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 info-picocli = { module = "info.picocli:picocli", version.ref = "info-picocli" }
 info-picocli-picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "info-picocli" }
 io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.20"
-io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.19"
+io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.20"
 jakarta-validation-jakarta-validation-api = "jakarta.validation:jakarta.validation-api:3.1.0-M1"
 org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.31.2"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.2.5"
@@ -50,7 +50,7 @@ org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:sprin
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.3.1"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.22.7"
+software-amazon-awssdk-s3 = "software.amazon.awssdk:s3:2.23.6"
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.50.0"
