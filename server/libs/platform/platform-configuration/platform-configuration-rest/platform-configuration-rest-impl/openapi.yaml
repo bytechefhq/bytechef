@@ -1242,7 +1242,7 @@ components:
               description: "The list of valid file entry property types."
               type: "array"
               items:
-                $ref: "#/components/schemas/ValueProperty"
+                $ref: "#/components/schemas/Property"
     Help:
       description: "The help text that is meant to guide your users as to how to configure\
         \ this action or trigger."
