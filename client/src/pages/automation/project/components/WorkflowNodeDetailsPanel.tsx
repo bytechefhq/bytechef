@@ -177,7 +177,7 @@ const WorkflowNodeDetailsPanel = ({
         !!currentActionDefinition?.outputSchemaDataSource
     );
 
-    const connectionKey = workflow.tasks?.filter((task) => task.name === currentNode.name)[0]?.connections![0].key;
+    const connectionKey = workflow.tasks?.filter((task) => task.name === currentNode.name)[0]?.connections![0]?.key;
 
     const getExistingProperties = (properties: Array<PropertyType>): Array<PropertyType> =>
         properties.filter((property) => {
