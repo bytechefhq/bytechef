@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "sendSMS",
-    "defaultOutputFunction": true,
-    "outputFunction": null,
+    "outputSchemaDefaultFunction": true,
+    "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The SID of the Account creating the Message resource.",
@@ -91,7 +91,7 @@
       "optionsDataSource": null
     }, {
       "advancedOption": null,
-      "description": "The maximum price in US dollars that you are willing to pay for this Message's delivery. The value can have up to four decimal places. When the max_price parameter is provided, the cost of a message is checked before it is sent. If the cost exceeds max_price, the message is not sent and the Message status is failed.",
+      "description": "The maximum price in US dollars that you are willing to pay for this Message's delivery. When the max_price parameter is provided, the cost of a message is checked before it is sent. If the cost exceeds max_price, the message is not sent and the Message status is failed.",
       "displayCondition": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -103,14 +103,14 @@
       "exampleValue": null,
       "label": "Maximum price",
       "placeholder": null,
-      "maxNumberPrecision": null,
+      "maxNumberPrecision": 4,
       "maxValue": null,
       "minNumberPrecision": null,
       "minValue": null,
       "numberPrecision": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "NUMBER"
+      "controlType": "NUMBER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Boolean indicating whether or not you intend to provide delivery confirmation feedback to Twilio (used in conjunction with the Message Feedback subresource). Boolean indicating whether or not you intend to provide delivery confirmation feedback to Twilio (used in conjunction with the Message Feedback subresource).",
@@ -154,8 +154,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "The maximum length in seconds that the Message can remain in Twilio's outgoing message queue. If a queued Message exceeds the validity_period, the Message is not sent. A validity_period greater than 5 is recommended.",
@@ -173,8 +173,8 @@
       "maxValue": 14400,
       "minValue": 1,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "INTEGER"
+      "controlType": "INTEGER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "Reserved",
@@ -221,12 +221,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "label": "retain",
+        "label": "Retain",
         "value": "retain"
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "discard",
+        "label": "Discard",
         "value": "discard"
       } ],
       "optionsDataSource": null
@@ -250,12 +250,12 @@
       "options": [ {
         "description": null,
         "displayCondition": null,
-        "label": "retain",
+        "label": "Retain",
         "value": "retain"
       }, {
         "description": null,
         "displayCondition": null,
-        "label": "obfuscate",
+        "label": "Obfuscate",
         "value": "obfuscate"
       } ],
       "optionsDataSource": null
@@ -294,15 +294,36 @@
       "metadata": { },
       "required": false,
       "name": "persistentAction",
-      "type": "STRING",
+      "type": "ARRAY",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Persistent action",
       "placeholder": null,
-      "controlType": "TEXT",
-      "maxLength": null,
-      "minLength": null,
+      "items": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": null,
+        "name": null,
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": null,
+        "placeholder": null,
+        "controlType": "TEXT",
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": null
+      } ],
+      "maxItems": null,
+      "minItems": null,
+      "multipleValues": null,
       "options": null,
+      "controlType": "ARRAY_BUILDER",
       "optionsDataSource": null
     }, {
       "advancedOption": null,
@@ -363,14 +384,56 @@
       "metadata": { },
       "required": false,
       "name": "sendAt",
-      "type": "DATE_TIME",
+      "type": "OBJECT",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Send at",
       "placeholder": null,
+      "additionalProperties": null,
+      "multipleValues": null,
       "options": null,
-      "optionsDataSource": null,
-      "controlType": "DATE_TIME"
+      "properties": [ {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "dateTime",
+        "type": "DATE_TIME",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Date time",
+        "placeholder": null,
+        "options": null,
+        "controlType": "DATE_TIME",
+        "optionsDataSource": null
+      }, {
+        "advancedOption": null,
+        "description": null,
+        "displayCondition": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "metadata": { },
+        "required": true,
+        "name": "zoneID",
+        "type": "STRING",
+        "defaultValue": null,
+        "exampleValue": null,
+        "label": "Zone ID",
+        "placeholder": null,
+        "controlType": "SELECT",
+        "maxLength": null,
+        "minLength": null,
+        "options": null,
+        "optionsDataSource": {
+          "loadOptionsDependsOn": null,
+          "options": { }
+        }
+      } ],
+      "controlType": "OBJECT_BUILDER",
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "If set to true, Twilio delivers the message as a single MMS message, regardless of the presence of media.",
@@ -406,23 +469,16 @@
       "metadata": { },
       "required": false,
       "name": "contentVariables",
-      "type": "BOOLEAN",
+      "type": "STRING",
       "defaultValue": null,
       "exampleValue": null,
       "label": "Content variables",
       "placeholder": null,
-      "options": [ {
-        "description": null,
-        "displayCondition": null,
-        "label": "True",
-        "value": true
-      }, {
-        "description": null,
-        "displayCondition": null,
-        "label": "False",
-        "value": true
-      } ],
-      "controlType": "CHECKBOX"
+      "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
     }, {
       "advancedOption": null,
       "description": "For SMS pumping protection feature only: Include this parameter with a value of disable to skip any kind of risk check on the respective message request.",
@@ -537,7 +593,7 @@
       "type": "DYNAMIC_PROPERTIES",
       "header": null,
       "dynamicPropertiesDataSource": {
-        "loadPropertiesDependsOn": [ "mediaUrl" ],
+        "loadPropertiesDependsOn": [ "content" ],
         "properties": { }
       }
     }, {
@@ -561,8 +617,9 @@
       "optionsDataSource": null
     } ],
     "title": "Send SMS",
-    "output": {
-      "outputSchema": {
+    "perform": { },
+    "outputSchema": {
+      "definition": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -626,17 +683,16 @@
           "metadata": { },
           "required": null,
           "name": "direction",
-          "type": "OBJECT",
+          "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
-          "additionalProperties": null,
-          "multipleValues": null,
+          "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
-          "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -654,9 +710,28 @@
           "additionalProperties": null,
           "multipleValues": null,
           "options": null,
-          "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "properties": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "rawNumber",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          } ],
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -685,14 +760,53 @@
           "metadata": { },
           "required": null,
           "name": "dateUpdated",
-          "type": "DATE_TIME",
+          "type": "OBJECT",
           "defaultValue": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
+          "additionalProperties": null,
+          "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "properties": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "dateTime",
+            "type": "DATE_TIME",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "options": null,
+            "controlType": "DATE_TIME",
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "zoneID",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          } ],
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -797,17 +911,16 @@
           "metadata": { },
           "required": null,
           "name": "status",
-          "type": "OBJECT",
+          "type": "STRING",
           "defaultValue": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
-          "additionalProperties": null,
-          "multipleValues": null,
+          "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
           "options": null,
-          "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -855,14 +968,53 @@
           "metadata": { },
           "required": null,
           "name": "dateSent",
-          "type": "DATE_TIME",
+          "type": "OBJECT",
           "defaultValue": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
+          "additionalProperties": null,
+          "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "properties": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "dateTime",
+            "type": "DATE_TIME",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "options": null,
+            "controlType": "DATE_TIME",
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "zoneID",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          } ],
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -872,14 +1024,53 @@
           "metadata": { },
           "required": null,
           "name": "dateCreated",
-          "type": "DATE_TIME",
+          "type": "OBJECT",
           "defaultValue": null,
           "exampleValue": null,
           "label": null,
           "placeholder": null,
+          "additionalProperties": null,
+          "multipleValues": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "DATE_TIME"
+          "properties": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "dateTime",
+            "type": "DATE_TIME",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "options": null,
+            "controlType": "DATE_TIME",
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "zoneID",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          } ],
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -897,8 +1088,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "optionsDataSource": null,
-          "controlType": "INTEGER"
+          "controlType": "INTEGER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -916,9 +1107,66 @@
           "additionalProperties": null,
           "multipleValues": null,
           "options": null,
-          "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "properties": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "currencyCode",
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "defaultFractionDigits",
+            "type": "INTEGER",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "controlType": "INTEGER",
+            "optionsDataSource": null
+          }, {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": "numericCode",
+            "type": "INTEGER",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "maxValue": null,
+            "minValue": null,
+            "options": null,
+            "controlType": "INTEGER",
+            "optionsDataSource": null
+          } ],
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         }, {
           "advancedOption": null,
           "description": null,
@@ -952,19 +1200,37 @@
           "exampleValue": null,
           "label": null,
           "placeholder": null,
-          "additionalProperties": null,
+          "additionalProperties": [ {
+            "advancedOption": null,
+            "description": null,
+            "displayCondition": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "metadata": { },
+            "required": null,
+            "name": null,
+            "type": "STRING",
+            "defaultValue": null,
+            "exampleValue": null,
+            "label": null,
+            "placeholder": null,
+            "controlType": "TEXT",
+            "maxLength": null,
+            "minLength": null,
+            "options": null,
+            "optionsDataSource": null
+          } ],
           "multipleValues": null,
           "options": null,
           "properties": null,
-          "optionsDataSource": null,
-          "controlType": "OBJECT_BUILDER"
+          "controlType": "OBJECT_BUILDER",
+          "optionsDataSource": null
         } ],
-        "optionsDataSource": null,
-        "controlType": "OBJECT_BUILDER"
+        "controlType": "OBJECT_BUILDER",
+        "optionsDataSource": null
       },
       "sampleOutput": null
-    },
-    "perform": { }
+    }
   } ],
   "category": null,
   "connection": {
@@ -1015,11 +1281,11 @@
       "title": "Basic Auth",
       "type": "BASIC_AUTH",
       "acquire": null,
+      "apply": null,
       "authorizationCallback": null,
       "authorizationUrl": null,
-      "clientSecret": null,
-      "apply": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,

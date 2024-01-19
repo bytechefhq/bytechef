@@ -27,9 +27,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -129,5 +132,15 @@ class TwilioUtilsTest {
                 "specific Sender from the Sender Pool.",
             messagingServiceSidProperty.getDescription().get());
         assertEquals(true, messagingServiceSidProperty.getRequired().get());
+    }
+
+    @Test
+    void testGetZoneIdOptions() {
+        Set<String> availableZoneIds = ZoneId.getAvailableZoneIds();
+
+        List<Option<String>> zoneIdOptions =
+            TwilioUtils.getZoneIdOptions(mockedParameters, mockedParameters, "", mockedContext);
+
+        assertEquals(availableZoneIds.size(), zoneIdOptions.size());
     }
 }
