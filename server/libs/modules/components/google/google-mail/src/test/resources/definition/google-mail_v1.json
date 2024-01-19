@@ -11,7 +11,7 @@
     "help": null,
     "metadata": null,
     "name": "getMail",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -544,7 +544,7 @@
     "help": null,
     "metadata": null,
     "name": "getThread",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1172,7 +1172,7 @@
     "help": null,
     "metadata": null,
     "name": "searchEmail",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1831,7 +1831,7 @@
     "help": null,
     "metadata": null,
     "name": "sendEmail",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

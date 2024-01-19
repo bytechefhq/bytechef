@@ -16,7 +16,7 @@
       "bodyContentType": "JSON"
     },
     "name": "createRecord",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

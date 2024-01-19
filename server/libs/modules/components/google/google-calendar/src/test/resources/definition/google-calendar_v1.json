@@ -11,7 +11,7 @@
     "help": null,
     "metadata": null,
     "name": "createEvent",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -4827,7 +4827,7 @@
     "help": null,
     "metadata": null,
     "name": "createQuickEvent",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -7536,7 +7536,7 @@
     "help": null,
     "metadata": null,
     "name": "getEvents",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

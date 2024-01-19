@@ -11,7 +11,7 @@
     "help": null,
     "metadata": null,
     "name": "createCustomer",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -688,7 +688,7 @@
     "help": null,
     "metadata": null,
     "name": "createItem",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -963,7 +963,7 @@
     "help": null,
     "metadata": null,
     "name": "downloadCustomerPdf",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

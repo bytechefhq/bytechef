@@ -233,7 +233,7 @@
     "help": null,
     "metadata": null,
     "name": "write",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

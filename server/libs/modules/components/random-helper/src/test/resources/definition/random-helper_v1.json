@@ -11,7 +11,7 @@
     "help": null,
     "metadata": null,
     "name": "randomInt",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -89,7 +89,7 @@
     "help": null,
     "metadata": null,
     "name": "randomFloat",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

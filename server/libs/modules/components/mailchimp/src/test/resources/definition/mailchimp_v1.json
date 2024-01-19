@@ -16,7 +16,7 @@
       "bodyContentType": "JSON"
     },
     "name": "addMemberToList",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -2000,7 +2000,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "subscribe",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

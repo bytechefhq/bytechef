@@ -11,7 +11,7 @@
     "help": null,
     "metadata": null,
     "name": "dummy",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ ],
     "title": "Title",

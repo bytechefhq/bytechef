@@ -16,7 +16,7 @@
       "bodyContentType": "JSON"
     },
     "name": "addPet",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -584,7 +584,7 @@
       "bodyContentType": "JSON"
     },
     "name": "updatePet",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1150,7 +1150,7 @@
       "path": "/pet/findByStatus"
     },
     "name": "findPetsByStatus",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1502,7 +1502,7 @@
       "path": "/pet/findByTags"
     },
     "name": "findPetsByTags",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1923,7 +1923,7 @@
       "path": "/pet/{petId}"
     },
     "name": "getPetById",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -2325,7 +2325,7 @@
       "bodyContentType": "BINARY"
     },
     "name": "uploadFile",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -2564,7 +2564,7 @@
       "path": "/store/inventory"
     },
     "name": "getInventory",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ ],
     "title": "Returns pet inventories by status",
@@ -2631,7 +2631,7 @@
       "bodyContentType": "JSON"
     },
     "name": "placeOrder",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -3009,7 +3009,7 @@
       "path": "/store/order/{orderId}"
     },
     "name": "getOrderById",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -3212,7 +3212,7 @@
       "bodyContentType": "JSON"
     },
     "name": "createUser",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -3586,7 +3586,7 @@
       "bodyContentType": "JSON"
     },
     "name": "createUsersWithListInput",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -4042,7 +4042,7 @@
       "path": "/user/{username}"
     },
     "name": "getUserByName",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -4263,7 +4263,7 @@
       "bodyContentType": "JSON"
     },
     "name": "updateUser",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -4691,7 +4691,6 @@
       "title": "OAuth2 Implicit",
       "type": "OAUTH2_IMPLICIT_CODE",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": { },
       "clientSecret": null,
       "apply": null,
@@ -4700,7 +4699,8 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationCallback": null
     }, {
       "detectOn": null,
       "description": null,
@@ -4748,7 +4748,6 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "authorizationCallback": null,
       "authorizationUrl": null,
       "clientSecret": null,
       "apply": null,
@@ -4757,7 +4756,8 @@
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null
+      "tokenUrl": null,
+      "authorizationCallback": null
     } ],
     "componentName": "petstore",
     "componentDescription": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",

@@ -574,7 +574,7 @@
     "help": null,
     "metadata": null,
     "name": "createAssistant",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1235,7 +1235,7 @@
     "help": null,
     "metadata": null,
     "name": "createImage",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1565,7 +1565,7 @@
     "help": null,
     "metadata": null,
     "name": "createSpeech",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1836,7 +1836,7 @@
     "help": null,
     "metadata": null,
     "name": "createTranscription",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -2757,7 +2757,7 @@
     "help": null,
     "metadata": null,
     "name": "createTranslation",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -4055,7 +4055,6 @@
       "title": "Bearer Token",
       "type": "BEARER_TOKEN",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
       "clientId": null,
       "pkce": null,
@@ -4064,7 +4063,8 @@
       "scopes": null,
       "tokenUrl": null,
       "authorizationUrl": null,
-      "clientSecret": null
+      "clientSecret": null,
+      "authorizationCallback": null
     } ],
     "componentName": "openai",
     "componentDescription": "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways that benefit humanity as a whole.",

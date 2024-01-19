@@ -16,7 +16,7 @@
       "bodyContentType": "JSON"
     },
     "name": "createIssue",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -3544,7 +3544,7 @@
       "path": "/rest/api/3/issue/{issueIdOrKey}"
     },
     "name": "getIssue",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -9177,7 +9177,7 @@
       "path": "/rest/api/3/search"
     },
     "name": "searchForIssuesUsingJql",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

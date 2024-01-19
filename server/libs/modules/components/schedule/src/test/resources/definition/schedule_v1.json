@@ -23,7 +23,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "everyDay",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -748,7 +748,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "everyWeek",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1142,7 +1142,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "everyMonth",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1501,7 +1501,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "interval",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1669,7 +1669,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "cron",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

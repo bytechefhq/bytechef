@@ -11,7 +11,7 @@
     "help": null,
     "metadata": null,
     "name": "sendSMS",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

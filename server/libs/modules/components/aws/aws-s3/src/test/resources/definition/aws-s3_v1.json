@@ -11,7 +11,7 @@
     "help": null,
     "metadata": null,
     "name": "getObject",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -162,7 +162,7 @@
     "help": null,
     "metadata": null,
     "name": "getUrl",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -221,7 +221,7 @@
     "help": null,
     "metadata": null,
     "name": "listObjects",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -359,7 +359,7 @@
     "help": null,
     "metadata": null,
     "name": "presignGetObject",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -437,7 +437,7 @@
     "help": null,
     "metadata": null,
     "name": "putObject",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

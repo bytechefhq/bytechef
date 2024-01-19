@@ -16,7 +16,7 @@
       "bodyContentType": "JSON"
     },
     "name": "createContact",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -589,7 +589,7 @@
       "bodyContentType": "JSON"
     },
     "name": "updateContact",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -1083,7 +1083,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "subscribe",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

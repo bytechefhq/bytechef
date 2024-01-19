@@ -11,7 +11,7 @@
     "help": null,
     "metadata": null,
     "name": "parse",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -71,7 +71,7 @@
     "help": null,
     "metadata": null,
     "name": "stringify",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,

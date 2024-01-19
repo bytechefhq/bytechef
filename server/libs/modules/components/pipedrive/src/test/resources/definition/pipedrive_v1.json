@@ -14,7 +14,7 @@
       "path": "/deals"
     },
     "name": "getDeals",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -2997,7 +2997,7 @@
       "bodyContentType": "JSON"
     },
     "name": "addDeal",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -5959,7 +5959,7 @@
       "path": "/deals/search"
     },
     "name": "searchDeals",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -6965,7 +6965,7 @@
       "path": "/deals/{id}"
     },
     "name": "deleteDeal",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -7102,7 +7102,7 @@
       "path": "/deals/{id}"
     },
     "name": "getDeal",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -10277,7 +10277,7 @@
       "path": "/leads"
     },
     "name": "getLeads",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -11151,7 +11151,7 @@
       "bodyContentType": "JSON"
     },
     "name": "addLead",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -11962,7 +11962,7 @@
       "path": "/leads/{id}"
     },
     "name": "deleteLead",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -12099,7 +12099,7 @@
       "path": "/leads/{id}"
     },
     "name": "getLead",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -12650,7 +12650,7 @@
       "path": "/leads/search"
     },
     "name": "searchLeads",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -13650,7 +13650,7 @@
       "path": "/organizations"
     },
     "name": "getOrganizations",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -15850,7 +15850,7 @@
       "bodyContentType": "JSON"
     },
     "name": "addOrganization",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -17888,7 +17888,7 @@
       "path": "/organizations/search"
     },
     "name": "searchOrganization",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -18558,7 +18558,7 @@
       "path": "/organizations/{id}"
     },
     "name": "deleteOrganization",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -18695,7 +18695,7 @@
       "path": "/organizations/{id}"
     },
     "name": "getOrganization",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -20924,7 +20924,7 @@
       "path": "/persons"
     },
     "name": "getPersons",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -23337,7 +23337,7 @@
       "bodyContentType": "JSON"
     },
     "name": "addPerson",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -25452,7 +25452,7 @@
       "path": "/persons/search"
     },
     "name": "searchPersons",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -26299,7 +26299,7 @@
       "path": "/persons/{id}"
     },
     "name": "deletePerson",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -26436,7 +26436,7 @@
       "path": "/persons/{id}"
     },
     "name": "getPerson",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": [ {
       "advancedOption": null,
@@ -28739,7 +28739,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "newActivity",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
@@ -30204,7 +30204,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "newDeal",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
@@ -32053,7 +32053,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "newOrganization",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
@@ -33313,7 +33313,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "newPerson",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
@@ -34863,7 +34863,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "updatedDeal",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
@@ -36712,7 +36712,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "updatedOrganization",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
@@ -37972,7 +37972,7 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "updatedPerson",
-    "outputSchemaDefaultFunction": false,
+    "outputSchemaDefaultFunction": true,
     "outputSchemaFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
