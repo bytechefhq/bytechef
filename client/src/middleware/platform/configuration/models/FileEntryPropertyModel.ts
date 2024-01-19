@@ -19,6 +19,12 @@ import {
     ControlTypeModelFromJSONTyped,
     ControlTypeModelToJSON,
 } from './ControlTypeModel';
+import type { PropertyModel } from './PropertyModel';
+import {
+    PropertyModelFromJSON,
+    PropertyModelFromJSONTyped,
+    PropertyModelToJSON,
+} from './PropertyModel';
 import type { PropertyTypeModel } from './PropertyTypeModel';
 import {
     PropertyTypeModelFromJSON,
@@ -40,10 +46,10 @@ import {
 export interface FileEntryPropertyModel extends ValuePropertyModel {
     /**
      * The list of valid file entry property types.
-     * @type {Array<ValuePropertyModel>}
+     * @type {Array<PropertyModel>}
      * @memberof FileEntryPropertyModel
      */
-    properties?: Array<ValuePropertyModel>;
+    properties?: Array<PropertyModel>;
 }
 
 /**
@@ -65,7 +71,7 @@ export function FileEntryPropertyModelFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         ...ValuePropertyModelFromJSONTyped(json, ignoreDiscriminator),
-        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(ValuePropertyModelFromJSON)),
+        'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
     };
 }
 
@@ -78,7 +84,7 @@ export function FileEntryPropertyModelToJSON(value?: FileEntryPropertyModel | nu
     }
     return {
         ...ValuePropertyModelToJSON(value),
-        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(ValuePropertyModelToJSON)),
+        'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
     };
 }
 
