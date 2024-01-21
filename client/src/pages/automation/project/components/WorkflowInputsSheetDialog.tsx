@@ -14,8 +14,14 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
+import {WorkflowTestConfigurationModel} from '@/middleware/platform/workflow/test';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
+import {
+    useCreateWorkflowTestConfigurationMutation,
+    useUpdateWorkflowTestConfigurationMutation,
+} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinition} from '@/types/types';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -28,6 +34,7 @@ export interface WorkflowInputsSheetDialogProps {
     projectId: number;
     triggerNode?: ReactNode;
     workflow: WorkflowModel;
+    workflowTestConfiguration?: WorkflowTestConfigurationModel;
 }
 
 const SPACE = 4;
@@ -38,24 +45,70 @@ const WorkflowInputsSheetDialog = ({
     projectId,
     triggerNode,
     workflow,
+    workflowTestConfiguration,
 }: WorkflowInputsSheetDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
-    const form = useForm<WorkflowInputModel>({
+    const form = useForm<WorkflowInputModel & {testValue: string}>({
         defaultValues: {
             ...workflow.inputs![inputIndex],
+            testValue: workflowTestConfiguration?.inputs
+                ? workflowTestConfiguration?.inputs[workflow.inputs![inputIndex]?.name]
+                : undefined,
         },
     });
 
-    const {handleSubmit, reset} = form;
+    const {getValues, handleSubmit, reset} = form;
 
     const queryClient = useQueryClient();
+
+    const createWorkflowTestConfigurationMutation = useCreateWorkflowTestConfigurationMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
+
+            closeDialog();
+        },
+    });
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projectWorkflows(projectId),
             });
+
+            if (workflowTestConfiguration?.workflowId) {
+                updateWorkflowTestConfigurationMutation.mutate({
+                    workflowId: workflowTestConfiguration.workflowId!,
+                    workflowTestConfigurationModel: {
+                        ...workflowTestConfiguration,
+                        inputs: {
+                            ...workflowTestConfiguration.inputs,
+                            [getValues().name]: getValues().testValue,
+                        },
+                    },
+                });
+            } else {
+                createWorkflowTestConfigurationMutation.mutate({
+                    workflowId: workflow.id!,
+                    workflowTestConfigurationModel: {
+                        inputs: {
+                            [workflow.inputs![inputIndex]?.name]: getValues().testValue,
+                        },
+                    },
+                });
+            }
+        },
+    });
+
+    const updateWorkflowTestConfigurationMutation = useUpdateWorkflowTestConfigurationMutation({
+        onSuccess: (workflowTestConfiguration) => {
+            queryClient.invalidateQueries({
+                queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration({
+                    workflowId: workflowTestConfiguration.workflowId!,
+                }),
+            });
+
+            closeDialog();
         },
     });
 
@@ -69,7 +122,9 @@ const WorkflowInputsSheetDialog = ({
         reset();
     }
 
-    function handleSave(input: WorkflowInputModel) {
+    function handleSave(input: WorkflowInputModel & {testValue?: string}) {
+        delete input['testValue'];
+
         const workflowDefinition: WorkflowDefinition = JSON.parse(workflow.definition!);
 
         let inputs: WorkflowInputModel[] = workflowDefinition.inputs ?? [];
@@ -94,8 +149,6 @@ const WorkflowInputsSheetDialog = ({
                 version: workflow.version,
             },
         });
-
-        closeDialog();
     }
 
     return (
@@ -209,6 +262,22 @@ const WorkflowInputsSheetDialog = ({
 
                                         <FormControl>
                                             <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="testValue"
+                                render={({field}) => (
+                                    <FormItem className="flex flex-col space-y-2">
+                                        <FormLabel>Test Value</FormLabel>
+
+                                        <FormControl>
+                                            <Input {...field} />
                                         </FormControl>
 
                                         <FormMessage />

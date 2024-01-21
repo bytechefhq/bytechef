@@ -1,6 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {WorkflowModel} from '@/middleware/automation/configuration';
+import {WorkflowTestConfigurationModel} from '@/middleware/platform/workflow/test';
 import WorkflowInputsSheetDialog from '@/pages/automation/project/components/WorkflowInputsSheetDialog';
 import WorkflowInputsSheetTable from '@/pages/automation/project/components/WorkflowInputsSheetTable';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
@@ -10,9 +11,10 @@ interface WorkflowInputsSheetProps {
     onClose: () => void;
     projectId: number;
     workflow: WorkflowModel;
+    workflowTestConfiguration?: WorkflowTestConfigurationModel;
 }
 
-const WorkflowInputsSheet = ({onClose, projectId, workflow}: WorkflowInputsSheetProps) => (
+const WorkflowInputsSheet = ({onClose, projectId, workflow, workflowTestConfiguration}: WorkflowInputsSheetProps) => (
     <Sheet modal={false} onOpenChange={onClose} open>
         <SheetContent
             className="flex flex-col p-4 sm:max-w-[700px]"
@@ -26,8 +28,9 @@ const WorkflowInputsSheet = ({onClose, projectId, workflow}: WorkflowInputsSheet
                     <div className="flex items-center gap-2">
                         <WorkflowInputsSheetDialog
                             projectId={projectId}
-                            triggerNode={<Button size="sm">Create</Button>}
+                            triggerNode={<Button size="sm">Add Input</Button>}
                             workflow={workflow}
+                            workflowTestConfiguration={workflowTestConfiguration}
                         />
 
                         <SheetPrimitive.Close asChild>
@@ -37,7 +40,11 @@ const WorkflowInputsSheet = ({onClose, projectId, workflow}: WorkflowInputsSheet
                 </div>
             </SheetHeader>
 
-            <WorkflowInputsSheetTable inputs={workflow.inputs || []} projectId={projectId} workflow={workflow} />
+            <WorkflowInputsSheetTable
+                projectId={projectId}
+                workflow={workflow}
+                workflowTestConfiguration={workflowTestConfiguration}
+            />
         </SheetContent>
     </Sheet>
 );

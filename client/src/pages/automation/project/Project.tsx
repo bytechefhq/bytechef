@@ -45,7 +45,6 @@ import {
 import WorkflowCodeEditorSheet from '@/pages/automation/project/components/WorkflowCodeEditorSheet';
 import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
 import WorkflowInputsSheet from '@/pages/automation/project/components/WorkflowInputsSheet';
-import WorkflowTestConfigurationDialog from '@/pages/automation/project/components/WorkflowTestConfigurationDialog';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
@@ -56,7 +55,10 @@ import {ProjectTagKeys} from '@/queries/automation/projectTags.quries';
 import {ProjectKeys, useGetProjectQuery, useGetProjectWorkflowsQuery} from '@/queries/automation/projects.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
-import {useGetWorkflowTestConfigurationsQuery} from '@/queries/platform/workflowTestConfigurations.queries';
+import {
+    WorkflowTestConfigurationKeys,
+    useGetWorkflowTestConfigurationQuery,
+} from '@/queries/platform/workflowTestConfigurations.queries';
 import {ChevronDownIcon, DotsVerticalIcon, PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {
@@ -97,7 +99,6 @@ const Project = () => {
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
-    const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
     const [showWorkflowCodeEditorSheet, setShowWorkflowCodeEditorSheet] = useState(false);
     const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] = useState(false);
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecutionModel>();
@@ -163,28 +164,15 @@ const Project = () => {
         isLoading: projectWorkflowsLoading,
     } = useGetProjectWorkflowsQuery(project?.id as number);
 
-    const {data: workflowTestConfigurations} = useGetWorkflowTestConfigurationsQuery();
-
-    const filteredWorkflowTestConfigurations =
-        workflowTestConfigurations && workflowTestConfigurations.length > 0
-            ? workflowTestConfigurations.filter(
-                  (workflowTestConfiguration) => workflowTestConfiguration.workflowId === workflow?.id
-              )
-            : undefined;
-
-    const currentWorkflowTestConfiguration =
-        filteredWorkflowTestConfigurations && filteredWorkflowTestConfigurations.length > 0
-            ? filteredWorkflowTestConfigurations[0]
-            : undefined;
+    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+    const {data: workflowTestConfiguration, isLoading: workflowTestConfigurationLoading} =
+        useGetWorkflowTestConfigurationQuery({workflowId: workflow?.id!});
 
     const workflowTestConfigurationInputs =
-        currentWorkflowTestConfiguration && currentWorkflowTestConfiguration.inputs
-            ? currentWorkflowTestConfiguration.inputs
-            : {};
+        workflowTestConfiguration && workflowTestConfiguration.inputs ? workflowTestConfiguration.inputs : {};
+
     const workflowTestConfigurationConnections = (
-        currentWorkflowTestConfiguration && currentWorkflowTestConfiguration.connections
-            ? currentWorkflowTestConfiguration.connections
-            : []
+        workflowTestConfiguration && workflowTestConfiguration.connections ? workflowTestConfiguration.connections : []
     ).reduce(function (map: {[key: string]: number}, workflowTestConfigurationConnection) {
         map[workflowTestConfigurationConnection.operationName + '_' + workflowTestConfigurationConnection.key] =
             workflowTestConfigurationConnection.connectionId;
@@ -265,9 +253,12 @@ const Project = () => {
     });
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
-        onSuccess: () => {
+        onSuccess: (workflow) => {
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projectWorkflows(+projectId!),
+            });
+            queryClient.invalidateQueries({
+                queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration({workflowId: workflow.id!}),
             });
 
             setShowEditWorkflowDialog(false);
@@ -533,21 +524,6 @@ const Project = () => {
                         </div>
 
                         <div className="mr-4 flex items-center space-x-1">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        onClick={() => setShowWorkflowTestConfigurationDialog(true)}
-                                        variant="outline"
-                                    >
-                                        Test Configuration
-                                    </Button>
-                                </TooltipTrigger>
-
-                                <TooltipContent>
-                                    Set the workflow test configuration (test input parameters and/or connections)
-                                </TooltipContent>
-                            </Tooltip>
-
                             {!workflowIsRunning && runDisabled && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -557,7 +533,7 @@ const Project = () => {
                                                 disabled={runDisabled}
                                                 variant="secondary"
                                             >
-                                                <PlayIcon className="mr-0.5 h-5" /> Run
+                                                <PlayIcon className="h-5" /> Run
                                             </Button>
                                         </span>
                                     </TooltipTrigger>
@@ -579,7 +555,7 @@ const Project = () => {
                                                 onClick={handleRunClick}
                                                 variant="secondary"
                                             >
-                                                <PlayIcon className="mr-0.5 h-5" /> Run
+                                                <PlayIcon className="h-5" /> Run
                                             </Button>
                                         </span>
                                     </TooltipTrigger>
@@ -596,7 +572,7 @@ const Project = () => {
                                     size="sm"
                                     variant="destructive"
                                 >
-                                    <SquareIcon className="mr-0.5 h-5" /> Running
+                                    <SquareIcon className="h-5" /> Running
                                 </Button>
                             )}
 
@@ -610,7 +586,7 @@ const Project = () => {
                                                 })
                                             }
                                         >
-                                            <CircleDotDashedIcon className="mr-0.5 h-5" /> Publish
+                                            <CircleDotDashedIcon className="h-5" /> Publish
                                         </Button>
                                     </TooltipTrigger>
 
@@ -623,7 +599,7 @@ const Project = () => {
                                     <TooltipTrigger asChild>
                                         <span>
                                             <Button disabled={!!project?.publishedDate}>
-                                                <CircleDotDashedIcon className="mr-0.5 h-5" /> Publish
+                                                <CircleDotDashedIcon className="h-5" /> Publish
                                             </Button>
                                         </span>
                                     </TooltipTrigger>
@@ -753,29 +729,26 @@ const Project = () => {
 
             {workflow && (
                 <>
-                    {showWorkflowTestConfigurationDialog && (
-                        <WorkflowTestConfigurationDialog
-                            onClose={() => setShowWorkflowTestConfigurationDialog(false)}
-                            workflow={workflow}
-                            workflowTestConfiguration={currentWorkflowTestConfiguration}
-                        />
-                    )}
-
-                    {showWorkflowCodeEditorSheet && (
+                    {showWorkflowCodeEditorSheet && !workflowTestConfigurationLoading && (
                         <WorkflowCodeEditorSheet
                             onClose={() => {
                                 setShowWorkflowCodeEditorSheet(false);
                             }}
+                            onRunClick={handleRunClick}
                             projectId={+projectId!}
+                            runDisabled={runDisabled}
                             workflow={workflow}
+                            workflowIsRunning={workflowIsRunning}
+                            workflowTestConfiguration={workflowTestConfiguration}
                         />
                     )}
 
-                    {projectId && showWorkflowInputsSheet && (
+                    {projectId && showWorkflowInputsSheet && !workflowTestConfigurationLoading && (
                         <WorkflowInputsSheet
                             onClose={() => setShowWorkflowInputsSheet(false)}
                             projectId={+projectId}
                             workflow={workflow}
+                            workflowTestConfiguration={workflowTestConfiguration}
                         />
                     )}
                 </>

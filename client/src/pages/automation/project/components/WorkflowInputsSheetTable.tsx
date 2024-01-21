@@ -17,6 +17,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
+import {WorkflowTestConfigurationModel} from '@/middleware/platform/workflow/test';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowInputsSheetDialog from '@/pages/automation/project/components/WorkflowInputsSheetDialog';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
@@ -29,13 +30,13 @@ import {useState} from 'react';
 const SPACE = 4;
 
 const WorkflowInputsSheetTable = ({
-    inputs,
     projectId,
     workflow,
+    workflowTestConfiguration,
 }: {
-    inputs: WorkflowInputModel[];
     projectId: number;
     workflow: WorkflowModel;
+    workflowTestConfiguration?: WorkflowTestConfigurationModel;
 }) => {
     const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
     const [showEditDialog, setShowEditDialog] = useState(false);
@@ -103,6 +104,10 @@ const WorkflowInputsSheetTable = ({
                                 Required
                             </th>
 
+                            <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900" scope="col">
+                                Test Value
+                            </th>
+
                             <th className="relative py-3.5 pl-3 pr-4 sm:pr-0" scope="col">
                                 <span className="sr-only">Edit</span>
                             </th>
@@ -110,52 +115,61 @@ const WorkflowInputsSheetTable = ({
                     </thead>
 
                     <tbody className="divide-y divide-gray-200">
-                        {inputs.map((input, index) => (
-                            <tr key={input.name}>
-                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                                    {input.name}
-                                </td>
+                        {workflow.inputs &&
+                            workflow.inputs.map((input, index) => (
+                                <tr key={input.name}>
+                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                                        {input.name}
+                                    </td>
 
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{input.label}</td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{input.label}</td>
 
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{input.type}</td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{input.type}</td>
 
-                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {input.required === true ? 'true' : 'false'}
-                                </td>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {input.required === true ? 'true' : 'false'}
+                                    </td>
 
-                                <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
-                                        </DropdownMenuTrigger>
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {workflowTestConfiguration?.inputs
+                                            ? workflowTestConfiguration?.inputs[
+                                                  workflow.inputs![index]?.name
+                                              ]?.toString()
+                                            : undefined}
+                                    </td>
 
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem
-                                                onClick={() => {
-                                                    setCurrentInputIndex(index);
-                                                    setShowEditDialog(true);
-                                                }}
-                                            >
-                                                Edit
-                                            </DropdownMenuItem>
+                                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
+                                            </DropdownMenuTrigger>
 
-                                            <DropdownMenuSeparator />
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem
+                                                    onClick={() => {
+                                                        setCurrentInputIndex(index);
+                                                        setShowEditDialog(true);
+                                                    }}
+                                                >
+                                                    Edit
+                                                </DropdownMenuItem>
 
-                                            <DropdownMenuItem
-                                                className="text-red-600"
-                                                onClick={() => {
-                                                    setCurrentInputIndex(index);
-                                                    setShowDeleteDialog(true);
-                                                }}
-                                            >
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </td>
-                            </tr>
-                        ))}
+                                                <DropdownMenuSeparator />
+
+                                                <DropdownMenuItem
+                                                    className="text-red-600"
+                                                    onClick={() => {
+                                                        setCurrentInputIndex(index);
+                                                        setShowDeleteDialog(true);
+                                                    }}
+                                                >
+                                                    Delete
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             ) : (
@@ -177,6 +191,7 @@ const WorkflowInputsSheetTable = ({
                                     </Button>
                                 }
                                 workflow={workflow}
+                                workflowTestConfiguration={workflowTestConfiguration}
                             />
                         </div>
                     </div>
@@ -212,6 +227,7 @@ const WorkflowInputsSheetTable = ({
                     onClose={() => setShowEditDialog(false)}
                     projectId={projectId}
                     workflow={workflow}
+                    workflowTestConfiguration={workflowTestConfiguration}
                 />
             )}
         </>

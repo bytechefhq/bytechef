@@ -259,6 +259,10 @@ public class TaskWorker {
     }
 
     private void handleException(TaskExecution taskExecution, Exception exception) {
+        while (exception.getCause() != null && exception.getCause() instanceof Exception cause) {
+            exception = cause;
+        }
+
         logger.error(exception.getMessage(), exception);
 
         taskExecution.setError(

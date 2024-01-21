@@ -1,5 +1,6 @@
 import {
     GetWorkflowTestConfigurationConnectionsRequest,
+    GetWorkflowTestConfigurationRequest,
     WorkflowTestConfigurationApi,
     WorkflowTestConfigurationConnectionModel,
     WorkflowTestConfigurationModel,
@@ -9,6 +10,10 @@ import {
 import {useQuery} from '@tanstack/react-query';
 
 export const WorkflowTestConfigurationKeys = {
+    workflowTestConfiguration: (request: GetWorkflowTestConfigurationRequest) => [
+        ...WorkflowTestConfigurationKeys.workflowTestConfigurations,
+        request,
+    ],
     workflowTestConfigurations: ['workflowTestConfigurations'] as const,
     workflowTestConfigurationConnections: (request: GetWorkflowTestConfigurationConnectionsRequest) => [
         ...WorkflowTestConfigurationKeys.workflowTestConfigurations,
@@ -24,8 +29,8 @@ export const useGetWorkflowTestConfigurationConnectionsQuery = (
         queryFn: () => new WorkflowTestConfigurationApi().getWorkflowTestConfigurationConnections(request),
     });
 
-export const useGetWorkflowTestConfigurationsQuery = () =>
-    useQuery<WorkflowTestConfigurationModel[], Error>({
-        queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
-        queryFn: () => new WorkflowTestConfigurationApi().getWorkflowTestConfigurations(),
+export const useGetWorkflowTestConfigurationQuery = (requestParameters: GetWorkflowTestConfigurationRequest) =>
+    useQuery<WorkflowTestConfigurationModel, Error>({
+        queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(requestParameters),
+        queryFn: () => new WorkflowTestConfigurationApi().getWorkflowTestConfiguration(requestParameters),
     });

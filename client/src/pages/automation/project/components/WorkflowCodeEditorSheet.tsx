@@ -3,24 +3,39 @@ import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/shee
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {toast} from '@/components/ui/use-toast';
 import {WorkflowModel} from '@/middleware/automation/configuration';
+import {WorkflowTestConfigurationModel} from '@/middleware/platform/workflow/test';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
+import WorkflowTestConfigurationDialog from '@/pages/automation/project/components/WorkflowTestConfigurationDialog';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
 import Editor from '@monaco-editor/react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {SaveIcon} from 'lucide-react';
+import {PlayIcon, SaveIcon, Settings2Icon, SquareIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface WorkflowExecutionDetailsSheetProps {
     onClose: () => void;
+    onRunClick: () => void;
     projectId: number;
     workflow: WorkflowModel;
+    workflowIsRunning: boolean;
+    workflowTestConfiguration?: WorkflowTestConfigurationModel;
+    runDisabled: boolean;
 }
 
-const WorkflowCodeEditorSheet = ({onClose, projectId, workflow}: WorkflowExecutionDetailsSheetProps) => {
+const WorkflowCodeEditorSheet = ({
+    onClose,
+    onRunClick,
+    projectId,
+    runDisabled,
+    workflow,
+    workflowIsRunning,
+    workflowTestConfiguration,
+}: WorkflowExecutionDetailsSheetProps) => {
     const [dirty, setDirty] = useState<boolean>(false);
     const [definition, setDefinition] = useState<string>(workflow.definition!);
+    const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
 
     const queryClient = useQueryClient();
 
@@ -62,24 +77,85 @@ const WorkflowCodeEditorSheet = ({onClose, projectId, workflow}: WorkflowExecuti
                         <div className="flex flex-1 items-center justify-between">
                             <div>Edit Workflow</div>
 
-                            <div className="flex items-center space-x-1">
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            disabled={!dirty}
-                                            onClick={() => handleWorkflowCodeEditorSheetSave(definition)}
-                                            size="icon"
-                                            type="submit"
-                                            variant="ghost"
-                                        >
-                                            <div className="relative">
-                                                <SaveIcon className="h-5" />
-                                            </div>
-                                        </Button>
-                                    </TooltipTrigger>
+                            <div className="flex items-center">
+                                <div className="mr-4 flex items-center space-x-0.5">
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                onClick={() => setShowWorkflowTestConfigurationDialog(true)}
+                                                variant="ghost"
+                                            >
+                                                <Settings2Icon className="mr-1 h-5" /> Test Configuration
+                                            </Button>
+                                        </TooltipTrigger>
 
-                                    <TooltipContent>Save current workflow</TooltipContent>
-                                </Tooltip>
+                                        <TooltipContent>Set the workflow test configuration</TooltipContent>
+                                    </Tooltip>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                disabled={!dirty}
+                                                onClick={() => handleWorkflowCodeEditorSheetSave(definition)}
+                                                size="icon"
+                                                type="submit"
+                                                variant="ghost"
+                                            >
+                                                <SaveIcon className="h-5" />
+                                            </Button>
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>Save current workflow</TooltipContent>
+                                    </Tooltip>
+
+                                    {!workflowIsRunning && runDisabled && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span tabIndex={0}>
+                                                    <Button disabled={runDisabled} size="icon" variant="ghost">
+                                                        <PlayIcon className="h-5 text-success" />
+                                                    </Button>
+                                                </span>
+                                            </TooltipTrigger>
+
+                                            <TooltipContent>
+                                                The workflow cannot be executed. Please set all required workflow input
+                                                parameters, connections and component properties.
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    )}
+
+                                    {!workflowIsRunning && !runDisabled && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span tabIndex={0}>
+                                                    <Button
+                                                        disabled={runDisabled}
+                                                        onClick={onRunClick}
+                                                        size="icon"
+                                                        variant="ghost"
+                                                    >
+                                                        <PlayIcon className="h-5 text-success" />
+                                                    </Button>
+                                                </span>
+                                            </TooltipTrigger>
+
+                                            <TooltipContent>Run the current workflow</TooltipContent>
+                                        </Tooltip>
+                                    )}
+
+                                    {workflowIsRunning && (
+                                        <Button
+                                            onClick={() => {
+                                                // TODO
+                                            }}
+                                            size="icon"
+                                            variant="destructive"
+                                        >
+                                            <SquareIcon className="h-5" />
+                                        </Button>
+                                    )}
+                                </div>
 
                                 <SheetPrimitive.Close asChild>
                                     <Cross2Icon className="size-4 cursor-pointer opacity-70" />
@@ -106,6 +182,14 @@ const WorkflowCodeEditorSheet = ({onClose, projectId, workflow}: WorkflowExecuti
                         />
                     </div>
                 </div>
+
+                {showWorkflowTestConfigurationDialog && (
+                    <WorkflowTestConfigurationDialog
+                        onClose={() => setShowWorkflowTestConfigurationDialog(false)}
+                        workflow={workflow}
+                        workflowTestConfiguration={workflowTestConfiguration}
+                    />
+                )}
             </SheetContent>
         </Sheet>
     );
