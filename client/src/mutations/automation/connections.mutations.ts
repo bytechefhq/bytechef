@@ -1,4 +1,5 @@
-import {ConnectionApi, ConnectionModel} from '@/middleware/automation/connection';
+import {ConnectionApi} from '@/middleware/automation/connection';
+import {ConnectionModel} from '@/middleware/platform/connection';
 import {useMutation} from '@tanstack/react-query';
 
 type CreateConnectionMutationProps = {

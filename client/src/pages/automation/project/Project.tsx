@@ -43,13 +43,13 @@ import {
     useUpdateWorkflowMutation,
 } from '@/mutations/automation/workflows.mutations';
 import WorkflowCodeEditorSheet from '@/pages/automation/project/components/WorkflowCodeEditorSheet';
-import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
 import WorkflowInputsSheet from '@/pages/automation/project/components/WorkflowInputsSheet';
 import useRightSidebarStore from '@/pages/automation/project/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/automation/project/stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '@/pages/automation/project/stores/useWorkflowNodeDetailsPanelStore';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import WorkflowExecutionDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordion';
+import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/automation/projectTags.quries';
 import {ProjectKeys, useGetProjectQuery, useGetProjectWorkflowsQuery} from '@/queries/automation/projects.queries';

@@ -1,5 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {useUpdateWorkflowTestConfigurationConnectionMutation} from '@/mutations/platform/workflowTestConfigurations.mutations';
 import {
     WorkflowTestConfigurationKeys,
@@ -10,8 +11,12 @@ import {useQueryClient} from '@tanstack/react-query';
 import EmptyList from 'components/EmptyList';
 import {LinkIcon, PlusIcon} from 'lucide-react';
 import {ComponentDefinitionModel} from 'middleware/platform/configuration';
-import ConnectionDialog from 'pages/automation/connections/components/ConnectionDialog';
-import {useGetConnectionsQuery} from 'queries/automation/connections.queries';
+import ConnectionDialog from 'pages/platform/connection/components/ConnectionDialog';
+import {
+    ConnectionKeys,
+    useGetConnectionTagsQuery,
+    useGetConnectionsQuery,
+} from 'queries/automation/connections.queries';
 import {useState} from 'react';
 
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
@@ -142,7 +147,12 @@ const ConnectionTab = ({
             {showEditConnectionDialog && (
                 <ConnectionDialog
                     componentDefinition={componentDefinition}
+                    connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                    connectionsQueryKey={ConnectionKeys.connections}
                     onClose={() => setShowEditConnectionDialog(false)}
+                    useCreateConnectionMutation={useCreateConnectionMutation}
+                    useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                    useUpdateConnectionMutation={useUpdateConnectionMutation}
                 />
             )}
         </div>

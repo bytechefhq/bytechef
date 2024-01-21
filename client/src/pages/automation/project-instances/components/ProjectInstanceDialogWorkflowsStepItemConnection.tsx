@@ -2,8 +2,13 @@ import {Button} from '@/components/ui/button';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ProjectInstanceModel, WorkflowConnectionModel} from '@/middleware/automation/configuration';
-import ConnectionDialog from '@/pages/automation/connections/components/ConnectionDialog';
-import {useGetConnectionsQuery} from '@/queries/automation/connections.queries';
+import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
+import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
+import {
+    ConnectionKeys,
+    useGetConnectionTagsQuery,
+    useGetConnectionsQuery,
+} from '@/queries/automation/connections.queries';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
 import * as Portal from '@radix-ui/react-portal';
 import {PlusIcon} from 'lucide-react';
@@ -120,7 +125,13 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
                 <Portal.Root>
                     <ConnectionDialog
                         componentDefinition={componentDefinition}
+                        connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                        connectionsQueryKey={ConnectionKeys.connections}
                         onClose={() => setShowNewConnectionDialog(false)}
+                        triggerNode={<Button>Create Connection</Button>}
+                        useCreateConnectionMutation={useCreateConnectionMutation}
+                        useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                        useUpdateConnectionMutation={useUpdateConnectionMutation}
                     />
                 </Portal.Root>
             )}

@@ -17,12 +17,17 @@ import {
     WorkflowTestConfigurationConnectionModel,
     WorkflowTestConfigurationModel,
 } from '@/middleware/platform/workflow/test';
+import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {
     useCreateWorkflowTestConfigurationMutation,
     useUpdateWorkflowTestConfigurationMutation,
 } from '@/mutations/platform/workflowTestConfigurations.mutations';
-import ConnectionDialog from '@/pages/automation/connections/components/ConnectionDialog';
-import {useGetConnectionsQuery} from '@/queries/automation/connections.queries';
+import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
+import {
+    ConnectionKeys,
+    useGetConnectionTagsQuery,
+    useGetConnectionsQuery,
+} from '@/queries/automation/connections.queries';
 import {useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
 import {WorkflowTestConfigurationKeys} from '@/queries/platform/workflowTestConfigurations.queries';
 import {PropertyType} from '@/types/projectTypes';
@@ -310,7 +315,12 @@ const WorkflowTestConfigurationDialog = ({
                     <Portal.Root>
                         <ConnectionDialog
                             componentDefinition={componentDefinition}
+                            connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                            connectionsQueryKey={ConnectionKeys.connections}
                             onClose={() => setShowNewConnectionDialog(false)}
+                            useCreateConnectionMutation={useCreateConnectionMutation}
+                            useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                            useUpdateConnectionMutation={useUpdateConnectionMutation}
                         />
                     </Portal.Root>
                 )}

@@ -20,8 +20,13 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ConnectionModel, TagModel} from '@/middleware/automation/connection';
 import {useUpdateConnectionTagsMutation} from '@/mutations/automation/connectionTags.mutations';
-import {useDeleteConnectionMutation} from '@/mutations/automation/connections.mutations';
-import {ConnectionKeys} from '@/queries/automation/connections.queries';
+import {
+    useCreateConnectionMutation,
+    useDeleteConnectionMutation,
+    useUpdateConnectionMutation,
+} from '@/mutations/automation/connections.mutations';
+import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
+import {ConnectionKeys, useGetConnectionTagsQuery} from '@/queries/automation/connections.queries';
 import {ComponentDefinitionKeys, useGetComponentDefinitionQuery} from '@/queries/platform/componentDefinitions.queries';
 import {Component1Icon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -31,7 +36,6 @@ import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 import TagList from '../../../../components/TagList';
-import ConnectionDialog from './ConnectionDialog';
 
 interface ConnectionListItemProps {
     connection: ConnectionModel;
@@ -188,7 +192,16 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                 </AlertDialog>
 
                 {showEditDialog && (
-                    <ConnectionDialog connection={connection} onClose={() => setShowEditDialog(false)} />
+                    <ConnectionDialog
+                        connection={connection}
+                        connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                        connectionsQueryKey={ConnectionKeys.connections}
+                        onClose={() => setShowEditDialog(false)}
+                        triggerNode={<Button>Create Connection</Button>}
+                        useCreateConnectionMutation={useCreateConnectionMutation}
+                        useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                        useUpdateConnectionMutation={useUpdateConnectionMutation}
+                    />
                 )}
             </>
         </li>

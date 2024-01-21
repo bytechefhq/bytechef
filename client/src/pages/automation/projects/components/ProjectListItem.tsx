@@ -23,7 +23,7 @@ import {ProjectModel, ProjectModelStatusEnum, TagModel} from '@/middleware/autom
 import {useUpdateProjectTagsMutation} from '@/mutations/automation/projectTags.mutations';
 import {useCreateProjectWorkflowMutation} from '@/mutations/automation/projectWorkflows.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/mutations/automation/projects.mutations';
-import WorkflowDialog from '@/pages/automation/project/components/WorkflowDialog';
+import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
 import {ProjectTagKeys} from '@/queries/automation/projectTags.quries';
 import {ProjectKeys} from '@/queries/automation/projects.queries';

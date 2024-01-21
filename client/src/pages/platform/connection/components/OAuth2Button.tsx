@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 
-import useOAuth2, {CodePayload, TokenPayload} from '../oauth2/useOAuth2';
+import useOAuth2, {CodePayload, TokenPayload} from './oauth2/useOAuth2';
 
 const LoadingIcon = () => (
     <svg

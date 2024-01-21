@@ -174,7 +174,7 @@ const WorkflowNodeDetailsPanel = ({
             },
             componentVersion: currentComponent?.version as number,
         },
-        !!currentActionDefinition?.outputSchemaDataSource
+        !!currentActionDefinition?.outputSchemaDataSource && activeTab === 'output'
     );
 
     const connectionKey = workflow.tasks?.filter((task) => task.name === currentNode.name)[0]?.connections![0]?.key;

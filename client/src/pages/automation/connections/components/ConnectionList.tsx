@@ -19,4 +19,5 @@ const ConnectionList = ({connections, tags}: {connections: ConnectionModel[]; ta
         </ul>
     );
 };
+
 export default ConnectionList;

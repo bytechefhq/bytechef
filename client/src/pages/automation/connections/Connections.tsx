@@ -2,7 +2,13 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/layouts/LeftSidebarNav';
-import {useGetConnectionTagsQuery, useGetConnectionsQuery} from '@/queries/automation/connections.queries';
+import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
+import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
+import {
+    ConnectionKeys,
+    useGetConnectionTagsQuery,
+    useGetConnectionsQuery,
+} from '@/queries/automation/connections.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
 import {Link2Icon, TagIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -10,7 +16,6 @@ import {useSearchParams} from 'react-router-dom';
 
 import LayoutContainer from '../../../layouts/LayoutContainer';
 import PageHeader from '../../../layouts/PageHeader';
-import ConnectionDialog from './components/ConnectionDialog';
 import ConnectionList from './components/ConnectionList';
 
 export enum Type {
@@ -75,7 +80,16 @@ export const Connections = () => {
                 <PageHeader
                     centerTitle={true}
                     position="main"
-                    right={<ConnectionDialog triggerNode={<Button>Create Connection</Button>} />}
+                    right={
+                        <ConnectionDialog
+                            connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                            connectionsQueryKey={ConnectionKeys.connections}
+                            triggerNode={<Button>Create Connection</Button>}
+                            useCreateConnectionMutation={useCreateConnectionMutation}
+                            useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                            useUpdateConnectionMutation={useUpdateConnectionMutation}
+                        />
+                    }
                     title={`${searchParams.get('tagId') ? 'Tags' : 'Components'}: ${pageTitle || 'All'}`}
                 />
             }
@@ -157,7 +171,16 @@ export const Connections = () => {
                     connections && tags && <ConnectionList connections={connections} tags={tags} />
                 ) : (
                     <EmptyList
-                        button={<ConnectionDialog triggerNode={<Button>Create Connection</Button>} />}
+                        button={
+                            <ConnectionDialog
+                                connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                                connectionsQueryKey={ConnectionKeys.connections}
+                                triggerNode={<Button>Create Connection</Button>}
+                                useCreateConnectionMutation={useCreateConnectionMutation}
+                                useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                                useUpdateConnectionMutation={useUpdateConnectionMutation}
+                            />
+                        }
                         icon={<Link2Icon className="size-12 text-gray-400" />}
                         message="You do not have any Connections created yet."
                         title="No Connections"

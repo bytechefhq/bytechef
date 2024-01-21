@@ -17,22 +17,20 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {TokenPayload} from '@/pages/automation/connections/oauth2/useOAuth2';
+import {TokenPayload} from '@/pages/platform/connection/components/oauth2/useOAuth2';
 import {useGetOAuth2AuthorizationParametersQuery, useGetOAuth2PropertiesQuery} from '@/queries/platform/oauth2.queries';
 import {Cross2Icon, QuestionMarkCircledIcon, RocketIcon} from '@radix-ui/react-icons';
-import {useQueryClient} from '@tanstack/react-query';
+import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import Properties from 'components/Properties/Properties';
 import useCopyToClipboard from 'hooks/useCopyToClipboard';
 import {ClipboardIcon} from 'lucide-react';
-import {ConnectionModel, TagModel} from 'middleware/automation/connection';
 import {
     AuthorizationModel,
     ComponentDefinitionBasicModel,
     ComponentDefinitionModel,
 } from 'middleware/platform/configuration';
-import {useCreateConnectionMutation, useUpdateConnectionMutation} from 'mutations/automation/connections.mutations';
-import {ConnectionKeys, useGetConnectionTagsQuery} from 'queries/automation/connections.queries';
+import {ConnectionModel, TagModel} from 'middleware/platform/connection';
 import {ComponentDefinitionKeys, useGetComponentDefinitionsQuery} from 'queries/platform/componentDefinitions.queries';
 import {
     useGetConnectionDefinitionQuery,
@@ -46,8 +44,19 @@ import OAuth2Button from './OAuth2Button';
 interface ConnectionDialogProps {
     componentDefinition?: ComponentDefinitionModel;
     connection?: ConnectionModel | undefined;
-    triggerNode?: ReactNode;
+    connectionTagsQueryKey: QueryKey;
+    connectionsQueryKey: QueryKey;
     onClose?: () => void;
+    useCreateConnectionMutation: (mutationProps: {
+        onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
+        onError?: (error: Error, variables: ConnectionModel) => void;
+    }) => UseMutationResult<ConnectionModel, Error, ConnectionModel, unknown>;
+    useGetConnectionTagsQuery: () => UseQueryResult<TagModel[], Error>;
+    useUpdateConnectionMutation: (mutationProps: {
+        onSuccess?: (result: ConnectionModel, variables: ConnectionModel) => void;
+        onError?: (error: Error, variables: ConnectionModel) => void;
+    }) => UseMutationResult<ConnectionModel, Error, ConnectionModel, unknown>;
+    triggerNode?: ReactNode;
 }
 
 export interface ConnectionDialogFormProps {
@@ -58,7 +67,17 @@ export interface ConnectionDialogFormProps {
     tags: Array<TagModel | {label: string; value: string}>;
 }
 
-const ConnectionDialog = ({componentDefinition, connection, onClose, triggerNode}: ConnectionDialogProps) => {
+const ConnectionDialog = ({
+    componentDefinition,
+    connection,
+    connectionTagsQueryKey,
+    connectionsQueryKey,
+    onClose,
+    triggerNode,
+    useCreateConnectionMutation,
+    useGetConnectionTagsQuery,
+    useUpdateConnectionMutation,
+}: ConnectionDialogProps) => {
     const [authorizationName, setAuthorizationName] = useState<string>();
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [oAuth2Error, setOAuth2Error] = useState<string>();
@@ -127,10 +146,10 @@ const ConnectionDialog = ({componentDefinition, connection, onClose, triggerNode
                 queryKey: ComponentDefinitionKeys.componentDefinitions,
             });
             queryClient.invalidateQueries({
-                queryKey: ConnectionKeys.connections,
+                queryKey: connectionsQueryKey,
             });
             queryClient.invalidateQueries({
-                queryKey: ConnectionKeys.connectionTags,
+                queryKey: connectionTagsQueryKey,
             });
 
             closeDialog();
@@ -143,10 +162,10 @@ const ConnectionDialog = ({componentDefinition, connection, onClose, triggerNode
                 queryKey: ComponentDefinitionKeys.componentDefinitions,
             });
             queryClient.invalidateQueries({
-                queryKey: ConnectionKeys.connections,
+                queryKey: connectionsQueryKey,
             });
             queryClient.invalidateQueries({
-                queryKey: ConnectionKeys.connectionTags,
+                queryKey: connectionTagsQueryKey,
             });
 
             closeDialog();
