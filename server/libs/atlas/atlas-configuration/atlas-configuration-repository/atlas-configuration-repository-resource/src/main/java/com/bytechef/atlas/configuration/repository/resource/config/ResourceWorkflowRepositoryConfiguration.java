@@ -16,6 +16,8 @@
 
 package com.bytechef.atlas.configuration.repository.resource.config;
 
+import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryClasspath;
+import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryFilesystem;
 import com.bytechef.atlas.configuration.repository.config.contributor.ClasspathResourceWorkflowRepositoryPropertiesContributor;
 import com.bytechef.atlas.configuration.repository.config.contributor.FilesystemResourceWorkflowRepositoryPropertiesContributor;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
@@ -25,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -47,7 +48,7 @@ public class ResourceWorkflowRepositoryConfiguration {
 
     @Bean
     @Order(1)
-    @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.classpath.enabled", havingValue = "true")
+    @ConditionalOnWorkflowRepositoryClasspath
     ClassPathResourceWorkflowRepository classpathBasedWorkflowRepository(
         List<ClasspathResourceWorkflowRepositoryPropertiesContributor> contributors) {
 
@@ -68,7 +69,7 @@ public class ResourceWorkflowRepositoryConfiguration {
 
     @Bean
     @Order(2)
-    @ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.filesystem.enabled", havingValue = "true")
+    @ConditionalOnWorkflowRepositoryFilesystem
     FilesystemResourceWorkflowRepository filesystemResourceWorkflowRepository(
         List<FilesystemResourceWorkflowRepositoryPropertiesContributor> contributors) {
 

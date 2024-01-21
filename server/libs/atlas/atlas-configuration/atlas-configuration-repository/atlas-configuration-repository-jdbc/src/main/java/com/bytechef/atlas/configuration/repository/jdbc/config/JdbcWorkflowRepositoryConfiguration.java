@@ -16,16 +16,16 @@
 
 package com.bytechef.atlas.configuration.repository.jdbc.config;
 
+import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryJdbc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.jdbc.enabled", havingValue = "true")
+@ConditionalOnWorkflowRepositoryJdbc
 public class JdbcWorkflowRepositoryConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcWorkflowRepositoryConfiguration.class);

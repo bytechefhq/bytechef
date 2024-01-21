@@ -16,11 +16,11 @@
 
 package com.bytechef.platform.workflow.coordinator.config;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.platform.workflow.coordinator.TriggerCoordinator;
 import com.bytechef.platform.workflow.coordinator.config.TriggerCoordinatorProperties.TriggerCoordinatorSubscriptions;
 import com.bytechef.platform.workflow.coordinator.message.route.TriggerCoordinatorMessageRoute;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnExpression("'${bytechef.coordinator.enabled:true}' == 'true'")
+@ConditionalOnCoordinator
 public class TriggerCoordinatorMessageBrokerConfigurerConfiguration {
 
     @Bean

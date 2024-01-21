@@ -16,10 +16,10 @@
 
 package com.bytechef.platform.workflow.worker.config;
 
+import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.platform.workflow.worker.TriggerWorker;
 import com.bytechef.platform.workflow.worker.trigger.message.route.TriggerWorkerMessageRoute;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnExpression("'${bytechef.worker.enabled:true}' == 'true'")
+@ConditionalOnWorker
 public class TriggerWorkerMessageBrokerConfigurerConfiguration {
 
     @Bean

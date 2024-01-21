@@ -19,8 +19,8 @@ package com.bytechef.atlas.configuration.repository.jdbc;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
+import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryJdbc;
 import java.util.List;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Repository;
  */
 @Order(5)
 @Repository
-@ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.jdbc.enabled", havingValue = "true")
+@ConditionalOnWorkflowRepositoryJdbc
 public interface JdbcWorkflowRepository
     extends ListPagingAndSortingRepository<Workflow, String>, WorkflowRepository, WorkflowCrudRepository {
 

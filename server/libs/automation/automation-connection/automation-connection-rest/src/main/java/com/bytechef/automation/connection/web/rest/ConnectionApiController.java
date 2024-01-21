@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.connection.web.rest;
 
+import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.AbstractConnectionApiController;
@@ -23,7 +24,6 @@ import com.bytechef.platform.connection.web.rest.model.ConnectionModel;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("com.bytechef.automation.connection.web.rest.ConnectionApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
-@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
+@ConditionalOnEndpoint
 public class ConnectionApiController extends AbstractConnectionApiController implements ConnectionApi {
 
     private final ConnectionFacade connectionFacade;

@@ -17,6 +17,7 @@
 package com.bytechef.message.broker.amqp.config;
 
 import com.bytechef.message.broker.amqp.AmqpMessageBroker;
+import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerAmqp;
 import com.bytechef.message.route.SystemMessageRoute;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -27,7 +28,6 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "amqp")
+@ConditionalOnMessageBrokerAmqp
 public class AmqpMessageBrokerConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(AmqpMessageBrokerConfiguration.class);

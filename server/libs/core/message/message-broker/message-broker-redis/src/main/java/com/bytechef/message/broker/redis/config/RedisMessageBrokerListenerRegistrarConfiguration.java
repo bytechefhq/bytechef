@@ -16,6 +16,7 @@
 
 package com.bytechef.message.broker.redis.config;
 
+import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerRedis;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.message.broker.redis.listener.RedisListenerEndpointRegistrar;
@@ -28,7 +29,6 @@ import java.util.List;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -40,7 +40,7 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "redis")
+@ConditionalOnMessageBrokerRedis
 public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartInitializingSingleton, DisposableBean,
     MessageBrokerListenerRegistrar<RedisListenerEndpointRegistrar> {
 

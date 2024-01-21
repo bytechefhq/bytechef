@@ -17,6 +17,7 @@
 package com.bytechef.message.broker.redis.config;
 
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerRedis;
 import com.bytechef.message.broker.redis.RedisMessageBroker;
 import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
 import com.bytechef.message.broker.redis.serializer.RedisMessageSerializer;
@@ -26,7 +27,6 @@ import com.oblac.jrsmq.RedisSMQConfig;
 import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +37,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "redis")
+@ConditionalOnMessageBrokerRedis
 public class RedisMessageBrokerConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisMessageBrokerConfiguration.class);

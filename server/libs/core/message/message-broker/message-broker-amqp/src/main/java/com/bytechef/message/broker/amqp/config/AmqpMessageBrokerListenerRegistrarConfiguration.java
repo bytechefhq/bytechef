@@ -18,6 +18,7 @@
 
 package com.bytechef.message.broker.amqp.config;
 
+import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerAmqp;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.message.route.MessageRoute;
@@ -42,7 +43,6 @@ import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -50,7 +50,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "amqp")
+@ConditionalOnMessageBrokerAmqp
 public class AmqpMessageBrokerListenerRegistrarConfiguration
     implements RabbitListenerConfigurer, MessageBrokerListenerRegistrar<RabbitListenerEndpointRegistrar> {
 

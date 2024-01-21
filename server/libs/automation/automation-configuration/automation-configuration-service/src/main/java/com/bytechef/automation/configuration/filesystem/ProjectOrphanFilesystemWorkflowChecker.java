@@ -18,7 +18,9 @@ package com.bytechef.automation.configuration.filesystem;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryFilesystem;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
@@ -32,7 +34,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -42,9 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Component
-@ConditionalOnExpression("""
-    '${bytechef.coordinator.enabled:true}' == 'true' and '${bytechef.workflow.repository.filesystem.enabled}' == 'true'
-    """)
+@ConditionalOnCoordinator
+@ConditionalOnWorkflowRepositoryFilesystem
 public class ProjectOrphanFilesystemWorkflowChecker {
 
     private static final String WORKFLOWS = "Workflows";

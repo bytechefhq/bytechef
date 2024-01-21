@@ -17,10 +17,12 @@
 package com.bytechef.atlas.configuration.config;
 
 import com.bytechef.atlas.configuration.filesystem.FilesystemWorkflowWatcher;
+import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryFilesystem;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -29,11 +31,9 @@ import org.springframework.core.task.TaskExecutor;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnExpression("""
-    '${bytechef.coordinator.enabled:true}' == 'true' and
-    '${bytechef.workflow.repository.filesystem.enabled}' == 'true' and
-    '${bytechef.workflow.repository.filesystem.watch}' == 'true'
-    """)
+@ConditionalOnCoordinator
+@ConditionalOnWorkflowRepositoryFilesystem
+@ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.filesystem.watch", havingValue = "true")
 public class FilesystemWorkflowWatchConfiguration {
 
     @Bean

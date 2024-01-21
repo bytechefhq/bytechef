@@ -16,6 +16,7 @@
 
 package com.bytechef.atlas.configuration.repository.git.config;
 
+import com.bytechef.atlas.configuration.repository.annotation.ConditionalOnWorkflowRepositoryGit;
 import com.bytechef.atlas.configuration.repository.config.contributor.GitWorkflowRepositoryPropertiesContributor;
 import com.bytechef.atlas.configuration.repository.git.GitWorkflowRepository;
 import java.util.HashMap;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -32,7 +32,7 @@ import org.springframework.core.annotation.Order;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.git.enabled", havingValue = "true")
+@ConditionalOnWorkflowRepositoryGit
 public class GitWorkflowRepositoryConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(GitWorkflowRepositoryConfiguration.class);

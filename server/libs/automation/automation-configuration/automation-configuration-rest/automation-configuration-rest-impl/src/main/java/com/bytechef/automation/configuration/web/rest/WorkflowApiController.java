@@ -20,13 +20,13 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.web.rest.AbstractWorkflowApiController;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.constant.Type;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("com.bytechef.helios.configuration.web.rest.WorkflowApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}")
-@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
+@ConditionalOnEndpoint
 public class WorkflowApiController extends AbstractWorkflowApiController implements WorkflowApi {
 
     private final ConversionService conversionService;

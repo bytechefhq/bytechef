@@ -19,6 +19,7 @@
 package com.bytechef.message.broker.kafka.config;
 
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerKafka;
 import com.bytechef.message.broker.kafka.KafkaMessageBroker;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +29,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,7 +48,7 @@ import org.springframework.messaging.handler.annotation.support.MessageHandlerMe
  * @author Arik Cohen
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "kafka")
+@ConditionalOnMessageBrokerKafka
 public class KafkaMessageBrokerConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(KafkaMessageBrokerConfiguration.class);

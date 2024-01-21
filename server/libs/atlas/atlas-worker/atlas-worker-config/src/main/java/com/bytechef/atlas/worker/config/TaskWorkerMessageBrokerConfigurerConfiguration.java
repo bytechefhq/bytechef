@@ -17,10 +17,10 @@
 package com.bytechef.atlas.worker.config;
 
 import com.bytechef.atlas.worker.TaskWorker;
+import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import java.util.Map;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnExpression("'${bytechef.worker.enabled:true}' == 'true'")
+@ConditionalOnWorker
 public class TaskWorkerMessageBrokerConfigurerConfiguration {
 
     @Bean

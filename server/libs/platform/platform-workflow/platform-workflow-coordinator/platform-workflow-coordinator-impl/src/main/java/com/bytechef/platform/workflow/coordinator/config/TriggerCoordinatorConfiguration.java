@@ -18,7 +18,7 @@
 
 package com.bytechef.platform.workflow.coordinator.config;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
+@ConditionalOnCoordinator
 @EnableConfigurationProperties(TriggerCoordinatorProperties.class)
 public class TriggerCoordinatorConfiguration {
 }

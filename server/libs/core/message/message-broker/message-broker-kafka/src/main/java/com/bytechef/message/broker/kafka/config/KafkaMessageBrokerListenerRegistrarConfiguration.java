@@ -18,6 +18,7 @@
 
 package com.bytechef.message.broker.kafka.config;
 
+import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerKafka;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.message.broker.config.MessageBrokerListenerRegistrar;
 import com.bytechef.message.route.MessageRoute;
@@ -28,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.KafkaListenerConfigurer;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistrar;
@@ -39,7 +39,7 @@ import org.springframework.messaging.handler.annotation.support.MessageHandlerMe
  * @author Arik Cohen
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "message-broker.provider", havingValue = "kafka")
+@ConditionalOnMessageBrokerKafka
 public class KafkaMessageBrokerListenerRegistrarConfiguration
     implements KafkaListenerConfigurer, MessageBrokerListenerRegistrar<KafkaListenerEndpointRegistrar> {
 

@@ -16,13 +16,13 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
+import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.web.rest.model.GetOAuth2AuthorizationParametersRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.OAuth2AuthorizationParametersModel;
 import com.bytechef.platform.configuration.web.rest.model.OAuth2PropertiesModel;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}")
-@ConditionalOnProperty(prefix = "bytechef", name = "coordinator.enabled", matchIfMissing = true)
+@ConditionalOnEndpoint
 public class OAuth2ApiController implements Oauth2Api {
 
     private final ConversionService conversionService;
