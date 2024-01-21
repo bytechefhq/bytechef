@@ -42,8 +42,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-impl"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
-    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-impl"))
-    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-rest"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-service"))
     implementation(project(":server:libs:platform:platform-swagger"))
 
     implementation(project(":ee:server:libs:atlas:atlas-execution:atlas-execution-remote-client"))

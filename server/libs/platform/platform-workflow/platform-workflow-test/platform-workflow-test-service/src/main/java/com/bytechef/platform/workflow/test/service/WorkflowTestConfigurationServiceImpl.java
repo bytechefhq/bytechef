@@ -61,12 +61,6 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
 
     @Override
     @Transactional(readOnly = true)
-    public WorkflowTestConfiguration getWorkflowTestConfiguration(long id) {
-        return OptionalUtils.get(workflowTestConfigurationRepository.findById(id));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
         String workflowId, String operationName) {
 
@@ -75,17 +69,12 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<WorkflowTestConfiguration> getWorkflowTestConfigurations() {
-        return workflowTestConfigurationRepository.findAll();
-    }
-
-    @Override
     public WorkflowTestConfiguration updateWorkflowTestConfiguration(
         WorkflowTestConfiguration workflowTestConfiguration) {
 
         WorkflowTestConfiguration currentWorkflowTestConfiguration = OptionalUtils.get(
-            workflowTestConfigurationRepository.findById(Validate.notNull(workflowTestConfiguration.getId(), "id")));
+            workflowTestConfigurationRepository.findByWorkflowId(
+                Validate.notNull(workflowTestConfiguration.getWorkflowId(), "workflowId(")));
 
         currentWorkflowTestConfiguration.setConnections(workflowTestConfiguration.getConnections());
         currentWorkflowTestConfiguration.setInputs(workflowTestConfiguration.getInputs());
@@ -114,7 +103,7 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
-    public void updateWorkflowTestConfigurationInputs(String workflowId, Map<String, Object> inputs) {
+    public void updateWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs) {
         WorkflowTestConfiguration workflowTestConfiguration = getWorkflowTestConfiguration(workflowId);
 
         workflowTestConfiguration.setInputs(inputs);
@@ -124,7 +113,8 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
 
     private WorkflowTestConfiguration getWorkflowTestConfiguration(String workflowId) {
         return OptionalUtils.orElseGet(
-            workflowTestConfigurationRepository.findByWorkflowId(workflowId), () -> {
+            workflowTestConfigurationRepository.findByWorkflowId(workflowId),
+            () -> {
                 WorkflowTestConfiguration newWorkflowTestConfiguration = new WorkflowTestConfiguration();
 
                 newWorkflowTestConfiguration.setWorkflowId(workflowId);

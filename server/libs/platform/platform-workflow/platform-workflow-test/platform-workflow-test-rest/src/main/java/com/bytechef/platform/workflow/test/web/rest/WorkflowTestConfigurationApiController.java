@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.test.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.workflow.test.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.workflow.test.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.workflow.test.web.rest.model.UpdateWorkflowTestConfigurationConnectionRequestModel;
@@ -50,20 +51,21 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
 
     @Override
     public ResponseEntity<WorkflowTestConfigurationModel> createWorkflowTestConfiguration(
-        WorkflowTestConfigurationModel workflowTestConfigurationModel) {
+        String workflowId, WorkflowTestConfigurationModel workflowTestConfigurationModel) {
 
         return ResponseEntity.ok(
             conversionService.convert(
                 workflowTestConfigurationService.create(
-                    conversionService.convert(workflowTestConfigurationModel, WorkflowTestConfiguration.class)),
+                    conversionService.convert(
+                        workflowTestConfigurationModel.workflowId(workflowId), WorkflowTestConfiguration.class)),
                 WorkflowTestConfigurationModel.class));
     }
 
     @Override
-    public ResponseEntity<WorkflowTestConfigurationModel> getWorkflowTestConfiguration(Long id) {
+    public ResponseEntity<WorkflowTestConfigurationModel> getWorkflowTestConfiguration(String workflowId) {
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowTestConfigurationService.getWorkflowTestConfiguration(id),
+                OptionalUtils.orElse(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId), null),
                 WorkflowTestConfigurationModel.class));
     }
 
@@ -79,22 +81,14 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     }
 
     @Override
-    public ResponseEntity<List<WorkflowTestConfigurationModel>> getWorkflowTestConfigurations() {
-        return ResponseEntity.ok(
-            CollectionUtils.map(
-                workflowTestConfigurationService.getWorkflowTestConfigurations(),
-                workflowTestConfiguration -> conversionService.convert(
-                    workflowTestConfiguration, WorkflowTestConfigurationModel.class)));
-    }
-
-    @Override
     public ResponseEntity<WorkflowTestConfigurationModel> updateWorkflowTestConfiguration(
-        Long id, WorkflowTestConfigurationModel workflowTestConfigurationModel) {
+        String workflowId, WorkflowTestConfigurationModel workflowTestConfigurationModel) {
 
         return ResponseEntity.ok(
             conversionService.convert(
                 workflowTestConfigurationService.updateWorkflowTestConfiguration(
-                    conversionService.convert(workflowTestConfigurationModel.id(id), WorkflowTestConfiguration.class)),
+                    conversionService.convert(
+                        workflowTestConfigurationModel.workflowId(workflowId), WorkflowTestConfiguration.class)),
                 WorkflowTestConfigurationModel.class));
     }
 

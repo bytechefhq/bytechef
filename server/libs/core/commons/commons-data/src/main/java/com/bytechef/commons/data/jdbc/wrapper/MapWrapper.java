@@ -37,7 +37,7 @@ public class MapWrapper {
         this.map = new HashMap<>(map);
     }
 
-    public Map<String, Object> getMap() {
+    public Map<String, ?> getMap() {
         return Collections.unmodifiableMap(map);
     }
 

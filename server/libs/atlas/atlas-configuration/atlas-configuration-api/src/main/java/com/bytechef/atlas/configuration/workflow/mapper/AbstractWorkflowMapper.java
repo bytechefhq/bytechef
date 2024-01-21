@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWor
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.FileCopyUtils;
 import com.bytechef.commons.util.LocalDateTimeUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,7 +49,7 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractWorkflowMapper.class);
 
-    static List<String> additionalWorkflowReservedWords = new ArrayList<>();
+    private static final List<String> additionalWorkflowReservedWords = new ArrayList<>();
 
     static {
         try {
@@ -74,13 +75,13 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
     }
 
     @Override
-    public Workflow readWorkflow(WorkflowResource workflowResource, int type) {
+    public Workflow readWorkflow(WorkflowResource workflowResource, int type) throws IOException {
         return doReadWorkflow(workflowResource, type);
     }
 
     @Override
-    public Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) {
-        return doReadWorkflowMap(workflowResource);
+    public Map<String, Object> readWorkflowMap(WorkflowResource workflowResource) throws IOException {
+        return parse(readDefinition(workflowResource));
     }
 
     @Override
@@ -88,34 +89,20 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
         return workflowResource.getWorkflowFormat() == format ? this : null;
     }
 
-    protected Workflow doReadWorkflow(WorkflowResource workflowResource, int type) {
-        try {
-            String definition = readDefinition(workflowResource);
-
-            return new Workflow(
-                workflowResource.getId(), definition, workflowResource.getWorkflowFormat(),
-                LocalDateTimeUtils.getLocalDateTime(new Date(workflowResource.lastModified())),
-                workflowResource.getMetadata(), type);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    protected Workflow doReadWorkflow(WorkflowResource workflowResource, int type) throws IOException {
+        return new Workflow(
+            workflowResource.getId(), readDefinition(workflowResource), workflowResource.getWorkflowFormat(),
+            type, LocalDateTimeUtils.getLocalDateTime(new Date(workflowResource.lastModified())),
+            workflowResource.getMetadata());
     }
 
-    protected Map<String, Object> doReadWorkflowMap(WorkflowResource workflowResource) {
-        try {
-            return parse(readDefinition(workflowResource));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Map<String, Object> parse(String workflow) {
-        Map<String, Object> workflowMap = read(workflow, new TypeReference<>() {});
+    private Map<String, Object> parse(String workflow) throws JsonProcessingException {
+        Map<String, Object> workflowMap = objectMapper.readValue(workflow, new TypeReference<>() {});
 
         validate(workflowMap);
 
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> rawTasks = (List<Map<String, Object>>) workflowMap.get(WorkflowConstants.TASKS);
+        List<Map<String, Object>> rawTasks = MapUtils.getList(
+            workflowMap, WorkflowConstants.TASKS, new TypeReference<>() {}, List.of());
 
         if (rawTasks == null) {
             rawTasks = Collections.emptyList();
@@ -134,14 +121,6 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
         workflowMap.put(WorkflowConstants.TASKS, tasks);
 
         return workflowMap;
-    }
-
-    private <T> T read(String json, TypeReference<T> typeReference) {
-        try {
-            return objectMapper.readValue(json, typeReference);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private String readDefinition(Resource resource) throws IOException {
@@ -182,6 +161,7 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
             if (v instanceof List) {
                 List<Object> items = (List<Object>) v;
+
                 for (Object item : items) {
                     if (item instanceof Map) {
                         validate((Map<String, Object>) item);

@@ -17,7 +17,6 @@
 package com.bytechef.platform.workflow.test.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
-import com.bytechef.commons.util.MapUtils;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
@@ -120,8 +119,9 @@ public class WorkflowTestConfiguration implements Persistable<Long>, Comparable<
         return createdDate;
     }
 
-    public Map<String, ?> getInputs() {
-        return Collections.unmodifiableMap(inputs.getMap());
+    @SuppressWarnings("unchecked")
+    public Map<String, String> getInputs() {
+        return Collections.unmodifiableMap((Map<String, String>) inputs.getMap());
     }
 
     @Override
@@ -160,8 +160,8 @@ public class WorkflowTestConfiguration implements Persistable<Long>, Comparable<
         this.id = id;
     }
 
-    public void setInputs(Map<String, ?> inputs) {
-        if (!MapUtils.isEmpty(inputs)) {
+    public void setInputs(Map<String, String> inputs) {
+        if (inputs != null) {
             this.inputs = new MapWrapper(inputs);
         }
     }

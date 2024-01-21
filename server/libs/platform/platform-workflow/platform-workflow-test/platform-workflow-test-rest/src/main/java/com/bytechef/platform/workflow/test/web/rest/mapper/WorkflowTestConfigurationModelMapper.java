@@ -20,6 +20,7 @@ import com.bytechef.platform.workflow.test.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.workflow.test.web.rest.mapper.config.PlatformWorkflowTestMapperSpringConfig;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestConfigurationModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -30,5 +31,6 @@ public interface WorkflowTestConfigurationModelMapper
     extends Converter<WorkflowTestConfigurationModel, WorkflowTestConfiguration> {
 
     @Override
+    @Mapping(target = "id", ignore = true)
     WorkflowTestConfiguration convert(WorkflowTestConfigurationModel workflowTestConfigurationModel);
 }

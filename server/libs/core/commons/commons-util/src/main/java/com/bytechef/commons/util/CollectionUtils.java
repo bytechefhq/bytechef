@@ -39,7 +39,7 @@ public final class CollectionUtils {
     private CollectionUtils() {
     }
 
-    public static <T> boolean anyMatch(List<T> list, Predicate<? super T> predicate) {
+    public static <T> boolean anyMatch(Collection<T> list, Predicate<? super T> predicate) {
         Validate.notNull(list, "'list' must not be null");
         Validate.notNull(predicate, "'predicate' must not be null");
 

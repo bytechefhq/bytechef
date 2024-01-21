@@ -34,14 +34,10 @@ public interface WorkflowTestConfigurationService {
     List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
         String workflowId, String operationName);
 
-    WorkflowTestConfiguration getWorkflowTestConfiguration(long id);
-
-    List<WorkflowTestConfiguration> getWorkflowTestConfigurations();
-
     WorkflowTestConfiguration updateWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
 
     void updateWorkflowTestConfigurationConnection(
         String workflowId, String operationName, String key, long connectionId);
 
-    void updateWorkflowTestConfigurationInputs(String workflowId, Map<String, Object> inputs);
+    void updateWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs);
 }

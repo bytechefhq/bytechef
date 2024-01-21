@@ -155,23 +155,20 @@ public final class Workflow implements Persistable<String>, Serializable {
     private int version;
 
     public Workflow(String definition, Format format, int type) {
-        this.definition = definition;
-        this.format = format.getId();
-        this.type = type;
+        this(null, definition, format, type, null, Map.of());
     }
 
     public Workflow(String id, String definition, Format format, int type) {
-        this(id, definition, format, null, Map.of(), type);
+        this(id, definition, format, type, null, Map.of());
     }
 
     @SuppressWarnings("unchecked")
     public Workflow(
-        String id, String definition, Format format, LocalDateTime lastModifiedDate, Map<String, Object> metadata,
-        int type) {
+        String id, String definition, Format format, int type, LocalDateTime lastModifiedDate,
+        Map<String, Object> metadata) {
 
         Validate.notNull(definition, "'definition' must not be null");
         Validate.notNull(format, "'format' must not be null");
-        Validate.notNull(id, "'id' must not be null");
         Validate.notNull(metadata, "'metadata' must not be null");
 
         this.definition = definition;
@@ -218,7 +215,7 @@ public final class Workflow implements Persistable<String>, Serializable {
     public Workflow(String id, String definition, int format, LocalDateTime lastModifiedDate, int type)
         throws Exception {
 
-        this(id, definition, Format.valueOf(format), lastModifiedDate, Map.of(), type);
+        this(id, definition, Format.valueOf(format), type, lastModifiedDate, Map.of());
     }
 
     private Workflow() {

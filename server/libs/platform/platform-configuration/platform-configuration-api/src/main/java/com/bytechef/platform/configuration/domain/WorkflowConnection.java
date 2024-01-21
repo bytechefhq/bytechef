@@ -16,13 +16,6 @@
 
 package com.bytechef.platform.configuration.domain;
 
-import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.component.registry.component.OperationType;
-import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -43,7 +36,7 @@ public class WorkflowConnection {
     private final String operationName; // task/trigger name used in the workflow
     private final boolean required;
 
-    private WorkflowConnection(
+    public WorkflowConnection(
         String componentName, int componentVersion, String operationName, String key, Long id, boolean required) {
 
         this.componentName = componentName;
@@ -52,66 +45,6 @@ public class WorkflowConnection {
         this.key = key;
         this.operationName = operationName;
         this.required = required;
-    }
-
-    public static List<WorkflowConnection> of(WorkflowTask workflowTask, boolean connectionRequired) {
-        return getWorkflowConnections(
-            workflowTask.getName(), workflowTask.getType(), workflowTask.getExtensions(), connectionRequired);
-    }
-
-    public static List<WorkflowConnection> of(WorkflowTrigger workflowTrigger, boolean connectionRequired) {
-        return getWorkflowConnections(
-            workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getExtensions(), connectionRequired);
-    }
-
-    private static List<WorkflowConnection> getWorkflowConnections(
-        String name, OperationType operationType, boolean connectionRequired) {
-
-        return List.of(
-            new WorkflowConnection(
-                operationType.componentName(), operationType.componentVersion(), name, operationType.componentName(),
-                null, connectionRequired));
-    }
-
-    private static List<WorkflowConnection> getWorkflowConnections(
-        String name, String type, Map<String, Object> extensions, boolean connectionRequired) {
-
-        List<WorkflowConnection> workflowConnections;
-        OperationType operationType = OperationType.ofType(type);
-
-        if (MapUtils.containsKey(extensions, CONNECTIONS)) {
-            workflowConnections = toList(
-                MapUtils.getMap(extensions, CONNECTIONS, new TypeReference<>() {}, Map.of()),
-                operationType.componentName(), operationType.componentVersion(), name, connectionRequired);
-        } else {
-            workflowConnections = getWorkflowConnections(name, operationType, connectionRequired);
-        }
-
-        return workflowConnections;
-    }
-
-    private static List<WorkflowConnection> toList(
-        Map<String, Map<String, Object>> connections, String componentName, int componentVersion,
-        String operationName, boolean connectionRequired) {
-
-        return CollectionUtils.map(
-            connections.entrySet(),
-            entry -> {
-                Map<String, Object> connectionMap = entry.getValue();
-
-                if (!connectionMap.containsKey(ID) &&
-                    (!connectionMap.containsKey(COMPONENT_NAME) || !connectionMap.containsKey(COMPONENT_VERSION))) {
-
-                    throw new IllegalStateException(
-                        "%s and %s must be set".formatted(COMPONENT_NAME, COMPONENT_VERSION));
-                }
-
-                return new WorkflowConnection(
-                    MapUtils.getString(connectionMap, COMPONENT_NAME, componentName),
-                    MapUtils.getInteger(connectionMap, COMPONENT_VERSION, componentVersion),
-                    operationName, entry.getKey(), MapUtils.getLong(connectionMap, ID),
-                    MapUtils.getBoolean(connectionMap, AUTHORIZATION_REQUIRED, false) || connectionRequired);
-            });
     }
 
     public String getComponentName() {
