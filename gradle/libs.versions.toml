@@ -16,7 +16,7 @@ pmd = "6.55.0"
 spotbugs = "4.8.2"
 spotless-plugin-gradle = "6.23.3"
 spotbugs-gradle-plugin = "6.0.2"
-spring-boot = "3.2.1"
+spring-boot = "3.2.2"
 
 [libraries]
 ch-qos-logback-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "ch-qos-logback" }
