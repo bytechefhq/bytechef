@@ -27,27 +27,7 @@ const ObjectProperty = ({
 }: ObjectPropertyProps) => {
     const [additionalPropertiesDialogOpen, setAdditionalPropertiesDialogOpen] = useState(false);
 
-    const {additionalProperties, label, multipleValues, name, objectType, properties} = property;
-
-    if (type === 'FILE_ENTRY' && dataPills?.length) {
-        return (
-            <Property
-                actionName={actionName}
-                currentComponent={currentComponent}
-                currentComponentData={currentComponentData}
-                dataPills={dataPills}
-                key={property.name}
-                mention
-                property={{
-                    description: property.description,
-                    label: property.label,
-                    name: property.name,
-                    required: property.required,
-                    type: property.type,
-                }}
-            />
-        );
-    }
+    const {additionalProperties, label, multipleValues, name, properties} = property;
 
     if (!properties?.length && !additionalProperties?.length) {
         return <></>;
@@ -108,10 +88,12 @@ const ObjectProperty = ({
                                 {(additionalProperties as Array<PropertyType>)?.length > 1 ? (
                                     <Select
                                         label="Type"
-                                        options={(additionalProperties as Array<PropertyType>).map((type) => ({
-                                            label: type.type!,
-                                            value: type.type!,
-                                        }))}
+                                        options={(additionalProperties as Array<PropertyType>).map(
+                                            (additionalProperty) => ({
+                                                label: additionalProperty.type!,
+                                                value: additionalProperty.type!,
+                                            })
+                                        )}
                                         triggerClassName="w-full"
                                     />
                                 ) : (

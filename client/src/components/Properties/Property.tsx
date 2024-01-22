@@ -78,6 +78,7 @@ const Property = ({
     let defaultValue: string | undefined = property.defaultValue;
 
     const {
+        controlType,
         description,
         hidden,
         items,
@@ -91,8 +92,6 @@ const Property = ({
         required,
         type,
     } = property;
-
-    const {controlType} = property;
 
     if (!name) {
         type === 'OBJECT' || type === 'ARRAY' ? (name = 'item') : <></>;
@@ -135,6 +134,10 @@ const Property = ({
 
     if (controlType === 'SELECT') {
         showInputTypeSwitchButton = true;
+    }
+
+    if (controlType === 'FILE_ENTRY') {
+        showInputTypeSwitchButton = false;
     }
 
     const otherComponentData = componentData.filter((component) => {
@@ -239,9 +242,17 @@ const Property = ({
         }
     };
 
-    return type === 'OBJECT' && !properties?.length && !items?.length ? (
-        <></>
-    ) : (
+    console.log(name, ' property: ', property);
+
+    if (type === 'OBJECT' && !properties?.length && !items?.length) {
+        return <></>;
+    }
+
+    if (type === 'FILE_ENTRY' && !dataPills?.length) {
+        return <></>;
+    }
+
+    return (
         <li
             className={twMerge(
                 controlType === 'CODE_EDITOR' && 'h-5/6',
@@ -323,6 +334,22 @@ const Property = ({
                                 dataPills={dataPills}
                                 property={property}
                             />
+                        )}
+
+                        {type === 'FILE_ENTRY' && !!dataPills?.length && (
+                            <>
+                                {console.log('!!dataPills?.length: ', !!dataPills?.length)}
+
+                                <span>foo</span>
+
+                                <ObjectProperty
+                                    actionName={actionName}
+                                    currentComponent={currentComponent}
+                                    currentComponentData={currentComponentData}
+                                    dataPills={dataPills}
+                                    property={property}
+                                />
+                            </>
                         )}
 
                         {register && isValidControlType && (

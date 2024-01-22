@@ -6,6 +6,7 @@ import BooleanIcon from 'assets/boolean.svg?react';
 import DateIcon from 'assets/date.svg?react';
 import DateTimeIcon from 'assets/datetime.svg?react';
 import DynamicIcon from 'assets/dynamic.svg?react';
+import FileEntryIcon from 'assets/file-entry.svg?react';
 import IntegerIcon from 'assets/integer.svg?react';
 import NullIcon from 'assets/null.svg?react';
 import NumberIcon from 'assets/number.svg?react';
@@ -20,6 +21,7 @@ export const TYPE_ICONS = {
     DATE: <DateIcon className="size-4 text-gray-600" />,
     DATE_TIME: <DateTimeIcon className="size-4 text-gray-600" />,
     DYNAMIC_PROPERTIES: <DynamicIcon className="size-4 text-gray-600" />,
+    FILE_ENTRY: <FileEntryIcon className="size-4 text-gray-600" />,
     INTEGER: <IntegerIcon className="size-4 text-gray-600" />,
     NULL: <NullIcon className="size-4 text-gray-600" />,
     NUMBER: <NumberIcon className="size-4 text-gray-600" />,
