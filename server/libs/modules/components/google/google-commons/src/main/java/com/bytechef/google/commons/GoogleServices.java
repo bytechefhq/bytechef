@@ -29,6 +29,7 @@ import com.google.api.client.util.Preconditions;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.gmail.Gmail;
+import com.google.api.services.sheets.v4.Sheets;
 
 /**
  * @author Mario Cvjetojevic
@@ -64,6 +65,15 @@ public class GoogleServices {
             GsonFactory.getDefaultInstance(),
             new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
                 .setApplicationName("Google Mail Component")
+                .build();
+    }
+
+    public static Sheets getSheets(Parameters connectionParameters) {
+        return new Sheets.Builder(
+            new NetHttpTransport(),
+            GsonFactory.getDefaultInstance(),
+            new OAuthAuthentication(connectionParameters.getRequiredString(ACCESS_TOKEN)))
+                .setApplicationName("Google Sheets Component")
                 .build();
     }
 
