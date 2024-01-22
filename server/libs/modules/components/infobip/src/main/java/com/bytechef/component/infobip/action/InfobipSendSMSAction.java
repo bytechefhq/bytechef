@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.Authorization.VALUE;
 import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.array;
 import static com.bytechef.component.definition.ComponentDSL.bool;
+import static com.bytechef.component.definition.ComponentDSL.dateTime;
 import static com.bytechef.component.definition.ComponentDSL.integer;
 import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
@@ -34,6 +35,7 @@ import static com.bytechef.component.infobip.constant.InfobipConstants.BULK_ID;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CALLBACK_DATA;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONTENT_TEMPLATE_ID;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CUSTOM_DOMAIN;
+import static com.bytechef.component.infobip.constant.InfobipConstants.DATE_TIME;
 import static com.bytechef.component.infobip.constant.InfobipConstants.DAYS;
 import static com.bytechef.component.infobip.constant.InfobipConstants.DELIVERY_TIME_WINDOW;
 import static com.bytechef.component.infobip.constant.InfobipConstants.DESCRIPTION;
@@ -82,10 +84,12 @@ import static com.bytechef.component.infobip.constant.InfobipConstants.TURKEY_IY
 import static com.bytechef.component.infobip.constant.InfobipConstants.TYPE;
 import static com.bytechef.component.infobip.constant.InfobipConstants.URL_OPTIONS;
 import static com.bytechef.component.infobip.constant.InfobipConstants.VALIDITY_PERIOD;
+import static com.bytechef.component.infobip.constant.InfobipConstants.ZONE_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.infobip.util.InfobipUtils;
 import com.infobip.ApiClient;
 import com.infobip.ApiException;
 import com.infobip.ApiKey;
@@ -93,6 +97,7 @@ import com.infobip.api.SmsApi;
 import com.infobip.model.SmsAdvancedTextualRequest;
 import com.infobip.model.SmsResponse;
 import com.infobip.model.SmsSendingSpeedLimit;
+import com.infobip.model.SmsSpeedLimitTimeUnit;
 import com.infobip.model.SmsTextualMessage;
 import com.infobip.model.SmsTracking;
 import com.infobip.model.SmsUrlOptions;
@@ -135,8 +140,7 @@ public class InfobipSendSMSAction {
                         .properties(
                             array(DAYS)
                                 .label("Days")
-                                .description(
-                                    "Days of the week which are included in the delivery time window.")
+                                .description("Days of the week which are included in the delivery time window.")
                                 .items(
                                     string()
                                         .options(
@@ -310,7 +314,16 @@ public class InfobipSendSMSAction {
                         .required(false),
                     object(SEND_AT)
                         .label("Send at")
-                        .description("")
+                        .description(
+                            "Date and time when the message is to be sent. Used for scheduled SMS. It can only be " +
+                                "scheduled for no later than 180 days in advance.")
+                        .properties(
+                            dateTime(DATE_TIME)
+                                .label("Date time")
+                                .required(false),
+                            string(ZONE_ID)
+                                .label("Zone id")
+                                .required(false))
                         .required(false),
                     string(TEXT)
                         .label("Text")
@@ -378,9 +391,9 @@ public class InfobipSendSMSAction {
                         .label("Time unit")
                         .description("The time unit to define when setting a messaging speed limit.")
                         .options(
-                            option(MINUTE_LABEL, "minute"),
-                            option("Hour", "hour"),
-                            option("Day", "day"))
+                            option(MINUTE_LABEL, "MINUTE"),
+                            option("Hour", "HOUR"),
+                            option("Day", "DAY"))
                         .defaultValue("minute")
                         .required(false))
                 .required(false),
@@ -480,11 +493,16 @@ public class InfobipSendSMSAction {
 
         SmsApi smsApi = new SmsApi(apiClient);
 
-        List<SmsTextualMessage> smsTextualMessages = inputParameters.getRequiredList(MESSAGES, SmsTextualMessage.class);
+        List<SmsTextualMessage> smsTextualMessages = InfobipUtils.createSmsTextualMessageList(
+            inputParameters.getRequiredList(MESSAGES, InfobipUtils.SmsTextualMessageCustom.class));
+
+        SmsSendingSpeedLimit smsSendingSpeedLimit = new SmsSendingSpeedLimit()
+            .amount(inputParameters.getInteger(AMOUNT))
+            .timeUnit(SmsSpeedLimitTimeUnit.fromValue(inputParameters.getString(TIME_UNIT)));
 
         SmsAdvancedTextualRequest smsAdvancedTextualRequest = new SmsAdvancedTextualRequest()
             .bulkId(inputParameters.getString(BULK_ID))
-            .sendingSpeedLimit(inputParameters.get(SENDING_SPEED_LIMIT, SmsSendingSpeedLimit.class))
+            .sendingSpeedLimit(smsSendingSpeedLimit)
             .urlOptions(inputParameters.get(URL_OPTIONS, SmsUrlOptions.class))
             .tracking(inputParameters.get(TRACKING, SmsTracking.class))
             .includeSmsCountInResponse(inputParameters.getBoolean(INCLUDE_SMS_COUNT_IN_RESPONSE))
@@ -492,5 +510,6 @@ public class InfobipSendSMSAction {
 
         return smsApi.sendSmsMessage(smsAdvancedTextualRequest)
             .execute();
+
     }
 }
