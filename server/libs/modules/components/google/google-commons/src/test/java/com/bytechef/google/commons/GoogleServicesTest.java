@@ -25,6 +25,7 @@ import com.bytechef.component.definition.Parameters;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.gmail.Gmail;
+import com.google.api.services.sheets.v4.Sheets;
 import org.junit.jupiter.api.Test;
 
 public class GoogleServicesTest {
@@ -59,5 +60,15 @@ public class GoogleServicesTest {
         Gmail gmail = GoogleServices.getMail(mockedParameters);
 
         assertEquals("Google Mail Component", gmail.getApplicationName());
+    }
+
+    @Test
+    void getSheets() {
+        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
+            .thenReturn("accessToken");
+
+        Sheets sheets = GoogleServices.getSheets(mockedParameters);
+
+        assertEquals("Google Sheets Component", sheets.getApplicationName());
     }
 }
