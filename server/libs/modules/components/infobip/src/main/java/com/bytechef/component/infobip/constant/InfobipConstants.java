@@ -34,6 +34,7 @@ public class InfobipConstants {
     public static final String CONTENT = "content";
     public static final String CONTENT_TEMPLATE_ID = "contentTemplateId";
     public static final String CUSTOM_DOMAIN = "customDomain";
+    public static final String DATE_TIME = "dateTime";
     public static final String DAYS = "days";
     public static final String DESCRIPTION = "description";
     public static final String DELIVERY_TIME_WINDOW = "deliveryTimeWindow";
@@ -86,4 +87,5 @@ public class InfobipConstants {
     public static final String TYPE = "type";
     public static final String URL_OPTIONS = "urlOptions";
     public static final String VALIDITY_PERIOD = "validityPeriod";
+    public static final String ZONE_ID = "zoneId";
 }
