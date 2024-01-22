@@ -700,7 +700,7 @@
         "optionsDataSource": null
       }, {
         "advancedOption": null,
-        "description": "",
+        "description": "Date and time when the message is to be sent. Used for scheduled SMS. It can only be scheduled for no later than 180 days in advance.",
         "displayCondition": null,
         "expressionEnabled": null,
         "hidden": null,
@@ -715,7 +715,43 @@
         "additionalProperties": null,
         "multipleValues": null,
         "options": null,
-        "properties": null,
+        "properties": [ {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": false,
+          "name": "dateTime",
+          "type": "DATE_TIME",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": "Date time",
+          "placeholder": null,
+          "options": null,
+          "controlType": "DATE_TIME",
+          "optionsDataSource": null
+        }, {
+          "advancedOption": null,
+          "description": null,
+          "displayCondition": null,
+          "expressionEnabled": null,
+          "hidden": null,
+          "metadata": { },
+          "required": false,
+          "name": "zoneId",
+          "type": "STRING",
+          "defaultValue": null,
+          "exampleValue": null,
+          "label": "Zone id",
+          "placeholder": null,
+          "controlType": "TEXT",
+          "maxLength": null,
+          "minLength": null,
+          "options": null,
+          "optionsDataSource": null
+        } ],
         "controlType": "OBJECT_BUILDER",
         "optionsDataSource": null
       }, {
@@ -930,17 +966,17 @@
           "description": null,
           "displayCondition": null,
           "label": "Minute",
-          "value": "minute"
+          "value": "MINUTE"
         }, {
           "description": null,
           "displayCondition": null,
           "label": "Hour",
-          "value": "hour"
+          "value": "HOUR"
         }, {
           "description": null,
           "displayCondition": null,
           "label": "Day",
-          "value": "day"
+          "value": "DAY"
         } ],
         "optionsDataSource": null
       } ],
@@ -2059,16 +2095,16 @@
       "title": "API Key",
       "type": "API_KEY",
       "acquire": null,
-      "authorizationCallback": null,
       "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
       "clientId": null,
+      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": null,
-      "tokenUrl": null,
-      "authorizationUrl": null,
-      "clientSecret": null
+      "tokenUrl": null
     } ],
     "componentName": "infobip",
     "componentDescription": "Infobip is a global communications platform that provide cloud-based messaging and omnichannel communication solutions for businesses.",
