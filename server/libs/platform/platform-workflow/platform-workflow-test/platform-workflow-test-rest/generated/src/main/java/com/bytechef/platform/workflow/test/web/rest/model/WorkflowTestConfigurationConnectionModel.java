@@ -16,19 +16,19 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The connection used in a particular task or trigger.
+ * The connection used in a particular action task or trigger.
  */
 
-@Schema(name = "WorkflowTestConfigurationConnection", description = "The connection used in a particular task or trigger.")
+@Schema(name = "WorkflowTestConfigurationConnection", description = "The connection used in a particular action task or trigger.")
 @JsonTypeName("WorkflowTestConfigurationConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-20T08:48:13.801332+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-25T10:11:39.095314+01:00[Europe/Zagreb]")
 public class WorkflowTestConfigurationConnectionModel {
 
   private Long connectionId;
 
-  private String key;
+  private String workflowConnectionKey;
 
-  private String operationName;
+  private String workflowNodeName;
 
   public WorkflowTestConfigurationConnectionModel() {
     super();
@@ -37,10 +37,10 @@ public class WorkflowTestConfigurationConnectionModel {
   /**
    * Constructor with only required parameters
    */
-  public WorkflowTestConfigurationConnectionModel(Long connectionId, String key, String operationName) {
+  public WorkflowTestConfigurationConnectionModel(Long connectionId, String workflowConnectionKey, String workflowNodeName) {
     this.connectionId = connectionId;
-    this.key = key;
-    this.operationName = operationName;
+    this.workflowConnectionKey = workflowConnectionKey;
+    this.workflowNodeName = workflowNodeName;
   }
 
   public WorkflowTestConfigurationConnectionModel connectionId(Long connectionId) {
@@ -63,44 +63,44 @@ public class WorkflowTestConfigurationConnectionModel {
     this.connectionId = connectionId;
   }
 
-  public WorkflowTestConfigurationConnectionModel key(String key) {
-    this.key = key;
+  public WorkflowTestConfigurationConnectionModel workflowConnectionKey(String workflowConnectionKey) {
+    this.workflowConnectionKey = workflowConnectionKey;
     return this;
   }
 
   /**
    * The connection key under which a connection is defined in a workflow definition.
-   * @return key
+   * @return workflowConnectionKey
   */
   @NotNull 
-  @Schema(name = "key", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("key")
-  public String getKey() {
-    return key;
+  @Schema(name = "workflowConnectionKey", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("workflowConnectionKey")
+  public String getWorkflowConnectionKey() {
+    return workflowConnectionKey;
   }
 
-  public void setKey(String key) {
-    this.key = key;
+  public void setWorkflowConnectionKey(String workflowConnectionKey) {
+    this.workflowConnectionKey = workflowConnectionKey;
   }
 
-  public WorkflowTestConfigurationConnectionModel operationName(String operationName) {
-    this.operationName = operationName;
+  public WorkflowTestConfigurationConnectionModel workflowNodeName(String workflowNodeName) {
+    this.workflowNodeName = workflowNodeName;
     return this;
   }
 
   /**
    * The action/trigger name to which a connection belongs.
-   * @return operationName
+   * @return workflowNodeName
   */
   @NotNull 
-  @Schema(name = "operationName", description = "The action/trigger name to which a connection belongs.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("operationName")
-  public String getOperationName() {
-    return operationName;
+  @Schema(name = "workflowNodeName", description = "The action/trigger name to which a connection belongs.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("workflowNodeName")
+  public String getWorkflowNodeName() {
+    return workflowNodeName;
   }
 
-  public void setOperationName(String operationName) {
-    this.operationName = operationName;
+  public void setWorkflowNodeName(String workflowNodeName) {
+    this.workflowNodeName = workflowNodeName;
   }
 
   @Override
@@ -113,13 +113,13 @@ public class WorkflowTestConfigurationConnectionModel {
     }
     WorkflowTestConfigurationConnectionModel workflowTestConfigurationConnection = (WorkflowTestConfigurationConnectionModel) o;
     return Objects.equals(this.connectionId, workflowTestConfigurationConnection.connectionId) &&
-        Objects.equals(this.key, workflowTestConfigurationConnection.key) &&
-        Objects.equals(this.operationName, workflowTestConfigurationConnection.operationName);
+        Objects.equals(this.workflowConnectionKey, workflowTestConfigurationConnection.workflowConnectionKey) &&
+        Objects.equals(this.workflowNodeName, workflowTestConfigurationConnection.workflowNodeName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionId, key, operationName);
+    return Objects.hash(connectionId, workflowConnectionKey, workflowNodeName);
   }
 
   @Override
@@ -127,8 +127,8 @@ public class WorkflowTestConfigurationConnectionModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowTestConfigurationConnectionModel {\n");
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
-    sb.append("    key: ").append(toIndentedString(key)).append("\n");
-    sb.append("    operationName: ").append(toIndentedString(operationName)).append("\n");
+    sb.append("    workflowConnectionKey: ").append(toIndentedString(workflowConnectionKey)).append("\n");
+    sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
     sb.append("}");
     return sb.toString();
   }

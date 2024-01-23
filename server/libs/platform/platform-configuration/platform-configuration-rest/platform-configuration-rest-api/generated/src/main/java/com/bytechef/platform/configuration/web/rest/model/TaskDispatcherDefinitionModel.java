@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.ResourcesModel;
-import com.bytechef.platform.configuration.web.rest.model.TaskDispatcherOutputSchemaModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-19T11:58:57.058637+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-26T08:17:52.891429+01:00[Europe/Zagreb]")
 public class TaskDispatcherDefinitionModel {
 
   private String description;
@@ -36,9 +35,7 @@ public class TaskDispatcherDefinitionModel {
 
   private String name;
 
-  private TaskDispatcherOutputSchemaModel outputSchema;
-
-  private Boolean outputSchemaDataSource;
+  private Boolean outputDefined;
 
   @Valid
   private List<@Valid PropertyModel> properties;
@@ -50,10 +47,7 @@ public class TaskDispatcherDefinitionModel {
 
   private String title;
 
-  @Valid
-  private List<@Valid PropertyModel> variableProperties;
-
-  private Boolean variablePropertiesDataSource;
+  private Boolean variablePropertiesDefined;
 
   private Integer version;
 
@@ -129,44 +123,24 @@ public class TaskDispatcherDefinitionModel {
     this.name = name;
   }
 
-  public TaskDispatcherDefinitionModel outputSchema(TaskDispatcherOutputSchemaModel outputSchema) {
-    this.outputSchema = outputSchema;
+  public TaskDispatcherDefinitionModel outputDefined(Boolean outputDefined) {
+    this.outputDefined = outputDefined;
     return this;
   }
 
   /**
-   * Get outputSchema
-   * @return outputSchema
-  */
-  @Valid 
-  @Schema(name = "outputSchema", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("outputSchema")
-  public TaskDispatcherOutputSchemaModel getOutputSchema() {
-    return outputSchema;
-  }
-
-  public void setOutputSchema(TaskDispatcherOutputSchemaModel outputSchema) {
-    this.outputSchema = outputSchema;
-  }
-
-  public TaskDispatcherDefinitionModel outputSchemaDataSource(Boolean outputSchemaDataSource) {
-    this.outputSchemaDataSource = outputSchemaDataSource;
-    return this;
-  }
-
-  /**
-   * Does task dispatcher has defined dynamic output schema.
-   * @return outputSchemaDataSource
+   * Does task dispatcher define output schema.
+   * @return outputDefined
   */
   
-  @Schema(name = "outputSchemaDataSource", description = "Does task dispatcher has defined dynamic output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("outputSchemaDataSource")
-  public Boolean getOutputSchemaDataSource() {
-    return outputSchemaDataSource;
+  @Schema(name = "outputDefined", description = "Does task dispatcher define output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputDefined")
+  public Boolean getOutputDefined() {
+    return outputDefined;
   }
 
-  public void setOutputSchemaDataSource(Boolean outputSchemaDataSource) {
-    this.outputSchemaDataSource = outputSchemaDataSource;
+  public void setOutputDefined(Boolean outputDefined) {
+    this.outputDefined = outputDefined;
   }
 
   public TaskDispatcherDefinitionModel properties(List<@Valid PropertyModel> properties) {
@@ -265,52 +239,24 @@ public class TaskDispatcherDefinitionModel {
     this.title = title;
   }
 
-  public TaskDispatcherDefinitionModel variableProperties(List<@Valid PropertyModel> variableProperties) {
-    this.variableProperties = variableProperties;
-    return this;
-  }
-
-  public TaskDispatcherDefinitionModel addVariablePropertiesItem(PropertyModel variablePropertiesItem) {
-    if (this.variableProperties == null) {
-      this.variableProperties = new ArrayList<>();
-    }
-    this.variableProperties.add(variablePropertiesItem);
+  public TaskDispatcherDefinitionModel variablePropertiesDefined(Boolean variablePropertiesDefined) {
+    this.variablePropertiesDefined = variablePropertiesDefined;
     return this;
   }
 
   /**
-   * Properties used to define tasks to be dispatched.
-   * @return variableProperties
-  */
-  @Valid 
-  @Schema(name = "variableProperties", description = "Properties used to define tasks to be dispatched.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("variableProperties")
-  public List<@Valid PropertyModel> getVariableProperties() {
-    return variableProperties;
-  }
-
-  public void setVariableProperties(List<@Valid PropertyModel> variableProperties) {
-    this.variableProperties = variableProperties;
-  }
-
-  public TaskDispatcherDefinitionModel variablePropertiesDataSource(Boolean variablePropertiesDataSource) {
-    this.variablePropertiesDataSource = variablePropertiesDataSource;
-    return this;
-  }
-
-  /**
-   * Does task dispatcher has defined dynamic variable properties.
-   * @return variablePropertiesDataSource
+   * Does task dispatcher define dynamic variable properties.
+   * @return variablePropertiesDefined
   */
   
-  @Schema(name = "variablePropertiesDataSource", description = "Does task dispatcher has defined dynamic variable properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("variablePropertiesDataSource")
-  public Boolean getVariablePropertiesDataSource() {
-    return variablePropertiesDataSource;
+  @Schema(name = "variablePropertiesDefined", description = "Does task dispatcher define dynamic variable properties.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("variablePropertiesDefined")
+  public Boolean getVariablePropertiesDefined() {
+    return variablePropertiesDefined;
   }
 
-  public void setVariablePropertiesDataSource(Boolean variablePropertiesDataSource) {
-    this.variablePropertiesDataSource = variablePropertiesDataSource;
+  public void setVariablePropertiesDefined(Boolean variablePropertiesDefined) {
+    this.variablePropertiesDefined = variablePropertiesDefined;
   }
 
   public TaskDispatcherDefinitionModel version(Integer version) {
@@ -345,20 +291,18 @@ public class TaskDispatcherDefinitionModel {
     return Objects.equals(this.description, taskDispatcherDefinition.description) &&
         Objects.equals(this.icon, taskDispatcherDefinition.icon) &&
         Objects.equals(this.name, taskDispatcherDefinition.name) &&
-        Objects.equals(this.outputSchema, taskDispatcherDefinition.outputSchema) &&
-        Objects.equals(this.outputSchemaDataSource, taskDispatcherDefinition.outputSchemaDataSource) &&
+        Objects.equals(this.outputDefined, taskDispatcherDefinition.outputDefined) &&
         Objects.equals(this.properties, taskDispatcherDefinition.properties) &&
         Objects.equals(this.resources, taskDispatcherDefinition.resources) &&
         Objects.equals(this.taskProperties, taskDispatcherDefinition.taskProperties) &&
         Objects.equals(this.title, taskDispatcherDefinition.title) &&
-        Objects.equals(this.variableProperties, taskDispatcherDefinition.variableProperties) &&
-        Objects.equals(this.variablePropertiesDataSource, taskDispatcherDefinition.variablePropertiesDataSource) &&
+        Objects.equals(this.variablePropertiesDefined, taskDispatcherDefinition.variablePropertiesDefined) &&
         Objects.equals(this.version, taskDispatcherDefinition.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, icon, name, outputSchema, outputSchemaDataSource, properties, resources, taskProperties, title, variableProperties, variablePropertiesDataSource, version);
+    return Objects.hash(description, icon, name, outputDefined, properties, resources, taskProperties, title, variablePropertiesDefined, version);
   }
 
   @Override
@@ -368,14 +312,12 @@ public class TaskDispatcherDefinitionModel {
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
-    sb.append("    outputSchemaDataSource: ").append(toIndentedString(outputSchemaDataSource)).append("\n");
+    sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
     sb.append("    taskProperties: ").append(toIndentedString(taskProperties)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
-    sb.append("    variableProperties: ").append(toIndentedString(variableProperties)).append("\n");
-    sb.append("    variablePropertiesDataSource: ").append(toIndentedString(variablePropertiesDataSource)).append("\n");
+    sb.append("    variablePropertiesDefined: ").append(toIndentedString(variablePropertiesDefined)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();

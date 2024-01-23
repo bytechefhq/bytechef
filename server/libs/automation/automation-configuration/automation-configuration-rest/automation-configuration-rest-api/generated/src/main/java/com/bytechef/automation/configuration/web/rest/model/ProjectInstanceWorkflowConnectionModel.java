@@ -16,19 +16,19 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The connection used in a particular task or trigger.
+ * The connection used in a particular action task or trigger.
  */
 
-@Schema(name = "ProjectInstanceWorkflowConnection", description = "The connection used in a particular task or trigger.")
+@Schema(name = "ProjectInstanceWorkflowConnection", description = "The connection used in a particular action task or trigger.")
 @JsonTypeName("ProjectInstanceWorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-12T19:58:02.230572+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-24T15:28:50.426082+01:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowConnectionModel {
 
   private Long connectionId;
 
   private String key;
 
-  private String operationName;
+  private String workflowNodeName;
 
   public ProjectInstanceWorkflowConnectionModel() {
     super();
@@ -37,10 +37,10 @@ public class ProjectInstanceWorkflowConnectionModel {
   /**
    * Constructor with only required parameters
    */
-  public ProjectInstanceWorkflowConnectionModel(Long connectionId, String key, String operationName) {
+  public ProjectInstanceWorkflowConnectionModel(Long connectionId, String key, String workflowNodeName) {
     this.connectionId = connectionId;
     this.key = key;
-    this.operationName = operationName;
+    this.workflowNodeName = workflowNodeName;
   }
 
   public ProjectInstanceWorkflowConnectionModel connectionId(Long connectionId) {
@@ -83,24 +83,24 @@ public class ProjectInstanceWorkflowConnectionModel {
     this.key = key;
   }
 
-  public ProjectInstanceWorkflowConnectionModel operationName(String operationName) {
-    this.operationName = operationName;
+  public ProjectInstanceWorkflowConnectionModel workflowNodeName(String workflowNodeName) {
+    this.workflowNodeName = workflowNodeName;
     return this;
   }
 
   /**
    * The action/trigger name to which a connection belongs.
-   * @return operationName
+   * @return workflowNodeName
   */
   @NotNull 
-  @Schema(name = "operationName", description = "The action/trigger name to which a connection belongs.", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("operationName")
-  public String getOperationName() {
-    return operationName;
+  @Schema(name = "workflowNodeName", description = "The action/trigger name to which a connection belongs.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("workflowNodeName")
+  public String getWorkflowNodeName() {
+    return workflowNodeName;
   }
 
-  public void setOperationName(String operationName) {
-    this.operationName = operationName;
+  public void setWorkflowNodeName(String workflowNodeName) {
+    this.workflowNodeName = workflowNodeName;
   }
 
   @Override
@@ -114,12 +114,12 @@ public class ProjectInstanceWorkflowConnectionModel {
     ProjectInstanceWorkflowConnectionModel projectInstanceWorkflowConnection = (ProjectInstanceWorkflowConnectionModel) o;
     return Objects.equals(this.connectionId, projectInstanceWorkflowConnection.connectionId) &&
         Objects.equals(this.key, projectInstanceWorkflowConnection.key) &&
-        Objects.equals(this.operationName, projectInstanceWorkflowConnection.operationName);
+        Objects.equals(this.workflowNodeName, projectInstanceWorkflowConnection.workflowNodeName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionId, key, operationName);
+    return Objects.hash(connectionId, key, workflowNodeName);
   }
 
   @Override
@@ -128,7 +128,7 @@ public class ProjectInstanceWorkflowConnectionModel {
     sb.append("class ProjectInstanceWorkflowConnectionModel {\n");
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
-    sb.append("    operationName: ").append(toIndentedString(operationName)).append("\n");
+    sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
     sb.append("}");
     return sb.toString();
   }

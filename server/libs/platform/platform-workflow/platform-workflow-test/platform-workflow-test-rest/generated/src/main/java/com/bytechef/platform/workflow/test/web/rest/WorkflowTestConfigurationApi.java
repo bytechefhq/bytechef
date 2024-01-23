@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-20T08:48:13.801332+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-25T10:11:39.095314+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-test-configuration", description = "the workflow-test-configuration API")
 public interface WorkflowTestConfigurationApi {
@@ -77,7 +77,7 @@ public interface WorkflowTestConfigurationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }";
+                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 }, { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 } ], \"workflowId\" : \"workflowId\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -118,7 +118,7 @@ public interface WorkflowTestConfigurationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }";
+                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 }, { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 } ], \"workflowId\" : \"workflowId\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -130,11 +130,11 @@ public interface WorkflowTestConfigurationApi {
 
 
     /**
-     * GET /workflow-test-configurations/{workflowId}/connections/{operationName} : Get a workflow test configuration connections
+     * GET /workflow-test-configurations/{workflowId}/connections/{workflowNodeName} : Get a workflow test configuration connections
      * Get a workflow test configuration connections.
      *
      * @param workflowId The id of a testing workflow. (required)
-     * @param operationName The action/trigger name defined in the workflow. (required)
+     * @param workflowNodeName The action/trigger name defined in the workflow. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -150,18 +150,18 @@ public interface WorkflowTestConfigurationApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/workflow-test-configurations/{workflowId}/connections/{operationName}",
+        value = "/workflow-test-configurations/{workflowId}/connections/{workflowNodeName}",
         produces = { "application/json" }
     )
     
     default ResponseEntity<List<WorkflowTestConfigurationConnectionModel>> getWorkflowTestConfigurationConnections(
         @Parameter(name = "workflowId", description = "The id of a testing workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
-        @Parameter(name = "operationName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("operationName") String operationName
+        @Parameter(name = "workflowNodeName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ]";
+                    String exampleString = "[ { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 }, { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -205,7 +205,7 @@ public interface WorkflowTestConfigurationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" }, { \"connectionId\" : 0, \"operationName\" : \"operationName\", \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }";
+                    String exampleString = "{ \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 }, { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 } ], \"workflowId\" : \"workflowId\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -217,12 +217,12 @@ public interface WorkflowTestConfigurationApi {
 
 
     /**
-     * PUT /workflow-test-configurations/{workflowId}/connections/{operationName}/{key} : Update a workflow test configuration connection
+     * PUT /workflow-test-configurations/{workflowId}/connections/{workflowNodeName}/{workflowConnectionKey} : Update a workflow test configuration connection
      * Update a workflow test configuration connection.
      *
      * @param workflowId The id of a testing workflow. (required)
-     * @param operationName The action/trigger name defined in the workflow. (required)
-     * @param key The key of a connection. (required)
+     * @param workflowNodeName The action/trigger name defined in the workflow. (required)
+     * @param workflowConnectionKey The key of a connection. (required)
      * @param updateWorkflowTestConfigurationConnectionRequestModel  (required)
      * @return Successful operation. (status code 200)
      */
@@ -237,14 +237,14 @@ public interface WorkflowTestConfigurationApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/workflow-test-configurations/{workflowId}/connections/{operationName}/{key}",
+        value = "/workflow-test-configurations/{workflowId}/connections/{workflowNodeName}/{workflowConnectionKey}",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> updateWorkflowTestConfigurationConnection(
         @Parameter(name = "workflowId", description = "The id of a testing workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
-        @Parameter(name = "operationName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("operationName") String operationName,
-        @Parameter(name = "key", description = "The key of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("key") String key,
+        @Parameter(name = "workflowNodeName", description = "The action/trigger name defined in the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
+        @Parameter(name = "workflowConnectionKey", description = "The key of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("workflowConnectionKey") String workflowConnectionKey,
         @Parameter(name = "UpdateWorkflowTestConfigurationConnectionRequestModel", description = "", required = true) @Valid @RequestBody UpdateWorkflowTestConfigurationConnectionRequestModel updateWorkflowTestConfigurationConnectionRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
