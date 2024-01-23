@@ -16,15 +16,8 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
-import com.bytechef.platform.component.registry.component.OperationType;
-import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
-import com.bytechef.platform.configuration.web.rest.model.ComponentOperationRequestModel;
-import com.bytechef.platform.configuration.web.rest.model.ComponentOutputSchemaModel;
-import com.bytechef.platform.configuration.web.rest.model.OptionModel;
-import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionModel;
 import java.util.List;
@@ -42,15 +35,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class TriggerDefinitionApiController implements TriggerDefinitionApi {
 
     private final ConversionService conversionService;
-    private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
 
     public TriggerDefinitionApiController(
-        ConversionService conversionService, TriggerDefinitionFacade triggerDefinitionFacade,
-        TriggerDefinitionService triggerDefinitionService) {
+        ConversionService conversionService, TriggerDefinitionService triggerDefinitionService) {
 
         this.conversionService = conversionService;
-        this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
     }
 
@@ -76,64 +66,55 @@ public class TriggerDefinitionApiController implements TriggerDefinitionApi {
                 .toList());
     }
 
-    @Override
-    public ResponseEntity<String> getComponentTriggerEditorDescription(
-        String componentName, Integer componentVersion, String triggerName,
-        ComponentOperationRequestModel componentOperationRequestModel) {
-
-        return ResponseEntity.ok(
-            triggerDefinitionFacade.executeEditorDescription(
-                componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
-                componentOperationRequestModel.getConnectionId()));
-    }
-
-    @Override
-    public ResponseEntity<ComponentOutputSchemaModel> getComponentTriggerOutputSchema(
-        String componentName, Integer componentVersion, String triggerName,
-        ComponentOperationRequestModel componentOperationRequestModel) {
-
-        return ResponseEntity.ok(
-            conversionService.convert(
-                triggerDefinitionFacade.executeOutputSchema(
-                    componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
-                    componentOperationRequestModel.getConnectionId()),
-                ComponentOutputSchemaModel.class));
-    }
-
-    @Override
-    public ResponseEntity<List<PropertyModel>> getComponentTriggerPropertyDynamicProperties(
-        String componentName, Integer componentVersion, String triggerName, String propertyName,
-        ComponentOperationRequestModel componentOperationRequestModel) {
-
-        return ResponseEntity.ok(
-            CollectionUtils.map(
-                triggerDefinitionFacade.executeDynamicProperties(
-                    componentName, componentVersion, triggerName, propertyName,
-                    componentOperationRequestModel.getParameters(),
-                    componentOperationRequestModel.getConnectionId()),
-                property -> conversionService.convert(property, PropertyModel.class)));
-    }
-
-    @Override
-    public ResponseEntity<List<OptionModel>> getComponentTriggerPropertyOptions(
-        String componentName, Integer componentVersion, String triggerName, String propertyName, String searchText,
-        ComponentOperationRequestModel componentOperationRequestModel) {
-
-        return ResponseEntity.ok(
-            CollectionUtils.map(
-                triggerDefinitionFacade.executeOptions(
-                    componentName, componentVersion, triggerName, propertyName,
-                    componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId(),
-                    searchText),
-                option -> conversionService.convert(option, OptionModel.class)));
-    }
-
-    @Override
-    public ResponseEntity<List<TriggerDefinitionModel>> getTriggerDefinitions(List<String> triggerTypes) {
-        return ResponseEntity.ok(
-            CollectionUtils.map(
-                triggerDefinitionService.getTriggerDefinitions(
-                    triggerTypes == null ? List.of() : CollectionUtils.map(triggerTypes, OperationType::ofType)),
-                triggerDefinition -> conversionService.convert(triggerDefinition, TriggerDefinitionModel.class)));
-    }
+//    @Override
+//    public ResponseEntity<String> getComponentTriggerEditorDescription(
+//        String componentName, Integer componentVersion, String triggerName,
+//        ComponentOperationRequestModel componentOperationRequestModel) {
+//
+//        return ResponseEntity.ok(
+//            triggerDefinitionFacade.executeEditorDescription(
+//                componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
+//                componentOperationRequestModel.getConnectionId()));
+//    }
+//
+//    @Override
+//    public ResponseEntity<ComponentOutputSchemaModel> getComponentTriggerOutputSchema(
+//        String componentName, Integer componentVersion, String triggerName,
+//        ComponentOperationRequestModel componentOperationRequestModel) {
+//
+//        return ResponseEntity.ok(
+//            conversionService.convert(
+//                triggerDefinitionFacade.executeOutputSchema(
+//                    componentName, componentVersion, triggerName, componentOperationRequestModel.getParameters(),
+//                    componentOperationRequestModel.getConnectionId()),
+//                ComponentOutputSchemaModel.class));
+//    }
+//
+//    @Override
+//    public ResponseEntity<List<PropertyModel>> getComponentTriggerPropertyDynamicProperties(
+//        String componentName, Integer componentVersion, String triggerName, String propertyName,
+//        ComponentOperationRequestModel componentOperationRequestModel) {
+//
+//        return ResponseEntity.ok(
+//            CollectionUtils.map(
+//                triggerDefinitionFacade.executeDynamicProperties(
+//                    componentName, componentVersion, triggerName, propertyName,
+//                    componentOperationRequestModel.getParameters(),
+//                    componentOperationRequestModel.getConnectionId()),
+//                property -> conversionService.convert(property, PropertyModel.class)));
+//    }
+//
+//    @Override
+//    public ResponseEntity<List<OptionModel>> getComponentTriggerPropertyOptions(
+//        String componentName, Integer componentVersion, String triggerName, String propertyName, String searchText,
+//        ComponentOperationRequestModel componentOperationRequestModel) {
+//
+//        return ResponseEntity.ok(
+//            CollectionUtils.map(
+//                triggerDefinitionFacade.executeOptions(
+//                    componentName, componentVersion, triggerName, propertyName,
+//                    componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId(),
+//                    searchText),
+//                option -> conversionService.convert(option, OptionModel.class)));
+//    }
 }

@@ -39,18 +39,18 @@ public class ContextImpl implements Context {
     private final Http http;
     private final Json json;
     private final Logger logger;
-    private final OutputSchema outputSchema;
+    private final Output output;
     private final Xml xml;
 
     @SuppressFBWarnings("EI")
     public ContextImpl(
-        String componentName, String operationName, ComponentConnection connection,
+        String componentName, String componentOperationName, ComponentConnection connection,
         HttpClientExecutor httpClientExecutor) {
 
         this.http = new HttpImpl(componentName, connection, this, httpClientExecutor);
         this.json = new JsonImpl();
-        this.logger = new LoggerImpl(componentName, operationName);
-        this.outputSchema = new OutputSchemaImpl();
+        this.logger = new LoggerImpl(componentName, componentOperationName);
+        this.output = new OutputImpl();
         this.xml = new XmlImpl();
     }
 
@@ -82,11 +82,11 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public com.bytechef.component.definition.OutputSchema outputSchema(
-        ContextFunction<OutputSchema, com.bytechef.component.definition.OutputSchema> outputSchema) {
+    public com.bytechef.component.definition.Output outputSchema(
+        ContextFunction<Output, com.bytechef.component.definition.Output> outputSchema) {
 
         try {
-            return outputSchema.apply(this.outputSchema);
+            return outputSchema.apply(this.output);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -375,8 +375,9 @@ public class ContextImpl implements Context {
 
         private final org.slf4j.Logger logger;
 
-        public LoggerImpl(String componentName, String actionName) {
-            logger = LoggerFactory.getLogger(componentName + (actionName == null ? "" : "." + actionName));
+        public LoggerImpl(String componentName, String componentOperationName) {
+            logger = LoggerFactory
+                .getLogger(componentName + (componentOperationName == null ? "" : "." + componentOperationName));
         }
 
         @Override
@@ -485,14 +486,14 @@ public class ContextImpl implements Context {
         }
     }
 
-    private static class OutputSchemaImpl implements OutputSchema {
+    private static class OutputImpl implements Output {
 
-        private OutputSchemaImpl() {
+        private OutputImpl() {
         }
 
         @Override
-        public com.bytechef.component.definition.OutputSchema get(Object value) {
-            return new com.bytechef.component.definition.OutputSchema(
+        public com.bytechef.component.definition.Output get(Object value) {
+            return new com.bytechef.component.definition.Output(
                 (Property.ValueProperty<?>) SchemaUtils.getSchemaDefinition(value, new PropertyFactoryFunction(value)),
                 value);
         }

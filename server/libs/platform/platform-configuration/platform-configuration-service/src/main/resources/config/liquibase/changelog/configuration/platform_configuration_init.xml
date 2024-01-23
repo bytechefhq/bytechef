@@ -4,14 +4,14 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <changeSet id="202308070817" author="Ivica Cardic">
-        <createTable tableName="workflow_component_definition">
+        <createTable tableName="workflow_node_output">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="workflow_id" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
-            <column name="operation_name" type="VARCHAR(256)">
+            <column name="workflow_node_name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
             <column name="component_name" type="VARCHAR(256)">

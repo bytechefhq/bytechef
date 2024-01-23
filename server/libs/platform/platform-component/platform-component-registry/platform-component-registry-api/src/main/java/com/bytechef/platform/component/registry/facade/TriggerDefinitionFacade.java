@@ -18,7 +18,7 @@ package com.bytechef.platform.component.registry.facade;
 
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.OutputSchema;
+import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.trigger.TriggerOutput;
 import com.bytechef.platform.component.registry.trigger.WebhookRequest;
@@ -65,7 +65,7 @@ public interface TriggerDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
         @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText);
 
-    OutputSchema executeOutputSchema(
+    Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId);
 

@@ -33,8 +33,8 @@ public interface WorkflowTestConfigurationConnectionRepository
             SELECT workflow_test_configuration_connection.* FROM workflow_test_configuration_connection
             JOIN workflow_test_configuration ON workflow_test_configuration_connection.workflow_test_configuration_id = workflow_test_configuration.id
             WHERE workflow_test_configuration.workflow_id = :workflowId
-            AND workflow_test_configuration_connection.operation_name = :operationName
+            AND workflow_test_configuration_connection.workflow_node_name = :workflowNodeName
         """)
-    List<WorkflowTestConfigurationConnection> findByWorkflowIdAndOperationName(
-        @Param("workflowId") String workflowId, @Param("operationName") String operationName);
+    List<WorkflowTestConfigurationConnection> findByWorkflowIdAndWorkflowNodeName(
+        @Param("workflowId") String workflowId, @Param("workflowNodeName") String workflowNodeName);
 }

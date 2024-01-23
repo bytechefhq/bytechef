@@ -35,21 +35,22 @@ public interface ProjectInstanceWorkflowConnectionRepository
             JOIN project_instance_workflow ON project_instance_workflow_connection.project_instance_workflow_id = project_instance_workflow.id
             WHERE project_instance_workflow.project_instance_id = :projectInstanceId
             AND project_instance_workflow.workflow_id = :workflowId
-            AND project_instance_workflow_connection.operation_name = :operationName
+            AND project_instance_workflow_connection.workflow_node_name = :workflowNodeName
         """)
-    List<ProjectInstanceWorkflowConnection> findAllByProjectInstanceIdAndWorkflowIdAndOperationName(
+    List<ProjectInstanceWorkflowConnection> findAllByProjectInstanceIdAndWorkflowIdAndWorkflowNodeName(
         @Param("projectInstanceId") long projectInstanceId, @Param("workflowId") String workflowId,
-        @Param("operationName") String operationName);
+        @Param("workflowNodeName") String workflowNodeName);
 
     @Query("""
             SELECT project_instance_workflow_connection.* FROM project_instance_workflow_connection
             JOIN project_instance_workflow ON project_instance_workflow_connection.project_instance_workflow_id = project_instance_workflow.id
             WHERE project_instance_workflow.project_instance_id = :projectInstanceId
             AND project_instance_workflow.workflow_id = :workflowId
-            AND project_instance_workflow_connection.operation_name = :operationName
-            AND project_instance_workflow_connection.key = :key
+            AND project_instance_workflow_connection.workflow_node_name = :workflowNodeName
+            AND project_instance_workflow_connection.workflow_connection_key = :workflowConnectionKey
         """)
-    Optional<ProjectInstanceWorkflowConnection> findByProjectInstanceIdAndWorkflowIdAndOperationNameAndKey(
+    Optional<ProjectInstanceWorkflowConnection> findByProjectInstanceIdAndWorkflowIdAndWorkflowNodeNameAndKey(
         @Param("projectInstanceId") long projectInstanceId, @Param("workflowId") String workflowId,
-        @Param("operationName") String operationName, @Param("key") String key);
+        @Param("workflowNodeName") String workflowNodeName,
+        @Param("workflowConnectionKey") String workflowConnectionKey);
 }

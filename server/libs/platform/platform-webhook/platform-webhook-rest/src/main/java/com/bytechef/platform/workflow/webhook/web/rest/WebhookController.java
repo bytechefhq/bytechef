@@ -26,7 +26,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentTy
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
-import com.bytechef.platform.component.registry.component.OperationType;
+import com.bytechef.platform.component.registry.component.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.component.registry.trigger.WebhookRequest;
@@ -118,11 +118,11 @@ public class WebhookController {
         Map<String, String[]> parameters = httpServletRequest.getParameterMap();
         ResponseEntity<?> responseEntity;
 
-        OperationType operationType = getComponentOperation(workflowExecutionId);
+        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
 
         WebhookTriggerFlags webhookTriggerFlags = triggerDefinitionService.getWebhookTriggerFlags(
-            operationType.componentName(), operationType.componentVersion(),
-            operationType.componentOperationName());
+            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+            workflowNodeType.componentOperationName());
 
         if (mediaType != null) {
             if (mediaType.startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)) {
@@ -222,12 +222,12 @@ public class WebhookController {
         return responseEntity;
     }
 
-    private OperationType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
+    private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
         Workflow workflow = workflowService.getWorkflow(workflowExecutionId.getWorkflowId());
 
         WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
 
-        return OperationType.ofType(workflowTrigger.getType());
+        return WorkflowNodeType.ofType(workflowTrigger.getType());
     }
 
     private static String getFilename(String mimeTypeString) {

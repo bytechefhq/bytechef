@@ -25,13 +25,13 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 /**
  * @author Ivica Cardic
  */
-public interface TriggerOutputSchemaFunction {
+public interface TriggerOutputFunction {
 
     /**
      *
      */
     @FunctionalInterface
-    interface DynamicWebhookTriggerOutputSchemaFunction extends TriggerOutputSchemaFunction {
+    interface DynamicWebhookTriggerOutputFunction extends TriggerOutputFunction {
 
         /**
          * @param inputParameters
@@ -44,7 +44,7 @@ public interface TriggerOutputSchemaFunction {
          * @param context
          * @return
          */
-        OutputSchema apply(
+        Output apply(
             Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
             HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
             TriggerContext context) throws Exception;
@@ -54,14 +54,14 @@ public interface TriggerOutputSchemaFunction {
      *
      */
     @FunctionalInterface
-    interface ListenerTriggerOutputSchemaFunction extends TriggerOutputSchemaFunction {
+    interface ListenerTriggerOutputFunction extends TriggerOutputFunction {
 
         /**
          * @param inputParameters
          * @param connectionParameters
          * @param workflowExecutionId
          */
-        OutputSchema accept(
+        Output accept(
             Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
             TriggerContext context) throws Exception;
     }
@@ -70,7 +70,7 @@ public interface TriggerOutputSchemaFunction {
      *
      */
     @FunctionalInterface
-    interface PollTriggerOutputSchemaFunction extends TriggerOutputSchemaFunction {
+    interface PollTriggerOutputFunction extends TriggerOutputFunction {
 
         /**
          * @param inputParameters
@@ -78,7 +78,7 @@ public interface TriggerOutputSchemaFunction {
          * @param context
          * @return
          */
-        OutputSchema apply(Parameters inputParameters, Parameters closureParameters, TriggerContext context)
+        Output apply(Parameters inputParameters, Parameters closureParameters, TriggerContext context)
             throws Exception;
 
     }
@@ -87,7 +87,7 @@ public interface TriggerOutputSchemaFunction {
      *
      */
     @FunctionalInterface
-    interface StaticWebhookTriggerOutputSchemaFunction extends TriggerOutputSchemaFunction {
+    interface StaticWebhookTriggerOutputFunction extends TriggerOutputFunction {
 
         /**
          * @param inputParameters
@@ -98,7 +98,7 @@ public interface TriggerOutputSchemaFunction {
          * @param context
          * @return
          */
-        OutputSchema apply(
+        Output apply(
             Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
             WebhookMethod method, TriggerContext context) throws Exception;
 

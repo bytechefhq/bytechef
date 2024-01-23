@@ -160,13 +160,13 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<OutputSchema> getOutputSchema();
+    Optional<Output> getOutput();
 
     /**
      *
      * @return
      */
-    Optional<TriggerOutputSchemaFunction> getOutputSchemaFunction();
+    Optional<TriggerOutputFunction> getOutputFunction();
 
     /**
      *
@@ -229,7 +229,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    boolean isOutputSchemaDefaultFunction();
+    boolean isDefaultOutputFunction();
 
     /**
      *

@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition;
+package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import com.bytechef.component.definition.Property.ValueProperty;
-import com.bytechef.definition.BaseOutputSchema;
+import com.bytechef.definition.BaseOutput;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty;
 import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-public record OutputSchema(ValueProperty<?> definition, Object sampleOutput)
-    implements BaseOutputSchema<ValueProperty<?>> {
+public record Output(ValueProperty<?> outputSchema, Object sampleOutput)
+    implements BaseOutput<ValueProperty<?>> {
 
-    public OutputSchema(ValueProperty<?> definition) {
-        this(definition, null);
+    public Output(ValueProperty<?> outputSchema) {
+        this(outputSchema, null);
     }
 
-    public OutputSchema {
-        Objects.requireNonNull(definition, "'definition' mut not be null");
+    public Output {
+        Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
     }
 
     @Override
-    public ValueProperty<?> getDefinition() {
-        return definition;
+    public ValueProperty<?> getOutputSchema() {
+        return outputSchema;
     }
 
     @Override

@@ -46,7 +46,7 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
 
     @Override
     public Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        long projectInstanceId, String workflowId, String operationName,
+        long projectInstanceId, String workflowId, String workflowNodeName,
         String key) {
 
         return Optional.ofNullable(
@@ -56,8 +56,8 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
                     .path(
                         PROJECT_INSTANCE_WORKFLOW_SERVICE +
                             "/fetch-project-instance-workflow-connection/{projectInstanceId}/{workflowId}/" +
-                            "{workflowConnectionOperationName}/{workflowConnectionKey}")
-                    .build(projectInstanceId, workflowId, operationName, key),
+                            "{workflowNodeName}/{workflowConnectionKey}")
+                    .build(projectInstanceId, workflowId, workflowNodeName, key),
                 ProjectInstanceWorkflowConnection.class));
     }
 
@@ -80,7 +80,7 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
 
     @Override
     public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
-        long projectInstanceOd, String workflowId, String operationName, String key) {
+        long projectInstanceOd, String workflowId, String workflowNodeName, String workflowConnectionKey) {
 
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
@@ -88,14 +88,14 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
                 .path(
                     PROJECT_INSTANCE_WORKFLOW_SERVICE +
                         "/get-project-instance-workflow-connection/{projectInstanceId}/{workflowId}/" +
-                        "{workflowConnectionOperationName}/{workflowConnectionKey}")
-                .build(projectInstanceOd, workflowId, operationName, key),
+                        "{workflowNodeName}/{workflowConnectionKey}")
+                .build(projectInstanceOd, workflowId, workflowNodeName, workflowConnectionKey),
             ProjectInstanceWorkflowConnection.class);
     }
 
     @Override
     public List<ProjectInstanceWorkflowConnection> getProjectInstanceWorkflowConnections(
-        long projectInstanceOd, String workflowId, String operationName) {
+        long projectInstanceOd, String workflowId, String workflowNodeName) {
 
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
@@ -103,8 +103,8 @@ public class RemoteProjectInstanceWorkflowServiceClient implements ProjectInstan
                 .path(
                     PROJECT_INSTANCE_WORKFLOW_SERVICE +
                         "/get-project-instance-workflow-connection/{projectInstanceId}/{workflowId}/" +
-                        "{workflowConnectionOperationName}")
-                .build(projectInstanceOd, workflowId, operationName),
+                        "{workflowNodeName}")
+                .build(projectInstanceOd, workflowId, workflowNodeName),
             new ParameterizedTypeReference<>() {});
     }
 

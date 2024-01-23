@@ -21,7 +21,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ActionEditorDescriptionFunction;
-import com.bytechef.component.definition.ActionOutputSchemaFunction;
+import com.bytechef.component.definition.ActionOutputFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.OptionsDataSource;
@@ -30,11 +30,10 @@ import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.platform.component.definition.ParametersImpl;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.platform.component.registry.component.OperationType;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.OutputSchema;
+import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.ValueProperty;
 import com.bytechef.platform.component.registry.exception.ComponentExecutionException;
@@ -113,19 +112,19 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public OutputSchema executeOutputSchema(
+    public Output executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
-        ActionOutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(
+        ActionOutputFunction outputSchemaFunction = getOutputSchemaFunction(
             componentName, componentVersion, actionName);
 
         try {
-            com.bytechef.component.definition.OutputSchema outputSchema = outputSchemaFunction.apply(
+            com.bytechef.component.definition.Output output = outputSchemaFunction.apply(
                 new ParametersImpl(inputParameters),
                 new ParametersImpl(connection == null ? Map.of() : connection.parameters()), context);
 
-            return new OutputSchema(Property.toProperty(outputSchema.definition()), outputSchema.sampleOutput());
+            return new Output(Property.toProperty(output.outputSchema()), output.sampleOutput());
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 103);
         }
@@ -166,24 +165,6 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             .stream()
             .map(ActionDefinition::new)
             .toList();
-    }
-
-    @Override
-    public List<ActionDefinition> getActionDefinitions(@NonNull List<OperationType> operationTypes) {
-        List<ActionDefinition> actionDefinitions;
-
-        if (operationTypes.isEmpty()) {
-            actionDefinitions = CollectionUtils.map(
-                componentDefinitionRegistry.getActionDefinitions(), ActionDefinition::new);
-        } else {
-            actionDefinitions = CollectionUtils.map(
-                operationTypes,
-                componentOperation -> getActionDefinition(
-                    componentOperation.componentName(), componentOperation.componentVersion(),
-                    componentOperation.componentOperationName()));
-        }
-
-        return actionDefinitions;
     }
 
     private ActionOptionsFunction<?> getComponentOptionsFunction(
@@ -228,15 +209,19 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
     }
 
-    private ActionOutputSchemaFunction getOutputSchemaFunction(
+    private ActionOutputFunction getOutputSchemaFunction(
         String componentName, int componentVersion, String actionName) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         return OptionalUtils.orElseGet(
-            actionDefinition.getOutputSchemaFunction(),
+            actionDefinition.getOutputFunction(),
             () -> {
+                if (!actionDefinition.isDefaultOutputFunction()) {
+                    throw new IllegalStateException("Default output schema function not allowed");
+                }
+
                 PerformFunction performFunction = OptionalUtils.get(actionDefinition.getPerform());
 
                 return (inputParameters, connectionParameters, context) -> context.outputSchema(

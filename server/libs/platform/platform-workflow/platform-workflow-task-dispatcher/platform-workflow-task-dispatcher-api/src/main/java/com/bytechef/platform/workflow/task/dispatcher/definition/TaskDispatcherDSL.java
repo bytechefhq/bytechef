@@ -1196,8 +1196,8 @@ public final class TaskDispatcherDSL {
         private Help help;
         private String icon;
         private final String name;
-        private OutputSchema outputSchema;
-        private OutputSchemaFunction outputSchemaFunction;
+        private Output output;
+        private OutputFunction outputFunction;
         private List<? extends Property> properties;
         private Resources resources;
         private List<? extends ModifiableProperty<?>> taskProperties;
@@ -1232,20 +1232,20 @@ public final class TaskDispatcherDSL {
             return outputSchema(definition, null);
         }
 
-        public ModifiableTaskDispatcherDefinition outputSchema(OutputSchema outputSchema) {
-            this.outputSchema = outputSchema;
+        public ModifiableTaskDispatcherDefinition outputSchema(Output output) {
+            this.output = output;
 
             return this;
         }
 
         public ModifiableTaskDispatcherDefinition outputSchema(ValueProperty<?> definition, Object sampleOutput) {
-            this.outputSchema = new OutputSchema(definition, sampleOutput);
+            this.output = new Output(definition, sampleOutput);
 
             return this;
         }
 
-        public ModifiableTaskDispatcherDefinition outputSchema(OutputSchemaFunction outputSchema) {
-            this.outputSchemaFunction = outputSchema;
+        public ModifiableTaskDispatcherDefinition outputSchema(OutputFunction outputSchema) {
+            this.outputFunction = outputSchema;
 
             return this;
         }
@@ -1340,13 +1340,13 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<OutputSchema> getOutputSchema() {
-            return Optional.ofNullable(outputSchema);
+        public Optional<Output> getOutput() {
+            return Optional.ofNullable(output);
         }
 
         @Override
-        public Optional<OutputSchemaFunction> getOutputSchemaFunction() {
-            return Optional.ofNullable(outputSchemaFunction);
+        public Optional<OutputFunction> getOutputFunction() {
+            return Optional.ofNullable(outputFunction);
         }
 
         @Override

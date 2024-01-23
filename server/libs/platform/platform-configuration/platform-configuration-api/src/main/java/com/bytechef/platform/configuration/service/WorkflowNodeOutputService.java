@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.instance.accessor;
+package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.constant.Type;
-import java.util.Map;
+import com.bytechef.platform.configuration.domain.WorkflowNodeOutput;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
-public interface InstanceAccessor {
+public interface WorkflowNodeOutputService {
 
-    boolean isConnectionUsed(
-        long connectionId, String workflowId, String workflowNodeName, String workflowConnectionKey);
-
-    boolean isWorkflowEnabled(long instanceId, String workflowId);
-
-    Map<String, ?> getInputMap(long instanceId, String workflowId);
-
-    Type getType();
+    Optional<WorkflowNodeOutput> fetchLastWorkflowNodeOutput(String workflowId, String workflowNodeName);
 }

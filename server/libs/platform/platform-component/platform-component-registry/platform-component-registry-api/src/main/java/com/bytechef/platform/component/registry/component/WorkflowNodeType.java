@@ -23,16 +23,16 @@ package com.bytechef.platform.component.registry.component;
  * @param componentVersion       The component version
  * @param componentOperationName The component action or trigger name
  */
-public record OperationType(String componentName, int componentVersion, String componentOperationName) {
+public record WorkflowNodeType(String componentName, int componentVersion, String componentOperationName) {
 
-    public static OperationType ofType(String type) {
+    public static WorkflowNodeType ofType(String type) {
         String[] typeItems = type.split("/");
 
         if (typeItems.length < 2) {
             throw new IllegalArgumentException("Wrong type format: %s".formatted(type));
         }
 
-        return new OperationType(
+        return new WorkflowNodeType(
             typeItems[0], Integer.parseInt(typeItems[1].replace("v", "")), typeItems.length == 2 ? null : typeItems[2]);
     }
 }

@@ -7,7 +7,7 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.registry.remote.web.rest.service;
 
-import com.bytechef.platform.workflow.task.dispatcher.registry.domain.OutputSchema;
+import com.bytechef.platform.workflow.task.dispatcher.registry.domain.Output;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,16 +43,14 @@ public class RemoteTaskDispatcherDefinitionServiceController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-output-schema",
+        value = "/execute-output",
         consumes = {
             "application/json"
         })
-    public ResponseEntity<OutputSchema> executeOutputSchema(
-        @Valid @RequestBody OutputSchemaRequest outputSchemaRequest) {
-
+    public ResponseEntity<Output> executeOutputSchema(@Valid @RequestBody OutputRequest outputRequest) {
         return ResponseEntity.ok(
             taskDispatcherDefinitionService.executeOutputSchema(
-                outputSchemaRequest.name, outputSchemaRequest.version, outputSchemaRequest.taskDispatcherParameters));
+                outputRequest.name, outputRequest.version, outputRequest.taskDispatcherParameters));
     }
 
     @RequestMapping(
@@ -90,6 +88,6 @@ public class RemoteTaskDispatcherDefinitionServiceController {
     }
 
     @SuppressFBWarnings("EI")
-    public record OutputSchemaRequest(@NotNull String name, int version, Map<String, Object> taskDispatcherParameters) {
+    public record OutputRequest(@NotNull String name, int version, Map<String, Object> taskDispatcherParameters) {
     }
 }

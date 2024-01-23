@@ -5,7 +5,6 @@ dependencies {
     annotationProcessor(libs.org.mapstruct.extensions.spring.mapstruct.spring.extensions)
 
     api(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
-    api(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-api"))
 
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 

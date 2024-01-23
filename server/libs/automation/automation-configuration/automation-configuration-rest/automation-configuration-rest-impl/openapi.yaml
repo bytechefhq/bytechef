@@ -1009,12 +1009,12 @@ components:
         __version:
           type: "integer"
     ProjectInstanceWorkflowConnection:
-      description: "The connection used in a particular task or trigger."
+      description: "The connection used in a particular action task or trigger."
       type: "object"
       required:
         - "connectionId"
         - "key"
-        - "operationName"
+        - "workflowNodeName"
       properties:
         connectionId:
           description: "The connection id"
@@ -1024,7 +1024,7 @@ components:
           description: "The connection key under which a connection is defined in\
             \ a workflow definition."
           type: "string"
-        operationName:
+        workflowNodeName:
           description: "The action/trigger name to which a connection belongs."
           type: "string"
     Tag:

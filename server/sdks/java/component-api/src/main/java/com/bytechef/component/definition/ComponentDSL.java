@@ -21,7 +21,10 @@ import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFu
 import com.bytechef.component.definition.PropertiesDataSource.TriggerPropertiesFunction;
 import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
-import com.bytechef.component.definition.TriggerOutputSchemaFunction.DynamicWebhookTriggerOutputSchemaFunction;
+import com.bytechef.component.definition.TriggerOutputFunction.DynamicWebhookTriggerOutputFunction;
+import com.bytechef.component.definition.TriggerOutputFunction.ListenerTriggerOutputFunction;
+import com.bytechef.component.definition.TriggerOutputFunction.PollTriggerOutputFunction;
+import com.bytechef.component.definition.TriggerOutputFunction.StaticWebhookTriggerOutputFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -240,11 +243,11 @@ public final class ComponentDSL {
         private Help help;
         private Map<String, Object> metadata;
         private final String name;
-        private ValueProperty<?> outputSchemaDefinition;
-        private boolean outputSchemaDefaultFunction;
-        private ActionOutputSchemaFunction outputSchemaFunction;
-        private Object outputSchemaSampleOutput;
+        private ValueProperty<?> outputSchema;
+        private boolean defaultOutputFunction;
+        private ActionOutputFunction outputFunction;
         private List<? extends Property> properties;
+        private Object sampleOutput;
         private String title;
 
         private ModifiableActionDefinition(String name) {
@@ -320,22 +323,22 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableActionDefinition outputSchema() {
-            this.outputSchemaDefaultFunction = true;
+        public ModifiableActionDefinition output() {
+            this.defaultOutputFunction = true;
 
             return this;
         }
 
-        public ModifiableActionDefinition outputSchema(ValueProperty<?> definition) {
-            this.outputSchemaDefinition = definition;
-            this.outputSchemaDefaultFunction = true;
+        public ModifiableActionDefinition output(ActionOutputFunction output) {
+            this.outputFunction = output;
+            this.defaultOutputFunction = false;
 
             return this;
         }
 
-        public ModifiableActionDefinition outputSchema(ActionOutputSchemaFunction outputSchema) {
-            this.outputSchemaFunction = outputSchema;
-            this.outputSchemaDefaultFunction = false;
+        public ModifiableActionDefinition outputSchema(ValueProperty<?> outputSchema) {
+            this.outputSchema = outputSchema;
+            this.defaultOutputFunction = true;
 
             return this;
         }
@@ -350,7 +353,7 @@ public final class ComponentDSL {
         }
 
         public ModifiableActionDefinition sampleOutput(Object sampleOutput) {
-            this.outputSchemaSampleOutput = sampleOutput;
+            this.sampleOutput = sampleOutput;
 
             return this;
         }
@@ -379,10 +382,10 @@ public final class ComponentDSL {
                 && Objects.equals(editorDescriptionFunction, that.editorDescriptionFunction)
                 && Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help)
                 && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
-                && Objects.equals(outputSchemaDefinition, that.outputSchemaDefinition)
-                && Objects.equals(outputSchemaDefaultFunction, that.outputSchemaDefaultFunction)
-                && Objects.equals(outputSchemaFunction, that.outputSchemaFunction)
-                && Objects.equals(outputSchemaSampleOutput, that.outputSchemaSampleOutput)
+                && Objects.equals(outputSchema, that.outputSchema)
+                && Objects.equals(defaultOutputFunction, that.defaultOutputFunction)
+                && Objects.equals(outputFunction, that.outputFunction)
+                && Objects.equals(sampleOutput, that.sampleOutput)
                 && Objects.equals(properties, that.properties) && Objects.equals(title, that.title);
         }
 
@@ -390,7 +393,7 @@ public final class ComponentDSL {
         public int hashCode() {
             return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
                 deprecated, description, editorDescriptionFunction, performFunction, help, metadata, name,
-                outputSchemaDefinition, outputSchemaDefaultFunction, outputSchemaFunction, outputSchemaSampleOutput,
+                outputSchema, defaultOutputFunction, outputFunction, sampleOutput,
                 properties, title);
         }
 
@@ -455,16 +458,16 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<OutputSchema> getOutputSchema() {
+        public Optional<Output> getOutput() {
             return Optional.ofNullable(
-                outputSchemaDefinition == null
+                outputSchema == null
                     ? null
-                    : new OutputSchema(outputSchemaDefinition, outputSchemaSampleOutput));
+                    : new Output(outputSchema, sampleOutput));
         }
 
         @Override
-        public Optional<ActionOutputSchemaFunction> getOutputSchemaFunction() {
-            return Optional.ofNullable(outputSchemaFunction);
+        public Optional<ActionOutputFunction> getOutputFunction() {
+            return Optional.ofNullable(outputFunction);
         }
 
         @Override
@@ -478,8 +481,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public boolean isOutputSchemaDefaultFunction() {
-            return outputSchemaDefaultFunction;
+        public boolean isDefaultOutputFunction() {
+            return defaultOutputFunction;
         }
     }
 
@@ -2909,12 +2912,12 @@ public final class ComponentDSL {
         private ListenerDisableConsumer listenerDisableConsumer;
         private ListenerEnableConsumer listenerEnableConsumer;
         private String name;
-        private boolean outputSchemaDefaultFunction;
-        private ValueProperty<?> outputSchemaDefinition;
-        private TriggerOutputSchemaFunction outputSchemaFunction;
-        private Object outputSchemaSampleOutput;
+        private boolean defaultOutputFunction;
+        private ValueProperty<?> outputSchema;
+        private TriggerOutputFunction outputFunction;
         private PollFunction pollFunction;
         private List<? extends Property> properties;
+        private Object sampleOutput;
         private StaticWebhookRequestFunction staticWebhookRequest;
         private String title;
         private TriggerType type;
@@ -3011,46 +3014,43 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition outputSchema() {
-            this.outputSchemaDefaultFunction = true;
+        public ModifiableTriggerDefinition output() {
+            this.defaultOutputFunction = true;
 
             return this;
         }
 
-        public ModifiableTriggerDefinition outputSchema(ValueProperty<?> definition) {
-            this.outputSchemaDefinition = definition;
-            this.outputSchemaDefaultFunction = true;
+        public ModifiableTriggerDefinition output(DynamicWebhookTriggerOutputFunction output) {
+            this.outputFunction = output;
+            this.defaultOutputFunction = false;
 
             return this;
         }
 
-        public ModifiableTriggerDefinition outputSchema(DynamicWebhookTriggerOutputSchemaFunction outputSchema) {
-            this.outputSchemaFunction = outputSchema;
-            this.outputSchemaDefaultFunction = false;
+        public ModifiableTriggerDefinition output(ListenerTriggerOutputFunction output) {
+            this.outputFunction = output;
+            this.defaultOutputFunction = false;
 
             return this;
         }
 
-        public ModifiableTriggerDefinition
-            outputSchema(TriggerOutputSchemaFunction.ListenerTriggerOutputSchemaFunction outputSchema) {
-            this.outputSchemaFunction = outputSchema;
-            this.outputSchemaDefaultFunction = false;
+        public ModifiableTriggerDefinition output(PollTriggerOutputFunction output) {
+            this.outputFunction = output;
+            this.defaultOutputFunction = false;
 
             return this;
         }
 
-        public ModifiableTriggerDefinition
-            outputSchema(TriggerOutputSchemaFunction.PollTriggerOutputSchemaFunction outputSchema) {
-            this.outputSchemaFunction = outputSchema;
-            this.outputSchemaDefaultFunction = false;
+        public ModifiableTriggerDefinition output(StaticWebhookTriggerOutputFunction output) {
+            this.outputFunction = output;
+            this.defaultOutputFunction = false;
 
             return this;
         }
 
-        public ModifiableTriggerDefinition
-            outputSchema(TriggerOutputSchemaFunction.StaticWebhookTriggerOutputSchemaFunction outputSchema) {
-            this.outputSchemaFunction = outputSchema;
-            this.outputSchemaDefaultFunction = false;
+        public ModifiableTriggerDefinition outputSchema(ValueProperty<?> outputSchema) {
+            this.outputSchema = outputSchema;
+            this.defaultOutputFunction = true;
 
             return this;
         }
@@ -3071,7 +3071,7 @@ public final class ComponentDSL {
         }
 
         public ModifiableTriggerDefinition sampleOutput(Object sampleOutput) {
-            this.outputSchemaSampleOutput = sampleOutput;
+            this.sampleOutput = sampleOutput;
 
             return this;
         }
@@ -3143,10 +3143,10 @@ public final class ComponentDSL {
                 && Objects.equals(listenerDisableConsumer, that.listenerDisableConsumer)
                 && Objects.equals(listenerEnableConsumer, that.listenerEnableConsumer)
                 && Objects.equals(name, that.name)
-                && Objects.equals(outputSchemaDefinition, that.outputSchemaDefinition)
-                && Objects.equals(outputSchemaDefaultFunction, that.outputSchemaDefaultFunction)
-                && Objects.equals(outputSchemaFunction, that.outputSchemaFunction)
-                && Objects.equals(outputSchemaSampleOutput, that.outputSchemaSampleOutput)
+                && Objects.equals(outputSchema, that.outputSchema)
+                && Objects.equals(defaultOutputFunction, that.defaultOutputFunction)
+                && Objects.equals(outputFunction, that.outputFunction)
+                && Objects.equals(sampleOutput, that.sampleOutput)
                 && Objects.equals(pollFunction, that.pollFunction) && Objects.equals(properties, that.properties)
                 && Objects.equals(staticWebhookRequest, that.staticWebhookRequest)
                 && Objects.equals(title, that.title) && type == that.type
@@ -3162,7 +3162,7 @@ public final class ComponentDSL {
                 deduplicateFunction, deprecated, description, dynamicWebhookDisableConsumer,
                 dynamicWebhookEnableFunction, dynamicWebhookRefreshFunction, dynamicWebhookRequestFunction,
                 editorDescriptionFunction, help, listenerDisableConsumer, listenerEnableConsumer, name,
-                outputSchemaDefinition, outputSchemaDefaultFunction, outputSchemaFunction, outputSchemaSampleOutput,
+                outputSchema, defaultOutputFunction, outputFunction, sampleOutput,
                 pollFunction, properties, staticWebhookRequest, title, type, webhookRawBody, webhookValidateFunction,
                 workflowSyncExecution, workflowSyncValidation);
         }
@@ -3253,16 +3253,16 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<OutputSchema> getOutputSchema() {
+        public Optional<Output> getOutput() {
             return Optional.ofNullable(
-                outputSchemaDefinition == null
+                outputSchema == null
                     ? null
-                    : new OutputSchema(outputSchemaDefinition, outputSchemaSampleOutput));
+                    : new Output(outputSchema, sampleOutput));
         }
 
         @Override
-        public Optional<TriggerOutputSchemaFunction> getOutputSchemaFunction() {
-            return Optional.ofNullable(outputSchemaFunction);
+        public Optional<TriggerOutputFunction> getOutputFunction() {
+            return Optional.ofNullable(outputFunction);
         }
 
         @Override
@@ -3311,8 +3311,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public boolean isOutputSchemaDefaultFunction() {
-            return outputSchemaDefaultFunction;
+        public boolean isDefaultOutputFunction() {
+            return defaultOutputFunction;
         }
     }
 

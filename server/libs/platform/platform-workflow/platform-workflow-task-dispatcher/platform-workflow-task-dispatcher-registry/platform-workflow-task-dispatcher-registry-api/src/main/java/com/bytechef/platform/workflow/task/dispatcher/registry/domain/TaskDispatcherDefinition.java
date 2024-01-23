@@ -35,14 +35,14 @@ public class TaskDispatcherDefinition {
     private Help help;
     private String icon;
     private String name;
-    private OutputSchema outputSchema;
-    private boolean outputSchemaDataSource;
+    private Output output;
+    private boolean outputDefined;
     private List<? extends Property> properties;
     private Resources resources;
     private List<? extends Property> taskProperties;
     private String title;
+    private boolean variablePropertiesDefined;
     private List<? extends Property> variableProperties;
-    private boolean variablePropertiesDataSource;
     private int version;
 
     private TaskDispatcherDefinition() {
@@ -61,9 +61,11 @@ public class TaskDispatcherDefinition {
         this.help = OptionalUtils.mapOrElse(taskDispatcherDefinition.getHelp(), Help::new, null);
         this.icon = OptionalUtils.mapOrElse(taskDispatcherDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = taskDispatcherDefinition.getName();
-        this.outputSchema = getOutputSchema(taskDispatcherDefinition);
-        this.outputSchemaDataSource = OptionalUtils.mapOrElse(
-            taskDispatcherDefinition.getOutputSchemaFunction(), outputSchemaDataSource -> true, false);
+        this.output = getOutputSchema(taskDispatcherDefinition);
+        this.outputDefined = OptionalUtils.mapOrElse(
+            taskDispatcherDefinition.getOutput(), outputSchema -> true, false) ||
+            OptionalUtils.mapOrElse(
+                taskDispatcherDefinition.getOutputFunction(), outputSchemaDataSource -> true, false);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()), Property::toProperty);
         this.resources = OptionalUtils.mapOrElse(taskDispatcherDefinition.getResources(), Resources::new, null);
@@ -74,8 +76,11 @@ public class TaskDispatcherDefinition {
         this.variableProperties = CollectionUtils.map(
             OptionalUtils.orElse(taskDispatcherDefinition.getVariableProperties(), List.of()),
             valueProperty -> (Property) Property.toProperty(valueProperty));
-        this.variablePropertiesDataSource = OptionalUtils.mapOrElse(
-            taskDispatcherDefinition.getOutputSchemaFunction(), outputSchemaDataSource -> true, false);
+        this.variablePropertiesDefined =
+            OptionalUtils.mapOrElse(
+                taskDispatcherDefinition.getVariableProperties(), variableProperties -> true, false) ||
+                OptionalUtils.mapOrElse(
+                    taskDispatcherDefinition.getOutputFunction(), outputSchemaDataSource -> true, false);
         this.version = taskDispatcherDefinition.getVersion();
     }
 
@@ -89,20 +94,20 @@ public class TaskDispatcherDefinition {
             return false;
         }
 
-        return outputSchemaDataSource == that.outputSchemaDataSource && version == that.version
+        return outputDefined == that.outputDefined && version == that.version
             && Objects.equals(description, that.description) && Objects.equals(help, that.help)
             && Objects.equals(icon, that.icon) && Objects.equals(name, that.name)
-            && Objects.equals(outputSchema, that.outputSchema) && Objects.equals(properties, that.properties)
+            && Objects.equals(output, that.output) && Objects.equals(properties, that.properties)
             && Objects.equals(resources, that.resources) && Objects.equals(taskProperties, that.taskProperties)
             && Objects.equals(title, that.title) && Objects.equals(variableProperties, that.variableProperties)
-            && Objects.equals(variablePropertiesDataSource, that.variablePropertiesDataSource);
+            && Objects.equals(variablePropertiesDefined, that.variablePropertiesDefined);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-            description, help, icon, name, outputSchema, outputSchemaDataSource, properties, resources, taskProperties,
-            title, variableProperties, variablePropertiesDataSource, version);
+            description, help, icon, name, output, outputDefined, properties, resources, taskProperties,
+            title, variableProperties, variablePropertiesDefined, version);
     }
 
     @Nullable
@@ -125,8 +130,8 @@ public class TaskDispatcherDefinition {
     }
 
     @Nullable
-    public OutputSchema getOutputSchema() {
-        return outputSchema;
+    public Output getOutputSchema() {
+        return output;
     }
 
     public List<? extends Property> getProperties() {
@@ -154,22 +159,22 @@ public class TaskDispatcherDefinition {
         return version;
     }
 
-    public boolean isOutputSchemaDataSource() {
-        return outputSchemaDataSource;
+    public boolean isOutputDefined() {
+        return outputDefined;
     }
 
-    public boolean isVariablePropertiesDataSource() {
-        return variablePropertiesDataSource;
+    public boolean isVariablePropertiesDefined() {
+        return variablePropertiesDefined;
     }
 
-    private static OutputSchema getOutputSchema(
+    private static Output getOutputSchema(
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition) {
 
         return OptionalUtils.mapOrElse(
-            taskDispatcherDefinition.getOutputSchema(),
+            taskDispatcherDefinition.getOutput(),
             outputSchema -> SchemaUtils.toOutputSchema(
                 outputSchema,
-                (baseValueProperty, sampleOutput) -> new OutputSchema(
+                (baseValueProperty, sampleOutput) -> new Output(
                     Property.toProperty(
                         (com.bytechef.platform.workflow.task.dispatcher.definition.Property) baseValueProperty),
                     sampleOutput)),
@@ -183,13 +188,14 @@ public class TaskDispatcherDefinition {
             ", help=" + help +
             ", icon='" + icon + '\'' +
             ", name='" + name + '\'' +
-            ", outputSchema=" + outputSchema +
             ", properties=" + properties +
+            ", outputDefined=" + outputDefined +
+            ", output=" + output +
             ", resources=" + resources +
             ", taskProperties=" + taskProperties +
             ", title='" + title + '\'' +
+            ", variablePropertiesDefined=" + variablePropertiesDefined +
             ", variableProperties=" + variableProperties +
-            ", variablePropertiesDataSource=" + variablePropertiesDataSource +
             ", version=" + version +
             '}';
     }

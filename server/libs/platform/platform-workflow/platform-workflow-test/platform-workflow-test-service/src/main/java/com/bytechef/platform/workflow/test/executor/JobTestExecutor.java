@@ -25,7 +25,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.sync.executor.JobSyncExecutor;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.component.registry.component.OperationType;
+import com.bytechef.platform.component.registry.component.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
@@ -77,9 +77,9 @@ public class JobTestExecutor {
     }
 
     private ComponentDefinition getComponentDefinition(TaskExecution taskExecution) {
-        OperationType operationType = OperationType.ofType(taskExecution.getType());
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(taskExecution.getType());
 
         return componentDefinitionService.getComponentDefinition(
-            operationType.componentName(), operationType.componentVersion());
+            workflowNodeType.componentName(), workflowNodeType.componentVersion());
     }
 }

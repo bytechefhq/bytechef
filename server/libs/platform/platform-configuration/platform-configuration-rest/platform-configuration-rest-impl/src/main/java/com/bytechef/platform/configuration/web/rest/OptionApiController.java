@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.definition;
+package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.definition.BaseProperty.BaseValueProperty;
+import com.bytechef.platform.configuration.web.rest.model.OptionModel;
+import java.util.List;
+import org.springframework.http.ResponseEntity;
 
-/**
- * @author Ivica Cardic
- */
-public interface BaseOutputSchema<V extends BaseValueProperty<?>> {
+public class OptionApiController implements OptionApi {
 
-    V getDefinition();
-
-    Object getSampleOutput();
+    @Override
+    public ResponseEntity<List<OptionModel>> getWorkflowOperationOptions(
+        String workflowId, String workflowNodeName, String propertyName, String searchText) {
+        return OptionApi.super.getWorkflowOperationOptions(workflowId, workflowNodeName, propertyName, searchText);
+    }
 }

@@ -16,17 +16,10 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
-import com.bytechef.platform.component.registry.component.OperationType;
-import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionModel;
-import com.bytechef.platform.configuration.web.rest.model.ComponentOperationRequestModel;
-import com.bytechef.platform.configuration.web.rest.model.ComponentOutputSchemaModel;
-import com.bytechef.platform.configuration.web.rest.model.OptionModel;
-import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -42,27 +35,15 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEndpoint
 public class ActionDefinitionApiController implements ActionDefinitionApi {
 
-    private final ActionDefinitionFacade actionDefinitionFacade;
     private final ActionDefinitionService actionDefinitionService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ActionDefinitionApiController(
-        ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
-        ConversionService conversionService) {
+        ActionDefinitionService actionDefinitionService, ConversionService conversionService) {
 
-        this.actionDefinitionFacade = actionDefinitionFacade;
         this.actionDefinitionService = actionDefinitionService;
         this.conversionService = conversionService;
-    }
-
-    @Override
-    public ResponseEntity<List<ActionDefinitionModel>> getActionDefinitions(List<String> taskTypes) {
-        return ResponseEntity.ok(
-            CollectionUtils.map(
-                actionDefinitionService.getActionDefinitions(
-                    taskTypes == null ? List.of() : CollectionUtils.map(taskTypes, OperationType::ofType)),
-                actionDefinition -> conversionService.convert(actionDefinition, ActionDefinitionModel.class)));
     }
 
     @Override
@@ -87,55 +68,55 @@ public class ActionDefinitionApiController implements ActionDefinitionApi {
                 .toList());
     }
 
-    @Override
-    public ResponseEntity<String> getComponentActionEditorDescription(
-        String componentName, Integer componentVersion, String actionName,
-        ComponentOperationRequestModel componentOperationRequestModel) {
-
-        return ResponseEntity.ok(
-            actionDefinitionFacade.executeEditorDescription(
-                componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
-                componentOperationRequestModel.getConnectionId()));
-    }
-
-    @Override
-    public ResponseEntity<ComponentOutputSchemaModel> getComponentActionOutputSchema(
-        String componentName, Integer componentVersion, String actionName,
-        ComponentOperationRequestModel componentOperationRequestModel) {
-
-        return ResponseEntity.ok(
-            conversionService.convert(
-                actionDefinitionFacade.executeOutputSchema(
-                    componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
-                    componentOperationRequestModel.getConnectionId()),
-                ComponentOutputSchemaModel.class));
-    }
-
-    @Override
-    public ResponseEntity<List<PropertyModel>> getComponentActionPropertyDynamicProperties(
-        String componentName, Integer componentVersion, String actionName, String propertyName,
-        ComponentOperationRequestModel componentOperationRequestModel) {
-
-        return ResponseEntity.ok(
-            CollectionUtils.map(
-                actionDefinitionFacade.executeDynamicProperties(
-                    componentName, componentVersion, actionName, propertyName,
-                    componentOperationRequestModel.getParameters(),
-                    componentOperationRequestModel.getConnectionId()),
-                property -> conversionService.convert(property, PropertyModel.class)));
-    }
-
-    @Override
-    public ResponseEntity<List<OptionModel>> getComponentActionPropertyOptions(
-        String componentName, Integer componentVersion, String actionName, String propertyName, String searchText,
-        ComponentOperationRequestModel componentOperationRequestModel) {
-
-        return ResponseEntity.ok(
-            CollectionUtils.map(
-                actionDefinitionFacade.executeOptions(
-                    componentName, componentVersion, actionName, propertyName,
-                    componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId(),
-                    searchText),
-                option -> conversionService.convert(option, OptionModel.class)));
-    }
+//    @Override
+//    public ResponseEntity<String> getComponentActionEditorDescription(
+//        String componentName, Integer componentVersion, String actionName,
+//        ComponentOperationRequestModel componentOperationRequestModel) {
+//
+//        return ResponseEntity.ok(
+//            actionDefinitionFacade.executeEditorDescription(
+//                componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
+//                componentOperationRequestModel.getConnectionId()));
+//    }
+//
+//    @Override
+//    public ResponseEntity<ComponentOutputSchemaModel> getComponentActionOutputSchema(
+//        String componentName, Integer componentVersion, String actionName,
+//        ComponentOperationRequestModel componentOperationRequestModel) {
+//
+//        return ResponseEntity.ok(
+//            conversionService.convert(
+//                actionDefinitionFacade.executeOutputSchema(
+//                    componentName, componentVersion, actionName, componentOperationRequestModel.getParameters(),
+//                    componentOperationRequestModel.getConnectionId()),
+//                ComponentOutputSchemaModel.class));
+//    }
+//
+//    @Override
+//    public ResponseEntity<List<PropertyModel>> getComponentActionPropertyDynamicProperties(
+//        String componentName, Integer componentVersion, String actionName, String propertyName,
+//        ComponentOperationRequestModel componentOperationRequestModel) {
+//
+//        return ResponseEntity.ok(
+//            CollectionUtils.map(
+//                actionDefinitionFacade.executeDynamicProperties(
+//                    componentName, componentVersion, actionName, propertyName,
+//                    componentOperationRequestModel.getParameters(),
+//                    componentOperationRequestModel.getConnectionId()),
+//                property -> conversionService.convert(property, PropertyModel.class)));
+//    }
+//
+//    @Override
+//    public ResponseEntity<List<OptionModel>> getComponentActionPropertyOptions(
+//        String componentName, Integer componentVersion, String actionName, String propertyName, String searchText,
+//        ComponentOperationRequestModel componentOperationRequestModel) {
+//
+//        return ResponseEntity.ok(
+//            CollectionUtils.map(
+//                actionDefinitionFacade.executeOptions(
+//                    componentName, componentVersion, actionName, propertyName,
+//                    componentOperationRequestModel.getParameters(), componentOperationRequestModel.getConnectionId(),
+//                    searchText),
+//                option -> conversionService.convert(option, OptionModel.class)));
+//    }
 }

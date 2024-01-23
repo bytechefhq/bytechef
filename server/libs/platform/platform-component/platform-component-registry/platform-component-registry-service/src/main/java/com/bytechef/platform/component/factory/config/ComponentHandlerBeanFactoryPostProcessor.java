@@ -85,8 +85,8 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
                 .getBeanDefinition());
     }
 
-    private static String getBeanName(String componentName, int componentVersion, String operationName) {
-        return componentName + '/' + "v" + componentVersion + '/' + operationName;
+    private static String getBeanName(String componentName, int componentVersion, String componentOperationName) {
+        return componentName + '/' + "v" + componentVersion + '/' + componentOperationName;
     }
 
     private record ComponentTaskHandlerMapFactory(

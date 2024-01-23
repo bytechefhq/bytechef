@@ -33,7 +33,7 @@ import static com.bytechef.component.definition.ComponentDSL.time;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionOutputSchemaFunction;
+import com.bytechef.component.definition.ActionOutputFunction;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDSL.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -88,7 +88,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .description(
                         "The list of properties which should be used as query parameters.")
                     .additionalProperties(bool(), dateTime(), number(), string()))
-            .outputSchema(getQueryOutputSchemaFunction())
+            .output(getQueryOutputSchemaFunction())
             .perform(this::performQuery),
         action(JdbcConstants.INSERT)
             .title("Insert")
@@ -114,7 +114,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .items(object().additionalProperties(
                         array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                         string(), time())))
-            .outputSchema(getInsertOutputSchemaFunction())
+            .output(getInsertOutputSchemaFunction())
             .perform(this::performInsert),
         action(JdbcConstants.UPDATE)
             .title("Update")
@@ -145,7 +145,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .items(object().additionalProperties(
                         array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                         string(), time())))
-            .outputSchema(getUpdateOutputSchemaFunction())
+            .output(getUpdateOutputSchemaFunction())
             .perform(this::performUpdate),
         action(JdbcConstants.DELETE)
             .title("Delete")
@@ -171,7 +171,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .items(object().additionalProperties(
                         array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
                         string(), time())))
-            .outputSchema(getDeleteOutputSchemaFunction())
+            .output(getDeleteOutputSchemaFunction())
             .perform(this::performDelete),
         action(JdbcConstants.EXECUTE)
             .title("Execute")
@@ -194,7 +194,7 @@ public class JdbcComponentHandler implements ComponentHandler {
                     .label("Parameters")
                     .description("The list of properties which should be used as parameters.")
                     .additionalProperties(bool(), dateTime(), number(), string()))
-            .outputSchema(getExecuteOutputSchemaFunction())
+            .output(getExecuteOutputSchemaFunction())
             .perform(this::performExecute));
 
     private final ComponentDefinition componentDefinition;
@@ -226,27 +226,27 @@ public class JdbcComponentHandler implements ComponentHandler {
         return componentDefinition;
     }
 
-    protected ActionOutputSchemaFunction getDeleteOutputSchemaFunction() {
+    protected ActionOutputFunction getDeleteOutputSchemaFunction() {
         return (inputParameters, connectionParameters, context) -> context.outputSchema(
             outputSchema -> outputSchema.get(performDelete(inputParameters, connectionParameters, context)));
     }
 
-    protected ActionOutputSchemaFunction getExecuteOutputSchemaFunction() {
+    protected ActionOutputFunction getExecuteOutputSchemaFunction() {
         return (inputParameters, connectionParameters, context) -> context.outputSchema(
             outputSchema -> outputSchema.get(performExecute(inputParameters, connectionParameters, context)));
     }
 
-    protected ActionOutputSchemaFunction getInsertOutputSchemaFunction() {
+    protected ActionOutputFunction getInsertOutputSchemaFunction() {
         return (inputParameters, connectionParameters, context) -> context.outputSchema(
             outputSchema -> outputSchema.get(performInsert(inputParameters, connectionParameters, context)));
     }
 
-    protected ActionOutputSchemaFunction getQueryOutputSchemaFunction() {
+    protected ActionOutputFunction getQueryOutputSchemaFunction() {
         return (inputParameters, connectionParameters, context) -> context.outputSchema(
             outputSchema -> outputSchema.get(performQuery(inputParameters, connectionParameters, context)));
     }
 
-    protected ActionOutputSchemaFunction getUpdateOutputSchemaFunction() {
+    protected ActionOutputFunction getUpdateOutputSchemaFunction() {
         return (inputParameters, connectionParameters, context) -> context.outputSchema(
             outputSchema -> outputSchema.get(performUpdate(inputParameters, connectionParameters, context)));
     }

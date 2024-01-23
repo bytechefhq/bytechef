@@ -32,12 +32,12 @@ public interface WorkflowTestConfigurationService {
     Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId);
 
     List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
-        String workflowId, String operationName);
+        String workflowId, String workflowNodeName);
 
     WorkflowTestConfiguration updateWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
 
     void updateWorkflowTestConfigurationConnection(
-        String workflowId, String operationName, String key, long connectionId);
+        String workflowId, String workflowNodeName, String key, long connectionId);
 
     void updateWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs);
 }

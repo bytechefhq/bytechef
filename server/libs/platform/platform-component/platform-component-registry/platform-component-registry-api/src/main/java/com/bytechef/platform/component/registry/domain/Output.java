@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.task.dispatcher.definition;
+package com.bytechef.platform.component.registry.domain;
 
-import java.util.Map;
+import com.bytechef.platform.registry.domain.BaseOutput;
 
 /**
- *
+ * @author Ivica Cardic
  */
-@FunctionalInterface
-public interface OutputSchemaFunction {
+public class Output extends BaseOutput<Property> {
 
-    /**
-     * @param inputParameters
-     * @return
-     */
-    OutputSchema apply(Map<String, ?> inputParameters) throws Exception;
+    public Output(Property outputSchema, Object sampleOutput) {
+        super(outputSchema, sampleOutput);
+    }
 }

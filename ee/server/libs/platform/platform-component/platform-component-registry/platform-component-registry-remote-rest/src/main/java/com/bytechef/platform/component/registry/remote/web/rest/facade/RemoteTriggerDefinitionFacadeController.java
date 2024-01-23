@@ -9,7 +9,7 @@ package com.bytechef.platform.component.registry.remote.web.rest.facade;
 
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.OutputSchema;
+import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.trigger.TriggerOutput;
@@ -181,21 +181,18 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-output-schema",
+        value = "/execute-output",
         consumes = {
             "application/json"
         },
         produces = {
             "application/json"
         })
-    public ResponseEntity<OutputSchema> executeOutputSchema(
-        @Valid @RequestBody RemoteTriggerDefinitionFacadeController.OutputSchemaRequest outputSchemaRequest) {
-
+    public ResponseEntity<Output> executeOutputSchema(@Valid @RequestBody OutputRequest outputRequest) {
         return ResponseEntity.ok(
-            triggerDefinitionFacade.executeOutputSchema(
-                outputSchemaRequest.componentName, outputSchemaRequest.componentVersion,
-                outputSchemaRequest.triggerName,
-                outputSchemaRequest.inputParameters, outputSchemaRequest.connectionId));
+            triggerDefinitionFacade.executeOutput(
+                outputRequest.componentName, outputRequest.componentVersion, outputRequest.triggerName,
+                outputRequest.inputParameters, outputRequest.connectionId));
     }
 
     @RequestMapping(
@@ -273,7 +270,7 @@ public class RemoteTriggerDefinitionFacadeController {
     }
 
     @SuppressFBWarnings("EI")
-    public record OutputSchemaRequest(
+    public record OutputRequest(
         @NotNull String componentName, int componentVersion, @NotNull String triggerName,
         @NotNull Map<String, ?> inputParameters, Long connectionId) {
     }

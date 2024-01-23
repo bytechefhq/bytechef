@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.service;
+package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import com.bytechef.platform.configuration.domain.WorkflowComponentDefinition;
-import java.util.Optional;
+import java.util.Map;
 
 /**
- * @author Ivica Cardic
+ *
  */
-public interface WorkflowComponentDefinitionService {
+@FunctionalInterface
+public interface OutputFunction {
 
-    Optional<WorkflowComponentDefinition> fetchWorkflowComponentDefinition(
-        String workflowId, String triggerName);
+    /**
+     * @param inputParameters
+     * @return
+     */
+    Output apply(Map<String, ?> inputParameters) throws Exception;
 }

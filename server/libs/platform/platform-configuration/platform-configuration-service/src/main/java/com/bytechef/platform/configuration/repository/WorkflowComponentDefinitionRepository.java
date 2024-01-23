@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.repository;
 
-import com.bytechef.platform.configuration.domain.WorkflowComponentDefinition;
+import com.bytechef.platform.configuration.domain.WorkflowNodeOutput;
 import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
@@ -26,7 +26,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface WorkflowComponentDefinitionRepository
-    extends ListCrudRepository<WorkflowComponentDefinition, Long> {
+    extends ListCrudRepository<WorkflowNodeOutput, Long> {
 
-    Optional<WorkflowComponentDefinition> findByWorkflowIdAndOperationName(String workflowId, String operationName);
+    Optional<WorkflowNodeOutput> findLastByWorkflowIdAndWorkflowNodeName(
+        String workflowId, String workflowNodeName);
 }

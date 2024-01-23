@@ -36,20 +36,21 @@ public class WorkflowTestConfigurationConnection implements Persistable<Long> {
     @Column("connection_id")
     private AggregateReference<Connection, Long> connectionId;
 
-    @Column
-    private String key;
+    @Column("workflow_connection_key")
+    private String workflowConnectionKey;
 
-    @Column("operation_name")
-    private String operationName;
+    @Column("workflow_node_name")
+    private String workflowNodeName;
 
     public WorkflowTestConfigurationConnection() {
     }
 
     @Default
-    public WorkflowTestConfigurationConnection(Long connectionId, String key, String operationName) {
+    public WorkflowTestConfigurationConnection(Long connectionId, String workflowConnectionKey,
+        String workflowNodeName) {
         this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
-        this.key = key;
-        this.operationName = operationName;
+        this.workflowConnectionKey = workflowConnectionKey;
+        this.workflowNodeName = workflowNodeName;
     }
 
     @Override
@@ -63,8 +64,9 @@ public class WorkflowTestConfigurationConnection implements Persistable<Long> {
 
         WorkflowTestConfigurationConnection that = (WorkflowTestConfigurationConnection) o;
 
-        return Objects.equals(connectionId, that.connectionId) && Objects.equals(key, that.key) &&
-            Objects.equals(operationName, that.operationName);
+        return Objects.equals(connectionId, that.connectionId)
+            && Objects.equals(workflowConnectionKey, that.workflowConnectionKey) &&
+            Objects.equals(workflowNodeName, that.workflowNodeName);
     }
 
     @Override
@@ -81,12 +83,12 @@ public class WorkflowTestConfigurationConnection implements Persistable<Long> {
         return connectionId.getId();
     }
 
-    public String getKey() {
-        return key;
+    public String getWorkflowConnectionKey() {
+        return workflowConnectionKey;
     }
 
-    public String getOperationName() {
-        return operationName;
+    public String getWorkflowNodeName() {
+        return workflowNodeName;
     }
 
     @Override
@@ -99,8 +101,8 @@ public class WorkflowTestConfigurationConnection implements Persistable<Long> {
         return "WorkflowTestConfigurationConnection{" +
             "id=" + id +
             ", connectionId=" + connectionId +
-            ", key='" + key + '\'' +
-            ", taskName='" + operationName + '\'' +
+            ", workflowConnectionKey='" + workflowConnectionKey + '\'' +
+            ", workflowNodeName='" + workflowNodeName + '\'' +
             '}';
     }
 

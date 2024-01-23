@@ -19,7 +19,7 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.component.registry.component.OperationType;
+import com.bytechef.platform.component.registry.component.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
@@ -60,26 +60,28 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
     }
 
     private static List<WorkflowConnection> getWorkflowConnections(
-        String name, OperationType operationType, boolean connectionRequired) {
+        String name, WorkflowNodeType workflowNodeType, boolean connectionRequired) {
 
         return List.of(
             new WorkflowConnection(
-                operationType.componentName(), operationType.componentVersion(), name, operationType.componentName(),
+                workflowNodeType.componentName(), workflowNodeType.componentVersion(), name,
+                workflowNodeType.componentName(),
                 null, connectionRequired));
     }
 
     private static List<WorkflowConnection> getWorkflowConnections(
-        String name, String type, Map<String, Object> extensions, boolean connectionRequired) {
+        String workflowNodeName, String type, Map<String, Object> extensions, boolean connectionRequired) {
 
         List<WorkflowConnection> workflowConnections;
-        OperationType operationType = OperationType.ofType(type);
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
         if (MapUtils.containsKey(extensions, WorkflowConnection.CONNECTIONS)) {
             workflowConnections = toList(
                 MapUtils.getMap(extensions, WorkflowConnection.CONNECTIONS, new TypeReference<>() {}, Map.of()),
-                operationType.componentName(), operationType.componentVersion(), name, connectionRequired);
+                workflowNodeType.componentName(), workflowNodeType.componentVersion(), workflowNodeName,
+                connectionRequired);
         } else {
-            workflowConnections = getWorkflowConnections(name, operationType, connectionRequired);
+            workflowConnections = getWorkflowConnections(workflowNodeName, workflowNodeType, connectionRequired);
         }
 
         return workflowConnections;
@@ -87,7 +89,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
 
     private static List<WorkflowConnection> toList(
         Map<String, Map<String, Object>> connections, String componentName, int componentVersion,
-        String operationName, boolean connectionRequired) {
+        String workflowNodeName, boolean connectionRequired) {
 
         return CollectionUtils.map(
             connections.entrySet(),
@@ -106,7 +108,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
                 return new WorkflowConnection(
                     MapUtils.getString(connectionMap, WorkflowConnection.COMPONENT_NAME, componentName),
                     MapUtils.getInteger(connectionMap, WorkflowConnection.COMPONENT_VERSION, componentVersion),
-                    operationName, entry.getKey(), MapUtils.getLong(connectionMap, WorkflowConnection.ID),
+                    workflowNodeName, entry.getKey(), MapUtils.getLong(connectionMap, WorkflowConnection.ID),
                     MapUtils.getBoolean(
                         connectionMap, WorkflowConnection.AUTHORIZATION_REQUIRED, false) || connectionRequired);
             });
@@ -117,11 +119,11 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
 
         List<WorkflowConnection> workflowConnections = List.of();
 
-        OperationType operationType = OperationType.ofType(type);
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
-        if (connectionDefinitionService.connectionExists(operationType.componentName())) {
+        if (connectionDefinitionService.connectionExists(workflowNodeType.componentName())) {
             ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinition(
-                operationType.componentName(), operationType.componentVersion());
+                workflowNodeType.componentName(), workflowNodeType.componentVersion());
 
             boolean propertiesRequired = CollectionUtils.anyMatch(
                 connectionDefinition.getProperties(), Property::getRequired);

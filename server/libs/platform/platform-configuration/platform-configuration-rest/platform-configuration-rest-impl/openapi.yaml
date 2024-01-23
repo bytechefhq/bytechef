@@ -18,7 +18,7 @@ tags:
   description: "The Platform Editor Description API"
 - name: "option"
   description: "The Platform Option API"
-- name: "workflow-step-output"
+- name: "workflow-node-output"
   description: "The Platform Workflow Step Output API"
 - name: "task-dispatcher-definition"
   description: "The Platform Task Dispatcher Definition API"
@@ -422,13 +422,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TaskDispatcherDefinition"
-  /workflows/{workflowId}/workflow-step-outputs:
+  /workflows/{workflowId}/workflow-node-outputs:
     get:
       description: "Get all dynamic output schemas used in a workflow."
       summary: "Get all dynamic output schemas used in a workflow"
       tags:
-        - "workflow-step-output"
-      operationId: "getWorkflowStepOutputs"
+        - "workflow-node-output"
+      operationId: "getWorkflowNodeOutputs"
       parameters:
         - name: "workflowId"
           description: "The workflow id for which to return all used action definitions"
@@ -450,14 +450,14 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/WorkflowStepOutput"
-  /workflows/{workflowId}/workflow-step-outputs/{workflowNodeName}:
+                  $ref: "#/components/schemas/WorkflowNodeOutput"
+  /workflows/{workflowId}/workflow-node-outputs/{workflowNodeName}:
     get:
       description: "Get dynamic output schema of an action task or trigger used in a workflow."
       summary: "Get dynamic output schema of an action task or trigger used in a workflow"
       tags:
-        - "workflow-step-output"
-      operationId: "getWorkflowStepOutput"
+        - "workflow-node-output"
+      operationId: "getWorkflowNodeOutput"
       parameters:
         - name: "workflowId"
           description: "The workflow id"
@@ -477,7 +477,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WorkflowStepOutput"
+                $ref: "#/components/schemas/WorkflowNodeOutput"
   /workflows/{workflowId}/{workflowNodeName}/editor-description:
     get:
       description: "Get an action description shown in the editor."
@@ -1567,7 +1567,7 @@ components:
         value:
           description: "The value of an output"
           type: "object"
-    WorkflowStepOutput:
+    WorkflowNodeOutput:
       description: The workflow step output
       type: "object"
       required:
