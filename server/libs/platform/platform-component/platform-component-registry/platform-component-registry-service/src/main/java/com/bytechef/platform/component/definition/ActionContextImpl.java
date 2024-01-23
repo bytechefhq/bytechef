@@ -87,20 +87,17 @@ public class ActionContextImpl extends ContextImpl implements ActionContext {
 
         @Override
         public <T> Optional<T> fetchValue(Scope scope, String key) {
-            return dataStorageService.fetch(
-                componentName, actionName, scope.getId(), getScopeId(scope), key, type);
+            return dataStorageService.fetch(componentName, actionName, scope.getId(), getScopeId(scope), key, type);
         }
 
         @Override
         public <T> T getValue(Scope scope, String key) {
-            return dataStorageService.get(
-                componentName, actionName, scope.getId(), getScopeId(scope), key, type);
+            return dataStorageService.get(componentName, actionName, scope.getId(), getScopeId(scope), key, type);
         }
 
         @Override
         public void setValue(Scope scope, String key, Object value) {
-            dataStorageService.put(
-                componentName, actionName, scope.getId(), getScopeId(scope), key, type, value);
+            dataStorageService.put(componentName, actionName, scope.getId(), getScopeId(scope), key, type, value);
         }
 
         private String getScopeId(Scope scope) {
