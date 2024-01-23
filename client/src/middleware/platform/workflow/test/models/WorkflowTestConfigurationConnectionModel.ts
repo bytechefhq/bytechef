@@ -14,7 +14,7 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * The connection used in a particular task or trigger.
+ * The connection used in a particular action task or trigger.
  * @export
  * @interface WorkflowTestConfigurationConnectionModel
  */
@@ -30,13 +30,13 @@ export interface WorkflowTestConfigurationConnectionModel {
      * @type {string}
      * @memberof WorkflowTestConfigurationConnectionModel
      */
-    key: string;
+    workflowConnectionKey: string;
     /**
      * The action/trigger name to which a connection belongs.
      * @type {string}
      * @memberof WorkflowTestConfigurationConnectionModel
      */
-    operationName: string;
+    workflowNodeName: string;
 }
 
 /**
@@ -45,8 +45,8 @@ export interface WorkflowTestConfigurationConnectionModel {
 export function instanceOfWorkflowTestConfigurationConnectionModel(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "connectionId" in value;
-    isInstance = isInstance && "key" in value;
-    isInstance = isInstance && "operationName" in value;
+    isInstance = isInstance && "workflowConnectionKey" in value;
+    isInstance = isInstance && "workflowNodeName" in value;
 
     return isInstance;
 }
@@ -62,8 +62,8 @@ export function WorkflowTestConfigurationConnectionModelFromJSONTyped(json: any,
     return {
         
         'connectionId': json['connectionId'],
-        'key': json['key'],
-        'operationName': json['operationName'],
+        'workflowConnectionKey': json['workflowConnectionKey'],
+        'workflowNodeName': json['workflowNodeName'],
     };
 }
 
@@ -77,8 +77,8 @@ export function WorkflowTestConfigurationConnectionModelToJSON(value?: WorkflowT
     return {
         
         'connectionId': value.connectionId,
-        'key': value.key,
-        'operationName': value.operationName,
+        'workflowConnectionKey': value.workflowConnectionKey,
+        'workflowNodeName': value.workflowNodeName,
     };
 }
 

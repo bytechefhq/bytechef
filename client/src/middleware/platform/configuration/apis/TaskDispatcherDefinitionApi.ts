@@ -17,18 +17,12 @@ import * as runtime from '../runtime';
 import type {
   TaskDispatcherDefinitionBasicModel,
   TaskDispatcherDefinitionModel,
-  TaskDispatcherOperationRequestModel,
-  TaskDispatcherOutputSchemaModel,
 } from '../models/index';
 import {
     TaskDispatcherDefinitionBasicModelFromJSON,
     TaskDispatcherDefinitionBasicModelToJSON,
     TaskDispatcherDefinitionModelFromJSON,
     TaskDispatcherDefinitionModelToJSON,
-    TaskDispatcherOperationRequestModelFromJSON,
-    TaskDispatcherOperationRequestModelToJSON,
-    TaskDispatcherOutputSchemaModelFromJSON,
-    TaskDispatcherOutputSchemaModelToJSON,
 } from '../models/index';
 
 export interface GetTaskDispatcherDefinitionRequest {
@@ -38,12 +32,6 @@ export interface GetTaskDispatcherDefinitionRequest {
 
 export interface GetTaskDispatcherDefinitionVersionsRequest {
     taskDispatcherName: string;
-}
-
-export interface GetTaskDispatcherOutputSchemaRequest {
-    taskDispatcherName: string;
-    taskDispatcherVersion: number;
-    taskDispatcherOperationRequestModel?: TaskDispatcherOperationRequestModel;
 }
 
 /**
@@ -144,45 +132,6 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
      */
     async getTaskDispatcherDefinitions(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskDispatcherDefinitionModel>> {
         const response = await this.getTaskDispatcherDefinitionsRaw(initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get a task dispatcher output schema shown in the editor.
-     * Get a task dispatcher output schema shown in the editor
-     */
-    async getTaskDispatcherOutputSchemaRaw(requestParameters: GetTaskDispatcherOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskDispatcherOutputSchemaModel>> {
-        if (requestParameters.taskDispatcherName === null || requestParameters.taskDispatcherName === undefined) {
-            throw new runtime.RequiredError('taskDispatcherName','Required parameter requestParameters.taskDispatcherName was null or undefined when calling getTaskDispatcherOutputSchema.');
-        }
-
-        if (requestParameters.taskDispatcherVersion === null || requestParameters.taskDispatcherVersion === undefined) {
-            throw new runtime.RequiredError('taskDispatcherVersion','Required parameter requestParameters.taskDispatcherVersion was null or undefined when calling getTaskDispatcherOutputSchema.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}/output-schema`.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters.taskDispatcherName))).replace(`{${"taskDispatcherVersion"}}`, encodeURIComponent(String(requestParameters.taskDispatcherVersion))),
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: TaskDispatcherOperationRequestModelToJSON(requestParameters.taskDispatcherOperationRequestModel),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => TaskDispatcherOutputSchemaModelFromJSON(jsonValue));
-    }
-
-    /**
-     * Get a task dispatcher output schema shown in the editor.
-     * Get a task dispatcher output schema shown in the editor
-     */
-    async getTaskDispatcherOutputSchema(requestParameters: GetTaskDispatcherOutputSchemaRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskDispatcherOutputSchemaModel> {
-        const response = await this.getTaskDispatcherOutputSchemaRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
