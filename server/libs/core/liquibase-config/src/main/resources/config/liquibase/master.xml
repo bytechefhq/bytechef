@@ -13,9 +13,6 @@
     <!-- configuration -->
     <includeAll path="classpath:config/liquibase/changelog/configuration/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration" />
 
-    <!-- data storage -->
-    <includeAll path="classpath:config/liquibase/changelog/data_entry" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or data-storage" />
-
     <!-- execution -->
     <includeAll path="classpath:config/liquibase/changelog/execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution" />
 
