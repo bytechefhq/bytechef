@@ -14,7 +14,7 @@ spring:
     hikari:
       poolName: Hikari
   liquibase:
-      contexts: execution,data-storage
+      contexts: execution
   task:
     execution:
       thread-name-prefix: execution-app-task-
