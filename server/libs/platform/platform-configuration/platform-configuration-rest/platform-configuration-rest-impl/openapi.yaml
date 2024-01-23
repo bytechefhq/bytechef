@@ -12,37 +12,19 @@ tags:
   description: "The Platform Component Definition API"
 - name: "connection-definition"
   description: "The Platform Connection Definition API"
+- name: "dynamic-property"
+  description: "The Platform Dynamic Property API"
+- name: "editor-description"
+  description: "The Platform Editor Description API"
+- name: "option"
+  description: "The Platform Option API"
+- name: "workflow-step-output"
+  description: "The Platform Workflow Step Output API"
 - name: "task-dispatcher-definition"
   description: "The Platform Task Dispatcher Definition API"
 - name: "trigger-definition"
   description: "The Platform Trigger Definition API"
 paths:
-  /action-definitions:
-    get:
-      description: "Get all action definitions."
-      summary: "Get all action definitions"
-      tags:
-      - "action-definition"
-      operationId: "getActionDefinitions"
-      parameters:
-      - name: "taskTypes"
-        description: "The list of task types defined in workflows.(E.g. mailchimp/v1/addMemberToList)"
-        in: "query"
-        required: false
-        schema:
-          type: "array"
-          items:
-            type: "string"
-          example: "mailchimp/v1/addMemberToList,httpClient/v1/get,httpClient/v1/post"
-      responses:
-        "200":
-          description: "Successful operation."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/ActionDefinition"
   /component-definitions:
     get:
       description: "Get all component definitions."
@@ -148,179 +130,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDefinition"
-  /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/editor-description:
-    post:
-      description: "Get an action description shown in the editor."
-      summary: "Get an action description shown in the editor"
-      tags:
-      - "action-definition"
-      operationId: "getComponentActionEditorDescription"
-      parameters:
-      - name: "componentName"
-        description: "The name of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "integer"
-      - name: "actionName"
-        description: "The name of an action."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComponentOperationRequest"
-      responses:
-        "200":
-          description: "The editor description."
-          content:
-            application/json:
-              schema:
-                type: "string"
-  /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/output-schema:
-    post:
-      description: "Get an action output schema shown in the editor."
-      summary: "Get an action output schema shown in the editor"
-      tags:
-      - "action-definition"
-      operationId: "getComponentActionOutputSchema"
-      parameters:
-      - name: "componentName"
-        description: "The name of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "integer"
-      - name: "actionName"
-        description: "The name of an action."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComponentOperationRequest"
-      responses:
-        "200":
-          description: "The output schema."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ComponentOutputSchema"
-  ? /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/dynamic-properties
-  : post:
-      description: "Get dynamic properties for an action property shown in the editor."
-      summary: "Get dynamic properties for an action property shown in the editor"
-      tags:
-      - "action-definition"
-      operationId: "getComponentActionPropertyDynamicProperties"
-      parameters:
-      - name: "componentName"
-        description: "The name of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "integer"
-      - name: "actionName"
-        description: "The name of an action."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "propertyName"
-        description: "The name of a property."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComponentOperationRequest"
-      responses:
-        "200":
-          description: "The list of options."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Property"
-  /component-definitions/{componentName}/{componentVersion}/action-definitions/{actionName}/properties/{propertyName}/options:
-    post:
-      description: "Get an action property options shown in the editor."
-      summary: "Get an action property options shown in the editor"
-      tags:
-      - "action-definition"
-      operationId: "getComponentActionPropertyOptions"
-      parameters:
-      - name: "componentName"
-        description: "The name of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "integer"
-      - name: "actionName"
-        description: "The name of an action."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "propertyName"
-        description: "The name of a property."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "searchText"
-        description: "Optional search text used to filter option items"
-        in: "query"
-        schema:
-          type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComponentOperationRequest"
-      responses:
-        "200":
-          description: "The list of options."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Option"
   /component-definitions/{componentName}/{componentVersion}/connection-definition:
     get:
       description: "Get connection definition for a component."
@@ -490,179 +299,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TriggerDefinition"
-  /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/editor-description:
-    post:
-      description: "Get an trigger description shown in the editor."
-      summary: "Get an trigger description shown in the editor"
-      tags:
-      - "trigger-definition"
-      operationId: "getComponentTriggerEditorDescription"
-      parameters:
-      - name: "componentName"
-        description: "The name of the component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "integer"
-      - name: "triggerName"
-        description: "The name of a trigger."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComponentOperationRequest"
-      responses:
-        "200":
-          description: "The editor description."
-          content:
-            application/json:
-              schema:
-                type: "string"
-  /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/output-schema:
-    post:
-      description: "Get a trigger output schema shown in the editor."
-      summary: "Get a trigger output schema shown in the editor"
-      tags:
-      - "trigger-definition"
-      operationId: "getComponentTriggerOutputSchema"
-      parameters:
-      - name: "componentName"
-        description: "The name of the component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "integer"
-      - name: "triggerName"
-        description: "The name of a trigger."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComponentOperationRequest"
-      responses:
-        "200":
-          description: "The output schema."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ComponentOutputSchema"
-  ? /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/dynamic-properties
-  : post:
-      description: "Get dynamic properties for a trigger property shown in the editor."
-      summary: "Get dynamic properties for a trigger property shown in the editor"
-      tags:
-      - "trigger-definition"
-      operationId: "getComponentTriggerPropertyDynamicProperties"
-      parameters:
-      - name: "componentName"
-        description: "The name of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "integer"
-      - name: "triggerName"
-        description: "The name of a trigger."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "propertyName"
-        description: "The name of a property."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComponentOperationRequest"
-      responses:
-        "200":
-          description: "The list of options."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Property"
-  /component-definitions/{componentName}/{componentVersion}/trigger-definitions/{triggerName}/properties/{propertyName}/options:
-    post:
-      description: "Get a trigger property options shown in the editor."
-      summary: "Get a trigger property options shown in the editor"
-      tags:
-      - "trigger-definition"
-      operationId: "getComponentTriggerPropertyOptions"
-      parameters:
-      - name: "componentName"
-        description: "The name of the component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "integer"
-      - name: "triggerName"
-        description: "The name of a trigger."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "propertyName"
-        description: "The name of a property."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "searchText"
-        description: "Optional search text used to filter option items"
-        in: "query"
-        schema:
-          type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComponentOperationRequest"
-      responses:
-        "200":
-          description: "The list of options."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Option"
   /oauth2/authorization-parameters:
     post:
       description: "Retrieves oauth2 authorization parameters."
@@ -786,55 +422,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TaskDispatcherDefinition"
-  /task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}/output-schema:
-    post:
-      description: "Get a task dispatcher output schema shown in the editor."
-      summary: "Get a task dispatcher output schema shown in the editor"
+  /workflows/{workflowId}/workflow-step-outputs:
+    get:
+      description: "Get all dynamic output schemas used in a workflow."
+      summary: "Get all dynamic output schemas used in a workflow"
       tags:
-        - "task-dispatcher-definition"
-      operationId: "getTaskDispatcherOutputSchema"
+        - "workflow-step-output"
+      operationId: "getWorkflowStepOutputs"
       parameters:
-        - name: "taskDispatcherName"
-          description: "The name of a task dispatcher."
-          required: true
+        - name: "workflowId"
+          description: "The workflow id for which to return all used action definitions"
           in: "path"
+          required: true
           schema:
             type: "string"
-        - name: "taskDispatcherVersion"
-          description: "The version of a task dispatcher."
-          required: true
-          in: "path"
-          schema:
-            type: "integer"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TaskDispatcherOperationRequest"
-      responses:
-        "200":
-          description: "The output schema."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TaskDispatcherOutputSchema"
-  /trigger-definitions:
-    get:
-      description: "Get all trigger definitions."
-      summary: "Get all trigger definitions"
-      tags:
-        - "trigger-definition"
-      operationId: "getTriggerDefinitions"
-      parameters:
-        - name: "triggerTypes"
-          description: "The list of trigger types defined in workflows.(E.g. mailchimp/v1/subscribe)"
+        - name: "lastWorkflowNodeName"
+          description: "The name of the last workflow node (action task or trigger) up to which include the output schema (E.g. mailchimp_1, airtable_3)"
           in: "query"
           required: false
           schema:
-            type: "array"
-            items:
-              type: "string"
-            example: "mailchimp/v1/subscribe"
+            type: "string"
       responses:
         "200":
           description: "Successful operation."
@@ -843,7 +450,136 @@ paths:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/TriggerDefinition"
+                  $ref: "#/components/schemas/WorkflowStepOutput"
+  /workflows/{workflowId}/workflow-step-outputs/{workflowNodeName}:
+    get:
+      description: "Get dynamic output schema of an action task or trigger used in a workflow."
+      summary: "Get dynamic output schema of an action task or trigger used in a workflow"
+      tags:
+        - "workflow-step-output"
+      operationId: "getWorkflowStepOutput"
+      parameters:
+        - name: "workflowId"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowStepOutput"
+  /workflows/{workflowId}/{workflowNodeName}/editor-description:
+    get:
+      description: "Get an action description shown in the editor."
+      summary: "Get an action description shown in the editor"
+      tags:
+        - "editor-description"
+      operationId: "getWorkflowOperationEditorDescription"
+      parameters:
+        - name: "workflowId"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of an workflow's action task or trigger (E.g. mailchimp_1)"
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The editor description."
+          content:
+            application/json:
+              schema:
+                type: "string"
+  /workflows/{workflowId}/{workflowNodeName}/properties/{propertyName}/dynamic-properties:
+    get:
+      description: "Get dynamic properties for an action or trigger property shown in the editor."
+      summary: "Get dynamic properties for an action or trigger property shown in the editor"
+      tags:
+        - "dynamic-property"
+      operationId: "getWorkflowOperationPropertyDynamicProperties"
+      parameters:
+        - name: "workflowId"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "propertyName"
+          description: "The name of a property."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The list of options."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Property"
+  /workflows/{workflowId}/{workflowNodeName}/properties/{propertyName}/options:
+    get:
+      description: "Get an action or trigger property options shown in the editor."
+      summary: "Get an action or trigger property options shown in the editor"
+      tags:
+        - "option"
+      operationId: "getWorkflowOperationOptions"
+      parameters:
+        - name: "workflowId"
+          description: "The workflow id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow's action task or trigger (E.g. mailchimp_1)"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "propertyName"
+          description: "The name of a property."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "searchText"
+          description: "Optional search text used to filter option items"
+          in: "query"
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The list of options."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Option"
 components:
   schemas:
     ActionDefinition:
@@ -865,18 +601,16 @@ components:
         description:
           description: "The description."
           type: "string"
-        editorDescriptionDataSource:
-          description: "Does action has defined dynamic editor description."
+        editorDescriptionDefined:
+          description: "Does action define dynamic editor description."
           type: "boolean"
         help:
           $ref: "#/components/schemas/Help"
         name:
           description: "The action name."
           type: "string"
-        outputSchema:
-          $ref: "#/components/schemas/ComponentOutputSchema"
-        outputSchemaDataSource:
-          description: "Does action has defined dynamic output schema."
+        outputDefined:
+          description: "Does action define output schema."
           type: "boolean"
         properties:
           description: "The list of action properties."
@@ -1071,31 +805,6 @@ components:
         triggersCount:
           default: "The number of triggers a component has"
           type: "integer"
-    ComponentOperationRequest:
-      type: "object"
-      required:
-      - "parameters"
-      properties:
-        connectionId:
-          description: "The connection id."
-          type: "integer"
-          format: "int64"
-        parameters:
-          description: "The parameters of an action."
-          type: "object"
-          additionalProperties:
-            type: "object"
-    ComponentOutputSchema:
-      type: "object"
-      required:
-        - definition
-        - sampleOutput
-      properties:
-        definition:
-          $ref: "#/components/schemas/Property"
-        sampleOutput:
-          description: "The sample value of the action's/trigger's output."
-          type: "object"
     ConnectionDefinition:
       description: "Definition of a connection to an outside service."
       type: "object"
@@ -1542,10 +1251,8 @@ components:
         name:
           description: "The task dispatcher name.."
           type: "string"
-        outputSchema:
-          $ref: "#/components/schemas/TaskDispatcherOutputSchema"
-        outputSchemaDataSource:
-          description: "Does task dispatcher has defined dynamic output schema."
+        outputDefined:
+          description: "Does task dispatcher define output schema."
           type: "boolean"
         properties:
           description: "The list of task dispatcher properties."
@@ -1562,13 +1269,8 @@ components:
         title:
           description: "The title"
           type: "string"
-        variableProperties:
-          description: "Properties used to define tasks to be dispatched."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Property"
-        variablePropertiesDataSource:
-          description: "Does task dispatcher has defined dynamic variable properties."
+        variablePropertiesDefined:
+          description: "Does task dispatcher define dynamic variable properties."
           type: "boolean"
         version:
           type: "integer"
@@ -1604,17 +1306,6 @@ components:
           type: "object"
           additionalProperties:
             type: "object"
-    TaskDispatcherOutputSchema:
-      type: "object"
-      required:
-        - definition
-        - sampleOutput
-      properties:
-        definition:
-          $ref: "#/components/schemas/Property"
-        sampleOutput:
-          description: "The sample value of the task dispatcher's output."
-          type: "object"
     TaskProperty:
       description: "A task property used in task dispatchers."
       type: "object"
@@ -1664,18 +1355,16 @@ components:
         description:
           description: "The description."
           type: "string"
-        editorDescriptionDataSource:
-          description: "Does trigger has defined dynamic editor description."
+        editorDescriptionDefined:
+          description: "Does trigger define dynamic editor description."
           type: "boolean"
         help:
           $ref: "#/components/schemas/Help"
         name:
           description: "The action name."
           type: "string"
-        outputSchema:
-          $ref: "#/components/schemas/ComponentOutputSchema"
-        outputSchemaDataSource:
-          description: "Does trigger has defined dynamic output schema."
+        outputDefined:
+          description: "Does trigger define output schema."
           type: "boolean"
         properties:
           description: "The list of action properties."
@@ -1825,8 +1514,8 @@ components:
         - "componentName"
         - "componentVersion"
         - "key"
-        - "operationName"
         - "required"
+        - "workflowNodeName"
       properties:
         componentName:
           type: "string"
@@ -1837,10 +1526,10 @@ components:
           format: "int64"
         key:
           type: "string"
-        operationName:
-          type: "string"
         required:
           type: "boolean"
+        workflowNodeName:
+          type: "string"
     WorkflowFormat:
       type: "string"
       enum:
@@ -1878,6 +1567,25 @@ components:
         value:
           description: "The value of an output"
           type: "object"
+    WorkflowStepOutput:
+      description: The workflow step output
+      type: "object"
+      required:
+        - outputSchema
+        - workflowNodeName
+      properties:
+        actionDefinition:
+          $ref: '#/components/schemas/ActionDefinition'
+        outputSchema:
+          $ref: "#/components/schemas/Property"
+        sampleOutput:
+          description: "The sample value of an output."
+          type: "object"
+        taskDispatcherDefinition:
+          $ref: '#/components/schemas/TaskDispatcherDefinition'
+        workflowNodeName:
+          description: The workflow node name
+          type: "string"
     WorkflowTask:
       description: "Represents a definition of a workflow task."
       type: "object"
