@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-19T11:58:57.058637+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-26T08:17:52.891429+01:00[Europe/Zagreb]")
 public class WorkflowConnectionModel {
 
   private String componentName;
@@ -31,9 +31,9 @@ public class WorkflowConnectionModel {
 
   private String key;
 
-  private String operationName;
-
   private Boolean required;
+
+  private String workflowNodeName;
 
   public WorkflowConnectionModel() {
     super();
@@ -42,12 +42,12 @@ public class WorkflowConnectionModel {
   /**
    * Constructor with only required parameters
    */
-  public WorkflowConnectionModel(String componentName, Integer componentVersion, String key, String operationName, Boolean required) {
+  public WorkflowConnectionModel(String componentName, Integer componentVersion, String key, Boolean required, String workflowNodeName) {
     this.componentName = componentName;
     this.componentVersion = componentVersion;
     this.key = key;
-    this.operationName = operationName;
     this.required = required;
+    this.workflowNodeName = workflowNodeName;
   }
 
   public WorkflowConnectionModel componentName(String componentName) {
@@ -130,26 +130,6 @@ public class WorkflowConnectionModel {
     this.key = key;
   }
 
-  public WorkflowConnectionModel operationName(String operationName) {
-    this.operationName = operationName;
-    return this;
-  }
-
-  /**
-   * Get operationName
-   * @return operationName
-  */
-  @NotNull 
-  @Schema(name = "operationName", requiredMode = Schema.RequiredMode.REQUIRED)
-  @JsonProperty("operationName")
-  public String getOperationName() {
-    return operationName;
-  }
-
-  public void setOperationName(String operationName) {
-    this.operationName = operationName;
-  }
-
   public WorkflowConnectionModel required(Boolean required) {
     this.required = required;
     return this;
@@ -170,6 +150,26 @@ public class WorkflowConnectionModel {
     this.required = required;
   }
 
+  public WorkflowConnectionModel workflowNodeName(String workflowNodeName) {
+    this.workflowNodeName = workflowNodeName;
+    return this;
+  }
+
+  /**
+   * Get workflowNodeName
+   * @return workflowNodeName
+  */
+  @NotNull 
+  @Schema(name = "workflowNodeName", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("workflowNodeName")
+  public String getWorkflowNodeName() {
+    return workflowNodeName;
+  }
+
+  public void setWorkflowNodeName(String workflowNodeName) {
+    this.workflowNodeName = workflowNodeName;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -183,13 +183,13 @@ public class WorkflowConnectionModel {
         Objects.equals(this.componentVersion, workflowConnection.componentVersion) &&
         Objects.equals(this.id, workflowConnection.id) &&
         Objects.equals(this.key, workflowConnection.key) &&
-        Objects.equals(this.operationName, workflowConnection.operationName) &&
-        Objects.equals(this.required, workflowConnection.required);
+        Objects.equals(this.required, workflowConnection.required) &&
+        Objects.equals(this.workflowNodeName, workflowConnection.workflowNodeName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, id, key, operationName, required);
+    return Objects.hash(componentName, componentVersion, id, key, required, workflowNodeName);
   }
 
   @Override
@@ -200,8 +200,8 @@ public class WorkflowConnectionModel {
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
-    sb.append("    operationName: ").append(toIndentedString(operationName)).append("\n");
     sb.append("    required: ").append(toIndentedString(required)).append("\n");
+    sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -4,9 +4,13 @@ src/main/java/com/bytechef/platform/configuration/web/rest/ActionDefinitionApi.j
 src/main/java/com/bytechef/platform/configuration/web/rest/ApiUtil.java
 src/main/java/com/bytechef/platform/configuration/web/rest/ComponentDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/ConnectionDefinitionApi.java
+src/main/java/com/bytechef/platform/configuration/web/rest/DynamicPropertyApi.java
+src/main/java/com/bytechef/platform/configuration/web/rest/EditorDescriptionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/Oauth2Api.java
+src/main/java/com/bytechef/platform/configuration/web/rest/OptionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TaskDispatcherDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TriggerDefinitionApi.java
+src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowStepOutputApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ActionDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ActionDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ArrayPropertyModel.java
@@ -15,8 +19,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationTy
 src/main/java/com/bytechef/platform/configuration/web/rest/model/BooleanPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentOperationRequestModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentOutputSchemaModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ControlTypeModel.java
@@ -42,7 +44,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/StringPropertyM
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherOperationRequestModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherOutputSchemaModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TimePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionBasicModel.java
@@ -55,5 +56,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowFormatM
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowInputModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowOutputModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowStepOutputModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowTaskModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowTriggerModel.java

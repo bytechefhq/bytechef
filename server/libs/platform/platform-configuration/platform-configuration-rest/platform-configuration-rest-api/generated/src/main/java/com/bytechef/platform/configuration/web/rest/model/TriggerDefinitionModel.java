@@ -2,7 +2,6 @@ package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.platform.configuration.web.rest.model.ComponentOutputSchemaModel;
 import com.bytechef.platform.configuration.web.rest.model.HelpModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerTypeModel;
@@ -29,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-19T11:58:57.058637+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-26T08:17:52.891429+01:00[Europe/Zagreb]")
 public class TriggerDefinitionModel {
 
   private String componentName;
@@ -38,15 +37,13 @@ public class TriggerDefinitionModel {
 
   private String description;
 
-  private Boolean editorDescriptionDataSource;
+  private Boolean editorDescriptionDefined;
 
   private HelpModel help;
 
   private String name;
 
-  private ComponentOutputSchemaModel outputSchema;
-
-  private Boolean outputSchemaDataSource;
+  private Boolean outputDefined;
 
   @Valid
   private List<@Valid PropertyModel> properties;
@@ -127,24 +124,24 @@ public class TriggerDefinitionModel {
     this.description = description;
   }
 
-  public TriggerDefinitionModel editorDescriptionDataSource(Boolean editorDescriptionDataSource) {
-    this.editorDescriptionDataSource = editorDescriptionDataSource;
+  public TriggerDefinitionModel editorDescriptionDefined(Boolean editorDescriptionDefined) {
+    this.editorDescriptionDefined = editorDescriptionDefined;
     return this;
   }
 
   /**
-   * Does trigger has defined dynamic editor description.
-   * @return editorDescriptionDataSource
+   * Does trigger define dynamic editor description.
+   * @return editorDescriptionDefined
   */
   
-  @Schema(name = "editorDescriptionDataSource", description = "Does trigger has defined dynamic editor description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("editorDescriptionDataSource")
-  public Boolean getEditorDescriptionDataSource() {
-    return editorDescriptionDataSource;
+  @Schema(name = "editorDescriptionDefined", description = "Does trigger define dynamic editor description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("editorDescriptionDefined")
+  public Boolean getEditorDescriptionDefined() {
+    return editorDescriptionDefined;
   }
 
-  public void setEditorDescriptionDataSource(Boolean editorDescriptionDataSource) {
-    this.editorDescriptionDataSource = editorDescriptionDataSource;
+  public void setEditorDescriptionDefined(Boolean editorDescriptionDefined) {
+    this.editorDescriptionDefined = editorDescriptionDefined;
   }
 
   public TriggerDefinitionModel help(HelpModel help) {
@@ -187,44 +184,24 @@ public class TriggerDefinitionModel {
     this.name = name;
   }
 
-  public TriggerDefinitionModel outputSchema(ComponentOutputSchemaModel outputSchema) {
-    this.outputSchema = outputSchema;
+  public TriggerDefinitionModel outputDefined(Boolean outputDefined) {
+    this.outputDefined = outputDefined;
     return this;
   }
 
   /**
-   * Get outputSchema
-   * @return outputSchema
-  */
-  @Valid 
-  @Schema(name = "outputSchema", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("outputSchema")
-  public ComponentOutputSchemaModel getOutputSchema() {
-    return outputSchema;
-  }
-
-  public void setOutputSchema(ComponentOutputSchemaModel outputSchema) {
-    this.outputSchema = outputSchema;
-  }
-
-  public TriggerDefinitionModel outputSchemaDataSource(Boolean outputSchemaDataSource) {
-    this.outputSchemaDataSource = outputSchemaDataSource;
-    return this;
-  }
-
-  /**
-   * Does trigger has defined dynamic output schema.
-   * @return outputSchemaDataSource
+   * Does trigger define output schema.
+   * @return outputDefined
   */
   
-  @Schema(name = "outputSchemaDataSource", description = "Does trigger has defined dynamic output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("outputSchemaDataSource")
-  public Boolean getOutputSchemaDataSource() {
-    return outputSchemaDataSource;
+  @Schema(name = "outputDefined", description = "Does trigger define output schema.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputDefined")
+  public Boolean getOutputDefined() {
+    return outputDefined;
   }
 
-  public void setOutputSchemaDataSource(Boolean outputSchemaDataSource) {
-    this.outputSchemaDataSource = outputSchemaDataSource;
+  public void setOutputDefined(Boolean outputDefined) {
+    this.outputDefined = outputDefined;
   }
 
   public TriggerDefinitionModel properties(List<@Valid PropertyModel> properties) {
@@ -307,11 +284,10 @@ public class TriggerDefinitionModel {
     return Objects.equals(this.componentName, triggerDefinition.componentName) &&
         Objects.equals(this.componentVersion, triggerDefinition.componentVersion) &&
         Objects.equals(this.description, triggerDefinition.description) &&
-        Objects.equals(this.editorDescriptionDataSource, triggerDefinition.editorDescriptionDataSource) &&
+        Objects.equals(this.editorDescriptionDefined, triggerDefinition.editorDescriptionDefined) &&
         Objects.equals(this.help, triggerDefinition.help) &&
         Objects.equals(this.name, triggerDefinition.name) &&
-        Objects.equals(this.outputSchema, triggerDefinition.outputSchema) &&
-        Objects.equals(this.outputSchemaDataSource, triggerDefinition.outputSchemaDataSource) &&
+        Objects.equals(this.outputDefined, triggerDefinition.outputDefined) &&
         Objects.equals(this.properties, triggerDefinition.properties) &&
         Objects.equals(this.title, triggerDefinition.title) &&
         Objects.equals(this.type, triggerDefinition.type);
@@ -319,7 +295,7 @@ public class TriggerDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, editorDescriptionDataSource, help, name, outputSchema, outputSchemaDataSource, properties, title, type);
+    return Objects.hash(componentName, componentVersion, description, editorDescriptionDefined, help, name, outputDefined, properties, title, type);
   }
 
   @Override
@@ -329,11 +305,10 @@ public class TriggerDefinitionModel {
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    editorDescriptionDataSource: ").append(toIndentedString(editorDescriptionDataSource)).append("\n");
+    sb.append("    editorDescriptionDefined: ").append(toIndentedString(editorDescriptionDefined)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    outputSchema: ").append(toIndentedString(outputSchema)).append("\n");
-    sb.append("    outputSchemaDataSource: ").append(toIndentedString(outputSchemaDataSource)).append("\n");
+    sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
