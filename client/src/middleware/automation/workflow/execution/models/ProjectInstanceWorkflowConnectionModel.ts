@@ -14,7 +14,7 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * The connection used in a particular task or trigger.
+ * The connection used in a particular action task or trigger.
  * @export
  * @interface ProjectInstanceWorkflowConnectionModel
  */
@@ -36,7 +36,7 @@ export interface ProjectInstanceWorkflowConnectionModel {
      * @type {string}
      * @memberof ProjectInstanceWorkflowConnectionModel
      */
-    operationName: string;
+    workflowNodeName: string;
 }
 
 /**
@@ -46,7 +46,7 @@ export function instanceOfProjectInstanceWorkflowConnectionModel(value: object):
     let isInstance = true;
     isInstance = isInstance && "connectionId" in value;
     isInstance = isInstance && "key" in value;
-    isInstance = isInstance && "operationName" in value;
+    isInstance = isInstance && "workflowNodeName" in value;
 
     return isInstance;
 }
@@ -63,7 +63,7 @@ export function ProjectInstanceWorkflowConnectionModelFromJSONTyped(json: any, i
         
         'connectionId': json['connectionId'],
         'key': json['key'],
-        'operationName': json['operationName'],
+        'workflowNodeName': json['workflowNodeName'],
     };
 }
 
@@ -78,7 +78,7 @@ export function ProjectInstanceWorkflowConnectionModelToJSON(value?: ProjectInst
         
         'connectionId': value.connectionId,
         'key': value.key,
-        'operationName': value.operationName,
+        'workflowNodeName': value.workflowNodeName,
     };
 }
 

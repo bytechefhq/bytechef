@@ -13,12 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ComponentOutputSchemaModel } from './ComponentOutputSchemaModel';
-import {
-    ComponentOutputSchemaModelFromJSON,
-    ComponentOutputSchemaModelFromJSONTyped,
-    ComponentOutputSchemaModelToJSON,
-} from './ComponentOutputSchemaModel';
 import type { HelpModel } from './HelpModel';
 import {
     HelpModelFromJSON,
@@ -57,11 +51,11 @@ export interface ActionDefinitionModel {
      */
     description?: string;
     /**
-     * Does action has defined dynamic editor description.
+     * Does action define dynamic editor description.
      * @type {boolean}
      * @memberof ActionDefinitionModel
      */
-    editorDescriptionDataSource?: boolean;
+    editorDescriptionDefined?: boolean;
     /**
      * 
      * @type {HelpModel}
@@ -75,17 +69,11 @@ export interface ActionDefinitionModel {
      */
     name: string;
     /**
-     * 
-     * @type {ComponentOutputSchemaModel}
-     * @memberof ActionDefinitionModel
-     */
-    outputSchema?: ComponentOutputSchemaModel;
-    /**
-     * Does action has defined dynamic output schema.
+     * Does action define output schema.
      * @type {boolean}
      * @memberof ActionDefinitionModel
      */
-    outputSchemaDataSource?: boolean;
+    outputDefined?: boolean;
     /**
      * The list of action properties.
      * @type {Array<PropertyModel>}
@@ -123,11 +111,10 @@ export function ActionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminato
         'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
         'componentVersion': !exists(json, 'componentVersion') ? undefined : json['componentVersion'],
         'description': !exists(json, 'description') ? undefined : json['description'],
-        'editorDescriptionDataSource': !exists(json, 'editorDescriptionDataSource') ? undefined : json['editorDescriptionDataSource'],
+        'editorDescriptionDefined': !exists(json, 'editorDescriptionDefined') ? undefined : json['editorDescriptionDefined'],
         'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
-        'outputSchema': !exists(json, 'outputSchema') ? undefined : ComponentOutputSchemaModelFromJSON(json['outputSchema']),
-        'outputSchemaDataSource': !exists(json, 'outputSchemaDataSource') ? undefined : json['outputSchemaDataSource'],
+        'outputDefined': !exists(json, 'outputDefined') ? undefined : json['outputDefined'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'title': !exists(json, 'title') ? undefined : json['title'],
     };
@@ -145,11 +132,10 @@ export function ActionDefinitionModelToJSON(value?: ActionDefinitionModel | null
         'componentName': value.componentName,
         'componentVersion': value.componentVersion,
         'description': value.description,
-        'editorDescriptionDataSource': value.editorDescriptionDataSource,
+        'editorDescriptionDefined': value.editorDescriptionDefined,
         'help': HelpModelToJSON(value.help),
         'name': value.name,
-        'outputSchema': ComponentOutputSchemaModelToJSON(value.outputSchema),
-        'outputSchemaDataSource': value.outputSchemaDataSource,
+        'outputDefined': value.outputDefined,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'title': value.title,
     };

@@ -31,7 +31,7 @@ export interface WorkflowTaskModel {
      * @type {Array<WorkflowConnectionModel>}
      * @memberof WorkflowTaskModel
      */
-    connections?: Array<WorkflowConnectionModel>;
+    readonly connections?: Array<WorkflowConnectionModel>;
     /**
      * The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.
      * @type {Array<WorkflowTaskModel>}
@@ -131,7 +131,6 @@ export function WorkflowTaskModelToJSON(value?: WorkflowTaskModel | null): any {
     }
     return {
         
-        'connections': value.connections === undefined ? undefined : ((value.connections as Array<any>).map(WorkflowConnectionModelToJSON)),
         'finalize': value.finalize === undefined ? undefined : ((value.finalize as Array<any>).map(WorkflowTaskModelToJSON)),
         'label': value.label,
         'name': value.name,

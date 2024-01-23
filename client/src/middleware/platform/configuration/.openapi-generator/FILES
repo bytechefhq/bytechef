@@ -1,9 +1,13 @@
 apis/ActionDefinitionApi.ts
 apis/ComponentDefinitionApi.ts
 apis/ConnectionDefinitionApi.ts
+apis/DynamicPropertyApi.ts
+apis/EditorDescriptionApi.ts
 apis/Oauth2Api.ts
+apis/OptionApi.ts
 apis/TaskDispatcherDefinitionApi.ts
 apis/TriggerDefinitionApi.ts
+apis/WorkflowNodeOutputApi.ts
 apis/index.ts
 index.ts
 models/ActionDefinitionBasicModel.ts
@@ -14,8 +18,6 @@ models/AuthorizationTypeModel.ts
 models/BooleanPropertyModel.ts
 models/ComponentDefinitionBasicModel.ts
 models/ComponentDefinitionModel.ts
-models/ComponentOperationRequestModel.ts
-models/ComponentOutputSchemaModel.ts
 models/ConnectionDefinitionBasicModel.ts
 models/ConnectionDefinitionModel.ts
 models/ControlTypeModel.ts
@@ -41,7 +43,6 @@ models/StringPropertyModel.ts
 models/TaskDispatcherDefinitionBasicModel.ts
 models/TaskDispatcherDefinitionModel.ts
 models/TaskDispatcherOperationRequestModel.ts
-models/TaskDispatcherOutputSchemaModel.ts
 models/TaskPropertyModel.ts
 models/TimePropertyModel.ts
 models/TriggerDefinitionBasicModel.ts
@@ -53,6 +54,7 @@ models/WorkflowConnectionModel.ts
 models/WorkflowFormatModel.ts
 models/WorkflowInputModel.ts
 models/WorkflowModel.ts
+models/WorkflowNodeOutputModel.ts
 models/WorkflowOutputModel.ts
 models/WorkflowTaskModel.ts
 models/WorkflowTriggerModel.ts

@@ -25,12 +25,6 @@ import {
     ResourcesModelFromJSONTyped,
     ResourcesModelToJSON,
 } from './ResourcesModel';
-import type { TaskDispatcherOutputSchemaModel } from './TaskDispatcherOutputSchemaModel';
-import {
-    TaskDispatcherOutputSchemaModelFromJSON,
-    TaskDispatcherOutputSchemaModelFromJSONTyped,
-    TaskDispatcherOutputSchemaModelToJSON,
-} from './TaskDispatcherOutputSchemaModel';
 
 /**
  * A task dispatcher defines a strategy for dispatching tasks to be executed.
@@ -57,17 +51,11 @@ export interface TaskDispatcherDefinitionModel {
      */
     name: string;
     /**
-     * 
-     * @type {TaskDispatcherOutputSchemaModel}
-     * @memberof TaskDispatcherDefinitionModel
-     */
-    outputSchema?: TaskDispatcherOutputSchemaModel;
-    /**
-     * Does task dispatcher has defined dynamic output schema.
+     * Does task dispatcher define output schema.
      * @type {boolean}
      * @memberof TaskDispatcherDefinitionModel
      */
-    outputSchemaDataSource?: boolean;
+    outputDefined?: boolean;
     /**
      * The list of task dispatcher properties.
      * @type {Array<PropertyModel>}
@@ -93,17 +81,11 @@ export interface TaskDispatcherDefinitionModel {
      */
     title?: string;
     /**
-     * Properties used to define tasks to be dispatched.
-     * @type {Array<PropertyModel>}
-     * @memberof TaskDispatcherDefinitionModel
-     */
-    variableProperties?: Array<PropertyModel>;
-    /**
-     * Does task dispatcher has defined dynamic variable properties.
+     * Does task dispatcher define dynamic variable properties.
      * @type {boolean}
      * @memberof TaskDispatcherDefinitionModel
      */
-    variablePropertiesDataSource?: boolean;
+    variablePropertiesDefined?: boolean;
     /**
      * The version of a task dispatcher.
      * @type {number}
@@ -136,14 +118,12 @@ export function TaskDispatcherDefinitionModelFromJSONTyped(json: any, ignoreDisc
         'description': !exists(json, 'description') ? undefined : json['description'],
         'icon': !exists(json, 'icon') ? undefined : json['icon'],
         'name': json['name'],
-        'outputSchema': !exists(json, 'outputSchema') ? undefined : TaskDispatcherOutputSchemaModelFromJSON(json['outputSchema']),
-        'outputSchemaDataSource': !exists(json, 'outputSchemaDataSource') ? undefined : json['outputSchemaDataSource'],
+        'outputDefined': !exists(json, 'outputDefined') ? undefined : json['outputDefined'],
         'properties': !exists(json, 'properties') ? undefined : ((json['properties'] as Array<any>).map(PropertyModelFromJSON)),
         'resources': !exists(json, 'resources') ? undefined : ResourcesModelFromJSON(json['resources']),
         'taskProperties': !exists(json, 'taskProperties') ? undefined : ((json['taskProperties'] as Array<any>).map(PropertyModelFromJSON)),
         'title': !exists(json, 'title') ? undefined : json['title'],
-        'variableProperties': !exists(json, 'variableProperties') ? undefined : ((json['variableProperties'] as Array<any>).map(PropertyModelFromJSON)),
-        'variablePropertiesDataSource': !exists(json, 'variablePropertiesDataSource') ? undefined : json['variablePropertiesDataSource'],
+        'variablePropertiesDefined': !exists(json, 'variablePropertiesDefined') ? undefined : json['variablePropertiesDefined'],
         'version': json['version'],
     };
 }
@@ -160,14 +140,12 @@ export function TaskDispatcherDefinitionModelToJSON(value?: TaskDispatcherDefini
         'description': value.description,
         'icon': value.icon,
         'name': value.name,
-        'outputSchema': TaskDispatcherOutputSchemaModelToJSON(value.outputSchema),
-        'outputSchemaDataSource': value.outputSchemaDataSource,
+        'outputDefined': value.outputDefined,
         'properties': value.properties === undefined ? undefined : ((value.properties as Array<any>).map(PropertyModelToJSON)),
         'resources': ResourcesModelToJSON(value.resources),
         'taskProperties': value.taskProperties === undefined ? undefined : ((value.taskProperties as Array<any>).map(PropertyModelToJSON)),
         'title': value.title,
-        'variableProperties': value.variableProperties === undefined ? undefined : ((value.variableProperties as Array<any>).map(PropertyModelToJSON)),
-        'variablePropertiesDataSource': value.variablePropertiesDataSource,
+        'variablePropertiesDefined': value.variablePropertiesDefined,
         'version': value.version,
     };
 }
