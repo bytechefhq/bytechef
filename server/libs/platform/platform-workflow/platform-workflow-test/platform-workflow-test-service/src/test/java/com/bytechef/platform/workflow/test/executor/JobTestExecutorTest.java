@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test;
+package com.bytechef.platform.workflow.test.executor;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
