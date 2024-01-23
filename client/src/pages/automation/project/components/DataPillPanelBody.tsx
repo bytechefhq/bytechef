@@ -11,17 +11,17 @@ export type ComponentActionData = {
 } & ActionDefinitionModel;
 
 type DataPillPanelBodyProps = {
-    componentData: Array<ComponentActionData>;
+    componentActionData: Array<ComponentActionData>;
     dataPillFilterQuery: string;
 };
 
-const DataPillPanelBody = ({componentData, dataPillFilterQuery}: DataPillPanelBodyProps) => (
+const DataPillPanelBody = ({componentActionData, dataPillFilterQuery}: DataPillPanelBodyProps) => (
     <div className="relative h-full overflow-y-auto">
         <div className="absolute left-0 top-0 w-full">
             <Accordion className="h-full" collapsible type="single">
-                {componentData.map((componentAction: ComponentActionData, index: number) => {
+                {componentActionData.map((componentAction: ComponentActionData, index: number) => {
                     const outputSchemaDefinition: PropertyType | undefined =
-                        componentData[index]?.outputSchema?.definition;
+                        componentActionData[index]?.outputSchema?.definition;
 
                     const properties: Array<PropertyType> | undefined = outputSchemaDefinition?.properties?.length
                         ? outputSchemaDefinition.properties

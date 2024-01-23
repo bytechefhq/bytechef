@@ -126,7 +126,7 @@ const DataPillPanel = ({
 
                             {dataPillComponentData && (
                                 <DataPillPanelBody
-                                    componentData={dataPillComponentData as Array<ComponentActionData>}
+                                    componentActionData={dataPillComponentData as Array<ComponentActionData>}
                                     dataPillFilterQuery={dataPillFilterQuery}
                                 />
                             )}
