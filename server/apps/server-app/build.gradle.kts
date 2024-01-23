@@ -118,6 +118,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:twilio"))
 //    implementation(project(":server:libs:modules:components:shopify"))
     implementation(project(":server:libs:modules:components:var"))
+    implementation(project(":server:libs:modules:components:xero"))
     implementation(project(":server:libs:modules:components:xlsx-file"))
     implementation(project(":server:libs:modules:components:xml-file"))
     implementation(project(":server:libs:modules:components:xml-helper"))
