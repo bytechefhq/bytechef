@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition;
+package com.bytechef.platform.configuration.facade;
+
+import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
+import java.util.List;
 
 /**
- *
+ * @author Ivica Cardic
  */
-@FunctionalInterface
-public interface ActionOutputSchemaFunction {
+public interface WorkflowNodeOutputFacade {
 
-    /**
-     * @param inputParameters
-     * @param connectionParameters
-     * @param context
-     * @return
-     */
-    OutputSchema apply(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws Exception;
+    WorkflowNodeOutputDTO getWorkflowNodeOutput(String workflowId, String workflowNodeName);
+
+    List<WorkflowNodeOutputDTO> getWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName);
 }

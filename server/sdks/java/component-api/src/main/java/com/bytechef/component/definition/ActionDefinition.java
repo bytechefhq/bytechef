@@ -104,13 +104,13 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<OutputSchema> getOutputSchema();
+    Optional<Output> getOutput();
 
     /**
      *
      * @return
      */
-    Optional<ActionOutputSchemaFunction> getOutputSchemaFunction();
+    Optional<ActionOutputFunction> getOutputFunction();
 
     /**
      *
@@ -128,7 +128,7 @@ public interface ActionDefinition {
      *
      * @return
      */
-    boolean isOutputSchemaDefaultFunction();
+    boolean isDefaultOutputFunction();
 
     /**
      *

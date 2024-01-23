@@ -62,10 +62,10 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     @Override
     @Transactional(readOnly = true)
     public List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
-        String workflowId, String operationName) {
+        String workflowId, String workflowNodeName) {
 
-        return workflowTestConfigurationConnectionRepository.findByWorkflowIdAndOperationName(
-            workflowId, operationName);
+        return workflowTestConfigurationConnectionRepository.findByWorkflowIdAndWorkflowNodeName(
+            workflowId, workflowNodeName);
     }
 
     @Override
@@ -84,19 +84,19 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
 
     @Override
     public void updateWorkflowTestConfigurationConnection(
-        String workflowId, String operationName, String key, long connectionId) {
+        String workflowId, String workflowNodeName, String key, long connectionId) {
 
         WorkflowTestConfiguration workflowTestConfiguration = getWorkflowTestConfiguration(workflowId);
 
         WorkflowTestConfigurationConnection workflowTestConfigurationConnection =
-            new WorkflowTestConfigurationConnection(connectionId, key, operationName);
+            new WorkflowTestConfigurationConnection(connectionId, key, workflowNodeName);
 
         workflowTestConfiguration.setConnections(
             CollectionUtils.concat(
                 CollectionUtils.filter(
                     workflowTestConfiguration.getConnections(),
-                    connection -> !(Objects.equals(connection.getKey(), key) &&
-                        Objects.equals(connection.getOperationName(), operationName))),
+                    connection -> !(Objects.equals(connection.getWorkflowConnectionKey(), key) &&
+                        Objects.equals(connection.getWorkflowNodeName(), workflowNodeName))),
                 List.of(workflowTestConfigurationConnection)));
 
         workflowTestConfigurationRepository.save(workflowTestConfiguration);

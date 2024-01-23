@@ -21,7 +21,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.DateUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.platform.component.registry.component.OperationType;
+import com.bytechef.platform.component.registry.component.WorkflowNodeType;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -90,22 +90,22 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
         this.workflowService = workflowService;
     }
 
-    private OperationType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
+    private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
         Workflow workflow = workflowService.getWorkflow(workflowExecutionId.getWorkflowId());
 
         WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
 
-        return OperationType.ofType(workflowTrigger.getType());
+        return WorkflowNodeType.ofType(workflowTrigger.getType());
     }
 
     private LocalDateTime refreshDynamicWebhookTrigger(WorkflowExecutionId workflowExecutionId) {
-        OperationType operationType = getComponentOperation(workflowExecutionId);
+        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
         DynamicWebhookEnableOutput output = OptionalUtils.get(triggerStateService.fetchValue(workflowExecutionId));
         LocalDateTime webhookExpirationDate = null;
 
         output = remoteTriggerDefinitionFacade.executeDynamicWebhookRefresh(
-            operationType.componentName(), operationType.componentVersion(),
-            operationType.componentOperationName(), output.parameters());
+            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+            workflowNodeType.componentOperationName(), output.parameters());
 
         if (output != null) {
             triggerStateService.save(workflowExecutionId, output);

@@ -10,7 +10,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/Oauth2Api.java
 src/main/java/com/bytechef/platform/configuration/web/rest/OptionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TaskDispatcherDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/TriggerDefinitionApi.java
-src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowStepOutputApi.java
+src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeOutputApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ActionDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ActionDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ArrayPropertyModel.java
@@ -55,7 +55,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowConnect
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowFormatModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowInputModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowNodeOutputModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowOutputModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowStepOutputModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowTaskModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowTriggerModel.java

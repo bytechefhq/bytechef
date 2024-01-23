@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.configuration.domain.WorkflowComponentDefinition;
+import com.bytechef.platform.configuration.domain.WorkflowNodeOutput;
 import com.bytechef.platform.configuration.repository.WorkflowComponentDefinitionRepository;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -27,20 +27,19 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class WorkflowComponentDefinitionServiceImpl implements WorkflowComponentDefinitionService {
+public class WorkflowNodeOutputServiceImpl implements WorkflowNodeOutputService {
 
     private final WorkflowComponentDefinitionRepository workflowTestComponentDefinitionRepository;
 
-    public WorkflowComponentDefinitionServiceImpl(
+    public WorkflowNodeOutputServiceImpl(
         WorkflowComponentDefinitionRepository workflowTestComponentDefinitionRepository) {
 
         this.workflowTestComponentDefinitionRepository = workflowTestComponentDefinitionRepository;
     }
 
     @Override
-    public Optional<WorkflowComponentDefinition> fetchWorkflowComponentDefinition(
-        String workflowId, String triggerName) {
-
-        return workflowTestComponentDefinitionRepository.findByWorkflowIdAndOperationName(workflowId, triggerName);
+    public Optional<WorkflowNodeOutput> fetchLastWorkflowNodeOutput(String workflowId, String workflowNodeName) {
+        return workflowTestComponentDefinitionRepository.findLastByWorkflowIdAndWorkflowNodeName(
+            workflowId, workflowNodeName);
     }
 }

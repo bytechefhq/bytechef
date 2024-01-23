@@ -33,18 +33,18 @@ public class WorkflowConnection {
     private final int componentVersion;
     private final Long id;
     private final String key;
-    private final String operationName; // task/trigger name used in the workflow
     private final boolean required;
+    private final String workflowNodeName; // action task/trigger name used in the workflow
 
     public WorkflowConnection(
-        String componentName, int componentVersion, String operationName, String key, Long id, boolean required) {
+        String componentName, int componentVersion, String workflowNodeName, String key, Long id, boolean required) {
 
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.id = id;
         this.key = key;
-        this.operationName = operationName;
         this.required = required;
+        this.workflowNodeName = workflowNodeName;
     }
 
     public String getComponentName() {
@@ -63,8 +63,8 @@ public class WorkflowConnection {
         return key;
     }
 
-    public String getOperationName() {
-        return operationName;
+    public String getWorkflowNodeName() {
+        return workflowNodeName;
     }
 
     public boolean isRequired() {
@@ -77,7 +77,7 @@ public class WorkflowConnection {
             "componentName='" + componentName + '\'' +
             ", componentVersion=" + componentVersion +
             ", key='" + key + '\'' +
-            ", operationName='" + operationName + '\'' +
+            ", workflowNodeName='" + workflowNodeName + '\'' +
             ", id=" + id +
             ", required=" + required +
             '}';

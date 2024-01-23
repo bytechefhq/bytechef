@@ -19,8 +19,6 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.web.rest.model.TaskDispatcherDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.TaskDispatcherDefinitionModel;
-import com.bytechef.platform.configuration.web.rest.model.TaskDispatcherOperationRequestModel;
-import com.bytechef.platform.configuration.web.rest.model.TaskDispatcherOutputSchemaModel;
 import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -77,17 +75,5 @@ public class TaskDispatcherDefinitionApiController implements TaskDispatcherDefi
                 .map(taskDispatcherDefinition -> conversionService.convert(
                     taskDispatcherDefinition, TaskDispatcherDefinitionBasicModel.class))
                 .toList());
-    }
-
-    @Override
-    public ResponseEntity<TaskDispatcherOutputSchemaModel> getTaskDispatcherOutputSchema(
-        String taskDispatcherName, Integer taskDispatcherVersion,
-        TaskDispatcherOperationRequestModel taskDispatcherOperationRequestModel) {
-
-        return ResponseEntity.ok(
-            conversionService.convert(
-                taskDispatcherDefinitionService.executeOutputSchema(
-                    taskDispatcherName, taskDispatcherVersion, taskDispatcherOperationRequestModel.getParameters()),
-                TaskDispatcherOutputSchemaModel.class));
     }
 }

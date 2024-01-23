@@ -34,7 +34,7 @@ import com.bytechef.automation.workflow.execution.dto.WorkflowExecution;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.component.registry.component.OperationType;
+import com.bytechef.platform.component.registry.component.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
@@ -174,10 +174,10 @@ public class WorkflowExecutionFacadeImpl implements WorkflowExecutionFacade {
     }
 
     private ComponentDefinition getComponentDefinition(String type) {
-        OperationType operationType = OperationType.ofType(type);
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
         return componentDefinitionService.getComponentDefinition(
-            operationType.componentName(), operationType.componentVersion());
+            workflowNodeType.componentName(), workflowNodeType.componentVersion());
     }
 
     private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {

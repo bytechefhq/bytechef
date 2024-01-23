@@ -19,6 +19,7 @@ package com.bytechef.platform.registry.util;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.definition.BaseFileEntry;
+import com.bytechef.definition.BaseOutput;
 import com.bytechef.definition.BaseProperty.BaseArrayProperty;
 import com.bytechef.definition.BaseProperty.BaseBooleanProperty;
 import com.bytechef.definition.BaseProperty.BaseDateProperty;
@@ -30,7 +31,6 @@ import com.bytechef.definition.BaseProperty.BaseNumberProperty;
 import com.bytechef.definition.BaseProperty.BaseObjectProperty;
 import com.bytechef.definition.BaseProperty.BaseStringProperty;
 import com.bytechef.definition.BaseProperty.BaseTimeProperty;
-import com.bytechef.platform.registry.domain.BaseOutputSchema;
 import com.bytechef.platform.registry.domain.BaseProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
@@ -99,14 +99,15 @@ public class SchemaUtils {
         return outputProperty;
     }
 
-    public static <P extends BaseProperty, O extends BaseOutputSchema<P>> O toOutputSchema(
-        com.bytechef.definition.BaseOutputSchema<? extends com.bytechef.definition.BaseProperty> outputSchema,
-        OutputSchemaFactoryFunction<P, O> outputSchemaFactoryFunction) {
+    public static <P extends BaseProperty, O extends com.bytechef.platform.registry.domain.BaseOutput<P>> O
+        toOutputSchema(
+            BaseOutput<? extends com.bytechef.definition.BaseProperty> outputSchema,
+            OutputFactoryFunction<P, O> outputFactoryFunction) {
 
         Object sampleOutput = outputSchema.getSampleOutput();
 
         if (sampleOutput == null) {
-            sampleOutput = getSampleOutput(outputSchema.getDefinition());
+            sampleOutput = getSampleOutput(outputSchema.getOutputSchema());
         }
 
         if (sampleOutput instanceof String string) {
@@ -117,7 +118,7 @@ public class SchemaUtils {
             }
         }
 
-        return outputSchemaFactoryFunction.apply(outputSchema.getDefinition(), sampleOutput);
+        return outputFactoryFunction.apply(outputSchema.getOutputSchema(), sampleOutput);
     }
 
     @SuppressFBWarnings("DLS")
@@ -164,7 +165,7 @@ public class SchemaUtils {
     }
 
     @FunctionalInterface
-    public interface OutputSchemaFactoryFunction<P extends BaseProperty, S extends BaseOutputSchema<P>> {
+    public interface OutputFactoryFunction<P extends BaseProperty, S extends com.bytechef.platform.registry.domain.BaseOutput<P>> {
 
         S apply(com.bytechef.definition.BaseProperty property, Object value);
     }

@@ -36,7 +36,7 @@ public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoade
         actionDefinition -> (inputParameters, connectionParameters, context) -> OpenApiClientUtils
             .execute(
                 inputParameters, OptionalUtils.orElse(actionDefinition.getProperties(), List.of()),
-                OptionalUtils.orElse(actionDefinition.getOutputSchema(), null),
+                OptionalUtils.orElse(actionDefinition.getOutput(), null),
                 OptionalUtils.orElse(actionDefinition.getMetadata(), null), context);
 
     public OpenApiComponentHandlerLoader() {

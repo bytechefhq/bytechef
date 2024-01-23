@@ -17,9 +17,9 @@
 package com.bytechef.platform.workflow.task.dispatcher.registry.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.workflow.task.dispatcher.definition.OutputSchemaFunction;
+import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
 import com.bytechef.platform.workflow.task.dispatcher.registry.TaskDispatcherDefinitionRegistry;
-import com.bytechef.platform.workflow.task.dispatcher.registry.domain.OutputSchema;
+import com.bytechef.platform.workflow.task.dispatcher.registry.domain.Output;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,16 +42,16 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public OutputSchema executeOutputSchema(
+    public Output executeOutputSchema(
         @NonNull String name, int version, @NonNull Map<String, Object> inputParameters) {
 
-        OutputSchemaFunction outputSchemaFunction = getOutputSchemaFunction(name, version);
+        OutputFunction outputFunction = getOutputSchemaFunction(name, version);
 
         try {
-            com.bytechef.platform.workflow.task.dispatcher.definition.OutputSchema outputSchema =
-                outputSchemaFunction.apply(inputParameters);
+            com.bytechef.platform.workflow.task.dispatcher.definition.Output output =
+                outputFunction.apply(inputParameters);
 
-            return new OutputSchema(Property.toProperty(outputSchema.definition()), outputSchema.sampleOutput());
+            return new Output(Property.toProperty(output.outputSchema()), output.sampleOutput());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -79,10 +79,10 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
             .toList();
     }
 
-    private OutputSchemaFunction getOutputSchemaFunction(String name, int version) {
+    private OutputFunction getOutputSchemaFunction(String name, int version) {
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
 
-        return OptionalUtils.get(taskDispatcherDefinition.getOutputSchemaFunction());
+        return OptionalUtils.get(taskDispatcherDefinition.getOutputFunction());
     }
 }

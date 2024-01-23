@@ -10,7 +10,7 @@ package com.bytechef.platform.component.registry.remote.client.facade;
 import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.OutputSchema;
+import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClient;
@@ -117,13 +117,13 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
-    public OutputSchema executeOutputSchema(
+    public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
         return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-output-schema"),
-            new OutputSchemaRequest(componentName, componentVersion, triggerName, inputParameters, connectionId),
+            uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-output"),
+            new OutputRequest(componentName, componentVersion, triggerName, inputParameters, connectionId),
             new ParameterizedTypeReference<>() {});
     }
 
@@ -196,7 +196,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         Map<String, ?> inputParameters, Long connectionId, String searchText) {
     }
 
-    private record OutputSchemaRequest(
+    private record OutputRequest(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         Long connectionId) {
     }

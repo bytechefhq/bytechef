@@ -49,13 +49,13 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
 
     @Override
     public boolean isConnectionUsed(
-        long connectionId, String workflowId, String workflowConnectionOperationName, String workflowConnectionKey) {
+        long connectionId, String workflowId, String workflowNodeName, String workflowConnectionKey) {
 
         List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances();
 
         for (ProjectInstance projectInstance : projectInstances) {
             if (projectInstanceWorkflowService.fetchProjectInstanceWorkflowConnection(
-                Validate.notNull(projectInstance.getId(), "id"), workflowId, workflowConnectionOperationName,
+                Validate.notNull(projectInstance.getId(), "id"), workflowId, workflowNodeName,
                 workflowConnectionKey)
                 .map(ProjectInstanceWorkflowConnection::getConnectionId)
                 .map(curConnectionId -> Objects.equals(curConnectionId, connectionId))

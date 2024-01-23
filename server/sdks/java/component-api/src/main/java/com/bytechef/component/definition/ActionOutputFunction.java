@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.registry.domain;
-
-import com.bytechef.platform.registry.domain.BaseOutputSchema;
+package com.bytechef.component.definition;
 
 /**
- * @author Ivica Cardic
+ *
  */
-public class OutputSchema extends BaseOutputSchema<Property> {
+@FunctionalInterface
+public interface ActionOutputFunction {
 
-    public OutputSchema(Property definition, Object sampleOutput) {
-        super(definition, sampleOutput);
-    }
+    /**
+     * @param inputParameters
+     * @param connectionParameters
+     * @param context
+     * @return
+     */
+    Output apply(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws Exception;
 }

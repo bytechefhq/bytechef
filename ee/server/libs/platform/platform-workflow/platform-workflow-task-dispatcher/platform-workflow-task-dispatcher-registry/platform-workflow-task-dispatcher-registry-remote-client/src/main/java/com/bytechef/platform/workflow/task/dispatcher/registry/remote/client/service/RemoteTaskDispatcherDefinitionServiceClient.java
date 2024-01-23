@@ -8,7 +8,7 @@
 package com.bytechef.platform.workflow.task.dispatcher.registry.remote.client.service;
 
 import com.bytechef.commons.rest.client.LoadBalancedRestClient;
-import com.bytechef.platform.workflow.task.dispatcher.registry.domain.OutputSchema;
+import com.bytechef.platform.workflow.task.dispatcher.registry.domain.Output;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,16 +36,16 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
     }
 
     @Override
-    public OutputSchema executeOutputSchema(
+    public Output executeOutputSchema(
         String name, int version, Map<String, Object> inputParameters) {
 
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(COORDINATOR_APP)
                 .path(
-                    TASK_DISPATCHER_DEFINITION_SERVICE + "/execute-output-schema")
+                    TASK_DISPATCHER_DEFINITION_SERVICE + "/execute-output")
                 .build(),
-            new OutputSchemaRequest(name, version, inputParameters),
+            new OutputRequest(name, version, inputParameters),
             new ParameterizedTypeReference<>() {});
     }
 
@@ -80,6 +80,6 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
             new ParameterizedTypeReference<>() {});
     }
 
-    private record OutputSchemaRequest(String name, int version, Map<String, ?> taskDispatcherParameters) {
+    private record OutputRequest(String name, int version, Map<String, ?> taskDispatcherParameters) {
     }
 }

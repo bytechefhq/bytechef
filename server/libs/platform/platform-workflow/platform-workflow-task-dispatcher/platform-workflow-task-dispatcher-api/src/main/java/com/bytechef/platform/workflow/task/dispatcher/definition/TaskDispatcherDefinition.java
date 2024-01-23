@@ -56,13 +56,13 @@ public interface TaskDispatcherDefinition {
      *
      * @return
      */
-    Optional<OutputSchema> getOutputSchema();
+    Optional<Output> getOutput();
 
     /**
      *
      * @return
      */
-    Optional<OutputSchemaFunction> getOutputSchemaFunction();
+    Optional<OutputFunction> getOutputFunction();
 
     /**
      *

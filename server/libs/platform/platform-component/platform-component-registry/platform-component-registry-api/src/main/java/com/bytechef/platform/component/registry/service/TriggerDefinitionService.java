@@ -18,10 +18,10 @@ package com.bytechef.platform.component.registry.service;
 
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.DynamicWebhookEnableOutput;
-import com.bytechef.platform.component.registry.component.OperationType;
+import com.bytechef.platform.component.registry.component.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.OutputSchema;
+import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.domain.WebhookTriggerFlags;
@@ -77,7 +77,7 @@ public interface TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @Nullable String searchText,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
-    OutputSchema executeOutputSchema(
+    Output executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull TriggerContext context);
@@ -97,7 +97,7 @@ public interface TriggerDefinitionService {
 
     List<TriggerDefinition> getTriggerDefinitions(@NonNull String componentName, int componentVersion);
 
-    List<TriggerDefinition> getTriggerDefinitions(@NonNull List<OperationType> operationTypes);
+    List<TriggerDefinition> getTriggerDefinitions(@NonNull List<WorkflowNodeType> workflowNodeTypes);
 
     WebhookTriggerFlags getWebhookTriggerFlags(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName);

@@ -19,7 +19,7 @@ package com.bytechef.platform.component.registry.facade;
 import com.bytechef.platform.component.definition.factory.ContextFactory;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.OutputSchema;
+import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.service.ActionDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
@@ -91,7 +91,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     @Override
-    public OutputSchema executeOutputSchema(
+    public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> inputParameters, Long connectionId) {
 

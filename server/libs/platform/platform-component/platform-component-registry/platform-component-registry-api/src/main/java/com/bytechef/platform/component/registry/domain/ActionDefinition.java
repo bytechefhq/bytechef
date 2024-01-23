@@ -29,9 +29,9 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class ActionDefinition extends ActionDefinitionBasic {
 
-    private boolean editorDescriptionDataSource;
-    private OutputSchema outputSchema;
-    private boolean outputSchemaDataSource;
+    private boolean editorDescriptionDefined;
+    private Output output;
+    private boolean outputDefined;
     private List<? extends Property> properties;
 
     private ActionDefinition() {
@@ -40,18 +40,20 @@ public class ActionDefinition extends ActionDefinitionBasic {
     public ActionDefinition(com.bytechef.component.definition.ActionDefinition actionDefinition) {
         super(actionDefinition);
 
-        this.editorDescriptionDataSource = OptionalUtils.mapOrElse(
+        this.editorDescriptionDefined = OptionalUtils.mapOrElse(
             actionDefinition.getEditorDescriptionFunction(), editorDescriptionDataSource -> true, false);
-        this.outputSchema = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputSchema(),
+        this.output = OptionalUtils.mapOrElse(
+            actionDefinition.getOutput(),
             outputSchema -> SchemaUtils.toOutputSchema(
                 outputSchema,
-                (baseProperty, sampleOutput) -> new OutputSchema(
+                (baseProperty, sampleOutput) -> new Output(
                     Property.toProperty((com.bytechef.component.definition.Property) baseProperty), sampleOutput)),
             null);
-        this.outputSchemaDataSource = OptionalUtils.mapOrElse(
-            actionDefinition.getOutputSchemaFunction(), outputSchemaDataSource -> true,
-            actionDefinition.isOutputSchemaDefaultFunction());
+        this.outputDefined =
+            OptionalUtils.mapOrElse(actionDefinition.getOutput(), outputSchema -> true, false) ||
+                OptionalUtils.mapOrElse(
+                    actionDefinition.getOutputFunction(), outputSchemaDataSource -> true,
+                    actionDefinition.isDefaultOutputFunction());
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
     }
@@ -70,27 +72,28 @@ public class ActionDefinition extends ActionDefinitionBasic {
             return false;
         }
 
-        return editorDescriptionDataSource == that.editorDescriptionDataSource
-            && outputSchemaDataSource == that.outputSchemaDataSource && Objects.equals(outputSchema, that.outputSchema)
+        return editorDescriptionDefined == that.editorDescriptionDefined
+            && outputDefined == that.outputDefined
+            && Objects.equals(output, that.output)
             && Objects.equals(properties, that.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), editorDescriptionDataSource, outputSchema, outputSchemaDataSource,
+        return Objects.hash(super.hashCode(), editorDescriptionDefined, outputDefined, output,
             properties);
     }
 
-    public boolean isEditorDescriptionDataSource() {
-        return editorDescriptionDataSource;
+    public boolean isEditorDescriptionDefined() {
+        return editorDescriptionDefined;
     }
 
-    public OutputSchema getOutputSchema() {
-        return outputSchema;
+    public Output getOutput() {
+        return output;
     }
 
-    public boolean isOutputSchemaDataSource() {
-        return outputSchemaDataSource;
+    public boolean isOutputDefined() {
+        return outputDefined;
     }
 
     public List<? extends Property> getProperties() {
@@ -100,9 +103,9 @@ public class ActionDefinition extends ActionDefinitionBasic {
     @Override
     public String toString() {
         return "Definition{" +
-            "editorDescriptionDataSource=" + editorDescriptionDataSource +
-            ", outputSchema=" + outputSchema +
-            ", outputSchemaDataSource=" + outputSchemaDataSource +
+            "editorDescription=" + editorDescriptionDefined +
+            ", outputDefined=" + outputDefined +
+            ", outputSchema=" + output +
             ", properties=" + properties +
             ", batch=" + batch +
             ", description='" + description + '\'' +

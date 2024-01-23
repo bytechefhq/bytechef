@@ -19,9 +19,9 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionEditorDescriptionFunction;
-import com.bytechef.component.definition.ActionOutputSchemaFunction;
+import com.bytechef.component.definition.ActionOutputFunction;
 import com.bytechef.component.definition.Help;
-import com.bytechef.component.definition.OutputSchema;
+import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Property;
 import java.util.HashMap;
 import java.util.List;
@@ -46,8 +46,8 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     protected final Help help;
     protected final Map<String, Object> metadata;
     protected final String name;
-    protected final OutputSchema outputSchema;
-    protected final ActionOutputSchemaFunction outputSchemaFunction;
+    protected final Output output;
+    protected final ActionOutputFunction outputSchemaFunction;
     private final boolean outputSchemaDefaultFunction;
     protected final List<? extends Property> properties;
     protected final String title;
@@ -68,9 +68,9 @@ public class ActionDefinitionWrapper implements ActionDefinition {
         this.help = OptionalUtils.orElse(actionDefinition.getHelp(), null);
         this.metadata = OptionalUtils.orElse(actionDefinition.getMetadata(), null);
         this.name = actionDefinition.getName();
-        this.outputSchema = OptionalUtils.orElse(actionDefinition.getOutputSchema(), null);
-        this.outputSchemaFunction = OptionalUtils.orElse(actionDefinition.getOutputSchemaFunction(), null);
-        this.outputSchemaDefaultFunction = actionDefinition.isOutputSchemaDefaultFunction();
+        this.output = OptionalUtils.orElse(actionDefinition.getOutput(), null);
+        this.outputSchemaFunction = OptionalUtils.orElse(actionDefinition.getOutputFunction(), null);
+        this.outputSchemaDefaultFunction = actionDefinition.isDefaultOutputFunction();
         this.properties = OptionalUtils.orElse(actionDefinition.getProperties(), null);
         this.title = OptionalUtils.orElse(actionDefinition.getTitle(), null);
     }
@@ -136,12 +136,12 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     }
 
     @Override
-    public Optional<OutputSchema> getOutputSchema() {
-        return Optional.ofNullable(outputSchema);
+    public Optional<Output> getOutput() {
+        return Optional.ofNullable(output);
     }
 
     @Override
-    public Optional<ActionOutputSchemaFunction> getOutputSchemaFunction() {
+    public Optional<ActionOutputFunction> getOutputFunction() {
         return Optional.ofNullable(outputSchemaFunction);
     }
 
@@ -156,7 +156,7 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     }
 
     @Override
-    public boolean isOutputSchemaDefaultFunction() {
+    public boolean isDefaultOutputFunction() {
         return outputSchemaDefaultFunction;
     }
 }

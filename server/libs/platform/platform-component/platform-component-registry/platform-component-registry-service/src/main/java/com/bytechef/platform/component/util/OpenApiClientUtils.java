@@ -27,7 +27,7 @@ import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.definition.OutputSchema;
+import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ValueProperty;
 import java.util.ArrayList;
@@ -47,9 +47,9 @@ public class OpenApiClientUtils {
 
     public static Response execute(
         Map<String, ?> inputParameters, List<? extends Property> properties,
-        @Nullable OutputSchema outputSchema, Map<String, Object> metadata, Context context) {
+        @Nullable Output output, Map<String, Object> metadata, Context context) {
 
-        ValueProperty<?> outputSchemaDefinition = outputSchema == null ? null : outputSchema.definition();
+        ValueProperty<?> outputSchemaDefinition = output == null ? null : output.outputSchema();
 
         return context.http(http -> http.exchange(
             createUrl(inputParameters, metadata, properties), MapUtils.get(metadata, "method", RequestMethod.class)))

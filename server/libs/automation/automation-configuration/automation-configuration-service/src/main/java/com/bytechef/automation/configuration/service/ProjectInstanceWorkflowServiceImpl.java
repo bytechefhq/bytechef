@@ -61,31 +61,32 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     @Override
     @Transactional(readOnly = true)
     public Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
-        long projectInstanceId, String workflowId, String operationName,
+        long projectInstanceId, String workflowId, String workflowNodeName,
         String key) {
 
-        return projectInstanceWorkflowConnectionRepository.findByProjectInstanceIdAndWorkflowIdAndOperationNameAndKey(
-            projectInstanceId, workflowId, operationName, key);
+        return projectInstanceWorkflowConnectionRepository
+            .findByProjectInstanceIdAndWorkflowIdAndWorkflowNodeNameAndKey(
+                projectInstanceId, workflowId, workflowNodeName, key);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProjectInstanceWorkflowConnection getProjectInstanceWorkflowConnection(
-        long projectInstanceId, String workflowId, String operationName,
+        long projectInstanceId, String workflowId, String workflowNodeName,
         String key) {
 
         return OptionalUtils.get(
-            projectInstanceWorkflowConnectionRepository.findByProjectInstanceIdAndWorkflowIdAndOperationNameAndKey(
-                projectInstanceId, workflowId, operationName, key));
+            projectInstanceWorkflowConnectionRepository.findByProjectInstanceIdAndWorkflowIdAndWorkflowNodeNameAndKey(
+                projectInstanceId, workflowId, workflowNodeName, key));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProjectInstanceWorkflowConnection> getProjectInstanceWorkflowConnections(
-        long projectInstanceId, String workflowId, String operationName) {
+        long projectInstanceId, String workflowId, String workflowNodeName) {
 
-        return projectInstanceWorkflowConnectionRepository.findAllByProjectInstanceIdAndWorkflowIdAndOperationName(
-            projectInstanceId, workflowId, operationName);
+        return projectInstanceWorkflowConnectionRepository.findAllByProjectInstanceIdAndWorkflowIdAndWorkflowNodeName(
+            projectInstanceId, workflowId, workflowNodeName);
     }
 
     @Override

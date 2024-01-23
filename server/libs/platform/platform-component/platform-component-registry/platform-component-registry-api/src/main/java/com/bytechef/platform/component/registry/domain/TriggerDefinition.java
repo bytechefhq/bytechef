@@ -29,9 +29,9 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class TriggerDefinition extends TriggerDefinitionBasic {
 
-    private boolean editorDescriptionDataSource;
-    private OutputSchema outputSchema;
-    private boolean outputSchemaDataSource;
+    private boolean editorDescriptionDefined;
+    private Output output;
+    private boolean outputDefined;
     private List<? extends Property> properties;
     private boolean webhookRawBody;
     private boolean workflowSyncExecution;
@@ -43,18 +43,20 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     public TriggerDefinition(com.bytechef.component.definition.TriggerDefinition triggerDefinition) {
         super(triggerDefinition);
 
-        this.editorDescriptionDataSource = OptionalUtils.mapOrElse(
+        this.editorDescriptionDefined = OptionalUtils.mapOrElse(
             triggerDefinition.getEditorDescriptionFunction(), editorDescriptionDataSource -> true, false);
-        this.outputSchema = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutputSchema(),
+        this.output = OptionalUtils.mapOrElse(
+            triggerDefinition.getOutput(),
             outputSchema -> SchemaUtils.toOutputSchema(
                 outputSchema,
-                (baseValueProperty, sampleOutput) -> new OutputSchema(
+                (baseValueProperty, sampleOutput) -> new Output(
                     Property.toProperty((com.bytechef.component.definition.Property) baseValueProperty), sampleOutput)),
             null);
-        this.outputSchemaDataSource = OptionalUtils.mapOrElse(
-            triggerDefinition.getOutputSchemaFunction(), outputSchemaDataSource -> true,
-            triggerDefinition.isOutputSchemaDefaultFunction());
+        this.outputDefined = OptionalUtils.mapOrElse(
+            triggerDefinition.getOutput(), outputSchema -> true, false) ||
+            OptionalUtils.mapOrElse(
+                triggerDefinition.getOutputFunction(), outputSchemaDataSource -> true,
+                triggerDefinition.isDefaultOutputFunction());
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()), Property::toProperty);
         this.webhookRawBody = OptionalUtils.orElse(triggerDefinition.getWebhookRawBody(), false);
@@ -76,34 +78,34 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
             return false;
         }
 
-        return editorDescriptionDataSource == that.editorDescriptionDataSource
-            && outputSchemaDataSource == that.outputSchemaDataSource && webhookRawBody == that.webhookRawBody
+        return editorDescriptionDefined == that.editorDescriptionDefined
+            && outputDefined == that.outputDefined && webhookRawBody == that.webhookRawBody
             && workflowSyncExecution == that.workflowSyncExecution
-            && workflowSyncValidation == that.workflowSyncValidation && Objects.equals(outputSchema, that.outputSchema)
+            && workflowSyncValidation == that.workflowSyncValidation && Objects.equals(output, that.output)
             && Objects.equals(properties, that.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), editorDescriptionDataSource, outputSchema, outputSchemaDataSource,
+        return Objects.hash(super.hashCode(), editorDescriptionDefined, output, outputDefined,
             properties, webhookRawBody, workflowSyncExecution,
             workflowSyncValidation);
     }
 
-    public OutputSchema getOutputSchema() {
-        return outputSchema;
+    public Output getOutput() {
+        return output;
     }
 
     public List<? extends Property> getProperties() {
         return properties;
     }
 
-    public boolean isEditorDescriptionDataSource() {
-        return editorDescriptionDataSource;
+    public boolean isEditorDescriptionDefined() {
+        return editorDescriptionDefined;
     }
 
-    public boolean isOutputSchemaDataSource() {
-        return outputSchemaDataSource;
+    public boolean isOutputDefined() {
+        return outputDefined;
     }
 
     public boolean isWebhookRawBody() {
@@ -121,9 +123,9 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     @Override
     public String toString() {
         return "TriggerDefinition{" +
-            "editorDescriptionDataSource=" + editorDescriptionDataSource +
-            ", outputSchema=" + outputSchema +
-            ", outputSchemaDataSource=" + outputSchemaDataSource +
+            "editorDescriptionDefined=" + editorDescriptionDefined +
+            ", outputDefined=" + outputDefined +
+            ", outputSchema=" + output +
             ", properties=" + properties +
             ", webhookRawBody=" + webhookRawBody +
             ", workflowSyncExecution=" + workflowSyncExecution +

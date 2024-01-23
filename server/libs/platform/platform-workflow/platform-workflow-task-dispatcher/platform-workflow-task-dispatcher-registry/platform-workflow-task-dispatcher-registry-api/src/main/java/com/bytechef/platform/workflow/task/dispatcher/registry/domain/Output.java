@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.instance.accessor;
+package com.bytechef.platform.workflow.task.dispatcher.registry.domain;
 
-import com.bytechef.platform.constant.Type;
-import java.util.Map;
+import com.bytechef.platform.registry.domain.BaseOutput;
 
 /**
  * @author Ivica Cardic
  */
-public interface InstanceAccessor {
+public class Output extends BaseOutput<Property> {
 
-    boolean isConnectionUsed(
-        long connectionId, String workflowId, String workflowNodeName, String workflowConnectionKey);
-
-    boolean isWorkflowEnabled(long instanceId, String workflowId);
-
-    Map<String, ?> getInputMap(long instanceId, String workflowId);
-
-    Type getType();
+    public Output(Property outputSchema, Object sampleOutput) {
+        super(outputSchema, sampleOutput);
+    }
 }

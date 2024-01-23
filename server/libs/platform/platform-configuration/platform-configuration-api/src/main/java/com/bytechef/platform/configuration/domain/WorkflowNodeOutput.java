@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import java.util.Map;
 import java.util.Objects;
@@ -30,8 +31,8 @@ import org.springframework.data.relational.core.mapping.Table;
 /**
  * @author Ivica Cardic
  */
-@Table("workflow_component_definition")
-public class WorkflowComponentDefinition implements Persistable<Long> {
+@Table("workflow_node_output")
+public class WorkflowNodeOutput implements Persistable<Long> {
 
     @Id
     private Long id;
@@ -45,14 +46,14 @@ public class WorkflowComponentDefinition implements Persistable<Long> {
     @Column("component_version")
     private int componentVersion;
 
-    @Column("operation_name")
-    private String operationName;
-
-    @Column("outputSchema")
+    @Column("output_schema")
     private MapWrapper outputSchema;
 
-    @Column("sampleOutput")
+    @Column("sample_output")
     private MapWrapper sampleOutput;
+
+    @Column("workflow_node_name")
+    private String workflowNodeName;
 
     @Version
     private int version;
@@ -69,7 +70,7 @@ public class WorkflowComponentDefinition implements Persistable<Long> {
             return false;
         }
 
-        WorkflowComponentDefinition that = (WorkflowComponentDefinition) o;
+        WorkflowNodeOutput that = (WorkflowNodeOutput) o;
 
         return Objects.equals(id, that.id);
     }
@@ -101,12 +102,12 @@ public class WorkflowComponentDefinition implements Persistable<Long> {
         return id;
     }
 
-    public String getOperationName() {
-        return operationName;
+    public Output getOutput() {
+        return new Output(getOutputSchema(), sampleOutput);
     }
 
     public Property getOutputSchema() {
-        return MapUtils.get(outputSchema.getMap(), "outputSchema", Property.class);
+        return MapUtils.get(outputSchema.getMap(), "output", Property.class);
     }
 
     public Object getSampleOutput() {
@@ -119,6 +120,10 @@ public class WorkflowComponentDefinition implements Persistable<Long> {
 
     public String getWorkflowId() {
         return workflowId;
+    }
+
+    public String getWorkflowNodeName() {
+        return workflowNodeName;
     }
 
     public void setId(Long id) {
@@ -137,12 +142,8 @@ public class WorkflowComponentDefinition implements Persistable<Long> {
         this.componentVersion = componentVersion;
     }
 
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
-    }
-
     public void setOutputSchema(Property outputSchema) {
-        this.outputSchema = new MapWrapper(Map.of("outputSchema", outputSchema));
+        this.outputSchema = new MapWrapper(Map.of("output", outputSchema));
     }
 
     public void setSampleOutput(Object sampleOutput) {
@@ -157,6 +158,10 @@ public class WorkflowComponentDefinition implements Persistable<Long> {
         this.workflowId = workflowId;
     }
 
+    public void setWorkflowNodeName(String workflowNodeName) {
+        this.workflowNodeName = workflowNodeName;
+    }
+
     @Override
     public String toString() {
         return "DynamicComponentDefinition{" +
@@ -164,7 +169,7 @@ public class WorkflowComponentDefinition implements Persistable<Long> {
             ", componentName='" + componentName + '\'' +
             ", componentOperationName='" + componentOperationName + '\'' +
             ", componentVersion=" + componentVersion +
-            ", operationName='" + operationName + '\'' +
+            ", workflowNodeName='" + workflowNodeName + '\'' +
             ", outputSchema='" + outputSchema + '\'' +
             ", sampleOutput='" + sampleOutput + '\'' +
             ", workflowId='" + workflowId + '\'' +

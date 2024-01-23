@@ -9,7 +9,7 @@ package com.bytechef.platform.component.registry.remote.client.facade;
 
 import com.bytechef.commons.rest.client.DefaultRestClient;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.OutputSchema;
+import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.registry.remote.client.AbstractWorkerClient;
@@ -67,13 +67,13 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public OutputSchema executeOutputSchema(
+    public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> inputParameters, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-output-schema"),
-            new OutputSchemaRequest(
+            new OutputRequest(
                 actionName, inputParameters, componentName, componentVersion, connectionId),
             new ParameterizedTypeReference<>() {});
     }
@@ -114,7 +114,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
         int componentVersion, Long connectionId, String searchText) {
     }
 
-    private record OutputSchemaRequest(
+    private record OutputRequest(
         String actionName, Map<String, Object> inputParameters, String componentName, int componentVersion,
         Long connectionId) {
     }

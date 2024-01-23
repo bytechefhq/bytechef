@@ -26,7 +26,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
-import com.bytechef.component.definition.OutputSchema;
+import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
@@ -239,7 +239,7 @@ public class ComponentDefinitionRegistry {
                 PropertyUtils.checkInputProperties(
                     OptionalUtils.orElse(actionDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(
-                    OptionalUtils.mapOrElse(actionDefinition.getOutputSchema(), OutputSchema::definition, null));
+                    OptionalUtils.mapOrElse(actionDefinition.getOutput(), Output::outputSchema, null));
             }
 
             List<? extends TriggerDefinition> triggerDefinitions = OptionalUtils.orElse(
@@ -248,7 +248,7 @@ public class ComponentDefinitionRegistry {
             for (TriggerDefinition triggerDefinition : triggerDefinitions) {
                 PropertyUtils.checkInputProperties(OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(
-                    OptionalUtils.mapOrElse(triggerDefinition.getOutputSchema(), OutputSchema::definition, null));
+                    OptionalUtils.mapOrElse(triggerDefinition.getOutput(), Output::outputSchema, null));
 
                 if (triggerDefinition.getType() == null) {
                     throw new IllegalStateException(

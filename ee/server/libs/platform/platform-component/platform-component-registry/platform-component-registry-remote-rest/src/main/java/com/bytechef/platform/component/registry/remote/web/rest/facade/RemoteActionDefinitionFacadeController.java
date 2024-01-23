@@ -8,7 +8,7 @@
 package com.bytechef.platform.component.registry.remote.web.rest.facade;
 
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.OutputSchema;
+import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -99,17 +99,17 @@ public class RemoteActionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-output-schema",
+        value = "/execute-output",
         consumes = {
             "application/json"
         })
-    public ResponseEntity<OutputSchema> executeOutputSchema(
-        @Valid @RequestBody OutputSchemaRequest outputSchemaRequest) {
+    public ResponseEntity<Output> executeOutput(
+        @Valid @RequestBody RemoteActionDefinitionFacadeController.OutputRequest outputRequest) {
 
         return ResponseEntity.ok(
-            actionDefinitionFacade.executeOutputSchema(
-                outputSchemaRequest.componentName, outputSchemaRequest.componentVersion, outputSchemaRequest.actionName,
-                outputSchemaRequest.inputParameters, outputSchemaRequest.connectionId));
+            actionDefinitionFacade.executeOutput(
+                outputRequest.componentName, outputRequest.componentVersion, outputRequest.actionName,
+                outputRequest.inputParameters, outputRequest.connectionId));
     }
 
     @SuppressFBWarnings("EI")
@@ -125,7 +125,7 @@ public class RemoteActionDefinitionFacadeController {
     }
 
     @SuppressFBWarnings("EI")
-    public record OutputSchemaRequest(
+    public record OutputRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
         Map<String, Object> inputParameters, Long connectionId) {
     }

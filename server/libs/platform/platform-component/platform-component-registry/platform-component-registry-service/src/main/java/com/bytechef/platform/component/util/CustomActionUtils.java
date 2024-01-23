@@ -162,7 +162,7 @@ public class CustomActionUtils {
                     .displayCondition("'%s' === '%s'".formatted(Http.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
                     .defaultValue("text/plain")
                     .placeholder("text/plain"))
-            .outputSchema()
+            .output()
             .perform(CustomActionUtils::perform);
 
         return customActionDefinition.help(

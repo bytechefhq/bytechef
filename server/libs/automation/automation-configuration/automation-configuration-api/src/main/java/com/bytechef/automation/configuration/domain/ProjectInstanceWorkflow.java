@@ -72,7 +72,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<Pr
     private AggregateReference<Project, Long> projectInstanceId;
 
     @MappedCollection(idColumn = "project_instance_workflow_id")
-    private Set<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections = Collections.emptySet();
+    private Set<ProjectInstanceWorkflowConnection> connections = Collections.emptySet();
 
     @Version
     private int version;
@@ -86,7 +86,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<Pr
     public ProjectInstanceWorkflow(
         List<ProjectInstanceWorkflowConnection> connections, Map<String, Object> inputs, String workflowId) {
 
-        this.projectInstanceWorkflowConnections = new HashSet<>(connections);
+        this.connections = new HashSet<>(connections);
         this.inputs = new MapWrapper(inputs);
         this.workflowId = workflowId;
     }
@@ -116,7 +116,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<Pr
     }
 
     public List<ProjectInstanceWorkflowConnection> getConnections() {
-        return List.copyOf(projectInstanceWorkflowConnections);
+        return List.copyOf(connections);
     }
 
     public String getCreatedBy() {
@@ -167,7 +167,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<Pr
 
     public void setConnections(List<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections) {
         if (projectInstanceWorkflowConnections != null) {
-            this.projectInstanceWorkflowConnections = new HashSet<>(projectInstanceWorkflowConnections);
+            this.connections = new HashSet<>(projectInstanceWorkflowConnections);
         }
     }
 
@@ -205,7 +205,7 @@ public class ProjectInstanceWorkflow implements Persistable<Long>, Comparable<Pr
             + id + '\'' + ", workflowId='"
             + workflowId + '\'' + ", inputs="
             + inputs + ", projectInstanceWorkflowConnections="
-            + projectInstanceWorkflowConnections + ", enabled="
+            + connections + ", enabled="
             + enabled + '}';
     }
 }

@@ -21,18 +21,18 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public abstract class BaseOutputSchema<P extends BaseProperty> {
+public abstract class BaseOutput<P extends BaseProperty> {
 
-    private final P definition;
+    private final P outputSchema;
     private final Object sampleOutput;
 
-    public BaseOutputSchema(P definition, Object sampleOutput) {
-        this.definition = definition;
+    public BaseOutput(P outputSchema, Object sampleOutput) {
+        this.outputSchema = outputSchema;
         this.sampleOutput = sampleOutput;
     }
 
-    public P getDefinition() {
-        return definition;
+    public P getOutputSchema() {
+        return outputSchema;
     }
 
     public Object getSampleOutput() {
@@ -45,22 +45,22 @@ public abstract class BaseOutputSchema<P extends BaseProperty> {
             return true;
         }
 
-        if (!(o instanceof BaseOutputSchema<?> that)) {
+        if (!(o instanceof BaseOutput<?> that)) {
             return false;
         }
 
-        return Objects.equals(definition, that.definition) && Objects.equals(sampleOutput, that.sampleOutput);
+        return Objects.equals(outputSchema, that.outputSchema) && Objects.equals(sampleOutput, that.sampleOutput);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(definition, sampleOutput);
+        return Objects.hash(outputSchema, sampleOutput);
     }
 
     @Override
     public String toString() {
         return "BaseOutputSchema{" +
-            "definition=" + definition +
+            "definition=" + outputSchema +
             ", sampleOutput=" + sampleOutput +
             '}';
     }

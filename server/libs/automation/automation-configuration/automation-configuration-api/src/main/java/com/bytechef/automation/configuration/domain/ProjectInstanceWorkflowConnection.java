@@ -39,17 +39,17 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
     @Column
     private String key;
 
-    @Column("operation_name")
-    private String operationName;
+    @Column("workflow_node_name")
+    private String workflowNodeName;
 
     public ProjectInstanceWorkflowConnection() {
     }
 
     @Default
-    public ProjectInstanceWorkflowConnection(Long connectionId, String key, String operationName) {
+    public ProjectInstanceWorkflowConnection(Long connectionId, String key, String workflowNodeName) {
         this.connectionId = connectionId == null ? null : AggregateReference.to(connectionId);
         this.key = key;
-        this.operationName = operationName;
+        this.workflowNodeName = workflowNodeName;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
         ProjectInstanceWorkflowConnection that = (ProjectInstanceWorkflowConnection) o;
 
         return Objects.equals(id, that.id) && Objects.equals(connectionId, that.connectionId) &&
-            Objects.equals(key, that.key) && Objects.equals(operationName, that.operationName);
+            Objects.equals(key, that.key) && Objects.equals(workflowNodeName, that.workflowNodeName);
     }
 
     @Override
@@ -85,8 +85,8 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
         return key;
     }
 
-    public String getOperationName() {
-        return operationName;
+    public String getWorkflowNodeName() {
+        return workflowNodeName;
     }
 
     @Override
@@ -100,7 +100,7 @@ public class ProjectInstanceWorkflowConnection implements Persistable<Long> {
             "id=" + id +
             ", connectionId=" + connectionId +
             ", key='" + key + '\'' +
-            ", taskName='" + operationName + '\'' +
+            ", workflowNodeName='" + workflowNodeName + '\'' +
             '}';
     }
 

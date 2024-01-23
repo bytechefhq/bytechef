@@ -41,10 +41,10 @@ import com.bytechef.platform.component.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.definition.HttpParametersImpl;
 import com.bytechef.platform.component.definition.ParametersImpl;
 import com.bytechef.platform.component.registry.ComponentDefinitionRegistry;
-import com.bytechef.platform.component.registry.component.OperationType;
+import com.bytechef.platform.component.registry.component.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.OutputSchema;
+import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.domain.ValueProperty;
@@ -226,7 +226,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public OutputSchema executeOutputSchema(
+    public Output executeOutputSchema(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 
@@ -309,15 +309,15 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public List<TriggerDefinition> getTriggerDefinitions(@NonNull List<OperationType> operationTypes) {
+    public List<TriggerDefinition> getTriggerDefinitions(@NonNull List<WorkflowNodeType> workflowNodeTypes) {
         List<TriggerDefinition> triggerDefinitions;
 
-        if (operationTypes.isEmpty()) {
+        if (workflowNodeTypes.isEmpty()) {
             triggerDefinitions = CollectionUtils.map(
                 componentDefinitionRegistry.getTriggerDefinitions(), TriggerDefinition::new);
         } else {
             triggerDefinitions = CollectionUtils.map(
-                operationTypes,
+                workflowNodeTypes,
                 componentOperation -> getTriggerDefinition(
                     componentOperation.componentName(), componentOperation.componentVersion(),
                     componentOperation.componentOperationName()));

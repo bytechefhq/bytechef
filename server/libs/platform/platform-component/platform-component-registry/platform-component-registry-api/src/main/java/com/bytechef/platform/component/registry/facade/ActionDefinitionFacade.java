@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.registry.facade;
 
 import com.bytechef.platform.component.registry.domain.Option;
-import com.bytechef.platform.component.registry.domain.OutputSchema;
+import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +40,7 @@ public interface ActionDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         @NonNull Map<String, Object> inputParameters, Long connectionId, String searchText);
 
-    OutputSchema executeOutputSchema(
+    Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, Object> inputParameters, Long connectionId);
 

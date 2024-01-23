@@ -245,7 +245,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         return workflowConnection.getId()
             .map(curConnectionId -> connectionId == curConnectionId)
             .orElseGet(() -> isConnectionUsed(
-                workflowId, workflowConnection.getOperationName(), workflowConnection.getKey(),
+                workflowId, workflowConnection.getWorkflowNodeName(), workflowConnection.getKey(),
                 connectionId, type));
     }
 
@@ -258,13 +258,12 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     private boolean isConnectionUsed(
-        String workflowId, String workflowConnectionOperationName, String workflowConnectionKey, long connectionId,
+        String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
         Type type) {
 
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(type);
 
-        return instanceAccessor.isConnectionUsed(
-            connectionId, workflowId, workflowConnectionOperationName, workflowConnectionKey);
+        return instanceAccessor.isConnectionUsed(connectionId, workflowId, workflowNodeName, workflowConnectionKey);
     }
 
     private List<Tag> filterTags(List<Tag> tags, Connection connection) {

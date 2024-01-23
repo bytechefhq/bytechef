@@ -332,7 +332,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     private Long getConnectionId(long projectInstanceId, String workflowId, WorkflowConnection workflowConnection) {
         return workflowConnection.getId()
             .orElseGet(() -> getConnectionId(
-                projectInstanceId, workflowId, workflowConnection.getOperationName(), workflowConnection.getKey()));
+                projectInstanceId, workflowId, workflowConnection.getWorkflowNodeName(), workflowConnection.getKey()));
     }
 
     private Long getConnectionId(long projectInstanceId, String workflowId, WorkflowTrigger workflowTrigger) {
@@ -344,12 +344,11 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     private Long getConnectionId(
-        long projectInstanceId, String workflowId, String workflowConnectionOperationName,
-        String workflowConnectionKey) {
+        long projectInstanceId, String workflowId, String workflowNodeName, String workflowConnectionKey) {
 
         ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection =
             projectInstanceWorkflowService.getProjectInstanceWorkflowConnection(
-                projectInstanceId, workflowId, workflowConnectionOperationName, workflowConnectionKey);
+                projectInstanceId, workflowId, workflowNodeName, workflowConnectionKey);
 
         return projectInstanceWorkflowConnection.getConnectionId();
     }

@@ -71,11 +71,11 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
 
     @Override
     public ResponseEntity<List<WorkflowTestConfigurationConnectionModel>> getWorkflowTestConfigurationConnections(
-        String workflowId, String operationName) {
+        String workflowId, String workflowNodeName) {
 
         return ResponseEntity.ok(
             CollectionUtils.map(
-                workflowTestConfigurationService.getWorkflowTestConfigurationConnections(workflowId, operationName),
+                workflowTestConfigurationService.getWorkflowTestConfigurationConnections(workflowId, workflowNodeName),
                 workflowTestConfigurationConnection -> conversionService.convert(
                     workflowTestConfigurationConnection, WorkflowTestConfigurationConnectionModel.class)));
     }
@@ -94,11 +94,11 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
 
     @Override
     public ResponseEntity<Void> updateWorkflowTestConfigurationConnection(
-        String workflowId, String operationName, String key,
+        String workflowId, String workflowNodeName, String key,
         UpdateWorkflowTestConfigurationConnectionRequestModel updateWorkflowTestConfigurationConnectionRequestModel) {
 
         workflowTestConfigurationService.updateWorkflowTestConfigurationConnection(
-            workflowId, operationName, key,
+            workflowId, workflowNodeName, key,
             updateWorkflowTestConfigurationConnectionRequestModel.getConnectionId());
 
         return ResponseEntity.noContent()
