@@ -27,16 +27,16 @@ import com.bytechef.platform.component.registry.domain.TriggerDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.component.registry.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.constant.MetadataConstants;
+import com.bytechef.platform.configuration.domain.WorkflowComponentDefinition;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.service.WorkflowComponentDefinitionService;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
-import com.bytechef.platform.workflow.test.domain.WorkflowTestComponentDefinition;
 import com.bytechef.platform.workflow.test.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.workflow.test.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecution;
 import com.bytechef.platform.workflow.test.executor.JobTestExecutor;
-import com.bytechef.platform.workflow.test.service.WorkflowTestComponentDefinitionService;
 import com.bytechef.platform.workflow.test.service.WorkflowTestConfigurationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -56,21 +56,21 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
     private final JobTestExecutor jobTestExecutor;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowService workflowService;
-    private final WorkflowTestComponentDefinitionService workflowTestComponentDefinitionService;
+    private final WorkflowComponentDefinitionService workflowComponentDefinitionService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowTestFacadeImpl(
         ComponentDefinitionService componentDefinitionService, JobTestExecutor jobTestExecutor,
         TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
-        WorkflowTestComponentDefinitionService workflowTestComponentDefinitionService,
+        WorkflowComponentDefinitionService workflowComponentDefinitionService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.jobTestExecutor = jobTestExecutor;
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowService = workflowService;
-        this.workflowTestComponentDefinitionService = workflowTestComponentDefinitionService;
+        this.workflowComponentDefinitionService = workflowComponentDefinitionService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
@@ -106,9 +106,9 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
             OperationType operationType = OperationType.ofType(workflowTrigger.getType());
 
             Object sampleOutput = OptionalUtils.mapOrElseGet(
-                workflowTestComponentDefinitionService.fetchWorkflowTestComponentDefinition(
+                workflowComponentDefinitionService.fetchWorkflowComponentDefinition(
                     workflowId, workflowTrigger.getName()),
-                WorkflowTestComponentDefinition::getSampleOutput,
+                WorkflowComponentDefinition::getSampleOutput,
                 () -> {
                     TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
                         operationType.componentName(), operationType.componentVersion(),

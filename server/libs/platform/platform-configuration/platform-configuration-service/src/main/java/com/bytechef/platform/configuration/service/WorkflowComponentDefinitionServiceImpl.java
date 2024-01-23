@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.service;
+package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.workflow.test.domain.WorkflowTestComponentDefinition;
-import com.bytechef.platform.workflow.test.repository.WorkflowTestComponentDefinitionRepository;
+import com.bytechef.platform.configuration.domain.WorkflowComponentDefinition;
+import com.bytechef.platform.configuration.repository.WorkflowComponentDefinitionRepository;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,18 +27,18 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class WorkflowTestComponentDefinitionServiceImpl implements WorkflowTestComponentDefinitionService {
+public class WorkflowComponentDefinitionServiceImpl implements WorkflowComponentDefinitionService {
 
-    private final WorkflowTestComponentDefinitionRepository workflowTestComponentDefinitionRepository;
+    private final WorkflowComponentDefinitionRepository workflowTestComponentDefinitionRepository;
 
-    public WorkflowTestComponentDefinitionServiceImpl(
-        WorkflowTestComponentDefinitionRepository workflowTestComponentDefinitionRepository) {
+    public WorkflowComponentDefinitionServiceImpl(
+        WorkflowComponentDefinitionRepository workflowTestComponentDefinitionRepository) {
 
         this.workflowTestComponentDefinitionRepository = workflowTestComponentDefinitionRepository;
     }
 
     @Override
-    public Optional<WorkflowTestComponentDefinition> fetchWorkflowTestComponentDefinition(
+    public Optional<WorkflowComponentDefinition> fetchWorkflowComponentDefinition(
         String workflowId, String triggerName) {
 
         return workflowTestComponentDefinitionRepository.findByWorkflowIdAndOperationName(workflowId, triggerName);

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.repository;
+package com.bytechef.platform.configuration.repository;
 
-import com.bytechef.platform.workflow.test.domain.WorkflowTestComponentDefinition;
+import com.bytechef.platform.configuration.domain.WorkflowComponentDefinition;
 import java.util.Optional;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
@@ -25,8 +25,8 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-public interface WorkflowTestComponentDefinitionRepository
-    extends ListCrudRepository<WorkflowTestComponentDefinition, Long> {
+public interface WorkflowComponentDefinitionRepository
+    extends ListCrudRepository<WorkflowComponentDefinition, Long> {
 
-    Optional<WorkflowTestComponentDefinition> findByWorkflowIdAndOperationName(String workflowId, String operationName);
+    Optional<WorkflowComponentDefinition> findByWorkflowIdAndOperationName(String workflowId, String operationName);
 }
