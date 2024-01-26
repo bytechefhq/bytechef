@@ -6,8 +6,7 @@ import 'reactflow/dist/base.css';
 
 import './ProjectWorkflow.css';
 
-import {useGetActionDefinitionsQuery} from '@/queries/platform/actionDefinitions.queries';
-import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
+import {useGetWorkflowNodeOutputsQuery} from '@/queries/platform/workflowNodeOutputs.queries';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -20,29 +19,26 @@ const ProjectWorkflow = ({
     taskDispatcherDefinitions,
     workflowId,
 }: WorkflowEditorProps) => {
-    const {componentActions, componentNames, nodeNames} = useWorkflowDataStore();
+    const {componentActions} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const currentNodeIndex = nodeNames.indexOf(currentNode.name);
-
-    const previousComponentNames = componentNames.length > 1 ? componentNames.slice(0, currentNodeIndex) : [];
-
-    const normalizedPreviousComponentNames = previousComponentNames.map((name) =>
-        name.match(new RegExp(/_\d$/)) ? name.slice(0, name.length - 2) : name
-    );
-
-    const {data: previousComponentDefinitions} = useGetComponentDefinitionsQuery(
+    const {data: workflowStepOutputs} = useGetWorkflowNodeOutputsQuery(
         {
-            include: normalizedPreviousComponentNames,
+            lastWorkflowNodeName: currentNode.name,
+            workflowId,
         },
-        !!normalizedPreviousComponentNames.length
+        !!componentActions?.length
     );
 
-    const taskTypes = componentActions?.map(
-        (componentAction) => `${componentAction.componentName}/1/${componentAction.actionName}`
-    );
-
-    const {data: actionDefinitions} = useGetActionDefinitionsQuery({taskTypes}, !!componentActions?.length);
+    const previousComponentDefinitions = workflowStepOutputs
+        ? workflowStepOutputs.map(
+              (workflowStepOutput) =>
+                  componentDefinitions.filter(
+                      (componentDefinition) =>
+                          componentDefinition.name === workflowStepOutput?.actionDefinition?.componentName
+                  )[0]
+          )
+        : [];
 
     return (
         <ReactFlowProvider>
@@ -55,17 +51,16 @@ const ProjectWorkflow = ({
 
             {currentNode.name && (
                 <WorkflowNodeDetailsPanel
-                    actionDefinitions={actionDefinitions ?? []}
-                    previousComponentDefinitions={previousComponentDefinitions ?? []}
+                    previousComponentDefinitions={previousComponentDefinitions}
+                    workflowId={workflowId}
+                    workflowStepOutputs={workflowStepOutputs ?? []}
                 />
             )}
 
-            {actionDefinitions && previousComponentDefinitions && (
+            {workflowStepOutputs && previousComponentDefinitions && (
                 <DataPillPanel
-                    actionDefinitions={actionDefinitions}
-                    normalizedPreviousComponentNames={normalizedPreviousComponentNames}
                     previousComponentDefinitions={previousComponentDefinitions}
-                    previousComponentNames={previousComponentNames}
+                    workflowStepOutputs={workflowStepOutputs ?? []}
                 />
             )}
         </ReactFlowProvider>

@@ -59,15 +59,15 @@ const WorkflowTestConfigurationDialog = ({
     const workflowTestConfigurationConnections = workflowConnections.map((workflowConnection) => {
         const workflowTestConfigurationConfiguration = (workflowTestConfiguration?.connections ?? []).find(
             (curWorkflowTestConfigurationConfiguration) =>
-                curWorkflowTestConfigurationConfiguration.operationName === workflowConnection.operationName &&
-                curWorkflowTestConfigurationConfiguration.key === workflowConnection.key
+                curWorkflowTestConfigurationConfiguration.workflowNodeName === workflowConnection.workflowNodeName &&
+                curWorkflowTestConfigurationConfiguration.workflowConnectionKey === workflowConnection.key
         );
 
         return (
             workflowTestConfigurationConfiguration ??
             ({
-                key: workflowConnection.key,
-                operationName: workflowConnection.operationName,
+                workflowConnectionKey: workflowConnection.key,
+                workflowNodeName: workflowConnection.workflowNodeName,
             } as WorkflowTestConfigurationConnectionModel)
         );
     });
@@ -187,8 +187,8 @@ const WorkflowTestConfigurationDialog = ({
                                             const operationConnectionCount = workflowConnections.reduce(
                                                 (count, curWorkflowConnection) => {
                                                     if (
-                                                        curWorkflowConnection.operationName ===
-                                                        workflowConnection.operationName
+                                                        curWorkflowConnection.workflowNodeName ===
+                                                        workflowConnection.workflowNodeName
                                                     ) {
                                                         return count + 1;
                                                     }
@@ -210,7 +210,7 @@ const WorkflowTestConfigurationDialog = ({
                                                                         {'Connection '}
 
                                                                         <span className="text-xs text-gray-500">
-                                                                            {`(${workflowConnection.operationName}${
+                                                                            {`(${workflowConnection.workflowNodeName}${
                                                                                 operationConnectionCount > 1
                                                                                     ? ' - ' + workflowConnection.key
                                                                                     : ''

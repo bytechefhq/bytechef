@@ -1,77 +1,46 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ActionDefinitionModel, ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
+import {ComponentDefinitionBasicModel, WorkflowNodeOutputModel} from '@/middleware/platform/configuration';
 import DataPillPanelBody, {ComponentActionData} from '@/pages/automation/project/components/DataPillPanelBody';
-import {PropertyType} from '@/types/projectTypes';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import Input from 'components/Input/Input';
 import {useState} from 'react';
 
 import {useDataPillPanelStore} from '../stores/useDataPillPanelStore';
-import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetailsPanelStore';
 
 const DataPillPanel = ({
-    actionDefinitions,
-    normalizedPreviousComponentNames,
     previousComponentDefinitions,
-    previousComponentNames,
+    workflowStepOutputs,
 }: {
-    actionDefinitions: Array<ActionDefinitionModel>;
-    normalizedPreviousComponentNames: Array<string>;
     previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
-    previousComponentNames: Array<string>;
+    workflowStepOutputs: WorkflowNodeOutputModel[];
 }) => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
     const {dataPillPanelOpen, setDataPillPanelOpen} = useDataPillPanelStore();
-    const {nodeNames} = useWorkflowDataStore();
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
-    const actionDataWithComponentAlias = actionDefinitions?.map((action) => {
-        const sameNameActions = actionDefinitions?.filter(
-            (actionDatum) => actionDatum.componentName === action.componentName
-        );
-
-        const sameNameIndex = sameNameActions.indexOf(action);
-
-        return {
-            ...action,
-            workflowNodeName: `${action.componentName}_${sameNameIndex + 1}`,
-        };
-    });
-
-    const previousActions = actionDataWithComponentAlias?.filter((action) =>
-        previousComponentNames.includes(action.componentName!)
-    );
-
-    const componentActionData = previousActions?.map((action, index) => {
-        const componentDefinition = previousComponentDefinitions?.find(
-            (currentComponentDefinition) => currentComponentDefinition.name === normalizedPreviousComponentNames[index]
-        );
-
-        if (previousComponentNames.includes(action.componentName!)) {
+    const componentActionData: ComponentActionData[] = workflowStepOutputs
+        .filter((workflowStepOutput) => workflowStepOutput?.actionDefinition)
+        .filter(
+            (workflowStepOutput) =>
+                workflowStepOutput.workflowNodeName !== currentNode.name &&
+                workflowStepOutput.actionDefinition!.outputDefined
+        )
+        .map((workflowStepOutput) => {
             return {
-                ...action,
-                componentDefinition,
-                workflowNodeName: nodeNames[index],
-            };
-        }
-    });
-
-    const dataPillComponentData = componentActionData?.filter((action) => {
-        if (!action) {
-            return false;
-        }
-
-        const outputSchemaContent =
-            (action.outputSchema?.definition as PropertyType)?.properties ||
-            (action.outputSchema?.definition as PropertyType)?.items ||
-            action.outputSchemaDataSource;
-
-        return action.workflowNodeName !== currentNode.name && action.componentDefinition && outputSchemaContent;
-    });
+                ...workflowStepOutput.actionDefinition,
+                componentDefinition: previousComponentDefinitions?.find(
+                    (currentComponentDefinition) =>
+                        currentComponentDefinition.name === workflowStepOutput.actionDefinition!.componentName
+                ),
+                outputSchema: workflowStepOutput.outputSchema,
+                sampleOutput: workflowStepOutput.sampleOutput,
+                workflowNodeName: workflowStepOutput.workflowNodeName,
+            } as ComponentActionData;
+        });
 
     return (
         <Dialog.Root
@@ -80,9 +49,8 @@ const DataPillPanel = ({
             open={
                 dataPillPanelOpen &&
                 workflowNodeDetailsPanelOpen &&
-                !!previousComponentNames.length &&
                 !!previousComponentDefinitions &&
-                !!dataPillComponentData.length
+                !!componentActionData.length
             }
         >
             <Dialog.Portal>
@@ -124,9 +92,9 @@ const DataPillPanel = ({
                                 value={dataPillFilterQuery}
                             />
 
-                            {dataPillComponentData && (
+                            {componentActionData && (
                                 <DataPillPanelBody
-                                    componentActionData={dataPillComponentData as Array<ComponentActionData>}
+                                    componentActionData={componentActionData}
                                     dataPillFilterQuery={dataPillFilterQuery}
                                 />
                             )}

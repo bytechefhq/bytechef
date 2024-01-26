@@ -1,4 +1,8 @@
-import {ActionDefinitionModel, ComponentDefinitionBasicModel} from '@/middleware/platform/configuration';
+import {
+    ActionDefinitionModel,
+    ComponentDefinitionBasicModel,
+    type PropertyModel,
+} from '@/middleware/platform/configuration';
 import getFilteredProperties from '@/pages/automation/project/utils/getFilteredProperties';
 import {PropertyType} from '@/types/projectTypes';
 import {Accordion, AccordionItem} from '@radix-ui/react-accordion';
@@ -7,6 +11,8 @@ import DataPillPanelBodyItem from './DataPillPanelBodyItem';
 
 export type ComponentActionData = {
     componentDefinition: ComponentDefinitionBasicModel;
+    outputSchema: PropertyModel;
+    sampleOutput: object;
     workflowNodeName: string;
 } & ActionDefinitionModel;
 
@@ -20,8 +26,7 @@ const DataPillPanelBody = ({componentActionData, dataPillFilterQuery}: DataPillP
         <div className="absolute left-0 top-0 w-full">
             <Accordion className="h-full" collapsible type="single">
                 {componentActionData.map((componentAction: ComponentActionData, index: number) => {
-                    const outputSchemaDefinition: PropertyType | undefined =
-                        componentActionData[index]?.outputSchema?.definition;
+                    const outputSchemaDefinition: PropertyType | undefined = componentActionData[index]?.outputSchema;
 
                     const properties: Array<PropertyType> | undefined = outputSchemaDefinition?.properties?.length
                         ? outputSchemaDefinition.properties

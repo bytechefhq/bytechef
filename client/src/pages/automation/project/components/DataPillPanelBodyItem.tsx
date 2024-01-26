@@ -1,3 +1,4 @@
+import {Button} from '@/components/ui/button';
 import DataPill from '@/pages/automation/project/components/DataPill';
 import {PropertyType} from '@/types/projectTypes';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
@@ -60,7 +61,7 @@ const DataPillPanelBodyItem = ({
                             componentIcon={componentAction.componentDefinition.icon}
                         />
 
-                        {(componentAction.outputSchema?.definition as PropertyType)?.type !== 'FILE_ENTRY' && (
+                        {(componentAction.outputSchema as PropertyType)?.type !== 'FILE_ENTRY' && (
                             <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">
                                 {filteredProperties?.map((property) => (
                                     <DataPill
@@ -74,13 +75,15 @@ const DataPillPanelBodyItem = ({
                         )}
                     </>
                 ) : (
-                    <div className="flex flex-col gap-2 px-6 py-4">
+                    <div className="flex flex-col gap-4 px-6 py-4">
                         <div className="font-semibold">Test component</div>
 
                         <div className="text-sm">
                             This component needs to be tested, to generate schema and sample data. Please go to the
                             &quot;Output&quot; tab of the component.
                         </div>
+
+                        <Button variant="secondary">Go to Output tab</Button>
                     </div>
                 )}
             </AccordionContent>
