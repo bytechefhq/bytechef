@@ -112,10 +112,7 @@ public final class GoogleDriveCreateNewTextFileAction {
         }
 
         return drive.files()
-            .create(
-                googleFile,
-                new FileContent(
-                    inputParameters.getString(MIME_TYPE), file))
+            .create(googleFile, new FileContent(inputParameters.getString(MIME_TYPE), file))
             .setFields("id")
             .setIgnoreDefaultVisibility(inputParameters.getBoolean(IGNORE_DEFAULT_VISIBILITY))
             .setKeepRevisionForever(inputParameters.getBoolean(KEEP_REVISION_FOREVER))

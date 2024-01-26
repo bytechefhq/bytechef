@@ -56,10 +56,8 @@ public class GoogleDriveReadFileActionTest extends AbstractGoogleDriveActionTest
             .thenReturn("includePermissionsForViewStub");
         when(mockedParameters.getString(INCLUDE_LABELS))
             .thenReturn("includeLabelsStub");
-
         when(mockedFiles.get(getArgumentCaptor.capture()))
             .thenReturn(mockedGet);
-
         when(mockedGet.setAcknowledgeAbuse(acknowledgeAbuseArgumentCaptor.capture()))
             .thenReturn(mockedGet);
         when(mockedGet.setSupportsAllDrives(supportsAllDrivesArgumentCaptor.capture()))

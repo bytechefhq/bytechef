@@ -83,9 +83,7 @@ public final class GoogleDriveCreateNewFolderAction {
         return drive.files()
             .create(
                 folderFile,
-                new FileContent(
-                    "application/vnd.google-apps.folder",
-                    java.io.File.createTempFile("New File", "")))
+                new FileContent("application/vnd.google-apps.folder", java.io.File.createTempFile("New File", "")))
             .setFields("id")
             .setIgnoreDefaultVisibility(inputParameters.getBoolean(IGNORE_DEFAULT_VISIBILITY))
             .setKeepRevisionForever(inputParameters.getBoolean(KEEP_REVISION_FOREVER))

@@ -49,7 +49,7 @@ public abstract class AbstractGoogleDriveCreateActionTest extends AbstractGoogle
     protected ArgumentCaptor<AbstractInputStreamContent> inputStreamArgumentCaptor =
         ArgumentCaptor.forClass(AbstractInputStreamContent.class);
 
-    protected HashMap<String, ArgumentCaptor> argumentCaptorMap = new HashMap<>() {
+    protected HashMap<String, ArgumentCaptor<?>> argumentCaptorMap = new HashMap<>() {
         {
             put(DRIVE_ID, ArgumentCaptor.forClass(String.class));
             put(IGNORE_DEFAULT_VISIBILITY, ArgumentCaptor.forClass(Boolean.class));
@@ -82,13 +82,10 @@ public abstract class AbstractGoogleDriveCreateActionTest extends AbstractGoogle
             .thenReturn("includePermissionsForViewStub");
         when(mockedParameters.getString(INCLUDE_LABELS))
             .thenReturn("includeLabelsStub");
-
         when(mockedFiles.create(any(), any()))
             .thenReturn(mockedCreate);
-
         when(mockedCreate.setFields("id"))
             .thenReturn(mockedCreate);
-
         when(mockedCreate.setIgnoreDefaultVisibility(
             (Boolean) argumentCaptorMap.get(IGNORE_DEFAULT_VISIBILITY).capture()))
             .thenReturn(mockedCreate);
