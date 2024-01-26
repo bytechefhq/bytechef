@@ -56,7 +56,7 @@ public class ScriptRubyAction {
                 .description("Add your Ruby custom logic here.")
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(ScriptRubyAction::perform);
 
     protected static Object perform(

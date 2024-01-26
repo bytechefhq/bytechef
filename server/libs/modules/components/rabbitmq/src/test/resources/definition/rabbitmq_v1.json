@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "sendMessage",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the queue to read from",
@@ -55,7 +55,7 @@
     } ],
     "title": "Send Message",
     "perform": { },
-    "outputSchema": null
+    "output": null
   } ],
   "category": null,
   "connection": {
@@ -166,8 +166,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "newMessage",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": { },
+    "defaultOutputFunction": false,
+    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the queue to read from",
@@ -203,7 +203,7 @@
     "listenerDisable": { },
     "listenerEnable": { },
     "webhookValidate": null,
-    "outputSchema": null
+    "output": null
   } ],
   "allowedConnections": null
 }

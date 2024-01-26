@@ -45,7 +45,7 @@ public class HttpClientDeleteAction {
                 //
 
                 HttpClientActionUtils.options(false)))
-        .outputSchema()
+        .output()
         .perform(HttpClientDeleteAction::perform);
 
     protected static Object perform(

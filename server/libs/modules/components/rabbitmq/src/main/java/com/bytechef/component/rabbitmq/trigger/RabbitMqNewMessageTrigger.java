@@ -29,7 +29,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.definition.TriggerOutputSchemaFunction.ListenerTriggerOutputSchemaFunction;
+import com.bytechef.component.definition.TriggerOutputFunction.ListenerTriggerOutputFunction;
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -55,11 +55,11 @@ public class RabbitMqNewMessageTrigger {
             string(QUEUE)
                 .description("The name of the queue to read from")
                 .required(true))
-        .outputSchema(getOutputSchema())
+        .output(getOutputSchema())
         .listenerEnable(RabbitMqNewMessageTrigger::listenerEnable)
         .listenerDisable(RabbitMqNewMessageTrigger::listenerDisable);
 
-    protected static ListenerTriggerOutputSchemaFunction getOutputSchema() {
+    protected static ListenerTriggerOutputFunction getOutputSchema() {
         // TODO
 
         return (inputParameters, connectionParameters, workflowExecutionId, context) -> null;

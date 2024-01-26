@@ -100,7 +100,7 @@ public class XlsxFileReadAction {
                     "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
                 .defaultValue("Sheet")
                 .advancedOption(true))
-        .outputSchema()
+        .output()
         .perform(XlsxFileReadAction::perform);
 
     protected static List<Map<String, ?>> perform(

@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "appendValueToList",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The namespace for appending a value.",
@@ -388,7 +388,7 @@
     } ],
     "title": "Append Value to List",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -401,8 +401,8 @@
     "help": null,
     "metadata": null,
     "name": "atomicIncrement",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to increment.",
@@ -483,7 +483,7 @@
     } ],
     "title": "Atomic Increment",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -496,8 +496,8 @@
     "help": null,
     "metadata": null,
     "name": "awaitGetValue",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to wait for.",
@@ -578,7 +578,7 @@
     } ],
     "title": "Await Get Value",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -591,8 +591,8 @@
     "help": null,
     "metadata": null,
     "name": "deleteValue",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to delete, stored earlier in the selected scope.",
@@ -654,7 +654,7 @@
     } ],
     "title": "Delete Value",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -667,8 +667,8 @@
     "help": null,
     "metadata": null,
     "name": "deleteValueFromlist",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a list to delete value from, stored earlier in the selected scope.",
@@ -749,7 +749,7 @@
     } ],
     "title": "Delete Value from List",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -762,8 +762,8 @@
     "help": null,
     "metadata": null,
     "name": "getAllEntries",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The namespace to get keys from.",
@@ -806,7 +806,7 @@
     } ],
     "title": "Get All Entries(Keys and Values)",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -819,8 +819,8 @@
     "help": null,
     "metadata": null,
     "name": "getValue",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value to get, stored earlier in the selected scope.",
@@ -1144,7 +1144,7 @@
     } ],
     "title": "Get Value",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -1157,8 +1157,8 @@
     "help": null,
     "metadata": null,
     "name": "setValue",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a value. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.",
@@ -1482,7 +1482,7 @@
     } ],
     "title": "Set Value",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "dataStorage",
@@ -1495,8 +1495,8 @@
     "help": null,
     "metadata": null,
     "name": "setValueInList",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The identifier of a list. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.",
@@ -1839,7 +1839,7 @@
     } ],
     "title": "Set Value in List",
     "perform": { },
-    "outputSchema": null
+    "output": null
   } ],
   "category": null,
   "connection": null,

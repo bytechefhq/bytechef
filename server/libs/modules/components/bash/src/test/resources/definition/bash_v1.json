@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "execute",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Script written in bash.",
@@ -35,8 +35,8 @@
     } ],
     "title": "Execute",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

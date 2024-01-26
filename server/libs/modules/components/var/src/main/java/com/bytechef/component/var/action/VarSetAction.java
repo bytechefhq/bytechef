@@ -109,7 +109,7 @@ public class VarSetAction {
                 .description("Value of any type to set.")
                 .displayCondition("type === 10")
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(VarSetAction::perform);
 
     protected static Object perform(

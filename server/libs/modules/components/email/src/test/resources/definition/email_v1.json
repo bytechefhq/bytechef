@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "send",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "From who to send the email.",
@@ -345,7 +345,7 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Send",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   } ],
   "category": null,

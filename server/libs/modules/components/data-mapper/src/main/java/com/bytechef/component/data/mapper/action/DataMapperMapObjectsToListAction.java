@@ -62,7 +62,7 @@ public class DataMapperMapObjectsToListAction {
             string(VALUE_KEY)
                 .label("Value key")
                 .description("The key name to which values should be mapped."))
-        .outputSchema()
+        .output()
         .perform(DataMapperMapObjectsToListAction::perform);
 
     protected static Object perform(

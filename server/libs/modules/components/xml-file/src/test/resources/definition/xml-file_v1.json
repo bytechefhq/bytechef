@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "read",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the XML file to read from.",
@@ -190,7 +190,7 @@
       "controlType": "INTEGER"
     } ],
     "title": "Read from file",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -204,8 +204,8 @@
     "help": null,
     "metadata": null,
     "name": "write",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The value type.",
@@ -297,8 +297,8 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

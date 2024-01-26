@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "sendSMS",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The SID of the Account creating the Message resource.",
@@ -561,8 +561,8 @@
       "optionsDataSource": null
     } ],
     "title": "Send SMS",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

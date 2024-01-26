@@ -3,8 +3,8 @@
   "help": null,
   "icon": "path:assets/map.svg",
   "name": "map",
-  "outputSchema": null,
-  "outputSchemaFunction": { },
+  "output": null,
+  "outputFunction": { },
   "properties": [ {
     "advancedOption": null,
     "displayCondition": null,

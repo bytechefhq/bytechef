@@ -22,7 +22,7 @@ import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
 import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
 import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
 
-import com.bytechef.component.definition.OutputSchema;
+import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -56,7 +56,7 @@ public class WebhookUtils {
         }
     }
 
-    public static OutputSchema getWebhookOutputSchema(
+    public static Output getWebhookOutputSchema(
         Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
         WebhookMethod method, TriggerContext context) {
 

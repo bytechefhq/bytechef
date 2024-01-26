@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "mapKeys",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Object containing one or more properties.",
@@ -114,7 +114,7 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Map Keys",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -128,8 +128,8 @@
     "help": null,
     "metadata": null,
     "name": "mapListToObject",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "An array of key value objects.",
@@ -191,7 +191,7 @@
       "optionsDataSource": null
     } ],
     "title": "Map list to object",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -205,8 +205,8 @@
     "help": null,
     "metadata": null,
     "name": "mapMultipleValuesBetweenObjects",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Object containing one or more properties.",
@@ -328,7 +328,7 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Map multiple values between objects\n",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -342,8 +342,8 @@
     "help": null,
     "metadata": null,
     "name": "mapObjects",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The value type.",
@@ -613,7 +613,7 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Map objects",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -627,8 +627,8 @@
     "help": null,
     "metadata": null,
     "name": "mapObjectsToList",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The value type.",
@@ -739,7 +739,7 @@
       "optionsDataSource": null
     } ],
     "title": "Map objects to list",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -753,8 +753,8 @@
     "help": null,
     "metadata": null,
     "name": "mapOneValue",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The value type.",
@@ -1832,7 +1832,7 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Map one value",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -1846,8 +1846,8 @@
     "help": null,
     "metadata": null,
     "name": "mapValues",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The value type.",
@@ -2347,7 +2347,7 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Map values",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   } ],
   "category": null,

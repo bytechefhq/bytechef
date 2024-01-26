@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "sendEmail",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Sender email address.",
@@ -482,8 +482,8 @@
     } ],
     "title": "Send Email",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

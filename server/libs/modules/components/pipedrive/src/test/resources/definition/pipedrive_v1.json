@@ -14,8 +14,8 @@
       "path": "/deals"
     },
     "name": "getDeals",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "If supplied, only deals matching the given user will be returned. However, `filter_id` and `owned_by_you` takes precedence over `user_id` when supplied.",
@@ -234,8 +234,8 @@
     } ],
     "title": "Get all deals",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -2997,8 +2997,8 @@
       "bodyContentType": "JSON"
     },
     "name": "addDeal",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -3331,8 +3331,8 @@
     } ],
     "title": "Add a deal",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -5959,8 +5959,8 @@
       "path": "/deals/search"
     },
     "name": "searchDeals",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.",
@@ -6198,8 +6198,8 @@
     } ],
     "title": "Search deals",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -6965,8 +6965,8 @@
       "path": "/deals/{id}"
     },
     "name": "deleteDeal",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The ID of the deal",
@@ -6991,8 +6991,8 @@
     } ],
     "title": "Delete a deal",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -7102,8 +7102,8 @@
       "path": "/deals/{id}"
     },
     "name": "getDeal",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The ID of the deal",
@@ -7128,8 +7128,8 @@
     } ],
     "title": "Get details of a deal",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -10277,8 +10277,8 @@
       "path": "/leads"
     },
     "name": "getLeads",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "For pagination, the limit of entries to be returned. If not provided, 100 items will be returned.",
@@ -10519,8 +10519,8 @@
     } ],
     "title": "Get all leads",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -11151,8 +11151,8 @@
       "bodyContentType": "JSON"
     },
     "name": "addLead",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -11437,8 +11437,8 @@
     } ],
     "title": "Add a lead",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -11962,8 +11962,8 @@
       "path": "/leads/{id}"
     },
     "name": "deleteLead",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The ID of the lead",
@@ -11988,8 +11988,8 @@
     } ],
     "title": "Delete a lead",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -12099,8 +12099,8 @@
       "path": "/leads/{id}"
     },
     "name": "getLead",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The ID of the lead",
@@ -12125,8 +12125,8 @@
     } ],
     "title": "Get one lead",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -12650,8 +12650,8 @@
       "path": "/leads/search"
     },
     "name": "searchLeads",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.",
@@ -12853,8 +12853,8 @@
     } ],
     "title": "Search leads",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -13650,8 +13650,8 @@
       "path": "/organizations"
     },
     "name": "getOrganizations",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "If supplied, only organizations owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.",
@@ -13787,8 +13787,8 @@
     } ],
     "title": "Get all organizations",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -15850,8 +15850,8 @@
       "bodyContentType": "JSON"
     },
     "name": "addOrganization",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -15973,8 +15973,8 @@
     } ],
     "title": "Add an organization",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -17888,8 +17888,8 @@
       "path": "/organizations/search"
     },
     "name": "searchOrganization",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.",
@@ -18025,8 +18025,8 @@
     } ],
     "title": "Search organizations",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -18558,8 +18558,8 @@
       "path": "/organizations/{id}"
     },
     "name": "deleteOrganization",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The ID of the organization",
@@ -18584,8 +18584,8 @@
     } ],
     "title": "Delete an organization",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -18695,8 +18695,8 @@
       "path": "/organizations/{id}"
     },
     "name": "getOrganization",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The ID of the organization",
@@ -18721,8 +18721,8 @@
     } ],
     "title": "Get details of an organization",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -20924,8 +20924,8 @@
       "path": "/persons"
     },
     "name": "getPersons",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "If supplied, only persons owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.",
@@ -21061,8 +21061,8 @@
     } ],
     "title": "Get all persons",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -23337,8 +23337,8 @@
       "bodyContentType": "JSON"
     },
     "name": "addPerson",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -23728,8 +23728,8 @@
     } ],
     "title": "Add a person",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -25452,8 +25452,8 @@
       "path": "/persons/search"
     },
     "name": "searchPersons",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.",
@@ -25641,8 +25641,8 @@
     } ],
     "title": "Search persons",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -26299,8 +26299,8 @@
       "path": "/persons/{id}"
     },
     "name": "deletePerson",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The ID of the person",
@@ -26325,8 +26325,8 @@
     } ],
     "title": "Delete a person",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -26436,8 +26436,8 @@
       "path": "/persons/{id}"
     },
     "name": "getPerson",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The ID of the person",
@@ -26462,8 +26462,8 @@
     } ],
     "title": "Get details of a person",
     "perform": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -28739,8 +28739,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "newActivity",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
     "title": "New Activity",
@@ -28753,8 +28753,8 @@
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -30204,8 +30204,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "newDeal",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
     "title": "New Deal",
@@ -30218,8 +30218,8 @@
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -32053,8 +32053,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "newOrganization",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
     "title": "New Organization",
@@ -32067,8 +32067,8 @@
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -33313,8 +33313,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "newPerson",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
     "title": "New Person",
@@ -33327,8 +33327,8 @@
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -34863,8 +34863,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "updatedDeal",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
     "title": "Updated Deal",
@@ -34877,8 +34877,8 @@
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -36712,8 +36712,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "updatedOrganization",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
     "title": "Updated Organization",
@@ -36726,8 +36726,8 @@
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -37972,8 +37972,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "updatedPerson",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": null,
     "staticWebhookRequest": null,
     "title": "Updated Person",
@@ -37986,8 +37986,8 @@
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

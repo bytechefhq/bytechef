@@ -41,7 +41,7 @@ public class HttpClientGetAction {
                 //
 
                 HttpClientConstants.COMMON_PROPERTIES))
-        .outputSchema()
+        .output()
         .perform(HttpClientGetAction::perform);
 
     protected static Object perform(

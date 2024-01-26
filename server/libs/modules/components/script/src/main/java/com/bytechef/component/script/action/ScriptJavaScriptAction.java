@@ -57,7 +57,7 @@ public class ScriptJavaScriptAction {
                 .description("Add your JavaScript custom logic here.")
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(ScriptJavaScriptAction::perform);
 
     protected static Object perform(

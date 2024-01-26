@@ -53,7 +53,7 @@ public class DataStorageAwaitGetValueAction {
                 .minValue(1)
                 .maxValue(300)
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(DataStorageAwaitGetValueAction::perform);
 
     protected static Object perform(

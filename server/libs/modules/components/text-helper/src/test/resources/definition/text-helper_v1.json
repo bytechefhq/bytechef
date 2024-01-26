@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "extractContentFromHtml",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The HTML content.",
@@ -133,7 +133,7 @@
     } ],
     "title": "Extract Content from HTML",
     "perform": { },
-    "outputSchema": null
+    "output": null
   } ],
   "category": null,
   "connection": null,

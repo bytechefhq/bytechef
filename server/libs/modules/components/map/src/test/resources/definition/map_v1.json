@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "map",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "List of items to iterate over.",
@@ -36,7 +36,7 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": null,
-    "outputSchema": null,
+    "output": null,
     "perform": null
   } ],
   "category": null,

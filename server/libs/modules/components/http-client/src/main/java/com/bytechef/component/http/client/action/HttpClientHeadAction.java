@@ -45,7 +45,7 @@ public class HttpClientHeadAction {
             //
 
             HttpClientActionUtils.options(false)))
-        .outputSchema()
+        .output()
         .perform(HttpClientHeadAction::perform);
 
     protected static Object perform(

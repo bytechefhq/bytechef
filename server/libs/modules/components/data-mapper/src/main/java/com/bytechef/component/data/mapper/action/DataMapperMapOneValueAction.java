@@ -252,7 +252,7 @@ public class DataMapperMapOneValueAction {
                             .displayCondition("type === 10")
                             .required(true)))
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(DataMapperMapOneValueAction::perform);
 
     protected static Object perform(

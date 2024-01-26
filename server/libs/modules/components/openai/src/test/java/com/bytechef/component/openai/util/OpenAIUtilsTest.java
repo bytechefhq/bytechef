@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OutputSchema;
+import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.openai.action.AbstractOpenAIActionTest;
 import java.util.List;
@@ -136,9 +136,9 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         when(mockedParameters.getRequiredBoolean(STREAM))
             .thenReturn(true);
 
-        OutputSchema outputSchema = OpenAIUtils.getOutputSchema(mockedParameters, mockedParameters, mockedContext);
+        Output output = OpenAIUtils.getOutputSchema(mockedParameters, mockedParameters, mockedContext);
 
-        Assertions.assertEquals(OpenAIUtils.outputSchemaResponseForStream, outputSchema.definition());
+        Assertions.assertEquals(OpenAIUtils.outputSchemaResponseForStream, output.outputSchema());
     }
 
     @Test
@@ -146,9 +146,9 @@ public class OpenAIUtilsTest extends AbstractOpenAIActionTest {
         when(mockedParameters.getRequiredBoolean(STREAM))
             .thenReturn(false);
 
-        OutputSchema outputSchema = OpenAIUtils.getOutputSchema(
+        Output output = OpenAIUtils.getOutputSchema(
             mockedParameters, mockedParameters, mockedContext);
 
-        Assertions.assertEquals(OpenAIUtils.outputSchemaResponse, outputSchema.definition());
+        Assertions.assertEquals(OpenAIUtils.outputSchemaResponse, output.outputSchema());
     }
 }

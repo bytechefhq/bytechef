@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "read",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the csv file to read from.",
@@ -242,7 +242,7 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "Read from file",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -256,8 +256,8 @@
     "help": null,
     "metadata": null,
     "name": "write",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The array of objects to write to the file.",
@@ -404,8 +404,8 @@
       "optionsDataSource": null
     } ],
     "title": "Write to file",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

@@ -3,8 +3,8 @@
   "help": null,
   "icon": "path:assets/subflow.svg",
   "name": "subflow",
-  "outputSchema": null,
-  "outputSchemaFunction": null,
+  "output": null,
+  "outputFunction": null,
   "properties": [ {
     "advancedOption": null,
     "displayCondition": null,

@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "read",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The file type to choose.",
@@ -220,7 +220,7 @@
     } ],
     "title": "Read from file",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "jsonFile",
@@ -233,8 +233,8 @@
     "help": null,
     "metadata": null,
     "name": "write",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The file type to choose.",
@@ -356,8 +356,8 @@
     } ],
     "title": "Write to file",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

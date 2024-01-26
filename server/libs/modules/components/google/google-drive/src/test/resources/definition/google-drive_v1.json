@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "uploadFile",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file to upload.",
@@ -129,8 +129,8 @@
       }
     } ],
     "title": "Upload file",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

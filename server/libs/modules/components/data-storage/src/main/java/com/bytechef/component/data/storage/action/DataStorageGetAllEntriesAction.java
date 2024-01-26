@@ -40,7 +40,7 @@ public class DataStorageGetAllEntriesAction {
                 .description("The namespace to get keys from.")
                 .options(SCOPE_OPTIONS)
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(DataStorageGetAllEntriesAction::perform);
 
     protected static Object perform(

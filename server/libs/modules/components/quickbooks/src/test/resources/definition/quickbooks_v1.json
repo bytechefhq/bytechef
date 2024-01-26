@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "createCustomer",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name of the person or organization as displayed. Must be unique across all Customer, Vendor, and Employee objects. Cannot be removed with sparse update. If not supplied, the system generates DisplayName by concatenating customer name components supplied in the request from the following list: Title, GivenName, MiddleName, FamilyName, and Suffix.",
@@ -129,8 +129,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create customer",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -688,8 +688,8 @@
     "help": null,
     "metadata": null,
     "name": "createItem",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Name of the item. This value must be unique. Required for create.",
@@ -847,8 +847,8 @@
       }
     } ],
     "title": "Create item",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -963,8 +963,8 @@
     "help": null,
     "metadata": null,
     "name": "downloadCustomerPdf",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The id of a customer to download the pdf for.",
@@ -989,8 +989,8 @@
       }
     } ],
     "title": "Download customer pdf",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

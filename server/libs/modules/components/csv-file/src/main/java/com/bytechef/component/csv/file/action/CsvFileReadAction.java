@@ -85,7 +85,7 @@ public class CsvFileReadAction {
                     "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
                 .defaultValue(false)
                 .advancedOption(true))
-        .outputSchema()
+        .output()
         .perform(CsvFileReadAction::perform);
 
     protected static List<Map<String, Object>> perform(

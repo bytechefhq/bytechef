@@ -75,7 +75,7 @@ public class TextHelperExtractContentFromHtmlAction {
                 .label("Return Array")
                 .description(
                     "If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string."))
-        .outputSchema()
+        .output()
         .perform(TextHelperExtractContentFromHtmlAction::perform);
 
     protected static Map<String, ?> perform(

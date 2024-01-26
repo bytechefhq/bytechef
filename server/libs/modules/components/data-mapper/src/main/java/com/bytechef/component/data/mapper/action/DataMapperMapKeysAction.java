@@ -55,7 +55,7 @@ public class DataMapperMapKeysAction {
                             string(TO)
                                 .label("To")))
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(DataMapperMapKeysAction::perform);
 
     protected static Object perform(

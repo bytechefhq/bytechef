@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "java",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Initialize parameter values used in the custom code.",
@@ -247,7 +247,7 @@
       "optionsDataSource": null
     } ],
     "title": "Java",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -261,8 +261,8 @@
     "help": null,
     "metadata": null,
     "name": "javascript",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Initialize parameter values used in the custom code.",
@@ -497,7 +497,7 @@
       "optionsDataSource": null
     } ],
     "title": "JavaScript",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -511,8 +511,8 @@
     "help": null,
     "metadata": null,
     "name": "python",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Initialize parameter values used in the custom code.",
@@ -747,7 +747,7 @@
       "optionsDataSource": null
     } ],
     "title": "Python",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -761,8 +761,8 @@
     "help": null,
     "metadata": null,
     "name": "ruby",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Initialize parameter values used in the custom code.",
@@ -997,7 +997,7 @@
       "optionsDataSource": null
     } ],
     "title": "Ruby",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   } ],
   "category": null,

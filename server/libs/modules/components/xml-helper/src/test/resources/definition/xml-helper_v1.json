@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "parse",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The XML string to convert to the data.",
@@ -35,8 +35,8 @@
     } ],
     "title": "Convert from XML string",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -71,8 +71,8 @@
     "help": null,
     "metadata": null,
     "name": "stringify",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The value type.",
@@ -146,8 +146,8 @@
     } ],
     "title": "Convert to XML string",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

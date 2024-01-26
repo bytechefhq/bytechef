@@ -16,8 +16,8 @@
       "bodyContentType": "JSON"
     },
     "name": "createIssue",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Whether the project in which the issue is created is added to the user's **Recently viewed** project list, as shown under **Projects** in Jira. When provided, the issue type and request type are added to the user's history for a project. These values are then used to provide defaults on the issue create screen.",
@@ -3277,8 +3277,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create issue",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": "Details about a created issue or subtask.",
         "displayCondition": null,
@@ -3544,8 +3544,8 @@
       "path": "/rest/api/3/issue/{issueIdOrKey}"
     },
     "name": "getIssue",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The ID or key of the issue.",
@@ -3730,8 +3730,8 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "Get issue",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": "Details about an issue.",
         "displayCondition": null,
@@ -9177,8 +9177,8 @@
       "path": "/rest/api/3/search"
     },
     "name": "searchForIssuesUsingJql",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The [JQL](https://confluence.atlassian.com/x/egORLQ) that defines the search. Note:\n\n *  If no JQL expression is provided, all issues are returned.\n *  `username` and `userkey` cannot be used as search terms due to privacy reasons. Use `accountId` instead.\n *  If a user has hidden their email address in their user profile, partial matches of the email address will not find the user. An exact match is required.",
@@ -9423,8 +9423,8 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "Search for issues using JQL (GET)",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": "The result of a JQL search.",
         "displayCondition": null,
