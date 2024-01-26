@@ -53,5 +53,5 @@ public class TwilioConstants {
     public static final String SMART_ENCODED = "smartEncoded";
     public static final String TO = "to";
     public static final String VALIDITY_PERIOD = "validityPeriod";
-    public static final String ZONE_ID = "zoneID";
+    public static final String ZONE_ID = "zoneId";
 }

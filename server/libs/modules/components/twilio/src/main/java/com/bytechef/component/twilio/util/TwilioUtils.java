@@ -110,12 +110,12 @@ public class TwilioUtils {
 
     public static List<Option<String>> getZoneIdOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context) {
+
         Set<String> availableZoneIds = ZoneId.getAvailableZoneIds();
 
         List<Option<String>> options = new ArrayList<>();
         for (String zoneId : availableZoneIds) {
-            options.add(
-                option(zoneId, zoneId));
+            options.add(option(zoneId, zoneId));
         }
 
         return options;

@@ -321,8 +321,8 @@ public class TwilioSendSMSAction {
         // second case: pathAccountSid, to, messagingServiceSid, mediaUrl
 
         if (isSecondCase(from, body, pathAccountSid)) {
-            MessageCreator messageCreator =
-                Message.creator(pathAccountSid, new PhoneNumber(to), messagingServiceSID, mediaURL);
+            MessageCreator messageCreator = Message.creator(
+                pathAccountSid, new PhoneNumber(to), messagingServiceSID, mediaURL);
 
             return getMessage(inputParameters, messageCreator);
         }
@@ -338,8 +338,8 @@ public class TwilioSendSMSAction {
         // fourth case: pathAccountSid, to, messagingServiceSid, body
 
         if (isFourthCase(from, body, pathAccountSid)) {
-            MessageCreator messageCreator =
-                Message.creator(pathAccountSid, new PhoneNumber(to), messagingServiceSID, body);
+            MessageCreator messageCreator = Message.creator(
+                pathAccountSid, new PhoneNumber(to), messagingServiceSID, body);
 
             return getMessage(inputParameters, messageCreator);
         }
@@ -355,8 +355,8 @@ public class TwilioSendSMSAction {
         // sixth case: pathAccountSid, to, from, mediaUrl
 
         if (isSixthCase(from, body, pathAccountSid)) {
-            MessageCreator messageCreator =
-                Message.creator(pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), mediaURL);
+            MessageCreator messageCreator = Message.creator(
+                pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), mediaURL);
 
             return getMessage(inputParameters, messageCreator);
         }
@@ -371,8 +371,9 @@ public class TwilioSendSMSAction {
 
         // eighth case: pathAccountSid, to, from, body
 
-        MessageCreator messageCreator =
-            Message.creator(pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), body);
+        MessageCreator messageCreator = Message.creator(
+            pathAccountSid, new PhoneNumber(to), new PhoneNumber(from), body);
+
         return getMessage(inputParameters, messageCreator);
 
     }
