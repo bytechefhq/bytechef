@@ -24,6 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.api.client.http.AbstractInputStreamContent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -52,10 +53,12 @@ public class GoogleDriveCreateNewTextFileActionTest extends AbstractGoogleDriveC
         assertEquals("fileName", fileArgumentCaptor.getValue().getName());
         assertEquals("mimeType", inputStreamArgumentCaptor.getValue().getType());
 
+        AbstractInputStreamContent content = inputStreamArgumentCaptor.getValue();
+
         try (InputStreamReader inputStreamReader = new InputStreamReader(
-            inputStreamArgumentCaptor.getValue()
-            .getInputStream(), StandardCharsets.UTF_8);
+                content.getInputStream(), StandardCharsets.UTF_8);
              BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+
             assertEquals("text", bufferedReader.lines()
                     .collect(Collectors.joining("\n")));
         }

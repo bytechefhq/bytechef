@@ -71,12 +71,13 @@ public class GoogleDriveInputPropertiesTest {
         mockedSubDriveArrayList.forEach(drive -> when(drive.getName())
             .thenReturn("NOT searched text"));
 
-        when(mockedSubDriveArrayList.get(0)
-            .getName())
-                .thenReturn(SEARCH_TEXT + " more text");
+        com.google.api.services.drive.model.Drive drive = mockedSubDriveArrayList.getFirst();
 
-        List<Option<String>> options = GoogleDriveInputProperties
-            .getDriveOptions(mockedParameters, mockedParameters, SEARCH_TEXT, mockedContext);
+        when(drive.getName())
+            .thenReturn(SEARCH_TEXT + " more text");
+
+        List<Option<String>> options = GoogleDriveInputProperties.getDriveOptions(
+            mockedParameters, mockedParameters, SEARCH_TEXT, mockedContext);
 
         verify(mockedDriveList, times(1))
             .getDrives();

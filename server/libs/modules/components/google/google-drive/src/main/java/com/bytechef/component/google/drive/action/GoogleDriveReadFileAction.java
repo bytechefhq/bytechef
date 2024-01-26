@@ -30,8 +30,8 @@ import static com.bytechef.component.google.drive.properties.GoogleDriveInputPro
 import static com.bytechef.component.google.drive.properties.GoogleDriveOutputProperties.FILE_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDSL.ModifiableOption;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.drive.util.GoogleDriveUtils;
@@ -54,7 +54,7 @@ public final class GoogleDriveReadFileAction {
                 .label("File")
                 .description(
                     "The id of a file to read.")
-                .options((ActionOptionsFunction) GoogleDriveReadFileAction::getFileOptions)
+                .options((ActionOptionsFunction<String>) GoogleDriveReadFileAction::getFileOptions)
                 .required(true),
             bool(ACKNOWLEDGE_ABUSE)
                 .label("Acknowledge abuse")
@@ -86,7 +86,7 @@ public final class GoogleDriveReadFileAction {
             .execute();
     }
 
-    private static List<ComponentDSL.ModifiableOption<String>> getFileOptions(
+    private static List<ModifiableOption<String>> getFileOptions(
         Parameters inputParameters, Parameters connectionParameters, String searchText, ActionContext context)
         throws IOException {
 
