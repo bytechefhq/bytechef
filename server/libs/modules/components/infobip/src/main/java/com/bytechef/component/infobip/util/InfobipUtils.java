@@ -46,7 +46,6 @@ public class InfobipUtils {
         List<SmsTextualMessage> smsTextualMessages = new ArrayList<>();
 
         for (InfobipUtils.SmsTextualMessageCustom smsTextualMessageCustom : smsTextualMessageCustoms) {
-
             SmsTextualMessage smsTextualMessage = new SmsTextualMessage()
                 .callbackData(smsTextualMessageCustom.callback())
                 .deliveryTimeWindow(createSmsDeliveryTimeWindow(smsTextualMessageCustom.deliveryTimeWindowCustom()))
@@ -75,31 +74,31 @@ public class InfobipUtils {
         SmsDeliveryTimeWindowCustom smsDeliveryTimeWindowCustom) {
 
         SmsDeliveryTimeFromCustom deliveryTimeFromCustom = smsDeliveryTimeWindowCustom.from();
-
         SmsDeliveryTimeToCustom smsDeliveryTimeToCustom = smsDeliveryTimeWindowCustom.to();
 
         return new SmsDeliveryTimeWindow()
             .days(createSmsDeliveryDayList(smsDeliveryTimeWindowCustom.days()))
-            .from(new SmsDeliveryTimeFrom()
-                .hour(deliveryTimeFromCustom.hour())
-                .minute(deliveryTimeFromCustom.minute()))
-            .to(new SmsDeliveryTimeTo()
-                .hour(smsDeliveryTimeToCustom.hour())
-                .minute(smsDeliveryTimeToCustom.minute()));
+            .from(
+                new SmsDeliveryTimeFrom()
+                    .hour(deliveryTimeFromCustom.hour())
+                    .minute(deliveryTimeFromCustom.minute()))
+            .to(
+                new SmsDeliveryTimeTo()
+                    .hour(smsDeliveryTimeToCustom.hour())
+                    .minute(smsDeliveryTimeToCustom.minute()));
     }
 
     private static List<SmsDestination> createSmsDestinationList(List<SmsDestinationCustom> smsDestinationCustoms) {
         List<SmsDestination> smsDestinations = new ArrayList<>();
 
         for (SmsDestinationCustom smsDestinationCustom : smsDestinationCustoms) {
-            SmsDestination smsDestination =
+            smsDestinations.add(
                 new SmsDestination()
                     .messageId(smsDestinationCustom.messageId())
-                    .to(smsDestinationCustom.to());
-
-            smsDestinations.add(smsDestination);
+                    .to(smsDestinationCustom.to()));
 
         }
+
         return smsDestinations;
     }
 
@@ -154,30 +153,18 @@ public class InfobipUtils {
         return smsDeliveryDays;
     }
 
-    public record SmsTextualMessageCustom(String callback, SmsDeliveryTimeWindowCustom deliveryTimeWindowCustom,
-        List<SmsDestinationCustom> destinations, Boolean flash, String from,
-        Boolean intermediateReport, SmsLanguageCustom language,
-        String notifyContentType, String notifyUrl,
-        SmsRegionalOptionsCustom regionalOptionsCustom,
-        OffsetDateTimeCustom sendAtCustom, String text, String transliteration,
-        Long validityPeriod, String entityId, String applicationId) {
+    public record SmsTextualMessageCustom(
+        String callback, SmsDeliveryTimeWindowCustom deliveryTimeWindowCustom, List<SmsDestinationCustom> destinations,
+        Boolean flash, String from, Boolean intermediateReport, SmsLanguageCustom language, String notifyContentType,
+        String notifyUrl, SmsRegionalOptionsCustom regionalOptionsCustom, OffsetDateTimeCustom sendAtCustom,
+        String text, String transliteration, Long validityPeriod, String entityId, String applicationId) {
 
-        public SmsTextualMessageCustom(String callback,
-            SmsDeliveryTimeWindowCustom deliveryTimeWindowCustom,
-            List<SmsDestinationCustom> destinations,
-            Boolean flash,
-            String from,
-            Boolean intermediateReport,
-            SmsLanguageCustom language,
-            String notifyContentType,
-            String notifyUrl,
-            SmsRegionalOptionsCustom regionalOptionsCustom,
-            OffsetDateTimeCustom sendAtCustom,
-            String text,
-            String transliteration,
-            Long validityPeriod,
-            String entityId,
-            String applicationId) {
+        public SmsTextualMessageCustom(
+            String callback, SmsDeliveryTimeWindowCustom deliveryTimeWindowCustom,
+            List<SmsDestinationCustom> destinations, Boolean flash, String from, Boolean intermediateReport,
+            SmsLanguageCustom language, String notifyContentType, String notifyUrl,
+            SmsRegionalOptionsCustom regionalOptionsCustom, OffsetDateTimeCustom sendAtCustom, String text,
+            String transliteration, Long validityPeriod, String entityId, String applicationId) {
 
             this.callback = callback;
             this.deliveryTimeWindowCustom = deliveryTimeWindowCustom;
@@ -203,41 +190,43 @@ public class InfobipUtils {
         }
     }
 
-    protected record SmsDeliveryTimeWindowCustom(
+    public record SmsDeliveryTimeWindowCustom(
         List<String> days, SmsDeliveryTimeFromCustom from, SmsDeliveryTimeToCustom to) {
-        protected SmsDeliveryTimeWindowCustom(List<String> days, SmsDeliveryTimeFromCustom from,
-            SmsDeliveryTimeToCustom to) {
+
+        public SmsDeliveryTimeWindowCustom(
+            List<String> days, SmsDeliveryTimeFromCustom from, SmsDeliveryTimeToCustom to) {
+
             this.days = Collections.unmodifiableList(days);
             this.from = from;
             this.to = to;
         }
     }
 
-    protected record SmsDeliveryTimeFromCustom(Integer hour, Integer minute) {
+    public record SmsDeliveryTimeFromCustom(Integer hour, Integer minute) {
     }
 
-    protected record SmsDeliveryTimeToCustom(Integer hour, Integer minute) {
+    public record SmsDeliveryTimeToCustom(Integer hour, Integer minute) {
     }
 
-    protected record SmsRegionalOptionsCustom(
+    public record SmsRegionalOptionsCustom(
         SmsIndiaDltOptionsCustom indiaDlt, SmsTurkeyIysOptionsCustom turkeyIys, SmsSouthKoreaOptionsCustom southKorea) {
     }
 
-    protected record SmsIndiaDltOptionsCustom(String contentTemplateId, String principalEntityId) {
+    public record SmsIndiaDltOptionsCustom(String contentTemplateId, String principalEntityId) {
     }
 
-    protected record SmsSouthKoreaOptionsCustom(Integer resellerCode) {
+    public record SmsSouthKoreaOptionsCustom(Integer resellerCode) {
     }
 
-    protected record SmsTurkeyIysOptionsCustom(Integer brandCode, String recipientType) {
+    public record SmsTurkeyIysOptionsCustom(Integer brandCode, String recipientType) {
     }
 
-    protected record OffsetDateTimeCustom(LocalDateTime dateTime, String zoneId) {
+    public record OffsetDateTimeCustom(LocalDateTime dateTime, String zoneId) {
     }
 
-    protected record SmsLanguageCustom(String languageCode) {
+    public record SmsLanguageCustom(String languageCode) {
     }
 
-    protected record SmsDestinationCustom(String messageId, String to) {
+    public record SmsDestinationCustom(String messageId, String to) {
     }
 }
