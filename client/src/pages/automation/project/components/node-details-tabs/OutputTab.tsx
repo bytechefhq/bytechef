@@ -1,5 +1,8 @@
-import {ComponentOutputSchemaModel} from '@/middleware/platform/configuration';
+import {Button} from '@/components/ui/button';
+import {DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {PropertyModel} from '@/middleware/platform/configuration';
 import {PropertyType} from '@/types/projectTypes';
+import {ChevronDownIcon} from 'lucide-react';
 
 /// <reference types="vite-plugin-svgr/client" />
 
@@ -43,30 +46,59 @@ const SchemaProperties = ({properties}: {properties: Array<PropertyType>}) => (
     </ul>
 );
 
-const OutputTab = ({outputSchema}: {outputSchema: ComponentOutputSchemaModel}) => {
+const OutputTab = ({outputSchema}: {outputSchema: PropertyModel}) => {
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     return (
-        <div className="max-h-full flex-[1_1_1px] p-4">
-            <div className="mb-1 flex items-center">
-                <span title={outputSchema.definition.type}>
-                    {TYPE_ICONS[outputSchema.definition.type as keyof typeof TYPE_ICONS]}
-                </span>
+        <div className="h-full p-4">
+            {outputSchema ? (
+                <>
+                    <div className="mb-1 flex items-center">
+                        <span title={outputSchema.type}>
+                            {TYPE_ICONS[outputSchema.type as keyof typeof TYPE_ICONS]}
+                        </span>
 
-                <span className="ml-2 text-sm text-gray-800">{currentNode.name}</span>
-            </div>
+                        <span className="ml-2 text-sm text-gray-800">{currentNode.name}</span>
+                    </div>
 
-            {(outputSchema.definition as PropertyType)?.properties && (
-                <SchemaProperties properties={(outputSchema.definition as PropertyType).properties!} />
+                    {(outputSchema as PropertyType)?.properties && (
+                        <SchemaProperties properties={(outputSchema as PropertyType).properties!} />
+                    )}
+
+                    {!(outputSchema as PropertyType).properties && !!(outputSchema as PropertyType).controlType && (
+                        <PropertyField data={outputSchema} label={(outputSchema as PropertyType).controlType!} />
+                    )}
+                </>
+            ) : (
+                <div className="flex size-full items-center justify-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div>Generate Schema and Sample Data</div>
+
+                        <div>
+                            <div className="inline-flex rounded-md shadow-sm">
+                                <Button
+                                    className="relative inline-flex items-center rounded-l-md rounded-r-none px-3 py-2 text-sm focus:z-10"
+                                    type="button"
+                                >
+                                    Test component
+                                </Button>
+
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild className="relative -ml-px block">
+                                        <Button className="relative inline-flex items-center rounded-l-none rounded-r-md p-2 focus:z-10">
+                                            <ChevronDownIcon aria-hidden="true" className="size-5" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent align="end" className="w-56 cursor-pointer">
+                                        <DropdownMenuLabel>Upload sample data</DropdownMenuLabel>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
-
-            {!(outputSchema.definition as PropertyType).properties &&
-                !!(outputSchema.definition as PropertyType).controlType && (
-                    <PropertyField
-                        data={outputSchema.definition}
-                        label={(outputSchema.definition as PropertyType).controlType!}
-                    />
-                )}
         </div>
     );
 };

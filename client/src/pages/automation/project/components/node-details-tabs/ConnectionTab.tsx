@@ -23,13 +23,13 @@ import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 
 const ConnectionTab = ({
     componentDefinition,
-    connectionKey,
-    operationName,
+    workflowConnectionKey,
     workflowId,
+    workflowNodeName,
 }: {
     componentDefinition: ComponentDefinitionModel;
-    connectionKey: string;
-    operationName: string;
+    workflowConnectionKey: string;
+    workflowNodeName: string;
     workflowId: string;
 }) => {
     const [showEditConnectionDialog, setShowEditConnectionDialog] = useState(false);
@@ -45,8 +45,8 @@ const ConnectionTab = ({
     );
 
     const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery({
-        operationName,
         workflowId,
+        workflowNodeName,
     });
 
     let connectionId: number | undefined;
@@ -67,12 +67,12 @@ const ConnectionTab = ({
 
     const handleValueChange = (connectionId: number) => {
         mutation.mutate({
-            key: connectionKey,
-            operationName,
             updateWorkflowTestConfigurationConnectionRequestModel: {
                 connectionId,
             },
+            workflowConnectionKey,
             workflowId,
+            workflowNodeName,
         });
     };
 

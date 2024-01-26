@@ -116,8 +116,8 @@ const ProjectInstanceDialogWorkflowsStepItemConnection = ({
 
             <FormField
                 control={control}
-                defaultValue={workflowConnection.operationName}
-                name={`projectInstanceWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.operationName`}
+                defaultValue={workflowConnection.workflowNodeName}
+                name={`projectInstanceWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.workflowNodeName`}
                 render={({field}) => <input type="hidden" {...field} />}
             />
 
