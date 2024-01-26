@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "debug",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -34,7 +34,7 @@
       "optionsDataSource": null
     } ],
     "title": "Debug",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -48,8 +48,8 @@
     "help": null,
     "metadata": null,
     "name": "error",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -71,7 +71,7 @@
       "optionsDataSource": null
     } ],
     "title": "Error",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -85,8 +85,8 @@
     "help": null,
     "metadata": null,
     "name": "info",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -108,7 +108,7 @@
       "optionsDataSource": null
     } ],
     "title": "Info",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   }, {
     "batch": null,
@@ -122,8 +122,8 @@
     "help": null,
     "metadata": null,
     "name": "warn",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -145,7 +145,7 @@
       "optionsDataSource": null
     } ],
     "title": "Warn",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   } ],
   "category": null,

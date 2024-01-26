@@ -16,8 +16,8 @@
       "bodyContentType": "JSON"
     },
     "name": "addMemberToList",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The unique ID for the list.",
@@ -575,8 +575,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Add a new member to the list",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -2000,8 +2000,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "subscribe",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The list id of intended audience to which you would like to add the contact.",
@@ -2035,8 +2035,8 @@
     "dynamicWebhookEnable": { },
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

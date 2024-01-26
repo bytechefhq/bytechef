@@ -23,8 +23,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "everyDay",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The hour at which a workflow will be triggered.",
@@ -428,8 +428,8 @@
     "workflowSyncValidation": null,
     "listenerDisable": { },
     "listenerEnable": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -748,8 +748,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "everyWeek",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The hour at which a workflow will be triggered.",
@@ -1005,8 +1005,8 @@
     "workflowSyncValidation": null,
     "listenerDisable": { },
     "listenerEnable": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1142,8 +1142,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "everyMonth",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The hour at which a workflow will be triggered.",
@@ -1364,8 +1364,8 @@
     "workflowSyncValidation": null,
     "listenerDisable": { },
     "listenerEnable": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1501,8 +1501,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "interval",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The hour at which a workflow will be triggered.",
@@ -1570,8 +1570,8 @@
     "workflowSyncValidation": null,
     "listenerDisable": { },
     "listenerEnable": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1669,8 +1669,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "cron",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The chron schedule expression. Format: [Minute] [Hour] [Day of Month] [Month] [Day of Week]",
@@ -1853,8 +1853,8 @@
     "workflowSyncValidation": null,
     "listenerDisable": { },
     "listenerEnable": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

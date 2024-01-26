@@ -16,8 +16,8 @@
       "bodyContentType": "JSON"
     },
     "name": "addPet",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -291,8 +291,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Add a new pet to the store",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -584,8 +584,8 @@
       "bodyContentType": "JSON"
     },
     "name": "updatePet",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -859,8 +859,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Update an existing pet",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1150,8 +1150,8 @@
       "path": "/pet/findByStatus"
     },
     "name": "findPetsByStatus",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Status values that need to be considered for filter",
@@ -1190,8 +1190,8 @@
       "optionsDataSource": null
     } ],
     "title": "Finds Pets by status",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1502,8 +1502,8 @@
       "path": "/pet/findByTags"
     },
     "name": "findPetsByTags",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Tags to filter by",
@@ -1548,8 +1548,8 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Finds Pets by tags",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1860,8 +1860,8 @@
       "path": "/pet/{petId}"
     },
     "name": "deletePet",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "",
@@ -1906,7 +1906,7 @@
       "controlType": "INTEGER"
     } ],
     "title": "Deletes a pet",
-    "outputSchema": null,
+    "output": null,
     "perform": null
   }, {
     "batch": null,
@@ -1923,8 +1923,8 @@
       "path": "/pet/{petId}"
     },
     "name": "getPetById",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "ID of pet to return",
@@ -1948,8 +1948,8 @@
       "controlType": "INTEGER"
     } ],
     "title": "Find pet by ID",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -2239,8 +2239,8 @@
       "path": "/pet/{petId}"
     },
     "name": "updatePetWithForm",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "ID of pet that needs to be updated",
@@ -2306,7 +2306,7 @@
       "optionsDataSource": null
     } ],
     "title": "Updates a pet in the store with form data",
-    "outputSchema": null,
+    "output": null,
     "perform": null
   }, {
     "batch": null,
@@ -2325,8 +2325,8 @@
       "bodyContentType": "BINARY"
     },
     "name": "uploadFile",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "ID of pet to update",
@@ -2465,8 +2465,8 @@
       "controlType": "FILE_ENTRY"
     } ],
     "title": "uploads an image",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -2564,12 +2564,12 @@
       "path": "/store/inventory"
     },
     "name": "getInventory",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ ],
     "title": "Returns pet inventories by status",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -2631,8 +2631,8 @@
       "bodyContentType": "JSON"
     },
     "name": "placeOrder",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -2791,8 +2791,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Place an order for a pet",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -2967,8 +2967,8 @@
       "path": "/store/order/{orderId}"
     },
     "name": "deleteOrder",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "ID of the order that needs to be deleted",
@@ -2992,7 +2992,7 @@
       "controlType": "INTEGER"
     } ],
     "title": "Delete purchase order by ID",
-    "outputSchema": null,
+    "output": null,
     "perform": null
   }, {
     "batch": null,
@@ -3009,8 +3009,8 @@
       "path": "/store/order/{orderId}"
     },
     "name": "getOrderById",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "ID of order that needs to be fetched",
@@ -3034,8 +3034,8 @@
       "controlType": "INTEGER"
     } ],
     "title": "Find purchase order by ID",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -3212,8 +3212,8 @@
       "bodyContentType": "JSON"
     },
     "name": "createUser",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -3390,8 +3390,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create user",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -3586,8 +3586,8 @@
       "bodyContentType": "JSON"
     },
     "name": "createUsersWithListInput",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -3785,8 +3785,8 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Creates list of users with given input array",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -4000,8 +4000,8 @@
       "path": "/user/{username}"
     },
     "name": "deleteUser",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name that needs to be deleted",
@@ -4025,7 +4025,7 @@
       "optionsDataSource": null
     } ],
     "title": "Delete user",
-    "outputSchema": null,
+    "output": null,
     "perform": null
   }, {
     "batch": null,
@@ -4042,8 +4042,8 @@
       "path": "/user/{username}"
     },
     "name": "getUserByName",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The name that needs to be fetched. Use user1 for testing. ",
@@ -4067,8 +4067,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get user by user name",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -4263,8 +4263,8 @@
       "bodyContentType": "JSON"
     },
     "name": "updateUser",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "name that need to be deleted",
@@ -4462,8 +4462,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Update user",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

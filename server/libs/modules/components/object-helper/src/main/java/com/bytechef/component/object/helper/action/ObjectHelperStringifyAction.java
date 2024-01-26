@@ -54,7 +54,7 @@ public class ObjectHelperStringifyAction {
                 .description("The data to convert to JSON string.")
                 .displayCondition("type === 2")
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(ObjectHelperStringifyAction::perform);
 
     protected static String perform(

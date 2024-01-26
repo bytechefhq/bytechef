@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "randomInt",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The minimum possible generated value.",
@@ -54,8 +54,8 @@
     } ],
     "title": "Int",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -89,8 +89,8 @@
     "help": null,
     "metadata": null,
     "name": "randomFloat",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The minimum possible generated value.",
@@ -132,8 +132,8 @@
     } ],
     "title": "Float",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

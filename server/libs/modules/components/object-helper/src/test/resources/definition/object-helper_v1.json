@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "parse",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The JSON string to convert to the data.",
@@ -35,7 +35,7 @@
     } ],
     "title": "Convert from JSON string",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "objectHelper",
@@ -48,8 +48,8 @@
     "help": null,
     "metadata": null,
     "name": "stringify",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The value type.",
@@ -123,7 +123,7 @@
     } ],
     "title": "Convert to JSON string",
     "perform": { },
-    "outputSchema": null
+    "output": null
   } ],
   "category": null,
   "connection": null,

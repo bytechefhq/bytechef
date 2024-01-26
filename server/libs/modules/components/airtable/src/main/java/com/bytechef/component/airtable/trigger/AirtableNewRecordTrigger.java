@@ -26,7 +26,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
-import com.bytechef.component.definition.TriggerOutputSchemaFunction;
+import com.bytechef.component.definition.TriggerOutputFunction.PollTriggerOutputFunction;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -58,7 +58,7 @@ public class AirtableNewRecordTrigger {
                 .description(
                     "It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.")
                 .required(true))
-        .outputSchema(getOutputSchema())
+        .output(getOutput())
         .poll(AirtableNewRecordTrigger::poll);
 
     protected static PollOutput poll(
@@ -86,7 +86,7 @@ public class AirtableNewRecordTrigger {
         return new PollOutput(records, Map.of(LAST_TIME_CHECKED, endDate), false);
     }
 
-    protected static TriggerOutputSchemaFunction.PollTriggerOutputSchemaFunction getOutputSchema() {
+    protected static PollTriggerOutputFunction getOutput() {
         // TODO
 
         return (inputParameters, closureParameters, context) -> null;

@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "set",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The value type.",
@@ -277,7 +277,7 @@
       "controlType": "TIME"
     } ],
     "title": "Set value",
-    "outputSchema": null,
+    "output": null,
     "perform": { }
   } ],
   "category": null,

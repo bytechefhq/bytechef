@@ -57,7 +57,7 @@ public class ScriptJavaAction {
                 .description("Add your Java custom logic here.")
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(ScriptJavaAction::perform);
 
     protected static Object perform(

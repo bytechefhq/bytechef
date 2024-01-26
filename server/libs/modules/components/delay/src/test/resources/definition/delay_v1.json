@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "sleep",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Time in milliseconds.",
@@ -35,7 +35,7 @@
     } ],
     "title": "Sleep",
     "perform": { },
-    "outputSchema": null
+    "output": null
   } ],
   "category": null,
   "connection": null,

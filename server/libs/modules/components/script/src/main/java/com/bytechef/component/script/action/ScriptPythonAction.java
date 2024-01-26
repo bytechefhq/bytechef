@@ -57,7 +57,7 @@ public class ScriptPythonAction {
                 .description("Add your Python custom logic here.")
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(ScriptPythonAction::perform);
 
     protected static Object perform(

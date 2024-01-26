@@ -87,7 +87,7 @@ public class JsonFileReadAction {
                 .description("The page number to get.")
                 .displayCondition("%s === true".formatted(IS_ARRAY))
                 .advancedOption(true))
-        .outputSchema()
+        .output()
         .perform(JsonFileReadAction::perform);
 
     protected static JsonFileConstants.FileType getFileType(Parameters inputParameters) {

@@ -3,8 +3,8 @@
   "help": null,
   "icon": "path:assets/fork-join.svg",
   "name": "fork-join",
-  "outputSchema": null,
-  "outputSchemaFunction": null,
+  "output": null,
+  "outputFunction": null,
   "properties": null,
   "resources": null,
   "taskProperties": [ {

@@ -11,12 +11,12 @@
     "help": null,
     "metadata": null,
     "name": "dummy",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ ],
     "title": "Title",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

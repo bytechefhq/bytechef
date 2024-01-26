@@ -51,7 +51,7 @@ public class HttpClientPutAction {
                 //
 
                 HttpClientActionUtils.options(true)))
-        .outputSchema()
+        .output()
         .perform(HttpClientPutAction::perform);
 
     protected static Object perform(

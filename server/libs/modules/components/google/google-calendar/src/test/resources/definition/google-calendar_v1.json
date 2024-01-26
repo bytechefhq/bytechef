@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "createEvent",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "",
@@ -2175,8 +2175,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create event",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -4827,8 +4827,8 @@
     "help": null,
     "metadata": null,
     "name": "createQuickEvent",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The text describing the event to be created.",
@@ -4884,8 +4884,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create Quick Event",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -7536,8 +7536,8 @@
     "help": null,
     "metadata": null,
     "name": "getEvents",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Event types to return.",
@@ -7959,8 +7959,8 @@
       "controlType": "DATE_TIME"
     } ],
     "title": "Get events",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

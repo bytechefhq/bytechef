@@ -106,7 +106,7 @@ public class DataStorageGetValueAction {
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type === 10")
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(DataStorageGetValueAction::perform);
 
     protected static Object perform(

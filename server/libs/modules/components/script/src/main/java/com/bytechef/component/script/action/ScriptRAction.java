@@ -57,7 +57,7 @@ public class ScriptRAction {
                 .description("Add your R custom logic here.")
                 .controlType(Property.ControlType.CODE_EDITOR)
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(ScriptRAction::perform);
 
     protected static Object perform(

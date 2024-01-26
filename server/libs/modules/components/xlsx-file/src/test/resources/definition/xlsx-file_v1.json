@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "read",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the XLS/XLSX file to read from.",
@@ -243,7 +243,7 @@
     } ],
     "title": "Read from file",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "xlsxFile",
@@ -256,8 +256,8 @@
     "help": null,
     "metadata": null,
     "name": "write",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The array of objects to write to the file.",
@@ -533,8 +533,8 @@
     } ],
     "title": "Write to file",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

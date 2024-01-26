@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "sendSMS",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Unique ID assigned to the request if messaging multiple recipients or sending multiple messages via a single API request. If not provided, it will be auto-generated and returned in the API response. Typically, used to fetch delivery reports and message logs.",
@@ -1207,8 +1207,8 @@
     } ],
     "title": "Send SMS",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1474,8 +1474,8 @@
     "help": null,
     "metadata": null,
     "name": "sendWhatsappTextMessage",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements.",
@@ -1813,8 +1813,8 @@
     } ],
     "title": "Send Whatsapp Text Message",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

@@ -90,7 +90,7 @@ public class DataMapperMapObjectsAction {
                 .label("Required fields")
                 .description("A list of fields that are required on the mapped object.")
                 .items(string()))
-        .outputSchema()
+        .output()
         .perform(DataMapperMapObjectsAction::perform);
 
     protected static Object perform(

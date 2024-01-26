@@ -16,8 +16,8 @@
       "bodyContentType": "JSON"
     },
     "name": "createRecord",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The base id.",
@@ -85,8 +85,8 @@
       }
     } ],
     "title": "Creates a record",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -414,8 +414,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "newRecord",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": { },
+    "defaultOutputFunction": false,
+    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The base id.",
@@ -484,7 +484,7 @@
     "dynamicWebhookEnable": null,
     "dynamicWebhookRefresh": null,
     "dynamicWebhookRequest": null,
-    "outputSchema": null,
+    "output": null,
     "listenerDisable": null,
     "listenerEnable": null,
     "webhookValidate": null,

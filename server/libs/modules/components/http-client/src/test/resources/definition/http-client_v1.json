@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "get",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URI to make the request to",
@@ -197,7 +197,7 @@
     } ],
     "title": "GET",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -210,8 +210,8 @@
     "help": null,
     "metadata": null,
     "name": "post",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URI to make the request to",
@@ -1120,7 +1120,7 @@
     } ],
     "title": "POST",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -1133,8 +1133,8 @@
     "help": null,
     "metadata": null,
     "name": "put",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URI to make the request to",
@@ -2043,7 +2043,7 @@
     } ],
     "title": "PUT",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -2056,8 +2056,8 @@
     "help": null,
     "metadata": null,
     "name": "patch",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URI to make the request to",
@@ -2966,7 +2966,7 @@
     } ],
     "title": "PATCH",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -2979,8 +2979,8 @@
     "help": null,
     "metadata": null,
     "name": "delete",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URI to make the request to",
@@ -3307,7 +3307,7 @@
     } ],
     "title": "DELETE",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "httpClient",
@@ -3320,8 +3320,8 @@
     "help": null,
     "metadata": null,
     "name": "head",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URI to make the request to",
@@ -3648,7 +3648,7 @@
     } ],
     "title": "HEAD",
     "perform": { },
-    "outputSchema": null
+    "output": null
   } ],
   "category": null,
   "connection": {

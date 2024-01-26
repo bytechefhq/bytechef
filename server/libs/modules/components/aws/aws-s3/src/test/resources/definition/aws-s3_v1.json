@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "getObject",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Filename to set for binary data.",
@@ -54,8 +54,8 @@
     } ],
     "title": "Get Object",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -162,8 +162,8 @@
     "help": null,
     "metadata": null,
     "name": "getUrl",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object key.",
@@ -186,8 +186,8 @@
     } ],
     "title": "Get URL",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -221,8 +221,8 @@
     "help": null,
     "metadata": null,
     "name": "listObjects",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The prefix of an AWS S3 objects.",
@@ -245,8 +245,8 @@
     } ],
     "title": "List Objects",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -359,8 +359,8 @@
     "help": null,
     "metadata": null,
     "name": "presignGetObject",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object key.",
@@ -402,8 +402,8 @@
     } ],
     "title": "Get Pre-signed Object",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -437,8 +437,8 @@
     "help": null,
     "metadata": null,
     "name": "putObject",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file that needs to be written to AWS S3.",
@@ -607,8 +607,8 @@
     } ],
     "title": "Put Object",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

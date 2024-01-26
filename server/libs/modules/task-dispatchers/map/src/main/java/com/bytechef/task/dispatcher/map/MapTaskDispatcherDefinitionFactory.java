@@ -29,7 +29,7 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
-import com.bytechef.platform.workflow.task.dispatcher.definition.OutputSchemaFunction;
+import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactoryFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
@@ -61,7 +61,7 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
         return TASK_DISPATCHER_DEFINITION;
     }
 
-    protected static OutputSchemaFunction getOutputSchemaFunction() {
+    protected static OutputFunction getOutputSchemaFunction() {
         // TODO
         return (inputParameters) -> null;
     }

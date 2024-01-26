@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "getMail",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The ID of the message to retrieve.",
@@ -97,8 +97,8 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Get Mail",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -544,8 +544,8 @@
     "help": null,
     "metadata": null,
     "name": "getThread",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The ID of the thread to retrieve.",
@@ -627,8 +627,8 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Get Thread",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1172,8 +1172,8 @@
     "help": null,
     "metadata": null,
     "name": "searchEmail",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Maximum number of messages to return.",
@@ -1302,8 +1302,8 @@
       "controlType": "CHECKBOX"
     } ],
     "title": "Search Email",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1831,8 +1831,8 @@
     "help": null,
     "metadata": null,
     "name": "sendEmail",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Email address of the sender, the mailbox account.",
@@ -2165,8 +2165,8 @@
       "controlType": "ARRAY_BUILDER"
     } ],
     "title": "Send Email",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

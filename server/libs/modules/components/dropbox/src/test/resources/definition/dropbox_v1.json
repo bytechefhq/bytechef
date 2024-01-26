@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "copy",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The path which the file or folder should be copyed from.",
@@ -53,8 +53,8 @@
       "optionsDataSource": null
     } ],
     "title": "Copy",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -205,8 +205,8 @@
     "help": null,
     "metadata": null,
     "name": "createNewFolder",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Path to create a folder on.",
@@ -228,8 +228,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create new folder",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -572,8 +572,8 @@
     "help": null,
     "metadata": null,
     "name": "createNewTextFile",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The path at which the new text file should be created.",
@@ -595,8 +595,8 @@
       "optionsDataSource": null
     } ],
     "title": "Create new text file",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -708,8 +708,8 @@
     "help": null,
     "metadata": null,
     "name": "delete",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Path in the user's Dropbox to delete. Must match pattern \"(/(.|[\\\\r\\\\n])*)|(ns:[0-9]+(/.*)?)|(id:.*)\" and not be null.",
@@ -731,8 +731,8 @@
       "optionsDataSource": null
     } ],
     "title": "Delete",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -883,8 +883,8 @@
     "help": null,
     "metadata": null,
     "name": "getFileLink",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The path to the file you want a temporary link to. Must match pattern \" (/(.|[\\\\r\\\\n])*|id:.*)|(rev:[0-9a-f]{9,})|(ns:[0-9]+(/.*)?)\" and not be null.",
@@ -906,8 +906,8 @@
       "optionsDataSource": null
     } ],
     "title": "Get file link",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1560,8 +1560,8 @@
     "help": null,
     "metadata": null,
     "name": "listAFolder",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "A unique identifier for the file. Must match pattern \" (/(.|[\\\\r\\\\n])*)?|id:.*|(ns:[0-9]+(/.*)?)\" and not be null.",
@@ -1583,8 +1583,8 @@
       "optionsDataSource": null
     } ],
     "title": "List folder",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1821,8 +1821,8 @@
     "help": null,
     "metadata": null,
     "name": "move",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Path in the user's Dropbox to be moved. Must match pattern \"(/(.|[\\\\r\\\\n])*)|(ns:[0-9]+(/.*)?)|(id:.*)\" and not be null.",
@@ -1863,8 +1863,8 @@
       "optionsDataSource": null
     } ],
     "title": "Move",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -2015,8 +2015,8 @@
     "help": null,
     "metadata": null,
     "name": "search",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The string to search for. May match across multiple fields based on the request arguments.Must have length of at most 1000 and not be null.",
@@ -2038,8 +2038,8 @@
       "optionsDataSource": null
     } ],
     "title": "Search",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -2227,8 +2227,8 @@
     "help": null,
     "metadata": null,
     "name": "uploadFile",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file to be written.",
@@ -2342,8 +2342,8 @@
       "optionsDataSource": null
     } ],
     "title": "Upload file",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

@@ -16,8 +16,8 @@
       "bodyContentType": "JSON"
     },
     "name": "createContact",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -369,8 +369,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Create",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -589,8 +589,8 @@
       "bodyContentType": "JSON"
     },
     "name": "updateContact",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -789,8 +789,8 @@
       "controlType": "OBJECT_BUILDER"
     } ],
     "title": "Update",
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1083,8 +1083,8 @@
     "editorDescriptionFunction": null,
     "help": null,
     "name": "subscribe",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The id of a Hubspot app used to register this trigger to. See the <a href=\"https://legacydocs.hubspot.com/docs/faq/integration-platform-api-requirements\">prerequisites documentation</a> for more details about creating an app",
@@ -1354,8 +1354,8 @@
     "webhookRawBody": null,
     "workflowSyncExecution": null,
     "workflowSyncValidation": null,
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

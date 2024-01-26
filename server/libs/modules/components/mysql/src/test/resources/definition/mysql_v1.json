@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "query",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": { },
+    "defaultOutputFunction": false,
+    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The raw SQL query to execute. You can use :property1 and :property2 in conjunction with parameters.",
@@ -139,7 +139,7 @@
     } ],
     "title": "Query",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "mysql",
@@ -152,8 +152,8 @@
     "help": null,
     "metadata": null,
     "name": "insert",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": { },
+    "defaultOutputFunction": false,
+    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "Name of the schema the table belongs to.",
@@ -469,7 +469,7 @@
     } ],
     "title": "Insert",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "mysql",
@@ -482,8 +482,8 @@
     "help": null,
     "metadata": null,
     "name": "update",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": { },
+    "defaultOutputFunction": false,
+    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "Name of the schema the table belongs to.",
@@ -818,7 +818,7 @@
     } ],
     "title": "Update",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "mysql",
@@ -831,8 +831,8 @@
     "help": null,
     "metadata": null,
     "name": "delete",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": { },
+    "defaultOutputFunction": false,
+    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "Name of the schema the table belongs to.",
@@ -1127,7 +1127,7 @@
     } ],
     "title": "Delete",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "mysql",
@@ -1140,8 +1140,8 @@
     "help": null,
     "metadata": null,
     "name": "execute",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": { },
+    "defaultOutputFunction": false,
+    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "The raw DML or DDL statement to execute. You can use :property1 and :property2 in conjunction with parameters.",
@@ -1502,7 +1502,7 @@
     } ],
     "title": "Execute",
     "perform": { },
-    "outputSchema": null
+    "output": null
   } ],
   "category": null,
   "connection": {

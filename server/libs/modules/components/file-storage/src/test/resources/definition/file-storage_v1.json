@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "read",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The object property which contains a reference to the file to read from.",
@@ -108,8 +108,8 @@
     } ],
     "title": "Read from file as string",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -143,8 +143,8 @@
     "help": null,
     "metadata": null,
     "name": "write",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "String to write to the file.",
@@ -186,8 +186,8 @@
     } ],
     "title": "Write to file",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -294,8 +294,8 @@
     "help": null,
     "metadata": null,
     "name": "download",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The URL to download a file from.",
@@ -337,8 +337,8 @@
     } ],
     "title": "Download file",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,

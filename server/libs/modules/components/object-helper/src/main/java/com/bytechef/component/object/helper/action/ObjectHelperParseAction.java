@@ -36,7 +36,7 @@ public class ObjectHelperParseAction {
             .label("Source")
             .description("The JSON string to convert to the data.")
             .required(true))
-        .outputSchema()
+        .output()
         .perform(ObjectHelperParseAction::perform);
 
     protected static Object perform(

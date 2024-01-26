@@ -32,7 +32,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OutputSchema;
+import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.component.definition.Property.ValueProperty;
@@ -146,15 +146,15 @@ public class OpenAIUtils {
         return List.of(string, n);
     }
 
-    public static OutputSchema getOutputSchema(
+    public static Output getOutputSchema(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         boolean stream = inputParameters.getRequiredBoolean(STREAM);
 
         if (stream) {
-            return new OutputSchema(outputSchemaResponseForStream);
+            return new Output(outputSchemaResponseForStream);
         } else {
-            return new OutputSchema(outputSchemaResponse);
+            return new Output(outputSchemaResponse);
         }
     }
 }

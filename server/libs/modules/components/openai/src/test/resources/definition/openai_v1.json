@@ -11,8 +11,8 @@
     "help": null,
     "metadata": null,
     "name": "askChatGPT",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": { },
+    "defaultOutputFunction": false,
+    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "A list of messages comprising the conversation so far.",
@@ -561,7 +561,7 @@
     } ],
     "title": "Ask ChatGPT",
     "perform": { },
-    "outputSchema": null
+    "output": null
   }, {
     "batch": null,
     "componentName": "openai",
@@ -574,8 +574,8 @@
     "help": null,
     "metadata": null,
     "name": "createAssistant",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "ID of the model to use.",
@@ -868,8 +868,8 @@
     } ],
     "title": "Create assistant",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1235,8 +1235,8 @@
     "help": null,
     "metadata": null,
     "name": "createImage",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": null,
@@ -1412,8 +1412,8 @@
     } ],
     "title": "Create image",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1565,8 +1565,8 @@
     "help": null,
     "metadata": null,
     "name": "createSpeech",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Text-to-Speech model which will generate the audio.",
@@ -1728,8 +1728,8 @@
     } ],
     "title": "Create speech",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1836,8 +1836,8 @@
     "help": null,
     "metadata": null,
     "name": "createTranscription",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The audio file object to transcribe, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.",
@@ -2346,8 +2346,8 @@
     } ],
     "title": "Create transcriptions",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -2757,8 +2757,8 @@
     "help": null,
     "metadata": null,
     "name": "createTranslation",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The audio file object translate, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.",
@@ -2963,8 +2963,8 @@
     } ],
     "title": "Create translation",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -3374,8 +3374,8 @@
     "help": null,
     "metadata": null,
     "name": "visionPrompt",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": { },
+    "defaultOutputFunction": false,
+    "outputFunction": { },
     "properties": [ {
       "advancedOption": null,
       "description": "A list of messages comprising the conversation so far.",
@@ -4023,7 +4023,7 @@
     } ],
     "title": "Vision Prompt",
     "perform": { },
-    "outputSchema": null
+    "output": null
   } ],
   "category": null,
   "connection": {

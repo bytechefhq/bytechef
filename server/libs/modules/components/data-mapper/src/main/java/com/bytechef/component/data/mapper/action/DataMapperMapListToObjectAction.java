@@ -48,7 +48,7 @@ public class DataMapperMapListToObjectAction {
                 .label("Field Key")
                 .description("The value of the key will become the value in the new object.")
                 .required(true))
-        .outputSchema()
+        .output()
         .perform(DataMapperMapListToObjectAction::perform);
 
     protected static Object perform(
