@@ -292,11 +292,10 @@ public class MicrosoftOutlook365SendEmailAction {
     private MicrosoftOutlook365SendEmailAction() {
     }
 
-    @SuppressWarnings("rawtypes")
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        GraphServiceClient graphClient = MicrosoftOutlook365Utils.getGraphServiceClient();
+        GraphServiceClient<?> graphClient = MicrosoftOutlook365Utils.getGraphServiceClient();
 
         Message message = MicrosoftOutlook365Utils.createMessage(inputParameters);
 

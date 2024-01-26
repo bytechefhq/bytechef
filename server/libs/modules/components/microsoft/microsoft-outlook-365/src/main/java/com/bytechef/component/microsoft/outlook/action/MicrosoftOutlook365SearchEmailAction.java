@@ -50,6 +50,5 @@ public class MicrosoftOutlook365SearchEmailAction {
         // TODO
 
         return null;
-
     }
 }

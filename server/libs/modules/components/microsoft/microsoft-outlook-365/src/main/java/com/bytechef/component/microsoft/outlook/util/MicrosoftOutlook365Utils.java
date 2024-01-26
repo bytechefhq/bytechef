@@ -64,7 +64,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -82,7 +81,7 @@ public class MicrosoftOutlook365Utils {
         final String clientSecret = "YOUR_CLIENT_SECRET";
         final String authorizationCode = "AUTH_CODE_FROM_REDIRECT";
         final String redirectUrl = "YOUR_REDIRECT_URI";
-        final List<String> scopes = Arrays.asList("User.Read");
+        final List<String> scopes = List.of("User.Read");
 
         final AuthorizationCodeCredential credential = new AuthorizationCodeCredentialBuilder()
             .clientId(clientId)
@@ -120,16 +119,16 @@ public class MicrosoftOutlook365Utils {
                 InferenceClassificationType.valueOf(inputParameters.getString(INFERENCE_CLASSIFICATION));
         }
 
-        message.internetMessageHeaders =
-            inputParameters.getList(INTERNET_MESSAGE_HEADERS, InternetMessageHeader.class, List.of());
+        message.internetMessageHeaders = inputParameters.getList(
+            INTERNET_MESSAGE_HEADERS, InternetMessageHeader.class, List.of());
         message.internetMessageId = inputParameters.getString(INTERNET_MESSAGE_ID);
         message.isDeliveryReceiptRequested = inputParameters.getBoolean(IS_DELIVERY_RECEIPT_REQUESTED);
         message.isDraft = inputParameters.getBoolean(IS_DRAFT);
         message.isRead = inputParameters.getBoolean(IS_READ);
         message.isReadReceiptRequested = inputParameters.getBoolean(IS_READ_RECEIPT_REQUESTED);
         message.parentFolderId = inputParameters.getString(PARENT_FOLDER_ID);
-        message.receivedDateTime =
-            createOffsetDateTime(inputParameters.get(RECEIVED_DATE_TIME, OffsetDateTimeCustom.class));
+        message.receivedDateTime = createOffsetDateTime(
+            inputParameters.get(RECEIVED_DATE_TIME, OffsetDateTimeCustom.class));
         message.replyTo = inputParameters.getList(REPLY_TO, Recipient.class, List.of());
         message.sender = inputParameters.get(SENDER, Recipient.class);
         message.sentDateTime = createOffsetDateTime(inputParameters.get(SENT_DATE_TIME, OffsetDateTimeCustom.class));
@@ -144,8 +143,8 @@ public class MicrosoftOutlook365Utils {
     private static FollowupFlag createFollowupFlag(Parameters inputParameters) {
         FollowupFlag followupFlag = new FollowupFlag();
 
-        followupFlag.completedDateTime =
-            createDateTimeTimeZone(inputParameters.get(COMPLETED_DATE_TIME, DateTimeCustom.class));
+        followupFlag.completedDateTime = createDateTimeTimeZone(
+            inputParameters.get(COMPLETED_DATE_TIME, DateTimeCustom.class));
         followupFlag.dueDateTime = createDateTimeTimeZone(inputParameters.get(DUE_DATE_TIME, DateTimeCustom.class));
 
         if (inputParameters.getString(FLAG_STATUS) != null) {
@@ -158,7 +157,6 @@ public class MicrosoftOutlook365Utils {
     }
 
     private static ItemBody createItemBody(ItemBodyCustom itemBodyCustom) {
-
         if (itemBodyCustom == null) {
             return null;
         }
@@ -172,15 +170,14 @@ public class MicrosoftOutlook365Utils {
     }
 
     private static DateTimeTimeZone createDateTimeTimeZone(DateTimeCustom dateTimeCustom) {
-
         if (dateTimeCustom == null) {
             return null;
         }
 
         DateTimeTimeZone dateTimeTimeZone = new DateTimeTimeZone();
+        LocalDateTime localDateTime = dateTimeCustom.dateTime();
 
-        dateTimeTimeZone.dateTime = dateTimeCustom.dateTime()
-            .toString();
+        dateTimeTimeZone.dateTime = localDateTime.toString();
         dateTimeTimeZone.timeZone = dateTimeCustom.timeZone();
 
         return dateTimeTimeZone;
