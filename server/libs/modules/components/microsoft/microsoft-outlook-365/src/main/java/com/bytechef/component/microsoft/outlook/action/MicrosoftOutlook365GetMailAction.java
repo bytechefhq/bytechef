@@ -48,11 +48,10 @@ public class MicrosoftOutlook365GetMailAction {
     private MicrosoftOutlook365GetMailAction() {
     }
 
-    @SuppressWarnings("rawtypes")
     public static Message perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        GraphServiceClient graphClient = MicrosoftOutlook365Utils.getGraphServiceClient();
+        GraphServiceClient<?> graphClient = MicrosoftOutlook365Utils.getGraphServiceClient();
 
         return graphClient.me()
             .messages(inputParameters.getRequiredString(ID))

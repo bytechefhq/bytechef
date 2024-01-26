@@ -24,6 +24,9 @@ import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
 import com.bytechef.component.definition.ComponentDSL;
+import com.bytechef.component.definition.ComponentDSL.ModifiableDateTimeProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
 
 /**
  * @author Monika Domiter
@@ -79,14 +82,12 @@ public class MicrosoftOutlook365Constants {
     public static final String VALUE = "value";
     public static final String WEB_LINK = "webLink";
     public static final String ZONE_ID = "zoneId";
-    public static final ComponentDSL.ModifiableStringProperty CONTENT_PROPERTY =
-        string(CONTENT)
+    public static final ModifiableStringProperty CONTENT_PROPERTY = string(CONTENT)
             .label("Content")
             .description("The content of the item.")
             .required(false);
 
-    public static final ComponentDSL.ModifiableStringProperty CONTENT_TYPE_PROPERTY =
-        string(CONTENT_TYPE)
+    public static final ModifiableStringProperty CONTENT_TYPE_PROPERTY = string(CONTENT_TYPE)
             .label("Content type")
             .description("The type of the content.")
             .options(
@@ -94,15 +95,13 @@ public class MicrosoftOutlook365Constants {
                 option("Html", "HTML"))
             .required(false);
 
-    public static final ComponentDSL.ModifiableDateTimeProperty DATE_TIME_PROPERTY =
-        dateTime(DATE_TIME)
+    public static final ModifiableDateTimeProperty DATE_TIME_PROPERTY = dateTime(DATE_TIME)
             .label("Date Time")
             .description(
                 "A single point of time in a combined date and time representation.")
             .required(false);
 
-    public static final ComponentDSL.ModifiableObjectProperty RECIPIENT_PROPERTY =
-        object(RECIPIENT)
+    public static final ModifiableObjectProperty RECIPIENT_PROPERTY = object(RECIPIENT)
             .label("Recipient")
             .properties(
                 object(EMAIL_ADDRESS)
@@ -116,14 +115,12 @@ public class MicrosoftOutlook365Constants {
                             .description("The display name of the person or entity.")
                             .required(false)));
 
-    public static final ComponentDSL.ModifiableStringProperty TIME_ZONE_PROPERTY =
-        string(TIME_ZONE)
+    public static final ModifiableStringProperty TIME_ZONE_PROPERTY = string(TIME_ZONE)
             .label("Time Zone")
             .description("Represents a time zone, for example, 'Pacific Standard Time'.")
             .required(false);
 
-    public static final ComponentDSL.ModifiableObjectProperty MESSAGE_OUTPUT_PROPERTY =
-        object()
+    public static final ModifiableObjectProperty MESSAGE_OUTPUT_PROPERTY = object()
             .properties(
                 array(BCC_RECIPIENTS)
                     .items(
