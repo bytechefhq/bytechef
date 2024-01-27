@@ -12,18 +12,16 @@ tags:
   description: "The Platform Component Definition API"
 - name: "connection-definition"
   description: "The Platform Connection Definition API"
-- name: "dynamic-property"
-  description: "The Platform Dynamic Property API"
-- name: "editor-description"
-  description: "The Platform Editor Description API"
-- name: "option"
-  description: "The Platform Option API"
-- name: "workflow-node-output"
-  description: "The Platform Workflow Step Output API"
 - name: "task-dispatcher-definition"
   description: "The Platform Task Dispatcher Definition API"
 - name: "trigger-definition"
   description: "The Platform Trigger Definition API"
+- name: "workflow-node"
+  description: "The Platform Workflow Node API"
+- name: "workflow-node-test-output"
+  description: "The Platform Workflow Node Test Output API"
+- name: "workflow-test-configuration"
+  description: "The Platform Workflow Test Configuration API"
 paths:
   /component-definitions:
     get:
@@ -422,15 +420,268 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TaskDispatcherDefinition"
-  /workflows/{workflowId}/workflow-node-outputs:
+  /workflow-node-test-outputs/{workflowId}/{workflowNodeName:
+    get:
+      description: "Get a workflow node outputs."
+      summary: "Get a workflow node outputs"
+      tags:
+        - "workflow-node-test-output"
+      operationId: "getWorkflowNodeTestOutputs"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The list of workflow node test outputs."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkflowNodeTestOutput"
+    post:
+      description: "Create a workflow node test output."
+      summary: "Create a workflow node test output"
+      tags:
+        - "workflow-node-test-output"
+      operationId: "createWorkflowNodeTestOutput"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow node for which to create test output objects."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The workflow node test output object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowNodeTestOutput"
+  /workflow-node-test-outputs/{workflowId}/{workflowNodeName/sample-output:
+    post:
+      description: "Upload a sample output to create a workflow node test output."
+      summary: "Upload a sample output to create a workflow node test output"
+      tags:
+        - "workflow-node-test-output"
+      operationId: "uploadSampleOutput"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The name of a workflow node for which to create test output objects."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "string"
+        required: true
+      responses:
+        "200":
+          description: "The workflow node test output object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowNodeTestOutput"
+  /workflow-test-configurations/{workflowId}:
+    get:
+      description: "Get a workflow test configuration."
+      summary: "Get a workflow test configuration"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "getWorkflowTestConfiguration"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTestConfiguration"
+    post:
+      description: "Create a new workflow test configuration."
+      summary: "Create a new workflow test configuration."
+      tags:
+        - "workflow-test-configuration"
+      operationId: "createWorkflowTestConfiguration"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkflowTestConfiguration"
+        required: true
+      responses:
+        "200":
+          description: "The workflow test configuration object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTestConfiguration"
+    put:
+      description: "Update an existing workflow test configuration."
+      summary: "Update an existing workflow test configuration"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "updateWorkflowTestConfiguration"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkflowTestConfiguration"
+        required: true
+      responses:
+        "200":
+          description: "The updated workflow test configuration object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTestConfiguration"
+  /workflow-test-configurations/{workflowId}/connections/{workflowNodeName}:
+    get:
+      description: "Get a workflow test configuration connections."
+      summary: "Get a workflow test configuration connections"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "getWorkflowTestConfigurationConnections"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a testing workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The action/trigger name defined in the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
+  /workflow-test-configurations/{workflowId}/inputs:
+    put:
+      description: "Update a workflow test configuration inputs."
+      summary: "Update a workflow test configuration inputs"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "updateWorkflowTestConfigurationInputs"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a testing workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                inputs:
+                  description: "The input parameters used as workflow\
+                    \ input values."
+                  type: "object"
+                  additionalProperties:
+                    type: "string"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
+  /workflow-test-configurations/{workflowId}/connections/{workflowNodeName}/{workflowConnectionKey}:
+    put:
+      description: "Update a workflow test configuration connection."
+      summary: "Update a workflow test configuration connection"
+      tags:
+        - "workflow-test-configuration"
+      operationId: "updateWorkflowTestConfigurationConnection"
+      parameters:
+        - name: "workflowId"
+          description: "The id of a testing workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowNodeName"
+          description: "The action/trigger name defined in the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowConnectionKey"
+          description: "The key of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                connectionId:
+                  type: "integer"
+                  format: "int64"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation."
+  /workflows/{id}/outputs:
     get:
       description: "Get all dynamic output schemas used in a workflow."
       summary: "Get all dynamic output schemas used in a workflow"
       tags:
-        - "workflow-node-output"
+        - "workflow-node"
       operationId: "getWorkflowNodeOutputs"
       parameters:
-        - name: "workflowId"
+        - name: "id"
           description: "The workflow id for which to return all used action definitions"
           in: "path"
           required: true
@@ -451,15 +702,15 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/WorkflowNodeOutput"
-  /workflows/{workflowId}/workflow-node-outputs/{workflowNodeName}:
+  /workflows/{id}/outputs/{workflowNodeName}:
     get:
       description: "Get dynamic output schema of an action task or trigger used in a workflow."
       summary: "Get dynamic output schema of an action task or trigger used in a workflow"
       tags:
-        - "workflow-node-output"
+        - "workflow-node"
       operationId: "getWorkflowNodeOutput"
       parameters:
-        - name: "workflowId"
+        - name: "id"
           description: "The workflow id"
           in: "path"
           required: true
@@ -478,15 +729,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowNodeOutput"
-  /workflows/{workflowId}/{workflowNodeName}/editor-description:
+  /workflows/{id}/{workflowNodeName}/description:
     get:
       description: "Get an action description shown in the editor."
       summary: "Get an action description shown in the editor"
       tags:
-        - "editor-description"
-      operationId: "getWorkflowOperationEditorDescription"
+        - "workflow-node"
+      operationId: "getWorkflowNodeDescription"
       parameters:
-        - name: "workflowId"
+        - name: "id"
           description: "The workflow id"
           in: "path"
           required: true
@@ -504,16 +755,19 @@ paths:
           content:
             application/json:
               schema:
-                type: "string"
-  /workflows/{workflowId}/{workflowNodeName}/properties/{propertyName}/dynamic-properties:
+                type: "object"
+                properties:
+                  description:
+                    type: string
+  /workflows/{id}/{workflowNodeName}/properties/{propertyName}/dynamic-properties:
     get:
       description: "Get dynamic properties for an action or trigger property shown in the editor."
       summary: "Get dynamic properties for an action or trigger property shown in the editor"
       tags:
-        - "dynamic-property"
-      operationId: "getWorkflowOperationPropertyDynamicProperties"
+        - "workflow-node"
+      operationId: "getWorkflowNodePropertyDynamicProperties"
       parameters:
-        - name: "workflowId"
+        - name: "id"
           description: "The workflow id"
           in: "path"
           required: true
@@ -540,15 +794,15 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Property"
-  /workflows/{workflowId}/{workflowNodeName}/properties/{propertyName}/options:
+  /workflows/{id}/{workflowNodeName}/properties/{propertyName}/options:
     get:
       description: "Get an action or trigger property options shown in the editor."
       summary: "Get an action or trigger property options shown in the editor"
       tags:
-        - "option"
-      operationId: "getWorkflowOperationOptions"
+        - "workflow-node"
+      operationId: "getWorkflowNodeOptions"
       parameters:
-        - name: "workflowId"
+        - name: "id"
           description: "The workflow id"
           in: "path"
           required: true
@@ -601,8 +855,8 @@ components:
         description:
           description: "The description."
           type: "string"
-        editorDescriptionDefined:
-          description: "Does action define dynamic editor description."
+        nodeDescriptionDefined:
+          description: "Does action define dynamic node description."
           type: "boolean"
         help:
           $ref: "#/components/schemas/Help"
@@ -1355,8 +1609,8 @@ components:
         description:
           description: "The description."
           type: "string"
-        editorDescriptionDefined:
-          description: "Does trigger define dynamic editor description."
+        nodeDescriptionDefined:
+          description: "Does trigger define dynamic node description."
           type: "boolean"
         help:
           $ref: "#/components/schemas/Help"
@@ -1586,6 +1840,88 @@ components:
         workflowNodeName:
           description: The workflow node name
           type: "string"
+    WorkflowNodeTestOutput:
+      description: "Contains test output of a workflow node."
+      type: "object"
+      properties:
+        id:
+          description: "The workflow test node output id"
+          type: "integer"
+          format: "int64"
+        workflowNodeName:
+          description: "The workflow node name."
+          type: "string"
+        workflowId:
+          description: "The workflow id."
+          type: "string"
+    WorkflowTestConfiguration:
+      description: "Contains configuration and connections required for the test execution of a particular workflow."
+      type: "object"
+      required:
+        - "name"
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        inputs:
+          description: "The input parameters used as workflow\
+            \ input values."
+          type: "object"
+          additionalProperties:
+            type: "string"
+        connections:
+          description: "The connections used by workflow test."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        workflowId:
+          description: "The id of a workflow."
+          type: "string"
+          readOnly: true
+        __version:
+          type: "integer"
+    WorkflowTestConfigurationConnection:
+      description: "The connection used in a particular action task or trigger."
+      type: "object"
+      required:
+        - "connectionId"
+        - "workflowConnectionKey"
+        - "workflowNodeName"
+      properties:
+        connectionId:
+          description: "The connection id"
+          type: "integer"
+          format: "int64"
+        workflowConnectionKey:
+          description: "The connection key under which a connection is defined in\
+            \ a workflow definition."
+          type: "string"
+        workflowNodeName:
+          description: "The action/trigger name to which a connection belongs."
+          type: "string"
+    WorkflowTestExecution:
+      description: "Contains information about test execution of a workflow."
+      type: "object"
+      properties:
+        job:
+          $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/Job"
+        triggerExecution:
+          $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TriggerExecution"
     WorkflowTask:
       description: "Represents a definition of a workflow task."
       type: "object"
