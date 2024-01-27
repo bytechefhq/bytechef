@@ -57,11 +57,11 @@ export interface TriggerDefinitionModel {
      */
     description?: string;
     /**
-     * Does trigger define dynamic editor description.
+     * Does trigger define dynamic node description.
      * @type {boolean}
      * @memberof TriggerDefinitionModel
      */
-    editorDescriptionDefined?: boolean;
+    nodeDescriptionDefined?: boolean;
     /**
      * 
      * @type {HelpModel}
@@ -124,7 +124,7 @@ export function TriggerDefinitionModelFromJSONTyped(json: any, ignoreDiscriminat
         'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
         'componentVersion': !exists(json, 'componentVersion') ? undefined : json['componentVersion'],
         'description': !exists(json, 'description') ? undefined : json['description'],
-        'editorDescriptionDefined': !exists(json, 'editorDescriptionDefined') ? undefined : json['editorDescriptionDefined'],
+        'nodeDescriptionDefined': !exists(json, 'nodeDescriptionDefined') ? undefined : json['nodeDescriptionDefined'],
         'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
         'outputDefined': !exists(json, 'outputDefined') ? undefined : json['outputDefined'],
@@ -146,7 +146,7 @@ export function TriggerDefinitionModelToJSON(value?: TriggerDefinitionModel | nu
         'componentName': value.componentName,
         'componentVersion': value.componentVersion,
         'description': value.description,
-        'editorDescriptionDefined': value.editorDescriptionDefined,
+        'nodeDescriptionDefined': value.nodeDescriptionDefined,
         'help': HelpModelToJSON(value.help),
         'name': value.name,
         'outputDefined': value.outputDefined,

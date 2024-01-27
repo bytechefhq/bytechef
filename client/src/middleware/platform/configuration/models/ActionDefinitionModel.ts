@@ -51,11 +51,11 @@ export interface ActionDefinitionModel {
      */
     description?: string;
     /**
-     * Does action define dynamic editor description.
+     * Does action define dynamic node description.
      * @type {boolean}
      * @memberof ActionDefinitionModel
      */
-    editorDescriptionDefined?: boolean;
+    nodeDescriptionDefined?: boolean;
     /**
      * 
      * @type {HelpModel}
@@ -111,7 +111,7 @@ export function ActionDefinitionModelFromJSONTyped(json: any, ignoreDiscriminato
         'componentName': !exists(json, 'componentName') ? undefined : json['componentName'],
         'componentVersion': !exists(json, 'componentVersion') ? undefined : json['componentVersion'],
         'description': !exists(json, 'description') ? undefined : json['description'],
-        'editorDescriptionDefined': !exists(json, 'editorDescriptionDefined') ? undefined : json['editorDescriptionDefined'],
+        'nodeDescriptionDefined': !exists(json, 'nodeDescriptionDefined') ? undefined : json['nodeDescriptionDefined'],
         'help': !exists(json, 'help') ? undefined : HelpModelFromJSON(json['help']),
         'name': json['name'],
         'outputDefined': !exists(json, 'outputDefined') ? undefined : json['outputDefined'],
@@ -132,7 +132,7 @@ export function ActionDefinitionModelToJSON(value?: ActionDefinitionModel | null
         'componentName': value.componentName,
         'componentVersion': value.componentVersion,
         'description': value.description,
-        'editorDescriptionDefined': value.editorDescriptionDefined,
+        'nodeDescriptionDefined': value.nodeDescriptionDefined,
         'help': HelpModelToJSON(value.help),
         'name': value.name,
         'outputDefined': value.outputDefined,
