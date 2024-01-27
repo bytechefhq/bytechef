@@ -51,10 +51,10 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
-    public String executeEditorDescription(
+    public String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters,
-        ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull ActionContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -69,7 +69,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
-    public Output executeOutputSchema(
+    public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 

@@ -47,7 +47,7 @@ public interface ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, String searchText, @Nullable ComponentConnection connection,
         @NonNull ActionContext context);
 
-    Output executeOutputSchema(
+    Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull ActionContext context);

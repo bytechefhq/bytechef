@@ -64,16 +64,14 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     }
 
     @Override
-    public String executeEditorDescription(
+    public String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> inputParameters, Long connectionId) {
+        @NonNull Map<String, Object> inputParameters) {
 
-        ComponentConnection componentConnection = getComponentConnection(connectionId);
-
-        return actionDefinitionService.executeEditorDescription(
-            componentName, componentVersion, actionName, inputParameters, componentConnection,
+        return actionDefinitionService.executeNodeDescription(
+            componentName, componentVersion, actionName, inputParameters,
             contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, componentConnection));
+                componentName, componentVersion, actionName, null, null, null, null, null));
     }
 
     @Override

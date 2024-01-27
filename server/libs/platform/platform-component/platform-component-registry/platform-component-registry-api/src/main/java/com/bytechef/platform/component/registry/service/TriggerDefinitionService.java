@@ -77,7 +77,7 @@ public interface TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName, @Nullable String searchText,
         @Nullable ComponentConnection connection, @NonNull TriggerContext context);
 
-    Output executeOutputSchema(
+    Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull TriggerContext context);

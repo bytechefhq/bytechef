@@ -84,9 +84,9 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public String executeEditorDescription(
+    public String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, ComponentConnection connection, @NonNull TriggerContext context) {
+        @NonNull Map<String, ?> triggerParameters, @NonNull TriggerContext context) {
 
         throw new UnsupportedOperationException();
     }
@@ -119,7 +119,7 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
-    public Output executeOutputSchema(
+    public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 

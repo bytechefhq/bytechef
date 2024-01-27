@@ -103,15 +103,13 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     }
 
     @Override
-    public String executeEditorDescription(
+    public String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters) {
 
-        ComponentConnection componentConnection = getComponentConnection(connectionId);
-
-        return triggerDefinitionService.executeEditorDescription(
-            componentName, componentVersion, triggerName, inputParameters, componentConnection,
-            contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
+        return triggerDefinitionService.executeNodeDescription(
+            componentName, componentVersion, triggerName, inputParameters,
+            contextFactory.createTriggerContext(componentName, triggerName, null));
     }
 
     @Override
