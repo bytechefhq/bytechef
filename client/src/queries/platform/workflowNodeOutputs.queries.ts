@@ -1,33 +1,31 @@
+/* eslint-disable sort-keys */
 import {
     GetWorkflowNodeOutputRequest,
     GetWorkflowNodeOutputsRequest,
-    WorkflowNodeOutputApi,
+    WorkflowNodeApi,
     WorkflowNodeOutputModel,
 } from '@/middleware/platform/configuration';
-
-/* eslint-disable sort-keys */
-
 import {useQuery} from '@tanstack/react-query';
 
-export const WorkflowStepOutputs = {
-    filteredWorkflowStepOutputs: (request: GetWorkflowNodeOutputsRequest) => [
-        ...WorkflowStepOutputs.outputSchemas,
+export const WorkflowNodeOutputs = {
+    filteredWorkflowNodeOutputs: (request: GetWorkflowNodeOutputsRequest) => [
+        ...WorkflowNodeOutputs.outputSchemas,
         request,
     ],
-    workflowStepOutput: (request: GetWorkflowNodeOutputRequest) => [...WorkflowStepOutputs.outputSchemas, request],
-    outputSchemas: ['workflowStepOutputs'] as const,
+    workflowNodeOutput: (request: GetWorkflowNodeOutputRequest) => [...WorkflowNodeOutputs.outputSchemas, request],
+    outputSchemas: ['workflowNodeOutputs'] as const,
 };
 
 export const useGetWorkflowNodeOutputQuery = (request: GetWorkflowNodeOutputRequest, enabled?: boolean) =>
     useQuery<WorkflowNodeOutputModel, Error>({
-        queryKey: WorkflowStepOutputs.workflowStepOutput(request),
-        queryFn: () => new WorkflowNodeOutputApi().getWorkflowNodeOutput(request),
+        queryKey: WorkflowNodeOutputs.workflowNodeOutput(request),
+        queryFn: () => new WorkflowNodeApi().getWorkflowNodeOutput(request),
         enabled: enabled === undefined ? true : enabled,
     });
 
 export const useGetWorkflowNodeOutputsQuery = (request: GetWorkflowNodeOutputsRequest, enabled?: boolean) =>
     useQuery<WorkflowNodeOutputModel[], Error>({
-        queryKey: WorkflowStepOutputs.filteredWorkflowStepOutputs(request),
-        queryFn: () => new WorkflowNodeOutputApi().getWorkflowNodeOutputs(request),
+        queryKey: WorkflowNodeOutputs.filteredWorkflowNodeOutputs(request),
+        queryFn: () => new WorkflowNodeApi().getWorkflowNodeOutputs(request),
         enabled: enabled === undefined ? true : enabled,
     });

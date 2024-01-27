@@ -1,8 +1,11 @@
 import {Button} from '@/components/ui/button';
+import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowNodesPopoverMenu from '@/pages/automation/project/components/WorkflowNodesPopoverMenu';
 import {ProjectKeys} from '@/queries/automation/projects.queries';
+import {useGetWorkflowNodeDescriptionQuery} from '@/queries/platform/workflowNodeDescriptions.queries';
 import {WorkflowDefinition} from '@/types/types';
+import {HoverCard} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {PencilIcon, TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
@@ -18,6 +21,7 @@ const SPACE = 4;
 
 const WorkflowNode = ({data, id}: NodeProps) => {
     const [isHovered, setIsHovered] = useState(false);
+    const [hoveredNode, setHoveredNode] = useState<string | undefined>();
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {componentNames, projectId, setComponentNames, setWorkflow, workflow} = useWorkflowDataStore();
@@ -27,6 +31,14 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     const {getEdges, getNode, getNodes, setEdges, setNodes} = useReactFlow();
 
     const isSelected = currentNode.name === data.name;
+
+    const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
+        {
+            workflowId: workflow.id!,
+            workflowNodeName: hoveredNode!,
+        },
+        hoveredNode !== undefined
+    );
 
     const queryClient = useQueryClient();
 
@@ -146,15 +158,31 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                 </div>
             )}
 
-            <Button
-                className={twMerge(
-                    'h-18 w-18 rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none',
-                    isSelected && workflowNodeDetailsPanelOpen && 'border-blue-300 bg-blue-100 shadow-none'
-                )}
-                onClick={handleNodeClick}
+            <HoverCard
+                onOpenChange={(open) => {
+                    if (open) {
+                        setHoveredNode(id);
+                    } else {
+                        setHoveredNode(undefined);
+                    }
+                }}
             >
-                {data.icon}
-            </Button>
+                <HoverCardTrigger>
+                    <Button
+                        className={twMerge(
+                            'h-18 w-18 rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none',
+                            isSelected && workflowNodeDetailsPanelOpen && 'border-blue-300 bg-blue-100 shadow-none'
+                        )}
+                        onClick={handleNodeClick}
+                    >
+                        {data.icon}
+                    </Button>
+                </HoverCardTrigger>
+
+                <HoverCardContent className="text-sm" side="right">
+                    {workflowNodeDescription?.description}
+                </HoverCardContent>
+            </HoverCard>
 
             <div className="ml-2 flex w-full min-w-max flex-col items-start">
                 <span className="text-sm">{data.title || data.label}</span>
