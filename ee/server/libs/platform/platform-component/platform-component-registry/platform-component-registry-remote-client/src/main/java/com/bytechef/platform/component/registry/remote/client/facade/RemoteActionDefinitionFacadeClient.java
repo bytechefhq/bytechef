@@ -104,18 +104,17 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
             Object.class);
     }
 
-    private record EditorDescriptionRequest(
-        String actionName, Map<String, Object> inputParameters, String componentName, int componentVersion,
-        Long connectionId) {
+    private record NodeDescriptionRequest(
+        int componentVersion, String componentName, String actionName, Map<String, Object> inputParameters) {
     }
 
     private record OptionsRequest(
-        String actionName, String propertyName, Map<String, Object> inputParameters, String componentName,
-        int componentVersion, Long connectionId, String searchText) {
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, Object> inputParameters, Long connectionId, String searchText) {
     }
 
     private record OutputRequest(
-        String actionName, Map<String, Object> inputParameters, String componentName, int componentVersion,
+        String componentName, int componentVersion, String actionName, Map<String, Object> inputParameters,
         Long connectionId) {
     }
 
@@ -125,12 +124,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     private record PropertiesRequest(
-        String actionName, Map<String, Object> inputParameters, String componentName, int componentVersion,
+        String componentName, int componentVersion, String actionName, Map<String, Object> inputParameters,
         Long connectionId, String propertyName) {
-    }
-
-    private record SampleOutputRequest(
-        String actionName, Map<String, Object> inputParameters, String componentName, int componentVersion,
-        Long connectionId) {
     }
 }

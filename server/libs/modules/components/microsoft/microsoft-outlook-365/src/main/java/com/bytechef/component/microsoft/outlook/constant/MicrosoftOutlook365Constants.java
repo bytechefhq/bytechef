@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.option;
 import static com.bytechef.component.definition.ComponentDSL.string;
 
-import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableDateTimeProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableStringProperty;
@@ -83,137 +82,137 @@ public class MicrosoftOutlook365Constants {
     public static final String WEB_LINK = "webLink";
     public static final String ZONE_ID = "zoneId";
     public static final ModifiableStringProperty CONTENT_PROPERTY = string(CONTENT)
-            .label("Content")
-            .description("The content of the item.")
-            .required(false);
+        .label("Content")
+        .description("The content of the item.")
+        .required(false);
 
     public static final ModifiableStringProperty CONTENT_TYPE_PROPERTY = string(CONTENT_TYPE)
-            .label("Content type")
-            .description("The type of the content.")
-            .options(
-                option("Text", "TEXT"),
-                option("Html", "HTML"))
-            .required(false);
+        .label("Content type")
+        .description("The type of the content.")
+        .options(
+            option("Text", "TEXT"),
+            option("Html", "HTML"))
+        .required(false);
 
     public static final ModifiableDateTimeProperty DATE_TIME_PROPERTY = dateTime(DATE_TIME)
-            .label("Date Time")
-            .description(
-                "A single point of time in a combined date and time representation.")
-            .required(false);
+        .label("Date Time")
+        .description(
+            "A single point of time in a combined date and time representation.")
+        .required(false);
 
     public static final ModifiableObjectProperty RECIPIENT_PROPERTY = object(RECIPIENT)
-            .label("Recipient")
-            .properties(
-                object(EMAIL_ADDRESS)
-                    .properties(
-                        string(ADDRESS)
-                            .label("Address")
-                            .description("The email address of the person or entity.")
-                            .required(false),
-                        string(NAME)
-                            .label("Name")
-                            .description("The display name of the person or entity.")
-                            .required(false)));
+        .label("Recipient")
+        .properties(
+            object(EMAIL_ADDRESS)
+                .properties(
+                    string(ADDRESS)
+                        .label("Address")
+                        .description("The email address of the person or entity.")
+                        .required(false),
+                    string(NAME)
+                        .label("Name")
+                        .description("The display name of the person or entity.")
+                        .required(false)));
 
     public static final ModifiableStringProperty TIME_ZONE_PROPERTY = string(TIME_ZONE)
-            .label("Time Zone")
-            .description("Represents a time zone, for example, 'Pacific Standard Time'.")
-            .required(false);
+        .label("Time Zone")
+        .description("Represents a time zone, for example, 'Pacific Standard Time'.")
+        .required(false);
 
     public static final ModifiableObjectProperty MESSAGE_OUTPUT_PROPERTY = object()
-            .properties(
-                array(BCC_RECIPIENTS)
-                    .items(
-                        object(RECIPIENT)
-                            .properties(
-                                object(EMAIL_ADDRESS)
-                                    .properties(
-                                        string(ADDRESS),
-                                        string(NAME)))),
-                object(BODY)
-                    .properties(
-                        string(CONTENT),
-                        string(CONTENT_TYPE)),
-                string(BODY_PREVIEW),
-                array(CC_RECIPIENTS)
-                    .items(
-                        object(RECIPIENT)
-                            .properties(
-                                object(EMAIL_ADDRESS)
-                                    .properties(
-                                        string(ADDRESS),
-                                        string(NAME)))),
-                string(CONVERSATION_ID),
-                object(FLAG)
-                    .properties(
-                        object(COMPLETED_DATE_TIME)
-                            .properties(
-                                dateTime(DATE_TIME),
-                                string(TIME_ZONE)),
-                        object(DUE_DATE_TIME)
-                            .properties(
-                                dateTime(DATE_TIME),
-                                string(TIME_ZONE)),
-                        string(FLAG_STATUS),
-                        object(START_DATE_TIME)
-                            .properties(
-                                dateTime(DATE_TIME),
-                                string(TIME_ZONE))),
-                object(FROM)
-                    .properties(
-                        object(RECIPIENT)
-                            .properties(
-                                object(EMAIL_ADDRESS)
-                                    .properties(
-                                        string(ADDRESS),
-                                        string(NAME)))),
-                bool(HAS_ATTACHMENTS),
-                string(IMPORTANCE),
-                string(INFERENCE_CLASSIFICATION),
-                array(INTERNET_MESSAGE_HEADERS)
-                    .items(
-                        object()
-                            .properties(
-                                string(NAME),
-                                string(VALUE))),
-                string(INTERNET_MESSAGE_ID),
-                bool(IS_DELIVERY_RECEIPT_REQUESTED),
-                bool(IS_DRAFT),
-                bool(IS_READ),
-                bool(IS_READ_RECEIPT_REQUESTED),
-                string(PARENT_FOLDER_ID),
-                object(RECEIVED_DATE_TIME)
-                    .properties(
-                        dateTime(DATE_TIME),
-                        string(ZONE_ID)),
-                array(REPLY_TO)
-                    .items(
-                        object(RECIPIENT)
-                            .properties(
-                                object(EMAIL_ADDRESS)
-                                    .properties(
-                                        string(ADDRESS),
-                                        string(NAME)))),
-                object(SENDER)
-                    .properties(
-                        object(RECIPIENT)
-                            .properties(
-                                object(EMAIL_ADDRESS)
-                                    .properties(
-                                        string(ADDRESS),
-                                        string(NAME))),
-                        string(SUBJECT),
-                        array(TO_RECIPIENTS)
-                            .items(
-                                object(RECIPIENT)
-                                    .properties(
-                                        object(EMAIL_ADDRESS)
-                                            .properties(
-                                                string(ADDRESS),
-                                                string(NAME)))),
-                        object(UNIQUE_BODY)
-                            .properties(
-                                string(CONTENT),
-                                string(CONTENT_TYPE)),
-                        string(WEB_LINK)));
+        .properties(
+            array(BCC_RECIPIENTS)
+                .items(
+                    object(RECIPIENT)
+                        .properties(
+                            object(EMAIL_ADDRESS)
+                                .properties(
+                                    string(ADDRESS),
+                                    string(NAME)))),
+            object(BODY)
+                .properties(
+                    string(CONTENT),
+                    string(CONTENT_TYPE)),
+            string(BODY_PREVIEW),
+            array(CC_RECIPIENTS)
+                .items(
+                    object(RECIPIENT)
+                        .properties(
+                            object(EMAIL_ADDRESS)
+                                .properties(
+                                    string(ADDRESS),
+                                    string(NAME)))),
+            string(CONVERSATION_ID),
+            object(FLAG)
+                .properties(
+                    object(COMPLETED_DATE_TIME)
+                        .properties(
+                            dateTime(DATE_TIME),
+                            string(TIME_ZONE)),
+                    object(DUE_DATE_TIME)
+                        .properties(
+                            dateTime(DATE_TIME),
+                            string(TIME_ZONE)),
+                    string(FLAG_STATUS),
+                    object(START_DATE_TIME)
+                        .properties(
+                            dateTime(DATE_TIME),
+                            string(TIME_ZONE))),
+            object(FROM)
+                .properties(
+                    object(RECIPIENT)
+                        .properties(
+                            object(EMAIL_ADDRESS)
+                                .properties(
+                                    string(ADDRESS),
+                                    string(NAME)))),
+            bool(HAS_ATTACHMENTS),
+            string(IMPORTANCE),
+            string(INFERENCE_CLASSIFICATION),
+            array(INTERNET_MESSAGE_HEADERS)
+                .items(
+                    object()
+                        .properties(
+                            string(NAME),
+                            string(VALUE))),
+            string(INTERNET_MESSAGE_ID),
+            bool(IS_DELIVERY_RECEIPT_REQUESTED),
+            bool(IS_DRAFT),
+            bool(IS_READ),
+            bool(IS_READ_RECEIPT_REQUESTED),
+            string(PARENT_FOLDER_ID),
+            object(RECEIVED_DATE_TIME)
+                .properties(
+                    dateTime(DATE_TIME),
+                    string(ZONE_ID)),
+            array(REPLY_TO)
+                .items(
+                    object(RECIPIENT)
+                        .properties(
+                            object(EMAIL_ADDRESS)
+                                .properties(
+                                    string(ADDRESS),
+                                    string(NAME)))),
+            object(SENDER)
+                .properties(
+                    object(RECIPIENT)
+                        .properties(
+                            object(EMAIL_ADDRESS)
+                                .properties(
+                                    string(ADDRESS),
+                                    string(NAME))),
+                    string(SUBJECT),
+                    array(TO_RECIPIENTS)
+                        .items(
+                            object(RECIPIENT)
+                                .properties(
+                                    object(EMAIL_ADDRESS)
+                                        .properties(
+                                            string(ADDRESS),
+                                            string(NAME)))),
+                    object(UNIQUE_BODY)
+                        .properties(
+                            string(CONTENT),
+                            string(CONTENT_TYPE)),
+                    string(WEB_LINK)));
 }

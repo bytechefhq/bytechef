@@ -26,7 +26,9 @@ import static com.bytechef.component.rabbitmq.constant.RabbitMqConstants.USERNAM
 
 import com.bytechef.component.definition.ComponentDSL.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Output;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerOutputFunction.ListenerTriggerOutputFunction;
@@ -55,14 +57,17 @@ public class RabbitMqNewMessageTrigger {
             string(QUEUE)
                 .description("The name of the queue to read from")
                 .required(true))
-        .output(getOutputSchema())
+        .output(RabbitMqNewMessageTrigger::output)
         .listenerEnable(RabbitMqNewMessageTrigger::listenerEnable)
         .listenerDisable(RabbitMqNewMessageTrigger::listenerDisable);
 
-    protected static ListenerTriggerOutputFunction getOutputSchema() {
+    protected static Output output(
+        Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
+        TriggerContext context) {
+
         // TODO
 
-        return (inputParameters, connectionParameters, workflowExecutionId, context) -> null;
+        return  null;
     }
 
     protected static void listenerDisable(
