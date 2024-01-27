@@ -1,7 +1,9 @@
-package com.bytechef.platform.workflow.test.web.rest.model;
+package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.platform.configuration.web.rest.model.JobModel;
+import com.bytechef.platform.configuration.web.rest.model.TriggerExecutionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -21,14 +23,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestExecution", description = "Contains information about test execution of a workflow.")
 @JsonTypeName("WorkflowTestExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:24:42.257874+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:59.663193+01:00[Europe/Zagreb]")
 public class WorkflowTestExecutionModel {
 
-  private com.bytechef.platform.workflow.execution.web.rest.model.JobModel job;
+  private JobModel job;
 
-  private com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution;
+  private TriggerExecutionModel triggerExecution;
 
-  public WorkflowTestExecutionModel job(com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
+  public WorkflowTestExecutionModel job(JobModel job) {
     this.job = job;
     return this;
   }
@@ -40,15 +42,15 @@ public class WorkflowTestExecutionModel {
   @Valid 
   @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("job")
-  public com.bytechef.platform.workflow.execution.web.rest.model.JobModel getJob() {
+  public JobModel getJob() {
     return job;
   }
 
-  public void setJob(com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
+  public void setJob(JobModel job) {
     this.job = job;
   }
 
-  public WorkflowTestExecutionModel triggerExecution(com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
+  public WorkflowTestExecutionModel triggerExecution(TriggerExecutionModel triggerExecution) {
     this.triggerExecution = triggerExecution;
     return this;
   }
@@ -60,11 +62,11 @@ public class WorkflowTestExecutionModel {
   @Valid 
   @Schema(name = "triggerExecution", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("triggerExecution")
-  public com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel getTriggerExecution() {
+  public TriggerExecutionModel getTriggerExecution() {
     return triggerExecution;
   }
 
-  public void setTriggerExecution(com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
+  public void setTriggerExecution(TriggerExecutionModel triggerExecution) {
     this.triggerExecution = triggerExecution;
   }
 

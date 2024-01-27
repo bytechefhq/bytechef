@@ -1,4 +1,4 @@
-package com.bytechef.platform.workflow.test.web.rest.model;
+package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Webhook_retry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:24:42.257874+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:59.663193+01:00[Europe/Zagreb]")
 public class WebhookRetryModel {
 
   private Integer initialInterval;

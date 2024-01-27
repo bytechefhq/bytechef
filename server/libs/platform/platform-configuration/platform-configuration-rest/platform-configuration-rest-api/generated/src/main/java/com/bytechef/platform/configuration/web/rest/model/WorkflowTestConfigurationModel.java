@@ -1,8 +1,8 @@
-package com.bytechef.platform.workflow.test.web.rest.model;
+package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestConfigurationConnectionModel;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationConnectionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestConfiguration", description = "Contains configuration and connections required for the test execution of a particular workflow.")
 @JsonTypeName("WorkflowTestConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-25T10:11:39.095314+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:59.663193+01:00[Europe/Zagreb]")
 public class WorkflowTestConfigurationModel {
 
   private String createdBy;

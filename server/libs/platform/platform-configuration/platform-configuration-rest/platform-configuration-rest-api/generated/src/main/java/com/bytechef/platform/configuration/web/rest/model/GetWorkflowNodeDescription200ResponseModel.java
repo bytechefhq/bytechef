@@ -16,34 +16,33 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * A set of available resources.
+ * GetWorkflowNodeDescription200ResponseModel
  */
 
-@Schema(name = "Resources", description = "A set of available resources.")
-@JsonTypeName("Resources")
+@JsonTypeName("getWorkflowNodeDescription_200_response")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:59.663193+01:00[Europe/Zagreb]")
-public class ResourcesModel {
+public class GetWorkflowNodeDescription200ResponseModel {
 
-  private String documentationUrl;
+  private String description;
 
-  public ResourcesModel documentationUrl(String documentationUrl) {
-    this.documentationUrl = documentationUrl;
+  public GetWorkflowNodeDescription200ResponseModel description(String description) {
+    this.description = description;
     return this;
   }
 
   /**
-   * The url of available documentation.
-   * @return documentationUrl
+   * Get description
+   * @return description
   */
   
-  @Schema(name = "documentationUrl", description = "The url of available documentation.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("documentationUrl")
-  public String getDocumentationUrl() {
-    return documentationUrl;
+  @Schema(name = "description", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("description")
+  public String getDescription() {
+    return description;
   }
 
-  public void setDocumentationUrl(String documentationUrl) {
-    this.documentationUrl = documentationUrl;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   @Override
@@ -54,20 +53,20 @@ public class ResourcesModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ResourcesModel resources = (ResourcesModel) o;
-    return Objects.equals(this.documentationUrl, resources.documentationUrl);
+    GetWorkflowNodeDescription200ResponseModel getWorkflowNodeDescription200Response = (GetWorkflowNodeDescription200ResponseModel) o;
+    return Objects.equals(this.description, getWorkflowNodeDescription200Response.description);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(documentationUrl);
+    return Objects.hash(description);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ResourcesModel {\n");
-    sb.append("    documentationUrl: ").append(toIndentedString(documentationUrl)).append("\n");
+    sb.append("class GetWorkflowNodeDescription200ResponseModel {\n");
+    sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("}");
     return sb.toString();
   }

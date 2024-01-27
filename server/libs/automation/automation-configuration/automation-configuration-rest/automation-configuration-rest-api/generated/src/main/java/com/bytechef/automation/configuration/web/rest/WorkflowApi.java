@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-24T15:28:50.426082+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:57.811691+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow", description = "The Automation Workflow API")
 public interface WorkflowApi {
@@ -200,7 +200,7 @@ public interface WorkflowApi {
      * GET /workflows : Get workflow definitions
      * Get workflow definitions.
      *
-     * @return A list of workflows. (status code 200)
+     * @return The list of workflows. (status code 200)
      */
     @Operation(
         operationId = "getWorkflows",
@@ -208,7 +208,7 @@ public interface WorkflowApi {
         description = "Get workflow definitions.",
         tags = { "workflow" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of workflows.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of workflows.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.platform.configuration.web.rest.model.WorkflowModel.class)))
             })
         }

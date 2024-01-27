@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-24T15:28:50.426082+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:57.811691+01:00[Europe/Zagreb]")
 public class ProjectInstanceWorkflowModel {
 
   private String createdBy;

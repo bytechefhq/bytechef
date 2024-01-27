@@ -3,12 +3,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.platform.workflow.test.web.rest;
+package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.workflow.test.web.rest.model.UpdateWorkflowTestConfigurationConnectionRequestModel;
-import com.bytechef.platform.workflow.test.web.rest.model.UpdateWorkflowTestConfigurationInputsRequestModel;
-import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestConfigurationConnectionModel;
-import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestConfigurationModel;
+import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowTestConfigurationConnectionRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowTestConfigurationInputsRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationConnectionModel;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,9 +35,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-25T10:11:39.095314+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:59.663193+01:00[Europe/Zagreb]")
 @Validated
-@Tag(name = "workflow-test-configuration", description = "the workflow-test-configuration API")
+@Tag(name = "workflow-test-configuration", description = "The Platform Workflow Test Configuration API")
 public interface WorkflowTestConfigurationApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -48,7 +48,7 @@ public interface WorkflowTestConfigurationApi {
      * POST /workflow-test-configurations/{workflowId} : Create a new workflow test configuration.
      * Create a new workflow test configuration.
      *
-     * @param workflowId The id of a workflow test configuration. (required)
+     * @param workflowId The id of a workflow. (required)
      * @param workflowTestConfigurationModel  (required)
      * @return The workflow test configuration object. (status code 200)
      */
@@ -71,7 +71,7 @@ public interface WorkflowTestConfigurationApi {
     )
     
     default ResponseEntity<WorkflowTestConfigurationModel> createWorkflowTestConfiguration(
-        @Parameter(name = "workflowId", description = "The id of a workflow test configuration.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
         @Parameter(name = "WorkflowTestConfigurationModel", description = "", required = true) @Valid @RequestBody WorkflowTestConfigurationModel workflowTestConfigurationModel
     ) {
         getRequest().ifPresent(request -> {
@@ -92,7 +92,7 @@ public interface WorkflowTestConfigurationApi {
      * GET /workflow-test-configurations/{workflowId} : Get a workflow test configuration
      * Get a workflow test configuration.
      *
-     * @param workflowId The id of a workflow test configuration. (required)
+     * @param workflowId The id of a workflow. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -113,7 +113,7 @@ public interface WorkflowTestConfigurationApi {
     )
     
     default ResponseEntity<WorkflowTestConfigurationModel> getWorkflowTestConfiguration(
-        @Parameter(name = "workflowId", description = "The id of a workflow test configuration.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
+        @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -176,7 +176,7 @@ public interface WorkflowTestConfigurationApi {
      * PUT /workflow-test-configurations/{workflowId} : Update an existing workflow test configuration
      * Update an existing workflow test configuration.
      *
-     * @param workflowId The id of a workflow test configuration. (required)
+     * @param workflowId The id of a workflow. (required)
      * @param workflowTestConfigurationModel  (required)
      * @return The updated workflow test configuration object. (status code 200)
      */
@@ -199,7 +199,7 @@ public interface WorkflowTestConfigurationApi {
     )
     
     default ResponseEntity<WorkflowTestConfigurationModel> updateWorkflowTestConfiguration(
-        @Parameter(name = "workflowId", description = "The id of a workflow test configuration.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
+        @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
         @Parameter(name = "WorkflowTestConfigurationModel", description = "", required = true) @Valid @RequestBody WorkflowTestConfigurationModel workflowTestConfigurationModel
     ) {
         getRequest().ifPresent(request -> {

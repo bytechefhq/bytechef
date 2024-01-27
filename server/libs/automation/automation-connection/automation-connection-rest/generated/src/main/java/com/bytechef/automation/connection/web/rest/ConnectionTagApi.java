@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-23T13:28:44.424288+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:57.390600+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "connection-tag", description = "The Automation Connection Tag API")
 public interface ConnectionTagApi {
@@ -44,7 +44,7 @@ public interface ConnectionTagApi {
      * GET /connections/tags : Get connection tags
      * Get connection tags.
      *
-     * @return A list of connection tags. (status code 200)
+     * @return The list of connection tags. (status code 200)
      */
     @Operation(
         operationId = "getConnectionTags",
@@ -52,7 +52,7 @@ public interface ConnectionTagApi {
         description = "Get connection tags.",
         tags = { "connection-tag" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of connection tags.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of connection tags.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.platform.connection.web.rest.model.TagModel.class)))
             })
         }

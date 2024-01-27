@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-24T15:28:50.426082+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:57.811691+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "project", description = "The Automation Project API")
 public interface ProjectApi {
@@ -246,7 +246,7 @@ public interface ProjectApi {
      * @param projectInstances Use for filtering projects for which project instances exist. (optional)
      * @param tagId The tag id of used for filtering projects. (optional)
      * @param published Use for filtering published projects. (optional)
-     * @return A list of projects. (status code 200)
+     * @return The list of projects. (status code 200)
      */
     @Operation(
         operationId = "getProjects",
@@ -254,7 +254,7 @@ public interface ProjectApi {
         description = "Get projects.",
         tags = { "project" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "A list of projects.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of projects.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ProjectModel.class)))
             })
         }

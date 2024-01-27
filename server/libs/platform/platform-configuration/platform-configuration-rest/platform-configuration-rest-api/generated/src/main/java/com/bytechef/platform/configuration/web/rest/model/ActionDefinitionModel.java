@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-26T08:17:52.891429+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:59.663193+01:00[Europe/Zagreb]")
 public class ActionDefinitionModel {
 
   private String componentName;
@@ -35,7 +35,7 @@ public class ActionDefinitionModel {
 
   private String description;
 
-  private Boolean editorDescriptionDefined;
+  private Boolean nodeDescriptionDefined;
 
   private HelpModel help;
 
@@ -119,24 +119,24 @@ public class ActionDefinitionModel {
     this.description = description;
   }
 
-  public ActionDefinitionModel editorDescriptionDefined(Boolean editorDescriptionDefined) {
-    this.editorDescriptionDefined = editorDescriptionDefined;
+  public ActionDefinitionModel nodeDescriptionDefined(Boolean nodeDescriptionDefined) {
+    this.nodeDescriptionDefined = nodeDescriptionDefined;
     return this;
   }
 
   /**
-   * Does action define dynamic editor description.
-   * @return editorDescriptionDefined
+   * Does action define dynamic node description.
+   * @return nodeDescriptionDefined
   */
   
-  @Schema(name = "editorDescriptionDefined", description = "Does action define dynamic editor description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("editorDescriptionDefined")
-  public Boolean getEditorDescriptionDefined() {
-    return editorDescriptionDefined;
+  @Schema(name = "nodeDescriptionDefined", description = "Does action define dynamic node description.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("nodeDescriptionDefined")
+  public Boolean getNodeDescriptionDefined() {
+    return nodeDescriptionDefined;
   }
 
-  public void setEditorDescriptionDefined(Boolean editorDescriptionDefined) {
-    this.editorDescriptionDefined = editorDescriptionDefined;
+  public void setNodeDescriptionDefined(Boolean nodeDescriptionDefined) {
+    this.nodeDescriptionDefined = nodeDescriptionDefined;
   }
 
   public ActionDefinitionModel help(HelpModel help) {
@@ -259,7 +259,7 @@ public class ActionDefinitionModel {
     return Objects.equals(this.componentName, actionDefinition.componentName) &&
         Objects.equals(this.componentVersion, actionDefinition.componentVersion) &&
         Objects.equals(this.description, actionDefinition.description) &&
-        Objects.equals(this.editorDescriptionDefined, actionDefinition.editorDescriptionDefined) &&
+        Objects.equals(this.nodeDescriptionDefined, actionDefinition.nodeDescriptionDefined) &&
         Objects.equals(this.help, actionDefinition.help) &&
         Objects.equals(this.name, actionDefinition.name) &&
         Objects.equals(this.outputDefined, actionDefinition.outputDefined) &&
@@ -269,7 +269,7 @@ public class ActionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, editorDescriptionDefined, help, name, outputDefined, properties, title);
+    return Objects.hash(componentName, componentVersion, description, nodeDescriptionDefined, help, name, outputDefined, properties, title);
   }
 
   @Override
@@ -279,7 +279,7 @@ public class ActionDefinitionModel {
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    editorDescriptionDefined: ").append(toIndentedString(editorDescriptionDefined)).append("\n");
+    sb.append("    nodeDescriptionDefined: ").append(toIndentedString(nodeDescriptionDefined)).append("\n");
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
