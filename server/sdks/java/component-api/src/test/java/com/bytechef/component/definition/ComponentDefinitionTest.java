@@ -51,7 +51,7 @@ public class ComponentDefinitionTest {
 
         jsonAssertEquals(
             """
-                {"batch":null,"componentName":null,"componentDescription":null,"componentTitle":null,"componentVersion":0,"deprecated":null,"description":"description","editorDescriptionFunction":null,"help":null,"metadata":null,"name":"name","defaultOutputFunction":false,"outputFunction":null,"properties":null,"title":"title","output":null,"perform":{}}
+                {"batch":null,"componentName":null,"componentDescription":null,"componentTitle":null,"componentVersion":0,"deprecated":null,"description":"description","nodeDescriptionFunction":null,"help":null,"metadata":null,"name":"name","defaultOutputFunction":false,"outputFunction":null,"properties":null,"title":"title","output":null,"perform":{}}
                 """,
             action);
     }

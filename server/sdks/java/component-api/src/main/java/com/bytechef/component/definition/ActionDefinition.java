@@ -73,7 +73,7 @@ public interface ActionDefinition {
      *
      * @return
      */
-    Optional<ActionEditorDescriptionFunction> getEditorDescriptionFunction();
+    Optional<ActionNodeDescriptionFunction> getNodeDescriptionFunction();
 
     /**
      * The code that should be executed when an action runs as a task inside the workflow engine.

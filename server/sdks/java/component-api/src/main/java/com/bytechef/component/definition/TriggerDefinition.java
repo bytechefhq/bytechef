@@ -130,7 +130,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<TriggerEditorDescriptionFunction> getEditorDescriptionFunction();
+    Optional<TriggerNodeDescriptionFunction> getNodeDescriptionFunction();
 
     /**
      *

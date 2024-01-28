@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.facade;
+package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
-import com.bytechef.platform.workflow.test.domain.WorkflowTestConfigurationConnection;
-import com.bytechef.platform.workflow.test.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkflowTestConfigurationFacade {
 
-    private WorkflowConnectionFacade workflowConnectionFacade;
+    private final WorkflowConnectionFacade workflowConnectionFacade;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     public WorkflowTestConfigurationFacade(

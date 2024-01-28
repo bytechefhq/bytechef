@@ -41,27 +41,26 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     @Override
-    public String executeEditorDescription(
+    public String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> inputParameters,
-        Long connectionId) {
+        @NonNull Map<String, ?> inputParameters) {
 
         return defaultRestClient.post(
-            uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-editor-description"),
-            new EditorDescriptionRequest(
-                actionName, inputParameters, componentName, componentVersion, connectionId),
+            uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-node-description"),
+            new NodeDescriptionRequest(
+                componentVersion, componentName, actionName, inputParameters),
             String.class);
     }
 
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, Object> inputParameters, Long connectionId, String searchText) {
+        @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-options"),
             new OptionsRequest(
-                actionName, propertyName, inputParameters, componentName, componentVersion, connectionId,
+                componentName, componentVersion, actionName, propertyName, inputParameters, connectionId,
                 searchText),
             new ParameterizedTypeReference<>() {});
     }
@@ -69,12 +68,12 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     @Override
     public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> inputParameters, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-output-schema"),
             new OutputRequest(
-                actionName, inputParameters, componentName, componentVersion, connectionId),
+                componentName, componentVersion, actionName, inputParameters, connectionId),
             new ParameterizedTypeReference<>() {});
     }
 
@@ -86,7 +85,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-dynamic-properties"),
             new PropertiesRequest(
-                actionName, inputParameters, componentName, componentVersion, connectionId, propertyName),
+                componentName, componentVersion, actionName, inputParameters, connectionId, propertyName),
             new ParameterizedTypeReference<>() {});
     }
 
@@ -105,16 +104,16 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     private record NodeDescriptionRequest(
-        int componentVersion, String componentName, String actionName, Map<String, Object> inputParameters) {
+        int componentVersion, String componentName, String actionName, Map<String, ?> inputParameters) {
     }
 
     private record OptionsRequest(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, Object> inputParameters, Long connectionId, String searchText) {
+        Map<String, ?> inputParameters, Long connectionId, String searchText) {
     }
 
     private record OutputRequest(
-        String componentName, int componentVersion, String actionName, Map<String, Object> inputParameters,
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
         Long connectionId) {
     }
 

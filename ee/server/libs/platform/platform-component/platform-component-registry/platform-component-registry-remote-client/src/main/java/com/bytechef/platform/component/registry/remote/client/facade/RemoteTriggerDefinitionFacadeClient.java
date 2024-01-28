@@ -45,7 +45,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     @Override
     public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, Object> inputParameters, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-properties"),
@@ -55,15 +55,15 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
-    public String executeEditorDescription(
+    public String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(
-                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-editor-description"),
-            new EditorDescriptionRequest(
-                componentName, componentVersion, triggerName, inputParameters, connectionId),
+                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-node-description"),
+            new NodeDescriptionRequest(
+                componentName, componentVersion, triggerName, inputParameters),
             String.class);
     }
 
@@ -186,9 +186,8 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
             Boolean.class);
     }
 
-    private record EditorDescriptionRequest(
-        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        Long connectionId) {
+    private record NodeDescriptionRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters) {
     }
 
     private record OptionsRequest(

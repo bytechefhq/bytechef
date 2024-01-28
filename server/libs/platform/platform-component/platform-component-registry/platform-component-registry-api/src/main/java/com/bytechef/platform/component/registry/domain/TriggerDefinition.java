@@ -29,7 +29,7 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class TriggerDefinition extends TriggerDefinitionBasic {
 
-    private boolean editorDescriptionDefined;
+    private boolean nodeDescriptionDefined;
     private Output output;
     private boolean outputDefined;
     private List<? extends Property> properties;
@@ -43,8 +43,8 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     public TriggerDefinition(com.bytechef.component.definition.TriggerDefinition triggerDefinition) {
         super(triggerDefinition);
 
-        this.editorDescriptionDefined = OptionalUtils.mapOrElse(
-            triggerDefinition.getEditorDescriptionFunction(), editorDescriptionDataSource -> true, false);
+        this.nodeDescriptionDefined = OptionalUtils.mapOrElse(
+            triggerDefinition.getNodeDescriptionFunction(), editorDescriptionDataSource -> true, false);
         this.output = OptionalUtils.mapOrElse(
             triggerDefinition.getOutput(),
             outputSchema -> SchemaUtils.toOutputSchema(
@@ -78,7 +78,7 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
             return false;
         }
 
-        return editorDescriptionDefined == that.editorDescriptionDefined
+        return nodeDescriptionDefined == that.nodeDescriptionDefined
             && outputDefined == that.outputDefined && webhookRawBody == that.webhookRawBody
             && workflowSyncExecution == that.workflowSyncExecution
             && workflowSyncValidation == that.workflowSyncValidation && Objects.equals(output, that.output)
@@ -87,7 +87,7 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), editorDescriptionDefined, output, outputDefined,
+        return Objects.hash(super.hashCode(), nodeDescriptionDefined, output, outputDefined,
             properties, webhookRawBody, workflowSyncExecution,
             workflowSyncValidation);
     }
@@ -100,8 +100,8 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
         return properties;
     }
 
-    public boolean isEditorDescriptionDefined() {
-        return editorDescriptionDefined;
+    public boolean isNodeDescriptionDefined() {
+        return nodeDescriptionDefined;
     }
 
     public boolean isOutputDefined() {
@@ -123,7 +123,7 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
     @Override
     public String toString() {
         return "TriggerDefinition{" +
-            "editorDescriptionDefined=" + editorDescriptionDefined +
+            "nodeDescriptionDefined=" + nodeDescriptionDefined +
             ", outputDefined=" + outputDefined +
             ", outputSchema=" + output +
             ", properties=" + properties +

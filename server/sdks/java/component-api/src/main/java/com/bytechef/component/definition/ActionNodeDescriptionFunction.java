@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest;
+package com.bytechef.component.definition;
 
-import com.bytechef.platform.configuration.web.rest.model.OptionModel;
-import java.util.List;
-import org.springframework.http.ResponseEntity;
+/**
+ *
+ */
+@FunctionalInterface
+public interface ActionNodeDescriptionFunction {
 
-public class OptionApiController implements OptionApi {
-
-    @Override
-    public ResponseEntity<List<OptionModel>> getWorkflowOperationOptions(
-        String workflowId, String workflowNodeName, String propertyName, String searchText) {
-        return OptionApi.super.getWorkflowOperationOptions(workflowId, workflowNodeName, propertyName, searchText);
-    }
+    /**
+     * @param inputParameters
+     * @param context
+     * @return
+     */
+    String apply(Parameters inputParameters, ActionContext context) throws Exception;
 }

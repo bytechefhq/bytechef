@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.repository;
-
-import com.bytechef.platform.configuration.domain.WorkflowNodeOutput;
-import java.util.Optional;
-import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.stereotype.Repository;
+package com.bytechef.component.definition;
 
 /**
- * @author Ivica Cardic
+ *
  */
-@Repository
-public interface WorkflowComponentDefinitionRepository
-    extends ListCrudRepository<WorkflowNodeOutput, Long> {
+@FunctionalInterface
+public interface TriggerNodeDescriptionFunction {
 
-    Optional<WorkflowNodeOutput> findLastByWorkflowIdAndWorkflowNodeName(
-        String workflowId, String workflowNodeName);
+    /**
+     * @param inputParameters
+     * @param context
+     * @return
+     */
+    String apply(Parameters inputParameters, TriggerContext context) throws Exception;
 }

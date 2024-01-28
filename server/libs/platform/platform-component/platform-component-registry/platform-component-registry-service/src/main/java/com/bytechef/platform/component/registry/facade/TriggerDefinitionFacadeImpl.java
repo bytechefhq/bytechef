@@ -56,7 +56,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, Object> inputParameters, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -155,7 +155,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
-        return triggerDefinitionService.executeOutputSchema(
+        return triggerDefinitionService.executeOutput(
             componentName, componentVersion, triggerName, inputParameters, componentConnection,
             contextFactory.createTriggerContext(componentName, triggerName, componentConnection));
     }

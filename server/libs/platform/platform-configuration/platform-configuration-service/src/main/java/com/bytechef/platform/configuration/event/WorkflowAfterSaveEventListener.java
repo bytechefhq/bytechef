@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.event;
+package com.bytechef.platform.configuration.event;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.platform.workflow.test.facade.WorkflowTestConfigurationFacade;
+import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
 import org.springframework.stereotype.Component;

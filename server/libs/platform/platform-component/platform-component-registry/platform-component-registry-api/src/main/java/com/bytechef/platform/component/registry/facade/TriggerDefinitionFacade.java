@@ -33,7 +33,7 @@ public interface TriggerDefinitionFacade {
 
     List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull String propertyName,
-        @NonNull Map<String, Object> inputParameters, Long connectionId);
+        @NonNull Map<String, ?> inputParameters, Long connectionId);
 
     void executeDynamicWebhookDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
@@ -49,9 +49,9 @@ public interface TriggerDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters);
 
-    String executeEditorDescription(
+    String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, Long connectionId);
+        @NonNull Map<String, ?> inputParameters);
 
     void executeListenerDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,

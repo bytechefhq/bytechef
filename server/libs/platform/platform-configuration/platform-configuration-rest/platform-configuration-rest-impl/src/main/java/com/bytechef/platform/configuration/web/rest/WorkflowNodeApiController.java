@@ -18,7 +18,11 @@ package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
+import com.bytechef.platform.configuration.facade.WorkflowNodeDescriptionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
+import com.bytechef.platform.configuration.web.rest.model.GetWorkflowNodeDescription200ResponseModel;
+import com.bytechef.platform.configuration.web.rest.model.OptionModel;
+import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeOutputModel;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -32,16 +36,35 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}")
 @ConditionalOnEndpoint
-public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
+public class WorkflowNodeApiController implements WorkflowNodeApi {
 
     private final ConversionService conversionService;
+    private final WorkflowNodeDescriptionFacade workflowNodeDescriptionFacade;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
 
-    public WorkflowNodeOutputApiController(
-        ConversionService conversionService, WorkflowNodeOutputFacade workflowNodeOutputFacade) {
+    public WorkflowNodeApiController(
+        ConversionService conversionService, WorkflowNodeDescriptionFacade workflowNodeDescriptionFacade,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade) {
 
         this.conversionService = conversionService;
+        this.workflowNodeDescriptionFacade = workflowNodeDescriptionFacade;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
+    }
+
+    @Override
+    public ResponseEntity<GetWorkflowNodeDescription200ResponseModel> getWorkflowNodeDescription(
+        String workflowId, String workflowNodeName) {
+
+        return ResponseEntity.ok(
+            new GetWorkflowNodeDescription200ResponseModel().description(
+                workflowNodeDescriptionFacade.getWorkflowNodeDescription(workflowId, workflowNodeName)));
+    }
+
+    @Override
+    public ResponseEntity<List<OptionModel>> getWorkflowNodeOptions(
+        String workflowId, String workflowNodeName, String propertyName, String searchText) {
+
+        return WorkflowNodeApi.super.getWorkflowNodeOptions(workflowId, workflowNodeName, propertyName, searchText);
     }
 
     @Override
@@ -61,5 +84,13 @@ public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
                 workflowNodeOutputFacade.getWorkflowNodeOutputs(workflowId, lastWorkflowNodeName),
                 workflowStepOutputDTO -> conversionService.convert(workflowStepOutputDTO,
                     WorkflowNodeOutputModel.class)));
+    }
+
+    @Override
+    public ResponseEntity<List<PropertyModel>> getWorkflowNodePropertyDynamicProperties(
+        String workflowId, String workflowNodeName, String propertyName) {
+
+        return WorkflowNodeApi.super.getWorkflowNodePropertyDynamicProperties(
+            workflowId, workflowNodeName, propertyName);
     }
 }

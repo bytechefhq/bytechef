@@ -20,7 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
-import com.bytechef.component.definition.ActionEditorDescriptionFunction;
+import com.bytechef.component.definition.ActionNodeDescriptionFunction;
 import com.bytechef.component.definition.ActionOutputFunction;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
@@ -76,16 +76,15 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public String executeEditorDescription(
+    public String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
+        @NonNull Map<String, ?> inputParameters, @NonNull ActionContext context) {
 
-        ActionEditorDescriptionFunction editorDescriptionFunction =
-            getEditorDescriptionFunction(
-                componentName, componentVersion, actionName);
+        ActionNodeDescriptionFunction nodeDescriptionFunction = getNodeDescriptionFunction(
+            componentName, componentVersion, actionName);
 
         try {
-            return editorDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
+            return nodeDescriptionFunction.apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 101);
         }
@@ -112,7 +111,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
-    public Output executeOutputSchema(
+    public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
@@ -191,7 +190,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     }
 
-    private ActionEditorDescriptionFunction getEditorDescriptionFunction(
+    private ActionNodeDescriptionFunction getNodeDescriptionFunction(
         String componentName, int componentVersion, String actionName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
@@ -203,7 +202,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         getActionDefinition(componentName, componentVersion, actionName);
 
         return OptionalUtils.orElse(
-            actionDefinition.getEditorDescriptionFunction(),
+            actionDefinition.getNodeDescriptionFunction(),
             (inputParameters, context) -> OptionalUtils.orElse(
                 componentDefinition.getTitle(), componentDefinition.getName()) + ": " +
                 OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));

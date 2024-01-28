@@ -31,7 +31,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.definition.TriggerOutputFunction.ListenerTriggerOutputFunction;
 import com.bytechef.component.rabbitmq.util.RabbitMqUtils;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -67,7 +66,7 @@ public class RabbitMqNewMessageTrigger {
 
         // TODO
 
-        return  null;
+        return null;
     }
 
     protected static void listenerDisable(

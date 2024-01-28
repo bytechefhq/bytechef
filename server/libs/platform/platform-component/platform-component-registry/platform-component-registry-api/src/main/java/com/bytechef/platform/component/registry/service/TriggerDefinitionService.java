@@ -57,9 +57,9 @@ public interface TriggerDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> outputParameters, @NonNull TriggerContext context);
 
-    String executeEditorDescription(
+    String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> triggerParameters, @Nullable ComponentConnection connection,
+        @NonNull Map<String, ?> triggerParameters,
         @NonNull TriggerContext context);
 
     void executeListenerDisable(

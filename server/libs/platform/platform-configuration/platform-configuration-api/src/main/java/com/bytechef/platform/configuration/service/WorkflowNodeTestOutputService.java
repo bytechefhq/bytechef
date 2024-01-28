@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition;
+package com.bytechef.platform.configuration.service;
+
+import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
+import java.util.Optional;
 
 /**
- *
+ * @author Ivica Cardic
  */
-@FunctionalInterface
-public interface TriggerEditorDescriptionFunction {
+public interface WorkflowNodeTestOutputService {
 
-    /**
-     * @param inputParameters
-     * @param context
-     * @return
-     */
-    String apply(Parameters inputParameters, TriggerContext context) throws Exception;
+    Optional<WorkflowNodeTestOutput> fetchLastWorkflowTestNodeOutput(String workflowId, String workflowNodeName);
 }

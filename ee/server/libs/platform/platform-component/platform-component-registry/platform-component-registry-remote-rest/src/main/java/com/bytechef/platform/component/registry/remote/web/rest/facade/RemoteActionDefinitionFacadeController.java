@@ -40,17 +40,16 @@ public class RemoteActionDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-editor-description",
+        value = "/execute-node-description",
         consumes = {
             "application/json"
         })
     public ResponseEntity<String> executeEditorDescription(
-        @Valid @RequestBody EditorDescriptionRequest editorDescriptionRequest) {
+        @Valid @RequestBody NodeDescriptionRequest nodeDescriptionRequest) {
 
-        return ResponseEntity.ok(actionDefinitionFacade.executeEditorDescription(
-            editorDescriptionRequest.componentName, editorDescriptionRequest.componentVersion,
-            editorDescriptionRequest.actionName, editorDescriptionRequest.inputParameters,
-            editorDescriptionRequest.connectionId));
+        return ResponseEntity.ok(actionDefinitionFacade.executeNodeDescription(
+            nodeDescriptionRequest.componentName, nodeDescriptionRequest.componentVersion,
+            nodeDescriptionRequest.actionName, nodeDescriptionRequest.inputParameters));
     }
 
     @RequestMapping(
@@ -113,9 +112,9 @@ public class RemoteActionDefinitionFacadeController {
     }
 
     @SuppressFBWarnings("EI")
-    public record EditorDescriptionRequest(
+    public record NodeDescriptionRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        Map<String, Object> inputParameters, Long connectionId) {
+        Map<String, Object> inputParameters) {
     }
 
     @SuppressFBWarnings("EI")

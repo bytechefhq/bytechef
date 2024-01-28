@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.service;
+package com.bytechef.platform.configuration.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.workflow.test.domain.WorkflowTestConfiguration;
-import com.bytechef.platform.workflow.test.domain.WorkflowTestConfigurationConnection;
-import com.bytechef.platform.workflow.test.repository.WorkflowTestConfigurationConnectionRepository;
-import com.bytechef.platform.workflow.test.repository.WorkflowTestConfigurationRepository;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationConnectionRepository;
+import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;

@@ -61,7 +61,7 @@ public class TaskDispatcherDefinition {
         this.help = OptionalUtils.mapOrElse(taskDispatcherDefinition.getHelp(), Help::new, null);
         this.icon = OptionalUtils.mapOrElse(taskDispatcherDefinition.getIcon(), IconUtils::readIcon, null);
         this.name = taskDispatcherDefinition.getName();
-        this.output = getOutputSchema(taskDispatcherDefinition);
+        this.output = getOutput(taskDispatcherDefinition);
         this.outputDefined = OptionalUtils.mapOrElse(
             taskDispatcherDefinition.getOutput(), outputSchema -> true, false) ||
             OptionalUtils.mapOrElse(
@@ -130,7 +130,7 @@ public class TaskDispatcherDefinition {
     }
 
     @Nullable
-    public Output getOutputSchema() {
+    public Output getOutput() {
         return output;
     }
 
@@ -167,7 +167,7 @@ public class TaskDispatcherDefinition {
         return variablePropertiesDefined;
     }
 
-    private static Output getOutputSchema(
+    private static Output getOutput(
         com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition) {
 
         return OptionalUtils.mapOrElse(

@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition;
+package com.bytechef.platform.configuration.facade;
 
 /**
- *
+ * @author Ivica Cardic
  */
-@FunctionalInterface
-public interface ActionEditorDescriptionFunction {
+public interface WorkflowNodeDescriptionFacade {
 
-    /**
-     * @param inputParameters
-     * @param context
-     * @return
-     */
-    String apply(Parameters inputParameters, ActionContext context) throws Exception;
+    String getWorkflowNodeDescription(String workflowId, String workflowNodeName);
 }

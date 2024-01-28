@@ -18,7 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.ActionEditorDescriptionFunction;
+import com.bytechef.component.definition.ActionNodeDescriptionFunction;
 import com.bytechef.component.definition.ActionOutputFunction;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Output;
@@ -41,7 +41,7 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     protected final int componentVersion;
     protected final Boolean deprecated;
     protected final String description;
-    protected final ActionEditorDescriptionFunction editorDescriptionFunction;
+    protected final ActionNodeDescriptionFunction nodeDescriptionFunction;
     protected final PerformFunction performFunction;
     protected final Help help;
     protected final Map<String, Object> metadata;
@@ -62,8 +62,8 @@ public class ActionDefinitionWrapper implements ActionDefinition {
         this.componentVersion = actionDefinition.getComponentVersion();
         this.deprecated = OptionalUtils.orElse(actionDefinition.getDeprecated(), null);
         this.description = OptionalUtils.orElse(actionDefinition.getDescription(), null);
-        this.editorDescriptionFunction =
-            OptionalUtils.orElse(actionDefinition.getEditorDescriptionFunction(), null);
+        this.nodeDescriptionFunction =
+            OptionalUtils.orElse(actionDefinition.getNodeDescriptionFunction(), null);
         this.performFunction = performFunctionSupplier.get();
         this.help = OptionalUtils.orElse(actionDefinition.getHelp(), null);
         this.metadata = OptionalUtils.orElse(actionDefinition.getMetadata(), null);
@@ -111,8 +111,8 @@ public class ActionDefinitionWrapper implements ActionDefinition {
     }
 
     @Override
-    public Optional<ActionEditorDescriptionFunction> getEditorDescriptionFunction() {
-        return Optional.ofNullable(editorDescriptionFunction);
+    public Optional<ActionNodeDescriptionFunction> getNodeDescriptionFunction() {
+        return Optional.ofNullable(nodeDescriptionFunction);
     }
 
     @Override

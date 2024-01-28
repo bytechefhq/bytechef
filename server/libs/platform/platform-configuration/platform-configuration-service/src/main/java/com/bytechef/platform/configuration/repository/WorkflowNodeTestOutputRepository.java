@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.service;
+package com.bytechef.platform.configuration.repository;
 
-import com.bytechef.platform.configuration.domain.WorkflowNodeOutput;
+import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import java.util.Optional;
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowNodeOutputService {
+@Repository
+public interface WorkflowNodeTestOutputRepository
+    extends ListCrudRepository<WorkflowNodeTestOutput, Long> {
 
-    Optional<WorkflowNodeOutput> fetchLastWorkflowNodeOutput(String workflowId, String workflowNodeName);
+    Optional<WorkflowNodeTestOutput> findLastByWorkflowIdAndWorkflowNodeName(
+        String workflowId, String workflowNodeName);
 }

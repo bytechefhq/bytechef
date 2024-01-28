@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.web.rest;
+package com.bytechef.platform.configuration.web.rest;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
-import com.bytechef.platform.workflow.test.domain.WorkflowTestConfiguration;
-import com.bytechef.platform.workflow.test.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.workflow.test.web.rest.model.UpdateWorkflowTestConfigurationConnectionRequestModel;
-import com.bytechef.platform.workflow.test.web.rest.model.UpdateWorkflowTestConfigurationInputsRequestModel;
-import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestConfigurationConnectionModel;
-import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestConfigurationModel;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowTestConfigurationConnectionRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowTestConfigurationInputsRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationConnectionModel;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationModel;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;

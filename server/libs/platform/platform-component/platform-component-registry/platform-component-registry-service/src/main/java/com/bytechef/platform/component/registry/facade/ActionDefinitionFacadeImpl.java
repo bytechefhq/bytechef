@@ -66,7 +66,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> inputParameters) {
+        @NonNull Map<String, ?> inputParameters) {
 
         return actionDefinitionService.executeNodeDescription(
             componentName, componentVersion, actionName, inputParameters,
@@ -77,7 +77,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, Object> inputParameters, Long connectionId, String searchText) {
+        @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -91,11 +91,11 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> inputParameters, Long connectionId) {
+        @NonNull Map<String, ?> inputParameters, Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
-        return actionDefinitionService.executeOutputSchema(
+        return actionDefinitionService.executeOutput(
             componentName, componentVersion, actionName, inputParameters, componentConnection,
             contextFactory.createActionContext(
                 componentName, componentVersion, actionName, null, null, null, null, componentConnection));

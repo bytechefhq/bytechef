@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.configuration.service;
 
-import com.bytechef.platform.configuration.domain.WorkflowNodeOutput;
-import com.bytechef.platform.configuration.repository.WorkflowComponentDefinitionRepository;
+import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
+import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,19 +27,20 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class WorkflowNodeOutputServiceImpl implements WorkflowNodeOutputService {
+public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutputService {
 
-    private final WorkflowComponentDefinitionRepository workflowTestComponentDefinitionRepository;
+    private final WorkflowNodeTestOutputRepository workflowNodeTestOutputRepository;
 
-    public WorkflowNodeOutputServiceImpl(
-        WorkflowComponentDefinitionRepository workflowTestComponentDefinitionRepository) {
+    public WorkflowNodeTestOutputServiceImpl(
+        WorkflowNodeTestOutputRepository workflowNodeTestOutputRepository) {
 
-        this.workflowTestComponentDefinitionRepository = workflowTestComponentDefinitionRepository;
+        this.workflowNodeTestOutputRepository = workflowNodeTestOutputRepository;
     }
 
     @Override
-    public Optional<WorkflowNodeOutput> fetchLastWorkflowNodeOutput(String workflowId, String workflowNodeName) {
-        return workflowTestComponentDefinitionRepository.findLastByWorkflowIdAndWorkflowNodeName(
+    public Optional<WorkflowNodeTestOutput>
+        fetchLastWorkflowTestNodeOutput(String workflowId, String workflowNodeName) {
+        return workflowNodeTestOutputRepository.findLastByWorkflowIdAndWorkflowNodeName(
             workflowId, workflowNodeName);
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.domain;
+package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.platform.connection.domain.Connection;
 import java.util.Objects;

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.repository;
+package com.bytechef.platform.configuration.repository;
 
-import com.bytechef.platform.workflow.test.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import java.util.List;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.query.Param;

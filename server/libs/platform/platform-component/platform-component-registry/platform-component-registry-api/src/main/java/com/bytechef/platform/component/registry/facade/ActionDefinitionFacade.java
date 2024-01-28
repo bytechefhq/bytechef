@@ -32,17 +32,17 @@ public interface ActionDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
         Map<String, Object> inputParameters, Long connectionId);
 
-    String executeEditorDescription(
+    String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> actionParameters, Long connectionId);
+        @NonNull Map<String, ?> actionParameters);
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        @NonNull Map<String, Object> inputParameters, Long connectionId, String searchText);
+        @NonNull Map<String, ?> inputParameters, Long connectionId, String searchText);
 
     Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, Object> inputParameters, Long connectionId);
+        @NonNull Map<String, ?> inputParameters, Long connectionId);
 
     Object executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, int type, Long instanceId,

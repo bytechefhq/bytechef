@@ -1,9 +1,7 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework:spring-context")
-    implementation("org.springframework:spring-tx")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-service"))
@@ -14,6 +12,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
     implementation(project(":server:libs:modules:components:map"))

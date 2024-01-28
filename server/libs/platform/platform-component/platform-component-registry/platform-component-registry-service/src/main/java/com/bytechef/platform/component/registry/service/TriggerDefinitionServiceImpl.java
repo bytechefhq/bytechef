@@ -36,7 +36,7 @@ import com.bytechef.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.StaticWebhookRequestFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.definition.TriggerEditorDescriptionFunction;
+import com.bytechef.component.definition.TriggerNodeDescriptionFunction;
 import com.bytechef.platform.component.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.definition.HttpParametersImpl;
 import com.bytechef.platform.component.definition.ParametersImpl;
@@ -146,16 +146,16 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public String executeEditorDescription(
+    public String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
+        @NonNull Map<String, ?> inputParameters, @NonNull TriggerContext context) {
 
-        TriggerEditorDescriptionFunction editorDescriptionFunction =
-            getEditorDescriptionFunction(
+        TriggerNodeDescriptionFunction nodeDescriptionFunction =
+            getNodeDescriptionFunction(
                 componentName, componentVersion, triggerName);
 
         try {
-            return editorDescriptionFunction
+            return nodeDescriptionFunction
                 .apply(new ParametersImpl(inputParameters), context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters, TriggerDefinition.class, 101);
@@ -226,7 +226,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
-    public Output executeOutputSchema(
+    public Output executeOutput(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 
@@ -472,7 +472,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return OptionalUtils.get(triggerDefinition.getDynamicWebhookEnable());
     }
 
-    private TriggerEditorDescriptionFunction getEditorDescriptionFunction(
+    private TriggerNodeDescriptionFunction getNodeDescriptionFunction(
         String componentName, int componentVersion, String triggerName) {
 
         ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
@@ -482,7 +482,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.orElse(
-            triggerDefinition.getEditorDescriptionFunction(),
+            triggerDefinition.getNodeDescriptionFunction(),
             (inputParameters, context) -> componentDefinition.getTitle() + ": " + triggerDefinition.getTitle());
     }
 

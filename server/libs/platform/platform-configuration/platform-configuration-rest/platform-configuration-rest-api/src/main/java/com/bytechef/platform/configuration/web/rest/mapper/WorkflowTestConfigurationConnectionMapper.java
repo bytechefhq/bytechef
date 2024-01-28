@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.web.rest.mapper;
+package com.bytechef.platform.configuration.web.rest.mapper;
 
-import com.bytechef.platform.workflow.test.domain.WorkflowTestConfiguration;
-import com.bytechef.platform.workflow.test.web.rest.mapper.config.PlatformWorkflowTestMapperSpringConfig;
-import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestConfigurationModel;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationConnectionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformWorkflowTestMapperSpringConfig.class)
-public interface WorkflowTestConfigurationMapper
-    extends Converter<WorkflowTestConfiguration, WorkflowTestConfigurationModel> {
+@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+public interface WorkflowTestConfigurationConnectionMapper
+    extends Converter<WorkflowTestConfigurationConnection, WorkflowTestConfigurationConnectionModel> {
 
     @Override
-    WorkflowTestConfigurationModel convert(WorkflowTestConfiguration workflowTestConfiguration);
+    WorkflowTestConfigurationConnectionModel convert(
+        WorkflowTestConfigurationConnection workflowTestConfigurationConnection);
 }

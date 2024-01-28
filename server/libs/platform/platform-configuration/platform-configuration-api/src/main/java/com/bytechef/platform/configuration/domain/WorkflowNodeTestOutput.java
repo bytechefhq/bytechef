@@ -20,9 +20,14 @@ import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
@@ -31,11 +36,8 @@ import org.springframework.data.relational.core.mapping.Table;
 /**
  * @author Ivica Cardic
  */
-@Table("workflow_node_output")
-public class WorkflowNodeOutput implements Persistable<Long> {
-
-    @Id
-    private Long id;
+@Table("workflow_node_test_output")
+public class WorkflowNodeTestOutput implements Persistable<Long> {
 
     @Column("component_name")
     private String componentName;
@@ -45,6 +47,25 @@ public class WorkflowNodeOutput implements Persistable<Long> {
 
     @Column("component_version")
     private int componentVersion;
+
+    @CreatedBy
+    @Column("created_by")
+    private String createdBy;
+
+    @Column("created_date")
+    @CreatedDate
+    private LocalDateTime createdDate;
+
+    @Id
+    private Long id;
+
+    @Column("last_modified_by")
+    @LastModifiedBy
+    private String lastModifiedBy;
+
+    @Column("last_modified_date")
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
 
     @Column("output_schema")
     private MapWrapper outputSchema;
@@ -70,7 +91,7 @@ public class WorkflowNodeOutput implements Persistable<Long> {
             return false;
         }
 
-        WorkflowNodeOutput that = (WorkflowNodeOutput) o;
+        WorkflowNodeTestOutput that = (WorkflowNodeTestOutput) o;
 
         return Objects.equals(id, that.id);
     }
@@ -97,9 +118,25 @@ public class WorkflowNodeOutput implements Persistable<Long> {
         return componentVersion;
     }
 
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
     @Override
     public Long getId() {
         return id;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public LocalDateTime getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
     public Output getOutput() {
@@ -126,10 +163,6 @@ public class WorkflowNodeOutput implements Persistable<Long> {
         return workflowNodeName;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public void setComponentName(String componentName) {
         this.componentName = componentName;
     }
@@ -140,6 +173,10 @@ public class WorkflowNodeOutput implements Persistable<Long> {
 
     public void setComponentVersion(int componentVersion) {
         this.componentVersion = componentVersion;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setOutputSchema(Property outputSchema) {
@@ -164,14 +201,19 @@ public class WorkflowNodeOutput implements Persistable<Long> {
 
     @Override
     public String toString() {
-        return "DynamicComponentDefinition{" +
-            "id=" + id +
-            ", componentName='" + componentName + '\'' +
+        return "WorkflowTestNodeOutput{" +
+            "componentName='" + componentName + '\'' +
             ", componentOperationName='" + componentOperationName + '\'' +
             ", componentVersion=" + componentVersion +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", id=" + id +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
+            ", outputSchema=" + outputSchema +
+            ", sampleOutput=" + sampleOutput +
             ", workflowNodeName='" + workflowNodeName + '\'' +
-            ", outputSchema='" + outputSchema + '\'' +
-            ", sampleOutput='" + sampleOutput + '\'' +
+            ", version=" + version +
             ", workflowId='" + workflowId + '\'' +
             '}';
     }

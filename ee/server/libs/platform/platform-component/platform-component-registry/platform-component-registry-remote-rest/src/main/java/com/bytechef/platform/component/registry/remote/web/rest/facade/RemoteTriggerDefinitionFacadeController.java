@@ -97,18 +97,17 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/execute-editor-description",
+        value = "/execute-node-description",
         consumes = {
             "application/json"
         })
     public ResponseEntity<String> executeEditorDescription(
-        @Valid @RequestBody EditorDescriptionRequest editorDescriptionRequest) {
+        @Valid @RequestBody NodeDescriptionRequest nodeDescriptionRequest) {
 
         return ResponseEntity.ok(
-            triggerDefinitionFacade.executeEditorDescription(
-                editorDescriptionRequest.componentName, editorDescriptionRequest.componentVersion,
-                editorDescriptionRequest.triggerName, editorDescriptionRequest.inputParameters,
-                editorDescriptionRequest.connectionId));
+            triggerDefinitionFacade.executeNodeDescription(
+                nodeDescriptionRequest.componentName, nodeDescriptionRequest.componentVersion,
+                nodeDescriptionRequest.triggerName, nodeDescriptionRequest.inputParameters));
     }
 
     @RequestMapping(
@@ -246,9 +245,8 @@ public class RemoteTriggerDefinitionFacadeController {
     }
 
     @SuppressFBWarnings("EI")
-    public record EditorDescriptionRequest(
-        @NotNull String componentName, String triggerName, int componentVersion, Map<String, ?> inputParameters,
-        long connectionId) {
+    public record NodeDescriptionRequest(
+        @NotNull String componentName, String triggerName, int componentVersion, Map<String, ?> inputParameters) {
     }
 
     @SuppressFBWarnings("EI")

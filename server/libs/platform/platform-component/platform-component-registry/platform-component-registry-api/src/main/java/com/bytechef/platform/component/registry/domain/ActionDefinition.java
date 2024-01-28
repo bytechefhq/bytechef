@@ -29,7 +29,7 @@ import java.util.Objects;
 @SuppressFBWarnings("EI")
 public class ActionDefinition extends ActionDefinitionBasic {
 
-    private boolean editorDescriptionDefined;
+    private boolean nodeDescriptionDefined;
     private Output output;
     private boolean outputDefined;
     private List<? extends Property> properties;
@@ -40,8 +40,8 @@ public class ActionDefinition extends ActionDefinitionBasic {
     public ActionDefinition(com.bytechef.component.definition.ActionDefinition actionDefinition) {
         super(actionDefinition);
 
-        this.editorDescriptionDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getEditorDescriptionFunction(), editorDescriptionDataSource -> true, false);
+        this.nodeDescriptionDefined = OptionalUtils.mapOrElse(
+            actionDefinition.getNodeDescriptionFunction(), editorDescriptionDataSource -> true, false);
         this.output = OptionalUtils.mapOrElse(
             actionDefinition.getOutput(),
             outputSchema -> SchemaUtils.toOutputSchema(
@@ -72,7 +72,7 @@ public class ActionDefinition extends ActionDefinitionBasic {
             return false;
         }
 
-        return editorDescriptionDefined == that.editorDescriptionDefined
+        return nodeDescriptionDefined == that.nodeDescriptionDefined
             && outputDefined == that.outputDefined
             && Objects.equals(output, that.output)
             && Objects.equals(properties, that.properties);
@@ -80,12 +80,12 @@ public class ActionDefinition extends ActionDefinitionBasic {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), editorDescriptionDefined, outputDefined, output,
+        return Objects.hash(super.hashCode(), nodeDescriptionDefined, outputDefined, output,
             properties);
     }
 
-    public boolean isEditorDescriptionDefined() {
-        return editorDescriptionDefined;
+    public boolean isNodeDescriptionDefined() {
+        return nodeDescriptionDefined;
     }
 
     public Output getOutput() {
@@ -103,7 +103,7 @@ public class ActionDefinition extends ActionDefinitionBasic {
     @Override
     public String toString() {
         return "Definition{" +
-            "editorDescription=" + editorDescriptionDefined +
+            "nodeDescriptionDefined=" + nodeDescriptionDefined +
             ", outputDefined=" + outputDefined +
             ", outputSchema=" + output +
             ", properties=" + properties +

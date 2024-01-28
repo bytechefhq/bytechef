@@ -37,9 +37,9 @@ public interface ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull ActionContext context);
 
-    String executeEditorDescription(
+    String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
+        @NonNull Map<String, ?> inputParameters,
         @NonNull ActionContext context);
 
     List<Option> executeOptions(

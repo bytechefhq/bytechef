@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.domain;
+package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import java.time.LocalDateTime;
@@ -176,10 +176,16 @@ public class WorkflowTestConfiguration implements Persistable<Long>, Comparable<
 
     @Override
     public String toString() {
-        return "WorkflowTestConfiguration{" + ", id='"
-            + id + '\'' + ", workflowId='"
-            + workflowId + '\'' + ", inputs="
-            + inputs + ", workflowTestConfigurationConnections="
-            + workflowTestConfigurationConnections + '}';
+        return "WorkflowTestConfiguration{" +
+            "createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", inputs=" + inputs +
+            ", id=" + id +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
+            ", workflowTestConfigurationConnections=" + workflowTestConfigurationConnections +
+            ", version=" + version +
+            ", workflowId='" + workflowId + '\'' +
+            '}';
     }
 }

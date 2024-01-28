@@ -34,7 +34,8 @@ public record WorkflowNodeOutputDTO(
         TriggerDefinition triggerDefinition, String workflowNodeName) {
 
         this(
-            actionDefinition, output.getOutputSchema(), output.getSampleOutput(), taskDispatcherDefinition,
+            actionDefinition, output == null ? null : output.getOutputSchema(),
+            output == null ? null : output.getSampleOutput(), taskDispatcherDefinition,
             triggerDefinition, workflowNodeName);
     }
 }

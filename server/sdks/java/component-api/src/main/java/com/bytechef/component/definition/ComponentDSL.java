@@ -238,7 +238,7 @@ public final class ComponentDSL {
         private int componentVersion;
         private Boolean deprecated;
         private String description;
-        private ActionEditorDescriptionFunction editorDescriptionFunction;
+        private ActionNodeDescriptionFunction nodeDescriptionFunction;
         private PerformFunction performFunction;
         private Help help;
         private Map<String, Object> metadata;
@@ -282,8 +282,8 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableActionDefinition editorDescription(ActionEditorDescriptionFunction editorDescription) {
-            this.editorDescriptionFunction = editorDescription;
+        public ModifiableActionDefinition nodeDescription(ActionNodeDescriptionFunction nodeDescription) {
+            this.nodeDescriptionFunction = nodeDescription;
 
             return this;
         }
@@ -379,7 +379,7 @@ public final class ComponentDSL {
                 && Objects.equals(componentDescription, that.componentDescription)
                 && Objects.equals(componentTitle, that.componentTitle) && Objects.equals(deprecated, that.deprecated)
                 && Objects.equals(description, that.description)
-                && Objects.equals(editorDescriptionFunction, that.editorDescriptionFunction)
+                && Objects.equals(nodeDescriptionFunction, that.nodeDescriptionFunction)
                 && Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help)
                 && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
                 && Objects.equals(outputSchema, that.outputSchema)
@@ -392,7 +392,7 @@ public final class ComponentDSL {
         @Override
         public int hashCode() {
             return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
-                deprecated, description, editorDescriptionFunction, performFunction, help, metadata, name,
+                deprecated, description, nodeDescriptionFunction, performFunction, help, metadata, name,
                 outputSchema, defaultOutputFunction, outputFunction, sampleOutput,
                 properties, title);
         }
@@ -433,8 +433,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<ActionEditorDescriptionFunction> getEditorDescriptionFunction() {
-            return Optional.ofNullable(editorDescriptionFunction);
+        public Optional<ActionNodeDescriptionFunction> getNodeDescriptionFunction() {
+            return Optional.ofNullable(nodeDescriptionFunction);
         }
 
         @Override
@@ -2907,7 +2907,7 @@ public final class ComponentDSL {
         private DynamicWebhookEnableFunction dynamicWebhookEnableFunction;
         private DynamicWebhookRefreshFunction dynamicWebhookRefreshFunction;
         private DynamicWebhookRequestFunction dynamicWebhookRequestFunction;
-        private TriggerEditorDescriptionFunction editorDescriptionFunction;
+        private TriggerNodeDescriptionFunction nodeDescriptionFunction;
         private Help help;
         private ListenerDisableConsumer listenerDisableConsumer;
         private ListenerEnableConsumer listenerEnableConsumer;
@@ -2978,8 +2978,8 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition editorDescription(TriggerEditorDescriptionFunction editorDescription) {
-            this.editorDescriptionFunction = editorDescription;
+        public ModifiableTriggerDefinition nodeDescription(TriggerNodeDescriptionFunction nodeDescription) {
+            this.nodeDescriptionFunction = nodeDescription;
 
             return this;
         }
@@ -3138,7 +3138,7 @@ public final class ComponentDSL {
                 && Objects.equals(dynamicWebhookEnableFunction, that.dynamicWebhookEnableFunction)
                 && Objects.equals(dynamicWebhookRefreshFunction, that.dynamicWebhookRefreshFunction)
                 && Objects.equals(dynamicWebhookRequestFunction, that.dynamicWebhookRequestFunction)
-                && Objects.equals(editorDescriptionFunction, that.editorDescriptionFunction)
+                && Objects.equals(nodeDescriptionFunction, that.nodeDescriptionFunction)
                 && Objects.equals(help, that.help)
                 && Objects.equals(listenerDisableConsumer, that.listenerDisableConsumer)
                 && Objects.equals(listenerEnableConsumer, that.listenerEnableConsumer)
@@ -3161,7 +3161,7 @@ public final class ComponentDSL {
             return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
                 deduplicateFunction, deprecated, description, dynamicWebhookDisableConsumer,
                 dynamicWebhookEnableFunction, dynamicWebhookRefreshFunction, dynamicWebhookRequestFunction,
-                editorDescriptionFunction, help, listenerDisableConsumer, listenerEnableConsumer, name,
+                nodeDescriptionFunction, help, listenerDisableConsumer, listenerEnableConsumer, name,
                 outputSchema, defaultOutputFunction, outputFunction, sampleOutput,
                 pollFunction, properties, staticWebhookRequest, title, type, webhookRawBody, webhookValidateFunction,
                 workflowSyncExecution, workflowSyncValidation);
@@ -3228,8 +3228,8 @@ public final class ComponentDSL {
         }
 
         @Override
-        public Optional<TriggerEditorDescriptionFunction> getEditorDescriptionFunction() {
-            return Optional.ofNullable(editorDescriptionFunction);
+        public Optional<TriggerNodeDescriptionFunction> getNodeDescriptionFunction() {
+            return Optional.ofNullable(nodeDescriptionFunction);
         }
 
         @Override
