@@ -7,7 +7,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Create a contact with the given properties and return a copy of the object, including the ID. Documentation and examples for creating standard contacts is provided.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/crm/v3/objects/contacts",
@@ -580,7 +580,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Perform a partial update of an Object identified by `{contactId}`. `{contactId}` refers to the internal object ID. Provided property values will be overwritten. Read-only and non-existent properties will be ignored. Properties values can be cleared by passing an empty string.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/crm/v3/objects/contacts/{contactId}",
@@ -1080,7 +1080,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Triggers when an event of the subscribed type happens inside HubSpot.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "name": "subscribe",
     "defaultOutputFunction": true,

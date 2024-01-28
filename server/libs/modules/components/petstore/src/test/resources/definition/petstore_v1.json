@@ -7,7 +7,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Add a new pet to the store",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/pet",
@@ -575,7 +575,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Update an existing pet by Id",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/pet",
@@ -1143,7 +1143,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Multiple status values can be provided with comma separated strings",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -1495,7 +1495,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -1853,7 +1853,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "delete a pet",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -1916,7 +1916,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Returns a single pet",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -2232,7 +2232,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "POST",
@@ -2316,7 +2316,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/pet/{petId}/uploadImage",
@@ -2557,7 +2557,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Returns a map of status codes to quantities",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -2622,7 +2622,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Place a new order in the store",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/store/order",
@@ -2960,7 +2960,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -3002,7 +3002,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -3203,7 +3203,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/user",
@@ -3577,7 +3577,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Creates list of users with given input array",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/user/createWithList",
@@ -3993,7 +3993,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "DELETE",
@@ -4035,7 +4035,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -4254,7 +4254,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "This can only be done by the logged in user.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/user/{username}",

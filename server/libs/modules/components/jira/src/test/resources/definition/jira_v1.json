@@ -7,7 +7,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Creates an issue or, where the option to create subtasks is enabled in Jira, a subtask. A transition may be applied, to move the issue or subtask to a workflow step other than the default start step, and issue properties set.\n\nThe content of the issue or subtask is defined using `update` and `fields`. The fields that can be set in the issue or subtask are determined using the [ Get create issue metadata](#api-rest-api-3-issue-createmeta-get). These are the same fields that appear on the issue's create screen. Note that the `description`, `environment`, and any `textarea` type custom fields (multi-line text fields) take Atlassian Document Format content. Single line custom fields (`textfield`) accept a string and don't handle Atlassian Document Format content.\n\nCreating a subtask differs from creating an issue as follows:\n\n *  `issueType` must be set to a subtask issue type (use [ Get create issue metadata](#api-rest-api-3-issue-createmeta-get) to find subtask issue types).\n *  `parent` must contain the ID or key of the parent issue.\n\nIn a next-gen project any issue may be made a child providing that the parent and child are members of the same project.\n\n**[Permissions](#permissions) required:** *Browse projects* and *Create issues* [project permissions](https://confluence.atlassian.com/x/yodKLg) for the project in which the issue or subtask is created.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/rest/api/3/issue",
@@ -3537,7 +3537,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Returns the details for an issue.\n\nThe issue is identified by its ID or key, however, if the identifier doesn't match an issue, a case-insensitive search and check for moved issues is performed. If a matching issue is found its details are returned, a 302 or other redirect is **not** returned. The issue key returned in the response is the key of the issue found.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:**\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project that the issue is in.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",
@@ -9170,7 +9170,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Searches for issues using [JQL](https://confluence.atlassian.com/x/egORLQ).\n\nIf the JQL query expression is too large to be encoded as a query parameter, use the [POST](#api-rest-api-3-search-post) version of this resource.\n\nThis operation can be accessed anonymously.\n\n**[Permissions](#permissions) required:** Issues are included in the response where the user has:\n\n *  *Browse projects* [project permission](https://confluence.atlassian.com/x/yodKLg) for the project containing the issue.\n *  If [issue-level security](https://confluence.atlassian.com/x/J4lKLg) is configured, issue-level security permission to view the issue.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "method": "GET",

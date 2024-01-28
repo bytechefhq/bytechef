@@ -7,12 +7,12 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Get a specific message",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "getMail",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "Id of the message",
@@ -35,8 +35,8 @@
     } ],
     "title": "Get Mail",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1399,17 +1399,17 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Get the messages in the signed-in user's mailbox",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "searchEmail",
-    "outputSchemaDefaultFunction": true,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": true,
+    "outputFunction": null,
     "properties": [ ],
     "title": "Search Email",
     "perform": { },
-    "outputSchema": {
-      "definition": {
+    "output": {
+      "outputSchema": {
         "advancedOption": null,
         "description": null,
         "displayCondition": null,
@@ -1439,12 +1439,12 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Send the message.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "sendEmail",
-    "outputSchemaDefaultFunction": false,
-    "outputSchemaFunction": null,
+    "defaultOutputFunction": false,
+    "outputFunction": null,
     "properties": [ {
       "advancedOption": null,
       "description": "The message to send.",
@@ -2942,7 +2942,7 @@
     } ],
     "title": "Send Email",
     "perform": { },
-    "outputSchema": null
+    "output": null
   } ],
   "category": null,
   "connection": {
@@ -2993,16 +2993,16 @@
       "title": "OAuth2 Authorization Code",
       "type": "OAUTH2_AUTHORIZATION_CODE",
       "acquire": null,
-      "apply": null,
       "authorizationCallback": null,
-      "authorizationUrl": { },
+      "apply": null,
       "clientId": null,
-      "clientSecret": null,
       "pkce": null,
       "refresh": null,
       "refreshUrl": null,
       "scopes": { },
-      "tokenUrl": { }
+      "tokenUrl": { },
+      "authorizationUrl": { },
+      "clientSecret": null
     } ],
     "componentName": "microsoftOutlook365",
     "componentDescription": "Microsoft Outlook 365 is a comprehensive email and productivity platform that integrates email, calendar, contacts, and tasks to streamline communication and organization.",

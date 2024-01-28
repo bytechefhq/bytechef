@@ -7,7 +7,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Add a new member to the list.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": {
       "path": "/lists/{listId}/members",
@@ -1997,7 +1997,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": "Triggers when an Audience subscriber is added to the list.",
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "name": "subscribe",
     "defaultOutputFunction": true,

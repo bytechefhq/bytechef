@@ -7,7 +7,7 @@
     "componentVersion": 1,
     "deprecated": null,
     "description": null,
-    "editorDescriptionFunction": null,
+    "nodeDescriptionFunction": null,
     "help": null,
     "metadata": null,
     "name": "map",
