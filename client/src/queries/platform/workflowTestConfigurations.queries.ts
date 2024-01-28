@@ -4,7 +4,7 @@ import {
     WorkflowTestConfigurationApi,
     WorkflowTestConfigurationConnectionModel,
     WorkflowTestConfigurationModel,
-} from '@/middleware/platform/workflow/test';
+} from '@/middleware/platform/configuration';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

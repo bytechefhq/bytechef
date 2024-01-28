@@ -12,11 +12,13 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {WorkflowConnectionModel, WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
 import {
+    WorkflowConnectionModel,
+    WorkflowInputModel,
+    WorkflowModel,
     WorkflowTestConfigurationConnectionModel,
     WorkflowTestConfigurationModel,
-} from '@/middleware/platform/workflow/test';
+} from '@/middleware/platform/configuration';
 import {useCreateConnectionMutation, useUpdateConnectionMutation} from '@/mutations/automation/connections.mutations';
 import {
     useCreateWorkflowTestConfigurationMutation,

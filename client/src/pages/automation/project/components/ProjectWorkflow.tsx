@@ -24,8 +24,8 @@ const ProjectWorkflow = ({
 
     const {data: workflowStepOutputs} = useGetWorkflowNodeOutputsQuery(
         {
+            id: workflowId,
             lastWorkflowNodeName: currentNode.name,
-            workflowId,
         },
         !!componentActions?.length
     );

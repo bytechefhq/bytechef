@@ -172,7 +172,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const {data: workflowStepOutput} = useGetWorkflowNodeOutputQuery(
         {
-            workflowId,
+            id: workflowId,
             workflowNodeName: currentNode.name,
         },
         !!currentActionDefinition?.outputDefined && activeTab === 'output'

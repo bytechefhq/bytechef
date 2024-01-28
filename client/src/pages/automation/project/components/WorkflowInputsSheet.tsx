@@ -1,7 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {WorkflowModel} from '@/middleware/automation/configuration';
-import {WorkflowTestConfigurationModel} from '@/middleware/platform/workflow/test';
+import {WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import WorkflowInputsSheetDialog from '@/pages/automation/project/components/WorkflowInputsSheetDialog';
 import WorkflowInputsSheetTable from '@/pages/automation/project/components/WorkflowInputsSheetTable';
 import * as SheetPrimitive from '@radix-ui/react-dialog';

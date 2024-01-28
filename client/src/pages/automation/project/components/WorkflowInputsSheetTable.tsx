@@ -16,8 +16,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
-import {WorkflowTestConfigurationModel} from '@/middleware/platform/workflow/test';
+import {WorkflowInputModel, WorkflowModel, WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import WorkflowInputsSheetDialog from '@/pages/automation/project/components/WorkflowInputsSheetDialog';
 import {ProjectKeys} from '@/queries/automation/projects.queries';

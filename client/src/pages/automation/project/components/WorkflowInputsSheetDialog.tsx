@@ -13,8 +13,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {WorkflowInputModel, WorkflowModel} from '@/middleware/platform/configuration';
-import {WorkflowTestConfigurationModel} from '@/middleware/platform/workflow/test';
+import {WorkflowInputModel, WorkflowModel, WorkflowTestConfigurationModel} from '@/middleware/platform/configuration';
 import {useUpdateWorkflowMutation} from '@/mutations/automation/workflows.mutations';
 import {
     useCreateWorkflowTestConfigurationMutation,

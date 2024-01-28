@@ -34,7 +34,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
         {
-            workflowId: workflow.id!,
+            id: workflow.id!,
             workflowNodeName: hoveredNode!,
         },
         hoveredNode !== undefined
