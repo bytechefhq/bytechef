@@ -165,8 +165,7 @@ const Project = () => {
     } = useGetProjectWorkflowsQuery(project?.id as number);
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-    const {data: workflowTestConfiguration, isLoading: workflowTestConfigurationLoading} =
-        useGetWorkflowTestConfigurationQuery({workflowId: workflow?.id!});
+    const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({workflowId: workflow?.id!});
 
     const workflowTestConfigurationInputs =
         workflowTestConfiguration && workflowTestConfiguration.inputs ? workflowTestConfiguration.inputs : {};
@@ -732,7 +731,7 @@ const Project = () => {
 
             {workflow && (
                 <>
-                    {showWorkflowCodeEditorSheet && !workflowTestConfigurationLoading && (
+                    {showWorkflowCodeEditorSheet && (
                         <WorkflowCodeEditorSheet
                             onClose={() => {
                                 setShowWorkflowCodeEditorSheet(false);
@@ -746,7 +745,7 @@ const Project = () => {
                         />
                     )}
 
-                    {projectId && showWorkflowInputsSheet && !workflowTestConfigurationLoading && (
+                    {projectId && showWorkflowInputsSheet && (
                         <WorkflowInputsSheet
                             onClose={() => setShowWorkflowInputsSheet(false)}
                             projectId={+projectId}
