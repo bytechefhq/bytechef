@@ -106,8 +106,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             Object sampleOutput = OptionalUtils.mapOrElseGet(
-                workflowNodeTestOutputService.fetchLastWorkflowTestNodeOutput(
-                    workflowId, workflowTrigger.getName()),
+                workflowNodeTestOutputService.fetchLastWorkflowTestNodeOutput(workflowId, workflowTrigger.getName()),
                 WorkflowNodeTestOutput::getOutput,
                 () -> {
                     TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
