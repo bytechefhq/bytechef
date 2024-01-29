@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.util.Collections;
@@ -81,6 +82,12 @@ public class WorkflowTrigger implements Serializable, Trigger {
         return CollectionUtils.getFirst(
             workflow.getExtensions(TRIGGERS, WorkflowTrigger.class, List.of()),
             workflowTrigger -> Objects.equals(triggerName, workflowTrigger.name));
+    }
+
+    public Map<String, ?> evaluateParameters(Map<String, ?> context) {
+        WorkflowTrigger workflowTrigger = new WorkflowTrigger(Evaluator.evaluate(toMap(), context));
+
+        return workflowTrigger.getParameters();
     }
 
     @Override

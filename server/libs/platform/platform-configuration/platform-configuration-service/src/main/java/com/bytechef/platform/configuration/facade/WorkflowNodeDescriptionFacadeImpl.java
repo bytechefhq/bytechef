@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.registry.component.WorkflowNodeType;
 import com.bytechef.platform.component.registry.facade.ActionDefinitionFacade;
@@ -41,21 +42,26 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowService workflowService;
+    private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeDescriptionFacadeImpl(
         ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
+        this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public String getWorkflowNodeDescription(String workflowId, String workflowNodeName) {
+        String nodeDescription = null;
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
@@ -68,24 +74,34 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
             if (Objects.equals(workflowTrigger.getName(), workflowNodeName)) {
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-                return triggerDefinitionFacade.executeNodeDescription(
+                nodeDescription = triggerDefinitionFacade.executeNodeDescription(
                     workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName(), Map.of());
+                    workflowNodeType.componentOperationName(), workflowTrigger.evaluateParameters(inputs));
+
+                break;
             }
         }
 
-        List<WorkflowTask> workflowTasks = workflow.getTasks();
+        if (nodeDescription == null) {
+            List<WorkflowTask> workflowTasks = workflow.getTasks();
 
-        for (WorkflowTask workflowTask : workflowTasks) {
-            if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
-                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+            for (WorkflowTask workflowTask : workflowTasks) {
+                if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
+                    WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-                return actionDefinitionFacade.executeNodeDescription(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName(), inputs);
+                    nodeDescription = actionDefinitionFacade.executeNodeDescription(
+                        workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                        workflowNodeType.componentOperationName(),
+                        workflowTask.evaluateParameters(
+                            MapUtils.concat(
+                                (Map<String, Object>) inputs,
+                                workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
+                                    workflowId, workflowTask.getName()))));
+                    break;
+                }
             }
         }
 
-        return null;
+        return nodeDescription;
     }
 }

@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -27,4 +28,6 @@ public interface WorkflowNodeOutputFacade {
     WorkflowNodeOutputDTO getWorkflowNodeOutput(String workflowId, String workflowNodeName);
 
     List<WorkflowNodeOutputDTO> getWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName);
+
+    Map<String, Object> getWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName);
 }

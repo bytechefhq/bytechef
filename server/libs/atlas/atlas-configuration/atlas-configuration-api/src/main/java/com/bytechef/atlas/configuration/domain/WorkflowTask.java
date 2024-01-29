@@ -21,6 +21,7 @@ package com.bytechef.atlas.configuration.domain;
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.evaluator.Evaluator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.util.Collections;
@@ -92,6 +93,12 @@ public class WorkflowTask implements Task, Serializable {
     }
 
     private WorkflowTask() {
+    }
+
+    public Map<String, ?> evaluateParameters(Map<String, ?> context) {
+        WorkflowTask workflowTask = new WorkflowTask(Evaluator.evaluate(toMap(), context));
+
+        return workflowTask.getParameters();
     }
 
     @Override

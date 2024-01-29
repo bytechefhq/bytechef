@@ -34,7 +34,7 @@ public interface ActionDefinitionFacade {
 
     String executeNodeDescription(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
-        @NonNull Map<String, ?> actionParameters);
+        @NonNull Map<String, ?> inputParameters);
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,

@@ -19,6 +19,8 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.registry.component.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ActionDefinition;
 import com.bytechef.platform.component.registry.domain.Output;
@@ -32,6 +34,7 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,7 +102,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @Override
     public List<WorkflowNodeOutputDTO> getWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName) {
-        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOS = new ArrayList<>();
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = new ArrayList<>();
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -121,7 +124,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                     .map(WorkflowNodeTestOutput::getOutput)
                     .orElse(triggerDefinition.getOutput());
 
-            workflowNodeOutputDTOS.add(
+            workflowNodeOutputDTOs.add(
                 new WorkflowNodeOutputDTO(null, output, null, triggerDefinition, workflowTrigger.getName()));
         }
 
@@ -143,10 +146,20 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                     .map(WorkflowNodeTestOutput::getOutput)
                     .orElse(actionDefinition.getOutput());
 
-            workflowNodeOutputDTOS.add(
+            workflowNodeOutputDTOs.add(
                 new WorkflowNodeOutputDTO(actionDefinition, output, null, null, workflowTask.getName()));
         }
 
-        return workflowNodeOutputDTOS;
+        return workflowNodeOutputDTOs;
+    }
+
+    @Override
+    public Map<String, Object> getWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
+        return MapUtils.toMap(
+            CollectionUtils.filter(
+                getWorkflowNodeOutputs(workflowId, lastWorkflowNodeName),
+                workflowNodeOutputDTO -> workflowNodeOutputDTO.sampleOutput() != null),
+            WorkflowNodeOutputDTO::workflowNodeName,
+            WorkflowNodeOutputDTO::sampleOutput);
     }
 }
