@@ -94,11 +94,11 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
 
     @Override
     public ResponseEntity<Void> updateWorkflowTestConfigurationConnection(
-        String workflowId, String workflowNodeName, String key,
+        String workflowId, String workflowNodeName, String workflowConnectionKey,
         UpdateWorkflowTestConfigurationConnectionRequestModel updateWorkflowTestConfigurationConnectionRequestModel) {
 
         workflowTestConfigurationService.updateWorkflowTestConfigurationConnection(
-            workflowId, workflowNodeName, key,
+            workflowId, workflowNodeName, workflowConnectionKey,
             updateWorkflowTestConfigurationConnectionRequestModel.getConnectionId());
 
         return ResponseEntity.noContent()

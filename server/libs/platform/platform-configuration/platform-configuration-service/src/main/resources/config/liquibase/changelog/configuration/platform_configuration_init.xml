@@ -86,7 +86,7 @@
             <column name="workflow_node_name" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
-            <column name="key" type="VARCHAR(256)">
+            <column name="workflow_connection_key" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
