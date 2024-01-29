@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDSL.action;
 import static com.bytechef.component.definition.ComponentDSL.bool;
 import static com.bytechef.component.definition.ComponentDSL.fileEntry;
 import static com.bytechef.component.definition.ComponentDSL.integer;
-import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.FILE_ENTRY;
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.HEADER_ROW;
@@ -69,6 +68,12 @@ public class XlsxFileReadAction {
                 .description(
                     "The object property which contains a reference to the XLS/XLSX file to read from.")
                 .required(true),
+            string(SHEET_NAME)
+                .label("Sheet Name")
+                .description(
+                    "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
+                .defaultValue("Sheet")
+                .advancedOption(true),
             bool(HEADER_ROW)
                 .label("Header Row")
                 .description("The first row of the file contains the header names.")
@@ -93,12 +98,6 @@ public class XlsxFileReadAction {
                 .description(
                     "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
                 .defaultValue(false)
-                .advancedOption(true),
-            string(SHEET_NAME)
-                .label("Sheet Name")
-                .description(
-                    "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
-                .defaultValue("Sheet")
                 .advancedOption(true))
         .output()
         .perform(XlsxFileReadAction::perform);

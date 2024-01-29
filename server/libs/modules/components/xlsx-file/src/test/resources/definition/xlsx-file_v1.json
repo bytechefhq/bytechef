@@ -107,6 +107,25 @@
       "controlType": "FILE_ENTRY"
     }, {
       "advancedOption": true,
+      "description": "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "name": "sheetName",
+      "type": "STRING",
+      "defaultValue": "Sheet",
+      "exampleValue": null,
+      "label": "Sheet Name",
+      "placeholder": null,
+      "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
+    }, {
+      "advancedOption": true,
       "description": "The first row of the file contains the header names.",
       "displayCondition": null,
       "expressionEnabled": null,
@@ -174,8 +193,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "The page number to get.",
@@ -193,8 +212,8 @@
       "maxValue": null,
       "minValue": null,
       "options": null,
-      "controlType": "INTEGER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "INTEGER"
     }, {
       "advancedOption": true,
       "description": "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.",
@@ -221,25 +240,6 @@
         "value": true
       } ],
       "controlType": "CHECKBOX"
-    }, {
-      "advancedOption": true,
-      "description": "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.",
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": null,
-      "name": "sheetName",
-      "type": "STRING",
-      "defaultValue": "Sheet",
-      "exampleValue": null,
-      "label": "Sheet Name",
-      "placeholder": null,
-      "controlType": "TEXT",
-      "maxLength": null,
-      "minLength": null,
-      "options": null,
-      "optionsDataSource": null
     } ],
     "title": "Read from file",
     "perform": { },
@@ -259,6 +259,25 @@
     "defaultOutputFunction": true,
     "outputFunction": null,
     "properties": [ {
+      "advancedOption": true,
+      "description": "The name of the sheet to create in the spreadsheet.",
+      "displayCondition": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "metadata": { },
+      "required": null,
+      "name": "sheetName",
+      "type": "STRING",
+      "defaultValue": "Sheet",
+      "exampleValue": null,
+      "label": "Sheet Name",
+      "placeholder": null,
+      "controlType": "TEXT",
+      "maxLength": null,
+      "minLength": null,
+      "options": null,
+      "optionsDataSource": null
+    }, {
       "advancedOption": null,
       "description": "The array of objects to write to the file.",
       "displayCondition": null,
@@ -287,27 +306,6 @@
         "label": null,
         "placeholder": null,
         "additionalProperties": [ {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": null,
-          "type": "ARRAY",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "items": null,
-          "maxItems": null,
-          "minItems": null,
-          "multipleValues": null,
-          "options": null,
-          "controlType": "ARRAY_BUILDER",
-          "optionsDataSource": null
-        }, {
           "advancedOption": null,
           "description": null,
           "displayCondition": null,
@@ -348,8 +346,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE"
         }, {
           "advancedOption": null,
           "description": null,
@@ -365,8 +363,8 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "DATE_TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "DATE_TIME"
         }, {
           "advancedOption": null,
           "description": null,
@@ -384,8 +382,8 @@
           "maxValue": null,
           "minValue": null,
           "options": null,
-          "controlType": "INTEGER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "INTEGER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -421,28 +419,8 @@
           "minValue": null,
           "numberPrecision": null,
           "options": null,
-          "controlType": "NUMBER",
-          "optionsDataSource": null
-        }, {
-          "advancedOption": null,
-          "description": null,
-          "displayCondition": null,
-          "expressionEnabled": null,
-          "hidden": null,
-          "metadata": { },
-          "required": null,
-          "name": null,
-          "type": "OBJECT",
-          "defaultValue": null,
-          "exampleValue": null,
-          "label": null,
-          "placeholder": null,
-          "additionalProperties": null,
-          "multipleValues": null,
-          "options": null,
-          "properties": null,
-          "controlType": "OBJECT_BUILDER",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "NUMBER"
         }, {
           "advancedOption": null,
           "description": null,
@@ -477,21 +455,21 @@
           "label": null,
           "placeholder": null,
           "options": null,
-          "controlType": "TIME",
-          "optionsDataSource": null
+          "optionsDataSource": null,
+          "controlType": "TIME"
         } ],
         "multipleValues": null,
         "options": null,
         "properties": null,
-        "controlType": "OBJECT_BUILDER",
-        "optionsDataSource": null
+        "optionsDataSource": null,
+        "controlType": "OBJECT_BUILDER"
       } ],
       "maxItems": null,
       "minItems": null,
       "multipleValues": null,
       "options": null,
-      "controlType": "ARRAY_BUILDER",
-      "optionsDataSource": null
+      "optionsDataSource": null,
+      "controlType": "ARRAY_BUILDER"
     }, {
       "advancedOption": true,
       "description": "Filename to set for binary data. By default, \"file.xlsx\" will be used.",
@@ -505,25 +483,6 @@
       "defaultValue": "file.xlsx",
       "exampleValue": null,
       "label": "Filename",
-      "placeholder": null,
-      "controlType": "TEXT",
-      "maxLength": null,
-      "minLength": null,
-      "options": null,
-      "optionsDataSource": null
-    }, {
-      "advancedOption": true,
-      "description": "The name of the sheet to create in the spreadsheet.",
-      "displayCondition": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "metadata": { },
-      "required": null,
-      "name": "sheetName",
-      "type": "STRING",
-      "defaultValue": "Sheet",
-      "exampleValue": null,
-      "label": "Sheet Name",
       "placeholder": null,
       "controlType": "TEXT",
       "maxLength": null,

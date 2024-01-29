@@ -28,6 +28,9 @@ import static com.bytechef.component.definition.ComponentDSL.number;
 import static com.bytechef.component.definition.ComponentDSL.object;
 import static com.bytechef.component.definition.ComponentDSL.string;
 import static com.bytechef.component.definition.ComponentDSL.time;
+import static com.bytechef.component.ods.file.constant.OdsFileConstants.FILENAME;
+import static com.bytechef.component.ods.file.constant.OdsFileConstants.ROWS;
+import static com.bytechef.component.ods.file.constant.OdsFileConstants.SHEET_NAME;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDSL.ModifiableActionDefinition;
@@ -55,23 +58,23 @@ public class OdsFileWriteAction {
         .title("Write to file")
         .description("Writes the data to a ODS file.")
         .properties(
-            array(OdsFileConstants.ROWS)
+            string(SHEET_NAME)
+                .label("Sheet Name")
+                .description("The name of the sheet to create in the spreadsheet.")
+                .defaultValue("Sheet")
+                .advancedOption(true),
+            array(ROWS)
                 .label("Rows")
                 .description("The array of objects to write to the file.")
                 .required(true)
                 .items(object().additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())),
-            string(OdsFileConstants.FILENAME)
+                    bool(), date(), dateTime(), integer(), nullable(), number(), string(), time())),
+            string(FILENAME)
                 .label("Filename")
                 .description(
                     "Filename to set for binary data. By default, \"file.ods\" will be used.")
                 .required(true)
                 .defaultValue("file.ods")
-                .advancedOption(true),
-            string(OdsFileConstants.SHEET_NAME)
-                .label("Sheet Name")
-                .description("The name of the sheet to create in the spreadsheet.")
-                .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(fileEntry())
         .perform(OdsFileWriteAction::perform);
@@ -100,9 +103,9 @@ public class OdsFileWriteAction {
     protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        String fileName = inputParameters.getString(OdsFileConstants.FILENAME, "file.ods");
-        List<Map<String, ?>> rows = (List) inputParameters.getList(OdsFileConstants.ROWS, List.of());
-        String sheetName = inputParameters.getString(OdsFileConstants.SHEET_NAME, "Sheet");
+        String fileName = inputParameters.getString(FILENAME, "file.ods");
+        List<Map<String, ?>> rows = (List) inputParameters.getList(ROWS, List.of());
+        String sheetName = inputParameters.getString(SHEET_NAME, "Sheet");
 
         return context.file(file -> file.storeContent(
             fileName, new ByteArrayInputStream(write(rows, new WriteConfiguration(fileName, sheetName)))));

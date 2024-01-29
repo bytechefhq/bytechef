@@ -59,23 +59,25 @@ public class XlsxFileWriteAction {
         .title("Write to file")
         .description("Writes the data to a XLS/XLSX file.")
         .properties(
+            string(SHEET_NAME)
+                .label("Sheet Name")
+                .description("The name of the sheet to create in the spreadsheet.")
+                .defaultValue("Sheet")
+                .advancedOption(true),
             array(ROWS)
                 .label("Rows")
                 .description("The array of objects to write to the file.")
                 .required(true)
-                .items(object().additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())),
+                .items(
+                    object()
+                        .additionalProperties(
+                            bool(), date(), dateTime(), integer(), nullable(), number(), string(), time())),
             string(FILENAME)
                 .label("Filename")
                 .description(
                     "Filename to set for binary data. By default, \"file.xlsx\" will be used.")
                 .required(true)
                 .defaultValue("file.xlsx")
-                .advancedOption(true),
-            string(SHEET_NAME)
-                .label("Sheet Name")
-                .description("The name of the sheet to create in the spreadsheet.")
-                .defaultValue("Sheet")
                 .advancedOption(true))
         .outputSchema(fileEntry())
         .perform(XlsxFileWriteAction::perform);

@@ -52,6 +52,12 @@ public class OdsFileReadAction {
                 .description(
                     "The object property which contains a reference to the ODS file to read from.")
                 .required(true),
+            string(OdsFileConstants.SHEET_NAME)
+                .label("Sheet Name")
+                .description(
+                    "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
+                .defaultValue("Sheet")
+                .advancedOption(true),
             bool(OdsFileConstants.HEADER_ROW)
                 .label("Header Row")
                 .description("The first row of the file contains the header names.")
@@ -76,12 +82,6 @@ public class OdsFileReadAction {
                 .description(
                     "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
                 .defaultValue(false)
-                .advancedOption(true),
-            string(OdsFileConstants.SHEET_NAME)
-                .label("Sheet Name")
-                .description(
-                    "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
-                .defaultValue("Sheet")
                 .advancedOption(true))
         .output()
         .perform(OdsFileReadAction::perform);
