@@ -121,7 +121,7 @@ const WorkflowTestConfigurationDialog = ({
             });
         } else {
             createWorkflowTestConfigurationMutation.mutate({
-                workflowId: workflowTestConfigurationModel.workflowId!,
+                workflowId: workflow.id!,
                 workflowTestConfigurationModel,
             });
         }
