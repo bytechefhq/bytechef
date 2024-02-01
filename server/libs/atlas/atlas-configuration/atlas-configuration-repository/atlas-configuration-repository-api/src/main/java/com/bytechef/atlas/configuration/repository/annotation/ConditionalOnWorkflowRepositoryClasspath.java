@@ -34,6 +34,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 @Target({
     ElementType.TYPE, ElementType.METHOD
 })
-@ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.git.enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef", name = "workflow.repository.classpath.enabled", havingValue = "true")
 public @interface ConditionalOnWorkflowRepositoryClasspath {
 }
