@@ -420,35 +420,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TaskDispatcherDefinition"
-  /workflow-node-test-outputs/{workflowId}/{workflowNodeName:
-    get:
-      description: "Get a workflow node outputs."
-      summary: "Get a workflow node outputs"
+  /workflow-node-test-outputs/{workflowId}/{workflowNodeName}:
+    put:
+      description: "Create a new or update existing workflow node test output."
+      summary: "Create a new or update existing workflow node test output"
       tags:
         - "workflow-node-test-output"
-      operationId: "getWorkflowNodeTestOutputs"
-      parameters:
-        - name: "workflowId"
-          description: "The id of a workflow."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      responses:
-        "200":
-          description: "The list of workflow node test outputs."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/WorkflowNodeTestOutput"
-    post:
-      description: "Create a workflow node test output."
-      summary: "Create a workflow node test output"
-      tags:
-        - "workflow-node-test-output"
-      operationId: "createWorkflowNodeTestOutput"
+      operationId: "saveWorkflowNodeTestOutput"
       parameters:
         - name: "workflowId"
           description: "The id of a workflow."
@@ -469,13 +447,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowNodeTestOutput"
-  /workflow-node-test-outputs/{workflowId}/{workflowNodeName/sample-output:
-    post:
-      description: "Upload a sample output to create a workflow node test output."
-      summary: "Upload a sample output to create a workflow node test output"
+  /workflow-node-test-outputs/{workflowId}/{workflowNodeName}/sample-output:
+    put:
+      description: "Upload a sample output to create a new or update existing workflow node test output."
+      summary: "Upload a sample output to create a new or update existing workflow node test output"
       tags:
         - "workflow-node-test-output"
-      operationId: "uploadSampleOutput"
+      operationId: "uploadWorkflowNodeSampleOutput"
       parameters:
         - name: "workflowId"
           description: "The id of a workflow."
@@ -493,7 +471,11 @@ paths:
         content:
           application/json:
             schema:
-              type: "string"
+              type: "object"
+              properties:
+                sampleOutput:
+                  type: "object"
+                  additionalProperties: true
         required: true
       responses:
         "200":
@@ -523,38 +505,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowTestConfiguration"
-    post:
-      description: "Create a new workflow test configuration."
-      summary: "Create a new workflow test configuration."
-      tags:
-        - "workflow-test-configuration"
-      operationId: "createWorkflowTestConfiguration"
-      parameters:
-        - name: "workflowId"
-          description: "The id of a workflow."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/WorkflowTestConfiguration"
-        required: true
-      responses:
-        "200":
-          description: "The workflow test configuration object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WorkflowTestConfiguration"
     put:
-      description: "Update an existing workflow test configuration."
-      summary: "Update an existing workflow test configuration"
+      description: "Create new or update an existing workflow test configuration."
+      summary: "Create new or update an existing workflow test configuration"
       tags:
         - "workflow-test-configuration"
-      operationId: "updateWorkflowTestConfiguration"
+      operationId: "saveWorkflowTestConfiguration"
       parameters:
         - name: "workflowId"
           description: "The id of a workflow."
@@ -606,11 +562,11 @@ paths:
                   $ref: "#/components/schemas/WorkflowTestConfigurationConnection"
   /workflow-test-configurations/{workflowId}/inputs:
     put:
-      description: "Update a workflow test configuration inputs."
-      summary: "Update a workflow test configuration inputs"
+      description: "Save a workflow test configuration inputs."
+      summary: "Save a workflow test configuration inputs"
       tags:
         - "workflow-test-configuration"
-      operationId: "updateWorkflowTestConfigurationInputs"
+      operationId: "saveWorkflowTestConfigurationInputs"
       parameters:
         - name: "workflowId"
           description: "The id of a testing workflow."
@@ -636,11 +592,11 @@ paths:
           description: "Successful operation."
   /workflow-test-configurations/{workflowId}/connections/{workflowNodeName}/{workflowConnectionKey}:
     put:
-      description: "Update a workflow test configuration connection."
-      summary: "Update a workflow test configuration connection"
+      description: "Save a workflow test configuration connection."
+      summary: "Save a workflow test configuration connection"
       tags:
         - "workflow-test-configuration"
-      operationId: "updateWorkflowTestConfigurationConnection"
+      operationId: "saveWorkflowTestConfigurationConnection"
       parameters:
         - name: "workflowId"
           description: "The id of a testing workflow."
