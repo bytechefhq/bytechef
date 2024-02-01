@@ -32,7 +32,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateCustomerAction;
 import com.intuit.ipp.data.Customer;
 import com.intuit.ipp.exception.FMSException;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,7 +39,6 @@ import org.junit.jupiter.api.Test;
  */
 public class QuickbooksCreateCustomerActionTest extends AbstractQuickbooksActionTest {
 
-    @Disabled
     @Test
     public void testPerform() throws FMSException {
         when(mockedParameters.getRequiredString(DISPLAY_NAME))

@@ -27,7 +27,6 @@ import com.intuit.ipp.data.Customer;
 import com.intuit.ipp.exception.FMSException;
 import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -38,7 +37,6 @@ public class QuickbooksDownloadCustomerPdfActionTest extends AbstractQuickbooksA
 
     private static final String ID = "ID";
 
-    @Disabled
     @Test
     public void testPerform() throws FMSException, IOException {
         Mockito

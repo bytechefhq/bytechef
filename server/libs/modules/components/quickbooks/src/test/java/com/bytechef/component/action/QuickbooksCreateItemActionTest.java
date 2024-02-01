@@ -37,7 +37,6 @@ import com.intuit.ipp.data.ReferenceType;
 import com.intuit.ipp.exception.FMSException;
 import java.math.BigDecimal;
 import java.util.Date;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,7 +44,6 @@ import org.junit.jupiter.api.Test;
  */
 public class QuickbooksCreateItemActionTest extends AbstractQuickbooksActionTest {
 
-    @Disabled
     @Test
     public void testPerform() throws FMSException {
         when(mockedParameters.getRequiredString(ASSET_ACCOUNT_ID))

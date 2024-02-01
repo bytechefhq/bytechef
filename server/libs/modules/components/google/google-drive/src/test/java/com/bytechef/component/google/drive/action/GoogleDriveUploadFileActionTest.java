@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.FileEntry;
 import java.io.File;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,7 +35,6 @@ public class GoogleDriveUploadFileActionTest extends AbstractGoogleDriveCreateAc
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final File mockedFile = mock(File.class);
 
-    @Disabled
     @Test
     public void testPerform() throws Exception {
         when(mockedParameters.getRequiredFileEntry(FILE_ENTRY))
