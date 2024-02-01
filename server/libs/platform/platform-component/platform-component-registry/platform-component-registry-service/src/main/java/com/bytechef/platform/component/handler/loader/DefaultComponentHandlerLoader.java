@@ -43,7 +43,7 @@ public class DefaultComponentHandlerLoader extends AbstractComponentHandlerLoade
             (componentHandler, actionDefinition) -> {
                 if (OptionalUtils.isPresent(componentHandler.getActionHandler())) {
                     return new ActionDefinitionWrapper(
-                        actionDefinition, () -> PERFORM_FUNCTION_FUNCTION.apply(componentHandler, actionDefinition));
+                        actionDefinition, PERFORM_FUNCTION_FUNCTION.apply(componentHandler, actionDefinition));
                 } else {
                     return actionDefinition;
                 }

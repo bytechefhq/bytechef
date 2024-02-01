@@ -16,7 +16,8 @@
 
 package com.bytechef.platform.component.definition;
 
-import com.bytechef.commons.util.CollectionUtils;
+import static com.bytechef.component.definition.ComponentDSL.object;
+
 import com.bytechef.component.definition.ComponentDSL;
 import com.bytechef.component.definition.ComponentDSL.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDSL.ModifiableObjectProperty;
@@ -24,7 +25,7 @@ import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.registry.util.SchemaUtils;
-import com.bytechef.platform.registry.util.SchemaUtils.SchemaPropertyFactoryFunction;
+import com.bytechef.platform.registry.util.SchemaUtils.SchemaPropertyFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +33,12 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-record PropertyFactoryFunction(Object value) implements SchemaPropertyFactoryFunction {
+public record PropertyFactory(Object value) implements SchemaPropertyFactory {
 
     @Override
-    public BaseValueProperty<?> apply(String name, Class<? extends BaseProperty> baseValueProperty) {
+    public BaseValueProperty<?> create(String name, Class<? extends BaseProperty> baseValueProperty) {
         if (baseValueProperty == BaseProperty.BaseArrayProperty.class) {
-            return getArrayProperty(name, value);
+            return getArrayProperty(name);
         } else if (baseValueProperty == BaseProperty.BaseBooleanProperty.class) {
             return ComponentDSL.bool(name);
         } else if (baseValueProperty == BaseProperty.BaseDateProperty.class) {
@@ -51,17 +52,17 @@ record PropertyFactoryFunction(Object value) implements SchemaPropertyFactoryFun
         } else if (baseValueProperty == BaseProperty.BaseNumberProperty.class) {
             return ComponentDSL.number(name);
         } else if (baseValueProperty == BaseProperty.BaseObjectProperty.class) {
-            return getObjectProperty();
+            return getObjectProperty(name);
         } else if (baseValueProperty == BaseProperty.BaseStringProperty.class) {
             return ComponentDSL.string(name);
         } else if (baseValueProperty == BaseProperty.BaseTimeProperty.class) {
             return ComponentDSL.time(name);
         } else {
-            return ComponentDSL.object(name);
+            return object(name);
         }
     }
 
-    private ModifiableArrayProperty getArrayProperty(String name, Object value) {
+    private ModifiableArrayProperty getArrayProperty(String name) {
         ModifiableArrayProperty arrayProperty;
         Class<?> valueClass = value.getClass();
 
@@ -74,25 +75,25 @@ record PropertyFactoryFunction(Object value) implements SchemaPropertyFactoryFun
 
             if (!list.isEmpty()) {
                 arrayProperty.items(
-                    (ModifiableValueProperty<?, ?>) SchemaUtils.getSchemaDefinition(null, list.getFirst(), this));
+                    (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
+                        null, list.getFirst(), new PropertyFactory(list.getFirst())));
             }
         }
 
         return arrayProperty;
     }
 
-    private ModifiableObjectProperty getObjectProperty() {
-        ModifiableObjectProperty objectProperty = ComponentDSL.object();
+    private ModifiableObjectProperty getObjectProperty(String name) {
+        ModifiableObjectProperty objectProperty = object(name);
 
-        List<BaseValueProperty<?>> properties = new ArrayList<>();
+        List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
         Map<?, ?> map = (Map<?, ?>) value;
 
         for (Map.Entry<?, ?> entry : map.entrySet()) {
-            properties.add((BaseValueProperty<?>) SchemaUtils.getSchemaDefinition(
-                (String) entry.getKey(), entry.getValue(), this));
+            properties.add((ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
+                (String) entry.getKey(), entry.getValue(), new PropertyFactory(entry.getValue())));
         }
 
-        return objectProperty.properties(
-            CollectionUtils.map(properties, property -> (ModifiableValueProperty<?, ?>) property));
+        return objectProperty.properties(properties);
     }
 }

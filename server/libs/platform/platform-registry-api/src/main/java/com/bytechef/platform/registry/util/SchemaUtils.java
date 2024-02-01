@@ -51,74 +51,77 @@ public class SchemaUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SchemaUtils.class);
 
-    public static com.bytechef.definition.BaseProperty getSchemaDefinition(
-        Object value, SchemaPropertyFactoryFunction propertyFactoryFunction) {
+    public static com.bytechef.definition.BaseProperty getOutputSchema(
+        Object value, SchemaPropertyFactory propertyFactoryFunction) {
 
-        return getSchemaDefinition(null, value, propertyFactoryFunction);
+        return getOutputSchema(null, value, propertyFactoryFunction);
     }
 
-    public static com.bytechef.definition.BaseProperty getSchemaDefinition(
-        String name, Object value, SchemaPropertyFactoryFunction propertyFactoryFunction) {
+    public static com.bytechef.definition.BaseProperty getOutputSchema(
+        String name, Object value, SchemaPropertyFactory propertyFactory) {
 
         com.bytechef.definition.BaseProperty outputProperty;
         Class<?> valueClass = value.getClass();
 
         if (value instanceof List<?> || valueClass.isArray()) {
-            outputProperty = propertyFactoryFunction.apply(name, BaseArrayProperty.class);
+            outputProperty = propertyFactory.create(name, BaseArrayProperty.class);
         } else if (value instanceof Boolean) {
-            outputProperty = propertyFactoryFunction.apply(name, BaseBooleanProperty.class);
+            outputProperty = propertyFactory.create(name, BaseBooleanProperty.class);
         } else if (value instanceof Date || value instanceof LocalDate) {
-            outputProperty = propertyFactoryFunction.apply(name, BaseDateProperty.class);
+            outputProperty = propertyFactory.create(name, BaseDateProperty.class);
         } else if (value instanceof LocalDateTime) {
-            outputProperty = propertyFactoryFunction.apply(name, BaseDateTimeProperty.class);
+            outputProperty = propertyFactory.create(name, BaseDateTimeProperty.class);
         } else if (value instanceof BaseFileEntry) {
-            outputProperty = propertyFactoryFunction.apply(name, BaseFileEntryProperty.class);
+            outputProperty = propertyFactory.create(name, BaseFileEntryProperty.class);
         } else if (value instanceof Integer) {
-            outputProperty = propertyFactoryFunction.apply(name, BaseIntegerProperty.class);
+            outputProperty = propertyFactory.create(name, BaseIntegerProperty.class);
         } else if (value instanceof Number) {
-            outputProperty = propertyFactoryFunction.apply(name, BaseNumberProperty.class);
+            outputProperty = propertyFactory.create(name, BaseNumberProperty.class);
         } else if (value instanceof Map<?, ?>) {
-            outputProperty = propertyFactoryFunction.apply(name, BaseObjectProperty.class);
+            outputProperty = propertyFactory.create(name, BaseObjectProperty.class);
         } else if (value instanceof String) {
-            outputProperty = propertyFactoryFunction.apply(name, BaseStringProperty.class);
+            outputProperty = propertyFactory.create(name, BaseStringProperty.class);
         } else if (value instanceof LocalTime) {
-            outputProperty = propertyFactoryFunction.apply(name, BaseTimeProperty.class);
+            outputProperty = propertyFactory.create(name, BaseTimeProperty.class);
         } else {
             try {
-                outputProperty = getSchemaDefinition(
-                    JsonUtils.convertValue(value, Map.class), propertyFactoryFunction);
+                outputProperty = getOutputSchema(
+                    "value", JsonUtils.convertValue(value, Map.class), propertyFactory);
             } catch (IllegalArgumentException e) {
                 if (logger.isDebugEnabled()) {
                     logger.debug(e.getMessage(), e);
                 }
 
-                outputProperty = propertyFactoryFunction.apply(name, com.bytechef.definition.BaseProperty.class);
+                outputProperty = propertyFactory.create(name, com.bytechef.definition.BaseProperty.class);
             }
         }
 
         return outputProperty;
     }
 
-    public static <P extends BaseProperty, O extends com.bytechef.platform.registry.domain.BaseOutput<P>> O
-        toOutputSchema(
-            BaseOutput<? extends com.bytechef.definition.BaseProperty> outputSchema,
-            OutputFactoryFunction<P, O> outputFactoryFunction) {
+    @SuppressWarnings("unchecked")
+    public static <P extends BaseProperty, O extends com.bytechef.platform.registry.domain.BaseOutput<P>> O toOutput(
+        BaseOutput<? extends com.bytechef.definition.BaseProperty> output,
+        OutputFactoryFunction<P, O> outputFactoryFunction) {
 
-        Object sampleOutput = outputSchema.getSampleOutput();
+        Map<String, ?> sampleOutput;
 
-        if (sampleOutput == null) {
-            sampleOutput = getSampleOutput(outputSchema.getOutputSchema());
-        }
-
-        if (sampleOutput instanceof String string) {
+        if (output.getSampleOutput() == null) {
+            sampleOutput = (Map<String, ?>) getSampleOutput(output.getOutputSchema());
+        } else if (output.getSampleOutput() instanceof Map map) {
+            sampleOutput = map;
+        } else if (output.getSampleOutput() instanceof String string) {
             try {
-                sampleOutput = JsonUtils.read(string);
+                sampleOutput = JsonUtils.readMap(string);
             } catch (Exception e) {
                 //
+                sampleOutput = Map.of("result", output.getSampleOutput());
             }
+        } else {
+            sampleOutput = Map.of("result", output.getSampleOutput());
         }
 
-        return outputFactoryFunction.apply(outputSchema.getOutputSchema(), sampleOutput);
+        return outputFactoryFunction.apply(output.getOutputSchema(), sampleOutput);
     }
 
     @SuppressFBWarnings("DLS")
@@ -167,13 +170,13 @@ public class SchemaUtils {
     @FunctionalInterface
     public interface OutputFactoryFunction<P extends BaseProperty, S extends com.bytechef.platform.registry.domain.BaseOutput<P>> {
 
-        S apply(com.bytechef.definition.BaseProperty property, Object value);
+        S apply(com.bytechef.definition.BaseProperty property, Map<String, ?> value);
     }
 
     @FunctionalInterface
-    public interface SchemaPropertyFactoryFunction {
+    public interface SchemaPropertyFactory {
 
-        com.bytechef.definition.BaseProperty apply(
+        com.bytechef.definition.BaseProperty create(
             String name, Class<? extends com.bytechef.definition.BaseProperty> basePropertyClass);
     }
 }

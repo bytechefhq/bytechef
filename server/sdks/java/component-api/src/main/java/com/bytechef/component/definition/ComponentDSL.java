@@ -236,6 +236,7 @@ public final class ComponentDSL {
         private String componentDescription;
         private String componentTitle;
         private int componentVersion;
+        private boolean defaultOutputFunction;
         private Boolean deprecated;
         private String description;
         private ActionNodeDescriptionFunction nodeDescriptionFunction;
@@ -243,8 +244,8 @@ public final class ComponentDSL {
         private Help help;
         private Map<String, Object> metadata;
         private final String name;
-        private ValueProperty<?> outputSchema;
-        private boolean defaultOutputFunction;
+        private Map<String, Object> outputSchemaMetadata;
+        private List<? extends ModifiableValueProperty<?, ?>> outputSchemaProperties;
         private ActionOutputFunction outputFunction;
         private List<? extends Property> properties;
         private Object sampleOutput;
@@ -336,9 +337,22 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableActionDefinition outputSchema(ValueProperty<?> outputSchema) {
-            this.outputSchema = outputSchema;
+        @SafeVarargs
+        public final <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition outputSchema(
+            P... properties) {
+
+            return outputSchema(List.of(properties));
+        }
+
+        public <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition outputSchema(List<P> properties) {
+            this.outputSchemaProperties = Collections.unmodifiableList(properties);
             this.defaultOutputFunction = true;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition outputSchemaMetadata(Map<String, Object> metadata) {
+            this.outputSchemaMetadata = Collections.unmodifiableMap(metadata);
 
             return this;
         }
@@ -352,7 +366,13 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableActionDefinition sampleOutput(Object sampleOutput) {
+        public ModifiableActionDefinition sampleOutput(String sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableActionDefinition sampleOutput(Map<String, ?> sampleOutput) {
             this.sampleOutput = sampleOutput;
 
             return this;
@@ -382,7 +402,8 @@ public final class ComponentDSL {
                 && Objects.equals(nodeDescriptionFunction, that.nodeDescriptionFunction)
                 && Objects.equals(performFunction, that.performFunction) && Objects.equals(help, that.help)
                 && Objects.equals(metadata, that.metadata) && Objects.equals(name, that.name)
-                && Objects.equals(outputSchema, that.outputSchema)
+                && Objects.equals(outputSchemaMetadata, that.outputSchemaMetadata)
+                && Objects.equals(outputSchemaProperties, that.outputSchemaProperties)
                 && Objects.equals(defaultOutputFunction, that.defaultOutputFunction)
                 && Objects.equals(outputFunction, that.outputFunction)
                 && Objects.equals(sampleOutput, that.sampleOutput)
@@ -393,7 +414,7 @@ public final class ComponentDSL {
         public int hashCode() {
             return Objects.hash(batch, componentName, componentDescription, componentTitle, componentVersion,
                 deprecated, description, nodeDescriptionFunction, performFunction, help, metadata, name,
-                outputSchema, defaultOutputFunction, outputFunction, sampleOutput,
+                outputSchemaMetadata, outputSchemaProperties, defaultOutputFunction, outputFunction, sampleOutput,
                 properties, title);
         }
 
@@ -460,9 +481,9 @@ public final class ComponentDSL {
         @Override
         public Optional<Output> getOutput() {
             return Optional.ofNullable(
-                outputSchema == null
+                outputSchemaProperties == null
                     ? null
-                    : new Output(outputSchema, sampleOutput));
+                    : new Output(outputSchemaProperties, outputSchemaMetadata, sampleOutput));
         }
 
         @Override
@@ -2579,7 +2600,9 @@ public final class ComponentDSL {
         @SuppressWarnings("unchecked")
         @SuppressFBWarnings("EI2")
         public M metadata(Map<String, Object> metadata) {
-            this.metadata = metadata;
+            if (metadata != null) {
+                this.metadata = metadata;
+            }
 
             return (M) this;
         }
@@ -2901,6 +2924,7 @@ public final class ComponentDSL {
         private String componentTitle;
         private int componentVersion;
         private DeduplicateFunction deduplicateFunction;
+        private boolean defaultOutputFunction;
         private Boolean deprecated;
         private String description;
         private DynamicWebhookDisableConsumer dynamicWebhookDisableConsumer;
@@ -2912,8 +2936,7 @@ public final class ComponentDSL {
         private ListenerDisableConsumer listenerDisableConsumer;
         private ListenerEnableConsumer listenerEnableConsumer;
         private String name;
-        private boolean defaultOutputFunction;
-        private ValueProperty<?> outputSchema;
+        private List<? extends ModifiableValueProperty<?, ?>> outputSchemaProperties;
         private TriggerOutputFunction outputFunction;
         private PollFunction pollFunction;
         private List<? extends Property> properties;
@@ -3048,8 +3071,15 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition outputSchema(ValueProperty<?> outputSchema) {
-            this.outputSchema = outputSchema;
+        @SafeVarargs
+        public final <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition outputSchema(
+            P... properties) {
+
+            return outputSchema(List.of(properties));
+        }
+
+        public <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition outputSchema(List<P> properties) {
+            this.outputSchemaProperties = Collections.unmodifiableList(properties);
             this.defaultOutputFunction = true;
 
             return this;
@@ -3070,7 +3100,13 @@ public final class ComponentDSL {
             return this;
         }
 
-        public ModifiableTriggerDefinition sampleOutput(Object sampleOutput) {
+        public ModifiableTriggerDefinition sampleOutput(String sampleOutput) {
+            this.sampleOutput = sampleOutput;
+
+            return this;
+        }
+
+        public ModifiableTriggerDefinition sampleOutput(Map<String, ?> sampleOutput) {
             this.sampleOutput = sampleOutput;
 
             return this;
@@ -3143,7 +3179,7 @@ public final class ComponentDSL {
                 && Objects.equals(listenerDisableConsumer, that.listenerDisableConsumer)
                 && Objects.equals(listenerEnableConsumer, that.listenerEnableConsumer)
                 && Objects.equals(name, that.name)
-                && Objects.equals(outputSchema, that.outputSchema)
+                && Objects.equals(outputSchemaProperties, that.outputSchemaProperties)
                 && Objects.equals(defaultOutputFunction, that.defaultOutputFunction)
                 && Objects.equals(outputFunction, that.outputFunction)
                 && Objects.equals(sampleOutput, that.sampleOutput)
@@ -3162,7 +3198,7 @@ public final class ComponentDSL {
                 deduplicateFunction, deprecated, description, dynamicWebhookDisableConsumer,
                 dynamicWebhookEnableFunction, dynamicWebhookRefreshFunction, dynamicWebhookRequestFunction,
                 nodeDescriptionFunction, help, listenerDisableConsumer, listenerEnableConsumer, name,
-                outputSchema, defaultOutputFunction, outputFunction, sampleOutput,
+                outputSchemaProperties, defaultOutputFunction, outputFunction, sampleOutput,
                 pollFunction, properties, staticWebhookRequest, title, type, webhookRawBody, webhookValidateFunction,
                 workflowSyncExecution, workflowSyncValidation);
         }
@@ -3255,9 +3291,7 @@ public final class ComponentDSL {
         @Override
         public Optional<Output> getOutput() {
             return Optional.ofNullable(
-                outputSchema == null
-                    ? null
-                    : new Output(outputSchema, sampleOutput));
+                outputSchemaProperties == null ? null : new Output(outputSchemaProperties, null, sampleOutput));
         }
 
         @Override

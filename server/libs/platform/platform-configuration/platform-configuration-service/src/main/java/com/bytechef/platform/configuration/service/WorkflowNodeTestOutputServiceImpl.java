@@ -16,8 +16,16 @@
 
 package com.bytechef.platform.configuration.service;
 
+import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.component.definition.PropertyFactory;
+import com.bytechef.platform.component.definition.WorkflowNodeType;
+import com.bytechef.platform.component.registry.domain.ObjectProperty;
+import com.bytechef.platform.component.registry.domain.Output;
+import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;
+import com.bytechef.platform.registry.util.SchemaUtils;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,9 +46,46 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     }
 
     @Override
-    public Optional<WorkflowNodeTestOutput>
-        fetchLastWorkflowTestNodeOutput(String workflowId, String workflowNodeName) {
-        return workflowNodeTestOutputRepository.findLastByWorkflowIdAndWorkflowNodeName(
-            workflowId, workflowNodeName);
+    @Transactional(readOnly = true)
+    public Optional<WorkflowNodeTestOutput> fetchWorkflowTestNodeOutput(String workflowId, String workflowNodeName) {
+        return workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName);
+    }
+
+    @Override
+    public WorkflowNodeTestOutput save(
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Map<String, ?> sampleOutput) {
+
+        ObjectProperty outputSchema = Property.toProperty(
+            (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
+                sampleOutput, new PropertyFactory(sampleOutput)));
+
+        return save(workflowId, workflowNodeName, workflowNodeType, outputSchema, sampleOutput);
+    }
+
+    @Override
+    public WorkflowNodeTestOutput save(
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Output output) {
+
+        return save(
+            workflowId, workflowNodeName, workflowNodeType, output.getOutputSchema(), output.getSampleOutput());
+    }
+
+    private WorkflowNodeTestOutput save(
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType,
+        Property outputSchema, Map<String, ?> sampleOutput) {
+
+        WorkflowNodeTestOutput workflowNodeTestOutput = OptionalUtils.orElse(
+            workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName),
+            new WorkflowNodeTestOutput());
+
+        workflowNodeTestOutput.setComponentName(workflowNodeType.componentName());
+        workflowNodeTestOutput.setComponentOperationName(workflowNodeType.componentOperationName());
+        workflowNodeTestOutput.setComponentVersion(workflowNodeType.componentVersion());
+        workflowNodeTestOutput.setOutputSchema(outputSchema);
+        workflowNodeTestOutput.setSampleOutput(sampleOutput);
+        workflowNodeTestOutput.setWorkflowId(workflowId);
+        workflowNodeTestOutput.setWorkflowNodeName(workflowNodeName);
+
+        return workflowNodeTestOutputRepository.save(workflowNodeTestOutput);
     }
 }

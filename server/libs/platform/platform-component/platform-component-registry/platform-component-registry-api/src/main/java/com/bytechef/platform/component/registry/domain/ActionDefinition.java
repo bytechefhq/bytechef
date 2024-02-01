@@ -32,6 +32,7 @@ public class ActionDefinition extends ActionDefinitionBasic {
     private boolean nodeDescriptionDefined;
     private Output output;
     private boolean outputDefined;
+    private boolean outputFunctionDefined;
     private List<? extends Property> properties;
 
     private ActionDefinition() {
@@ -41,19 +42,21 @@ public class ActionDefinition extends ActionDefinitionBasic {
         super(actionDefinition);
 
         this.nodeDescriptionDefined = OptionalUtils.mapOrElse(
-            actionDefinition.getNodeDescriptionFunction(), editorDescriptionDataSource -> true, false);
+            actionDefinition.getNodeDescriptionFunction(), actionNodeDescriptionFunction -> true, false);
         this.output = OptionalUtils.mapOrElse(
             actionDefinition.getOutput(),
-            outputSchema -> SchemaUtils.toOutputSchema(
-                outputSchema,
-                (baseProperty, sampleOutput) -> new Output(
-                    Property.toProperty((com.bytechef.component.definition.Property) baseProperty), sampleOutput)),
+            output -> SchemaUtils.toOutput(
+                output,
+                (property, sampleOutput) -> new Output(
+                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput)),
             null);
         this.outputDefined =
-            OptionalUtils.mapOrElse(actionDefinition.getOutput(), outputSchema -> true, false) ||
+            OptionalUtils.mapOrElse(actionDefinition.getOutput(), output -> true, false) ||
                 OptionalUtils.mapOrElse(
-                    actionDefinition.getOutputFunction(), outputSchemaDataSource -> true,
+                    actionDefinition.getOutputFunction(), outputFunction -> true,
                     actionDefinition.isDefaultOutputFunction());
+        this.outputFunctionDefined = OptionalUtils.mapOrElse(
+            actionDefinition.getOutputFunction(), outputFunction -> true, false);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(actionDefinition.getProperties(), List.of()), Property::toProperty);
     }
@@ -73,15 +76,14 @@ public class ActionDefinition extends ActionDefinitionBasic {
         }
 
         return nodeDescriptionDefined == that.nodeDescriptionDefined
-            && outputDefined == that.outputDefined
-            && Objects.equals(output, that.output)
-            && Objects.equals(properties, that.properties);
+            && Objects.equals(output, that.output) && outputDefined == that.outputDefined
+            && outputFunctionDefined == that.outputFunctionDefined && Objects.equals(properties, that.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), nodeDescriptionDefined, outputDefined, output,
-            properties);
+        return Objects.hash(
+            super.hashCode(), nodeDescriptionDefined, output, outputDefined, outputFunctionDefined, properties);
     }
 
     public boolean isNodeDescriptionDefined() {
@@ -96,6 +98,10 @@ public class ActionDefinition extends ActionDefinitionBasic {
         return outputDefined;
     }
 
+    public boolean isOutputFunctionDefined() {
+        return outputFunctionDefined;
+    }
+
     public List<? extends Property> getProperties() {
         return properties;
     }
@@ -104,8 +110,9 @@ public class ActionDefinition extends ActionDefinitionBasic {
     public String toString() {
         return "Definition{" +
             "nodeDescriptionDefined=" + nodeDescriptionDefined +
+            ", output=" + output +
             ", outputDefined=" + outputDefined +
-            ", outputSchema=" + output +
+            ", outputFunctionDefined=" + outputFunctionDefined +
             ", properties=" + properties +
             ", batch=" + batch +
             ", description='" + description + '\'' +

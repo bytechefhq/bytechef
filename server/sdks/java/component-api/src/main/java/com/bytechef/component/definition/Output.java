@@ -16,27 +16,41 @@
 
 package com.bytechef.component.definition;
 
-import com.bytechef.component.definition.Property.ValueProperty;
+import static com.bytechef.component.definition.ComponentDSL.object;
+
+import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
+import com.bytechef.component.definition.Property.ObjectProperty;
 import com.bytechef.definition.BaseOutput;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * @author Ivica Cardic
  */
-public record Output(ValueProperty<?> outputSchema, Object sampleOutput)
-    implements BaseOutput<ValueProperty<?>> {
+@SuppressFBWarnings("EI")
+public record Output(
+    List<? extends ModifiableValueProperty<?, ?>> properties, Map<String, Object> metadata, Object sampleOutput)
+    implements BaseOutput<ObjectProperty> {
 
-    public Output(ValueProperty<?> outputSchema) {
-        this(outputSchema, null);
+    public Output(ModifiableValueProperty<?, ?>... properties) {
+        this(List.of(properties), null, null);
+    }
+
+    public Output(List<ModifiableValueProperty<?, ?>> properties) {
+        this(properties, null, null);
     }
 
     public Output {
-        Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
+        Objects.requireNonNull(properties, "'properties' mut not be null");
     }
 
     @Override
-    public ValueProperty<?> getOutputSchema() {
-        return outputSchema;
+    public ObjectProperty getOutputSchema() {
+        return object()
+            .properties(properties)
+            .metadata(metadata);
     }
 
     @Override

@@ -25,6 +25,7 @@ import com.bytechef.platform.component.handler.loader.AbstractComponentHandlerLo
 import com.bytechef.platform.component.oas.handler.OpenApiComponentTaskHandler;
 import com.bytechef.platform.component.util.OpenApiClientUtils;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -32,17 +33,31 @@ import java.util.function.Function;
  */
 public class OpenApiComponentHandlerLoader extends AbstractComponentHandlerLoader<OpenApiComponentHandler> {
 
+    @SuppressWarnings({
+        "unchecked", "rawtypes"
+    })
     public static final Function<ActionDefinition, PerformFunction> PERFORM_FUNCTION_FUNCTION =
-        actionDefinition -> (inputParameters, connectionParameters, context) -> OpenApiClientUtils
-            .execute(
+        actionDefinition -> (inputParameters, connectionParameters, context) -> {
+            Object result = OpenApiClientUtils.execute(
                 inputParameters, OptionalUtils.orElse(actionDefinition.getProperties(), List.of()),
                 OptionalUtils.orElse(actionDefinition.getOutput(), null),
                 OptionalUtils.orElse(actionDefinition.getMetadata(), null), context);
 
+            Map<String, ?> output;
+
+            if (result instanceof Map map) {
+                output = map;
+            } else {
+                output = Map.of("result", result);
+            }
+
+            return output;
+        };
+
     public OpenApiComponentHandlerLoader() {
         super(
             (componentHandler, actionDefinition) -> new ActionDefinitionWrapper(
-                actionDefinition, () -> PERFORM_FUNCTION_FUNCTION.apply(actionDefinition)),
+                actionDefinition, PERFORM_FUNCTION_FUNCTION.apply(actionDefinition)),
             OpenApiComponentHandler.class);
     }
 

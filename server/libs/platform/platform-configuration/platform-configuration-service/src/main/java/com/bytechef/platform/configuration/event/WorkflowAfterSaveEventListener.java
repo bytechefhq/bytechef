@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.event;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
 import org.springframework.stereotype.Component;
@@ -35,6 +36,10 @@ public class WorkflowAfterSaveEventListener extends AbstractRelationalEventListe
     protected void onAfterSave(AfterSaveEvent<Workflow> afterSaveEvent) {
         Workflow workflow = afterSaveEvent.getEntity();
 
-        workflowTestConfigurationFacade.updateWorkflowTestConfiguration(workflow);
+        workflowTestConfigurationFacade.updateWorkflowTestConfiguration(
+            // refresh definition
+            new Workflow(
+                Validate.notNull(workflow.getId(), "id"), workflow.getDefinition(), workflow.getFormat(),
+                workflow.getType()));
     }
 }

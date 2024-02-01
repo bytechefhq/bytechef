@@ -52,7 +52,7 @@ public interface ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull ActionContext context);
 
-    Object executePerform(
+    Map<String, ?> executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, @Nullable ComponentConnection connection,
         @NonNull ActionContext context);

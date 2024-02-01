@@ -77,7 +77,7 @@ public class RemoteActionDefinitionServiceClient extends AbstractWorkerClient im
     }
 
     @Override
-    public Object executePerform(
+    public Map<String, ?> executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters,
         ComponentConnection connection, @NonNull ActionContext context) {

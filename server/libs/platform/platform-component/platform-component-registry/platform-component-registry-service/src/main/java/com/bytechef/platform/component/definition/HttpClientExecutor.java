@@ -87,13 +87,13 @@ public class HttpClientExecutor {
     public Response execute(
         String urlString, Map<String, List<String>> headers, Map<String, List<String>> queryParameters, Body body,
         Configuration configuration, RequestMethod requestMethod, String componentName, ComponentConnection connection,
-        Context context)
-        throws Exception {
+        Context context) throws Exception {
 
         HttpResponse<?> httpResponse;
 
         try (HttpClient httpClient = createHttpClient(
             headers, queryParameters, configuration, componentName, connection, context)) {
+
             HttpRequest httpRequest = createHTTPRequest(
                 urlString, requestMethod, headers, queryParameters, body, componentName, connection, context);
 
@@ -194,7 +194,8 @@ public class HttpClientExecutor {
         Map<String, List<String>> queryParameters, Body body, String componentName, ComponentConnection connection,
         Context context) {
 
-        HttpRequest.Builder httpRequestBuilder = HttpRequest.newBuilder()
+        HttpRequest.Builder httpRequestBuilder = HttpRequest
+            .newBuilder()
             .method(requestMethod.name(), createBodyPublisher(body));
 
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {

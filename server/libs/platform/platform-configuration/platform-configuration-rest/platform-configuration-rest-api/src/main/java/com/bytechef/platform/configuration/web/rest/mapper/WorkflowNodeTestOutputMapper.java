@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.repository;
+package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
-import java.util.Optional;
-import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.stereotype.Repository;
+import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
+import org.mapstruct.Mapper;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * @author Ivica Cardic
  */
-@Repository
-public interface WorkflowNodeTestOutputRepository
-    extends ListCrudRepository<WorkflowNodeTestOutput, Long> {
+@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+public interface WorkflowNodeTestOutputMapper extends Converter<WorkflowNodeTestOutput, WorkflowNodeTestOutputModel> {
 
-    Optional<WorkflowNodeTestOutput> findByWorkflowIdAndWorkflowNodeName(
-        String workflowId, String workflowNodeName);
+    @Override
+    WorkflowNodeTestOutputModel convert(WorkflowNodeTestOutput workflowNodeTestOutput);
 }

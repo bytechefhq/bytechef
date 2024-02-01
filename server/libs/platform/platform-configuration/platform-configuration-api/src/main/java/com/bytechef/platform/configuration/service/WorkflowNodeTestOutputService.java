@@ -16,7 +16,10 @@
 
 package com.bytechef.platform.configuration.service;
 
+import com.bytechef.platform.component.definition.WorkflowNodeType;
+import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -24,5 +27,11 @@ import java.util.Optional;
  */
 public interface WorkflowNodeTestOutputService {
 
-    Optional<WorkflowNodeTestOutput> fetchLastWorkflowTestNodeOutput(String workflowId, String workflowNodeName);
+    Optional<WorkflowNodeTestOutput> fetchWorkflowTestNodeOutput(String workflowId, String workflowNodeName);
+
+    WorkflowNodeTestOutput save(
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Map<String, ?> sampleOutput);
+
+    WorkflowNodeTestOutput save(
+        String workflowId, String workflowNodeName, WorkflowNodeType workflowNodeType, Output output);
 }

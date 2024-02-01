@@ -37,12 +37,13 @@ public class TaskDispatcherDefinition {
     private String name;
     private Output output;
     private boolean outputDefined;
+    private boolean outputFunctionDefined;
     private List<? extends Property> properties;
     private Resources resources;
     private List<? extends Property> taskProperties;
     private String title;
+    private ObjectProperty variableProperties;
     private boolean variablePropertiesDefined;
-    private List<? extends Property> variableProperties;
     private int version;
 
     private TaskDispatcherDefinition() {
@@ -66,6 +67,8 @@ public class TaskDispatcherDefinition {
             taskDispatcherDefinition.getOutput(), outputSchema -> true, false) ||
             OptionalUtils.mapOrElse(
                 taskDispatcherDefinition.getOutputFunction(), outputSchemaDataSource -> true, false);
+        this.outputFunctionDefined = OptionalUtils.mapOrElse(
+            taskDispatcherDefinition.getOutputFunction(), outputFunction -> true, false);
         this.properties = CollectionUtils.map(
             OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()), Property::toProperty);
         this.resources = OptionalUtils.mapOrElse(taskDispatcherDefinition.getResources(), Resources::new, null);
@@ -73,9 +76,8 @@ public class TaskDispatcherDefinition {
             OptionalUtils.orElse(taskDispatcherDefinition.getTaskProperties(), List.of()),
             valueProperty -> (Property) Property.toProperty(valueProperty));
         this.title = OptionalUtils.orElse(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getName());
-        this.variableProperties = CollectionUtils.map(
-            OptionalUtils.orElse(taskDispatcherDefinition.getVariableProperties(), List.of()),
-            valueProperty -> (Property) Property.toProperty(valueProperty));
+        this.variableProperties =
+            OptionalUtils.mapOrElse(taskDispatcherDefinition.getVariableProperties(), Property::toProperty, null);
         this.variablePropertiesDefined =
             OptionalUtils.mapOrElse(
                 taskDispatcherDefinition.getVariableProperties(), variableProperties -> true, false) ||
@@ -94,13 +96,13 @@ public class TaskDispatcherDefinition {
             return false;
         }
 
-        return outputDefined == that.outputDefined && version == that.version
-            && Objects.equals(description, that.description) && Objects.equals(help, that.help)
+        return Objects.equals(description, that.description) && Objects.equals(help, that.help)
             && Objects.equals(icon, that.icon) && Objects.equals(name, that.name)
-            && Objects.equals(output, that.output) && Objects.equals(properties, that.properties)
+            && Objects.equals(output, that.output) && outputDefined == that.outputDefined
+            && outputFunctionDefined == that.outputFunctionDefined && Objects.equals(properties, that.properties)
             && Objects.equals(resources, that.resources) && Objects.equals(taskProperties, that.taskProperties)
             && Objects.equals(title, that.title) && Objects.equals(variableProperties, that.variableProperties)
-            && Objects.equals(variablePropertiesDefined, that.variablePropertiesDefined);
+            && Objects.equals(variablePropertiesDefined, that.variablePropertiesDefined) && version == that.version;
     }
 
     @Override
@@ -151,7 +153,7 @@ public class TaskDispatcherDefinition {
         return title;
     }
 
-    public List<? extends Property> getVariableProperties() {
+    public ObjectProperty getVariableProperties() {
         return variableProperties;
     }
 
@@ -163,6 +165,10 @@ public class TaskDispatcherDefinition {
         return outputDefined;
     }
 
+    public boolean isOutputFunctionDefined() {
+        return outputFunctionDefined;
+    }
+
     public boolean isVariablePropertiesDefined() {
         return variablePropertiesDefined;
     }
@@ -172,11 +178,11 @@ public class TaskDispatcherDefinition {
 
         return OptionalUtils.mapOrElse(
             taskDispatcherDefinition.getOutput(),
-            outputSchema -> SchemaUtils.toOutputSchema(
-                outputSchema,
-                (baseValueProperty, sampleOutput) -> new Output(
+            output -> SchemaUtils.toOutput(
+                output,
+                (property, sampleOutput) -> new Output(
                     Property.toProperty(
-                        (com.bytechef.platform.workflow.task.dispatcher.definition.Property) baseValueProperty),
+                        (com.bytechef.platform.workflow.task.dispatcher.definition.Property) property),
                     sampleOutput)),
             null);
     }
@@ -189,8 +195,9 @@ public class TaskDispatcherDefinition {
             ", icon='" + icon + '\'' +
             ", name='" + name + '\'' +
             ", properties=" + properties +
-            ", outputDefined=" + outputDefined +
             ", output=" + output +
+            ", outputDefined=" + outputDefined +
+            ", outputFunctionDefined=" + outputFunctionDefined +
             ", resources=" + resources +
             ", taskProperties=" + taskProperties +
             ", title='" + title + '\'' +

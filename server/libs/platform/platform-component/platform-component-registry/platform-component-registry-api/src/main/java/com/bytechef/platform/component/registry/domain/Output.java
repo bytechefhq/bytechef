@@ -17,13 +17,14 @@
 package com.bytechef.platform.component.registry.domain;
 
 import com.bytechef.platform.registry.domain.BaseOutput;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public class Output extends BaseOutput<Property> {
 
-    public Output(Property outputSchema, Object sampleOutput) {
+    public Output(ObjectProperty outputSchema, Map<String, ?> sampleOutput) {
         super(outputSchema, sampleOutput);
     }
 }

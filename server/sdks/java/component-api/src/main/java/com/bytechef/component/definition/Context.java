@@ -58,11 +58,11 @@ public interface Context {
 
     /**
      *
-     * @param outputSchemaFunction
+     * @param outputFunction
      * @return
      */
-    com.bytechef.component.definition.Output outputSchema(
-        ContextFunction<Output, com.bytechef.component.definition.Output> outputSchemaFunction);
+    com.bytechef.component.definition.Output output(
+        ContextFunction<Output, com.bytechef.component.definition.Output> outputFunction);
 
     /**
      *
@@ -1044,7 +1044,7 @@ public interface Context {
          * @param value
          * @return
          */
-        com.bytechef.component.definition.Output get(Object value);
+        com.bytechef.component.definition.Output get(Map<String, ?> value);
     }
 
     /**

@@ -21,8 +21,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowTestConfigurationConnectionRequestModel;
-import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowTestConfigurationInputsRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.SaveWorkflowTestConfigurationConnectionRequestModel;
+import com.bytechef.platform.configuration.web.rest.model.SaveWorkflowTestConfigurationInputsRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationConnectionModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationModel;
 import java.util.List;
@@ -50,18 +50,6 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     }
 
     @Override
-    public ResponseEntity<WorkflowTestConfigurationModel> createWorkflowTestConfiguration(
-        String workflowId, WorkflowTestConfigurationModel workflowTestConfigurationModel) {
-
-        return ResponseEntity.ok(
-            conversionService.convert(
-                workflowTestConfigurationService.create(
-                    conversionService.convert(
-                        workflowTestConfigurationModel.workflowId(workflowId), WorkflowTestConfiguration.class)),
-                WorkflowTestConfigurationModel.class));
-    }
-
-    @Override
     public ResponseEntity<WorkflowTestConfigurationModel> getWorkflowTestConfiguration(String workflowId) {
         return ResponseEntity.ok(
             conversionService.convert(
@@ -81,39 +69,41 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     }
 
     @Override
-    public ResponseEntity<WorkflowTestConfigurationModel> updateWorkflowTestConfiguration(
+    public ResponseEntity<WorkflowTestConfigurationModel> saveWorkflowTestConfiguration(
         String workflowId, WorkflowTestConfigurationModel workflowTestConfigurationModel) {
 
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowTestConfigurationService.updateWorkflowTestConfiguration(
+                workflowTestConfigurationService.saveWorkflowTestConfiguration(
                     conversionService.convert(
                         workflowTestConfigurationModel.workflowId(workflowId), WorkflowTestConfiguration.class)),
                 WorkflowTestConfigurationModel.class));
     }
 
     @Override
-    public ResponseEntity<Void> updateWorkflowTestConfigurationConnection(
+    public ResponseEntity<Void> saveWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String workflowConnectionKey,
-        UpdateWorkflowTestConfigurationConnectionRequestModel updateWorkflowTestConfigurationConnectionRequestModel) {
+        SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequestModel) {
 
-        workflowTestConfigurationService.updateWorkflowTestConfigurationConnection(
+        workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
             workflowId, workflowNodeName, workflowConnectionKey,
-            updateWorkflowTestConfigurationConnectionRequestModel.getConnectionId());
+            saveWorkflowTestConfigurationConnectionRequestModel.getConnectionId());
 
-        return ResponseEntity.noContent()
+        return ResponseEntity
+            .noContent()
             .build();
     }
 
     @Override
-    public ResponseEntity<Void> updateWorkflowTestConfigurationInputs(
+    public ResponseEntity<Void> saveWorkflowTestConfigurationInputs(
         String workflowId,
-        UpdateWorkflowTestConfigurationInputsRequestModel updateWorkflowTestConfigurationInputsRequestModel) {
+        SaveWorkflowTestConfigurationInputsRequestModel saveWorkflowTestConfigurationInputsRequestModel) {
 
-        workflowTestConfigurationService.updateWorkflowTestConfigurationInputs(
-            workflowId, updateWorkflowTestConfigurationInputsRequestModel.getInputs());
+        workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(
+            workflowId, saveWorkflowTestConfigurationInputsRequestModel.getInputs());
 
-        return ResponseEntity.noContent()
+        return ResponseEntity
+            .noContent()
             .build();
     }
 }

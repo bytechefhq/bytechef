@@ -77,7 +77,7 @@ public class TaskDispatcherDefinitionRegistry {
             PropertyUtils.checkInputProperties(
                 OptionalUtils.orElse(taskDispatcherDefinition.getProperties(), List.of()));
             PropertyUtils.checkOutputProperty(
-                OptionalUtils.mapOrElse(taskDispatcherDefinition.getOutput(), Output::outputSchema, null));
+                OptionalUtils.mapOrElse(taskDispatcherDefinition.getOutput(), Output::getOutputSchema, null));
         }
     }
 }

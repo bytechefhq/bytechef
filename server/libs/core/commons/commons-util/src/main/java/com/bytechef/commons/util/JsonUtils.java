@@ -52,6 +52,12 @@ public class JsonUtils {
         return objectMapper.convertValue(fromValue, toValueType);
     }
 
+    public static <T> T convertValue(Object fromValue, Type type) {
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
+
+        return objectMapper.convertValue(fromValue, typeFactory.constructType(type));
+    }
+
     public static Object read(InputStream inputStream) {
         try {
             return objectMapper.readValue(inputStream, Object.class);

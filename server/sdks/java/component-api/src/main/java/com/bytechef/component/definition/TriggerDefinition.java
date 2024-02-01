@@ -241,7 +241,7 @@ public interface TriggerDefinition {
          * @param record
          * @return
          */
-        String apply(Object record);
+        String apply(Map<String, ?> record);
     }
 
     /**
@@ -319,7 +319,7 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        Object apply(
+        Map<String, ?> apply(
             Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
             HttpParameters parameters, WebhookBody body, WebhookMethod method, DynamicWebhookEnableOutput output,
             TriggerContext context) throws Exception;
@@ -416,7 +416,7 @@ public interface TriggerDefinition {
         /**
          * @param output
          */
-        void emit(Object output);
+        void emit(Map<String, ?> output);
     }
 
     /**
@@ -463,7 +463,7 @@ public interface TriggerDefinition {
      * @param pollImmediately
      */
     @SuppressFBWarnings("EI")
-    record PollOutput(List<?> records, Map<String, ?> closureParameters, boolean pollImmediately) {
+    record PollOutput(List<Map<String, ?>> records, Map<String, ?> closureParameters, boolean pollImmediately) {
         public List<?> getRecords() {
             return records;
         }
@@ -485,7 +485,7 @@ public interface TriggerDefinition {
          * @param context
          * @return
          */
-        Object apply(
+        Map<String, ?> apply(
             Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
             WebhookMethod method, TriggerContext context) throws Exception;
 
@@ -501,6 +501,10 @@ public interface TriggerDefinition {
          * @return
          */
         Object getContent();
+
+        <T> T getContent(Class<T> valueType);
+
+        <T> T getContent(Context.TypeReference<T> valueTypeRef);
 
         /**
          *

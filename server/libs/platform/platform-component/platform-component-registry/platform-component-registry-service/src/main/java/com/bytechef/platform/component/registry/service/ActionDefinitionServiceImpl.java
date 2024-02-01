@@ -37,6 +37,7 @@ import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.domain.ValueProperty;
 import com.bytechef.platform.component.registry.exception.ComponentExecutionException;
+import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -115,22 +116,24 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
-        ActionOutputFunction outputSchemaFunction = getOutputSchemaFunction(
-            componentName, componentVersion, actionName);
+        ActionOutputFunction outputFunction = getOutputFunction(componentName, componentVersion, actionName);
 
         try {
-            com.bytechef.component.definition.Output output = outputSchemaFunction.apply(
+            com.bytechef.component.definition.Output output = outputFunction.apply(
                 new ParametersImpl(inputParameters),
                 new ParametersImpl(connection == null ? Map.of() : connection.parameters()), context);
 
-            return new Output(Property.toProperty(output.outputSchema()), output.sampleOutput());
+            return SchemaUtils.toOutput(
+                output,
+                (property, sampleOutput) -> new Output(
+                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput));
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters, ActionDefinition.class, 103);
         }
     }
 
     @Override
-    public Object executePerform(
+    public Map<String, ?> executePerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
@@ -208,7 +211,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName()));
     }
 
-    private ActionOutputFunction getOutputSchemaFunction(
+    private ActionOutputFunction getOutputFunction(
         String componentName, int componentVersion, String actionName) {
 
         com.bytechef.component.definition.ActionDefinition actionDefinition =
@@ -223,9 +226,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
                 PerformFunction performFunction = OptionalUtils.get(actionDefinition.getPerform());
 
-                return (inputParameters, connectionParameters, context) -> context.outputSchema(
-                    outputSchema -> outputSchema.get(
-                        performFunction.apply(inputParameters, connectionParameters, context)));
+                return (inputParameters, connectionParameters, context) -> context.output(
+                    output -> output.get(performFunction.apply(inputParameters, connectionParameters, context)));
             });
     }
 }

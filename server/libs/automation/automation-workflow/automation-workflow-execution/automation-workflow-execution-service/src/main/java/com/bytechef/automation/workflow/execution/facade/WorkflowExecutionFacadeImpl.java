@@ -34,7 +34,7 @@ import com.bytechef.automation.workflow.execution.dto.WorkflowExecution;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.component.registry.component.WorkflowNodeType;
+import com.bytechef.platform.component.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ComponentDefinition;
 import com.bytechef.platform.component.registry.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;

@@ -47,18 +47,13 @@ public class WorkflowTestConfigurationFacade {
     }
 
     public void updateWorkflowTestConfiguration(Workflow workflow) {
-        // refresh definition
-
-        Workflow newWorkflow = new Workflow(
-            workflow.getId(), workflow.getDefinition(), workflow.getFormat(), workflow.getType());
-
         workflowTestConfigurationService
             .fetchWorkflowTestConfiguration(Validate.notNull(workflow.getId(), "id"))
             .ifPresent(workflowTestConfiguration -> {
                 Map<String, String> inputMap = new HashMap<>(workflowTestConfiguration.getInputs());
 
                 for (String key : new HashSet<>(inputMap.keySet())) {
-                    if (!CollectionUtils.anyMatch(newWorkflow.getInputs(),
+                    if (!CollectionUtils.anyMatch(workflow.getInputs(),
                         input -> Objects.equals(input.name(), key))) {
                         inputMap.remove(key);
                     }
@@ -67,7 +62,7 @@ public class WorkflowTestConfigurationFacade {
                 workflowTestConfiguration.setInputs(inputMap);
 
                 List<WorkflowConnection> taskWorkflowConnections = CollectionUtils.flatMap(
-                    newWorkflow.getTasks(), workflowConnectionFacade::getWorkflowConnections);
+                    workflow.getTasks(), workflowConnectionFacade::getWorkflowConnections);
 
                 List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections = new ArrayList<>(
                     workflowTestConfiguration.getConnections());
@@ -77,6 +72,7 @@ public class WorkflowTestConfigurationFacade {
                     workflowConnection -> Objects.equals(
                         workflowConnection.getWorkflowNodeName(), connection.getWorkflowNodeName())));
 
+                // TODO
 //                List<WorkflowConnection> triggerWorkflowConnections = CollectionUtils.flatMap(
 //                    WorkflowTrigger.of(workflow), workflowConnectionFacade::getWorkflowConnections);
 //
@@ -87,7 +83,7 @@ public class WorkflowTestConfigurationFacade {
 
                 workflowTestConfiguration.setConnections(workflowTestConfigurationConnections);
 
-                workflowTestConfigurationService.updateWorkflowTestConfiguration(workflowTestConfiguration);
+                workflowTestConfigurationService.saveWorkflowTestConfiguration(workflowTestConfiguration);
             });
     }
 }

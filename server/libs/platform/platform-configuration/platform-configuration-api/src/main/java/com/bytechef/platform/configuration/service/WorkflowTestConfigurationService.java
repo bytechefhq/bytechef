@@ -27,17 +27,15 @@ import java.util.Optional;
  */
 public interface WorkflowTestConfigurationService {
 
-    WorkflowTestConfiguration create(WorkflowTestConfiguration workflowTestConfiguration);
-
     Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId);
 
     List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
         String workflowId, String workflowNodeName);
 
-    WorkflowTestConfiguration updateWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
+    WorkflowTestConfiguration saveWorkflowTestConfiguration(WorkflowTestConfiguration workflowTestConfiguration);
 
-    void updateWorkflowTestConfigurationConnection(
+    void saveWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String key, long connectionId);
 
-    void updateWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs);
+    void saveWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs);
 }

@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.component.registry.domain.ObjectProperty;
 import com.bytechef.platform.component.registry.domain.Output;
 import com.bytechef.platform.component.registry.domain.Property;
 import java.time.LocalDateTime;
@@ -140,15 +141,15 @@ public class WorkflowNodeTestOutput implements Persistable<Long> {
     }
 
     public Output getOutput() {
-        return new Output(getOutputSchema(), sampleOutput);
+        return new Output(getOutputSchema(), getSampleOutput());
     }
 
-    public Property getOutputSchema() {
-        return MapUtils.get(outputSchema.getMap(), "output", Property.class);
+    public ObjectProperty getOutputSchema() {
+        return MapUtils.get(outputSchema.getMap(), "outputSchema", ObjectProperty.class);
     }
 
-    public Object getSampleOutput() {
-        return MapUtils.get(outputSchema.getMap(), "sampleOutput");
+    public Map<String, ?> getSampleOutput() {
+        return MapUtils.getMap(sampleOutput.getMap(), "sampleOutput");
     }
 
     public int getVersion() {
@@ -180,10 +181,10 @@ public class WorkflowNodeTestOutput implements Persistable<Long> {
     }
 
     public void setOutputSchema(Property outputSchema) {
-        this.outputSchema = new MapWrapper(Map.of("output", outputSchema));
+        this.outputSchema = new MapWrapper(Map.of("outputSchema", outputSchema));
     }
 
-    public void setSampleOutput(Object sampleOutput) {
+    public void setSampleOutput(Map<String, ?> sampleOutput) {
         this.sampleOutput = new MapWrapper(Map.of("sampleOutput", sampleOutput));
     }
 

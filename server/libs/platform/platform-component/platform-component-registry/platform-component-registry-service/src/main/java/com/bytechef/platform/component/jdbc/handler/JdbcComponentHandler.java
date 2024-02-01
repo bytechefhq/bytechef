@@ -227,37 +227,39 @@ public class JdbcComponentHandler implements ComponentHandler {
     }
 
     protected ActionOutputFunction getDeleteOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+        return (inputParameters, connectionParameters, context) -> context.output(
             outputSchema -> outputSchema.get(performDelete(inputParameters, connectionParameters, context)));
     }
 
     protected ActionOutputFunction getExecuteOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> context.outputSchema(
-            outputSchema -> outputSchema.get(performExecute(inputParameters, connectionParameters, context)));
+        return (inputParameters, connectionParameters, context) -> context.output(
+            output -> output.get(performExecute(inputParameters, connectionParameters, context)));
     }
 
     protected ActionOutputFunction getInsertOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+        return (inputParameters, connectionParameters, context) -> context.output(
             outputSchema -> outputSchema.get(performInsert(inputParameters, connectionParameters, context)));
     }
 
     protected ActionOutputFunction getQueryOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+        return (inputParameters, connectionParameters, context) -> context.output(
             outputSchema -> outputSchema.get(performQuery(inputParameters, connectionParameters, context)));
     }
 
     protected ActionOutputFunction getUpdateOutputSchemaFunction() {
-        return (inputParameters, connectionParameters, context) -> context.outputSchema(
+        return (inputParameters, connectionParameters, context) -> context.output(
             outputSchema -> outputSchema.get(performUpdate(inputParameters, connectionParameters, context)));
     }
 
     protected Map<String, Integer> performDelete(
         Map<String, ?> inputParameters, Map<String, ?> connectionParameters, ActionContext context) {
+
         return deleteJdbcOperation.execute(inputParameters, connectionParameters);
     }
 
     protected Map<String, Integer> performExecute(
         Map<String, ?> inputParameters, Map<String, ?> connectionParameters, ActionContext context) {
+
         return executeJdbcOperation.execute(inputParameters, connectionParameters);
     }
 
@@ -267,10 +269,10 @@ public class JdbcComponentHandler implements ComponentHandler {
         return insertJdbcOperation.execute(inputParameters, connectionParameters);
     }
 
-    protected List<Map<String, Object>> performQuery(
+    protected Map<String, List<Map<String, Object>>> performQuery(
         Map<String, ?> inputParameters, Map<String, ?> connectionParameters, ActionContext context) {
 
-        return queryJdbcOperation.execute(inputParameters, connectionParameters);
+        return Map.of("result", queryJdbcOperation.execute(inputParameters, connectionParameters));
     }
 
     protected Map<String, Integer> performUpdate(

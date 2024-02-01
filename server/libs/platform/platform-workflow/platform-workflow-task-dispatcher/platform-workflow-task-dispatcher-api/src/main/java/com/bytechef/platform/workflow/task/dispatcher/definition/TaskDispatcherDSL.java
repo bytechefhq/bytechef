@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
@@ -807,7 +808,7 @@ public final class TaskDispatcherDSL {
 
     public static class ModifiableObjectProperty
         extends ModifiableValueProperty<Map<String, ?>, ModifiableObjectProperty>
-        implements Property.ObjectProperty {
+        implements ObjectProperty {
 
         private List<Option<Object>> options;
         private List<? extends ModifiableValueProperty<?, ?>> additionalProperties;
@@ -1202,7 +1203,7 @@ public final class TaskDispatcherDSL {
         private Resources resources;
         private List<? extends ModifiableProperty<?>> taskProperties;
         private String title;
-        private List<? extends ModifiableProperty<?>> variableProperties;
+        private ObjectProperty variableProperties;
         private VariablePropertiesFunction variablePropertiesFunction;
         private int version = 1;
 
@@ -1228,26 +1229,25 @@ public final class TaskDispatcherDSL {
             return this;
         }
 
-        public ModifiableTaskDispatcherDefinition outputSchema(ValueProperty<?> definition) {
-            return outputSchema(definition, null);
-        }
-
-        public ModifiableTaskDispatcherDefinition outputSchema(Output output) {
-            this.output = output;
+        public ModifiableTaskDispatcherDefinition output(OutputFunction output) {
+            this.outputFunction = output;
 
             return this;
         }
 
-        public ModifiableTaskDispatcherDefinition outputSchema(ValueProperty<?> definition, Object sampleOutput) {
-            this.output = new Output(definition, sampleOutput);
+        public ModifiableTaskDispatcherDefinition output(
+            List<ModifiableValueProperty<?, ?>> outputSchemaProperties, Map<String, ?> sampleOutput) {
+
+            this.output = new Output(outputSchemaProperties, sampleOutput);
 
             return this;
         }
 
-        public ModifiableTaskDispatcherDefinition outputSchema(OutputFunction outputSchema) {
-            this.outputFunction = outputSchema;
+        @SafeVarargs
+        public final <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition outputSchema(
+            P... properties) {
 
-            return this;
+            return output(List.of(properties), null);
         }
 
         public ModifiableTaskDispatcherDefinition resources(String documentationUrl) {
@@ -1303,10 +1303,10 @@ public final class TaskDispatcherDSL {
         }
 
         @SafeVarargs
-        public final <P extends ModifiableProperty<?>> ModifiableTaskDispatcherDefinition variableProperties(
+        public final <P extends ModifiableValueProperty<?, ?>> ModifiableTaskDispatcherDefinition variableProperties(
             P... variableProperties) {
 
-            this.variableProperties = List.of(variableProperties);
+            this.variableProperties = object().properties(variableProperties);
 
             return this;
         }
@@ -1370,7 +1370,7 @@ public final class TaskDispatcherDSL {
         }
 
         @Override
-        public Optional<List<? extends Property>> getVariableProperties() {
+        public Optional<ObjectProperty> getVariableProperties() {
             return Optional.ofNullable(variableProperties);
         }
 

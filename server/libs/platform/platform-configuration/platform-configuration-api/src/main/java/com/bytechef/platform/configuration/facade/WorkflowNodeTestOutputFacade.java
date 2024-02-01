@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.task.dispatcher.definition;
+package com.bytechef.platform.configuration.facade;
 
-import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
+import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import java.util.Map;
 
 /**
- *
+ * @author Ivica Cardic
  */
-@FunctionalInterface
-public interface VariablePropertiesFunction {
+public interface WorkflowNodeTestOutputFacade {
 
-    /**
-     * @param inputParameters
-     * @return
-     */
-    ObjectProperty apply(Map<String, ?> inputParameters) throws Exception;
+    WorkflowNodeTestOutput saveWorkflowNodeTestOutput(String workflowId, String workflowNodeName);
+
+    WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
+        String workflowId, String workflowNodeName, Map<String, ?> sampleOutput);
 }

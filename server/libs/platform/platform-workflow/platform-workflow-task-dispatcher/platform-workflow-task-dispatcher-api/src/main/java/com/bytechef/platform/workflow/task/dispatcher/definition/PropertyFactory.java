@@ -16,10 +16,9 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.definition;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.registry.util.SchemaUtils;
-import com.bytechef.platform.registry.util.SchemaUtils.SchemaPropertyFactoryFunction;
+import com.bytechef.platform.registry.util.SchemaUtils.SchemaPropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.ModifiableArrayProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.ModifiableObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.ModifiableProperty;
@@ -31,12 +30,12 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public record PropertyFactoryFunction(Object value) implements SchemaPropertyFactoryFunction {
+public record PropertyFactory(Object value) implements SchemaPropertyFactory {
 
     @Override
-    public BaseProperty apply(String name, Class<? extends BaseProperty> baseValueProperty) {
+    public BaseProperty create(String name, Class<? extends BaseProperty> baseValueProperty) {
         if (baseValueProperty == BaseProperty.BaseArrayProperty.class) {
-            return getArrayProperty(name, value);
+            return getArrayProperty(name);
         } else if (baseValueProperty == BaseProperty.BaseBooleanProperty.class) {
             return TaskDispatcherDSL.bool(name);
         } else if (baseValueProperty == BaseProperty.BaseDateProperty.class) {
@@ -60,7 +59,7 @@ public record PropertyFactoryFunction(Object value) implements SchemaPropertyFac
         }
     }
 
-    private ModifiableArrayProperty getArrayProperty(String name, Object value) {
+    private ModifiableArrayProperty getArrayProperty(String name) {
         ModifiableArrayProperty arrayProperty;
         Class<?> valueClass = value.getClass();
 
@@ -73,7 +72,8 @@ public record PropertyFactoryFunction(Object value) implements SchemaPropertyFac
 
             if (!list.isEmpty()) {
                 arrayProperty.items(
-                    (ModifiableProperty<?>) SchemaUtils.getSchemaDefinition(null, list.getFirst(), this));
+                    (ModifiableProperty<?>) SchemaUtils.getOutputSchema(
+                        null, list.getFirst(), new PropertyFactory(list.getFirst())));
             }
         }
 
@@ -83,14 +83,14 @@ public record PropertyFactoryFunction(Object value) implements SchemaPropertyFac
     private ModifiableObjectProperty getObjectProperty() {
         ModifiableObjectProperty objectProperty = TaskDispatcherDSL.object();
 
-        List<BaseProperty> properties = new ArrayList<>();
+        List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
         Map<?, ?> map = (Map<?, ?>) value;
 
         for (Map.Entry<?, ?> entry : map.entrySet()) {
-            properties.add(SchemaUtils.getSchemaDefinition((String) entry.getKey(), entry.getValue(), this));
+            properties.add((ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
+                (String) entry.getKey(), entry.getValue(), new PropertyFactory(entry.getValue())));
         }
 
-        return objectProperty.properties(
-            CollectionUtils.map(properties, property -> (ModifiableValueProperty<?, ?>) property));
+        return objectProperty.properties(properties);
     }
 }

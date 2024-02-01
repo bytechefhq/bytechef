@@ -18,8 +18,8 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.XmlUtils;
+import com.bytechef.component.definition.ComponentDSL.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.registry.domain.ComponentConnection;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -82,11 +82,11 @@ public class ContextImpl implements Context {
     }
 
     @Override
-    public com.bytechef.component.definition.Output outputSchema(
-        ContextFunction<Output, com.bytechef.component.definition.Output> outputSchema) {
+    public com.bytechef.component.definition.Output output(
+        ContextFunction<Output, com.bytechef.component.definition.Output> outputFunction) {
 
         try {
-            return outputSchema.apply(this.output);
+            return outputFunction.apply(this.output);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -492,10 +492,10 @@ public class ContextImpl implements Context {
         }
 
         @Override
-        public com.bytechef.component.definition.Output get(Object value) {
+        public com.bytechef.component.definition.Output get(Map<String, ?> value) {
             return new com.bytechef.component.definition.Output(
-                (Property.ValueProperty<?>) SchemaUtils.getSchemaDefinition(value, new PropertyFactoryFunction(value)),
-                value);
+                List.of((ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(value, new PropertyFactory(value))),
+                null, value);
         }
     }
 

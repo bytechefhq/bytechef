@@ -49,11 +49,6 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
-    public WorkflowTestConfiguration create(WorkflowTestConfiguration workflowTestConfiguration) {
-        return workflowTestConfigurationRepository.save(workflowTestConfiguration);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId) {
         return workflowTestConfigurationRepository.findByWorkflowId(workflowId);
@@ -69,21 +64,27 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
-    public WorkflowTestConfiguration updateWorkflowTestConfiguration(
+    public WorkflowTestConfiguration saveWorkflowTestConfiguration(
         WorkflowTestConfiguration workflowTestConfiguration) {
 
-        WorkflowTestConfiguration currentWorkflowTestConfiguration = OptionalUtils.get(
-            workflowTestConfigurationRepository.findByWorkflowId(
-                Validate.notNull(workflowTestConfiguration.getWorkflowId(), "workflowId(")));
+        WorkflowTestConfiguration currentWorkflowTestConfiguration;
 
-        currentWorkflowTestConfiguration.setConnections(workflowTestConfiguration.getConnections());
-        currentWorkflowTestConfiguration.setInputs(workflowTestConfiguration.getInputs());
+        if (workflowTestConfiguration.getWorkflowId() == null) {
+            currentWorkflowTestConfiguration = workflowTestConfiguration;
+        } else {
+            currentWorkflowTestConfiguration = OptionalUtils.get(
+                workflowTestConfigurationRepository.findByWorkflowId(
+                    Validate.notNull(workflowTestConfiguration.getWorkflowId(), "workflowId(")));
+
+            currentWorkflowTestConfiguration.setConnections(workflowTestConfiguration.getConnections());
+            currentWorkflowTestConfiguration.setInputs(workflowTestConfiguration.getInputs());
+        }
 
         return workflowTestConfigurationRepository.save(currentWorkflowTestConfiguration);
     }
 
     @Override
-    public void updateWorkflowTestConfigurationConnection(
+    public void saveWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String key, long connectionId) {
 
         WorkflowTestConfiguration workflowTestConfiguration = getWorkflowTestConfiguration(workflowId);
@@ -103,7 +104,7 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
-    public void updateWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs) {
+    public void saveWorkflowTestConfigurationInputs(String workflowId, Map<String, String> inputs) {
         WorkflowTestConfiguration workflowTestConfiguration = getWorkflowTestConfiguration(workflowId);
 
         workflowTestConfiguration.setInputs(inputs);

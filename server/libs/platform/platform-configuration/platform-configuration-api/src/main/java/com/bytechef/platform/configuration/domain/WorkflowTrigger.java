@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -82,6 +83,12 @@ public class WorkflowTrigger implements Serializable, Trigger {
         return CollectionUtils.getFirst(
             workflow.getExtensions(TRIGGERS, WorkflowTrigger.class, List.of()),
             workflowTrigger -> Objects.equals(triggerName, workflowTrigger.name));
+    }
+
+    public static Optional<WorkflowTrigger> fetch(Workflow workflow, String workflowNodeName) {
+        return CollectionUtils.findFirst(
+            of(workflow),
+            workflowTrigger -> Objects.equals(workflowTrigger.getName(), workflowNodeName));
     }
 
     public Map<String, ?> evaluateParameters(Map<String, ?> context) {

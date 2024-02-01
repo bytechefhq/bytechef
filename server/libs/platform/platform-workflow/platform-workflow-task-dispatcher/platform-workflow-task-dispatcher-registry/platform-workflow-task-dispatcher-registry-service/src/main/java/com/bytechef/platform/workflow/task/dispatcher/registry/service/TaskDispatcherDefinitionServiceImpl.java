@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.task.dispatcher.registry.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.registry.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
 import com.bytechef.platform.workflow.task.dispatcher.registry.TaskDispatcherDefinitionRegistry;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.Output;
@@ -51,7 +52,11 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
             com.bytechef.platform.workflow.task.dispatcher.definition.Output output =
                 outputFunction.apply(inputParameters);
 
-            return new Output(Property.toProperty(output.outputSchema()), output.sampleOutput());
+            return SchemaUtils.toOutput(
+                output,
+                (property, sampleOutput) -> new Output(
+                    Property.toProperty((com.bytechef.platform.workflow.task.dispatcher.definition.Property) property),
+                    sampleOutput));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

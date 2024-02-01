@@ -239,7 +239,7 @@ public class ComponentDefinitionRegistry {
                 PropertyUtils.checkInputProperties(
                     OptionalUtils.orElse(actionDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(
-                    OptionalUtils.mapOrElse(actionDefinition.getOutput(), Output::outputSchema, null));
+                    OptionalUtils.mapOrElse(actionDefinition.getOutput(), Output::getOutputSchema, null));
             }
 
             List<? extends TriggerDefinition> triggerDefinitions = OptionalUtils.orElse(
@@ -248,7 +248,7 @@ public class ComponentDefinitionRegistry {
             for (TriggerDefinition triggerDefinition : triggerDefinitions) {
                 PropertyUtils.checkInputProperties(OptionalUtils.orElse(triggerDefinition.getProperties(), List.of()));
                 PropertyUtils.checkOutputProperty(
-                    OptionalUtils.mapOrElse(triggerDefinition.getOutput(), Output::outputSchema, null));
+                    OptionalUtils.mapOrElse(triggerDefinition.getOutput(), Output::getOutputSchema, null));
 
                 if (triggerDefinition.getType() == null) {
                     throw new IllegalStateException(

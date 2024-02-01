@@ -322,6 +322,16 @@ public final class Workflow implements Persistable<String>, Serializable {
         return maxRetries;
     }
 
+    public WorkflowTask getTask(String workflowNodeName) {
+        for (WorkflowTask workflowTask : tasks) {
+            if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
+                return workflowTask;
+            }
+        }
+
+        throw new IllegalArgumentException("Workflow task %s does not exist".formatted(workflowNodeName));
+    }
+
     /** Returns the steps that make up the workflow. */
     public List<WorkflowTask> getTasks() {
         return Collections.unmodifiableList(tasks);

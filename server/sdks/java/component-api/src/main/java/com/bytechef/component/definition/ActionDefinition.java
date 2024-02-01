@@ -143,7 +143,7 @@ public interface ActionDefinition {
          * @param context
          * @return
          */
-        Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+        Map<String, ?> apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
 

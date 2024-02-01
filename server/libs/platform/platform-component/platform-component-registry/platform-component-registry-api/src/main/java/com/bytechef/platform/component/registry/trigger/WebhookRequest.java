@@ -16,7 +16,9 @@
 
 package com.bytechef.platform.component.registry.trigger;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.Context.TypeReference;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -59,6 +61,16 @@ public record WebhookRequest(
         @Override
         public Object getContent() {
             return content;
+        }
+
+        @Override
+        public <T> T getContent(Class<T> valueType) {
+            return JsonUtils.convertValue(content, valueType);
+        }
+
+        @Override
+        public <T> T getContent(TypeReference<T> valueTypeRef) {
+            return JsonUtils.convertValue(content, valueTypeRef.getType());
         }
 
         @Override

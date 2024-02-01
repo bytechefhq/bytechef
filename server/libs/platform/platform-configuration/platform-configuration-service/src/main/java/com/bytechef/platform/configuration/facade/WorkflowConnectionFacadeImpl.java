@@ -19,7 +19,7 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.component.registry.component.WorkflowNodeType;
+import com.bytechef.platform.component.definition.WorkflowNodeType;
 import com.bytechef.platform.component.registry.domain.ConnectionDefinition;
 import com.bytechef.platform.component.registry.domain.Property;
 import com.bytechef.platform.component.registry.service.ConnectionDefinitionService;
