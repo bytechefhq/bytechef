@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface UpdateWorkflowTestConfigurationInputsRequestModel
+ * @interface SaveWorkflowTestConfigurationInputsRequestModel
  */
-export interface UpdateWorkflowTestConfigurationInputsRequestModel {
+export interface SaveWorkflowTestConfigurationInputsRequestModel {
     /**
      * The input parameters used as workflow input values.
      * @type {{ [key: string]: string; }}
-     * @memberof UpdateWorkflowTestConfigurationInputsRequestModel
+     * @memberof SaveWorkflowTestConfigurationInputsRequestModel
      */
     inputs?: { [key: string]: string; };
 }
 
 /**
- * Check if a given object implements the UpdateWorkflowTestConfigurationInputsRequestModel interface.
+ * Check if a given object implements the SaveWorkflowTestConfigurationInputsRequestModel interface.
  */
-export function instanceOfUpdateWorkflowTestConfigurationInputsRequestModel(value: object): boolean {
+export function instanceOfSaveWorkflowTestConfigurationInputsRequestModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function UpdateWorkflowTestConfigurationInputsRequestModelFromJSON(json: any): UpdateWorkflowTestConfigurationInputsRequestModel {
-    return UpdateWorkflowTestConfigurationInputsRequestModelFromJSONTyped(json, false);
+export function SaveWorkflowTestConfigurationInputsRequestModelFromJSON(json: any): SaveWorkflowTestConfigurationInputsRequestModel {
+    return SaveWorkflowTestConfigurationInputsRequestModelFromJSONTyped(json, false);
 }
 
-export function UpdateWorkflowTestConfigurationInputsRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): UpdateWorkflowTestConfigurationInputsRequestModel {
+export function SaveWorkflowTestConfigurationInputsRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): SaveWorkflowTestConfigurationInputsRequestModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function UpdateWorkflowTestConfigurationInputsRequestModelFromJSONTyped(j
     };
 }
 
-export function UpdateWorkflowTestConfigurationInputsRequestModelToJSON(value?: UpdateWorkflowTestConfigurationInputsRequestModel | null): any {
+export function SaveWorkflowTestConfigurationInputsRequestModelToJSON(value?: SaveWorkflowTestConfigurationInputsRequestModel | null): any {
     if (value === undefined) {
         return undefined;
     }

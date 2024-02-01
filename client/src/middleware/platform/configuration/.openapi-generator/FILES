@@ -42,6 +42,8 @@ models/PropertiesDataSourceModel.ts
 models/PropertyModel.ts
 models/PropertyTypeModel.ts
 models/ResourcesModel.ts
+models/SaveWorkflowTestConfigurationConnectionRequestModel.ts
+models/SaveWorkflowTestConfigurationInputsRequestModel.ts
 models/StringPropertyModel.ts
 models/TaskDispatcherDefinitionBasicModel.ts
 models/TaskDispatcherDefinitionModel.ts
@@ -53,8 +55,7 @@ models/TriggerDefinitionBasicModel.ts
 models/TriggerDefinitionModel.ts
 models/TriggerExecutionModel.ts
 models/TriggerTypeModel.ts
-models/UpdateWorkflowTestConfigurationConnectionRequestModel.ts
-models/UpdateWorkflowTestConfigurationInputsRequestModel.ts
+models/UploadWorkflowNodeSampleOutputRequestModel.ts
 models/ValuePropertyModel.ts
 models/WebhookModel.ts
 models/WebhookRetryModel.ts

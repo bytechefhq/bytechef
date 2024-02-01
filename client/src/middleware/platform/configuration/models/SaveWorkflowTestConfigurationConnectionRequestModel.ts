@@ -16,31 +16,31 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface UpdateWorkflowTestConfigurationConnectionRequestModel
+ * @interface SaveWorkflowTestConfigurationConnectionRequestModel
  */
-export interface UpdateWorkflowTestConfigurationConnectionRequestModel {
+export interface SaveWorkflowTestConfigurationConnectionRequestModel {
     /**
      * 
      * @type {number}
-     * @memberof UpdateWorkflowTestConfigurationConnectionRequestModel
+     * @memberof SaveWorkflowTestConfigurationConnectionRequestModel
      */
     connectionId?: number;
 }
 
 /**
- * Check if a given object implements the UpdateWorkflowTestConfigurationConnectionRequestModel interface.
+ * Check if a given object implements the SaveWorkflowTestConfigurationConnectionRequestModel interface.
  */
-export function instanceOfUpdateWorkflowTestConfigurationConnectionRequestModel(value: object): boolean {
+export function instanceOfSaveWorkflowTestConfigurationConnectionRequestModel(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function UpdateWorkflowTestConfigurationConnectionRequestModelFromJSON(json: any): UpdateWorkflowTestConfigurationConnectionRequestModel {
-    return UpdateWorkflowTestConfigurationConnectionRequestModelFromJSONTyped(json, false);
+export function SaveWorkflowTestConfigurationConnectionRequestModelFromJSON(json: any): SaveWorkflowTestConfigurationConnectionRequestModel {
+    return SaveWorkflowTestConfigurationConnectionRequestModelFromJSONTyped(json, false);
 }
 
-export function UpdateWorkflowTestConfigurationConnectionRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): UpdateWorkflowTestConfigurationConnectionRequestModel {
+export function SaveWorkflowTestConfigurationConnectionRequestModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): SaveWorkflowTestConfigurationConnectionRequestModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -50,7 +50,7 @@ export function UpdateWorkflowTestConfigurationConnectionRequestModelFromJSONTyp
     };
 }
 
-export function UpdateWorkflowTestConfigurationConnectionRequestModelToJSON(value?: UpdateWorkflowTestConfigurationConnectionRequestModel | null): any {
+export function SaveWorkflowTestConfigurationConnectionRequestModelToJSON(value?: SaveWorkflowTestConfigurationConnectionRequestModel | null): any {
     if (value === undefined) {
         return undefined;
     }
