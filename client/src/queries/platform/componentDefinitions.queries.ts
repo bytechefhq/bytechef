@@ -10,12 +10,12 @@ import {useQuery} from '@tanstack/react-query';
 
 export const ComponentDefinitionKeys = {
     componentDefinition: (request: GetComponentDefinitionRequest) => [
-        ComponentDefinitionKeys.componentDefinitions,
+        ...ComponentDefinitionKeys.componentDefinitions,
         request,
     ],
     componentDefinitions: ['componentDefinitions'] as const,
     filteredComponentDefinitions: (request?: GetComponentDefinitionsRequest) => [
-        ComponentDefinitionKeys.componentDefinitions,
+        ...ComponentDefinitionKeys.componentDefinitions,
         request,
     ],
 };
