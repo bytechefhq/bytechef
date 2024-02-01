@@ -48,7 +48,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
         },
     });
 
-    const handleDeleteActionNodeClick = () => {
+    const handleDeleteNodeClick = () => {
         const nodes = getNodes();
         const node = getNode(id);
 
@@ -148,7 +148,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                     ) : (
                         <Button
                             className="bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
-                            onClick={handleDeleteActionNodeClick}
+                            onClick={handleDeleteNodeClick}
                             title="Delete a node"
                             variant="outline"
                         >

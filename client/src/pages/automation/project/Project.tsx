@@ -51,7 +51,7 @@ import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog'
 import WorkflowExecutionDetailsAccordion from '@/pages/automation/workflow-executions/components/WorkflowExecutionDetailsAccordion';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {ProjectCategoryKeys} from '@/queries/automation/projectCategories.queries';
-import {ProjectTagKeys} from '@/queries/automation/projectTags.quries';
+import {ProjectTagKeys} from '@/queries/automation/projectTags.queries';
 import {ProjectKeys, useGetProjectQuery, useGetProjectWorkflowsQuery} from '@/queries/automation/projects.queries';
 import {useGetComponentDefinitionsQuery} from '@/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/queries/platform/taskDispatcherDefinitions.queries';
@@ -259,6 +259,7 @@ const Project = () => {
             queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projectWorkflows(+projectId!),
             });
+
             queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration({workflowId: workflow.id!}),
             });
@@ -666,6 +667,7 @@ const Project = () => {
                             componentDefinitions={componentDefinitions}
                             projectId={+projectId!}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
+                            updateWorkflowMutation={updateWorkflowMutation}
                             workflowId={workflow.id}
                         />
                     )}
