@@ -18,22 +18,22 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * UpdateWorkflowTestConfigurationInputsRequestModel
+ * SaveWorkflowTestConfigurationInputsRequestModel
  */
 
-@JsonTypeName("updateWorkflowTestConfigurationInputs_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:59.663193+01:00[Europe/Zagreb]")
-public class UpdateWorkflowTestConfigurationInputsRequestModel {
+@JsonTypeName("saveWorkflowTestConfigurationInputs_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-31T19:34:53.739677+01:00[Europe/Zagreb]")
+public class SaveWorkflowTestConfigurationInputsRequestModel {
 
   @Valid
   private Map<String, String> inputs = new HashMap<>();
 
-  public UpdateWorkflowTestConfigurationInputsRequestModel inputs(Map<String, String> inputs) {
+  public SaveWorkflowTestConfigurationInputsRequestModel inputs(Map<String, String> inputs) {
     this.inputs = inputs;
     return this;
   }
 
-  public UpdateWorkflowTestConfigurationInputsRequestModel putInputsItem(String key, String inputsItem) {
+  public SaveWorkflowTestConfigurationInputsRequestModel putInputsItem(String key, String inputsItem) {
     if (this.inputs == null) {
       this.inputs = new HashMap<>();
     }
@@ -64,8 +64,8 @@ public class UpdateWorkflowTestConfigurationInputsRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    UpdateWorkflowTestConfigurationInputsRequestModel updateWorkflowTestConfigurationInputsRequest = (UpdateWorkflowTestConfigurationInputsRequestModel) o;
-    return Objects.equals(this.inputs, updateWorkflowTestConfigurationInputsRequest.inputs);
+    SaveWorkflowTestConfigurationInputsRequestModel saveWorkflowTestConfigurationInputsRequest = (SaveWorkflowTestConfigurationInputsRequestModel) o;
+    return Objects.equals(this.inputs, saveWorkflowTestConfigurationInputsRequest.inputs);
   }
 
   @Override
@@ -76,7 +76,7 @@ public class UpdateWorkflowTestConfigurationInputsRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class UpdateWorkflowTestConfigurationInputsRequestModel {\n");
+    sb.append("class SaveWorkflowTestConfigurationInputsRequestModel {\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("}");
     return sb.toString();

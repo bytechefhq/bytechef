@@ -5,6 +5,7 @@
  */
 package com.bytechef.platform.configuration.web.rest;
 
+import com.bytechef.platform.configuration.web.rest.model.UploadWorkflowNodeSampleOutputRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:59.663193+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-31T19:34:53.739677+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-node-test-output", description = "The Platform Workflow Node Test Output API")
 public interface WorkflowNodeTestOutputApi {
@@ -42,17 +43,17 @@ public interface WorkflowNodeTestOutputApi {
     }
 
     /**
-     * POST /workflow-node-test-outputs/{workflowId}/{workflowNodeName : Create a workflow node test output
-     * Create a workflow node test output.
+     * PUT /workflow-node-test-outputs/{workflowId}/{workflowNodeName} : Create a new or update existing workflow node test output
+     * Create a new or update existing workflow node test output.
      *
      * @param workflowId The id of a workflow. (required)
      * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
      * @return The workflow node test output object. (status code 200)
      */
     @Operation(
-        operationId = "createWorkflowNodeTestOutput",
-        summary = "Create a workflow node test output",
-        description = "Create a workflow node test output.",
+        operationId = "saveWorkflowNodeTestOutput",
+        summary = "Create a new or update existing workflow node test output",
+        description = "Create a new or update existing workflow node test output.",
         tags = { "workflow-node-test-output" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow node test output object.", content = {
@@ -61,12 +62,12 @@ public interface WorkflowNodeTestOutputApi {
         }
     )
     @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/workflow-node-test-outputs/{workflowId}/{workflowNodeName",
+        method = RequestMethod.PUT,
+        value = "/workflow-node-test-outputs/{workflowId}/{workflowNodeName}",
         produces = { "application/json" }
     )
     
-    default ResponseEntity<WorkflowNodeTestOutputModel> createWorkflowNodeTestOutput(
+    default ResponseEntity<WorkflowNodeTestOutputModel> saveWorkflowNodeTestOutput(
         @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName
     ) {
@@ -85,59 +86,18 @@ public interface WorkflowNodeTestOutputApi {
 
 
     /**
-     * GET /workflow-node-test-outputs/{workflowId}/{workflowNodeName : Get a workflow node outputs
-     * Get a workflow node outputs.
-     *
-     * @param workflowId The id of a workflow. (required)
-     * @return The list of workflow node test outputs. (status code 200)
-     */
-    @Operation(
-        operationId = "getWorkflowNodeTestOutputs",
-        summary = "Get a workflow node outputs",
-        description = "Get a workflow node outputs.",
-        tags = { "workflow-node-test-output" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The list of workflow node test outputs.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = WorkflowNodeTestOutputModel.class)))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/workflow-node-test-outputs/{workflowId}/{workflowNodeName",
-        produces = { "application/json" }
-    )
-    
-    default ResponseEntity<List<WorkflowNodeTestOutputModel>> getWorkflowNodeTestOutputs(
-        @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"workflowNodeName\" : \"workflowNodeName\", \"id\" : 0, \"workflowId\" : \"workflowId\" }, { \"workflowNodeName\" : \"workflowNodeName\", \"id\" : 0, \"workflowId\" : \"workflowId\" } ]";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * POST /workflow-node-test-outputs/{workflowId}/{workflowNodeName/sample-output : Upload a sample output to create a workflow node test output
-     * Upload a sample output to create a workflow node test output.
+     * PUT /workflow-node-test-outputs/{workflowId}/{workflowNodeName}/sample-output : Upload a sample output to create a new or update existing workflow node test output
+     * Upload a sample output to create a new or update existing workflow node test output.
      *
      * @param workflowId The id of a workflow. (required)
      * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
-     * @param body  (required)
+     * @param uploadWorkflowNodeSampleOutputRequestModel  (required)
      * @return The workflow node test output object. (status code 200)
      */
     @Operation(
-        operationId = "uploadSampleOutput",
-        summary = "Upload a sample output to create a workflow node test output",
-        description = "Upload a sample output to create a workflow node test output.",
+        operationId = "uploadWorkflowNodeSampleOutput",
+        summary = "Upload a sample output to create a new or update existing workflow node test output",
+        description = "Upload a sample output to create a new or update existing workflow node test output.",
         tags = { "workflow-node-test-output" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The workflow node test output object.", content = {
@@ -146,16 +106,16 @@ public interface WorkflowNodeTestOutputApi {
         }
     )
     @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/workflow-node-test-outputs/{workflowId}/{workflowNodeName/sample-output",
+        method = RequestMethod.PUT,
+        value = "/workflow-node-test-outputs/{workflowId}/{workflowNodeName}/sample-output",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<WorkflowNodeTestOutputModel> uploadSampleOutput(
+    default ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleOutput(
         @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
         @Parameter(name = "workflowNodeName", description = "The name of a workflow node for which to create test output objects.", required = true, in = ParameterIn.PATH) @PathVariable("workflowNodeName") String workflowNodeName,
-        @Parameter(name = "body", description = "", required = true) @Valid @RequestBody String body
+        @Parameter(name = "UploadWorkflowNodeSampleOutputRequestModel", description = "", required = true) @Valid @RequestBody UploadWorkflowNodeSampleOutputRequestModel uploadWorkflowNodeSampleOutputRequestModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

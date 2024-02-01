@@ -43,6 +43,8 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertiesDataS
 src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertyTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ResourcesModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/SaveWorkflowTestConfigurationConnectionRequestModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/SaveWorkflowTestConfigurationInputsRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/StringPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TaskDispatcherDefinitionModel.java
@@ -54,8 +56,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefiniti
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerExecutionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerTypeModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateWorkflowTestConfigurationConnectionRequestModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateWorkflowTestConfigurationInputsRequestModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/UploadWorkflowNodeSampleOutputRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ValuePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WebhookModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WebhookRetryModel.java

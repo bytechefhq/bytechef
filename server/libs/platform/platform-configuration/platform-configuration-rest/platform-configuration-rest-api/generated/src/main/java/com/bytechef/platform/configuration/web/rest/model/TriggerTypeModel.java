@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets TriggerType
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:59.663193+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-31T19:34:53.739677+01:00[Europe/Zagreb]")
 public enum TriggerTypeModel {
   
   STATIC_WEBHOOK("STATIC_WEBHOOK"),

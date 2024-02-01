@@ -16,16 +16,16 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * UpdateWorkflowTestConfigurationConnectionRequestModel
+ * SaveWorkflowTestConfigurationConnectionRequestModel
  */
 
-@JsonTypeName("updateWorkflowTestConfigurationConnection_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-28T17:30:59.663193+01:00[Europe/Zagreb]")
-public class UpdateWorkflowTestConfigurationConnectionRequestModel {
+@JsonTypeName("saveWorkflowTestConfigurationConnection_request")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-31T19:34:53.739677+01:00[Europe/Zagreb]")
+public class SaveWorkflowTestConfigurationConnectionRequestModel {
 
   private Long connectionId;
 
-  public UpdateWorkflowTestConfigurationConnectionRequestModel connectionId(Long connectionId) {
+  public SaveWorkflowTestConfigurationConnectionRequestModel connectionId(Long connectionId) {
     this.connectionId = connectionId;
     return this;
   }
@@ -53,8 +53,8 @@ public class UpdateWorkflowTestConfigurationConnectionRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    UpdateWorkflowTestConfigurationConnectionRequestModel updateWorkflowTestConfigurationConnectionRequest = (UpdateWorkflowTestConfigurationConnectionRequestModel) o;
-    return Objects.equals(this.connectionId, updateWorkflowTestConfigurationConnectionRequest.connectionId);
+    SaveWorkflowTestConfigurationConnectionRequestModel saveWorkflowTestConfigurationConnectionRequest = (SaveWorkflowTestConfigurationConnectionRequestModel) o;
+    return Objects.equals(this.connectionId, saveWorkflowTestConfigurationConnectionRequest.connectionId);
   }
 
   @Override
@@ -65,7 +65,7 @@ public class UpdateWorkflowTestConfigurationConnectionRequestModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class UpdateWorkflowTestConfigurationConnectionRequestModel {\n");
+    sb.append("class SaveWorkflowTestConfigurationConnectionRequestModel {\n");
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("}");
     return sb.toString();
