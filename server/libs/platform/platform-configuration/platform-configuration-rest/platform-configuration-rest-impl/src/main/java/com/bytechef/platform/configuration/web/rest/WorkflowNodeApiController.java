@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEndpoint;
 import com.bytechef.platform.configuration.facade.WorkflowNodeDescriptionFacade;
+import com.bytechef.platform.configuration.facade.WorkflowNodeOptionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.web.rest.model.GetWorkflowNodeDescription200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
@@ -40,14 +41,16 @@ public class WorkflowNodeApiController implements WorkflowNodeApi {
 
     private final ConversionService conversionService;
     private final WorkflowNodeDescriptionFacade workflowNodeDescriptionFacade;
+    private final WorkflowNodeOptionFacade workflowNodeOptionFacade;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
 
     public WorkflowNodeApiController(
         ConversionService conversionService, WorkflowNodeDescriptionFacade workflowNodeDescriptionFacade,
-        WorkflowNodeOutputFacade workflowNodeOutputFacade) {
+        WorkflowNodeOptionFacade workflowNodeOptionFacade, WorkflowNodeOutputFacade workflowNodeOutputFacade) {
 
         this.conversionService = conversionService;
         this.workflowNodeDescriptionFacade = workflowNodeDescriptionFacade;
+        this.workflowNodeOptionFacade = workflowNodeOptionFacade;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
     }
 
@@ -64,7 +67,10 @@ public class WorkflowNodeApiController implements WorkflowNodeApi {
     public ResponseEntity<List<OptionModel>> getWorkflowNodeOptions(
         String workflowId, String workflowNodeName, String propertyName, String searchText) {
 
-        return WorkflowNodeApi.super.getWorkflowNodeOptions(workflowId, workflowNodeName, propertyName, searchText);
+        return ResponseEntity.ok(
+            CollectionUtils.map(
+                workflowNodeOptionFacade.getWorkflowNodeOptions(workflowId, workflowNodeName, propertyName, searchText),
+                option -> conversionService.convert(option, OptionModel.class)));
     }
 
     @Override
