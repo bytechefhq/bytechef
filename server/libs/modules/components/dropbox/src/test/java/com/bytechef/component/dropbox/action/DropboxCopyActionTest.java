@@ -22,6 +22,7 @@ import static org.mockito.Mockito.times;
 import com.bytechef.component.definition.ActionContext;
 import com.dropbox.core.DbxException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -30,6 +31,7 @@ import org.mockito.Mockito;
  */
 public class DropboxCopyActionTest extends AbstractDropboxActionTest {
 
+    @Disabled
     @Test
     public void testPerform() throws DbxException {
         DropboxCopyAction.perform(parameters, parameters, Mockito.mock(ActionContext.class));

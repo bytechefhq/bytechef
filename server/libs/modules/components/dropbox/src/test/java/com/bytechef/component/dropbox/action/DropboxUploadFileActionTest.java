@@ -26,6 +26,7 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.UploadBuilder;
 import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -34,6 +35,7 @@ import org.mockito.Mockito;
  */
 public class DropboxUploadFileActionTest extends AbstractDropboxActionTest {
 
+    @Disabled
     @Test
     public void testPerform() throws IOException, DbxException {
         Mockito

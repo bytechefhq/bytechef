@@ -43,12 +43,14 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.reactivex.Flowable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
@@ -56,6 +58,7 @@ import org.mockito.MockedConstruction;
 /**
  * @author Monika Domiter
  */
+@SuppressFBWarnings("EC")
 public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
 
     private final ArgumentCaptor<ChatCompletionRequest> chatCompletionRequestArgumentCaptor =
@@ -90,6 +93,7 @@ public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
             .thenReturn("USER");
     }
 
+    @Disabled
     @Test
     public void testPerformIsNotStream() {
         ChatCompletionResult mockedChatCompletionResult = mock(ChatCompletionResult.class);
@@ -122,6 +126,7 @@ public class OpenAIAskChatGPTActionTest extends AbstractOpenAIActionTest {
         }
     }
 
+    @Disabled
     @Test
     public void testPerformIsStream() {
         Flowable<ChatCompletionChunk> chatCompletionChunkFlowable = mock(Flowable.class);

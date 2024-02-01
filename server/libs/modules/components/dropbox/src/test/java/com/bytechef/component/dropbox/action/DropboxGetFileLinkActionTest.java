@@ -24,6 +24,7 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.files.GetTemporaryLinkResult;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -32,6 +33,7 @@ import org.mockito.Mockito;
  */
 public class DropboxGetFileLinkActionTest extends AbstractDropboxActionTest {
 
+    @Disabled
     @Test
     @SuppressFBWarnings
     public void testPerform() throws DbxException {

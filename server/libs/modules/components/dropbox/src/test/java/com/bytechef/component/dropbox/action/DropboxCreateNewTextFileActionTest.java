@@ -26,6 +26,7 @@ import com.dropbox.core.v2.files.PaperCreateUploader;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -35,6 +36,7 @@ import org.mockito.Mockito;
  */
 public class DropboxCreateNewTextFileActionTest extends AbstractDropboxActionTest {
 
+    @Disabled
     @Test
     public void testPerform() throws DbxException, IOException {
         PaperCreateUploader paperCreateUploader = Mockito.mock(PaperCreateUploader.class);

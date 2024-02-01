@@ -28,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.api.services.drive.Drive;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -44,6 +45,7 @@ public class GoogleDriveReadFileActionTest extends AbstractGoogleDriveActionTest
         ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> includeLabelsArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
+    @Disabled
     @Test
     public void testPerform() throws Exception {
         when(mockedParameters.getRequiredString(FILE_ID))

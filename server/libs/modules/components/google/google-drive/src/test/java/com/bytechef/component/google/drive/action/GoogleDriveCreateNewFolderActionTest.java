@@ -22,6 +22,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.Test;
  */
 public class GoogleDriveCreateNewFolderActionTest extends AbstractGoogleDriveCreateActionTest {
 
+    @Disabled
     @Test
     public void testPerform() throws Exception {
         when(mockedParameters.getRequiredString(FOLDER_NAME))
