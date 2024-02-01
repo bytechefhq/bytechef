@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-01-31T19:34:53.739677+01:00[Europe/Zagreb]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-02-01T17:41:34.894265+01:00[Europe/Zagreb]")
 @Validated
 @Tag(name = "workflow-node-test-output", description = "The Platform Workflow Node Test Output API")
 public interface WorkflowNodeTestOutputApi {
