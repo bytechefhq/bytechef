@@ -436,8 +436,18 @@ public class OpenApiComponentGenerator {
 
         CodeBlock codeBlock = outputEntry == null ? null : outputEntry.outputSchemaCodeBlock();
 
+        if (codeBlock != null) {
+            if (codeBlock.isEmpty()) {
+                builder.add(".outputSchema()");
+            } else {
+                builder.add(".outputSchema($L)", codeBlock);
+            }
+        }
+
+        codeBlock = outputEntry == null ? null : outputEntry.outputSchemaMetadataCodeBlock();
+
         if (codeBlock != null && !codeBlock.isEmpty()) {
-            builder.add(".outputSchema($L)", codeBlock);
+            builder.add(".outputSchemaMetadata($L)", codeBlock);
         }
 
         codeBlock = outputEntry == null ? null : outputEntry.sampleOutputCodeBlock();
@@ -929,9 +939,10 @@ public class OpenApiComponentGenerator {
         List<CodeBlock> codeBlocks = new ArrayList<>();
 
         if (schema.getProperties() != null) {
-            codeBlocks.add(getPropertiesSchemaCodeBlock(
-                schema.getProperties(), schema.getRequired() == null ? List.of() : schema.getRequired(), outputSchema,
-                openAPI));
+            codeBlocks.add(
+                getPropertiesSchemaCodeBlock(
+                    schema.getProperties(), schema.getRequired() == null ? List.of() : schema.getRequired(),
+                    outputSchema, openAPI));
         }
 
         if (schema.getAllOf() != null) {
@@ -1124,19 +1135,33 @@ public class OpenApiComponentGenerator {
                 MediaType mediaType = content.get(mimeType);
 
                 outputEntry = new OutputEntry(
-                    getOutputSchemaCodeBlock(mimeType, mediaType), getSampleOutputCodeBlock(mediaType.getExample()));
+                    getOutputSchemaCodeBlock(mediaType),
+                    getSampleOutputCodeBlock(mediaType.getExample()),
+                    getOutputSchemaMetadataCodeBlock(mimeType, mediaType.getSchema()));
             }
         }
 
         return outputEntry;
     }
 
-    private CodeBlock getOutputSchemaCodeBlock(String mimeType, MediaType mediaType) {
+    private CodeBlock getOutputSchemaCodeBlock(MediaType mediaType) {
         CodeBlock.Builder builder = CodeBlock.builder();
 
-        Schema schema = mediaType.getSchema();
+        Schema<?> schema = mediaType.getSchema();
 
-        builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, true, true, openAPI));
+        String type = StringUtils.isEmpty(schema.getType()) ? "object" : schema.getType();
+
+        if (type.equals("object")) {
+            builder.add(getSchemaCodeBlock(null, schema.getDescription(), null, null, schema, true, true, openAPI));
+        } else {
+            builder.add(getSchemaCodeBlock("result", schema.getDescription(), null, null, schema, true, true, openAPI));
+        }
+
+        return builder.build();
+    }
+
+    private static CodeBlock getOutputSchemaMetadataCodeBlock(String mimeType, Schema<?> schema) {
+        CodeBlock.Builder builder = CodeBlock.builder();
 
         String responseType;
 
@@ -1153,12 +1178,10 @@ public class OpenApiComponentGenerator {
 
         builder.add(
             """
-                .metadata(
-                   $T.of(
-                     "responseType", ResponseType.$L
-                   )
+                $T.of(
+                  "responseType", ResponseType.$L
                 )
-                """,
+                 """,
             Map.class,
             responseType);
 
@@ -1230,7 +1253,6 @@ public class OpenApiComponentGenerator {
     private CodeBlock getPropertiesCodeBlock(
         String propertyName, String schemaName, Schema<?> schema, boolean outputSchema, OpenAPI openAPI) {
 
-        CodeBlock.Builder builder = CodeBlock.builder();
         CodeBlock propertiesCodeBlock;
 
         if (schemas.contains(schemaName)) {
@@ -1239,9 +1261,7 @@ public class OpenApiComponentGenerator {
             propertiesCodeBlock = getObjectPropertiesCodeBlock(propertyName, schema, outputSchema, openAPI);
         }
 
-        builder.add(".properties($L)", propertiesCodeBlock);
-
-        return builder.build();
+        return propertiesCodeBlock;
     }
 
     private CodeBlock getRefCodeBlock(
@@ -1264,8 +1284,7 @@ public class OpenApiComponentGenerator {
                 ? StringUtils.uncapitalize(curSchemaName)
                 : propertyName,
             schema.getDescription(), required, curSchemaName, schema, excludePropertyNameIfEmpty,
-            outputSchema,
-            openAPI);
+            outputSchema, openAPI);
     }
 
     @SuppressWarnings({
@@ -1567,7 +1586,8 @@ public class OpenApiComponentGenerator {
             }
         }
 
-        return codeBlocks.stream()
+        return codeBlocks
+            .stream()
             .collect(CodeBlock.joining(","));
     }
 
@@ -1636,7 +1656,9 @@ public class OpenApiComponentGenerator {
                     }
                     case "object" -> {
                         if (StringUtils.isEmpty(propertyName) && excludePropertyNameIfEmpty) {
-                            builder.add("object()");
+                            if (!outputSchema) {
+                                builder.add("object()");
+                            }
                         } else {
                             propertyName = StringUtils.isEmpty(propertyName) ? "__item" : propertyName;
 
@@ -1644,11 +1666,17 @@ public class OpenApiComponentGenerator {
                         }
 
                         if (schema.getProperties() != null || schema.getAllOf() != null) {
-                            builder
-                                .add(getPropertiesCodeBlock(propertyName, schemaName, schema, outputSchema, openAPI));
+                            CodeBlock propertiesCodeBlock = getPropertiesCodeBlock(
+                                propertyName, schemaName, schema, outputSchema, openAPI);
+
+                            if (StringUtils.isEmpty(propertyName) && excludePropertyNameIfEmpty && outputSchema) {
+                                builder.add("$L", propertiesCodeBlock);
+                            } else {
+                                builder.add(".properties($L)", propertiesCodeBlock);
+                            }
                         }
 
-                        if (schema.getAdditionalProperties() != null) {
+                        if (schema.getAdditionalProperties() != null && !outputSchema) {
                             builder.add(getAdditionalPropertiesCodeBlock(propertyName, schema, outputSchema));
                         }
                     }
@@ -1676,7 +1704,7 @@ public class OpenApiComponentGenerator {
                     builder.add(".label($S)", buildPropertyLabel(propertyName.replace("__", "")));
                 }
 
-                if (propertyDescription != null) {
+                if (propertyDescription != null && !outputSchema) {
                     builder.add(".description($S)", propertyDescription);
                 }
 
@@ -1996,7 +2024,8 @@ public class OpenApiComponentGenerator {
         }
     }
 
-    private record OutputEntry(CodeBlock outputSchemaCodeBlock, CodeBlock sampleOutputCodeBlock) {
+    private record OutputEntry(
+        CodeBlock outputSchemaCodeBlock, CodeBlock sampleOutputCodeBlock, CodeBlock outputSchemaMetadataCodeBlock) {
     }
 
     private record PropertiesEntry(CodeBlock propertiesCodeBlock, String bodyContentType, String mimeType) {
