@@ -64,7 +64,8 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
                     resourceWorkflowRepositoryProperties.protocol(),
                     resourceWorkflowRepositoryProperties.getLocationPattern(type)));
 
-            return Arrays.stream(resources)
+            return Arrays
+                .stream(resources)
                 .map(resource -> read(resource, type))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -75,7 +76,8 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
 
     @Override
     public Optional<Workflow> findById(String id) {
-        List<Workflow> workflows = resourceWorkflowRepositoryProperties.properties()
+        List<Workflow> workflows = resourceWorkflowRepositoryProperties
+            .properties()
             .keySet()
             .stream()
             .flatMap(type -> CollectionUtils.stream(findAll(type)))
