@@ -18,6 +18,7 @@ package com.bytechef.task.dispatcher.map;
 
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.array;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.integer;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.object;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.INDEX;
@@ -30,8 +31,9 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
-import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
-import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactoryFunction;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
+import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
+import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.ModifiableValueProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,7 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
             array(LIST)
                 .label("List of items")
                 .description("List of items to iterate over."))
-        .outputSchema(getOutputSchemaFunction())
+        .output(getOutputFunction())
         .taskProperties(task(ITERATEE))
         .variableProperties(MapTaskDispatcherDefinitionFactory::getVariableProperties);
 
@@ -61,25 +63,26 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
         return TASK_DISPATCHER_DEFINITION;
     }
 
-    protected static OutputFunction getOutputSchemaFunction() {
+    protected static OutputFunction getOutputFunction() {
         // TODO
         return (inputParameters) -> null;
     }
 
-    private static List<Property> getVariableProperties(Map<String, ?> inputParameters) {
-        List<Property> properties;
+    private static ObjectProperty getVariableProperties(Map<String, ?> inputParameters) {
+        ObjectProperty variableProperties;
 
         List<?> list = MapUtils.getRequiredList(inputParameters, LIST);
 
         if (list.isEmpty()) {
-            properties = List.of();
+            variableProperties = object();
         } else {
-            properties = List.of(
-                (Property.ValueProperty<?>) SchemaUtils.getSchemaDefinition(
-                    ITEM, new PropertyFactoryFunction(list.getFirst())),
-                integer(INDEX));
+            variableProperties = object()
+                .properties(
+                    (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
+                        ITEM, list.getFirst(), new PropertyFactory(list.getFirst())),
+                    integer(INDEX));
         }
 
-        return properties;
+        return variableProperties;
     }
 }

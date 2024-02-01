@@ -19,6 +19,7 @@ package com.bytechef.task.dispatcher.loop;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.array;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.bool;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.integer;
+import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.object;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.task;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.taskDispatcher;
 import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConstants.INDEX;
@@ -31,8 +32,9 @@ import static com.bytechef.task.dispatcher.loop.constant.LoopTaskDispatcherConst
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
-import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
-import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactoryFunction;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;
+import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
+import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDSL.ModifiableValueProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import java.util.List;
 import java.util.Map;
@@ -63,20 +65,20 @@ public class LoopTaskDispatcherDefinitionFactory implements TaskDispatcherDefini
         return TASK_DISPATCHER_DEFINITION;
     }
 
-    private static List<Property> getVariableProperties(Map<String, ?> inputParameters) {
-        List<Property> properties;
+    private static ObjectProperty getVariableProperties(Map<String, ?> inputParameters) {
+        ObjectProperty variableProperties;
 
         List<?> list = MapUtils.getRequiredList(inputParameters, LIST);
 
         if (list.isEmpty()) {
-            properties = List.of();
+            variableProperties = object();
         } else {
-            properties = List.of(
-                (Property.ValueProperty<?>) SchemaUtils.getSchemaDefinition(
-                    ITEM, new PropertyFactoryFunction(list.getFirst())),
+            variableProperties = object().properties(
+                (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
+                    ITEM, list.getFirst(), new PropertyFactory(list.getFirst())),
                 integer(INDEX));
         }
 
-        return properties;
+        return variableProperties;
     }
 }
