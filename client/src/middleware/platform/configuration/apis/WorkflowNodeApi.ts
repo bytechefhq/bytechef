@@ -36,6 +36,12 @@ export interface GetWorkflowNodeDescriptionRequest {
     workflowNodeName: string;
 }
 
+export interface GetWorkflowNodeDynamicPropertiesRequest {
+    id: string;
+    workflowNodeName: string;
+    propertyName: string;
+}
+
 export interface GetWorkflowNodeOptionsRequest {
     id: string;
     workflowNodeName: string;
@@ -51,12 +57,6 @@ export interface GetWorkflowNodeOutputRequest {
 export interface GetWorkflowNodeOutputsRequest {
     id: string;
     lastWorkflowNodeName?: string;
-}
-
-export interface GetWorkflowNodePropertyDynamicPropertiesRequest {
-    id: string;
-    workflowNodeName: string;
-    propertyName: string;
 }
 
 /**
@@ -97,6 +97,46 @@ export class WorkflowNodeApi extends runtime.BaseAPI {
      */
     async getWorkflowNodeDescription(requestParameters: GetWorkflowNodeDescriptionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetWorkflowNodeDescription200ResponseModel> {
         const response = await this.getWorkflowNodeDescriptionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get dynamic properties for an action or trigger property shown in the editor.
+     * Get dynamic properties for an action or trigger property shown in the editor
+     */
+    async getWorkflowNodeDynamicPropertiesRaw(requestParameters: GetWorkflowNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getWorkflowNodeDynamicProperties.');
+        }
+
+        if (requestParameters.workflowNodeName === null || requestParameters.workflowNodeName === undefined) {
+            throw new runtime.RequiredError('workflowNodeName','Required parameter requestParameters.workflowNodeName was null or undefined when calling getWorkflowNodeDynamicProperties.');
+        }
+
+        if (requestParameters.propertyName === null || requestParameters.propertyName === undefined) {
+            throw new runtime.RequiredError('propertyName','Required parameter requestParameters.propertyName was null or undefined when calling getWorkflowNodeDynamicProperties.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/workflows/{id}/{workflowNodeName}/properties/{propertyName}/dynamic-properties`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters.workflowNodeName))).replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters.propertyName))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PropertyModelFromJSON));
+    }
+
+    /**
+     * Get dynamic properties for an action or trigger property shown in the editor.
+     * Get dynamic properties for an action or trigger property shown in the editor
+     */
+    async getWorkflowNodeDynamicProperties(requestParameters: GetWorkflowNodeDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PropertyModel>> {
+        const response = await this.getWorkflowNodeDynamicPropertiesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -213,46 +253,6 @@ export class WorkflowNodeApi extends runtime.BaseAPI {
      */
     async getWorkflowNodeOutputs(requestParameters: GetWorkflowNodeOutputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<WorkflowNodeOutputModel>> {
         const response = await this.getWorkflowNodeOutputsRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Get dynamic properties for an action or trigger property shown in the editor.
-     * Get dynamic properties for an action or trigger property shown in the editor
-     */
-    async getWorkflowNodePropertyDynamicPropertiesRaw(requestParameters: GetWorkflowNodePropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<PropertyModel>>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getWorkflowNodePropertyDynamicProperties.');
-        }
-
-        if (requestParameters.workflowNodeName === null || requestParameters.workflowNodeName === undefined) {
-            throw new runtime.RequiredError('workflowNodeName','Required parameter requestParameters.workflowNodeName was null or undefined when calling getWorkflowNodePropertyDynamicProperties.');
-        }
-
-        if (requestParameters.propertyName === null || requestParameters.propertyName === undefined) {
-            throw new runtime.RequiredError('propertyName','Required parameter requestParameters.propertyName was null or undefined when calling getWorkflowNodePropertyDynamicProperties.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/workflows/{id}/{workflowNodeName}/properties/{propertyName}/dynamic-properties`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters.workflowNodeName))).replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters.propertyName))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(PropertyModelFromJSON));
-    }
-
-    /**
-     * Get dynamic properties for an action or trigger property shown in the editor.
-     * Get dynamic properties for an action or trigger property shown in the editor
-     */
-    async getWorkflowNodePropertyDynamicProperties(requestParameters: GetWorkflowNodePropertyDynamicPropertiesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<PropertyModel>> {
-        const response = await this.getWorkflowNodePropertyDynamicPropertiesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
