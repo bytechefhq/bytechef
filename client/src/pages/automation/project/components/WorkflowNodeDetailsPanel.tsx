@@ -170,7 +170,7 @@ const WorkflowNodeDetailsPanel = ({
         };
     });
 
-    const {data: workflowStepOutput} = useGetWorkflowNodeOutputQuery(
+    const {data: workflowNodeOutput} = useGetWorkflowNodeOutputQuery(
         {
             id: workflowId,
             workflowNodeName: currentNode.name,
@@ -557,8 +557,12 @@ const WorkflowNodeDetailsPanel = ({
                                                 </div>
                                             ))}
 
-                                        {activeTab === 'output' && workflowStepOutput && (
-                                            <OutputTab outputSchema={workflowStepOutput.outputSchema} />
+                                        {activeTab === 'output' && workflowNodeOutput && (
+                                            <OutputTab
+                                                currentNode={currentNode}
+                                                outputSchema={workflowNodeOutput.outputSchema}
+                                                workflowId={workflowId}
+                                            />
                                         )}
                                     </div>
                                 </div>

@@ -26,11 +26,9 @@ const DataPillPanelBody = ({componentActionData, dataPillFilterQuery}: DataPillP
         <div className="absolute left-0 top-0 w-full">
             <Accordion className="h-full" collapsible type="single">
                 {componentActionData.map((componentAction: ComponentActionData, index: number) => {
-                    const outputSchemaDefinition: PropertyType | undefined = componentActionData[index]?.outputSchema;
+                    const outputSchema: PropertyType | undefined = componentActionData[index]?.outputSchema;
 
-                    const properties: Array<PropertyType> | undefined = outputSchemaDefinition?.properties?.length
-                        ? outputSchemaDefinition.properties
-                        : outputSchemaDefinition?.items;
+                    const properties: Array<PropertyType> | undefined = outputSchema?.properties;
 
                     let existingProperties = properties?.filter((property) => {
                         if (property.name) {
@@ -45,12 +43,12 @@ const DataPillPanelBody = ({componentActionData, dataPillFilterQuery}: DataPillP
                     if (outputSchemaDefinition && outputSchemaDefinition.type === 'FILE_ENTRY') {
                         existingProperties = [
                             {
-                                controlType: outputSchemaDefinition.controlType,
-                                description: outputSchemaDefinition.description,
-                                label: outputSchemaDefinition.label,
-                                name: outputSchemaDefinition.name || componentAction.workflowNodeName || 'fileEntry',
-                                required: outputSchemaDefinition.required,
-                                type: outputSchemaDefinition.type,
+                                controlType: outputSchema.controlType,
+                                description: outputSchema.description,
+                                label: outputSchema.label,
+                                name: outputSchema.name || componentAction.workflowNodeName,
+                                required: outputSchema.required,
+                                type: outputSchema.type,
                             },
                         ];
                     }

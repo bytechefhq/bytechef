@@ -22,7 +22,7 @@ const ProjectWorkflow = ({
     const {componentActions} = useWorkflowDataStore();
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const {data: workflowStepOutputs} = useGetWorkflowNodeOutputsQuery(
+    const {data: workflowNodeOutputs} = useGetWorkflowNodeOutputsQuery(
         {
             id: workflowId,
             lastWorkflowNodeName: currentNode.name,
@@ -30,8 +30,8 @@ const ProjectWorkflow = ({
         !!componentActions?.length
     );
 
-    const previousComponentDefinitions = workflowStepOutputs
-        ? workflowStepOutputs.map(
+    const previousComponentDefinitions = workflowNodeOutputs
+        ? workflowNodeOutputs.map(
               (workflowStepOutput) =>
                   componentDefinitions.filter(
                       (componentDefinition) =>
@@ -53,14 +53,14 @@ const ProjectWorkflow = ({
                 <WorkflowNodeDetailsPanel
                     previousComponentDefinitions={previousComponentDefinitions}
                     workflowId={workflowId}
-                    workflowStepOutputs={workflowStepOutputs ?? []}
+                    workflowStepOutputs={workflowNodeOutputs ?? []}
                 />
             )}
 
-            {workflowStepOutputs && previousComponentDefinitions && (
+            {workflowNodeOutputs && previousComponentDefinitions && (
                 <DataPillPanel
                     previousComponentDefinitions={previousComponentDefinitions}
-                    workflowStepOutputs={workflowStepOutputs ?? []}
+                    workflowNodeOutputs={workflowNodeOutputs ?? []}
                 />
             )}
         </ReactFlowProvider>

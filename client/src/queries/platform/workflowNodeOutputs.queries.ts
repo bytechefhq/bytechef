@@ -7,25 +7,32 @@ import {
 } from '@/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
 
-export const WorkflowNodeOutputs = {
+export const WorkflowNodeOutputKeys = {
     filteredWorkflowNodeOutputs: (request: GetWorkflowNodeOutputsRequest) => [
-        ...WorkflowNodeOutputs.outputSchemas,
-        request,
+        ...WorkflowNodeOutputKeys.workflowNodeOutputs,
+        request.id,
+        'lastWorkflowNodeName',
+        request.lastWorkflowNodeName,
     ],
-    workflowNodeOutput: (request: GetWorkflowNodeOutputRequest) => [...WorkflowNodeOutputs.outputSchemas, request],
-    outputSchemas: ['workflowNodeOutputs'] as const,
+    workflowNodeOutput: (request: GetWorkflowNodeOutputRequest) => [
+        ...WorkflowNodeOutputKeys.workflowNodeOutputs,
+        request.id,
+        'workflowNodeOutput',
+        request.workflowNodeName,
+    ],
+    workflowNodeOutputs: ['workflowNodeOutputs'] as const,
 };
 
 export const useGetWorkflowNodeOutputQuery = (request: GetWorkflowNodeOutputRequest, enabled?: boolean) =>
     useQuery<WorkflowNodeOutputModel, Error>({
-        queryKey: WorkflowNodeOutputs.workflowNodeOutput(request),
+        queryKey: WorkflowNodeOutputKeys.workflowNodeOutput(request),
         queryFn: () => new WorkflowNodeApi().getWorkflowNodeOutput(request),
         enabled: enabled === undefined ? true : enabled,
     });
 
 export const useGetWorkflowNodeOutputsQuery = (request: GetWorkflowNodeOutputsRequest, enabled?: boolean) =>
     useQuery<WorkflowNodeOutputModel[], Error>({
-        queryKey: WorkflowNodeOutputs.filteredWorkflowNodeOutputs(request),
+        queryKey: WorkflowNodeOutputKeys.filteredWorkflowNodeOutputs(request),
         queryFn: () => new WorkflowNodeApi().getWorkflowNodeOutputs(request),
         enabled: enabled === undefined ? true : enabled,
     });

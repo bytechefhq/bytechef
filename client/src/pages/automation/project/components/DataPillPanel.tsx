@@ -11,10 +11,10 @@ import {useWorkflowNodeDetailsPanelStore} from '../stores/useWorkflowNodeDetails
 
 const DataPillPanel = ({
     previousComponentDefinitions,
-    workflowStepOutputs,
+    workflowNodeOutputs,
 }: {
     previousComponentDefinitions: Array<ComponentDefinitionBasicModel>;
-    workflowStepOutputs: WorkflowNodeOutputModel[];
+    workflowNodeOutputs: WorkflowNodeOutputModel[];
 }) => {
     const [dataPillFilterQuery, setDataPillFilterQuery] = useState('');
 
@@ -22,7 +22,7 @@ const DataPillPanel = ({
 
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
-    const componentActionData: ComponentActionData[] = workflowStepOutputs
+    const componentActionData: ComponentActionData[] = workflowNodeOutputs
         .filter((workflowStepOutput) => workflowStepOutput?.actionDefinition)
         .filter(
             (workflowStepOutput) =>

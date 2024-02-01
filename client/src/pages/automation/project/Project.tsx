@@ -282,7 +282,7 @@ const Project = () => {
         }
     };
 
-    const handleProjectDialogCloseClick = () => {
+    const handleProjectDialogClose = () => {
         setShowEditProjectDialog(false);
 
         if (project) {
@@ -717,9 +717,7 @@ const Project = () => {
                 </AlertDialogContent>
             </AlertDialog>
 
-            {showEditProjectDialog && project && (
-                <ProjectDialog onClose={handleProjectDialogCloseClick} project={project} />
-            )}
+            {showEditProjectDialog && project && <ProjectDialog onClose={handleProjectDialogClose} project={project} />}
 
             {showEditWorkflowDialog && (
                 <WorkflowDialog
